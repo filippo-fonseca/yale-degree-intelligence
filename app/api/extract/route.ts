@@ -1,36 +1,61 @@
-import { NextRequest, NextResponse } from "next/server";
-import OpenAI from "openai";
+import { NextResponse } from 'next/server'
+import OpenAI from 'openai'
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
 
-export async function POST(req: NextRequest) {
-  const { text } = await req.json();
+export async function POST(request: Request) {
+  try {
+    const { text } = await request.json()
 
-  const prompt = `
+    if (!text || typeof text !== 'string') {
+      return NextResponse.json(
+        { error: 'Missing or invalid text in request body' },
+        { status: 400 }
+      )
+    }
+
+    const prompt = `
 You are given a university transcript in raw text format.
-Extract the courses semester by semester and format your answer like this:
+Extract the courses semester by semester and format your answer EXACTLY like this:
 
 Semester: Fall 2023
 - CPSC 201: Introduction to Computer Science — A
 - ENAS 194: Linear Algebra — A-
+- PHYS 180: University Physics — In Progress
 
 Semester: Spring 2024
-- PHYS 180: University Physics — A
 - FREN S164: Advanced French — A+
+- MATH 222: Calculus III — IP
 
-Only include terms that contain grades. Don't include in-progress or placeholder sections. Only output the list.
-  
+Important Rules:
+1. Include both completed and in-progress courses
+2. For completed courses, use: — [Grade]
+3. For in-progress courses, use: — In Progress or — IP
+4. Always use this exact format:
+   Semester: [Season] [Year]
+   - [Course Code]: [Course Name] — [Grade/Status]
+5. Course codes should preserve their original formatting
+6. Course names should be properly capitalized
+
 Transcript:
 ${text}
-`;
+`
 
-  const chat = await openai.chat.completions.create({
-    model: "gpt-4o-mini", // or "gpt-3.5-turbo"
-    messages: [{ role: "user", content: prompt }],
-    temperature: 0.2,
-  });
+    const chat = await openai.chat.completions.create({
+      model: 'gpt-4.1',
+      messages: [{ role: 'user', content: prompt }],
+      temperature: 0,
+      max_tokens: 2000
+    })
 
-  return NextResponse.json({ result: chat.choices[0].message.content });
+    const result = chat.choices[0].message?.content ?? ''
+    console.log("the openai result is:", result);
+    return NextResponse.json({ result })
+  } catch (error) {
+    console.error('OpenAI error:', error)
+    return NextResponse.json(
+      { error: 'Failed to extract courses' },
+      { status: 500 }
+    )
+  }
 }

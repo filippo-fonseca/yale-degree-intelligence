@@ -6,6 +6,10 @@
   --foreground-rgb: 0, 0, 0;
   --background-start-rgb: 214, 219, 220;
   --background-end-rgb: 255, 255, 255;
+  --neumorph-light: #ffffff;
+  --neumorph-dark: #e0e0e0;
+  --neumorph-dark-light: #2d3748;
+  --neumorph-dark-dark: #1a202c;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -24,4 +28,29 @@ body {
       rgb(var(--background-end-rgb))
     )
     rgb(var(--background-start-rgb));
+}
+
+.shadow-neumorph {
+  box-shadow: 8px 8px 16px #d1d1d1, -8px -8px 16px #ffffff;
+}
+
+.shadow-neumorph-dark {
+  box-shadow: 8px 8px 16px #1a202c, -8px -8px 16px #2d3748;
+}
+
+.shadow-neumorph-inset {
+  box-shadow: inset 3px 3px 6px #d1d1d1, inset -3px -3px 6px #ffffff;
+}
+
+.shadow-neumorph-inset-dark {
+  box-shadow: inset 3px 3px 6px #1a202c, inset -3px -3px 6px #2d3748;
+}
+
+.dark {
+  --neumorph-light: #2d3748;
+  --neumorph-dark: #1a202c;
+}
+
+body {
+  @apply bg-gray-100 dark:bg-gray-900 transition-colors duration-300;
 }

@@ -16,12 +16,27 @@ import {
 import { Course } from "@/lib/types";
 import { db } from "@/config/firebase";
 import { gradePoints } from "@/lib/constants";
+import { calculateMajorProgress } from "@/lib/majors";
+import MajorProgressView from "@/components/MajorProgressView";
 
 export default function Home() {
   const { user, loading, logout } = useAuth();
   const [activeTab, setActiveTab] = useState("upload");
   const [courses, setCourses] = useState<Course[]>([]);
   const [hasData, setHasData] = useState(false);
+
+  //major-specific:
+  const [selectedMajor, setSelectedMajor] = useState<string>("MENG");
+
+  const getMajorProgress = () => {
+    if (!user || courses.length === 0) return null;
+
+    const completedCourseCodes = courses
+      .filter((course) => course.status === "completed" && course.grade)
+      .map((course) => course.code);
+
+    return calculateMajorProgress(selectedMajor, completedCourseCodes);
+  };
 
   useEffect(() => {
     if (user) {
@@ -364,6 +379,15 @@ export default function Home() {
                           </div>
                         )}
                       </div>
+                    )}
+                    {hasData && (
+                      <>
+                        {/* Your existing stats display */}
+                        <MajorProgressView
+                          selectedMajor={selectedMajor}
+                          progress={getMajorProgress()!}
+                        />
+                      </>
                     )}
                   </div>
                 ) : (

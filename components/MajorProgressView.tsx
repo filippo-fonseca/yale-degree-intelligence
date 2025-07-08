@@ -2,7 +2,6 @@
 "use client";
 
 import { MajorProgress } from "@/lib/majors";
-import { getCourseInfo } from "@/lib/courseCatalog";
 import { MAJORS } from "@/lib/majors";
 
 interface MajorProgressViewProps {
@@ -39,7 +38,7 @@ export default function MajorProgressView({
       </div>
 
       {/* Credit summary */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
         <div className="p-4 bg-white rounded-lg border border-gray-200">
           <p className="text-sm text-gray-500">Total Credits</p>
           <p className="text-2xl font-medium">
@@ -47,87 +46,121 @@ export default function MajorProgressView({
           </p>
         </div>
         <div className="p-4 bg-white rounded-lg border border-gray-200">
-          <p className="text-sm text-gray-500">Core Courses</p>
+          <p className="text-sm text-gray-500">Requirements Completed</p>
           <p className="text-2xl font-medium">
-            {progress.completedCore.length}/
-            {MAJORS[selectedMajor].coreCourses.length}
+            {progress.completedRequirements.length}/
+            {progress.completedRequirements.length +
+              progress.remainingRequirements.length}
           </p>
         </div>
-        {progress.electiveProgress.map((elective, index) => (
-          <div
-            key={index}
-            className="p-4 bg-white rounded-lg border border-gray-200"
-          >
-            <p className="text-sm text-gray-500">{elective.name}</p>
-            <p className="text-2xl font-medium">
-              {elective.completed}/{elective.required}
-            </p>
-          </div>
-        ))}
       </div>
 
-      {/* Core courses */}
-      <div className="mb-6">
-        <h4 className="font-medium mb-3">Core Requirements</h4>
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
-          {MAJORS[selectedMajor].coreCourses.map((code) => {
-            const completed = progress.completedCore.includes(code);
-            const course = getCourseInfo(code);
-            return (
-              <div
-                key={code}
-                className={`p-3 rounded-lg border ${
-                  completed
-                    ? "bg-green-50 border-green-200"
-                    : "bg-gray-50 border-gray-200"
-                }`}
-              >
-                <div className="flex justify-between">
-                  <span className="font-medium">{code}</span>
-                  {completed && <span className="text-green-600">✓</span>}
-                </div>
-                <p className="text-sm text-gray-600 truncate">{course?.name}</p>
-                <p className="text-xs text-gray-500">
-                  {course?.credits} credit{course?.credits !== 1 ? "s" : ""}
-                </p>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* Electives and other requirements */}
-      {[
-        ...progress.electiveProgress,
-        ...progress.otherRequirementsProgress,
-      ].map((req, index) => (
-        <div key={index} className="mb-6">
-          <h4 className="font-medium mb-2">
-            {req.name} ({req.completed}/{req.required})
+      {/* Completed requirements */}
+      {progress.completedRequirements.length > 0 && (
+        <div className="mb-8">
+          <h4 className="font-medium text-lg mb-4 text-green-700">
+            Completed Requirements
           </h4>
-          {req.description && (
-            <p className="text-sm text-gray-600 mb-3">{req.description}</p>
-          )}
-          <div className="flex flex-wrap gap-2">
-            {req.options?.map((option) => {
-              const course = getCourseInfo(option.code);
-              return (
-                <div
-                  key={option.code}
-                  className={`px-3 py-1.5 text-sm rounded-full ${
-                    option.completed
-                      ? "bg-green-100 text-green-800"
-                      : "bg-gray-100 text-gray-800"
-                  }`}
-                  title={course?.name}
-                >
-                  {option.code}
+          <div className="space-y-4">
+            {progress.completedRequirements.map((req, i) => (
+              <div
+                key={i}
+                className="p-4 bg-green-50 rounded-lg border border-green-200"
+              >
+                <div className="flex justify-between items-start mb-2">
+                  <h5 className="font-medium text-green-800">{req.name}</h5>
+                  <span className="text-sm bg-green-100 text-green-800 px-2 py-1 rounded-full">
+                    Completed
+                  </span>
                 </div>
-              );
-            })}
+                {req.description && (
+                  <p className="text-sm text-green-700 mb-3">
+                    {req.description}
+                  </p>
+                )}
+                <div className="flex flex-wrap gap-2">
+                  {req.options
+                    .filter((o) => o.completed)
+                    .map((opt, j) => (
+                      <div
+                        key={j}
+                        className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm flex items-center"
+                      >
+                        {opt.code}
+                        <span className="ml-1 text-xs">({opt.credits} cr)</span>
+                      </div>
+                    ))}
+                </div>
+              </div>
+            ))}
           </div>
         </div>
-      ))}
+      )}
+
+      {/* Remaining requirements */}
+      {progress.remainingRequirements.length > 0 && (
+        <div>
+          <h4 className="font-medium text-lg mb-4 text-red-700">
+            Remaining Requirements
+          </h4>
+          <div className="space-y-4">
+            {progress.remainingRequirements.map((req, i) => (
+              <div
+                key={i}
+                className="p-4 bg-red-50 rounded-lg border border-red-200"
+              >
+                <div className="flex justify-between items-start mb-2">
+                  <h5 className="font-medium text-red-800">{req.name}</h5>
+                  <span className="text-sm bg-red-100 text-red-800 px-2 py-1 rounded-full">
+                    {req.completed}/{req.required} completed
+                  </span>
+                </div>
+                {req.description && (
+                  <p className="text-sm text-red-700 mb-3">{req.description}</p>
+                )}
+                <div className="flex flex-wrap gap-2">
+                  {req.options
+                    .filter((o) => o.required)
+                    .map((opt, j) => (
+                      <div
+                        key={j}
+                        className={`px-3 py-1 rounded-full text-sm flex items-center ${
+                          opt.completed
+                            ? "bg-green-100 text-green-800"
+                            : "bg-red-100 text-red-800"
+                        }`}
+                      >
+                        {opt.code}
+                        {opt.completed && (
+                          <span className="ml-1 text-xs">✓</span>
+                        )}
+                      </div>
+                    ))}
+                </div>
+                {req.options.some((o) => !o.required && o.completed) && (
+                  <>
+                    <p className="text-xs text-gray-500 mt-2">
+                      Extra completed:
+                    </p>
+                    <div className="flex flex-wrap gap-2 mt-1">
+                      {req.options
+                        .filter((o) => !o.required && o.completed)
+                        .map((opt, j) => (
+                          <div
+                            key={`extra-${j}`}
+                            className="px-2 py-0.5 bg-gray-100 text-gray-800 rounded-full text-xs"
+                          >
+                            {opt.code}
+                          </div>
+                        ))}
+                    </div>
+                  </>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

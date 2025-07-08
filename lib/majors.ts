@@ -1,198 +1,307 @@
 // src/lib/majors.ts
 import { CourseInfo, getCourseInfo } from "./courseCatalog";
 
-export type MajorRequirement = {
+type RequirementOption = {
+  type: 'course';
+  code: string;
+} | {
+  type: 'group';
+  options: string[];
+  required: number;
+  description?: string;
+};
+
+type MajorRequirement = {
   id: string;
   name: string;
   description: string;
-  coreCourses: string[]; // Required course codes
+  requirements: {
+    name: string;
+    description?: string;
+    required: number;
+    options: RequirementOption[];
+  }[];
   creditRequirements: {
     total: number;
     core: number;
     electives: number;
-    other?: number;
   };
-  electiveOptions?: {
-    name: string;
-    required: number; // Number needed
-    courses: string[]; // Allowed course codes
-  }[];
-  otherRequirements?: {
-    name: string;
-    description: string;
-    required: number;
-    options: string[]; // Course codes or other options
-  }[];
 };
 
 export const MAJORS: Record<string, MajorRequirement> = {
   "MENG": {
     id: "MENG",
-    name: "Mechanical Engineering (ABET)",
+    name: "Mechanical Engineering (ABET), B.S.",
     description: "Bachelor of Science in Mechanical Engineering",
-    coreCourses: [
-      "MATH 112", "MATH 115", "ENAS 151",
-      "PHYS 180", "PHYS 181",
-      "ENAS 130", "ENAS 194", "ECE 200",
-      "MENG 110", "MENG 211", "MENG 280",
-      "MENG 285", "MENG 285L", "MENG 320",
-      "MENG 370", "MENG 370L", "MENG 380",
-      "MENG 390", "MENG 400", "MENG 401"
-    ],
     creditRequirements: {
       total: 36,
       core: 30,
       electives: 6
     },
-    electiveOptions: [
+    requirements: [
+      // PREREQUISITES
       {
-        name: "Technical Electives",
-        required: 3,
-        courses: [
-          "MENG 491", 
-          // Add more elective options here
+        name: "Calculus I",
+        required: 1,
+        options: [{ type: 'course', code: "MATH 112" }]
+      },
+      {
+        name: "Calculus II",
+        required: 1,
+        options: [{ type: 'course', code: "MATH 115" }]
+      },
+      {
+        name: "Calculus III",
+        description: "ENAS 151 or MATH 120",
+        required: 1,
+        options: [
+          { type: 'course', code: "ENAS 151" },
+          { type: 'course', code: "MATH 120" }
         ]
-      }
-    ],
-    otherRequirements: [
+      },
+      {
+        name: "Physics Sequence",
+        description: "PHYS 180+181 or PHYS 200+201",
+        required: 2,
+        options: [
+          { 
+            type: 'group', 
+            options: ["PHYS 180", "PHYS 181"], 
+            required: 2,
+            description: "University Physics sequence"
+          },
+          { 
+            type: 'group', 
+            options: ["PHYS 200", "PHYS 201"], 
+            required: 2,
+            description: "Fundamentals Physics sequence"
+          }
+        ]
+      },
       {
         name: "Physics Labs",
-        description: "Two semesters of physics lab",
+        description: "Two semesters (can mix sequences)",
         required: 2,
-        options: ["PHYS 165L", "PHYS 166L"]
+        options: [
+          { type: 'course', code: "PHYS 165L" },
+          { type: 'course', code: "PHYS 166L" },
+          { type: 'course', code: "PHYS 205L" },
+          { type: 'course', code: "PHYS 206L" }
+        ]
       },
       {
         name: "Chemistry",
-        description: "Introductory chemistry course",
+        description: "One introductory chemistry course",
         required: 1,
-        options: ["CHEM 161", "CHEM 165"]
+        options: [
+          { type: 'course', code: "CHEM 161" },
+          { type: 'course', code: "CHEM 165" }
+        ]
+      },
+
+      // CORE REQUIREMENTS
+      {
+        name: "Intro to Engineering",
+        required: 1,
+        options: [{ type: 'course', code: "ENAS 130" }]
+      },
+      {
+        name: "Linear Algebra",
+        description: "ENAS 194 or MATH 222",
+        required: 1,
+        options: [
+          { type: 'course', code: "ENAS 194" },
+          { type: 'course', code: "MATH 222" }
+        ]
+      },
+      {
+        name: "Electrical Engineering",
+        required: 1,
+        options: [{ type: 'course', code: "ECE 200" }]
+      },
+      {
+        name: "Differential Equations",
+        required: 1,
+        options: [{ type: 'course', code: "ENAS 194" }]
+      },
+      {
+        name: "Mechanical Engineering Design",
+        required: 1,
+        options: [{ type: 'course', code: "MENG 110" }]
+      },
+      {
+        name: "Thermodynamics",
+        required: 1,
+        options: [{ type: 'course', code: "MENG 211" }]
+      },
+      {
+        name: "Mechanics of Materials",
+        required: 1,
+        options: [{ type: 'course', code: "MENG 231" }]
+      },
+      {
+        name: "Dynamics",
+        required: 1,
+        options: [{ type: 'course', code: "MENG 261" }]
+      },
+      {
+        name: "Dynamics Lab",
+        required: 1,
+        options: [{ type: 'course', code: "MENG 261L" }]
+      },
+      {
+        name: "Fluid Mechanics",
+        required: 1,
+        options: [{ type: 'course', code: "MENG 312" }]
+      },
+      {
+        name: "Heat Transfer",
+        required: 1,
+        options: [{ type: 'course', code: "MENG 342" }]
+      },
+      {
+        name: "Heat Transfer Lab",
+        required: 1,
+        options: [{ type: 'course', code: "MENG 342L" }]
+      },
+      {
+        name: "Materials Science",
+        required: 1,
+        options: [{ type: 'course', code: "MENG 332" }]
+      },
+      {
+        name: "Thermal Systems",
+        required: 1,
+        options: [{ type: 'course', code: "MENG 390" }]
+      },
+      {
+        name: "Mechanical Engineering Lab",
+        required: 1,
+        options: [{ type: 'course', code: "MENG 302L" }]
+      },
+      {
+        name: "Technical Electives",
+        description: "3 required (max 1 independent study)",
+        required: 3,
+        options: [
+          { type: 'course', code: "MENG 491" },
+          { type: 'course', code: "MENG 492" }
+          // Would add more electives here
+        ]
+      },
+      {
+        name: "Senior Design I",
+        required: 1,
+        options: [{ type: 'course', code: "MENG 413L" }]
+      },
+      {
+        name: "Senior Design II",
+        required: 1,
+        options: [{ type: 'course', code: "MENG 414L" }]
       }
     ]
   }
 };
 
+type CompletedRequirement = {
+  name: string;
+  description?: string;
+  completed: number;
+  required: number;
+  satisfied: boolean;
+  options: {
+    code: string;
+    name: string;
+    completed: boolean;
+    required: boolean;
+    credits: number;
+  }[];
+};
+
 export type MajorProgress = {
-  completedCore: string[];
-  remainingCore: string[];
-  completedElectives: string[];
+  completedRequirements: CompletedRequirement[];
+  remainingRequirements: CompletedRequirement[];
   completedCredits: number;
   totalCredits: number;
-  electiveProgress: {
-    name: string;
-    completed: number;
-    required: number;
-    courses: {
-      code: string;
-      completed: boolean;
-    }[];
-  }[];
-  otherRequirementsProgress: {
-    name: string;
-    description: string;
-    completed: number;
-    required: number;
-    options: {
-      code: string;
-      completed: boolean;
-    }[];
-  }[];
   percentage: number;
 };
 
 export const calculateMajorProgress = (
   majorId: string,
-  completedCourses: string[]
+  completedCourseCodes: string[]
 ): MajorProgress => {
   const major = MAJORS[majorId];
   if (!major) throw new Error(`Major ${majorId} not found`);
 
-  // Calculate core course progress
-  const completedCore = major.coreCourses.filter(code => 
-    completedCourses.includes(code)
-  );
-  const remainingCore = major.coreCourses.filter(code => 
-    !completedCourses.includes(code)
-  );
+  let completedCredits = 0;
+  const requirementProgress: CompletedRequirement[] = [];
 
-  // Calculate elective progress
-  const electiveProgress = major.electiveOptions?.map(elective => {
-    const completed = elective.courses
-      .filter(code => completedCourses.includes(code))
-      .slice(0, elective.required); // Only count up to required number
+  for (const req of major.requirements) {
+    let reqCompleted = 0;
+    const reqOptions: CompletedRequirement['options'] = [];
 
-    return {
-      name: elective.name,
-      completed: completed.length,
-      required: elective.required,
-      courses: elective.courses.map(code => ({
-        code,
-        completed: completedCourses.includes(code)
-      }))
-    };
-  }) || [];
+    for (const option of req.options) {
+      if (option.type === 'course') {
+        const completed = completedCourseCodes.includes(option.code);
+        const course = getCourseInfo(option.code);
+        
+        if (completed) reqCompleted++;
+        
+        reqOptions.push({
+          code: option.code,
+          name: course?.name || option.code,
+          completed,
+          required: reqCompleted < req.required,
+          credits: course?.credits || 0
+        });
+      } 
+      else if (option.type === 'group') {
+        const groupCompleted = option.options
+          .filter(code => completedCourseCodes.includes(code))
+          .slice(0, option.required)
+          .length;
 
-  // Calculate other requirements progress
-  const otherRequirementsProgress = major.otherRequirements?.map(req => {
-    const completed = req.options
-      .filter(option => completedCourses.includes(option))
-      .slice(0, req.required);
+        reqCompleted += groupCompleted;
 
-    return {
+        option.options.forEach(code => {
+          const completed = completedCourseCodes.includes(code);
+          const course = getCourseInfo(code);
+          
+          reqOptions.push({
+            code,
+            name: course?.name || code,
+            completed,
+            required: reqCompleted < req.required && 
+                     groupCompleted < option.required,
+            credits: course?.credits || 0
+          });
+        });
+      }
+    }
+
+    // Add credits for completed courses (only up to required number)
+    reqOptions
+      .filter(opt => opt.completed)
+      .slice(0, req.required)
+      .forEach(opt => {
+        completedCredits += opt.credits;
+      });
+
+    requirementProgress.push({
       name: req.name,
       description: req.description,
-      completed: completed.length,
+      completed: Math.min(reqCompleted, req.required),
       required: req.required,
-      options: req.options.map(option => ({
-        code: option,
-        completed: completedCourses.includes(option)
-      }))
-    };
-  }) || [];
-
-  // Calculate completed credits
-  let completedCredits = 0;
-
-  // Core courses
-  completedCore.forEach(code => {
-    const course = getCourseInfo(code);
-    completedCredits += course?.credits || 0;
-  });
-
-  // Electives
-  electiveProgress.forEach(elective => {
-    elective.courses
-      .filter(c => c.completed)
-      .slice(0, elective.required)
-      .forEach(course => {
-        const info = getCourseInfo(course.code);
-        completedCredits += info?.credits || 0;
-      });
-  });
-
-  // Other requirements
-  otherRequirementsProgress.forEach(req => {
-    req.options
-      .filter(o => o.completed)
-      .slice(0, req.required)
-      .forEach(option => {
-        const info = getCourseInfo(option.code);
-        completedCredits += info?.credits || 0;
-      });
-  });
+      satisfied: reqCompleted >= req.required,
+      options: reqOptions
+    });
+  }
 
   return {
-    completedCore,
-    remainingCore,
-    completedElectives: electiveProgress.flatMap(e => 
-      e.courses.filter(c => c.completed).map(c => c.code)
-    ),
+    completedRequirements: requirementProgress.filter(r => r.satisfied),
+    remainingRequirements: requirementProgress.filter(r => !r.satisfied),
     completedCredits,
     totalCredits: major.creditRequirements.total,
-    electiveProgress,
-    otherRequirementsProgress,
-    percentage: Math.min(
-      100,
-      (completedCredits / major.creditRequirements.total) * 100
-    )
+    percentage: Math.min(100, (completedCredits / major.creditRequirements.total) * 100)
   };
 };

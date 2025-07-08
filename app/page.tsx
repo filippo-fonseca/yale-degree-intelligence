@@ -301,8 +301,8 @@ export default function Home() {
                                       </p>
                                       <div className="flex items-center mt-1 space-x-2">
                                         {course.status === "in-progress" && (
-                                          <span className="inline-block px-2 py-0.5 text-xs bg-blue-100 text-blue-800 rounded">
-                                            In Progress
+                                          <span className="inline-block px-2 py-0.5 bg-blue-100 text-blue-300 rounded">
+                                            jd In Progress
                                           </span>
                                         )}
                                         <span className="text-xs text-gray-500">
@@ -312,9 +312,17 @@ export default function Home() {
                                       </div>
                                     </div>
                                     {course.grade && (
-                                      <span className="text-lg font-medium">
-                                        {course.grade}
-                                      </span>
+                                      <>
+                                        {course.grade == "In Progress" ? (
+                                          <span className="text-pink-500 text-xs font-medium">
+                                            No grade yet
+                                          </span>
+                                        ) : (
+                                          <span className="text-gray-800 font-medium">
+                                            {course.grade}
+                                          </span>
+                                        )}
+                                      </>
                                     )}
                                   </div>
                                 </div>

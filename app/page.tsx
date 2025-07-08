@@ -33,10 +33,14 @@ export default function Home() {
 
   const [selectedMajor, setSelectedMajor] = useState<string>("MENG");
 
+  // Update the getMajorProgress function in src/app/page.tsx
   const getMajorProgress = () => {
     if (!user || courses.length === 0) return null;
     const completedCourseCodes = courses
-      .filter((course) => course.status === "completed" && course.grade)
+      .filter(
+        (course) =>
+          course.status === "completed" && (course.grade || course.skipped) // Include both graded and skipped courses
+      )
       .map((course) => course.code);
     return calculateMajorProgress(selectedMajor, completedCourseCodes);
   };
@@ -63,6 +67,7 @@ export default function Home() {
     await fetchCourses();
   };
 
+  // Update the calculateStats function in src/app/page.tsx
   const calculateStats = () => {
     if (courses.length === 0) return null;
     let totalCredits = 0;
@@ -76,6 +81,9 @@ export default function Home() {
         inProgressCourses++;
         return;
       }
+      // Skip courses that are marked as skipped
+      if (course.skipped) return;
+
       if (course.grade && gradePoints[course.grade]) {
         completedCoursesWithGrades++;
         totalCredits += course.credits || 0;
@@ -210,6 +218,8 @@ export default function Home() {
                                   className={`p-4 border rounded-lg ${
                                     course.status === "in-progress"
                                       ? "border-blue-200 bg-blue-50"
+                                      : course.skipped
+                                      ? "border-gray-200 bg-gray-50"
                                       : "border-gray-200"
                                   }`}
                                 >
@@ -217,6 +227,11 @@ export default function Home() {
                                     <div>
                                       <h4 className="font-medium">
                                         {course.code}
+                                        {course.skipped && (
+                                          <span className="ml-2 text-xs text-gray-500">
+                                            (skipped)
+                                          </span>
+                                        )}
                                       </h4>
                                       <p className="text-sm text-gray-600">
                                         {course.name}
@@ -233,7 +248,7 @@ export default function Home() {
                                         </span>
                                       </div>
                                     </div>
-                                    {course.grade && (
+                                    {course.grade && !course.skipped && (
                                       <span className="text-gray-800 font-medium">
                                         {course.grade}
                                       </span>
@@ -331,6 +346,7 @@ export default function Home() {
                 <MajorProgressView
                   selectedMajor={selectedMajor}
                   progress={getMajorProgress()!}
+                  onRequirementChange={fetchCourses}
                 />
               </div>
             )}

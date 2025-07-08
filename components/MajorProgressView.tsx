@@ -3,16 +3,49 @@
 
 import { MajorProgress } from "@/lib/majors";
 import { MAJORS } from "@/lib/majors";
+import { useAuth } from "@/context/AuthContext";
+import { useState } from "react";
+import { FiMoreVertical, FiX, FiCheck } from "react-icons/fi";
+import { skipCourse, unskipCourse } from "@/lib/utils/courseOperations";
 
 interface MajorProgressViewProps {
   selectedMajor: string;
   progress: MajorProgress;
+  onRequirementChange: () => void;
 }
 
 export default function MajorProgressView({
   selectedMajor,
   progress,
+  onRequirementChange,
 }: MajorProgressViewProps) {
+  const { user } = useAuth();
+  const [dropdownOpen, setDropdownOpen] = useState<string | null>(null);
+
+  const handleSkip = async (courseCode: string, courseName: string) => {
+    if (!user?.uid) return;
+    try {
+      await skipCourse(user.uid, courseCode, courseName);
+      onRequirementChange();
+    } catch (error) {
+      console.error("Error skipping course:", error);
+    }
+  };
+
+  const handleUnskip = async (courseCode: string) => {
+    if (!user?.uid) return;
+    try {
+      await unskipCourse(user.uid, courseCode);
+      onRequirementChange();
+    } catch (error) {
+      console.error("Error unskipping course:", error);
+    }
+  };
+
+  const toggleDropdown = (reqId: string) => {
+    setDropdownOpen(dropdownOpen === reqId ? null : reqId);
+  };
+
   return (
     <div className="mb-8 p-6 bg-gray-50 rounded-xl border border-gray-200">
       <div className="flex justify-between items-center mb-6">
@@ -67,13 +100,33 @@ export default function MajorProgressView({
               {progress.completedRequirements.map((req, i) => (
                 <div
                   key={i}
-                  className="p-4 bg-green-50 rounded-lg border border-green-200"
+                  className="p-4 bg-green-50 rounded-lg border border-green-200 relative"
                 >
                   <div className="flex justify-between items-center mb-2">
                     <h5 className="font-medium text-green-800">{req.name}</h5>
-                    <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full">
-                      ✓ Complete
-                    </span>
+                    <div className="flex items-center">
+                      <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full">
+                        ✓ Complete
+                      </span>
+                      {req.options.some(
+                        (opt) => opt.completed && opt.credits === 0
+                      ) && (
+                        <button
+                          onClick={() => {
+                            const skippedCourse = req.options.find(
+                              (opt) => opt.completed && opt.credits === 0
+                            );
+                            if (skippedCourse) {
+                              handleUnskip(skippedCourse.code);
+                            }
+                          }}
+                          className="ml-2 text-xs bg-gray-100 text-gray-800 px-2 py-1 rounded-full flex items-center hover:bg-gray-200"
+                        >
+                          <FiX className="mr-1" />
+                          Undo Skip
+                        </button>
+                      )}
+                    </div>
                   </div>
                   {req.description && (
                     <p className="text-xs text-green-600 mb-2">
@@ -86,11 +139,16 @@ export default function MajorProgressView({
                       .map((opt, j) => (
                         <div
                           key={j}
-                          className="px-2 py-0.5 bg-green-100 text-green-800 rounded-full text-xs flex items-center"
+                          className={`px-2 py-0.5 rounded-full text-xs flex items-center ${
+                            opt.credits === 0
+                              ? "bg-gray-100 text-gray-800"
+                              : "bg-green-100 text-green-800"
+                          }`}
                         >
                           {opt.code}
                           <span className="ml-1 text-[0.65rem]">
-                            ({opt.credits}cr)
+                            ({opt.credits}cr
+                            {opt.credits === 0 ? ", skipped" : ""})
                           </span>
                         </div>
                       ))}
@@ -111,14 +169,43 @@ export default function MajorProgressView({
               {progress.remainingRequirements.map((req, i) => (
                 <div
                   key={i}
-                  className="p-4 bg-red-50 rounded-lg border border-red-200"
+                  className="p-4 bg-red-50 rounded-lg border border-red-200 relative"
                 >
                   <div className="flex justify-between items-center mb-2">
                     <h5 className="font-medium text-red-800">{req.name}</h5>
-                    <span className="text-xs bg-red-100 text-red-800 px-2 py-1 rounded-full">
-                      {req.completed}/{req.required}
-                    </span>
+                    <div className="flex items-center">
+                      <span className="text-xs bg-red-100 text-red-800 px-2 py-1 rounded-full">
+                        {req.completed}/{req.required}
+                      </span>
+                      <button
+                        onClick={() => toggleDropdown(`req-${i}`)}
+                        className="ml-2 p-1 text-gray-500 hover:text-gray-700"
+                      >
+                        <FiMoreVertical />
+                      </button>
+                    </div>
                   </div>
+
+                  {dropdownOpen === `req-${i}` && (
+                    <div className="absolute right-4 top-12 z-10 mt-1 w-48 rounded-md bg-white shadow-lg border border-gray-200">
+                      <button
+                        onClick={() => {
+                          const firstOption = req.options.find(
+                            (opt) => opt.required
+                          );
+                          if (firstOption) {
+                            handleSkip(firstOption.code, firstOption.name);
+                          }
+                          setDropdownOpen(null);
+                        }}
+                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left flex items-center"
+                      >
+                        <FiCheck className="mr-2" />
+                        Mark as Skipped
+                      </button>
+                    </div>
+                  )}
+
                   {req.description && (
                     <p className="text-xs text-red-600 mb-2">
                       {req.description}

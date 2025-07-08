@@ -9,6 +9,7 @@ export type Course = {
   userId: string;
   status: "completed" | "in-progress";
   credits: number;
+  skipped?: boolean; // Add this new property
 };
   
 export type Semester = {

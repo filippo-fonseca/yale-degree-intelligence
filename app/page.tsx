@@ -15,6 +15,7 @@ import {
 } from "firebase/firestore";
 import { Course } from "@/lib/types";
 import { db } from "@/config/firebase";
+import { gradePoints } from "@/lib/constants";
 
 export default function Home() {
   const { user, loading, logout } = useAuth();
@@ -140,6 +141,48 @@ export default function Home() {
     await fetchCourses();
   };
 
+  // Add this to your existing code, somewhere before the return statement
+
+  const calculateStats = () => {
+    if (courses.length === 0) return null;
+
+    let totalCredits = 0;
+    let totalGradePoints = 0;
+    let completedCoursesWithGrades = 0;
+    let inProgressCourses = 0;
+    const distribution: Record<string, number> = {};
+
+    courses.forEach((course) => {
+      if (
+        course.status === "completed" &&
+        course.grade &&
+        gradePoints[course.grade]
+      ) {
+        completedCoursesWithGrades++;
+        totalCredits += 1.0; // 1.0 credit per course
+        totalGradePoints += gradePoints[course.grade];
+        distribution[course.grade] = (distribution[course.grade] || 0) + 1;
+      } else if (course.status === "in-progress") {
+        inProgressCourses++;
+      }
+    });
+
+    const gpa =
+      completedCoursesWithGrades > 0
+        ? totalGradePoints / completedCoursesWithGrades
+        : 0;
+
+    return {
+      gpa: gpa.toFixed(2),
+      totalCredits,
+      completedCourses: completedCoursesWithGrades,
+      inProgressCourses,
+      distribution,
+    };
+  };
+
+  const stats = calculateStats();
+
   if (loading) {
     return (
       <main className="flex min-h-screen flex-col items-center justify-center p-4 bg-white">
@@ -254,6 +297,63 @@ export default function Home() {
                         </div>
                       ))}
                     </div>
+                    {hasData && stats && (
+                      <div className="mb-6 p-4 bg-gray-50 rounded-lg">
+                        <h3 className="font-medium mb-3">Academic Summary</h3>
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                          <div className="p-3 bg-white rounded border border-gray-200">
+                            <p className="text-sm text-gray-500">GPA</p>
+                            <p className="text-2xl font-medium">{stats.gpa}</p>
+                          </div>
+                          <div className="p-3 bg-white rounded border border-gray-200">
+                            <p className="text-sm text-gray-500">Credits</p>
+                            <p className="text-2xl font-medium">
+                              {stats.totalCredits}
+                            </p>
+                          </div>
+                          <div className="p-3 bg-white rounded border border-gray-200">
+                            <p className="text-sm text-gray-500">Completed</p>
+                            <p className="text-2xl font-medium">
+                              {stats.completedCourses}
+                            </p>
+                          </div>
+                          <div className="p-3 bg-white rounded border border-gray-200">
+                            <p className="text-sm text-gray-500">In Progress</p>
+                            <p className="text-2xl font-medium">
+                              {stats.inProgressCourses}
+                            </p>
+                          </div>
+                        </div>
+
+                        {Object.keys(stats.distribution).length > 0 && (
+                          <div className="mt-4">
+                            <h4 className="text-sm font-medium mb-2">
+                              Grade Distribution
+                            </h4>
+                            <div className="flex flex-wrap gap-2">
+                              {Object.entries(stats.distribution)
+                                .sort(
+                                  ([gradeA], [gradeB]) =>
+                                    gradePoints[gradeB] - gradePoints[gradeA]
+                                )
+                                .map(([grade, count]) => (
+                                  <div
+                                    key={grade}
+                                    className="flex items-center bg-white px-3 py-1 rounded-full border border-gray-200"
+                                  >
+                                    <span className="font-medium mr-1">
+                                      {grade}
+                                    </span>
+                                    <span className="text-sm text-gray-500">
+                                      ×{count}
+                                    </span>
+                                  </div>
+                                ))}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    )}
                   </div>
                 ) : (
                   <div className="flex flex-col items-center justify-center py-12">

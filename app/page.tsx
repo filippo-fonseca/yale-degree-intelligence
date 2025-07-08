@@ -24,6 +24,7 @@ import { db } from "@/config/firebase";
 import { gradePoints } from "@/lib/constants";
 import { calculateMajorProgress } from "@/lib/majors";
 import MajorProgressView from "@/components/MajorProgressView";
+import StatsView from "@/components/StatsView";
 
 export default function Home() {
   const { user, loading, logout } = useAuth();
@@ -273,73 +274,7 @@ export default function Home() {
                 )}
               </div>
             )}
-
-            {activeTab === "stats" && stats && (
-              <div>
-                <h2 className="text-xl font-medium mb-6">
-                  Academic Statistics
-                </h2>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-                  <div className="p-4 bg-white rounded border border-gray-200">
-                    <p className="text-sm text-gray-500">GPA</p>
-                    <p
-                      className={`text-2xl font-medium ${getGPAColor(
-                        stats.gpa
-                      )}`}
-                    >
-                      {stats.gpa}
-                    </p>
-                  </div>
-                  <div className="p-4 bg-white rounded border border-gray-200">
-                    <p className="text-sm text-gray-500">Credits</p>
-                    <p
-                      className={`text-2xl font-medium ${getCreditsColor(
-                        stats.totalCredits
-                      )}`}
-                    >
-                      {stats.totalCredits}
-                    </p>
-                  </div>
-                  <div className="p-4 bg-white rounded border border-gray-200">
-                    <p className="text-sm text-gray-500">Completed</p>
-                    <p className="text-2xl font-medium">
-                      {stats.completedCourses}
-                    </p>
-                  </div>
-                  <div className="p-4 bg-white rounded border border-gray-200">
-                    <p className="text-sm text-gray-500">In Progress</p>
-                    <p className="text-2xl font-medium">
-                      {stats.inProgressCourses}
-                    </p>
-                  </div>
-                </div>
-
-                {Object.keys(stats.distribution).length > 0 && (
-                  <div className="p-4 bg-white rounded border border-gray-200">
-                    <h3 className="font-medium mb-3">Grade Distribution</h3>
-                    <div className="flex flex-wrap gap-2">
-                      {Object.entries(stats.distribution)
-                        .sort(
-                          ([gradeA], [gradeB]) =>
-                            gradePoints[gradeB] - gradePoints[gradeA]
-                        )
-                        .map(([grade, count]) => (
-                          <div
-                            key={grade}
-                            className="flex items-center bg-gray-50 px-3 py-1 rounded-full border"
-                          >
-                            <span className="font-medium mr-1">{grade}</span>
-                            <span className="text-sm text-gray-500">
-                              ×{count}
-                            </span>
-                          </div>
-                        ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-            )}
-
+            {activeTab === "stats" && <StatsView courses={courses} />}
             {activeTab === "major" && getMajorProgress() && (
               <div>
                 <h2 className="text-xl font-medium mb-6">Major Progress</h2>
@@ -350,7 +285,6 @@ export default function Home() {
                 />
               </div>
             )}
-
             {activeTab === "settings" && (
               <div>
                 <h2 className="text-xl font-medium mb-6">Settings</h2>

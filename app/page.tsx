@@ -44,27 +44,29 @@ export default function Home() {
     setHasData(coursesData.length > 0);
   };
 
+  // Update the parseAndStoreCourses function in src/app/page.tsx
   const parseAndStoreCourses = async (extractedText: string) => {
     if (!user) return;
 
-    // Clear existing courses for this user to prevent duplicates
+    // Get existing courses to prevent duplicates
     const existingCoursesQuery = query(
       collection(db, "courses"),
       where("userId", "==", user.uid)
     );
     const existingSnapshot = await getDocs(existingCoursesQuery);
-
-    // Delete existing courses if needed (or skip if they exist)
-    // const deletePromises = existingSnapshot.docs.map(doc => deleteDoc(doc.ref));
-    // await Promise.all(deletePromises);
+    const existingCourseKeys = new Set(
+      existingSnapshot.docs.map(
+        (doc) => `${doc.data().semester}-${doc.data().year}-${doc.data().code}`
+      )
+    );
 
     const semesterBlocks = extractedText
       .split("Semester: ")
       .filter((block) => block.trim() !== "");
     const coursesToAdd: Omit<Course, "id">[] = [];
 
-    // Track seen courses to prevent duplicates in the same parse
-    const seenCourses = new Set<string>();
+    // Track seen courses in this parse to prevent duplicates
+    const seenInThisParse = new Set<string>();
 
     for (const block of semesterBlocks) {
       const [semesterInfo, ...courseLines] = block.split("\n");
@@ -73,17 +75,22 @@ export default function Home() {
       for (const line of courseLines) {
         if (line.trim() === "") continue;
 
-        // Create a unique key for each course
-        const courseKey = `${season}-${year}-${line.trim()}`;
-
-        // Skip if we've already seen this course in this parse
-        if (seenCourses.has(courseKey)) continue;
-        seenCourses.add(courseKey);
-
-        // Match completed courses (with grades)
-        const completedMatch = line.match(/^- (.+?): (.+?) — (.+)$/);
+        // Match completed courses (with grades and credits)
+        const completedMatch = line.match(
+          /^- (.+?): (.+?) — (.+?) \((\d+\.\d+)\)$/
+        );
         if (completedMatch) {
-          const [, code, name, grade] = completedMatch;
+          const [, code, name, grade, credits] = completedMatch;
+          const courseKey = `${season.trim()}-${year.trim()}-${code.trim()}`;
+
+          // Skip if already exists or seen in this parse
+          if (
+            existingCourseKeys.has(courseKey) ||
+            seenInThisParse.has(courseKey)
+          )
+            continue;
+          seenInThisParse.add(courseKey);
+
           coursesToAdd.push({
             code: code.trim(),
             name: name.trim(),
@@ -92,14 +99,27 @@ export default function Home() {
             year: parseInt(year.trim()),
             userId: user.uid,
             status: "completed",
+            credits: parseFloat(credits),
           });
           continue;
         }
 
-        // Match in-progress courses (without grades)
-        const inProgressMatch = line.match(/^- (.+?): (.+?)( — (.*))?$/);
+        // Match in-progress courses (without grades but with credits)
+        const inProgressMatch = line.match(
+          /^- (.+?): (.+?) — (?:In Progress|IP) \((\d+\.\d+)\)$/
+        );
         if (inProgressMatch) {
-          const [, code, name, , status] = inProgressMatch;
+          const [, code, name, credits] = inProgressMatch;
+          const courseKey = `${season.trim()}-${year.trim()}-${code.trim()}`;
+
+          // Skip if already exists or seen in this parse
+          if (
+            existingCourseKeys.has(courseKey) ||
+            seenInThisParse.has(courseKey)
+          )
+            continue;
+          seenInThisParse.add(courseKey);
+
           coursesToAdd.push({
             code: code.trim(),
             name: name.trim(),
@@ -108,29 +128,15 @@ export default function Home() {
             year: parseInt(year.trim()),
             userId: user.uid,
             status: "in-progress",
+            credits: parseFloat(credits),
           });
         }
       }
     }
 
-    // Check for existing courses before adding new ones
-    const existingCourseKeys = new Set(
-      existingSnapshot.docs.map(
-        (doc) => `${doc.data().semester}-${doc.data().year}-${doc.data().code}`
-      )
-    );
-
-    // Filter out courses that already exist
-    const newCoursesToAdd = coursesToAdd.filter(
-      (course) =>
-        !existingCourseKeys.has(
-          `${course.semester}-${course.year}-${course.code}`
-        )
-    );
-
     // Only proceed if there are new courses to add
-    if (newCoursesToAdd.length > 0) {
-      const batchWrites = newCoursesToAdd.map((course) => {
+    if (coursesToAdd.length > 0) {
+      const batchWrites = coursesToAdd.map((course) => {
         const docRef = doc(collection(db, "courses"));
         return setDoc(docRef, course);
       });
@@ -143,6 +149,7 @@ export default function Home() {
 
   // Add this to your existing code, somewhere before the return statement
 
+  // Update the calculateStats function in src/app/page.tsx
   const calculateStats = () => {
     if (courses.length === 0) return null;
 
@@ -159,18 +166,16 @@ export default function Home() {
         gradePoints[course.grade]
       ) {
         completedCoursesWithGrades++;
-        totalCredits += 1.0; // 1.0 credit per course
-        totalGradePoints += gradePoints[course.grade];
+        totalCredits += course.credits || 0;
+        totalGradePoints += gradePoints[course.grade] * (course.credits || 1.0);
         distribution[course.grade] = (distribution[course.grade] || 0) + 1;
       } else if (course.status === "in-progress") {
         inProgressCourses++;
+        totalCredits += course.credits || 0;
       }
     });
 
-    const gpa =
-      completedCoursesWithGrades > 0
-        ? totalGradePoints / completedCoursesWithGrades
-        : 0;
+    const gpa = totalCredits > 0 ? totalGradePoints / totalCredits : 0;
 
     return {
       gpa: gpa.toFixed(2),
@@ -279,11 +284,17 @@ export default function Home() {
                                       <p className="text-sm text-gray-600">
                                         {course.name}
                                       </p>
-                                      {course.status === "in-progress" && (
-                                        <span className="inline-block mt-1 px-2 py-0.5 text-xs bg-blue-100 text-blue-800 rounded">
-                                          In Progress
+                                      <div className="flex items-center mt-1 space-x-2">
+                                        {course.status === "in-progress" && (
+                                          <span className="inline-block px-2 py-0.5 text-xs bg-blue-100 text-blue-800 rounded">
+                                            In Progress
+                                          </span>
+                                        )}
+                                        <span className="text-xs text-gray-500">
+                                          {course.credits} credit
+                                          {course.credits !== 1 ? "s" : ""}
                                         </span>
-                                      )}
+                                      </div>
                                     </div>
                                     {course.grade && (
                                       <span className="text-lg font-medium">

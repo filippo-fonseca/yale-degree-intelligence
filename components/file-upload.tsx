@@ -40,6 +40,8 @@ export default function FileUpload({ onSuccess }: FileUploadProps) {
       const { text, fileName } = await response.json();
       console.log("PDF parsed successfully:", fileName);
 
+      console.log("THE RESPONSE: ", text);
+
       // Step 2: Extract course information
       const extractRes = await fetch("/api/extract", {
         method: "POST",

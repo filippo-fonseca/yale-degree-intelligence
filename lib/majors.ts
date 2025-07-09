@@ -13,6 +13,8 @@ type RequirementOption = {
 
 type MajorRequirement = {
   id: string;
+  //CRUCIALLY: this "name" allows a shorter, human-readable identifier that the student can refer to "like - "CHEMISTRY REQUIREMENT", "Thermo", etc."
+  //we will have to do this for all majors (manually), but that's okay. 
   name: string;
   description: string;
   requirements: {
@@ -30,177 +32,105 @@ type MajorRequirement = {
 
 export const MAJORS: Record<string, MajorRequirement> = {
   "MENG": {
-    id: "MENG",
-    name: "Mechanical Engineering (ABET), B.S.",
-    description: "Bachelor of Science in Mechanical Engineering",
-    creditRequirements: {
-      total: 36,
-      core: 30,
-      electives: 6
+  id: "MENG",
+  name: "Mechanical Engineering (ABET), B.S.",
+  description: "Bachelor of Science in Mechanical Engineering",
+  creditRequirements: {
+    total: 36,
+    core: 30,
+    electives: 6
+  },
+  requirements: [
+    // --- PREREQUISITES ---
+    {
+      name: "Calculus I",
+      required: 1,
+      options: [{ type: 'course', code: "MATH 1120" }]
     },
-    requirements: [
-      // PREREQUISITES
-      {
-        name: "Calculus I",
-        required: 1,
-        options: [{ type: 'course', code: "MATH 112" }]
-      },
-      {
-        name: "Calculus II",
-        required: 1,
-        options: [{ type: 'course', code: "MATH 115" }]
-      },
-      {
-        name: "Calculus III",
-        description: "ENAS 151 or MATH 120",
-        required: 1,
-        options: [
-          { type: 'course', code: "ENAS 151" },
-          { type: 'course', code: "MATH 120" }
-        ]
-      },
-      {
-        name: "Physics Sequence",
-        description: "PHYS 180+181 or PHYS 200+201",
-        required: 2,
-        options: [
-          { 
-            type: 'group', 
-            options: ["PHYS 180", "PHYS 181"], 
-            required: 2,
-            description: "University Physics sequence"
-          },
-          { 
-            type: 'group', 
-            options: ["PHYS 200", "PHYS 201"], 
-            required: 2,
-            description: "Fundamentals Physics sequence"
-          }
-        ]
-      },
-      {
-        name: "Physics Labs",
-        description: "Two semesters (can mix sequences)",
-        required: 2,
-        options: [
-          { type: 'course', code: "PHYS 165L" },
-          { type: 'course', code: "PHYS 166L" },
-          { type: 'course', code: "PHYS 205L" },
-          { type: 'course', code: "PHYS 206L" }
-        ]
-      },
-      {
-        name: "Chemistry",
-        description: "One introductory chemistry course",
-        required: 1,
-        options: [
-          { type: 'course', code: "CHEM 161" },
-          { type: 'course', code: "CHEM 165" }
-        ]
-      },
+    {
+      name: "Calculus II",
+      required: 1,
+      options: [{ type: 'course', code: "MATH 1150" }]
+    },
+    {
+      name: "Calculus III",
+      description: "ENAS 1510 or equivalent",
+      required: 1,
+      options: [{ type: 'course', code: "ENAS 1510" }, { type: 'course', code: "MATH 1200" }]
+    },
+    {
+      name: "Physics Sequence",
+      description: "PHYS 1800 + 1810 or PHYS 2000 + 2010",
+      required: 2,
+      options: [
+        { type: 'group', options: ["PHYS 1800", "PHYS 1810"], required: 2 },
+        { type: 'group', options: ["PHYS 2000", "PHYS 2010"], required: 2 }
+      ]
+    },
+    {
+      name: "Physics Labs",
+      required: 2,
+      description: "Two labs from PHYS 1650L, 1660L, 2050L, or 2060L",
+      options: [
+        { type: 'course', code: "PHYS 1650L" },
+        { type: 'course', code: "PHYS 1660L" },
+        { type: 'course', code: "PHYS 2050L" },
+        { type: 'course', code: "PHYS 2060L" }
+      ]
+    },
+    {
+      name: "Introductory Chemistry",
+      required: 1,
+      options: [{ type: 'course', code: "CHEM 1610" }]
+    },
 
-      // CORE REQUIREMENTS
-      {
-        name: "Intro to Engineering",
-        required: 1,
-        options: [{ type: 'course', code: "ENAS 130" }]
-      },
-      {
-        name: "Linear Algebra",
-        description: "ENAS 194 or MATH 222",
-        required: 1,
-        options: [
-          { type: 'course', code: "ENAS 194" },
-          { type: 'course', code: "MATH 222" }
-        ]
-      },
-      {
-        name: "Electrical Engineering",
-        required: 1,
-        options: [{ type: 'course', code: "ECE 200" }]
-      },
-      {
-        name: "Differential Equations",
-        required: 1,
-        options: [{ type: 'course', code: "ENAS 194" }]
-      },
-      {
-        name: "Mechanical Engineering Design",
-        required: 1,
-        options: [{ type: 'course', code: "MENG 110" }]
-      },
-      {
-        name: "Thermodynamics",
-        required: 1,
-        options: [{ type: 'course', code: "MENG 211" }]
-      },
-      {
-        name: "Mechanics of Materials",
-        required: 1,
-        options: [{ type: 'course', code: "MENG 231" }]
-      },
-      {
-        name: "Dynamics",
-        required: 1,
-        options: [{ type: 'course', code: "MENG 261" }]
-      },
-      {
-        name: "Dynamics Lab",
-        required: 1,
-        options: [{ type: 'course', code: "MENG 261L" }]
-      },
-      {
-        name: "Fluid Mechanics",
-        required: 1,
-        options: [{ type: 'course', code: "MENG 312" }]
-      },
-      {
-        name: "Heat Transfer",
-        required: 1,
-        options: [{ type: 'course', code: "MENG 342" }]
-      },
-      {
-        name: "Heat Transfer Lab",
-        required: 1,
-        options: [{ type: 'course', code: "MENG 342L" }]
-      },
-      {
-        name: "Materials Science",
-        required: 1,
-        options: [{ type: 'course', code: "MENG 332" }]
-      },
-      {
-        name: "Thermal Systems",
-        required: 1,
-        options: [{ type: 'course', code: "MENG 390" }]
-      },
-      {
-        name: "Mechanical Engineering Lab",
-        required: 1,
-        options: [{ type: 'course', code: "MENG 302L" }]
-      },
-      {
-        name: "Technical Electives",
-        description: "3 required (max 1 independent study)",
-        required: 3,
-        options: [
-          { type: 'course', code: "MENG 491" },
-          { type: 'course', code: "MENG 492" }
-          // Would add more electives here
-        ]
-      },
-      {
-        name: "Senior Design I",
-        required: 1,
-        options: [{ type: 'course', code: "MENG 413L" }]
-      },
-      {
-        name: "Senior Design II",
-        required: 1,
-        options: [{ type: 'course', code: "MENG 414L" }]
-      }
-    ]
-  }
+    // --- CORE REQUIREMENTS ---
+    { name: "Intro to Engineering", required: 1, options: [{ type: 'course', code: "ENAS 1300" }] },
+    { name: "Linear Algebra", required: 1, options: [{ type: 'course', code: "ENAS 1940" }, { type: 'course', code: "MATH 2220" }] },
+    { name: "Electrical Engineering", required: 1, options: [{ type: 'course', code: "ECE 2000" }] },
+    { name: "Mechanical Design", required: 1, options: [{ type: 'course', code: "MENG 1105" }] },
+    { name: "Thermodynamics", required: 1, options: [{ type: 'course', code: "MENG 2511" }] },
+    { name: "Strength of Materials", required: 1, options: [{ type: 'course', code: "MENG 2311" }] },
+    { name: "Materials Science", required: 1, options: [{ type: 'course', code: "MENG 2615" }] },
+    { name: "Solid Mechanics Lab", required: 1, options: [{ type: 'course', code: "MENG 2616L" }] },
+    { name: "Manufacturing & Design", required: 1, options: [{ type: 'course', code: "MENG 3125" }] },
+    { name: "Fluid Mechanics", required: 1, options: [{ type: 'course', code: "MENG 3422" }] },
+    { name: "Fluid Mechanics Lab", required: 1, options: [{ type: 'course', code: "MENG 3423L" }] },
+    { name: "Dynamics", required: 1, options: [{ type: 'course', code: "MENG 3323" }] },
+    { name: "Thermal Systems", required: 1, options: [{ type: 'course', code: "MENG 3424" }] },
+    { name: "Mechatronics Lab", required: 1, options: [{ type: 'course', code: "MENG 3020L" }] },
+
+    // --- TECHNICAL ELECTIVES ---
+    {
+      name: "Technical Electives",
+      description: "Three required; max one from MENG 4991 or MENG 4992",
+      required: 3,
+      options: [
+        { type: 'course', code: "MENG 2050" },
+        { type: 'course', code: "MENG 2147" },
+        { type: 'course', code: "MENG 3465" },
+        { type: 'course', code: "MENG 3675" },
+        { type: 'course', code: "MENG 4041" },
+        { type: 'course', code: "MENG 4145" },
+        { type: 'course', code: "MENG 4154" },
+        { type: 'course', code: "MENG 4359" },
+        { type: 'course', code: "MENG 4370" },
+        { type: 'course', code: "MENG 4469" },
+        { type: 'course', code: "MENG 4475" },
+        { type: 'course', code: "MENG 4664" },
+        { type: 'course', code: "MENG 4672" },
+        { type: 'course', code: "MENG 4673" },
+        { type: 'course', code: "MENG 4774" },
+        { type: 'course', code: "MENG 4991" },
+        { type: 'course', code: "MENG 4992" }
+      ]
+    },
+
+    // --- SENIOR DESIGN ---
+    { name: "Senior Design I", required: 1, options: [{ type: 'course', code: "MENG 4137L" }] },
+    { name: "Senior Design II", required: 1, options: [{ type: 'course', code: "MENG 4138L" }] }
+  ]
+}
 };
 
 type CompletedRequirement = {

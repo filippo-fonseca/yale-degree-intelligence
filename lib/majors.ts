@@ -1,12 +1,12 @@
 // src/lib/majors.ts
-import { CourseInfo, getCourseInfo } from "./courseCatalog";
+import { CourseInfo, getCourseInfo, getCanonicalCode, isValidCourseCode } from "./courseCatalog";
 
 type RequirementOption = {
   type: 'course';
-  code: string;
+  code: string; // This should be the canonical code
 } | {
   type: 'group';
-  options: string[];
+  options: string[]; // These should be canonical codes
   required: number;
   description?: string;
 };
@@ -233,6 +233,11 @@ export const calculateMajorProgress = (
   const major = MAJORS[majorId];
   if (!major) throw new Error(`Major ${majorId} not found`);
 
+  // Convert all completed codes to their canonical versions
+  const canonicalCompletedCodes = completedCourseCodes.map(code => 
+    getCanonicalCode(code) || code
+  ).filter(code => isValidCourseCode(code));
+
   let completedCredits = 0;
   const requirementProgress: CompletedRequirement[] = [];
 
@@ -242,7 +247,7 @@ export const calculateMajorProgress = (
 
     for (const option of req.options) {
       if (option.type === 'course') {
-        const completed = completedCourseCodes.includes(option.code);
+        const completed = canonicalCompletedCodes.includes(option.code);
         const course = getCourseInfo(option.code);
         
         if (completed) reqCompleted++;
@@ -257,14 +262,14 @@ export const calculateMajorProgress = (
       } 
       else if (option.type === 'group') {
         const groupCompleted = option.options
-          .filter(code => completedCourseCodes.includes(code))
+          .filter(code => canonicalCompletedCodes.includes(code))
           .slice(0, option.required)
           .length;
 
         reqCompleted += groupCompleted;
 
         option.options.forEach(code => {
-          const completed = completedCourseCodes.includes(code);
+          const completed = canonicalCompletedCodes.includes(code);
           const course = getCourseInfo(code);
           
           reqOptions.push({

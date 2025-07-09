@@ -1,16 +1,17 @@
-// src/app/page.tsx
 "use client";
 
 import { useAuth } from "@/context/AuthContext";
 import LoginPage from "@/components/LoginPage";
 import FileUpload from "@/components/file-upload";
 import { useEffect, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   FiUpload,
   FiSettings,
   FiLogOut,
   FiBarChart2,
   FiBook,
+  FiChevronRight,
 } from "react-icons/fi";
 import {
   collection,
@@ -33,6 +34,7 @@ export default function Home() {
   const [courses, setCourses] = useState<Course[]>([]);
   const [hasData, setHasData] = useState(false);
   const [selectedMajor, setSelectedMajor] = useState<string>("MENG");
+  const [isHoveringLogout, setIsHoveringLogout] = useState(false);
 
   const getMajorProgress = () => {
     if (!user || courses.length === 0) return null;
@@ -110,181 +112,282 @@ export default function Home() {
     return "text-red-400";
   };
 
-  const getCreditsColor = (credits: number) => {
-    if (credits >= 32) return "text-emerald-400";
-    if (credits >= 24) return "text-blue-400";
-    if (credits >= 16) return "text-yellow-400";
-    return "text-red-400";
-  };
-
   if (loading)
     return (
-      <div className="flex items-center justify-center min-h-screen bg-gray-900">
-        <div className="neumorphic-loader animate-pulse"></div>
+      <div className="flex items-center justify-center min-h-screen bg-gray-950">
+        <motion.div
+          animate={{ rotate: 360 }}
+          transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
+          className="w-8 h-8 rounded-full border-2 border-transparent border-t-blue-500 border-r-blue-500/50"
+        />
       </div>
     );
   if (!user) return <LoginPage />;
 
   return (
-    <main className="min-h-screen bg-gray-900 text-gray-100">
-      <div className="max-w-6xl mx-auto px-4">
-        <header className="flex justify-between items-center py-6">
-          <h1 className="font-louize text-2xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-blue-500">
-            Yale DegreeIntelligence
-          </h1>
-          <button
+    <main className={`min-h-screen bg-gray-950 text-gray-100 font-louize`}>
+      {/* Subtle background elements */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute inset-0 bg-gradient-to-br from-gray-950 via-blue-950/20 to-purple-950/20"></div>
+        {[...Array(12)].map((_, i) => (
+          <motion.div
+            key={i}
+            className="absolute rounded-full bg-white/5 backdrop-blur-sm"
+            initial={{
+              x: Math.random() * 100,
+              y: Math.random() * 100,
+              scale: Math.random() * 0.5 + 0.5,
+            }}
+            animate={{
+              x: [null, Math.random() * 100],
+              y: [null, Math.random() * 100],
+            }}
+            transition={{
+              duration: Math.random() * 20 + 20,
+              repeat: Infinity,
+              repeatType: "reverse",
+              ease: "easeInOut",
+            }}
+            style={{
+              width: `${Math.random() * 8 + 4}px`,
+              height: `${Math.random() * 8 + 4}px`,
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+            }}
+          />
+        ))}
+      </div>
+
+      <div className="relative max-w-7xl mx-auto px-6">
+        {/* Header */}
+        <motion.header
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="flex justify-between items-center py-8"
+        >
+          <div className="flex items-center space-x-2">
+            <motion.div
+              whileHover={{ rotate: 15 }}
+              className="w-8 h-8 rounded-full flex items-center justify-center bg-gradient-to-br from-blue-500 to-purple-600 text-white font-medium"
+            >
+              Y
+            </motion.div>
+            <h1 className="text-2xl font-medium tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-blue-200 to-purple-200">
+              DegreeIntelligence
+            </h1>
+          </div>
+
+          <motion.button
+            onHoverStart={() => setIsHoveringLogout(true)}
+            onHoverEnd={() => setIsHoveringLogout(false)}
             onClick={logout}
-            className="neumorphic-btn flex items-center space-x-2 text-sm px-4 py-2 rounded-lg hover:bg-gray-800 transition-all"
+            className="flex items-center space-x-2 text-sm px-4 py-2 rounded-lg hover:bg-gray-900/50 transition-all border border-gray-800 hover:border-gray-700"
           >
-            <FiLogOut size={16} />
-            <span>Logout</span>
-          </button>
-        </header>
+            <span>Sign out</span>
+            <motion.div
+              animate={isHoveringLogout ? { x: 2 } : { x: 0 }}
+              transition={{ type: "spring", stiffness: 500 }}
+            >
+              <FiLogOut size={16} />
+            </motion.div>
+          </motion.button>
+        </motion.header>
 
-        <div className="flex flex-col md:flex-row gap-8 py-8">
+        <div className="flex flex-col lg:flex-row gap-8 pb-16">
           {/* Sidebar Navigation */}
-          <aside className="w-full md:w-64">
-            <nav className="space-y-2">
-              <button
-                onClick={() => setActiveTab("upload")}
-                className={`w-full flex items-center space-x-3 px-4 py-3 text-left rounded-xl transition-all ${
-                  activeTab === "upload"
-                    ? "neumorphic-btn-active bg-gradient-to-br from-purple-500 to-blue-600 text-white"
-                    : "neumorphic-btn hover:bg-gray-800"
-                }`}
-              >
-                <FiUpload size={18} />
-                <span>My Courses</span>
-              </button>
-
-              <button
-                onClick={() => setActiveTab("stats")}
-                className={`w-full flex items-center space-x-3 px-4 py-3 text-left rounded-xl transition-all ${
-                  activeTab === "stats"
-                    ? "neumorphic-btn-active bg-gradient-to-br from-purple-500 to-blue-600 text-white"
-                    : "neumorphic-btn hover:bg-gray-800"
-                }`}
-              >
-                <FiBarChart2 size={18} />
-                <span>Academic Stats</span>
-              </button>
-
-              <button
-                onClick={() => setActiveTab("major")}
-                className={`w-full flex items-center space-x-3 px-4 py-3 text-left rounded-xl transition-all ${
-                  activeTab === "major"
-                    ? "neumorphic-btn-active bg-gradient-to-br from-purple-500 to-blue-600 text-white"
-                    : "neumorphic-btn hover:bg-gray-800"
-                }`}
-              >
-                <FiBook size={18} />
-                <span>Major Progress</span>
-              </button>
+          <motion.aside
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.2, duration: 0.5 }}
+            className="w-full lg:w-56"
+          >
+            <nav className="space-y-1">
+              {[
+                { id: "upload", icon: FiUpload, label: "My Courses" },
+                { id: "stats", icon: FiBarChart2, label: "Academic Stats" },
+                { id: "major", icon: FiBook, label: "Major Progress" },
+              ].map((item) => (
+                <motion.button
+                  key={item.id}
+                  whileHover={{ x: 4 }}
+                  onClick={() => setActiveTab(item.id)}
+                  className={`w-full flex items-center justify-between px-4 py-3 text-left rounded-xl transition-all ${
+                    activeTab === item.id
+                      ? "bg-gray-900/50 border border-gray-800 text-white"
+                      : "text-gray-400 hover:text-white hover:bg-gray-900/30"
+                  }`}
+                >
+                  <div className="flex items-center space-x-3">
+                    <item.icon size={18} />
+                    <span>{item.label}</span>
+                  </div>
+                  {activeTab === item.id && (
+                    <motion.div
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      className="text-blue-400"
+                    >
+                      <FiChevronRight />
+                    </motion.div>
+                  )}
+                </motion.button>
+              ))}
             </nav>
-          </aside>
+          </motion.aside>
 
           {/* Main Content Area */}
-          <div className="flex-1">
-            {activeTab === "upload" && (
-              <div>
-                {hasData ? (
-                  <div>
-                    <h2 className="text-xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-blue-500">
-                      Your Courses
-                    </h2>
-                    <div className="space-y-6">
-                      {Array.from(
-                        new Set(courses.map((c) => `${c.semester} ${c.year}`))
-                      ).map((semester) => (
-                        <div key={semester} className="mb-8">
-                          <h3 className="text-lg font-medium mb-4">
-                            {semester}
-                          </h3>
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            {courses
-                              .filter(
-                                (c) => `${c.semester} ${c.year}` === semester
-                              )
-                              .map((course) => (
-                                <div
-                                  key={course.id}
-                                  className={`p-4 rounded-xl neumorphic-card ${
-                                    course.status === "in-progress"
-                                      ? "border-l-4 border-blue-400"
-                                      : course.skipped
-                                      ? "border-l-4 border-gray-500"
-                                      : ""
-                                  }`}
-                                >
-                                  <div className="flex justify-between items-start">
-                                    <div>
-                                      <h4 className="font-medium">
-                                        {course.code}
-                                        {course.skipped && (
-                                          <span className="ml-2 text-xs text-gray-400">
-                                            (skipped)
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3, duration: 0.5 }}
+            className="flex-1"
+          >
+            <AnimatePresence mode="wait">
+              {activeTab === "upload" && (
+                <motion.div
+                  key="upload"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  {hasData ? (
+                    <div>
+                      <h2 className="text-xl font-medium mb-6 bg-clip-text text-transparent bg-gradient-to-r from-blue-200 to-purple-200">
+                        Your Academic Journey
+                      </h2>
+                      <div className="space-y-8">
+                        {Array.from(
+                          new Set(courses.map((c) => `${c.semester} ${c.year}`))
+                        ).map((semester) => (
+                          <motion.div
+                            key={semester}
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            className="mb-8"
+                          >
+                            <h3 className="text-lg font-medium mb-4 text-gray-300">
+                              {semester}
+                            </h3>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                              {courses
+                                .filter(
+                                  (c) => `${c.semester} ${c.year}` === semester
+                                )
+                                .map((course) => (
+                                  <motion.div
+                                    key={course.id}
+                                    whileHover={{ y: -2 }}
+                                    className={`p-4 rounded-xl bg-gray-900/50 backdrop-blur-sm border border-gray-800 hover:border-gray-700 transition-all ${
+                                      course.status === "in-progress"
+                                        ? "border-l-2 border-blue-400/80"
+                                        : course.skipped
+                                        ? "border-l-2 border-gray-600"
+                                        : ""
+                                    }`}
+                                  >
+                                    <div className="flex justify-between items-start">
+                                      <div>
+                                        <h4 className="font-medium">
+                                          {course.code}
+                                          {course.skipped && (
+                                            <span className="ml-2 text-xs text-gray-500">
+                                              (skipped)
+                                            </span>
+                                          )}
+                                        </h4>
+                                        <p className="text-sm text-gray-400">
+                                          {course.name}
+                                        </p>
+                                        <div className="flex items-center mt-1 space-x-2">
+                                          {course.status === "in-progress" && (
+                                            <span className="inline-block px-2 py-0.5 bg-blue-900/20 text-blue-400 rounded-full text-xs">
+                                              In Progress
+                                            </span>
+                                          )}
+                                          <span className="text-xs text-gray-500">
+                                            {course.credits} credit
+                                            {course.credits !== 1 ? "s" : ""}
                                           </span>
-                                        )}
-                                      </h4>
-                                      <p className="text-sm text-gray-400">
-                                        {course.name}
-                                      </p>
-                                      <div className="flex items-center mt-1 space-x-2">
-                                        {course.status === "in-progress" && (
-                                          <span className="inline-block px-2 py-0.5 bg-blue-900/30 text-blue-400 rounded-full text-xs">
-                                            In Progress
-                                          </span>
-                                        )}
-                                        <span className="text-xs text-gray-500">
-                                          {course.credits} credit
-                                          {course.credits !== 1 ? "s" : ""}
-                                        </span>
+                                        </div>
                                       </div>
+                                      {course.grade && !course.skipped && (
+                                        <span
+                                          className={`text-lg font-medium ${getGPAColor(
+                                            course.grade
+                                          )}`}
+                                        >
+                                          {course.grade}
+                                        </span>
+                                      )}
                                     </div>
-                                    {course.grade && !course.skipped && (
-                                      <span
-                                        className={`text-lg font-medium ${getGPAColor(
-                                          course.grade
-                                        )}`}
-                                      >
-                                        {course.grade}
-                                      </span>
-                                    )}
-                                  </div>
-                                </div>
-                              ))}
-                          </div>
-                        </div>
-                      ))}
+                                  </motion.div>
+                                ))}
+                            </div>
+                          </motion.div>
+                        ))}
+                      </div>
                     </div>
-                  </div>
-                ) : (
-                  <div className="flex flex-col items-center justify-center py-12">
-                    <h2 className="text-xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-blue-500">
-                      Import Your Transcript
-                    </h2>
-                    <div className="w-full max-w-md neumorphic-card p-6 rounded-xl">
-                      <FileUpload onSuccess={parseAndStoreCourses} />
+                  ) : (
+                    <div className="flex flex-col items-center justify-center py-12">
+                      <h2 className="text-xl font-medium mb-6 bg-clip-text text-transparent bg-gradient-to-r from-blue-200 to-purple-200">
+                        Begin Your Academic Analysis
+                      </h2>
+                      <div className="w-full max-w-lg bg-gray-900/50 backdrop-blur-sm p-8 rounded-xl border border-gray-800">
+                        <FileUpload onSuccess={parseAndStoreCourses} />
+                        <p className="text-center text-gray-500 text-sm mt-4">
+                          Upload your Yale transcript to unlock insights
+                        </p>
+                      </div>
                     </div>
-                  </div>
-                )}
-              </div>
-            )}
-            {activeTab === "stats" && <StatsView courses={courses} />}
-            {activeTab === "major" && getMajorProgress() && (
-              <div>
-                <h2 className="text-xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-blue-500">
-                  Major Progress
-                </h2>
-                <MajorProgressView
-                  selectedMajor={selectedMajor}
-                  progress={getMajorProgress()!}
-                  onRequirementChange={fetchCourses}
-                />
-              </div>
-            )}
-          </div>
+                  )}
+                </motion.div>
+              )}
+
+              {activeTab === "stats" && (
+                <motion.div
+                  key="stats"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <StatsView courses={courses} />
+                </motion.div>
+              )}
+
+              {activeTab === "major" && getMajorProgress() && (
+                <motion.div
+                  key="major"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <h2 className="text-xl font-medium mb-6 bg-clip-text text-transparent bg-gradient-to-r from-blue-200 to-purple-200">
+                    Major Progress Tracker
+                  </h2>
+                  <MajorProgressView
+                    selectedMajor={selectedMajor}
+                    progress={getMajorProgress()!}
+                    onRequirementChange={fetchCourses}
+                  />
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </motion.div>
         </div>
+
+        {/* Footer */}
+        <motion.footer
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.8 }}
+          className="py-8 text-center text-sm text-gray-500 border-t border-gray-900"
+        >
+          <p>Yale DegreeIntelligence · Elevating academic excellence</p>
+        </motion.footer>
       </div>
     </main>
   );

@@ -13,16 +13,19 @@ export default function LoginPage() {
 
   const features = [
     {
-      title: "Academic Excellence",
-      description: "Process documents with Yale-grade precision",
+      title: "AI Academic Planning. Done right.",
+      description:
+        "All we need is YHub transcript for intelligent, personalized suggestions.",
     },
     {
-      title: "Elite Security",
-      description: "Enterprise-level protection for your intellectual work",
+      title: "Major & Distributional Insights.",
+      description:
+        "Track your major requirements, distributionals, & get real-time guidance.",
     },
     {
-      title: "Intelligent Processing",
-      description: "AI-enhanced tools designed for scholarly needs",
+      title: "Goodbye Google Sheets.",
+      description:
+        "No more broken formulas or outdated planners — this is DegreeIntelligence.",
     },
   ];
 
@@ -140,7 +143,7 @@ export default function LoginPage() {
                 transition={{ delay: 0.3 }}
                 className="text-4xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-blue-200 to-purple-300"
               >
-                Yale Scholar Suite
+                Yale DegreeIntelligence
               </motion.h1>
               <motion.p
                 initial={{ opacity: 0 }}
@@ -148,8 +151,7 @@ export default function LoginPage() {
                 transition={{ delay: 0.5 }}
                 className="text-lg text-gray-300"
               >
-                The premier document processing platform for Yale's academic
-                community
+                Navigate your Yale journey with clarity, not spreadsheets.
               </motion.p>
             </div>
 
@@ -198,7 +200,7 @@ export default function LoginPage() {
                   </motion.span>
                 ) : (
                   <span className="flex items-center justify-center gap-2">
-                    <span>Continue with Yale Credentials</span>
+                    <span>Log in with CAS</span>
                     <motion.span
                       animate={isHovering ? { x: [0, 2, 0] } : {}}
                       transition={{ duration: 0.5 }}
@@ -219,7 +221,7 @@ export default function LoginPage() {
             >
               <div className="inline-flex items-center px-3 py-1 rounded-full bg-gradient-to-r from-blue-900/40 to-purple-900/40 border border-blue-700/30">
                 <span className="text-xs font-medium text-blue-200">
-                  EXCLUSIVE TO YALE COMMUNITY
+                  MADE BY YALIES, FOR YALIES.
                 </span>
               </div>
             </motion.div>
@@ -232,10 +234,20 @@ export default function LoginPage() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 1.2 }}
-        className="absolute bottom-6 text-center text-gray-400 text-sm"
+        className="absolute bottom-6 text-center text-sm"
       >
-        <p>Elevating academic work since 2023</p>
-        <p className="text-xs mt-1">v2.1.0</p>
+        <p className="text-gray-400">
+          Hey there! Thanks for stopping by. We're Filippo Fonseca & Emir Ahmed.{" "}
+          <a
+            href="mailto:filippo.fonseca@yale.edu,emir.ahmed@yale.edu"
+            className="text-white font-normal hover:underline"
+          >
+            Have feedback?
+          </a>
+        </p>
+        <p className="text-xs mt-1 text-gray-400">
+          v0.0.1. Not officially affiliated or partnered with Yale University.
+        </p>
       </motion.div>
     </div>
   );

@@ -1,8 +1,8 @@
-// src/components/StatsView.tsx
 "use client";
 
 import { Course } from "@/lib/types";
 import { gradePoints } from "@/lib/constants";
+import { motion } from "framer-motion";
 import {
   BarChart,
   Bar,
@@ -163,27 +163,34 @@ export default function StatsView({ courses }: { courses: Course[] }) {
   const gpaTicks = getAxisTicks(0, 4, 0.5);
 
   return (
-    <div className="space-y-8">
-      {/* summary cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <div className={`space-y-8 font-louize`}>
+      {/* Summary Cards */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="grid grid-cols-1 md:grid-cols-3 gap-4"
+      >
         <StatCard
-          label="GPA"
+          label="Cumulative GPA"
           value={overallGpa.toFixed(2)}
           color={getGPAColor(overallGpa.toFixed(2))}
+          icon="GPA"
         />
         <StatCard
           label="Total Credits"
           value={summary.totalCredits}
           color={getCreditsColor(summary.totalCredits)}
+          icon="CR"
         />
         <StatCard
           label="Courses Completed"
           value={activeCourses.length}
-          color="text-purple-400"
+          color="text-purple-300"
+          icon="✓"
         />
-      </div>
+      </motion.div>
 
-      {/* charts */}
+      {/* Charts Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Grade Distribution */}
         <ChartBox title="Grade Distribution">
@@ -192,7 +199,11 @@ export default function StatsView({ courses }: { courses: Course[] }) {
               data={gradeDistribution}
               margin={{ top: 20, right: 30, left: 20, bottom: 60 }}
             >
-              <CartesianGrid strokeDasharray="3 3" stroke="#4B5563" />
+              <CartesianGrid
+                strokeDasharray="3 3"
+                stroke="#374151"
+                opacity={0.3}
+              />
               <XAxis
                 dataKey="grade"
                 label={{
@@ -217,29 +228,34 @@ export default function StatsView({ courses }: { courses: Course[] }) {
               />
               <Tooltip
                 contentStyle={{
-                  backgroundColor: "#1F2937",
-                  borderColor: "#4B5563",
+                  backgroundColor: "#111827",
+                  borderColor: "#1F2937",
                   borderRadius: "0.5rem",
+                  backdropFilter: "blur(4px)",
                 }}
               />
               <Bar
                 dataKey="count"
                 fill={COLORS[4]}
                 name="Courses"
-                label={{ position: "top", fill: "#E5E7EB" }}
+                radius={[4, 4, 0, 0]}
               />
             </BarChart>
           </ResponsiveContainer>
         </ChartBox>
 
         {/* Semester GPA */}
-        <ChartBox title="Semester GPA">
+        <ChartBox title="Semester Performance">
           <ResponsiveContainer width="100%" height={400}>
             <AreaChart
               data={sortedSemData}
               margin={{ top: 20, right: 30, left: 20, bottom: 60 }}
             >
-              <CartesianGrid strokeDasharray="3 3" stroke="#4B5563" />
+              <CartesianGrid
+                strokeDasharray="3 3"
+                stroke="#374151"
+                opacity={0.3}
+              />
               <XAxis
                 dataKey="semester"
                 label={{
@@ -263,9 +279,10 @@ export default function StatsView({ courses }: { courses: Course[] }) {
               />
               <Tooltip
                 contentStyle={{
-                  backgroundColor: "#1F2937",
-                  borderColor: "#4B5563",
+                  backgroundColor: "#111827",
+                  borderColor: "#1F2937",
                   borderRadius: "0.5rem",
+                  backdropFilter: "blur(4px)",
                 }}
                 formatter={(value) => [value, "GPA"]}
                 labelFormatter={(label) => `Semester: ${label}`}
@@ -276,20 +293,25 @@ export default function StatsView({ courses }: { courses: Course[] }) {
                 name="Semester GPA"
                 stroke={COLORS[0]}
                 fill={COLORS[0]}
-                fillOpacity={0.3}
+                fillOpacity={0.2}
+                strokeWidth={2}
               />
             </AreaChart>
           </ResponsiveContainer>
         </ChartBox>
 
         {/* Cumulative GPA */}
-        <ChartBox title="Cumulative GPA">
+        <ChartBox title="Academic Trajectory">
           <ResponsiveContainer width="100%" height={400}>
             <AreaChart
               data={cumulativeData}
               margin={{ top: 20, right: 30, left: 20, bottom: 60 }}
             >
-              <CartesianGrid strokeDasharray="3 3" stroke="#4B5563" />
+              <CartesianGrid
+                strokeDasharray="3 3"
+                stroke="#374151"
+                opacity={0.3}
+              />
               <XAxis
                 dataKey="semester"
                 label={{
@@ -313,9 +335,10 @@ export default function StatsView({ courses }: { courses: Course[] }) {
               />
               <Tooltip
                 contentStyle={{
-                  backgroundColor: "#1F2937",
-                  borderColor: "#4B5563",
+                  backgroundColor: "#111827",
+                  borderColor: "#1F2937",
                   borderRadius: "0.5rem",
+                  backdropFilter: "blur(4px)",
                 }}
                 formatter={(value) => [value, "GPA"]}
                 labelFormatter={(label) => `Semester: ${label}`}
@@ -326,20 +349,25 @@ export default function StatsView({ courses }: { courses: Course[] }) {
                 name="Cumulative GPA"
                 stroke={COLORS[2]}
                 fill={COLORS[2]}
-                fillOpacity={0.3}
+                fillOpacity={0.2}
+                strokeWidth={2}
               />
             </AreaChart>
           </ResponsiveContainer>
         </ChartBox>
 
-        {/* Department Performance Bar */}
-        <ChartBox title="Department Performance (GPA)">
+        {/* Department Performance */}
+        <ChartBox title="Department Analysis">
           <ResponsiveContainer width="100%" height={400}>
             <BarChart
-              data={departmentData}
+              data={departmentData.slice(0, 8)}
               margin={{ top: 20, right: 30, left: 20, bottom: 60 }}
             >
-              <CartesianGrid strokeDasharray="3 3" stroke="#4B5563" />
+              <CartesianGrid
+                strokeDasharray="3 3"
+                stroke="#374151"
+                opacity={0.3}
+              />
               <XAxis
                 dataKey="department"
                 label={{
@@ -363,9 +391,10 @@ export default function StatsView({ courses }: { courses: Course[] }) {
               />
               <Tooltip
                 contentStyle={{
-                  backgroundColor: "#1F2937",
-                  borderColor: "#4B5563",
+                  backgroundColor: "#111827",
+                  borderColor: "#1F2937",
                   borderRadius: "0.5rem",
+                  backdropFilter: "blur(4px)",
                 }}
                 formatter={(value) => [value, "GPA"]}
                 labelFormatter={(label) => `Department: ${label}`}
@@ -374,7 +403,7 @@ export default function StatsView({ courses }: { courses: Course[] }) {
                 dataKey="gpa"
                 fill={COLORS[1]}
                 name="GPA"
-                label={{ position: "top", fill: "#E5E7EB" }}
+                radius={[4, 4, 0, 0]}
               />
             </BarChart>
           </ResponsiveContainer>
@@ -382,10 +411,10 @@ export default function StatsView({ courses }: { courses: Course[] }) {
 
         {/* Department Radar Chart */}
         {topDepartments.length > 2 && (
-          <ChartBox title="Top Departments (Radar)">
+          <ChartBox title="Top Departments">
             <ResponsiveContainer width="100%" height={400}>
               <RadarChart outerRadius={150} data={radarData}>
-                <PolarGrid gridType="circle" stroke="#4B5563" />
+                <PolarGrid gridType="circle" stroke="#374151" opacity={0.3} />
                 <PolarAngleAxis dataKey="subject" tick={{ fill: "#9CA3AF" }} />
                 <PolarRadiusAxis angle={30} domain={[0, 4]} />
                 <Radar
@@ -393,16 +422,18 @@ export default function StatsView({ courses }: { courses: Course[] }) {
                   dataKey="GPA"
                   stroke={COLORS[3]}
                   fill={COLORS[3]}
-                  fillOpacity={0.6}
+                  fillOpacity={0.3}
+                  strokeWidth={2}
                 />
                 <Legend
                   wrapperStyle={{ color: "#E5E7EB", paddingTop: "20px" }}
                 />
                 <Tooltip
                   contentStyle={{
-                    backgroundColor: "#1F2937",
-                    borderColor: "#4B5563",
+                    backgroundColor: "#111827",
+                    borderColor: "#1F2937",
                     borderRadius: "0.5rem",
+                    backdropFilter: "blur(4px)",
                   }}
                   formatter={(value) => [value, "GPA"]}
                   labelFormatter={(label) => `Department: ${label}`}
@@ -414,7 +445,7 @@ export default function StatsView({ courses }: { courses: Course[] }) {
 
         {/* Credits Distribution */}
         {departmentData.length > 0 && (
-          <ChartBox title="Credits by Department">
+          <ChartBox title="Credit Allocation">
             <ResponsiveContainer width="100%" height={400}>
               <PieChart>
                 <Pie
@@ -423,7 +454,7 @@ export default function StatsView({ courses }: { courses: Course[] }) {
                   cy="50%"
                   outerRadius={120}
                   innerRadius={60}
-                  paddingAngle={5}
+                  paddingAngle={2}
                   dataKey="credits"
                   nameKey="department"
                   label={({ name, percent }) =>
@@ -432,14 +463,20 @@ export default function StatsView({ courses }: { courses: Course[] }) {
                   labelLine={false}
                 >
                   {departmentData.map((_, idx) => (
-                    <Cell key={idx} fill={COLORS[idx % COLORS.length]} />
+                    <Cell
+                      key={idx}
+                      fill={COLORS[idx % COLORS.length]}
+                      stroke="#111827"
+                      strokeWidth={1}
+                    />
                   ))}
                 </Pie>
                 <Tooltip
                   contentStyle={{
-                    backgroundColor: "#1F2937",
-                    borderColor: "#4B5563",
+                    backgroundColor: "#111827",
+                    borderColor: "#1F2937",
                     borderRadius: "0.5rem",
+                    backdropFilter: "blur(4px)",
                   }}
                   formatter={(value, name, props) => [
                     `${value} credits`,
@@ -452,7 +489,7 @@ export default function StatsView({ courses }: { courses: Course[] }) {
                   align="right"
                   wrapperStyle={{ color: "#E5E7EB" }}
                   formatter={(value, entry, index) => (
-                    <span className="text-sm">
+                    <span className="text-xs">
                       {value} ({departmentData[index].credits} credits)
                     </span>
                   )}
@@ -470,16 +507,24 @@ function StatCard({
   label,
   value,
   color = "text-white",
+  icon,
 }: {
   label: string;
   value: string | number;
   color?: string;
+  icon?: string;
 }) {
   return (
-    <div className="neumorphic-card p-6 rounded-xl">
+    <motion.div
+      whileHover={{ y: -2 }}
+      className="p-6 rounded-xl bg-gray-900/50 backdrop-blur-sm border border-gray-800 hover:border-gray-700 transition-all"
+    >
       <p className="text-sm text-gray-400">{label}</p>
-      <p className={`text-3xl font-bold mt-2 ${color}`}>{value}</p>
-    </div>
+      <div className="flex items-end justify-between mt-2">
+        <p className={`text-3xl font-medium ${color}`}>{value}</p>
+        {icon && <span className={`text-lg ${color} opacity-60`}>{icon}</span>}
+      </div>
+    </motion.div>
   );
 }
 
@@ -491,26 +536,30 @@ function ChartBox({
   children: React.ReactNode;
 }) {
   return (
-    <div className="neumorphic-card p-6 rounded-xl">
-      <h3 className="font-bold mb-4 text-center text-lg text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-blue-500">
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="p-6 rounded-xl bg-gray-900/50 backdrop-blur-sm border border-gray-800"
+    >
+      <h3 className="font-medium mb-4 text-center text-transparent bg-clip-text bg-gradient-to-r from-blue-200 to-purple-200">
         {title}
       </h3>
       {children}
-    </div>
+    </motion.div>
   );
 }
 
 function getGPAColor(gpa: string) {
   const numericGPA = parseFloat(gpa);
-  if (numericGPA >= 3.7) return "text-emerald-400";
-  if (numericGPA >= 3.3) return "text-blue-400";
-  if (numericGPA >= 2.7) return "text-yellow-400";
-  return "text-red-400";
+  if (numericGPA >= 3.7) return "text-emerald-300";
+  if (numericGPA >= 3.3) return "text-blue-300";
+  if (numericGPA >= 2.7) return "text-amber-300";
+  return "text-red-300";
 }
 
 function getCreditsColor(credits: number) {
-  if (credits >= 32) return "text-emerald-400";
-  if (credits >= 24) return "text-blue-400";
-  if (credits >= 16) return "text-yellow-400";
-  return "text-red-400";
+  if (credits >= 32) return "text-emerald-300";
+  if (credits >= 24) return "text-blue-300";
+  if (credits >= 16) return "text-amber-300";
+  return "text-red-300";
 }

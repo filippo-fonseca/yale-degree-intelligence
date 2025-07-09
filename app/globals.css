@@ -6,10 +6,30 @@
   --foreground-rgb: 0, 0, 0;
   --background-start-rgb: 214, 219, 220;
   --background-end-rgb: 255, 255, 255;
-  --neumorph-light: #ffffff;
-  --neumorph-dark: #e0e0e0;
+  /* --neumorph-light: #ffffff;
+  --neumorph-dark: #e0e0e0; */
   --neumorph-dark-light: #2d3748;
   --neumorph-dark-dark: #1a202c;
+  --neumorphic-light: #1F2937;
+  --neumorphic-dark: #111827;
+  --neumorphic-shadow: 8px 8px 16px #0d121c, -8px -8px 16px #252f43;
+  --neumorphic-shadow-inset: inset 3px 3px 6px #0d121c, inset -3px -3px 6px #252f43;
+  --neumorphic-shadow-active: 4px 4px 8px #0d121c, -4px -4px 8px #252f43;
+}
+
+@theme {
+  --font-sans: var(--font-sf), ui-sans-serif, system-ui, sans-serif,
+    "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+}
+
+@layer utilities {
+  .font-louize {
+    font-family: var(--font-louize);
+  }
+  
+  .font-sf {
+    font-family: var(--font-sf);
+  }
 }
 
 @media (prefers-color-scheme: dark) {
@@ -28,6 +48,72 @@ body {
       rgb(var(--background-end-rgb))
     )
     rgb(var(--background-start-rgb));
+}
+
+.neumorphic-card {
+  background: linear-gradient(145deg, #1F2937, #111827);
+  box-shadow: var(--neumorphic-shadow);
+  border-radius: 12px;
+  transition: all 0.3s ease;
+}
+
+.neumorphic-card:hover {
+  box-shadow: var(--neumorphic-shadow-active);
+}
+
+.neumorphic-btn {
+  background: linear-gradient(145deg, #1F2937, #111827);
+  box-shadow: var(--neumorphic-shadow);
+  border-radius: 10px;
+  transition: all 0.3s ease;
+}
+
+.neumorphic-btn:hover {
+  box-shadow: var(--neumorphic-shadow-active);
+}
+
+.neumorphic-btn-active {
+  background: linear-gradient(145deg, #1F2937, #111827);
+  box-shadow: var(--neumorphic-shadow-inset);
+}
+
+.neumorphic-loader {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: linear-gradient(145deg, #1F2937, #111827);
+  box-shadow: var(--neumorphic-shadow);
+  position: relative;
+}
+
+.neumorphic-loader::after {
+  content: '';
+  position: absolute;
+  top: 5px;
+  left: 5px;
+  right: 5px;
+  bottom: 5px;
+  border-radius: 50%;
+  background: linear-gradient(145deg, #1F2937, #111827);
+  box-shadow: var(--neumorphic-shadow-inset);
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #1F2937;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #4B5563;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #6B7280;
 }
 
 .shadow-neumorph {

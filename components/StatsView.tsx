@@ -25,12 +25,12 @@ import {
 } from "recharts";
 
 const COLORS = [
-  "#0088FE",
-  "#00C49F",
-  "#FFBB28",
-  "#FF8042",
-  "#8884D8",
-  "#82ca9d",
+  "#8B5CF6",
+  "#3B82F6",
+  "#10B981",
+  "#F59E0B",
+  "#EC4899",
+  "#6366F1",
 ];
 const seasonOrder: Record<string, number> = {
   Spring: 1,
@@ -48,7 +48,6 @@ const getAxisTicks = (min: number, max: number, step: number) => {
 };
 
 export default function StatsView({ courses }: { courses: Course[] }) {
-  // Filter out skipped and in-progress courses, and only include graded courses
   const activeCourses = courses.filter(
     (c) =>
       !c.skipped &&
@@ -57,7 +56,6 @@ export default function StatsView({ courses }: { courses: Course[] }) {
       gradePoints[c.grade]
   );
 
-  // Summary stats
   const summary = activeCourses.reduce(
     (acc, c) => {
       acc.totalCredits += c.credits || 0;
@@ -72,7 +70,6 @@ export default function StatsView({ courses }: { courses: Course[] }) {
       ? summary.totalGradePoints / summary.totalCredits
       : 0;
 
-  // Grade distribution
   const gradeDistribution = Object.entries(
     activeCourses.reduce((acc, c) => {
       acc[c.grade!] = (acc[c.grade!] || 0) + 1;
@@ -80,7 +77,6 @@ export default function StatsView({ courses }: { courses: Course[] }) {
     }, {} as Record<string, number>)
   ).map(([grade, count]) => ({ grade, count }));
 
-  // Calculate max count for grade distribution Y-axis
   const maxGradeCount = Math.max(...gradeDistribution.map((g) => g.count), 5);
   const gradeTicks = getAxisTicks(
     0,
@@ -88,7 +84,6 @@ export default function StatsView({ courses }: { courses: Course[] }) {
     Math.ceil(maxGradeCount / 5)
   );
 
-  // Semester GPA
   const semesterGroups = activeCourses.reduce((acc, c) => {
     const key = `${c.semester} ${c.year}`;
     if (!acc[key]) {
@@ -107,7 +102,6 @@ export default function StatsView({ courses }: { courses: Course[] }) {
     }))
     .filter((item) => item.gpa > 0);
 
-  // Sort chronologically
   const sortedSemData = semesterData.sort((a, b) => {
     const [sa, ya] = a.semester.split(" ");
     const [sb, yb] = b.semester.split(" ");
@@ -117,7 +111,6 @@ export default function StatsView({ courses }: { courses: Course[] }) {
     return (seasonOrder[sa] || 0) - (seasonOrder[sb] || 0);
   });
 
-  // Cumulative GPA
   let cumCreds = 0,
     cumPts = 0;
   const cumulativeData = sortedSemData.map((entry) => {
@@ -137,7 +130,6 @@ export default function StatsView({ courses }: { courses: Course[] }) {
     };
   });
 
-  // Department performance
   const departmentData = Object.entries(
     activeCourses.reduce((acc, c) => {
       const dept = c.code.split(" ")[0];
@@ -157,7 +149,6 @@ export default function StatsView({ courses }: { courses: Course[] }) {
     .filter((dept) => dept.gpa > 0)
     .sort((a, b) => b.credits - a.credits);
 
-  // Prepare data for radar chart (top 6 departments by credits)
   const topDepartments = [...departmentData].slice(0, 6);
   const radarData = topDepartments.map((dept) => ({
     subject: dept.department,
@@ -165,7 +156,6 @@ export default function StatsView({ courses }: { courses: Course[] }) {
     fullMark: 4,
   }));
 
-  // Calculate axis ranges dynamically
   const gpaRange = {
     min: Math.min(0, ...departmentData.map((d) => d.gpa)),
     max: Math.max(4, ...departmentData.map((d) => d.gpa)),
@@ -176,9 +166,21 @@ export default function StatsView({ courses }: { courses: Course[] }) {
     <div className="space-y-8">
       {/* summary cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <StatCard label="GPA" value={overallGpa.toFixed(2)} />
-        <StatCard label="Total Credits" value={summary.totalCredits} />
-        <StatCard label="Courses Completed" value={activeCourses.length} />
+        <StatCard
+          label="GPA"
+          value={overallGpa.toFixed(2)}
+          color={getGPAColor(overallGpa.toFixed(2))}
+        />
+        <StatCard
+          label="Total Credits"
+          value={summary.totalCredits}
+          color={getCreditsColor(summary.totalCredits)}
+        />
+        <StatCard
+          label="Courses Completed"
+          value={activeCourses.length}
+          color="text-purple-400"
+        />
       </div>
 
       {/* charts */}
@@ -190,32 +192,41 @@ export default function StatsView({ courses }: { courses: Course[] }) {
               data={gradeDistribution}
               margin={{ top: 20, right: 30, left: 20, bottom: 60 }}
             >
-              <CartesianGrid strokeDasharray="3 3" />
+              <CartesianGrid strokeDasharray="3 3" stroke="#4B5563" />
               <XAxis
                 dataKey="grade"
                 label={{
                   value: "Grade",
                   position: "insideBottom",
                   offset: -40,
+                  fill: "#9CA3AF",
                 }}
-                tick={{ fontSize: 12 }}
+                tick={{ fill: "#9CA3AF", fontSize: 12 }}
               />
               <YAxis
                 label={{
                   value: "Number of Courses",
                   angle: -90,
                   position: "insideLeft",
+                  fill: "#9CA3AF",
                 }}
                 ticks={gradeTicks}
                 domain={[0, maxGradeCount]}
                 allowDecimals={false}
+                tick={{ fill: "#9CA3AF" }}
               />
-              <Tooltip />
+              <Tooltip
+                contentStyle={{
+                  backgroundColor: "#1F2937",
+                  borderColor: "#4B5563",
+                  borderRadius: "0.5rem",
+                }}
+              />
               <Bar
                 dataKey="count"
                 fill={COLORS[4]}
                 name="Courses"
-                label={{ position: "top" }}
+                label={{ position: "top", fill: "#E5E7EB" }}
               />
             </BarChart>
           </ResponsiveContainer>
@@ -228,22 +239,34 @@ export default function StatsView({ courses }: { courses: Course[] }) {
               data={sortedSemData}
               margin={{ top: 20, right: 30, left: 20, bottom: 60 }}
             >
-              <CartesianGrid strokeDasharray="3 3" />
+              <CartesianGrid strokeDasharray="3 3" stroke="#4B5563" />
               <XAxis
                 dataKey="semester"
                 label={{
                   value: "Semester",
                   position: "insideBottom",
                   offset: -40,
+                  fill: "#9CA3AF",
                 }}
-                tick={{ fontSize: 12 }}
+                tick={{ fill: "#9CA3AF", fontSize: 12 }}
               />
               <YAxis
                 domain={[0, 4]}
                 ticks={gpaTicks}
-                label={{ value: "GPA", angle: -90, position: "insideLeft" }}
+                label={{
+                  value: "GPA",
+                  angle: -90,
+                  position: "insideLeft",
+                  fill: "#9CA3AF",
+                }}
+                tick={{ fill: "#9CA3AF" }}
               />
               <Tooltip
+                contentStyle={{
+                  backgroundColor: "#1F2937",
+                  borderColor: "#4B5563",
+                  borderRadius: "0.5rem",
+                }}
                 formatter={(value) => [value, "GPA"]}
                 labelFormatter={(label) => `Semester: ${label}`}
               />
@@ -266,22 +289,34 @@ export default function StatsView({ courses }: { courses: Course[] }) {
               data={cumulativeData}
               margin={{ top: 20, right: 30, left: 20, bottom: 60 }}
             >
-              <CartesianGrid strokeDasharray="3 3" />
+              <CartesianGrid strokeDasharray="3 3" stroke="#4B5563" />
               <XAxis
                 dataKey="semester"
                 label={{
                   value: "Semester",
                   position: "insideBottom",
                   offset: -40,
+                  fill: "#9CA3AF",
                 }}
-                tick={{ fontSize: 12 }}
+                tick={{ fill: "#9CA3AF", fontSize: 12 }}
               />
               <YAxis
                 domain={[0, 4]}
                 ticks={gpaTicks}
-                label={{ value: "GPA", angle: -90, position: "insideLeft" }}
+                label={{
+                  value: "GPA",
+                  angle: -90,
+                  position: "insideLeft",
+                  fill: "#9CA3AF",
+                }}
+                tick={{ fill: "#9CA3AF" }}
               />
               <Tooltip
+                contentStyle={{
+                  backgroundColor: "#1F2937",
+                  borderColor: "#4B5563",
+                  borderRadius: "0.5rem",
+                }}
                 formatter={(value) => [value, "GPA"]}
                 labelFormatter={(label) => `Semester: ${label}`}
               />
@@ -304,22 +339,34 @@ export default function StatsView({ courses }: { courses: Course[] }) {
               data={departmentData}
               margin={{ top: 20, right: 30, left: 20, bottom: 60 }}
             >
-              <CartesianGrid strokeDasharray="3 3" />
+              <CartesianGrid strokeDasharray="3 3" stroke="#4B5563" />
               <XAxis
                 dataKey="department"
                 label={{
                   value: "Department",
                   position: "insideBottom",
                   offset: -40,
+                  fill: "#9CA3AF",
                 }}
-                tick={{ fontSize: 12 }}
+                tick={{ fill: "#9CA3AF", fontSize: 12 }}
               />
               <YAxis
                 domain={[gpaRange.min, gpaRange.max]}
                 ticks={gpaTicks}
-                label={{ value: "GPA", angle: -90, position: "insideLeft" }}
+                label={{
+                  value: "GPA",
+                  angle: -90,
+                  position: "insideLeft",
+                  fill: "#9CA3AF",
+                }}
+                tick={{ fill: "#9CA3AF" }}
               />
               <Tooltip
+                contentStyle={{
+                  backgroundColor: "#1F2937",
+                  borderColor: "#4B5563",
+                  borderRadius: "0.5rem",
+                }}
                 formatter={(value) => [value, "GPA"]}
                 labelFormatter={(label) => `Department: ${label}`}
               />
@@ -327,7 +374,7 @@ export default function StatsView({ courses }: { courses: Course[] }) {
                 dataKey="gpa"
                 fill={COLORS[1]}
                 name="GPA"
-                label={{ position: "top" }}
+                label={{ position: "top", fill: "#E5E7EB" }}
               />
             </BarChart>
           </ResponsiveContainer>
@@ -338,8 +385,8 @@ export default function StatsView({ courses }: { courses: Course[] }) {
           <ChartBox title="Top Departments (Radar)">
             <ResponsiveContainer width="100%" height={400}>
               <RadarChart outerRadius={150} data={radarData}>
-                <PolarGrid gridType="circle" />
-                <PolarAngleAxis dataKey="subject" />
+                <PolarGrid gridType="circle" stroke="#4B5563" />
+                <PolarAngleAxis dataKey="subject" tick={{ fill: "#9CA3AF" }} />
                 <PolarRadiusAxis angle={30} domain={[0, 4]} />
                 <Radar
                   name="GPA"
@@ -348,8 +395,15 @@ export default function StatsView({ courses }: { courses: Course[] }) {
                   fill={COLORS[3]}
                   fillOpacity={0.6}
                 />
-                <Legend />
+                <Legend
+                  wrapperStyle={{ color: "#E5E7EB", paddingTop: "20px" }}
+                />
                 <Tooltip
+                  contentStyle={{
+                    backgroundColor: "#1F2937",
+                    borderColor: "#4B5563",
+                    borderRadius: "0.5rem",
+                  }}
                   formatter={(value) => [value, "GPA"]}
                   labelFormatter={(label) => `Department: ${label}`}
                 />
@@ -382,6 +436,11 @@ export default function StatsView({ courses }: { courses: Course[] }) {
                   ))}
                 </Pie>
                 <Tooltip
+                  contentStyle={{
+                    backgroundColor: "#1F2937",
+                    borderColor: "#4B5563",
+                    borderRadius: "0.5rem",
+                  }}
                   formatter={(value, name, props) => [
                     `${value} credits`,
                     props.payload.department,
@@ -391,6 +450,7 @@ export default function StatsView({ courses }: { courses: Course[] }) {
                   layout="vertical"
                   verticalAlign="middle"
                   align="right"
+                  wrapperStyle={{ color: "#E5E7EB" }}
                   formatter={(value, entry, index) => (
                     <span className="text-sm">
                       {value} ({departmentData[index].credits} credits)
@@ -406,12 +466,19 @@ export default function StatsView({ courses }: { courses: Course[] }) {
   );
 }
 
-// Reusable components
-function StatCard({ label, value }: { label: string; value: string | number }) {
+function StatCard({
+  label,
+  value,
+  color = "text-white",
+}: {
+  label: string;
+  value: string | number;
+  color?: string;
+}) {
   return (
-    <div className="p-4 bg-white rounded-lg border shadow-sm text-center">
-      <p className="text-sm text-gray-500">{label}</p>
-      <p className="text-2xl font-medium">{value}</p>
+    <div className="neumorphic-card p-6 rounded-xl">
+      <p className="text-sm text-gray-400">{label}</p>
+      <p className={`text-3xl font-bold mt-2 ${color}`}>{value}</p>
     </div>
   );
 }
@@ -424,9 +491,26 @@ function ChartBox({
   children: React.ReactNode;
 }) {
   return (
-    <div className="bg-white p-4 rounded-lg border shadow-sm">
-      <h3 className="font-medium mb-4 text-center">{title}</h3>
+    <div className="neumorphic-card p-6 rounded-xl">
+      <h3 className="font-bold mb-4 text-center text-lg text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-blue-500">
+        {title}
+      </h3>
       {children}
     </div>
   );
+}
+
+function getGPAColor(gpa: string) {
+  const numericGPA = parseFloat(gpa);
+  if (numericGPA >= 3.7) return "text-emerald-400";
+  if (numericGPA >= 3.3) return "text-blue-400";
+  if (numericGPA >= 2.7) return "text-yellow-400";
+  return "text-red-400";
+}
+
+function getCreditsColor(credits: number) {
+  if (credits >= 32) return "text-emerald-400";
+  if (credits >= 24) return "text-blue-400";
+  if (credits >= 16) return "text-yellow-400";
+  return "text-red-400";
 }

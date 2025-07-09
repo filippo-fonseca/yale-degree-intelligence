@@ -1,3 +1,4 @@
+// src/app/page.tsx
 "use client";
 
 import { useAuth } from "@/context/AuthContext";
@@ -31,16 +32,14 @@ export default function Home() {
   const [activeTab, setActiveTab] = useState("upload");
   const [courses, setCourses] = useState<Course[]>([]);
   const [hasData, setHasData] = useState(false);
-
   const [selectedMajor, setSelectedMajor] = useState<string>("MENG");
 
-  // Update the getMajorProgress function in src/app/page.tsx
   const getMajorProgress = () => {
     if (!user || courses.length === 0) return null;
     const completedCourseCodes = courses
       .filter(
         (course) =>
-          course.status === "completed" && (course.grade || course.skipped) // Include both graded and skipped courses
+          course.status === "completed" && (course.grade || course.skipped)
       )
       .map((course) => course.code);
     return calculateMajorProgress(selectedMajor, completedCourseCodes);
@@ -68,7 +67,6 @@ export default function Home() {
     await fetchCourses();
   };
 
-  // Update the calculateStats function in src/app/page.tsx
   const calculateStats = () => {
     if (courses.length === 0) return null;
     let totalCredits = 0;
@@ -82,7 +80,6 @@ export default function Home() {
         inProgressCourses++;
         return;
       }
-      // Skip courses that are marked as skipped
       if (course.skipped) return;
 
       if (course.grade && gradePoints[course.grade]) {
@@ -107,33 +104,37 @@ export default function Home() {
 
   const getGPAColor = (gpa: string) => {
     const numericGPA = parseFloat(gpa);
-    if (numericGPA >= 3.7) return "text-green-600";
-    if (numericGPA >= 3.3) return "text-blue-600";
-    if (numericGPA >= 2.7) return "text-yellow-600";
-    return "text-red-600";
+    if (numericGPA >= 3.7) return "text-emerald-400";
+    if (numericGPA >= 3.3) return "text-blue-400";
+    if (numericGPA >= 2.7) return "text-yellow-400";
+    return "text-red-400";
   };
 
   const getCreditsColor = (credits: number) => {
-    if (credits >= 32) return "text-green-600";
-    if (credits >= 24) return "text-blue-600";
-    if (credits >= 16) return "text-yellow-600";
-    return "text-red-600";
+    if (credits >= 32) return "text-emerald-400";
+    if (credits >= 24) return "text-blue-400";
+    if (credits >= 16) return "text-yellow-400";
+    return "text-red-400";
   };
 
   if (loading)
-    return <div className="animate-pulse text-black">Loading...</div>;
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-gray-900">
+        <div className="neumorphic-loader animate-pulse"></div>
+      </div>
+    );
   if (!user) return <LoginPage />;
 
   return (
-    <main className="min-h-screen bg-white text-black">
+    <main className="min-h-screen bg-gray-900 text-gray-100">
       <div className="max-w-6xl mx-auto px-4">
-        <header className="flex justify-between items-center py-6 border-b border-gray-200">
-          <h1 className="text-2xl font-medium tracking-tight">
+        <header className="flex justify-between items-center py-6">
+          <h1 className="font-louize text-2xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-blue-500">
             Yale DegreeIntelligence
           </h1>
           <button
             onClick={logout}
-            className="flex items-center space-x-2 text-sm hover:text-gray-600"
+            className="neumorphic-btn flex items-center space-x-2 text-sm px-4 py-2 rounded-lg hover:bg-gray-800 transition-all"
           >
             <FiLogOut size={16} />
             <span>Logout</span>
@@ -143,24 +144,25 @@ export default function Home() {
         <div className="flex flex-col md:flex-row gap-8 py-8">
           {/* Sidebar Navigation */}
           <aside className="w-full md:w-64">
-            <nav className="space-y-1">
+            <nav className="space-y-2">
               <button
                 onClick={() => setActiveTab("upload")}
-                className={`w-full flex items-center space-x-3 px-4 py-3 text-left ${
+                className={`w-full flex items-center space-x-3 px-4 py-3 text-left rounded-xl transition-all ${
                   activeTab === "upload"
-                    ? "bg-black text-white"
-                    : "hover:bg-gray-100"
+                    ? "neumorphic-btn-active bg-gradient-to-br from-purple-500 to-blue-600 text-white"
+                    : "neumorphic-btn hover:bg-gray-800"
                 }`}
               >
-                My courses
+                <FiUpload size={18} />
+                <span>My Courses</span>
               </button>
 
               <button
                 onClick={() => setActiveTab("stats")}
-                className={`w-full flex items-center space-x-3 px-4 py-3 text-left ${
+                className={`w-full flex items-center space-x-3 px-4 py-3 text-left rounded-xl transition-all ${
                   activeTab === "stats"
-                    ? "bg-black text-white"
-                    : "hover:bg-gray-100"
+                    ? "neumorphic-btn-active bg-gradient-to-br from-purple-500 to-blue-600 text-white"
+                    : "neumorphic-btn hover:bg-gray-800"
                 }`}
               >
                 <FiBarChart2 size={18} />
@@ -169,26 +171,14 @@ export default function Home() {
 
               <button
                 onClick={() => setActiveTab("major")}
-                className={`w-full flex items-center space-x-3 px-4 py-3 text-left ${
+                className={`w-full flex items-center space-x-3 px-4 py-3 text-left rounded-xl transition-all ${
                   activeTab === "major"
-                    ? "bg-black text-white"
-                    : "hover:bg-gray-100"
+                    ? "neumorphic-btn-active bg-gradient-to-br from-purple-500 to-blue-600 text-white"
+                    : "neumorphic-btn hover:bg-gray-800"
                 }`}
               >
                 <FiBook size={18} />
                 <span>Major Progress</span>
-              </button>
-
-              <button
-                onClick={() => setActiveTab("settings")}
-                className={`w-full flex items-center space-x-3 px-4 py-3 text-left ${
-                  activeTab === "settings"
-                    ? "bg-black text-white"
-                    : "hover:bg-gray-100"
-                }`}
-              >
-                <FiSettings size={18} />
-                <span>Settings</span>
               </button>
             </nav>
           </aside>
@@ -199,7 +189,9 @@ export default function Home() {
               <div>
                 {hasData ? (
                   <div>
-                    <h2 className="text-xl font-medium mb-6">Your Courses</h2>
+                    <h2 className="text-xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-blue-500">
+                      Your Courses
+                    </h2>
                     <div className="space-y-6">
                       {Array.from(
                         new Set(courses.map((c) => `${c.semester} ${c.year}`))
@@ -216,12 +208,12 @@ export default function Home() {
                               .map((course) => (
                                 <div
                                   key={course.id}
-                                  className={`p-4 border rounded-lg ${
+                                  className={`p-4 rounded-xl neumorphic-card ${
                                     course.status === "in-progress"
-                                      ? "border-blue-200 bg-blue-50"
+                                      ? "border-l-4 border-blue-400"
                                       : course.skipped
-                                      ? "border-gray-200 bg-gray-50"
-                                      : "border-gray-200"
+                                      ? "border-l-4 border-gray-500"
+                                      : ""
                                   }`}
                                 >
                                   <div className="flex justify-between items-start">
@@ -229,17 +221,17 @@ export default function Home() {
                                       <h4 className="font-medium">
                                         {course.code}
                                         {course.skipped && (
-                                          <span className="ml-2 text-xs text-gray-500">
+                                          <span className="ml-2 text-xs text-gray-400">
                                             (skipped)
                                           </span>
                                         )}
                                       </h4>
-                                      <p className="text-sm text-gray-600">
+                                      <p className="text-sm text-gray-400">
                                         {course.name}
                                       </p>
                                       <div className="flex items-center mt-1 space-x-2">
                                         {course.status === "in-progress" && (
-                                          <span className="inline-block px-2 py-0.5 bg-blue-100 text-blue-300 rounded">
+                                          <span className="inline-block px-2 py-0.5 bg-blue-900/30 text-blue-400 rounded-full text-xs">
                                             In Progress
                                           </span>
                                         )}
@@ -250,7 +242,11 @@ export default function Home() {
                                       </div>
                                     </div>
                                     {course.grade && !course.skipped && (
-                                      <span className="text-gray-800 font-medium">
+                                      <span
+                                        className={`text-lg font-medium ${getGPAColor(
+                                          course.grade
+                                        )}`}
+                                      >
                                         {course.grade}
                                       </span>
                                     )}
@@ -264,10 +260,10 @@ export default function Home() {
                   </div>
                 ) : (
                   <div className="flex flex-col items-center justify-center py-12">
-                    <h2 className="text-xl font-medium mb-6">
+                    <h2 className="text-xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-blue-500">
                       Import Your Transcript
                     </h2>
-                    <div className="w-full max-w-md">
+                    <div className="w-full max-w-md neumorphic-card p-6 rounded-xl">
                       <FileUpload onSuccess={parseAndStoreCourses} />
                     </div>
                   </div>
@@ -277,23 +273,14 @@ export default function Home() {
             {activeTab === "stats" && <StatsView courses={courses} />}
             {activeTab === "major" && getMajorProgress() && (
               <div>
-                <h2 className="text-xl font-medium mb-6">Major Progress</h2>
+                <h2 className="text-xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-blue-500">
+                  Major Progress
+                </h2>
                 <MajorProgressView
                   selectedMajor={selectedMajor}
                   progress={getMajorProgress()!}
                   onRequirementChange={fetchCourses}
                 />
-              </div>
-            )}
-            {activeTab === "settings" && (
-              <div>
-                <h2 className="text-xl font-medium mb-6">Settings</h2>
-                <div className="space-y-6">
-                  <div className="border-b border-gray-200 pb-6">
-                    <h3 className="font-medium mb-4">Account</h3>
-                    <p className="text-sm">{user.email}</p>
-                  </div>
-                </div>
               </div>
             )}
           </div>

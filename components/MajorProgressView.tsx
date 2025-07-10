@@ -44,7 +44,6 @@ export default function MajorProgressView({
   const [expandedSections, setExpandedSections] = useState({
     completed: true,
     remaining: true,
-    inProgress: true,
   });
   const [showInProgressStats, setShowInProgressStats] = useState(false);
 
@@ -83,12 +82,6 @@ export default function MajorProgressView({
   const completedCredits = progress.completedCredits;
   const inProgressCredits = progress.inProgressCredits || 0;
   const totalCredits = progress.totalCredits;
-  const completedRequirements = progress.completedRequirements.length;
-  const inProgressRequirements = progress.inProgressRequirements?.length || 0;
-  const totalRequirements =
-    completedRequirements +
-    inProgressRequirements +
-    progress.remainingRequirements.length;
   const completionPercentage = progress.percentage;
   const withInProgressPercentage =
     progress.inProgressPercentage || progress.percentage;
@@ -179,131 +172,6 @@ export default function MajorProgressView({
 
       {/* Requirements Sections */}
       <div className="space-y-6">
-        {/* In Progress Requirements */}
-        {/* In Progress Requirements Section */}
-        {/* In Progress Requirements Section */}
-        {progress.inProgressRequirements &&
-          progress.inProgressRequirements.length > 0 && (
-            <div className="space-y-4">
-              <button
-                onClick={() => toggleSection("inProgress")}
-                className="flex items-center gap-2 text-blue-300 hover:text-blue-200 transition-colors"
-              >
-                <motion.div
-                  animate={{ rotate: expandedSections.inProgress ? 0 : -90 }}
-                >
-                  <FiChevronDown />
-                </motion.div>
-                <h4 className="font-medium">
-                  In Progress ({progress.inProgressCredits} credits)
-                </h4>
-              </button>
-
-              <AnimatePresence>
-                {expandedSections.inProgress && (
-                  <motion.div
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: "auto" }}
-                    exit={{ opacity: 0, height: 0 }}
-                    className="overflow-hidden"
-                  >
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                      {progress.inProgressRequirements.map((req, i) => {
-                        // Filter to only show options that are in progress
-                        const inProgressOptions = req.options.filter(
-                          (o) => o.inProgress
-                        );
-                        const hasSkipped = req.options.some((o) => o.skipped);
-
-                        if (inProgressOptions.length === 0) return null;
-
-                        return (
-                          <motion.div
-                            key={`inprogress-${i}`}
-                            initial={{ opacity: 0, y: 10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: i * 0.05 }}
-                            className={`p-4 rounded-xl backdrop-blur-sm border transition-all ${
-                              hasSkipped
-                                ? "bg-gray-900/30 border-gray-700 hover:border-gray-600"
-                                : "bg-blue-900/10 border-blue-800/30 hover:border-blue-500/30"
-                            }`}
-                          >
-                            <div className="flex justify-between items-start mb-2">
-                              <h5
-                                className={`font-medium ${
-                                  hasSkipped ? "text-gray-300" : "text-blue-300"
-                                }`}
-                              >
-                                {req.name}
-                              </h5>
-                              <div className="flex items-center gap-2">
-                                <span className="text-xs bg-blue-900/20 text-blue-300 px-2 py-1 rounded-full">
-                                  In Progress ({inProgressOptions.length}/
-                                  {req.required})
-                                </span>
-                                {hasSkipped && (
-                                  <span className="text-xs bg-gray-700 text-gray-300 px-2 py-1 rounded-full">
-                                    Contains Skipped
-                                  </span>
-                                )}
-                              </div>
-                            </div>
-
-                            {req.description && (
-                              <p
-                                className={`text-xs mb-3 ${
-                                  hasSkipped
-                                    ? "text-gray-400"
-                                    : "text-blue-300/80"
-                                }`}
-                              >
-                                {req.description}
-                              </p>
-                            )}
-
-                            <div className="flex flex-wrap gap-1.5">
-                              {inProgressOptions.map((opt, j) => (
-                                <div
-                                  key={`opt-${j}`}
-                                  className={`px-2 py-0.5 rounded-full text-xs flex items-center ${
-                                    opt.skipped
-                                      ? "bg-gray-800 text-gray-300 border border-dashed border-gray-600"
-                                      : "bg-blue-900/20 text-blue-300"
-                                  }`}
-                                >
-                                  {opt.code}
-                                  <span className="ml-1 text-[0.65rem]">
-                                    ({opt.credits}cr
-                                    {opt.skipped
-                                      ? ", skipped"
-                                      : ", in progress"}
-                                    )
-                                  </span>
-                                  {opt.skipped && (
-                                    <button
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        handleUnskip(opt.code);
-                                      }}
-                                      className="ml-1 text-[0.65rem] text-gray-400 hover:text-gray-200"
-                                      title="Unskip this course"
-                                    >
-                                      <FiX size={10} />
-                                    </button>
-                                  )}
-                                </div>
-                              ))}
-                            </div>
-                          </motion.div>
-                        );
-                      })}
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
-          )}
         {/* Completed Requirements */}
         {progress.completedRequirements.length > 0 && (
           <div className="space-y-4">
@@ -421,169 +289,156 @@ export default function MajorProgressView({
             </AnimatePresence>
           </div>
         )}
-        {/* Remaining Requirements */}
-        {/* Remaining Requirements Section */}
+
+        {/* Remaining Requirements - Now includes in-progress courses */}
         {progress.remainingRequirements.length > 0 && (
           <div className="space-y-4">
+            <button
+              onClick={() => toggleSection("remaining")}
+              className="flex items-center gap-2 text-amber-300 hover:text-amber-200 transition-colors"
+            >
+              <motion.div
+                animate={{ rotate: expandedSections.remaining ? 0 : -90 }}
+              >
+                <FiChevronDown />
+              </motion.div>
+              <h4 className="font-medium">
+                Remaining (
+                {progress.remainingRequirements.reduce(
+                  (total, req) => total + (req.required || 0),
+                  0
+                )}{" "}
+                credits)
+              </h4>
+            </button>
+
             <AnimatePresence>
-              {progress.remainingRequirements.length > 0 && (
-                <div className="space-y-4">
-                  <button
-                    onClick={() => toggleSection("remaining")}
-                    className="flex items-center gap-2 text-amber-300 hover:text-amber-200 transition-colors"
-                  >
-                    <motion.div
-                      animate={{ rotate: expandedSections.remaining ? 0 : -90 }}
-                    >
-                      <FiChevronDown />
-                    </motion.div>
-                    <h4 className="font-medium">
-                      Remaining (
-                      {progress.remainingRequirements.reduce(
-                        (total, req) => total + (req.required || 0),
-                        0
-                      )}{" "}
-                      credits)
-                    </h4>
-                  </button>
+              {expandedSections.remaining && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: "auto" }}
+                  exit={{ opacity: 0, height: 0 }}
+                  className="overflow-hidden"
+                >
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {progress.remainingRequirements.map((req, i) => {
+                      // Get all options that are not completed (including in-progress ones)
+                      const remainingOptions = req.options.filter(
+                        (o) => !o.completed && !o.skipped
+                      );
 
-                  <AnimatePresence>
-                    {expandedSections.remaining && (
-                      <motion.div
-                        initial={{ opacity: 0, height: 0 }}
-                        animate={{ opacity: 1, height: "auto" }}
-                        exit={{ opacity: 0, height: 0 }}
-                        className="overflow-hidden"
-                      >
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                          {progress.remainingRequirements.map((req, i) => {
-                            // Get all options that are not completed (including in-progress ones)
-                            const remainingOptions = req.options.filter(
-                              (o) => !o.completed && !o.skipped
-                            );
+                      // Skip if all options are completed
+                      if (remainingOptions.length === 0) return null;
 
-                            // Skip if all options are completed
-                            if (remainingOptions.length === 0) return null;
-
-                            return (
-                              <motion.div
-                                key={`remaining-${i}`}
-                                initial={{ opacity: 0, y: 10 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: i * 0.05 }}
-                                className="p-4 rounded-xl bg-gray-900/50 backdrop-blur-sm border border-gray-800 hover:border-amber-500/30 transition-all relative"
+                      return (
+                        <motion.div
+                          key={`remaining-${i}`}
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: i * 0.05 }}
+                          className="p-4 rounded-xl bg-gray-900/50 backdrop-blur-sm border border-gray-800 hover:border-amber-500/30 transition-all relative"
+                        >
+                          <div className="flex justify-between items-start mb-2">
+                            <h5 className="font-medium text-amber-300">
+                              {req.name}
+                            </h5>
+                            <div className="flex items-center gap-2">
+                              <span className="text-xs bg-amber-900/20 text-amber-300 px-2 py-1 rounded-full">
+                                {req.completed}/{req.required}
+                              </span>
+                              <button
+                                onClick={() => toggleDropdown(`req-${i}`)}
+                                className="p-1 text-gray-400 hover:text-gray-200 rounded-full hover:bg-gray-800"
                               >
-                                <div className="flex justify-between items-start mb-2">
-                                  <h5 className="font-medium text-amber-300">
-                                    {req.name}
-                                  </h5>
-                                  <div className="flex items-center gap-2">
-                                    <span className="text-xs bg-amber-900/20 text-amber-300 px-2 py-1 rounded-full">
-                                      {req.completed}/{req.required}
-                                    </span>
-                                    <button
-                                      onClick={() => toggleDropdown(`req-${i}`)}
-                                      className="p-1 text-gray-400 hover:text-gray-200 rounded-full hover:bg-gray-800"
-                                    >
-                                      <FiMoreVertical />
-                                    </button>
-                                  </div>
+                                <FiMoreVertical />
+                              </button>
+                            </div>
+                          </div>
+
+                          <AnimatePresence>
+                            {dropdownOpen === `req-${i}` && (
+                              <motion.div
+                                initial={{ opacity: 0, y: -10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: -10 }}
+                                className="absolute right-4 top-12 z-10 mt-1 w-48 rounded-md bg-gray-800 shadow-lg border border-gray-700 overflow-hidden"
+                              >
+                                <button
+                                  onClick={() => {
+                                    const firstOption = remainingOptions.find(
+                                      (opt) => opt.required
+                                    );
+                                    if (firstOption) {
+                                      handleSkip(
+                                        firstOption.code,
+                                        firstOption.name
+                                      );
+                                    }
+                                    setDropdownOpen(null);
+                                  }}
+                                  className="block px-4 py-2 text-sm text-gray-200 hover:bg-gray-700 w-full text-left flex items-center gap-2"
+                                >
+                                  <FiCheck />
+                                  Mark as Skipped
+                                </button>
+                              </motion.div>
+                            )}
+                          </AnimatePresence>
+
+                          {req.description && (
+                            <p className="text-xs text-amber-300/80 mb-3">
+                              {req.description}
+                            </p>
+                          )}
+
+                          <div className="space-y-2">
+                            <div className="flex flex-wrap gap-1.5">
+                              {remainingOptions.map((opt, j) => (
+                                <div
+                                  key={`opt-${j}`}
+                                  className={`px-2 py-0.5 rounded-full text-xs flex items-center ${
+                                    opt.inProgress
+                                      ? "bg-blue-900/20 text-blue-300"
+                                      : "bg-amber-900/20 text-amber-300"
+                                  }`}
+                                >
+                                  {opt.code}
+                                  <span className="ml-1 text-[0.65rem]">
+                                    ({opt.credits}cr
+                                    {opt.inProgress ? ", in progress" : ""})
+                                  </span>
                                 </div>
+                              ))}
+                            </div>
 
-                                <AnimatePresence>
-                                  {dropdownOpen === `req-${i}` && (
-                                    <motion.div
-                                      initial={{ opacity: 0, y: -10 }}
-                                      animate={{ opacity: 1, y: 0 }}
-                                      exit={{ opacity: 0, y: -10 }}
-                                      className="absolute right-4 top-12 z-10 mt-1 w-48 rounded-md bg-gray-800 shadow-lg border border-gray-700 overflow-hidden"
-                                    >
-                                      <button
-                                        onClick={() => {
-                                          const firstOption =
-                                            remainingOptions.find(
-                                              (opt) => opt.required
-                                            );
-                                          if (firstOption) {
-                                            handleSkip(
-                                              firstOption.code,
-                                              firstOption.name
-                                            );
-                                          }
-                                          setDropdownOpen(null);
-                                        }}
-                                        className="block px-4 py-2 text-sm text-gray-200 hover:bg-gray-700 w-full text-left flex items-center gap-2"
-                                      >
-                                        <FiCheck />
-                                        Mark as Skipped
-                                      </button>
-                                    </motion.div>
-                                  )}
-                                </AnimatePresence>
-
-                                {req.description && (
-                                  <p className="text-xs text-amber-300/80 mb-3">
-                                    {req.description}
-                                  </p>
-                                )}
-
-                                {/* Show all remaining options (both not started and in-progress) */}
-                                <div className="space-y-2">
-                                  <div className="flex flex-wrap gap-1.5">
-                                    {remainingOptions.map((opt, j) => (
+                            {/* Show any extra completed courses */}
+                            {req.options.some(
+                              (o) => o.completed && !o.required
+                            ) && (
+                              <div>
+                                <p className="text-xs text-gray-400 mb-1">
+                                  Extra completed:
+                                </p>
+                                <div className="flex flex-wrap gap-1.5">
+                                  {req.options
+                                    .filter((o) => o.completed && !o.required)
+                                    .map((opt, j) => (
                                       <div
-                                        key={`opt-${j}`}
-                                        className={`px-2 py-0.5 rounded-full text-xs flex items-center ${
-                                          opt.inProgress
-                                            ? "bg-blue-900/20 text-blue-300"
-                                            : "bg-amber-900/20 text-amber-300"
-                                        }`}
+                                        key={`extra-${j}`}
+                                        className="px-2 py-0.5 rounded-full text-xs bg-gray-800 text-gray-300"
                                       >
                                         {opt.code}
-                                        <span className="ml-1 text-[0.65rem]">
-                                          ({opt.credits}cr
-                                          {opt.inProgress
-                                            ? ", in progress"
-                                            : ""}
-                                          )
-                                        </span>
                                       </div>
                                     ))}
-                                  </div>
-
-                                  {/* Show any extra completed courses */}
-                                  {req.options.some(
-                                    (o) => o.completed && !o.required
-                                  ) && (
-                                    <div>
-                                      <p className="text-xs text-gray-400 mb-1">
-                                        Extra completed:
-                                      </p>
-                                      <div className="flex flex-wrap gap-1.5">
-                                        {req.options
-                                          .filter(
-                                            (o) => o.completed && !o.required
-                                          )
-                                          .map((opt, j) => (
-                                            <div
-                                              key={`extra-${j}`}
-                                              className="px-2 py-0.5 rounded-full text-xs bg-gray-800 text-gray-300"
-                                            >
-                                              {opt.code}
-                                            </div>
-                                          ))}
-                                      </div>
-                                    </div>
-                                  )}
                                 </div>
-                              </motion.div>
-                            );
-                          })}
-                        </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </div>
+                              </div>
+                            )}
+                          </div>
+                        </motion.div>
+                      );
+                    })}
+                  </div>
+                </motion.div>
               )}
             </AnimatePresence>
           </div>

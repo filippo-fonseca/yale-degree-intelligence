@@ -146,19 +146,19 @@ const COURSES: CourseInfo[] = [
     department: "MENG"
   },
   {
-    codes: ["MENG 2311", "MENG 231"],
+    codes: ["MENG 2311", "MENG 280"],
     name: "Strength and Deformation of Mechanical Elements",
     credits: 1.0,
     department: "MENG"
   },
   {
-    codes: ["MENG 2615", "MENG 261"],
+    codes: ["MENG 2615", "MENG 285"],
     name: "Introduction to Materials Science",
     credits: 1.0,
     department: "MENG"
   },
   {
-    codes: ["MENG 2616L", "MENG 261L"],
+    codes: ["MENG 2616L", "MENG 286L"],
     name: "Solid Mechanics and Materials Science Laboratory",
     credits: 0.5,
     department: "MENG"
@@ -170,7 +170,7 @@ const COURSES: CourseInfo[] = [
     department: "MENG"
   },
   {
-    codes: ["MENG 3125", "MENG 312"],
+    codes: ["MENG 3125", "MENG 325"],
     name: "Machine Elements and Manufacturing Processes",
     credits: 1.0,
     department: "MENG"

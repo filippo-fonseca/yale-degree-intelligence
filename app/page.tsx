@@ -73,10 +73,21 @@ export default function Home() {
     const completedCourseCodes = courses
       .filter(
         (course) =>
-          course.status === "completed" && (course.grade || course.skipped)
+          course.status === "completed" &&
+          ((course.grade !== null && course.grade !== "In Progress") ||
+            course.skipped)
       )
       .map((course) => course.code);
-    return calculateMajorProgress(selectedMajor, completedCourseCodes);
+
+    const inProgressCourseCodes = courses
+      .filter((course) => course.grade === "In Progress" && !course.skipped)
+      .map((course) => course.code);
+
+    return calculateMajorProgress(
+      selectedMajor,
+      completedCourseCodes,
+      inProgressCourseCodes
+    );
   };
 
   useEffect(() => {
@@ -85,19 +96,119 @@ export default function Home() {
 
   const fetchCourses = async () => {
     if (!user) return;
+
     const q = query(collection(db, "courses"), where("userId", "==", user.uid));
     const querySnapshot = await getDocs(q);
     const coursesData: Course[] = [];
+
     querySnapshot.forEach((doc) => {
       coursesData.push({ id: doc.id, ...doc.data() } as Course);
     });
+
     setCourses(coursesData);
     setHasData(coursesData.length > 0);
   };
 
+  // Update the parseAndStoreCourses function in src/app/page.tsx
   const parseAndStoreCourses = async (extractedText: string) => {
     if (!user) return;
-    // ... (existing parseAndStoreCourses implementation)
+
+    // Get existing courses to prevent duplicates
+    const existingCoursesQuery = query(
+      collection(db, "courses"),
+      where("userId", "==", user.uid)
+    );
+    const existingSnapshot = await getDocs(existingCoursesQuery);
+    const existingCourseKeys = new Set(
+      existingSnapshot.docs.map(
+        (doc) => `${doc.data().semester}-${doc.data().year}-${doc.data().code}`
+      )
+    );
+
+    const semesterBlocks = extractedText
+      .split("Semester: ")
+      .filter((block) => block.trim() !== "");
+    const coursesToAdd: Omit<Course, "id">[] = [];
+
+    // Track seen courses in this parse to prevent duplicates
+    const seenInThisParse = new Set<string>();
+
+    for (const block of semesterBlocks) {
+      const [semesterInfo, ...courseLines] = block.split("\n");
+      const [season, year] = semesterInfo.split(" ");
+
+      for (const line of courseLines) {
+        if (line.trim() === "") continue;
+
+        // Match completed courses (with grades and credits)
+        const completedMatch = line.match(
+          /^- (.+?): (.+?) — (.+?) \((\d+\.\d+)\)$/
+        );
+        if (completedMatch) {
+          const [, code, name, grade, credits] = completedMatch;
+          const courseKey = `${season.trim()}-${year.trim()}-${code.trim()}`;
+
+          // Skip if already exists or seen in this parse
+          if (
+            existingCourseKeys.has(courseKey) ||
+            seenInThisParse.has(courseKey)
+          )
+            continue;
+          seenInThisParse.add(courseKey);
+
+          coursesToAdd.push({
+            code: code.trim(),
+            name: name.trim(),
+            grade: grade.trim(),
+            semester: season.trim(),
+            year: parseInt(year.trim()),
+            userId: user.uid,
+            status: "completed",
+            credits: parseFloat(credits),
+          });
+          continue;
+        }
+
+        // Match in-progress courses (without grades but with credits)
+        const inProgressMatch = line.match(
+          /^- (.+?): (.+?) — (?:In Progress|IP) \((\d+\.\d+)\)$/
+        );
+        if (inProgressMatch) {
+          const [, code, name, credits] = inProgressMatch;
+          const courseKey = `${season.trim()}-${year.trim()}-${code.trim()}`;
+
+          // Skip if already exists or seen in this parse
+          if (
+            existingCourseKeys.has(courseKey) ||
+            seenInThisParse.has(courseKey)
+          )
+            continue;
+          seenInThisParse.add(courseKey);
+
+          coursesToAdd.push({
+            code: code.trim(),
+            name: name.trim(),
+            grade: null,
+            semester: season.trim(),
+            year: parseInt(year.trim()),
+            userId: user.uid,
+            status: "in-progress",
+            credits: parseFloat(credits),
+          });
+        }
+      }
+    }
+
+    // Only proceed if there are new courses to add
+    if (coursesToAdd.length > 0) {
+      const batchWrites = coursesToAdd.map((course) => {
+        const docRef = doc(collection(db, "courses"));
+        return setDoc(docRef, course);
+      });
+
+      await Promise.all(batchWrites);
+    }
+
     await fetchCourses();
   };
 

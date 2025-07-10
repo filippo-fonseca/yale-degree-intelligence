@@ -26,7 +26,9 @@ export default function MajorProgressView({
   >({
     completed: true,
     remaining: true,
+    inProgress: true,
   });
+  const [showInProgressStats, setShowInProgressStats] = useState(false);
 
   const handleSkip = async (courseCode: string, courseName: string) => {
     if (!user?.uid) return;
@@ -59,6 +61,22 @@ export default function MajorProgressView({
     }));
   };
 
+  // Calculate stats
+  const completedCredits = progress.completedCredits;
+  const inProgressCredits = progress.inProgressCredits || 0;
+  const totalCredits = progress.totalCredits;
+
+  const completedRequirements = progress.completedRequirements.length;
+  const inProgressRequirements = progress.inProgressRequirements?.length || 0;
+  const totalRequirements =
+    completedRequirements +
+    inProgressRequirements +
+    progress.remainingRequirements.length;
+
+  const completionPercentage = progress.percentage;
+  const withInProgressPercentage =
+    progress.inProgressPercentage || progress.percentage;
+
   return (
     <div className={`space-y-6 font-louize`}>
       {/* Header */}
@@ -73,7 +91,10 @@ export default function MajorProgressView({
         </div>
         <div className="flex items-center gap-4">
           <div className="text-3xl font-medium bg-clip-text text-transparent bg-gradient-to-r from-blue-200 to-purple-200">
-            {progress.percentage.toFixed(0)}%
+            {showInProgressStats
+              ? withInProgressPercentage.toFixed(0)
+              : completionPercentage.toFixed(0)}
+            %
           </div>
         </div>
       </div>
@@ -82,36 +103,151 @@ export default function MajorProgressView({
       <div className="w-full bg-gray-900 rounded-full h-2">
         <motion.div
           initial={{ width: 0 }}
-          animate={{ width: `${progress.percentage}%` }}
+          animate={{
+            width: `${
+              showInProgressStats
+                ? withInProgressPercentage
+                : completionPercentage
+            }%`,
+          }}
           transition={{ duration: 1, ease: "easeOut" }}
           className="h-2 rounded-full bg-gradient-to-r from-blue-400 to-purple-500"
         />
+      </div>
+
+      {/* Stats toggle */}
+      <div className="flex items-center gap-2">
+        <span className="text-sm text-gray-400">Show:</span>
+        <button
+          onClick={() => setShowInProgressStats(false)}
+          className={`px-3 py-1 text-xs rounded-full ${
+            !showInProgressStats
+              ? "bg-blue-900/50 text-blue-300 border border-blue-700"
+              : "bg-gray-800 text-gray-400 hover:bg-gray-700"
+          }`}
+        >
+          Completed Only
+        </button>
+        <button
+          onClick={() => setShowInProgressStats(true)}
+          className={`px-3 py-1 text-xs rounded-full ${
+            showInProgressStats
+              ? "bg-purple-900/50 text-purple-300 border border-purple-700"
+              : "bg-gray-800 text-gray-400 hover:bg-gray-700"
+          }`}
+        >
+          Including In Progress
+        </button>
       </div>
 
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <StatCard
           label="Total Credits"
-          value={`${progress.completedCredits}/${progress.totalCredits}`}
-          color="text-blue-300"
+          value={
+            showInProgressStats
+              ? `${completedCredits + inProgressCredits}/${totalCredits}`
+              : `${completedCredits}/${totalCredits}`
+          }
+          color={showInProgressStats ? "text-purple-300" : "text-blue-300"}
         />
         <StatCard
           label="Requirements"
-          value={`${progress.completedRequirements.length}/${
-            progress.completedRequirements.length +
-            progress.remainingRequirements.length
-          }`}
-          color="text-purple-300"
+          value={
+            showInProgressStats
+              ? `${
+                  completedRequirements + inProgressRequirements
+                }/${totalRequirements}`
+              : `${completedRequirements}/${totalRequirements}`
+          }
+          color={showInProgressStats ? "text-purple-300" : "text-blue-300"}
         />
         <StatCard
           label="Completion"
-          value={`${progress.percentage.toFixed(0)}%`}
+          value={`${(showInProgressStats
+            ? withInProgressPercentage
+            : completionPercentage
+          ).toFixed(0)}%`}
           color="text-emerald-300"
         />
       </div>
 
       {/* Requirements Sections */}
       <div className="space-y-6">
+        {/* In Progress Requirements */}
+        {progress.inProgressRequirements &&
+          progress.inProgressRequirements.length > 0 && (
+            <div className="space-y-4">
+              <button
+                onClick={() => toggleSection("inProgress")}
+                className="flex items-center gap-2 text-blue-300 hover:text-blue-200 transition-colors"
+              >
+                <motion.div
+                  animate={{ rotate: expandedSections.inProgress ? 0 : -90 }}
+                >
+                  <FiChevronDown />
+                </motion.div>
+                <h4 className="font-medium">
+                  In Progress ({progress.inProgressRequirements.length})
+                </h4>
+              </button>
+
+              <AnimatePresence>
+                {expandedSections.inProgress && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: "auto" }}
+                    exit={{ opacity: 0, height: 0 }}
+                    className="overflow-hidden"
+                  >
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                      {progress.inProgressRequirements.map((req, i) => (
+                        <motion.div
+                          key={`inprogress-${i}`}
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: i * 0.05 }}
+                          className="p-4 rounded-xl bg-gray-900/50 backdrop-blur-sm border border-gray-800 hover:border-blue-500/30 transition-all"
+                        >
+                          <div className="flex justify-between items-start mb-2">
+                            <h5 className="font-medium text-blue-300">
+                              {req.name}
+                            </h5>
+                            <div className="flex items-center gap-2">
+                              <span className="text-xs bg-blue-900/20 text-blue-300 px-2 py-1 rounded-full">
+                                In Progress
+                              </span>
+                            </div>
+                          </div>
+                          {req.description && (
+                            <p className="text-xs text-blue-300/80 mb-3">
+                              {req.description}
+                            </p>
+                          )}
+                          <div className="flex flex-wrap gap-1.5">
+                            {req.options
+                              .filter((o) => o.inProgress)
+                              .map((opt, j) => (
+                                <div
+                                  key={`opt-${j}`}
+                                  className="px-2 py-0.5 rounded-full text-xs flex items-center bg-blue-900/20 text-blue-300"
+                                >
+                                  {opt.code}
+                                  <span className="ml-1 text-[0.65rem]">
+                                    ({opt.credits}cr, in progress)
+                                  </span>
+                                </div>
+                              ))}
+                          </div>
+                        </motion.div>
+                      ))}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          )}
+
         {/* Completed Requirements */}
         {progress.completedRequirements.length > 0 && (
           <div className="space-y-4">
@@ -181,7 +317,7 @@ export default function MajorProgressView({
                         )}
                         <div className="flex flex-wrap gap-1.5">
                           {req.options
-                            .filter((o) => o.completed)
+                            .filter((o) => o.completed && !o.inProgress)
                             .map((opt, j) => (
                               <div
                                 key={`opt-${j}`}
@@ -304,6 +440,8 @@ export default function MajorProgressView({
                                   className={`px-2 py-0.5 rounded-full text-xs flex items-center ${
                                     opt.completed
                                       ? "bg-emerald-900/20 text-emerald-300"
+                                      : opt.inProgress
+                                      ? "bg-blue-900/20 text-blue-300"
                                       : "bg-amber-900/20 text-amber-300"
                                   }`}
                                 >
@@ -313,25 +451,62 @@ export default function MajorProgressView({
                                       ✓
                                     </span>
                                   )}
+                                  {opt.inProgress && (
+                                    <span className="ml-1 text-[0.65rem]">
+                                      (in progress)
+                                    </span>
+                                  )}
                                 </div>
                               ))}
                           </div>
                           {req.options.some(
-                            (o) => !o.required && o.completed
+                            (o) => !o.required && (o.completed || o.inProgress)
                           ) && (
                             <div>
                               <p className="text-xs text-gray-400 mb-1">
-                                Extra completed:
+                                Extra{" "}
+                                {req.options.some(
+                                  (o) => !o.required && o.completed
+                                )
+                                  ? "completed"
+                                  : ""}
+                                {req.options.some(
+                                  (o) => !o.required && o.completed
+                                ) &&
+                                req.options.some(
+                                  (o) => !o.required && o.inProgress
+                                )
+                                  ? " and "
+                                  : ""}
+                                {req.options.some(
+                                  (o) => !o.required && o.inProgress
+                                )
+                                  ? "in progress"
+                                  : ""}
+                                :
                               </p>
                               <div className="flex flex-wrap gap-1.5">
                                 {req.options
-                                  .filter((o) => !o.required && o.completed)
+                                  .filter(
+                                    (o) =>
+                                      !o.required &&
+                                      (o.completed || o.inProgress)
+                                  )
                                   .map((opt, j) => (
                                     <div
                                       key={`extra-${j}`}
-                                      className="px-2 py-0.5 bg-gray-800 text-gray-300 rounded-full text-xs"
+                                      className={`px-2 py-0.5 rounded-full text-xs ${
+                                        opt.completed
+                                          ? "bg-gray-800 text-gray-300"
+                                          : "bg-blue-900/20 text-blue-300"
+                                      }`}
                                     >
                                       {opt.code}
+                                      {opt.inProgress && (
+                                        <span className="ml-1 text-[0.65rem]">
+                                          (in progress)
+                                        </span>
+                                      )}
                                     </div>
                                   ))}
                               </div>

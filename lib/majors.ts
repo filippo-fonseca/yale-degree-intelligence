@@ -86,7 +86,8 @@ export const MAJORS: Record<string, MajorRequirement> = {
 
     // --- CORE REQUIREMENTS ---
     { name: "Intro to Engineering", required: 1, options: [{ type: 'course', code: "ENAS 1300" }] },
-    { name: "Linear Algebra", required: 1, options: [{ type: 'course', code: "ENAS 1940" }, { type: 'course', code: "MATH 2220" }] },
+    { name: "Linear Algebra", required: 1, options: [{ type: 'course', code: "MATH 2250" }, { type: 'course', code: "MATH 2220" }] },
+    { name: "Diff Eqs", required: 1, options: [{ type: 'course', code: "ENAS 1940" }]},
     { name: "Electrical Engineering", required: 1, options: [{ type: 'course', code: "ECE 2000" }] },
     { name: "Mechanical Design", required: 1, options: [{ type: 'course', code: "MENG 1105" }] },
     { name: "Thermodynamics", required: 1, options: [{ type: 'course', code: "MENG 2511" }] },
@@ -248,6 +249,7 @@ type CompletedRequirement = {
     code: string;
     name: string;
     completed: boolean;
+    inProgress: boolean;
     required: boolean;
     credits: number;
   }[];
@@ -255,43 +257,57 @@ type CompletedRequirement = {
 
 export type MajorProgress = {
   completedRequirements: CompletedRequirement[];
+  inProgressRequirements: CompletedRequirement[];
   remainingRequirements: CompletedRequirement[];
   completedCredits: number;
+  inProgressCredits: number;
   totalCredits: number;
   percentage: number;
+  inProgressPercentage: number;
 };
 
+// Update the calculateMajorProgress function in majors.ts
 export const calculateMajorProgress = (
   majorId: string,
-  completedCourseCodes: string[]
+  completedCourseCodes: string[],
+  inProgressCourseCodes: string[] = []
 ): MajorProgress => {
   const major = MAJORS[majorId];
   if (!major) throw new Error(`Major ${majorId} not found`);
 
-  // Convert all completed codes to their canonical versions
+  // Convert all codes to their canonical versions
   const canonicalCompletedCodes = completedCourseCodes.map(code => 
     getCanonicalCode(code) || code
   ).filter(code => isValidCourseCode(code));
 
+  const canonicalInProgressCodes = inProgressCourseCodes.map(code => 
+    getCanonicalCode(code) || code
+  ).filter(code => isValidCourseCode(code));
+
   let completedCredits = 0;
+  let inProgressCredits = 0;
   const requirementProgress: CompletedRequirement[] = [];
 
   for (const req of major.requirements) {
     let reqCompleted = 0;
+    let reqInProgress = 0;
     const reqOptions: CompletedRequirement['options'] = [];
 
     for (const option of req.options) {
       if (option.type === 'course') {
         const completed = canonicalCompletedCodes.includes(option.code);
+        const inProgress = !completed && canonicalInProgressCodes.includes(option.code);
         const course = getCourseInfo(option.code);
         
         if (completed) reqCompleted++;
+        if (inProgress && reqCompleted < req.required) reqInProgress++;
         
         reqOptions.push({
           code: option.code,
           name: course?.name || option.code,
           completed,
-          required: reqCompleted < req.required,
+          inProgress,
+          required: reqCompleted + reqInProgress < req.required,
           credits: course?.credits || 0
         });
       } 
@@ -301,18 +317,27 @@ export const calculateMajorProgress = (
           .slice(0, option.required)
           .length;
 
+        const groupInProgress = option.options
+          .filter(code => !canonicalCompletedCodes.includes(code))
+          .filter(code => canonicalInProgressCodes.includes(code))
+          .slice(0, option.required - groupCompleted)
+          .length;
+
         reqCompleted += groupCompleted;
+        reqInProgress += groupInProgress;
 
         option.options.forEach(code => {
           const completed = canonicalCompletedCodes.includes(code);
+          const inProgress = !completed && canonicalInProgressCodes.includes(code);
           const course = getCourseInfo(code);
           
           reqOptions.push({
             code,
             name: course?.name || code,
             completed,
-            required: reqCompleted < req.required && 
-                     groupCompleted < option.required,
+            inProgress,
+            required: (reqCompleted + reqInProgress) < req.required && 
+                     (groupCompleted + groupInProgress) < option.required,
             credits: course?.credits || 0
           });
         });
@@ -321,34 +346,52 @@ export const calculateMajorProgress = (
 
     // Add credits for completed courses (only up to required number)
     reqOptions
-      .filter(opt => opt.completed)
+      .filter(opt => opt.completed && !opt.inProgress) // Only count truly completed courses
       .slice(0, req.required)
       .forEach(opt => {
         completedCredits += opt.credits;
       });
 
+    // Add credits for in-progress courses (only up to remaining required number)
+    reqOptions
+      .filter(opt => opt.inProgress)
+      .slice(0, Math.max(0, req.required - reqCompleted))
+      .forEach(opt => {
+        inProgressCredits += opt.credits;
+      });
+
     requirementProgress.push({
       name: req.name,
       description: req.description,
-      completed: Math.min(reqCompleted, req.required),
+      completed: reqCompleted,
       required: req.required,
-      satisfied: reqCompleted >= req.required,
+      satisfied: reqCompleted >= req.required, // Only count as satisfied if actually completed
       options: reqOptions
     });
   }
 
-  return {
-    completedRequirements: requirementProgress.filter(r => r.satisfied),
-    remainingRequirements: requirementProgress.filter(r => !r.satisfied),
-    completedCredits,
-    totalCredits: major.creditRequirements.total,
-    percentage: Math.min(100, (completedCredits / major.creditRequirements.total) * 100)
-  };
-};
+  // Update how we categorize requirements
+  const completedReqs = requirementProgress.filter(r => r.satisfied);
+  const inProgressReqs = requirementProgress.filter(r => 
+    !r.satisfied && (r.options.some(o => o.inProgress) || r.completed > 0)
+  );
+  const remainingReqs = requirementProgress.filter(r => 
+    !r.satisfied && !r.options.some(o => o.inProgress) && r.completed === 0
+  );
 
-export const getAllMajorProgress = (majors: string[], completedCourses: string[]) => {
-  return majors.map(major => ({
-    major,
-    progress: calculateMajorProgress(major, completedCourses)
-  }));
+  const percentage = Math.min(100, (completedCredits / major.creditRequirements.total) * 100);
+  const inProgressPercentage = Math.min(100, 
+    ((completedCredits + inProgressCredits) / major.creditRequirements.total) * 100
+  );
+
+  return {
+    completedRequirements: completedReqs,
+    inProgressRequirements: inProgressReqs,
+    remainingRequirements: remainingReqs,
+    completedCredits,
+    inProgressCredits,
+    totalCredits: major.creditRequirements.total,
+    percentage,
+    inProgressPercentage
+  };
 };

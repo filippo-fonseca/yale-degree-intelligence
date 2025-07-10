@@ -388,6 +388,20 @@ export default function Home() {
                   </span>
                 </div>
               )}
+              <motion.button
+                onHoverStart={() => setIsHoveringLogout(true)}
+                onHoverEnd={() => setIsHoveringLogout(false)}
+                onClick={logout}
+                className="flex items-center justify-center space-x-2 text-xs px-4 py-2 rounded-lg hover:bg-gray-900/50 transition-all border border-gray-800 hover:border-gray-700 mt-4"
+              >
+                <span>Sign out</span>
+                <motion.div
+                  animate={isHoveringLogout ? { x: 2 } : { x: 0 }}
+                  transition={{ type: "spring", stiffness: 500 }}
+                >
+                  <FiLogOut size={14} />
+                </motion.div>
+              </motion.button>
             </div>
 
             {/* Rest of the settings modal content remains the same */}
@@ -595,20 +609,6 @@ export default function Home() {
               )}
               <FiChevronDown className="text-gray-400 text-sm" />
             </button>
-            <motion.button
-              onHoverStart={() => setIsHoveringLogout(true)}
-              onHoverEnd={() => setIsHoveringLogout(false)}
-              onClick={logout}
-              className="flex items-center space-x-2 text-sm px-4 py-2 rounded-lg hover:bg-gray-900/50 transition-all border border-gray-800 hover:border-gray-700"
-            >
-              <span>Sign out</span>
-              <motion.div
-                animate={isHoveringLogout ? { x: 2 } : { x: 0 }}
-                transition={{ type: "spring", stiffness: 500 }}
-              >
-                <FiLogOut size={16} />
-              </motion.div>
-            </motion.button>
           </div>
         </motion.header>
 

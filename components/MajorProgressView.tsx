@@ -30,21 +30,24 @@ export default function MajorProgressView({
   });
   const [showInProgressStats, setShowInProgressStats] = useState(false);
 
+  // Then modify the skip/unskip handlers in your Home component
   const handleSkip = async (courseCode: string, courseName: string) => {
-    if (!user?.uid) return;
+    if (!user) return;
+
     try {
       await skipCourse(user.uid, courseCode, courseName);
-      onRequirementChange();
+      await onRequirementChange(); // Refresh the courses list
     } catch (error) {
       console.error("Error skipping course:", error);
     }
   };
 
   const handleUnskip = async (courseCode: string) => {
-    if (!user?.uid) return;
+    if (!user) return;
+
     try {
       await unskipCourse(user.uid, courseCode);
-      onRequirementChange();
+      await onRequirementChange(); // Refresh the courses list
     } catch (error) {
       console.error("Error unskipping course:", error);
     }

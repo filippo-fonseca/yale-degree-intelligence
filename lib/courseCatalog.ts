@@ -134,7 +134,7 @@ const COURSES: CourseInfo[] = [
 
   // MENG Courses (renamed with canonical codes)
   {
-    codes: ["MENG 1105", "MENG 110"],
+    codes: ["MENG 1105", "MENG 185"],
     name: "Mechanical Design",
     credits: 1.0,
     department: "MENG"

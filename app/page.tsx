@@ -105,7 +105,15 @@ export default function Home() {
       coursesData.push({ id: doc.id, ...doc.data() } as Course);
     });
 
-    setCourses(coursesData);
+    // Use functional update to ensure we get the latest state
+    setCourses((prevCourses) => {
+      // Only update if there are actual changes to prevent unnecessary re-renders
+      if (JSON.stringify(prevCourses) !== JSON.stringify(coursesData)) {
+        return coursesData;
+      }
+      return prevCourses;
+    });
+
     setHasData(coursesData.length > 0);
   };
 

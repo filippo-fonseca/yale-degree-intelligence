@@ -3,7 +3,7 @@
 import { MajorProgress } from "@/lib/majors";
 import { MAJORS } from "@/lib/majors";
 import { useAuth } from "@/context/AuthContext";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   FiMoreVertical,
@@ -71,6 +71,8 @@ export default function MajorProgressView({
     remaining: true,
   });
   const [showInProgressStats, setShowInProgressStats] = useState(false);
+  //course options:
+  const dropdownRef = useRef<HTMLDivElement | null>(null);
 
   const handleSkip = async (courseCode: string, courseName: string) => {
     if (!user) return;
@@ -91,6 +93,23 @@ export default function MajorProgressView({
       console.error("Error unskipping course:", error);
     }
   };
+
+  useEffect(() => {
+    if (!dropdownOpen) return;
+    const handleClick = (e: MouseEvent) => {
+      // If click outside the dropdown or trigger, close
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(e.target as Node)
+      ) {
+        setDropdownOpen(null);
+      }
+    };
+    document.addEventListener("mousedown", handleClick);
+    return () => {
+      document.removeEventListener("mousedown", handleClick);
+    };
+  }, [dropdownOpen]);
 
   const toggleDropdown = (reqIdx: number, optIdx: number) => {
     const key = `${reqIdx}-${optIdx}`;
@@ -417,10 +436,11 @@ export default function MajorProgressView({
                                   <AnimatePresence>
                                     {dropdownOpen === dropdownKey && (
                                       <motion.div
+                                        ref={dropdownRef}
                                         initial={{ opacity: 0, y: -10 }}
                                         animate={{ opacity: 1, y: 0 }}
                                         exit={{ opacity: 0, y: -10 }}
-                                        className="absolute left-0 z-20 mt-1 w-40 rounded-md bg-gray-800 shadow-lg border border-gray-700 overflow-hidden"
+                                        className="absolute left-0 z-[999] mt-1 w-40 rounded-md bg-gray-800 shadow-lg border border-gray-700 overflow-visible"
                                       >
                                         <button
                                           className="flex items-center gap-2 w-full px-3 py-2 text-sm text-gray-200 hover:bg-gray-700"
@@ -430,7 +450,7 @@ export default function MajorProgressView({
                                           }}
                                         >
                                           <FiCornerDownLeft />
-                                          Mark as Skipped
+                                          Mark as skipped
                                         </button>
                                         <button
                                           className="flex items-center gap-2 w-full px-3 py-2 text-sm text-gray-400 hover:bg-gray-700"

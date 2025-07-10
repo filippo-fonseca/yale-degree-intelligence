@@ -13,6 +13,7 @@ import {
   FiBook,
   FiChevronRight,
   FiUser,
+  FiChevronDown,
 } from "react-icons/fi";
 import {
   collection,
@@ -268,6 +269,26 @@ export default function Home() {
     return "text-red-400";
   };
 
+  const getYearStatus = (graduationYear: number): string => {
+    const now = new Date();
+    const currentYear = now.getFullYear();
+    const currentMonth = now.getMonth(); // 0 = Jan, 8 = Sep
+
+    // Academic year starts in September
+    const academicYear = currentMonth >= 8 ? currentYear + 1 : currentYear;
+
+    const yearsRemaining = graduationYear - academicYear;
+
+    if (yearsRemaining > 4) return "High School";
+    if (yearsRemaining === 4) return "Freshman";
+    if (yearsRemaining === 3) return "Sophomore";
+    if (yearsRemaining === 2) return "Junior";
+    if (yearsRemaining === 1) return "Senior";
+    if (yearsRemaining <= 0) return "Graduated";
+
+    return "Unknown";
+  };
+
   const handleProfileUpdate = async (updatedProfile: Partial<UserProfile>) => {
     if (!user) return;
 
@@ -342,8 +363,34 @@ export default function Home() {
                 {user.displayName || "User"}
               </h2>
               <p className="text-gray-400 text-sm mt-1">{user.email}</p>
+
+              {/* Graduation Year Badge */}
+              {userProfile.graduationYear && (
+                <div className="mt-3 flex items-center">
+                  <span className="text-xs font-medium px-2.5 py-0.5 rounded-full flex items-center">
+                    <span
+                      className={`w-2 h-2 rounded-full mr-1.5 ${
+                        getYearStatus(userProfile.graduationYear) === "Freshman"
+                          ? "bg-green-400"
+                          : getYearStatus(userProfile.graduationYear) ===
+                            "Sophomore"
+                          ? "bg-blue-400"
+                          : getYearStatus(userProfile.graduationYear) ===
+                            "Junior"
+                          ? "bg-yellow-400"
+                          : "bg-purple-400"
+                      }`}
+                    ></span>
+                    <span className="text-gray-300">
+                      {getYearStatus(userProfile.graduationYear)} • Class of{" "}
+                      {userProfile.graduationYear}
+                    </span>
+                  </span>
+                </div>
+              )}
             </div>
 
+            {/* Rest of the settings modal content remains the same */}
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-400 mb-2">
@@ -440,7 +487,7 @@ export default function Home() {
                 <input
                   type="number"
                   min={new Date().getFullYear()}
-                  max={new Date().getFullYear() + 10}
+                  max={new Date().getFullYear() + 4}
                   value={userProfile.graduationYear}
                   onChange={(e) =>
                     setUserProfile({
@@ -531,10 +578,22 @@ export default function Home() {
           <div className="flex items-center space-x-3">
             <button
               onClick={() => setShowSettings(true)}
-              className="p-2 rounded-lg hover:bg-gray-900/50 transition-all border border-gray-800 hover:border-gray-700"
+              className="p-2 rounded-lg hover:bg-gray-900/50 transition-all border border-gray-800 hover:border-gray-700 flex items-center gap-1"
               title="Settings"
             >
-              <FiUser size={18} />
+              {user.photoURL ? (
+                <img
+                  src={user.photoURL}
+                  alt="Profile"
+                  className="w-6 h-6 rounded-full object-cover border-2 border-gray-700"
+                />
+              ) : (
+                <div className="w-6 h-6 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-2xl font-medium border-2 border-gray-700">
+                  {user.displayName?.charAt(0) ||
+                    user.email?.charAt(0).toUpperCase()}
+                </div>
+              )}
+              <FiChevronDown className="text-gray-400 text-sm" />
             </button>
             <motion.button
               onHoverStart={() => setIsHoveringLogout(true)}

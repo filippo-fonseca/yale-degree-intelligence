@@ -848,7 +848,11 @@ export default function Home() {
           transition={{ delay: 0.8 }}
           className="py-8 text-center text-sm text-gray-500 border-t border-gray-900"
         >
-          <p>Yale DegreeIntelligence · Elevating academic excellence</p>
+          <p>
+            Yale DegreeIntelligence can be. Not affiliated with Yale University.
+            We do not take responsibility for any wrong advice/deductions. We
+            make no money from this.
+          </p>
         </motion.footer>
       </div>
     </main>

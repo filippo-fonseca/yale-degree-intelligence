@@ -315,7 +315,8 @@ export const calculateMajorProgress = (
           completed: completed || skipped,
           inProgress,
           required: reqCompleted + reqInProgress < req.required,
-          credits: skipped ? 0 : (course?.credits || 0), // Skipped courses count as 0 credits
+          // credits: skipped ? 0 : (course?.credits || 0), // Skipped courses count as 0 credits
+          credits: course?.credits || 0,
           skipped
         });
       } else if (option.type === 'group') {
@@ -357,7 +358,7 @@ export const calculateMajorProgress = (
 
     // Calculate credits from completed (non-skipped) courses
     reqOptions
-      .filter(opt => opt.completed && !opt.inProgress && !opt.skipped)
+      .filter(opt => opt.completed && !opt.inProgress)
       .slice(0, req.required)
       .forEach(opt => {
         completedCredits += opt.credits;

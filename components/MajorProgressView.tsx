@@ -168,17 +168,6 @@ export default function MajorProgressView({
           color={showInProgressStats ? "text-purple-300" : "text-blue-300"}
         />
         <StatCard
-          label="Requirements"
-          value={
-            showInProgressStats
-              ? `${
-                  completedRequirements + inProgressRequirements
-                }/${totalRequirements}`
-              : `${completedRequirements}/${totalRequirements}`
-          }
-          color={showInProgressStats ? "text-purple-300" : "text-blue-300"}
-        />
-        <StatCard
           label="Completion"
           value={`${(showInProgressStats
             ? withInProgressPercentage

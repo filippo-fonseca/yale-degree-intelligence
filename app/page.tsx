@@ -506,32 +506,6 @@ export default function Home() {
           </div>
         </motion.header>
 
-        {/* Major Selector */}
-        {userProfile &&
-          activeTab === "major" &&
-          userProfile?.majors?.length > 1 && (
-            <div className="mb-6">
-              <label className="block text-sm font-medium text-gray-400 mb-2">
-                Viewing Progress For:
-              </label>
-              <div className="flex flex-wrap gap-2">
-                {userProfile.majors.map((major) => (
-                  <button
-                    key={major}
-                    onClick={() => setSelectedMajor(major)}
-                    className={`px-4 py-2 rounded-lg border transition-colors ${
-                      selectedMajor === major
-                        ? "border-blue-500 bg-blue-900/20 text-blue-100"
-                        : "border-gray-800 hover:border-gray-700 hover:bg-gray-800/50"
-                    }`}
-                  >
-                    {major} - {subjects[major] || major}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
-
         <div className="flex flex-col lg:flex-row gap-8 pb-16">
           {/* Sidebar Navigation */}
           <motion.aside
@@ -691,6 +665,15 @@ export default function Home() {
                   exit={{ opacity: 0 }}
                   transition={{ duration: 0.3 }}
                 >
+                  <div className="mb-6">
+                    <h2 className="text-3xl font-medium bg-clip-text text-transparent bg-gradient-to-r from-blue-200 to-purple-200">
+                      Numbers aren't everything, but they're important.
+                    </h2>
+                    <p>
+                      Here's a comprehesive visual overview of your academic
+                      trajectory over your time at Yale.
+                    </p>
+                  </div>
                   <StatsView courses={courses} />
                 </motion.div>
               )}
@@ -703,9 +686,44 @@ export default function Home() {
                   exit={{ opacity: 0 }}
                   transition={{ duration: 0.3 }}
                 >
-                  <h2 className="text-xl font-medium mb-6 bg-clip-text text-transparent bg-gradient-to-r from-blue-200 to-purple-200">
-                    Major Progress Tracker
-                  </h2>
+                  {user && userProfile && (
+                    <div className="mb-6">
+                      <h2 className="text-3xl font-medium bg-clip-text text-transparent bg-gradient-to-r from-blue-200 to-purple-200">
+                        This is how you're doing for your{" "}
+                        {userProfile?.majors?.length > 1 ? "majors" : "major"},{" "}
+                        {user?.displayName?.split(" ")[0]}.
+                      </h2>
+                      <p>
+                        This is based on data from your transcript and the
+                        major(s) you indicated to us.
+                      </p>
+                    </div>
+                  )}
+                  {/* Major Selector */}
+                  {userProfile &&
+                    activeTab === "major" &&
+                    userProfile?.majors?.length > 1 && (
+                      <div className="mb-6">
+                        <label className="block text-sm font-medium text-gray-400 mb-2">
+                          Viewing Progress For:
+                        </label>
+                        <div className="flex flex-wrap gap-2">
+                          {userProfile.majors.map((major) => (
+                            <button
+                              key={major}
+                              onClick={() => setSelectedMajor(major)}
+                              className={`px-4 py-2 rounded-lg border transition-colors ${
+                                selectedMajor === major
+                                  ? "border-blue-500 bg-blue-900/20 text-blue-100"
+                                  : "border-gray-800 hover:border-gray-700 hover:bg-gray-800/50"
+                              }`}
+                            >
+                              {major} - {subjects[major] || major}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   <MajorProgressView
                     selectedMajor={selectedMajor}
                     progress={getMajorProgress()!}

@@ -5,13 +5,34 @@ import { MAJORS } from "@/lib/majors";
 import { useAuth } from "@/context/AuthContext";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { FiMoreVertical, FiX, FiCheck, FiChevronDown } from "react-icons/fi";
+import {
+  FiMoreVertical,
+  FiX,
+  FiCheck,
+  FiChevronDown,
+  FiCornerDownLeft,
+} from "react-icons/fi";
 import { skipCourse, unskipCourse } from "@/lib/utils/courseOperations";
 
-interface MajorProgressViewProps {
-  selectedMajor: string;
-  progress: MajorProgress;
-  onRequirementChange: () => void;
+// Status color mapping for course pills
+function getCourseStatusColor({
+  completed,
+  inProgress,
+  skipped,
+  grade,
+}: {
+  completed: boolean;
+  inProgress: boolean;
+  skipped?: boolean;
+  grade?: string | null;
+}) {
+  if (skipped)
+    return "bg-gray-800 text-gray-300 border border-dashed border-gray-600";
+  if (completed && grade && grade !== "In Progress")
+    return "bg-emerald-900/20 text-emerald-300 border border-emerald-700";
+  if (inProgress || grade === "In Progress")
+    return "bg-blue-900/20 text-blue-300 border border-blue-700";
+  return "bg-amber-900/20 text-amber-300 border border-amber-700";
 }
 
 function StatCard({
@@ -38,7 +59,11 @@ export default function MajorProgressView({
   selectedMajor,
   progress,
   onRequirementChange,
-}: MajorProgressViewProps) {
+}: {
+  selectedMajor: string;
+  progress: MajorProgress;
+  onRequirementChange: () => void;
+}) {
   const { user } = useAuth();
   const [dropdownOpen, setDropdownOpen] = useState<string | null>(null);
   const [expandedSections, setExpandedSections] = useState({
@@ -67,8 +92,9 @@ export default function MajorProgressView({
     }
   };
 
-  const toggleDropdown = (reqId: string) => {
-    setDropdownOpen(dropdownOpen === reqId ? null : reqId);
+  const toggleDropdown = (reqIdx: number, optIdx: number) => {
+    const key = `${reqIdx}-${optIdx}`;
+    setDropdownOpen(dropdownOpen === key ? null : key);
   };
 
   const toggleSection = (section: keyof typeof expandedSections) => {
@@ -199,90 +225,68 @@ export default function MajorProgressView({
                   className="overflow-hidden"
                 >
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {progress.completedRequirements.map((req, i) => {
-                      const hasSkipped = req.options.some((o) => o.skipped);
-                      return (
-                        <motion.div
-                          key={`completed-${i}`}
-                          initial={{ opacity: 0, y: 10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ delay: i * 0.05 }}
-                          className={`p-4 rounded-xl border transition-all ${
-                            hasSkipped
-                              ? "bg-gray-900/30 border-gray-700 hover:border-gray-600"
-                              : "bg-emerald-900/10 border-emerald-800/30 hover:border-emerald-500/30"
-                          }`}
-                        >
-                          <div className="flex justify-between items-start mb-2">
-                            <h5
-                              className={`font-medium ${
-                                hasSkipped
-                                  ? "text-gray-300"
-                                  : "text-emerald-300"
+                    {progress.completedRequirements.map((req, i) => (
+                      <motion.div
+                        key={`completed-${i}`}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: i * 0.05 }}
+                        className="p-4 rounded-xl border bg-emerald-900/10 border-emerald-800/30 hover:border-emerald-500/30"
+                      >
+                        <div className="flex justify-between items-start mb-2">
+                          <h5 className="font-medium text-emerald-300">
+                            {req.name}
+                          </h5>
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs bg-emerald-900/20 text-emerald-300 px-2 py-1 rounded-full">
+                              ✓ Complete
+                            </span>
+                          </div>
+                        </div>
+                        {req.description && (
+                          <p className="text-xs mb-3 text-emerald-300/80">
+                            {req.description}
+                          </p>
+                        )}
+                        <div className="flex flex-wrap gap-1.5">
+                          {req.options.map((opt, j) => (
+                            <div
+                              key={`opt-${j}`}
+                              className={`relative px-2 py-0.5 rounded-full text-xs flex items-center transition-all duration-150 ${
+                                opt.completed
+                                  ? "bg-emerald-900/20 text-emerald-300 border border-emerald-700"
+                                  : "bg-gray-900/20 text-gray-300 border border-gray-700"
                               }`}
                             >
-                              {req.name}
-                            </h5>
-                            <div className="flex items-center gap-2">
-                              {hasSkipped ? (
-                                <span className="text-xs bg-gray-700 text-gray-300 px-2 py-1 rounded-full">
-                                  Contains Skipped
-                                </span>
-                              ) : (
-                                <span className="text-xs bg-emerald-900/20 text-emerald-300 px-2 py-1 rounded-full">
-                                  ✓ Complete
-                                </span>
+                              {opt.code}
+                              <span className="ml-1 text-[0.65rem]">
+                                ({opt.credits}cr
+                                {opt.skipped
+                                  ? ", skipped"
+                                  : opt.inProgress
+                                  ? ", in progress"
+                                  : opt.completed
+                                  ? ", complete"
+                                  : ""}
+                                )
+                              </span>
+                              {opt.skipped && (
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleUnskip(opt.code);
+                                  }}
+                                  className="ml-1 text-[0.65rem] text-gray-400 hover:text-gray-200"
+                                  title="Unskip this course"
+                                >
+                                  <FiX size={10} />
+                                </button>
                               )}
                             </div>
-                          </div>
-
-                          {req.description && (
-                            <p
-                              className={`text-xs mb-3 ${
-                                hasSkipped
-                                  ? "text-gray-400"
-                                  : "text-emerald-300/80"
-                              }`}
-                            >
-                              {req.description}
-                            </p>
-                          )}
-
-                          <div className="flex flex-wrap gap-1.5">
-                            {req.options
-                              .filter((o) => o.completed || o.skipped)
-                              .map((opt, j) => (
-                                <div
-                                  key={`opt-${j}`}
-                                  className={`px-2 py-0.5 rounded-full text-xs flex items-center ${
-                                    opt.skipped
-                                      ? "bg-gray-800 text-gray-300 border border-dashed border-gray-600"
-                                      : "bg-emerald-900/20 text-emerald-300"
-                                  }`}
-                                >
-                                  {opt.code}
-                                  <span className="ml-1 text-[0.65rem]">
-                                    ({opt.credits}cr
-                                    {opt.skipped ? ", skipped" : ""})
-                                  </span>
-                                  {opt.skipped && (
-                                    <button
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        handleUnskip(opt.code);
-                                      }}
-                                      className="ml-1 text-[0.65rem] text-gray-400 hover:text-gray-200"
-                                      title="Unskip this course"
-                                    >
-                                      <FiX size={10} />
-                                    </button>
-                                  )}
-                                </div>
-                              ))}
-                          </div>
-                        </motion.div>
-                      );
-                    })}
+                          ))}
+                        </div>
+                      </motion.div>
+                    ))}
                   </div>
                 </motion.div>
               )}
@@ -290,7 +294,7 @@ export default function MajorProgressView({
           </div>
         )}
 
-        {/* Remaining Requirements - Now includes in-progress courses */}
+        {/* Remaining Requirements */}
         {progress.remainingRequirements.length > 0 && (
           <div className="space-y-4">
             <button
@@ -321,21 +325,20 @@ export default function MajorProgressView({
                   className="overflow-hidden"
                 >
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {progress.remainingRequirements.map((req, i) => {
-                      // Get all options that are not completed (including in-progress ones)
-                      const remainingOptions = req.options.filter(
-                        (o) => !o.completed && !o.skipped
-                      );
-
-                      // Skip if all options are completed
-                      if (remainingOptions.length === 0) return null;
+                    {progress.remainingRequirements.map((req, reqIdx) => {
+                      const reqCompleted = req.options
+                        .filter((o) => o.completed)
+                        .reduce((sum, o) => sum + o.credits, 0);
+                      const reqInProgress = req.options
+                        .filter((o) => o.inProgress)
+                        .reduce((sum, o) => sum + o.credits, 0);
 
                       return (
                         <motion.div
-                          key={`remaining-${i}`}
+                          key={`remaining-${reqIdx}`}
                           initial={{ opacity: 0, y: 10 }}
                           animate={{ opacity: 1, y: 0 }}
-                          transition={{ delay: i * 0.05 }}
+                          transition={{ delay: reqIdx * 0.05 }}
                           className="p-4 rounded-xl bg-gray-900/50 backdrop-blur-sm border border-gray-800 hover:border-amber-500/30 transition-all relative"
                         >
                           <div className="flex justify-between items-start mb-2">
@@ -344,46 +347,10 @@ export default function MajorProgressView({
                             </h5>
                             <div className="flex items-center gap-2">
                               <span className="text-xs bg-amber-900/20 text-amber-300 px-2 py-1 rounded-full">
-                                {req.completed}/{req.required}
+                                {reqInProgress + reqCompleted}/{req.required}
                               </span>
-                              <button
-                                onClick={() => toggleDropdown(`req-${i}`)}
-                                className="p-1 text-gray-400 hover:text-gray-200 rounded-full hover:bg-gray-800"
-                              >
-                                <FiMoreVertical />
-                              </button>
                             </div>
                           </div>
-
-                          <AnimatePresence>
-                            {dropdownOpen === `req-${i}` && (
-                              <motion.div
-                                initial={{ opacity: 0, y: -10 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                exit={{ opacity: 0, y: -10 }}
-                                className="absolute right-4 top-12 z-10 mt-1 w-48 rounded-md bg-gray-800 shadow-lg border border-gray-700 overflow-hidden"
-                              >
-                                <button
-                                  onClick={() => {
-                                    const firstOption = remainingOptions.find(
-                                      (opt) => opt.required
-                                    );
-                                    if (firstOption) {
-                                      handleSkip(
-                                        firstOption.code,
-                                        firstOption.name
-                                      );
-                                    }
-                                    setDropdownOpen(null);
-                                  }}
-                                  className="block px-4 py-2 text-sm text-gray-200 hover:bg-gray-700 w-full text-left flex items-center gap-2"
-                                >
-                                  <FiCheck />
-                                  Mark as Skipped
-                                </button>
-                              </motion.div>
-                            )}
-                          </AnimatePresence>
 
                           {req.description && (
                             <p className="text-xs text-amber-300/80 mb-3">
@@ -391,48 +358,93 @@ export default function MajorProgressView({
                             </p>
                           )}
 
-                          <div className="space-y-2">
-                            <div className="flex flex-wrap gap-1.5">
-                              {remainingOptions.map((opt, j) => (
-                                <div
-                                  key={`opt-${j}`}
-                                  className={`px-2 py-0.5 rounded-full text-xs flex items-center ${
-                                    opt.inProgress
-                                      ? "bg-blue-900/20 text-blue-300"
-                                      : "bg-amber-900/20 text-amber-300"
-                                  }`}
-                                >
-                                  {opt.code}
-                                  <span className="ml-1 text-[0.65rem]">
-                                    ({opt.credits}cr
-                                    {opt.inProgress ? ", in progress" : ""})
-                                  </span>
-                                </div>
-                              ))}
-                            </div>
-
-                            {/* Show any extra completed courses */}
-                            {req.options.some(
-                              (o) => o.completed && !o.required
-                            ) && (
-                              <div>
-                                <p className="text-xs text-gray-400 mb-1">
-                                  Extra completed:
-                                </p>
-                                <div className="flex flex-wrap gap-1.5">
-                                  {req.options
-                                    .filter((o) => o.completed && !o.required)
-                                    .map((opt, j) => (
-                                      <div
-                                        key={`extra-${j}`}
-                                        className="px-2 py-0.5 rounded-full text-xs bg-gray-800 text-gray-300"
+                          <div className="flex flex-wrap gap-1.5">
+                            {req.options.map((opt, optIdx) => {
+                              const dropdownKey = `${reqIdx}-${optIdx}`;
+                              return (
+                                <div key={`opt-${optIdx}`} className="relative">
+                                  <div
+                                    className={`px-2 py-0.5 rounded-full text-xs flex items-center transition-all duration-150 cursor-pointer ${
+                                      opt.inProgress
+                                        ? "bg-blue-900/20 text-blue-300 border border-blue-700"
+                                        : "bg-amber-900/20 text-amber-300 border border-amber-700"
+                                    }`}
+                                    onClick={() => {
+                                      if (!opt.completed && !opt.skipped) {
+                                        toggleDropdown(reqIdx, optIdx);
+                                      }
+                                    }}
+                                  >
+                                    {opt.code}
+                                    <span className="ml-1 text-[0.65rem]">
+                                      ({opt.credits}cr
+                                      {opt.skipped
+                                        ? ", skipped"
+                                        : opt.inProgress
+                                        ? ", in progress"
+                                        : opt.completed
+                                        ? ", complete"
+                                        : ""}
+                                      )
+                                    </span>
+                                    {opt.skipped && (
+                                      <button
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          handleUnskip(opt.code);
+                                        }}
+                                        className="ml-1 text-[0.65rem] text-gray-400 hover:text-gray-200"
+                                        title="Unskip this course"
                                       >
-                                        {opt.code}
-                                      </div>
-                                    ))}
+                                        <FiX size={10} />
+                                      </button>
+                                    )}
+                                    {!opt.completed && !opt.skipped && (
+                                      <button
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          toggleDropdown(reqIdx, optIdx);
+                                        }}
+                                        className="ml-1 text-[0.65rem] text-gray-400 hover:text-gray-200"
+                                        title="More options"
+                                      >
+                                        <FiMoreVertical size={12} />
+                                      </button>
+                                    )}
+                                  </div>
+
+                                  {/* Skip/Unskip menu */}
+                                  <AnimatePresence>
+                                    {dropdownOpen === dropdownKey && (
+                                      <motion.div
+                                        initial={{ opacity: 0, y: -10 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        exit={{ opacity: 0, y: -10 }}
+                                        className="absolute left-0 z-20 mt-1 w-40 rounded-md bg-gray-800 shadow-lg border border-gray-700 overflow-hidden"
+                                      >
+                                        <button
+                                          className="flex items-center gap-2 w-full px-3 py-2 text-sm text-gray-200 hover:bg-gray-700"
+                                          onClick={() => {
+                                            handleSkip(opt.code, opt.name);
+                                            setDropdownOpen(null);
+                                          }}
+                                        >
+                                          <FiCornerDownLeft />
+                                          Mark as Skipped
+                                        </button>
+                                        <button
+                                          className="flex items-center gap-2 w-full px-3 py-2 text-sm text-gray-400 hover:bg-gray-700"
+                                          onClick={() => setDropdownOpen(null)}
+                                        >
+                                          <FiX />
+                                          Cancel
+                                        </button>
+                                      </motion.div>
+                                    )}
+                                  </AnimatePresence>
                                 </div>
-                              </div>
-                            )}
+                              );
+                            })}
                           </div>
                         </motion.div>
                       );

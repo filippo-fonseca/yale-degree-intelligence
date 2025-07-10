@@ -69,7 +69,7 @@ export const MAJORS: Record<string, MajorRequirement> = {
     },
     {
       name: "Physics Labs",
-      required: 2,
+      required: 1,
       description: "Two labs from PHYS 1650L, 1660L, 2050L, or 2060L",
       options: [
         { type: 'course', code: "PHYS 1650L" },
@@ -136,8 +136,8 @@ export const MAJORS: Record<string, MajorRequirement> = {
   name: "Electrical Engineering and Computer Science, B.S.",
   description: "Bachelor of Science in EECS",
   creditRequirements: {
-    total: 15,
-    core: 11,
+    total: 21,
+    core: 17,
     electives: 4
   },
   requirements: [

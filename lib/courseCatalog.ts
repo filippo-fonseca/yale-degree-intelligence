@@ -160,7 +160,7 @@ const COURSES: CourseInfo[] = [
   {
     codes: ["MENG 2616L", "MENG 286L"],
     name: "Solid Mechanics and Materials Science Laboratory",
-    credits: 0.5,
+    credits: 1,
     department: "MENG"
   },
   {

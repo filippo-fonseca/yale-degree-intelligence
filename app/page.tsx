@@ -12,6 +12,7 @@ import {
   FiBarChart2,
   FiBook,
   FiChevronRight,
+  FiUser,
 } from "react-icons/fi";
 import {
   collection,
@@ -20,24 +21,55 @@ import {
   getDocs,
   doc,
   setDoc,
+  getDoc,
 } from "firebase/firestore";
 import { Course } from "@/lib/types";
 import { db } from "@/config/firebase";
-import { gradePoints } from "@/lib/constants";
+import { gradePoints, subjects } from "@/lib/constants";
 import { calculateMajorProgress } from "@/lib/majors";
 import MajorProgressView from "@/components/MajorProgressView";
 import StatsView from "@/components/StatsView";
+import MajorSelectionFlow from "@/components/MajorSelectionFlow";
+
+interface UserProfile {
+  majors: string[];
+  graduationYear: number;
+  updatedAt: Date;
+}
 
 export default function Home() {
   const { user, loading, logout } = useAuth();
   const [activeTab, setActiveTab] = useState("upload");
   const [courses, setCourses] = useState<Course[]>([]);
   const [hasData, setHasData] = useState(false);
-  const [selectedMajor, setSelectedMajor] = useState<string>("MENG");
+  const [selectedMajor, setSelectedMajor] = useState<string>("");
   const [isHoveringLogout, setIsHoveringLogout] = useState(false);
+  const [showMajorSelection, setShowMajorSelection] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+
+  // Fetch user profile on load
+  useEffect(() => {
+    if (!user) return;
+
+    const fetchUserProfile = async () => {
+      const docRef = doc(db, "users", user.uid);
+      const docSnap = await getDoc(docRef);
+
+      if (docSnap.exists()) {
+        const profileData = docSnap.data() as UserProfile;
+        setUserProfile(profileData);
+        setSelectedMajor(profileData.majors[0] || "");
+      } else {
+        setShowMajorSelection(true);
+      }
+    };
+
+    fetchUserProfile();
+  }, [user]);
 
   const getMajorProgress = () => {
-    if (!user || courses.length === 0) return null;
+    if (!user || courses.length === 0 || !selectedMajor) return null;
     const completedCourseCodes = courses
       .filter(
         (course) =>
@@ -112,6 +144,34 @@ export default function Home() {
     return "text-red-400";
   };
 
+  const handleProfileUpdate = async (updatedProfile: Partial<UserProfile>) => {
+    if (!user) return;
+
+    try {
+      await setDoc(
+        doc(db, "users", user.uid),
+        {
+          ...userProfile,
+          ...updatedProfile,
+          updatedAt: new Date(),
+        },
+        { merge: true }
+      );
+
+      const docRef = doc(db, "users", user.uid);
+      const docSnap = await getDoc(docRef);
+      if (docSnap.exists()) {
+        setUserProfile(docSnap.data() as UserProfile);
+        if (updatedProfile.majors) {
+          setSelectedMajor(updatedProfile.majors[0] || "");
+        }
+      }
+      setShowSettings(false);
+    } catch (error) {
+      console.error("Error updating profile:", error);
+    }
+  };
+
   if (loading)
     return (
       <div className="flex items-center justify-center min-h-screen bg-gray-950">
@@ -126,7 +186,126 @@ export default function Home() {
 
   return (
     <main className={`min-h-screen bg-gray-950 text-gray-100 font-louize`}>
-      {/* Subtle background elements */}
+      {/* Major Selection Flow */}
+      {showMajorSelection && (
+        <MajorSelectionFlow onComplete={() => setShowMajorSelection(false)} />
+      )}
+
+      {/* Settings Modal */}
+      {showSettings && userProfile && (
+        <div className="fixed inset-0 bg-gray-950/90 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="w-full max-w-md bg-gray-900 rounded-xl border border-gray-800 p-6"
+          >
+            <h2 className="text-xl font-medium mb-6 text-center text-gray-200">
+              Academic Profile
+            </h2>
+
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-400 mb-2">
+                  Majors
+                </label>
+                <div className="space-y-2">
+                  {userProfile.majors.map((major, index) => (
+                    <div key={index} className="flex items-center space-x-2">
+                      <select
+                        value={major}
+                        onChange={(e) => {
+                          const newMajors = [...userProfile.majors];
+                          newMajors[index] = e.target.value;
+                          setUserProfile({
+                            ...userProfile,
+                            majors: newMajors,
+                          });
+                        }}
+                        className="flex-1 bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      >
+                        {Object.entries(subjects).map(([code, name]) => (
+                          <option key={code} value={code}>
+                            {code} - {name}
+                          </option>
+                        ))}
+                      </select>
+                      {index > 0 && (
+                        <button
+                          onClick={() => {
+                            const newMajors = [...userProfile.majors];
+                            newMajors.splice(index, 1);
+                            setUserProfile({
+                              ...userProfile,
+                              majors: newMajors,
+                            });
+                          }}
+                          className="text-red-400 hover:text-red-300 p-2"
+                        >
+                          ×
+                        </button>
+                      )}
+                    </div>
+                  ))}
+                  {userProfile.majors.length < 2 && (
+                    <button
+                      onClick={() => {
+                        setUserProfile({
+                          ...userProfile,
+                          majors: [...userProfile.majors, "MENG"],
+                        });
+                      }}
+                      className="text-sm text-blue-400 hover:text-blue-300"
+                    >
+                      + Add another major
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-400 mb-2">
+                  Graduation Year
+                </label>
+                <input
+                  type="number"
+                  min={new Date().getFullYear()}
+                  max={new Date().getFullYear() + 10}
+                  value={userProfile.graduationYear}
+                  onChange={(e) =>
+                    setUserProfile({
+                      ...userProfile,
+                      graduationYear: parseInt(e.target.value),
+                    })
+                  }
+                  className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+            </div>
+
+            <div className="flex justify-end space-x-3 mt-6">
+              <button
+                onClick={() => setShowSettings(false)}
+                className="px-4 py-2 rounded-lg border border-gray-700 hover:bg-gray-800/50 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() =>
+                  handleProfileUpdate({
+                    majors: userProfile.majors,
+                    graduationYear: userProfile.graduationYear,
+                  })
+                }
+                className="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 transition-colors"
+              >
+                Save Changes
+              </button>
+            </div>
+          </motion.div>
+        </div>
+      )}
+
+      {/* Background elements */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <div className="absolute inset-0 bg-gradient-to-br from-gray-950 via-blue-950/20 to-purple-950/20"></div>
         {[...Array(12)].map((_, i) => (
@@ -178,21 +357,56 @@ export default function Home() {
             </h1>
           </div>
 
-          <motion.button
-            onHoverStart={() => setIsHoveringLogout(true)}
-            onHoverEnd={() => setIsHoveringLogout(false)}
-            onClick={logout}
-            className="flex items-center space-x-2 text-sm px-4 py-2 rounded-lg hover:bg-gray-900/50 transition-all border border-gray-800 hover:border-gray-700"
-          >
-            <span>Sign out</span>
-            <motion.div
-              animate={isHoveringLogout ? { x: 2 } : { x: 0 }}
-              transition={{ type: "spring", stiffness: 500 }}
+          <div className="flex items-center space-x-3">
+            <button
+              onClick={() => setShowSettings(true)}
+              className="p-2 rounded-lg hover:bg-gray-900/50 transition-all border border-gray-800 hover:border-gray-700"
+              title="Settings"
             >
-              <FiLogOut size={16} />
-            </motion.div>
-          </motion.button>
+              <FiUser size={18} />
+            </button>
+            <motion.button
+              onHoverStart={() => setIsHoveringLogout(true)}
+              onHoverEnd={() => setIsHoveringLogout(false)}
+              onClick={logout}
+              className="flex items-center space-x-2 text-sm px-4 py-2 rounded-lg hover:bg-gray-900/50 transition-all border border-gray-800 hover:border-gray-700"
+            >
+              <span>Sign out</span>
+              <motion.div
+                animate={isHoveringLogout ? { x: 2 } : { x: 0 }}
+                transition={{ type: "spring", stiffness: 500 }}
+              >
+                <FiLogOut size={16} />
+              </motion.div>
+            </motion.button>
+          </div>
         </motion.header>
+
+        {/* Major Selector */}
+        {userProfile &&
+          activeTab === "major" &&
+          userProfile?.majors?.length > 1 && (
+            <div className="mb-6">
+              <label className="block text-sm font-medium text-gray-400 mb-2">
+                Viewing Progress For:
+              </label>
+              <div className="flex flex-wrap gap-2">
+                {userProfile.majors.map((major) => (
+                  <button
+                    key={major}
+                    onClick={() => setSelectedMajor(major)}
+                    className={`px-4 py-2 rounded-lg border transition-colors ${
+                      selectedMajor === major
+                        ? "border-blue-500 bg-blue-900/20 text-blue-100"
+                        : "border-gray-800 hover:border-gray-700 hover:bg-gray-800/50"
+                    }`}
+                  >
+                    {major} - {subjects[major] || major}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
 
         <div className="flex flex-col lg:flex-row gap-8 pb-16">
           {/* Sidebar Navigation */}

@@ -130,7 +130,112 @@ export const MAJORS: Record<string, MajorRequirement> = {
     { name: "Senior Design I", required: 1, options: [{ type: 'course', code: "MENG 4137L" }] },
     { name: "Senior Design II", required: 1, options: [{ type: 'course', code: "MENG 4138L" }] }
   ]
+}, "EECS": {
+  id: "EECS",
+  name: "Electrical Engineering and Computer Science, B.S.",
+  description: "Bachelor of Science in EECS",
+  creditRequirements: {
+    total: 15,
+    core: 11,
+    electives: 4
+  },
+  requirements: [
+    // --- PREREQUISITES ---
+    {
+      name: "Calculus I",
+      required: 1,
+      options: [{ type: 'course', code: "MATH 1120" }]
+    },
+    {
+      name: "Calculus II",
+      required: 1,
+      options: [{ type: 'course', code: "MATH 1150" }]
+    },
+    {
+      name: "Multivariable Calculus",
+      description: "ENAS 1510 or MATH 1200",
+      required: 1,
+      options: [
+        { type: 'course', code: "ENAS 1510" },
+        { type: 'course', code: "MATH 1200" }
+      ]
+    },
+    {
+      name: "Intro Programming",
+      required: 1,
+      options: [{ type: 'course', code: "CPSC 1001" }]
+    },
+    {
+      name: "Physics Sequence",
+      description: "PHYS 1800 + 1810 or PHYS 2000 + 2010",
+      required: 2,
+      options: [
+        { type: 'group', options: ["PHYS 1800", "PHYS 1810"], required: 2 },
+        { type: 'group', options: ["PHYS 2000", "PHYS 2010"], required: 2 }
+      ]
+    },
+
+    // --- CORE EECS ---
+    { name: "Intro to Computer Science", required: 1, options: [{ type: 'course', code: "CPSC 2010" }] },
+    { name: "Math Tools for CS", required: 1, options: [{ type: 'course', code: "CPSC 2020" }] },
+    { name: "Data Structures", required: 1, options: [{ type: 'course', code: "CPSC 2230" }] },
+    { name: "Systems Programming", required: 1, options: [{ type: 'course', code: "CPSC 3230" }] },
+    {
+      name: "Algorithms",
+      required: 1,
+      options: [
+        { type: 'course', code: "CPSC 3650" },
+        { type: 'course', code: "CPSC 3660" }
+      ]
+    },
+    { name: "Intro to Electronics", required: 1, options: [{ type: 'course', code: "ECE 2000" }] },
+    { name: "Computer Engineering", required: 1, options: [{ type: 'course', code: "ECE 2011" }] },
+    { name: "Comms and Control", required: 1, options: [{ type: 'course', code: "ECE 2020" }] },
+    { name: "Circuits and Systems", required: 1, options: [{ type: 'course', code: "ECE 2031" }] },
+
+    {
+      name: "Mathematics Elective",
+      description: "Choose one: MATH 2220, MATH 2250, MATH 2260, S&DS 2380, S&DS 2410",
+      required: 1,
+      options: [
+        { type: 'course', code: "MATH 2220" },
+        { type: 'course', code: "MATH 2250" },
+        { type: 'course', code: "MATH 2260" },
+        { type: 'course', code: "S&DS 2380" },
+        { type: 'course', code: "S&DS 2410" }
+      ]
+    },
+
+    // --- ELECTIVES ---
+    {
+      name: "EECS Electives",
+      description: "4 electives at 3000+ level: 2 in CPSC and 2 in ECE",
+      required: 4,
+      options: [
+        // CS electives
+        ...["CPSC 3270", "CPSC 3380", "CPSC 3650", "CPSC 3660", "CPSC 3700", "CPSC 4130", "CPSC 4150", "CPSC 4190", "CPSC 4200", "CPSC 4210", "CPSC 4230", "CPSC 4240", "CPSC 4261", "CPSC 4270", "CPSC 4301", "CPSC 4320", "CPSC 4330", "CPSC 4350", "CPSC 4370", "CPSC 4380", "CPSC 4390", "CPSC 4391", "CPSC 4410"].map(
+          (code): { type: "course"; code: string } => ({ type: "course", code })
+        ),
+        // ECE electives
+        ...["ECE 3101", "ECE 3200", "ECE 3250", "ECE 3481", "ECE 4021", "ECE 4061", "ECE 4201", "ECE 4250", "ECE 4320", "ECE 4500", "ECE 4520", "ECE 4551", "ECE 4680", "ECE 4710", "ECE 4811", "ECE 5021", "ECE 5750", "ECE 7181", "ECE 8061"].map(
+          (code): { type: "course"; code: string } => ({ type: "course", code })
+        )
+      ],
+    },
+
+    // --- SENIOR PROJECT ---
+    {
+      name: "Senior Project",
+      required: 1,
+      options: [
+        { type: 'course', code: "CPSC 4900" },
+        { type: 'course', code: "ECE 4710" },
+        { type: 'course', code: "ECE 4721" }
+      ]
+    }
+  ]
 }
+
 };
 
 type CompletedRequirement = {
@@ -239,4 +344,11 @@ export const calculateMajorProgress = (
     totalCredits: major.creditRequirements.total,
     percentage: Math.min(100, (completedCredits / major.creditRequirements.total) * 100)
   };
+};
+
+export const getAllMajorProgress = (majors: string[], completedCourses: string[]) => {
+  return majors.map(major => ({
+    major,
+    progress: calculateMajorProgress(major, completedCourses)
+  }));
 };

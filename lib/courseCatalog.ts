@@ -222,7 +222,95 @@ const COURSES: CourseInfo[] = [
     name: "Special Projects II",
     credits: 1.0,
     department: "MENG"
-  }
+  },
+  // CPSC Courses (EECS relevant ones)
+{
+  codes: ["CPSC 1001", "CPSC 100"],
+  name: "Introduction to Programming",
+  credits: 1.0,
+  department: "CPSC"
+},
+{
+  codes: ["CPSC 2010", "CPSC 201"],
+  name: "Introduction to Computer Science",
+  credits: 1.0,
+  department: "CPSC"
+},
+{
+  codes: ["CPSC 2020", "CPSC 202"],
+  name: "Mathematical Tools for Computer Science",
+  credits: 1.0,
+  department: "CPSC"
+},
+{
+  codes: ["CPSC 2230", "CPSC 223"],
+  name: "Data Structures and Programming Techniques",
+  credits: 1.0,
+  department: "CPSC"
+},
+{
+  codes: ["CPSC 3230", "CPSC 323"],
+  name: "Introduction to Systems Programming and Computer Organization",
+  credits: 1.0,
+  department: "CPSC"
+},
+{
+  codes: ["CPSC 3650", "CPSC 365"],
+  name: "Algorithms",
+  credits: 1.0,
+  department: "CPSC"
+},
+{
+  codes: ["CPSC 3660"],
+  name: "Intensive Algorithms",
+  credits: 1.0,
+  department: "CPSC"
+},
+{
+  codes: ["CPSC 4900", "CPSC 490"],
+  name: "Senior Project",
+  credits: 1.0,
+  department: "CPSC"
+},
+
+// ECE Courses (renamed from EENG)
+{
+  codes: ["ECE 2000", "EENG 200"],
+  name: "Introduction to Electronics",
+  credits: 1.0,
+  department: "ECE"
+},
+{
+  codes: ["ECE 2010", "EENG 201"],
+  name: "Introduction to Computer Engineering",
+  credits: 1.0,
+  department: "ECE"
+},
+{
+  codes: ["ECE 2020", "EENG 202"],
+  name: "Introduction to Communications and Control",
+  credits: 1.0,
+  department: "ECE"
+},
+{
+  codes: ["ECE 2030", "EENG 203"],
+  name: "Circuits and Systems Design",
+  credits: 1.0,
+  department: "ECE"
+},
+{
+  codes: ["ECE 4710", "EENG 471"],
+  name: "Senior Advanced Special Projects I",
+  credits: 1.0,
+  department: "ECE"
+},
+{
+  codes: ["ECE 4721", "EENG 472"],
+  name: "Senior Advanced Special Projects II",
+  credits: 1.0,
+  department: "ECE"
+}
+
 ];
 
 // Create a lookup map from all codes to their canonical course info

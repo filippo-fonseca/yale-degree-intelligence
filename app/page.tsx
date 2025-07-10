@@ -83,10 +83,15 @@ export default function Home() {
       .filter((course) => course.grade === "In Progress" && !course.skipped)
       .map((course) => course.code);
 
+    const skippedCourseCodes = courses
+      .filter((course) => course.skipped)
+      .map((course) => course.code);
+
     return calculateMajorProgress(
       selectedMajor,
       completedCourseCodes,
-      inProgressCourseCodes
+      inProgressCourseCodes,
+      skippedCourseCodes
     );
   };
 

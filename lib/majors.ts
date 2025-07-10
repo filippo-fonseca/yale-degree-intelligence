@@ -1,20 +1,19 @@
+
 // src/lib/majors.ts
 import { CourseInfo, getCourseInfo, getCanonicalCode, isValidCourseCode } from "./courseCatalog";
 
 type RequirementOption = {
   type: 'course';
-  code: string; // This should be the canonical code
+  code: string; // Canonical course code
 } | {
   type: 'group';
-  options: string[]; // These should be canonical codes
-  required: number;
+  options: string[]; // Array of canonical course codes
+  required: number; // Number of courses required from this group
   description?: string;
 };
 
 type MajorRequirement = {
   id: string;
-  //CRUCIALLY: this "name" allows a shorter, human-readable identifier that the student can refer to "like - "CHEMISTRY REQUIREMENT", "Thermo", etc."
-  //we will have to do this for all majors (manually), but that's okay. 
   name: string;
   description: string;
   requirements: {
@@ -252,6 +251,7 @@ type CompletedRequirement = {
     inProgress: boolean;
     required: boolean;
     credits: number;
+    skipped?: boolean;
   }[];
 };
 
@@ -266,23 +266,27 @@ export type MajorProgress = {
   inProgressPercentage: number;
 };
 
-// Update the calculateMajorProgress function in majors.ts
 export const calculateMajorProgress = (
   majorId: string,
   completedCourseCodes: string[],
-  inProgressCourseCodes: string[] = []
+  inProgressCourseCodes: string[] = [],
+  skippedCourseCodes: string[] = []
 ): MajorProgress => {
   const major = MAJORS[majorId];
   if (!major) throw new Error(`Major ${majorId} not found`);
 
-  // Convert all codes to their canonical versions
-  const canonicalCompletedCodes = completedCourseCodes.map(code => 
-    getCanonicalCode(code) || code
-  ).filter(code => isValidCourseCode(code));
-
-  const canonicalInProgressCodes = inProgressCourseCodes.map(code => 
-    getCanonicalCode(code) || code
-  ).filter(code => isValidCourseCode(code));
+  // Normalize all course codes to their canonical versions
+  const canonicalCompleted = completedCourseCodes
+    .map(code => getCanonicalCode(code) || code)
+    .filter(isValidCourseCode);
+  
+  const canonicalInProgress = inProgressCourseCodes
+    .map(code => getCanonicalCode(code) || code)
+    .filter(isValidCourseCode);
+  
+  const canonicalSkipped = skippedCourseCodes
+    .map(code => getCanonicalCode(code) || code)
+    .filter(isValidCourseCode);
 
   let completedCredits = 0;
   let inProgressCredits = 0;
@@ -295,64 +299,71 @@ export const calculateMajorProgress = (
 
     for (const option of req.options) {
       if (option.type === 'course') {
-        const completed = canonicalCompletedCodes.includes(option.code);
-        const inProgress = !completed && canonicalInProgressCodes.includes(option.code);
-        const course = getCourseInfo(option.code);
-        
-        if (completed) reqCompleted++;
+        const code = option.code;
+        const completed = canonicalCompleted.includes(code);
+        const inProgress = !completed && canonicalInProgress.includes(code);
+        const skipped = canonicalSkipped.includes(code);
+        const course = getCourseInfo(code);
+
+        // Count as completed if actually completed or explicitly skipped
+        if (completed || skipped) reqCompleted++;
         if (inProgress && reqCompleted < req.required) reqInProgress++;
-        
+
         reqOptions.push({
-          code: option.code,
-          name: course?.name || option.code,
-          completed,
+          code,
+          name: course?.name || code,
+          completed: completed || skipped,
           inProgress,
           required: reqCompleted + reqInProgress < req.required,
-          credits: course?.credits || 0
+          credits: skipped ? 0 : (course?.credits || 0), // Skipped courses count as 0 credits
+          skipped
         });
-      } 
-      else if (option.type === 'group') {
+      } else if (option.type === 'group') {
+        // Handle course groups
         const groupCompleted = option.options
-          .filter(code => canonicalCompletedCodes.includes(code))
+          .filter(code => canonicalCompleted.includes(code) || canonicalSkipped.includes(code))
           .slice(0, option.required)
           .length;
 
         const groupInProgress = option.options
-          .filter(code => !canonicalCompletedCodes.includes(code))
-          .filter(code => canonicalInProgressCodes.includes(code))
+          .filter(code => !canonicalCompleted.includes(code) && !canonicalSkipped.includes(code))
+          .filter(code => canonicalInProgress.includes(code))
           .slice(0, option.required - groupCompleted)
           .length;
 
         reqCompleted += groupCompleted;
         reqInProgress += groupInProgress;
 
+        // Add all group options to the requirements
         option.options.forEach(code => {
-          const completed = canonicalCompletedCodes.includes(code);
-          const inProgress = !completed && canonicalInProgressCodes.includes(code);
+          const completed = canonicalCompleted.includes(code);
+          const inProgress = canonicalInProgress.includes(code);
+          const skipped = canonicalSkipped.includes(code);
           const course = getCourseInfo(code);
-          
+
           reqOptions.push({
             code,
             name: course?.name || code,
-            completed,
+            completed: completed || skipped,
             inProgress,
             required: (reqCompleted + reqInProgress) < req.required && 
                      (groupCompleted + groupInProgress) < option.required,
-            credits: course?.credits || 0
+            credits: skipped ? 0 : (course?.credits || 0),
+            skipped
           });
         });
       }
     }
 
-    // Add credits for completed courses (only up to required number)
+    // Calculate credits from completed (non-skipped) courses
     reqOptions
-      .filter(opt => opt.completed && !opt.inProgress) // Only count truly completed courses
+      .filter(opt => opt.completed && !opt.inProgress && !opt.skipped)
       .slice(0, req.required)
       .forEach(opt => {
         completedCredits += opt.credits;
       });
 
-    // Add credits for in-progress courses (only up to remaining required number)
+    // Calculate credits from in-progress courses
     reqOptions
       .filter(opt => opt.inProgress)
       .slice(0, Math.max(0, req.required - reqCompleted))
@@ -365,12 +376,12 @@ export const calculateMajorProgress = (
       description: req.description,
       completed: reqCompleted,
       required: req.required,
-      satisfied: reqCompleted >= req.required, // Only count as satisfied if actually completed
+      satisfied: reqCompleted >= req.required,
       options: reqOptions
     });
   }
 
-  // Update how we categorize requirements
+  // Categorize requirements
   const completedReqs = requirementProgress.filter(r => r.satisfied);
   const inProgressReqs = requirementProgress.filter(r => 
     !r.satisfied && (r.options.some(o => o.inProgress) || r.completed > 0)
@@ -379,6 +390,7 @@ export const calculateMajorProgress = (
     !r.satisfied && !r.options.some(o => o.inProgress) && r.completed === 0
   );
 
+  // Calculate percentages
   const percentage = Math.min(100, (completedCredits / major.creditRequirements.total) * 100);
   const inProgressPercentage = Math.min(100, 
     ((completedCredits + inProgressCredits) / major.creditRequirements.total) * 100

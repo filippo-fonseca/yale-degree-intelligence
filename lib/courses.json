@@ -1,72 +1,90 @@
 [
     {
       "codes": ["MATH 1120", "MATH 112"],
-      "name": "Calculus I",
+      "name": "Calculus of Functions of One Variable I",
       "credits": 1.0,
-      "department": "MATH"
+      "department": "MATH",
+      "distributionals": ["QR"]
     },
     {
       "codes": ["MATH 1150", "MATH 115"],
-      "name": "Calculus II",
+      "name": "Calculus of Functions of One Variable II",
       "credits": 1.0,
-      "department": "MATH"
+      "department": "MATH",
+      "distributionals": ["QR"]
     },
     {
       "codes": ["MATH 1200", "MATH 120"],
-      "name": "Calculus III",
+      "name": "Calculus of Functions of Several Variables",
       "credits": 1.0,
-      "department": "MATH"
+      "department": "MATH",
+      "distributionals": ["QR"]
     },
     {
       "codes": ["MATH 2220", "MATH 222"],
-      "name": "Linear Algebra",
+      "name": "Linear Algebra with Applications",
       "credits": 1.0,
-      "department": "MATH"
+      "department": "MATH",
+      "distributionals": ["QR"]
     },
     {
       "codes": ["MATH 2250", "MATH 225"],
-      "name": "Differential Equations",
+      "name": "Linear Algebra",
       "credits": 1.0,
-      "department": "MATH"
+      "department": "MATH",
+      "distributionals": ["QR"]
     },
+    {
+        "codes": ["MATH 2260", "MATH 226"],
+        "name": "Linear Algebra (Intensive)",
+        "credits": 1.0,
+        "department": "MATH",
+        "distributionals": ["QR"]
+      },
   
     {
       "codes": ["ENAS 1300", "ENAS 130"],
-      "name": "Intro to Engineering",
+      "name": "Introduction to Computing for Engineers and Scientists",
       "credits": 1.0,
-      "department": "ENAS"
+      "department": "ENAS",
+      "distributionals": ["QR"]
     },
     {
       "codes": ["ENAS 1510", "ENAS 151"],
       "name": "Multivariable Calculus for Engineers",
       "credits": 1.0,
-      "department": "ENAS"
+      "department": "ENAS",
+      "distributionals": ["QR"]
     },
     {
       "codes": ["ENAS 1940", "ENAS 194"],
-      "name": "Linear Algebra and Matrix Theory",
+      "name": "Ordinary and Partial Differential Equations with Applications",
       "credits": 1.0,
-      "department": "ENAS"
+      "department": "ENAS",
+      "distributionals": ["QR"]
     },
-  
+
 
     {
       "codes": ["PHYS 1800", "PHYS 180"],
-      "name": "Physics I: Mechanics",
+      "name": "University Physics I",
       "credits": 1.0,
-      "department": "PHYS"
+      "department": "PHYS",
+      "distributionals": ["QR", "Sc"]
     },
     {
       "codes": ["PHYS 1810", "PHYS 181"],
-      "name": "Physics II: Electricity, Magnetism, & Waves",
+      "name": "University Physics II",
       "credits": 1.0,
-      "department": "PHYS"
+      "department": "PHYS",
+      "distributionals": ["QR", "Sc"]
     },
     {
       "codes": ["PHYS 2000", "PHYS 200"],
       "name": "Fundamentals of Physics I",
       "credits": 1.0,
-      "department": "PHYS"
+      "department": "PHYS",
+      "distributionals": ["QR", "Sc"]
     },
     {
       "codes": ["PHYS 2010", "PHYS 201"],
@@ -76,27 +94,31 @@
     },
     {
       "codes": ["PHYS 1650L", "PHYS 165L"],
-      "name": "Introductory Physics Lab I",
+      "name": "General Physics Laboratory I",
       "credits": 0.5,
-      "department": "PHYS"
+      "department": "PHYS",
+      "distributionals": ["Sc"]
     },
     {
       "codes": ["PHYS 1660L", "PHYS 166L"],
-      "name": "Introductory Physics Lab II",
+      "name": "General Physics Laboratory II",
       "credits": 0.5,
-      "department": "PHYS"
+      "department": "PHYS",
+      "distributionals": ["Sc"]
     },
     {
       "codes": ["PHYS 2050L", "PHYS 205L"],
-      "name": "Fundamentals of Physics Lab I",
+      "name": "Modern Physical Measurement I",
       "credits": 0.5,
-      "department": "PHYS"
+      "department": "PHYS",
+      "distributionals": ["Sc"]
     },
     {
       "codes": ["PHYS 2060L", "PHYS 206L"],
-      "name": "Fundamentals of Physics Lab II",
+      "name": "Modern Physical Measurement II",
       "credits": 0.5,
-      "department": "PHYS"
+      "department": "PHYS",
+      "distributionals": ["Sc"]
     },
   
 
@@ -104,13 +126,29 @@
       "codes": ["CHEM 1610", "CHEM 161"],
       "name": "General Chemistry I",
       "credits": 1.0,
-      "department": "CHEM"
+      "department": "CHEM",
+      "distributionals": ["QR", "Sc"]
+    },
+    {
+        "codes": ["CHEM 163"],
+        "name": "Advanced General Chemistry I",
+        "credits": 1.0,
+        "department": "CHEM",
+        "distributionals": ["QR", "Sc"]
+    },
+    {
+        "codes": ["CHEM 167"],
+        "name": "Advanced General Chemistry II",
+        "credits": 1.0,
+        "department": "CHEM",
+        "distributionals": ["QR", "Sc"]
     },
     {
       "codes": ["CHEM 1650", "CHEM 165"],
-      "name": "Intensive General Chemistry",
+      "name": "General Chemistry II",
       "credits": 1.0,
-      "department": "CHEM"
+      "department": "CHEM",
+      "distributionals": ["QR", "Sc"]
     },
   
 
@@ -118,25 +156,29 @@
       "codes": ["ECE 2000", "EENG 200", "ECE 200"],
       "name": "Introduction to Electronics",
       "credits": 1.0,
-      "department": "ECE"
+      "department": "ECE",
+      "distributionals": ["QR", "WR", "Sc"]
     },
     {
-      "codes": ["ECE 2010", "EENG 201"],
+      "codes": ["ECE 2011", "EENG 201"],
       "name": "Introduction to Computer Engineering",
       "credits": 1.0,
-      "department": "ECE"
+      "department": "ECE",
+      "distributionals": ["QR"]
     },
     {
       "codes": ["ECE 2020", "EENG 202"],
       "name": "Introduction to Communications and Control",
       "credits": 1.0,
-      "department": "ECE"
+      "department": "ECE",
+      "distributionals": ["QR"]
     },
     {
-      "codes": ["ECE 2030", "EENG 203"],
+      "codes": ["ECE 2031", "EENG 203"],
       "name": "Circuits and Systems Design",
       "credits": 1.0,
-      "department": "ECE"
+      "department": "ECE",
+      "distributionals": ["QR", "Sc"]
     },
     {
       "codes": ["ECE 4710", "EENG 471"],

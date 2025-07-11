@@ -54,6 +54,33 @@ export default function Home() {
   const [showSettings, setShowSettings] = useState(false);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
 
+  const navItems = [
+    {
+      id: "upload",
+      icon: HiDocumentDuplicate,
+      label: "My courses",
+      disabled: false, // Always enabled
+    },
+    {
+      id: "stats",
+      icon: FiBarChart2,
+      label: "Academic stats",
+      disabled: !hasData, // Disabled if no data
+    },
+    {
+      id: "major",
+      icon: RiProgress3Fill,
+      label: "My major",
+      disabled: !hasData, // Disabled if no data
+    },
+    {
+      id: "distributionals",
+      icon: RiProgress3Fill,
+      label: "Distributionals",
+      disabled: !hasData, // Disabled if no data
+    },
+  ];
+
   // Fetch user profile on load
   useEffect(() => {
     if (!user) return;
@@ -613,29 +640,19 @@ export default function Home() {
             className="w-full lg:w-56"
           >
             <nav className="space-y-1">
-              {[
-                {
-                  id: "upload",
-                  icon: HiDocumentDuplicate,
-                  label: "My courses",
-                },
-                { id: "stats", icon: FiBarChart2, label: "Academic stats" },
-                { id: "major", icon: RiProgress3Fill, label: "My major" },
-                {
-                  id: "major",
-                  icon: RiProgress3Fill,
-                  label: "Distributionals",
-                },
-              ].map((item) => (
+              {navItems.map((item) => (
                 <motion.button
                   key={item.id}
-                  whileHover={{ x: 4 }}
-                  onClick={() => setActiveTab(item.id)}
+                  whileHover={!item.disabled ? { x: 4 } : {}}
+                  onClick={() => !item.disabled && setActiveTab(item.id)}
                   className={`w-full flex items-center justify-between px-4 py-3 text-left rounded-xl transition-all ${
                     activeTab === item.id
                       ? "bg-gray-900/50 border border-gray-800 text-white"
+                      : item.disabled
+                      ? "text-gray-600 cursor-not-allowed"
                       : "text-gray-400 hover:text-white hover:bg-gray-900/30"
                   }`}
+                  disabled={item.disabled}
                 >
                   <div className="flex items-center space-x-3">
                     <item.icon size={18} />
@@ -860,9 +877,9 @@ export default function Home() {
           className="py-8 text-center text-sm text-gray-500 border-t border-gray-900"
         >
           <p>
-            Yale DegreeIntelligence can be. Not affiliated with Yale University.
-            We do not take responsibility for any wrong advice/deductions. We
-            make no money from this.
+            Yale DegreeIntelligence can be wrong. Not affiliated with Yale
+            University. We do not take responsibility for any wrong
+            advice/deductions. We make no money from this.
           </p>
         </motion.footer>
       </div>

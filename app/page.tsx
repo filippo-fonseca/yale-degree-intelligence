@@ -31,11 +31,12 @@ import { calculateMajorProgress } from "@/lib/majors";
 import MajorProgressView from "@/components/MajorProgressView";
 import StatsView from "@/components/StatsView";
 import MajorSelectionFlow from "@/components/MajorSelectionFlow";
-import LogoIcon from "@/icons/LogoIcon";
 import { HiDocumentDuplicate } from "react-icons/hi";
 import { RiProgress3Fill } from "react-icons/ri";
 import CompoundLogo from "@/components/ui/CompoundLogo";
 import { getCourseCreditsFromCode } from "@/lib/courseCatalog";
+import DistributionalsView from "@/components/DistributionalProgress";
+import { FaBuildingCircleCheck } from "react-icons/fa6";
 
 interface UserProfile {
   majors: string[];
@@ -75,7 +76,7 @@ export default function Home() {
     },
     {
       id: "distributionals",
-      icon: RiProgress3Fill,
+      icon: FaBuildingCircleCheck,
       label: "Distributionals",
       disabled: !hasData, // Disabled if no data
     },
@@ -863,6 +864,17 @@ export default function Home() {
                     progress={getMajorProgress()!}
                     onRequirementChange={fetchCourses}
                   />
+                </motion.div>
+              )}
+              {activeTab === "distributionals" && (
+                <motion.div
+                  key="distributionals"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <DistributionalsView courses={courses} />
                 </motion.div>
               )}
             </AnimatePresence>

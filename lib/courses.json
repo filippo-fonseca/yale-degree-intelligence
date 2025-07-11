@@ -181,16 +181,106 @@
       "distributionals": ["QR", "Sc"]
     },
     {
-      "codes": ["ECE 4710", "EENG 471"],
-      "name": "Senior Advanced Special Projects I",
+      "codes": ["ECE 2350", "EENG 235"],
+      "name": "Special Projects",
+      "credits": 0.5,
+      "department": "ECE"
+    },
+    {
+      "codes": ["ECE 3101", "EENG 310"],
+      "name": "Signals and Systems",
+      "credits": 1.0,
+      "department": "ECE",
+      "distributionals": ["QR"]
+    },
+    {
+      "codes": ["ECE 3200", "EENG 320"],
+      "name": "Semiconductor Devices",
+      "credits": 1.0,
+      "department": "ECE",
+      "distributionals": ["QR", "Sc"]
+    },
+    {
+      "codes": ["ECE 3250", "EENG 325"],
+      "name": "Microelectronic Circuits",
+      "credits": 1.0,
+      "department": "ECE",
+      "distributionals": ["QR"]
+    },
+    {
+      "codes": ["ECE 3481", "EENG 348"],
+      "name": "Digital Systems",
+      "credits": 1.0,
+      "department": "ECE",
+      "distributionals": ["QR"]
+    },
+    {
+      "codes": ["ECE 4021", "EENG 402"],
+      "name": "Advanced Electron Devices",
+      "credits": 1.0,
+      "department": "ECE",
+      "distributionals": ["QR", "Sc"]
+    },
+    {
+      "codes": ["ECE 4201", "EENG 420"],
+      "name": "Computer Architecture",
       "credits": 1.0,
       "department": "ECE"
     },
     {
-      "codes": ["ECE 4721", "EENG 472"],
-      "name": "Senior Advanced Special Projects II",
+      "codes": ["ECE 4250", "EENG 425"],
+      "name": "Introduction to VLSI System Design",
+      "credits": 1.0,
+      "department": "ECE",
+      "distributionals": ["QR"]
+    },
+    {
+      "codes": ["ECE 4320", "EENG 423"],
+      "name": "Linear Systems",
+      "credits": 1.0,
+      "department": "ECE",
+      "distributionals": ["QR"]
+    },
+    {
+      "codes": ["ECE 4500", "EENG 450"],
+      "name": "Applied Digital Signal Processing",
+      "credits": 1.0,
+      "department": "ECE",
+      "distributionals": ["QR"]
+    },
+    {
+      "codes": ["ECE 4520", "EENG 452"],
+      "name": "Internet Engineering",
+      "credits": 1.0,
+      "department": "ECE",
+      "distributionals": ["QR"]
+    },
+    {
+      "codes": ["ECE 4551", "EENG 455"],
+      "name": "Network Algorithms and Stochastic Optimization",
+      "credits": 1.0,
+      "department": "ECE",
+      "distributionals": ["QR"]
+    },
+    {
+      "codes": ["ECE 4680", "EENG 468"],
+      "name": "Advanced Special Projects",
       "credits": 1.0,
       "department": "ECE"
+    },
+    {
+      "codes": ["ECE 4710", "EENG 471"],
+      "name": "Senior Advanced Special Projects",
+      "credits": 1.0,
+      "department": "ECE",
+      "distributionals": ["QR"]
+    },
+    {
+      "codes": ["ECE 4881", "EENG 481"],
+      "name": "Advanced ABET Projects",
+      "credits": 1.0,
+      "department": "ECE",
+      "distributionals": ["QR"]
     },
   
 
@@ -198,11 +288,19 @@
       "codes": ["MENG 1105", "MENG 185"],
       "name": "Mechanical Design",
       "credits": 1.0,
-      "department": "MENG"
+      "department": "MENG",
+      "distributionals": ["Sc"]
     },
     {
-      "codes": ["MENG 2511", "MENG 211"],
-      "name": "Thermodynamics for Mechanical Engineers",
+      "codes": ["MENG 2050", "MENG 400"],
+      "name": "Computer-Aided Engineering",
+      "credits": 1.0,
+      "department": "MENG",
+      "distributionals": ["QR"]
+    },
+    {
+      "codes": ["MENG 2147", "MENG 287"],
+      "name": "Intermediate Mechanical Design",
       "credits": 1.0,
       "department": "MENG"
     },
@@ -213,22 +311,32 @@
       "department": "MENG"
     },
     {
+      "codes": ["MENG 2511", "MENG 211"],
+      "name": "Thermodynamics for Mechanical Engineers",
+      "credits": 1.0,
+      "department": "MENG",
+      "distributionals": ["QR", "Sc"]
+    },
+    {
       "codes": ["MENG 2615", "MENG 285"],
       "name": "Introduction to Materials Science",
       "credits": 1.0,
-      "department": "MENG"
+      "department": "MENG",
+      "distributionals": ["QR", "Sc"]
     },
     {
       "codes": ["MENG 2616L", "MENG 286L"],
       "name": "Solid Mechanics and Materials Science Laboratory",
       "credits": 1,
-      "department": "MENG"
+      "department": "MENG",
+      "distributionals": ["Sc"]
     },
     {
-      "codes": ["MENG 3020L", "MENG 302L"],
+      "codes": ["MENG 3020L", "MENG 390"],
       "name": "Mechatronics Laboratory",
       "credits": 0.5,
-      "department": "MENG"
+      "department": "MENG",
+      "distributionals": ["QR"]
     },
     {
       "codes": ["MENG 3125", "MENG 325"],
@@ -237,53 +345,153 @@
       "department": "MENG"
     },
     {
-      "codes": ["MENG 3323", "MENG 332"],
+      "codes": ["MENG 3323", "MENG 383"],
       "name": "Mechanical Engineering III: Dynamics",
       "credits": 1.0,
-      "department": "MENG"
+      "department": "MENG",
+      "distributionals": ["QR", "Sc"]
     },
     {
-      "codes": ["MENG 3422", "MENG 342"],
+      "codes": ["MENG 3422", "MENG 361"],
       "name": "Mechanical Engineering II: Fluid Mechanics",
       "credits": 1.0,
-      "department": "MENG"
+      "department": "MENG",
+      "distributionals": ["QR", "Sc"]
     },
     {
-      "codes": ["MENG 3423L", "MENG 342L"],
+      "codes": ["MENG 3423L", "MENG 363L"],
       "name": "Fluid Mechanics and Thermodynamics Laboratory",
       "credits": 0.5,
-      "department": "MENG"
+      "department": "MENG",
+      "distributionals": ["WR", "Sc"]
     },
     {
-      "codes": ["MENG 3424", "MENG 390"],
+      "codes": ["MENG 3424", "MENG 389"],
       "name": "Mechanical Engineering IV: Fluid and Thermal Energy Science",
+      "credits": 1.0,
+      "department": "MENG",
+      "distributionals": ["QR", "Sc"]
+    },
+    {
+      "codes": ["MENG 3465", "MENG 365"],
+      "name": "Chemical Propulsion Systems",
+      "credits": 1.0,
+      "department": "MENG",
+      "distributionals": ["QR", "Sc"]
+    },
+    {
+      "codes": ["MENG 3675", "MENG 385"],
+      "name": "Thermodynamics, Kinetics, and Structure of Materials",
       "credits": 1.0,
       "department": "MENG"
     },
     {
-      "codes": ["MENG 4137L", "MENG 413L"],
+      "codes": ["MENG 4041", "MENG 441"],
+      "name": "Applied Numerical Methods for Differential Equations",
+      "credits": 1.0,
+      "department": "MENG",
+      "distributionals": ["QR"]
+    },
+    {
+      "codes": ["MENG 4147L", "MENG 487L"],
       "name": "Mechanical Design: Process and Implementation I",
       "credits": 1.0,
       "department": "MENG"
     },
     {
-      "codes": ["MENG 4138L", "MENG 414L"],
+      "codes": ["MENG 4138L", "MENG 488L"],
       "name": "Mechanical Design: Process and Implementation II",
       "credits": 0.5,
       "department": "MENG"
     },
     {
-      "codes": ["MENG 4991"],
+      "codes": ["MENG 4145", "MENG 425"],
+      "name": "Advanced Design and Analysis of Machines",
+      "credits": 1.0,
+      "department": "MENG"
+    },
+    {
+      "codes": ["MENG 4154", "MENG 404"],
+      "name": "Medical Device Design and Innovation",
+      "credits": 1.0,
+      "department": "MENG"
+    },
+    {
+      "codes": ["MENG 4359", "MENG 459"],
+      "name": "Neuromuscular Biomechanics",
+      "credits": 1.0,
+      "department": "MENG",
+      "distributionals": ["QR"]
+    },
+    {
+      "codes": ["MENG 4359", "MENG 459"],
+      "name": "Computational Mechanics",
+      "credits": 1.0,
+      "department": "MENG"
+    },
+    {
+      "codes": ["MENG 4469", "MENG 469"],
+      "name": "Aerodynamics",
+      "credits": 1.0,
+      "department": "MENG",
+      "distributionals": ["QR", "Sc"]
+    },
+    {
+      "codes": ["MENG 4475", "MENG 475"],
+      "name": "Fluid Mechanics of Natural Phenomena",
+      "credits": 1.0,
+      "department": "MENG"
+    },
+    {
+      "codes": ["MENG 4664", "MENG 464"],
+      "name": "Forces on the Nanoscale",
+      "credits": 1.0,
+      "department": "MENG",
+      "distributionals": ["Sc"]
+    },
+    {
+      "codes": ["MENG 4672", "MENG 492"],
+      "name": "Electronic and Optimal Properties of Energy Materials",
+      "credits": 1.0,
+      "department": "MENG",
+      "distributionals": ["QR", "Sc"]
+    },
+    {
+      "codes": ["MENG 4673", "MENG 403"],
+      "name": "Introduction to Nanomaterials and Nanotechnology",
+      "credits": 1.0,
+      "department": "MENG",
+      "distributionals": ["Sc"]
+    },
+    {
+      "codes": ["MENG 4774"],
+      "name": "Topics in Computational and Systems Biology",
+      "credits": 1.0,
+      "department": "MENG"
+    },
+    {
+      "codes": ["MENG 4991", "MENG 471"],
       "name": "Special Projects I",
       "credits": 1.0,
       "department": "MENG"
     },
     {
-      "codes": ["MENG 4992"],
+      "codes": ["MENG 4992", "MENG 473"],
       "name": "Special Projects II",
       "credits": 1.0,
       "department": "MENG"
     },
+
+
+
+
+
+    
+    
+    
+
+
+   
   
 
     {
@@ -333,5 +541,21 @@
       "name": "Senior Project",
       "credits": 1.0,
       "department": "CPSC"
+    },
+
+  
+    {
+      "codes": ["FREN 1600", "FREN 160"],
+      "name": "France On Screen and Off: Advanced French Conversation and Culture Through Film",
+      "credits": 1.0,
+      "department": "FREN",
+      "distributionals": ["L5"]
+    },
+    {
+      "codes": ["FREN S164", "FREN S1640"],
+      "name": "France On Screen and Off: Advanced French Conversation and Culture Through Film",
+      "credits": 2.0,
+      "department": "FREN",
+      "distributionals": ["L5", "Hu"]
     }
   ]

@@ -5,6 +5,7 @@ export type CourseInfo = {
   name: string;
   credits: number;
   department: string;
+  distributionals?: string[];
 };
 
 // Create a lookup map from all codes to their canonical course info
@@ -39,4 +40,9 @@ export const getCourseNameFromCode = (code: string): string | undefined => {
 export const getCourseCreditsFromCode = (code: string): number | undefined => { 
   const course = getCourseInfo(code);
   return course?.credits;
+}
+
+export const getCourseDistributionalsFromCode = (code: string): string[] | undefined => {
+  const course = getCourseInfo(code);
+  return course?.distributionals;
 }

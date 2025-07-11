@@ -51,7 +51,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const result = await signInWithPopup(auth, googleProvider);
       if (!result.user.email?.endsWith("@yale.edu")) {
         await logout();
-        throw new Error("Only Yale email addresses are allowed");
+        alert("Only valid Yale email addresses are allowed. Sorry!! :)");
+        // throw new Error("Only Yale email addresses are allowed");
       }
     } catch (error) {
       console.error("Error signing in with Google", error);

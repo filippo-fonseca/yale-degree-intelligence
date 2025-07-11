@@ -34,7 +34,7 @@ export const isValidCourseCode = (code: string): boolean => {
 
 export const getCourseNameFromCode = (code: string): string | undefined => {
   const course = getCourseInfo(code);
-  return course?.name;
+  return course ? course.name : "Course";
 }
 
 export const getCourseCreditsFromCode = (code: string): number | undefined => { 

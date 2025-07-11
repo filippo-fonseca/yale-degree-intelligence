@@ -34,7 +34,10 @@ import MajorSelectionFlow from "@/components/MajorSelectionFlow";
 import { HiDocumentDuplicate } from "react-icons/hi";
 import { RiProgress3Fill } from "react-icons/ri";
 import CompoundLogo from "@/components/ui/CompoundLogo";
-import { getCourseCreditsFromCode } from "@/lib/courseCatalog";
+import {
+  getCourseCreditsFromCode,
+  getCourseNameFromCode,
+} from "@/lib/courseCatalog";
 import DistributionalsView from "@/components/DistributionalProgress";
 import { FaBuildingCircleCheck } from "react-icons/fa6";
 
@@ -743,9 +746,7 @@ export default function Home() {
                                           )}
                                         </h4>
                                         <p className="text-sm text-gray-400">
-                                          {getCourseCreditsFromCode(
-                                            course.code
-                                          )}
+                                          {getCourseNameFromCode(course.code)}
                                         </p>
                                         <div className="flex items-center mt-1 space-x-2">
                                           {course.status === "in-progress" && (

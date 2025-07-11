@@ -34,6 +34,8 @@ import MajorSelectionFlow from "@/components/MajorSelectionFlow";
 import LogoIcon from "@/icons/LogoIcon";
 import { HiDocumentDuplicate } from "react-icons/hi";
 import { RiProgress3Fill } from "react-icons/ri";
+import CompoundLogo from "@/components/ui/CompoundLogo";
+import { getCourseCreditsFromCode } from "@/lib/courseCatalog";
 
 interface UserProfile {
   majors: string[];
@@ -175,7 +177,6 @@ export default function Home() {
 
           coursesToAdd.push({
             code: code.trim(),
-            name: name.trim(),
             grade: grade.trim(),
             semester: season.trim(),
             year: parseInt(year.trim()),
@@ -204,7 +205,6 @@ export default function Home() {
 
           coursesToAdd.push({
             code: code.trim(),
-            name: name.trim(),
             grade: null,
             semester: season.trim(),
             year: parseInt(year.trim()),
@@ -579,22 +579,7 @@ export default function Home() {
           transition={{ duration: 0.5 }}
           className="flex justify-between items-center py-8"
         >
-          <div className="flex items-center space-x-2">
-            <LogoIcon />
-            <div className="relative">
-              <h1 className="text-2xl font-medium tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-blue-200 to-purple-200">
-                DegreeIntelligence
-              </h1>
-              <motion.span
-                whileHover={{ scale: 1.05 }}
-                className="font-sf absolute -top-3 -right-6 text-xs font-bold px-2 py-1 rounded-lg transform rotate-12
-                 bg-gray-900 border border-gray-800 shadow-[inset_2px_2px_4px_rgba(0,0,0,0.3),inset_-2px_-2px_4px_rgba(255,255,255,0.05)]
-                 text-pink-400 hover:shadow-[inset_3px_3px_6px_rgba(0,0,0,0.4),inset_-3px_-3px_6px_rgba(255,255,255,0.1)] transition-all"
-              >
-                YALE
-              </motion.span>
-            </div>
-          </div>
+          <CompoundLogo />
 
           <div className="flex items-center space-x-3">
             <button
@@ -635,7 +620,12 @@ export default function Home() {
                   label: "My courses",
                 },
                 { id: "stats", icon: FiBarChart2, label: "Academic stats" },
-                { id: "major", icon: RiProgress3Fill, label: "My degree" },
+                { id: "major", icon: RiProgress3Fill, label: "My major" },
+                {
+                  id: "major",
+                  icon: RiProgress3Fill,
+                  label: "Distributionals",
+                },
               ].map((item) => (
                 <motion.button
                   key={item.id}
@@ -735,7 +725,9 @@ export default function Home() {
                                           )}
                                         </h4>
                                         <p className="text-sm text-gray-400">
-                                          {course.name}
+                                          {getCourseCreditsFromCode(
+                                            course.code
+                                          )}
                                         </p>
                                         <div className="flex items-center mt-1 space-x-2">
                                           {course.status === "in-progress" && (

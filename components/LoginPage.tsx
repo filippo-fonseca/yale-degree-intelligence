@@ -4,6 +4,8 @@ import { useAuth } from "@/context/AuthContext";
 import { Button } from "./ui/button";
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import CompoundLogo from "./ui/CompoundLogo";
+import LogoIcon from "@/icons/LogoIcon";
 
 export default function LoginPage() {
   const { signInWithGoogle, loading } = useAuth();
@@ -118,7 +120,7 @@ export default function LoginPage() {
               whileHover={{ scale: 1.05 }}
               className="flex justify-center"
             >
-              <div className="relative w-24 h-24">
+              <div className="relative w-32 h-32">
                 <motion.div
                   animate={{ rotate: 360 }}
                   transition={{
@@ -130,7 +132,8 @@ export default function LoginPage() {
                 />
                 <div className="absolute inset-0 flex items-center justify-center">
                   <div className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-300 to-purple-300">
-                    Y
+                    {/* <CompoundLogo animated /> */}
+                    <LogoIcon width={64} height={64} />
                   </div>
                 </div>
               </div>
@@ -141,9 +144,9 @@ export default function LoginPage() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.3 }}
-                className="text-4xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-blue-200 to-purple-300"
+                className="flex items-center justify-center text-4xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-blue-200 to-purple-300"
               >
-                Yale DegreeIntelligence
+                <CompoundLogo hideLogo animated size="xl" />
               </motion.h1>
               <motion.p
                 initial={{ opacity: 0 }}
@@ -151,7 +154,8 @@ export default function LoginPage() {
                 transition={{ delay: 0.5 }}
                 className="text-lg text-gray-300"
               >
-                Navigate your Yale journey with clarity, not spreadsheets.
+                Here you'll navigate Yale journey with clarity, not
+                spreadsheets.
               </motion.p>
             </div>
 

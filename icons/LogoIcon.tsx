@@ -1,6 +1,7 @@
 import React from "react";
+import { IconProps } from ".";
 
-const LogoIcon = () => {
+const LogoIcon = (props: IconProps) => {
   return (
     <svg
       width="32"
@@ -8,6 +9,7 @@ const LogoIcon = () => {
       viewBox="0 0 784 787"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
+      {...props}
     >
       <g clip-path="url(#clip0_3_67)">
         <path

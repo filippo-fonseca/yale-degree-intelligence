@@ -31,6 +31,9 @@ import { calculateMajorProgress } from "@/lib/majors";
 import MajorProgressView from "@/components/MajorProgressView";
 import StatsView from "@/components/StatsView";
 import MajorSelectionFlow from "@/components/MajorSelectionFlow";
+import LogoIcon from "@/icons/LogoIcon";
+import { HiDocumentDuplicate } from "react-icons/hi";
+import { RiProgress3Fill } from "react-icons/ri";
 
 interface UserProfile {
   majors: string[];
@@ -577,15 +580,20 @@ export default function Home() {
           className="flex justify-between items-center py-8"
         >
           <div className="flex items-center space-x-2">
-            <motion.div
-              whileHover={{ rotate: 15 }}
-              className="w-8 h-8 rounded-full flex items-center justify-center bg-gradient-to-br from-blue-500 to-purple-600 text-white font-medium"
-            >
-              Y
-            </motion.div>
-            <h1 className="text-2xl font-medium tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-blue-200 to-purple-200">
-              DegreeIntelligence
-            </h1>
+            <LogoIcon />
+            <div className="relative">
+              <h1 className="text-2xl font-medium tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-blue-200 to-purple-200">
+                DegreeIntelligence
+              </h1>
+              <motion.span
+                whileHover={{ scale: 1.05 }}
+                className="font-sf absolute -top-3 -right-6 text-xs font-bold px-2 py-1 rounded-lg transform rotate-12
+                 bg-gray-900 border border-gray-800 shadow-[inset_2px_2px_4px_rgba(0,0,0,0.3),inset_-2px_-2px_4px_rgba(255,255,255,0.05)]
+                 text-pink-400 hover:shadow-[inset_3px_3px_6px_rgba(0,0,0,0.4),inset_-3px_-3px_6px_rgba(255,255,255,0.1)] transition-all"
+              >
+                YALE
+              </motion.span>
+            </div>
           </div>
 
           <div className="flex items-center space-x-3">
@@ -621,9 +629,13 @@ export default function Home() {
           >
             <nav className="space-y-1">
               {[
-                { id: "upload", icon: FiUpload, label: "My Courses" },
-                { id: "stats", icon: FiBarChart2, label: "Academic Stats" },
-                { id: "major", icon: FiBook, label: "Major Progress" },
+                {
+                  id: "upload",
+                  icon: HiDocumentDuplicate,
+                  label: "My courses",
+                },
+                { id: "stats", icon: FiBarChart2, label: "Academic stats" },
+                { id: "major", icon: RiProgress3Fill, label: "My degree" },
               ].map((item) => (
                 <motion.button
                   key={item.id}
@@ -671,9 +683,17 @@ export default function Home() {
                 >
                   {hasData ? (
                     <div>
-                      <h2 className="text-xl font-medium mb-6 bg-clip-text text-transparent bg-gradient-to-r from-blue-200 to-purple-200">
-                        Your Academic Journey
-                      </h2>
+                      <div className="mb-6">
+                        <h2 className="text-3xl font-medium bg-clip-text text-transparent bg-gradient-to-r from-blue-200 to-purple-200">
+                          Your academic journey at Yale,{" "}
+                          {user?.displayName?.split(" ")[0]}.
+                        </h2>
+                        <p>
+                          These are all the classes you've taken, including
+                          their grades and in-progress ones. You can always
+                          upload a more recent transcript to update this data.
+                        </p>
+                      </div>
                       <div className="space-y-8">
                         {Array.from(
                           new Set(courses.map((c) => `${c.semester} ${c.year}`))

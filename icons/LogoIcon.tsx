@@ -33,8 +33,8 @@ const LogoIcon = (props: IconProps) => {
           y2="787"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#BFDBFE" />
-          <stop offset="1" stop-color="white" />
+          <stop stopColor="#BFDBFE" />
+          <stop offset="1" stopColor="white" />
         </linearGradient>
         <linearGradient
           id="paint1_linear_3_67"
@@ -44,8 +44,8 @@ const LogoIcon = (props: IconProps) => {
           y2="285"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#F4C4F3" />
-          <stop offset="1" stop-color="#FC67FA" />
+          <stop stopColor="#F4C4F3" />
+          <stop offset="1" stopColor="#FC67FA" />
         </linearGradient>
         <clipPath id="clip0_3_67">
           <rect

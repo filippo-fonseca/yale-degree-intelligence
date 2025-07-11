@@ -350,6 +350,14 @@ export default function Home() {
     }
   };
 
+  useEffect(() => {
+    // Play sound on tab change
+    if (typeof window === "undefined") return;
+
+    // Only play if we have data (for tabs that require it) or if it's the upload tab
+    void new Audio("/audio/pop.mp3").play().catch(() => null);
+  }, [activeTab, hasData]);
+
   if (loading)
     return (
       <div className="flex items-center justify-center min-h-screen bg-gray-950">

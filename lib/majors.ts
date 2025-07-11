@@ -190,9 +190,9 @@ export const MAJORS: Record<string, MajorRequirement> = {
       ]
     },
     { name: "Intro to Electronics", required: 1, options: [{ type: 'course', code: "ECE 2000" }] },
-    { name: "Computer Engineering", required: 1, options: [{ type: 'course', code: "ECE 2011" }] },
+    { name: "Computer Engineering", required: 1, options: [{ type: 'course', code: "ECE 2010" }] },
     { name: "Comms and Control", required: 1, options: [{ type: 'course', code: "ECE 2020" }] },
-    { name: "Circuits and Systems", required: 1, options: [{ type: 'course', code: "ECE 2031" }] },
+    { name: "Circuits and Systems", required: 1, options: [{ type: 'course', code: "ECE 2030" }] },
 
     {
       name: "Mathematics Elective",

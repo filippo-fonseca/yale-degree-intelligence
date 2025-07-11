@@ -262,10 +262,9 @@ export default function Home() {
   const stats = calculateStats();
 
   const getGPAColor = (gpa: string) => {
-    const numericGPA = parseFloat(gpa);
-    if (numericGPA >= 3.7) return "text-emerald-400";
-    if (numericGPA >= 3.3) return "text-blue-400";
-    if (numericGPA >= 2.7) return "text-yellow-400";
+    if (gpa == "A" || gpa == "A-") return "text-emerald-400";
+    if (gpa == "B+" || gpa == "B" || gpa == "B-") return "text-amber-400";
+    if (gpa == "In Progress") return "text-blue-400";
     return "text-red-400";
   };
 

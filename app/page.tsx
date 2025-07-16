@@ -151,9 +151,9 @@ export default function Home() {
     setCourses((prevCourses) => {
       // Only update if there are actual changes to prevent unnecessary re-renders
       if (JSON.stringify(prevCourses) !== JSON.stringify(coursesData)) {
-        return coursesData;
+        return coursesData.filter((course) => !course.skipped); // Filter out skipped courses
       }
-      return prevCourses;
+      return prevCourses.filter((course) => !course.skipped); // Filter out skipped courses
     });
 
     setHasData(coursesData.length > 0);

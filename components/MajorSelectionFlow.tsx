@@ -3,10 +3,10 @@
 
 import { motion } from "framer-motion";
 import { useState } from "react";
-import { subjects } from "@/lib/constants";
 import { doc, setDoc } from "firebase/firestore";
 import { db } from "@/config/firebase";
 import { useAuth } from "@/context/AuthContext";
+import { MAJORS } from "@/lib/majors";
 
 interface MajorSelectionFlowProps {
   onComplete: () => void;
@@ -91,7 +91,7 @@ export default function MajorSelectionFlow({
 
             <div className="max-h-[60vh] overflow-y-auto pr-2">
               <div className="grid grid-cols-1 gap-2">
-                {Object.entries(subjects).map(([code, name]) => (
+                {Object.entries(MAJORS).map(([code, name]) => (
                   <button
                     key={code}
                     onClick={() => handleMajorToggle(code)}

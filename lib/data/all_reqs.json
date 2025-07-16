@@ -1,0 +1,3165 @@
+{
+    "ASTR_BA": {
+      "id": "ASTR_BA",
+      "name": "Astronomy, B.A.",
+      "description": "Bachelor of Arts in Astronomy",
+      "creditRequirements": {
+        "total": 14
+      },
+      "requirements": [
+        {
+          "name": "Introductory Physics Sequence",
+          "required": 2,
+          "options": [
+            {
+              "type": "course",
+              "code": "PHYS 1700"
+            },
+            {
+              "type": "course",
+              "code": "PHYS 1710"
+            },
+            {
+              "type": "course",
+              "code": "PHYS 1800"
+            },
+            {
+              "type": "course",
+              "code": "PHYS 1810"
+            },
+            {
+              "type": "course",
+              "code": "PHYS 2000"
+            },
+            {
+              "type": "course",
+              "code": "PHYS 2010"
+            }
+          ]
+        },
+        {
+          "name": "Calculus I",
+          "required": 2,
+          "options": [
+            {
+              "type": "course",
+              "code": "MATH 1120"
+            }
+          ]
+        },
+        {
+          "name": "Calculus II",
+          "required": 2,
+          "options": [
+            {
+              "type": "course",
+              "code": "MATH 1150"
+            }
+          ]
+        },
+        {
+          "name": "Fundamentals of Astronomy",
+          "required": 1,
+          "options": [
+            {
+              "type": "course",
+              "code": "ASTR 2100"
+            },
+            {
+              "type": "course",
+              "code": "ASTR 2200"
+            }
+          ]
+        },
+        {
+          "name": "Research Methods in Astrophysics",
+          "required": 1,
+          "options": [
+            {
+              "type": "course",
+              "code": "ASTR 2550"
+            }
+          ]
+        },
+        {
+          "name": "Galactic and Extragalactic Astronomy",
+          "required": 1,
+          "options": [
+            {
+              "type": "course",
+              "code": "ASTR 3100"
+            }
+          ]
+        },
+        {
+          "name": "Astronomy Elective (1500+)",
+          "required": 1,
+          "options": [
+            {
+              "type": "course",
+              "code": "ASTR 1550"
+            },
+            {
+              "type": "course",
+              "code": "ASTR 1800"
+            },
+            {
+              "type": "course",
+              "code": "ASTR 2100"
+            },
+            {
+              "type": "course",
+              "code": "ASTR 2550"
+            },
+            {
+              "type": "course",
+              "code": "ASTR 3100"
+            },
+            {
+              "type": "course",
+              "code": "ASTR 3200"
+            },
+            {
+              "type": "course",
+              "code": "ASTR 3550"
+            },
+            {
+              "type": "course",
+              "code": "ASTR 3560"
+            },
+            {
+              "type": "course",
+              "code": "ASTR 3800"
+            },
+            {
+              "type": "course",
+              "code": "ASTR 3850"
+            },
+            {
+              "type": "course",
+              "code": "ASTR 4000"
+            },
+            {
+              "type": "course",
+              "code": "ASTR 4200"
+            },
+            {
+              "type": "course",
+              "code": "ASTR 4710"
+            },
+            {
+              "type": "course",
+              "code": "ASTR 4900"
+            },
+            {
+              "type": "course",
+              "code": "ASTR 4920"
+            },
+            {
+              "type": "course",
+              "code": "ASTR 5010"
+            },
+            {
+              "type": "course",
+              "code": "ASTR 5200"
+            },
+            {
+              "type": "course",
+              "code": "ASTR 5650"
+            },
+            {
+              "type": "course",
+              "code": "ASTR 5700"
+            },
+            {
+              "type": "course",
+              "code": "ASTR 6000"
+            },
+            {
+              "type": "course",
+              "code": "ASTR 7460"
+            }
+          ]
+        },
+        {
+          "name": "Senior Requirement (Essay/Project)",
+          "required": 1,
+          "options": [
+            {
+              "type": "course",
+              "code": "ASTR 4920"
+            }
+          ]
+        },
+        {
+          "name": "Advanced Mathematics or Mathematical Methods",
+          "description": "MATH 1200, ENAS 1510, CPSC 1001, MATH 2000+, ASTR 3560, or departmentally approved",
+          "required": 2,
+          "options": []
+        },
+        {
+          "name": "Science Electives",
+          "description": "Natural, applied, or mathematical sciences. At least two must have college-level prerequisites. May include additional astronomy.",
+          "required": 3,
+          "options": []
+        }
+      ]
+    },
+    "ASTR_BS": {
+      "id": "ASTR_BS",
+      "name": "Astrophysics, B.S.",
+      "description": "Bachelor of Science in Astrophysics",
+      "creditRequirements": {
+        "total": 18
+      },
+      "prerequisites": [
+        {
+          "name": "Introductory Physics Sequence",
+          "required": 2,
+          "options": [
+            {
+              "type": "course",
+              "code": "PHYS 1800"
+            },
+            {
+              "type": "course",
+              "code": "PHYS 1810"
+            },
+            {
+              "type": "course",
+              "code": "PHYS 2000"
+            },
+            {
+              "type": "course",
+              "code": "PHYS 2010"
+            },
+            {
+              "type": "course",
+              "code": "PHYS 2600"
+            },
+            {
+              "type": "course",
+              "code": "PHYS 2610"
+            }
+          ]
+        },
+        {
+          "name": "Physics Laboratory Sequence",
+          "required": 1,
+          "options": [
+            {
+              "type": "course",
+              "code": "PHYS 1650L"
+            },
+            {
+              "type": "course",
+              "code": "PHYS 1660L"
+            },
+            {
+              "type": "course",
+              "code": "PHYS 2050L"
+            },
+            {
+              "type": "course",
+              "code": "PHYS 2060L"
+            },
+            {
+              "type": "course",
+              "code": "ASTR 1550"
+            }
+          ]
+        },
+        {
+          "name": "Calculus I",
+          "required": 1,
+          "options": [
+            {
+              "type": "course",
+              "code": "MATH 1120"
+            }
+          ]
+        },
+        {
+          "name": "Calculus II",
+          "required": 1,
+          "options": [
+            {
+              "type": "course",
+              "code": "MATH 1150"
+            }
+          ]
+        },
+        {
+          "name": "Calculus III",
+          "required": 1,
+          "options": [
+            {
+              "type": "course",
+              "code": "MATH 1200"
+            },
+            {
+              "type": "course",
+              "code": "ENAS 1510"
+            }
+          ]
+        }
+      ],
+      "requirements": [
+        {
+          "name": "Fundamentals of Astronomy",
+          "required": 1,
+          "options": [
+            {
+              "type": "course",
+              "code": "ASTR 2100"
+            },
+            {
+              "type": "course",
+              "code": "ASTR 2200"
+            }
+          ]
+        },
+        {
+          "name": "Research Methods in Astrophysics",
+          "required": 1,
+          "options": [
+            {
+              "type": "course",
+              "code": "ASTR 2550"
+            }
+          ]
+        },
+        {
+          "name": "Galactic and Extragalactic Astronomy",
+          "required": 1,
+          "options": [
+            {
+              "type": "course",
+              "code": "ASTR 3100"
+            }
+          ]
+        },
+        {
+          "name": "Physical Processes in Astronomy",
+          "required": 1,
+          "options": [
+            {
+              "type": "course",
+              "code": "ASTR 3200"
+            }
+          ]
+        },
+        {
+          "name": "Senior Project I",
+          "required": 1,
+          "options": [
+            {
+              "type": "course",
+              "code": "ASTR 4900"
+            }
+          ]
+        },
+        {
+          "name": "Senior Project II",
+          "required": 1,
+          "options": [
+            {
+              "type": "course",
+              "code": "ASTR 4910"
+            }
+          ]
+        },
+        {
+          "name": "Physics Courses (4000+)",
+          "required": 3,
+          "options": [
+            {
+              "type": "course",
+              "code": "PHYS 4010"
+            },
+            {
+              "type": "course",
+              "code": "PHYS 4020"
+            },
+            {
+              "type": "course",
+              "code": "PHYS 4390"
+            }
+          ]
+        },
+        {
+          "name": "Physics/Astronomy Advanced Elective",
+          "description": "One additional course in physics at the 4000-level or above, or in astronomy at the 3000-level or above.",
+          "required": 1,
+          "options": []
+        },
+        {
+          "name": "Differential Equations",
+          "description": "MATH 2460, PHYS 4000, or ENAS 1940",
+          "required": 1,
+          "options": [
+            {
+              "type": "course",
+              "code": "MATH 2460"
+            },
+            {
+              "type": "course",
+              "code": "PHYS 4000"
+            },
+            {
+              "type": "course",
+              "code": "ENAS 1940"
+            }
+          ]
+        },
+        {
+          "name": "Math/Statistics/Computing",
+          "description": "Math course numbered 2000+, or a course in statistics/computing (CPSC 1001, CPSC 2010, ASTR 3560)",
+          "required": 1,
+          "options": [
+            {
+              "type": "course",
+              "code": "CPSC 1001"
+            },
+            {
+              "type": "course",
+              "code": "CPSC 2010"
+            },
+            {
+              "type": "course",
+              "code": "ASTR 3560"
+            }
+          ]
+        }
+      ]
+    },
+    "APHY": {
+      "id": "APHY_BS",
+      "name": "Applied Physics, B.S.",
+      "description": "Bachelor of Science in Applied Physics",
+      "creditRequirements": {
+        "total": 12.5
+      },
+      "requirements": [
+        {
+          "name": "Physics Courses",
+          "required": 2,
+          "options": [
+            {
+              "type": "course",
+              "code": "PHYS 1800"
+            },
+            {
+              "type": "course",
+              "code": "PHYS 1810"
+            },
+            {
+              "type": "course",
+              "code": "PHYS 2000"
+            },
+            {
+              "type": "course",
+              "code": "PHYS 2010"
+            },
+            {
+              "type": "course",
+              "code": "PHYS 2600"
+            },
+            {
+              "type": "course",
+              "code": "PHYS 2610"
+            }
+          ]
+        },
+        {
+          "name": "Physics Lab",
+          "required": 1,
+          "options": [
+            {
+              "type": "course",
+              "code": "PHYS 1650L"
+            },
+            {
+              "type": "course",
+              "code": "PHYS 1660L"
+            },
+            {
+              "type": "course",
+              "code": "PHYS 2050L"
+            },
+            {
+              "type": "course",
+              "code": "PHYS 2060L"
+            }
+          ]
+        },
+        {
+          "name": "Multivariable Calculus",
+          "required": 1,
+          "options": [
+            {
+              "type": "course",
+              "code": "APHY 1510"
+            },
+            {
+              "type": "course",
+              "code": "MATH 1200"
+            }
+          ]
+        },
+        {
+          "name": "Advanced Math & Physics",
+          "required": 1,
+          "options": [
+            {
+              "type": "course",
+              "code": "PHYS 4000"
+            },
+            {
+              "type": "course",
+              "code": "APHY 1940"
+            }
+          ]
+        },
+        {
+          "name": "Core Applied Physics",
+          "required": 1,
+          "options": [
+            {
+              "type": "course",
+              "code": "APHY 3220"
+            }
+          ]
+        },
+        {
+          "name": "Electronics/Quantum",
+          "required": 1,
+          "options": [
+            {
+              "type": "course",
+              "code": "APHY 4390"
+            },
+            {
+              "type": "course",
+              "code": "PHYS 4400"
+            }
+          ]
+        },
+        {
+          "name": "Applied Physics Topics",
+          "required": 1,
+          "options": [
+            {
+              "type": "course",
+              "code": "APHY 4200"
+            }
+          ]
+        },
+        {
+          "name": "Area of Focus Courses",
+          "description": "Choose three advanced courses within an area of focus; consult DUS.",
+          "required": 3,
+          "options": []
+        },
+        {
+          "name": "Senior Research Project I",
+          "required": 1,
+          "options": [
+            {
+              "type": "course",
+              "code": "APHY 4710"
+            }
+          ]
+        },
+        {
+          "name": "Senior Research Project II",
+          "required": 1,
+          "options": [
+            {
+              "type": "course",
+              "code": "APHY 4720"
+            }
+          ]
+        }
+      ]
+    },
+    "AFST": {
+      "id": "AFST",
+      "name": "African Studies, B.A.",
+      "description": "Bachelor of Arts in African Studies",
+      "creditRequirements": {
+        "total": 12,
+        "core": 8,
+        "electives": 4
+      },
+      "requirements": [
+        {
+          "name": "AFST Humanities Course",
+          "description": "One AFST course in the humanities",
+          "required": 1,
+          "options": [
+            {
+              "type": "course",
+              "code": "AFST 3351"
+            }
+          ]
+        },
+        {
+          "name": "AFST Social Science Course",
+          "description": "One AFST course in the social sciences",
+          "required": 1,
+          "options": [
+            {
+              "type": "course",
+              "code": "AFST 3381"
+            },
+            {
+              "type": "course",
+              "code": "AFST 3385"
+            },
+            {
+              "type": "course",
+              "code": "AFST 3344"
+            },
+            {
+              "type": "course",
+              "code": "AFST 2170"
+            }
+          ]
+        },
+        {
+          "name": "African Language Study",
+          "description": "Four courses in an African language (two years); substitutions may be approved by DUS",
+          "required": 4,
+          "options": []
+        },
+        {
+          "name": "Research Methods",
+          "description": "One course in research methods; can be AFST 5505",
+          "required": 1,
+          "options": [
+            {
+              "type": "course",
+              "code": "AFST 5505"
+            }
+          ]
+        },
+        {
+          "name": "Focus Area Courses",
+          "description": "Four courses in a chosen area of focus",
+          "required": 4,
+          "options": []
+        },
+        {
+          "name": "Senior Essay",
+          "required": 1,
+          "options": [
+            {
+              "type": "course",
+              "code": "AFST 4491"
+            }
+          ]
+        }
+      ]
+    },
+    "ARCG": {
+      "id": "ARCG_BA",
+      "name": "Archaeological Studies, B.A.",
+      "description": "Bachelor of Arts in Archaeological Studies",
+      "creditRequirements": {
+        "total": 12
+      },
+      "requirements": [
+        {
+          "name": "Introductory Laboratory",
+          "required": 1,
+          "options": [
+            {
+              "type": "course",
+              "code": "ARCG 3116L"
+            },
+            {
+              "type": "course",
+              "code": "ARCG 316L"
+            }
+          ]
+        },
+        {
+          "name": "Introductory Survey",
+          "required": 1,
+          "options": [
+            {
+              "type": "course",
+              "code": "ARCG 1110"
+            },
+            {
+              "type": "course",
+              "code": "ARCG 110"
+            },
+            {
+              "type": "course",
+              "code": "ARCG 2143"
+            },
+            {
+              "type": "course",
+              "code": "ARCG 2345"
+            },
+            {
+              "type": "course",
+              "code": "ARCG 1172"
+            },
+            {
+              "type": "course",
+              "code": "ARCG 172"
+            }
+          ]
+        },
+        {
+          "name": "Advanced Laboratory",
+          "required": 1,
+          "options": [
+            {
+              "type": "course",
+              "code": "ARCG 4150"
+            },
+            {
+              "type": "course",
+              "code": "ARCG 450"
+            },
+            {
+              "type": "course",
+              "code": "ARCG 3185"
+            },
+            {
+              "type": "course",
+              "code": "ARCG 385"
+            },
+            {
+              "type": "course",
+              "code": "ARCG 3136"
+            },
+            {
+              "type": "course",
+              "code": "ARCG 336"
+            },
+            {
+              "type": "course",
+              "code": "ARCG 3684"
+            },
+            {
+              "type": "course",
+              "code": "ARCG 4564"
+            },
+            {
+              "type": "course",
+              "code": "ARCG 464"
+            },
+            {
+              "type": "course",
+              "code": "ARCG 3116L"
+            },
+            {
+              "type": "course",
+              "code": "ARCG 316L"
+            },
+            {
+              "type": "course",
+              "code": "ARCG 7185"
+            },
+            {
+              "type": "course",
+              "code": "ARCG 785"
+            }
+          ]
+        },
+        {
+          "name": "Theory Course",
+          "required": 1,
+          "options": [
+            {
+              "type": "course",
+              "code": "ARCG 7280"
+            },
+            {
+              "type": "course",
+              "code": "ARCG 780"
+            },
+            {
+              "type": "course",
+              "code": "ARCG 2275"
+            }
+          ]
+        },
+        {
+          "name": "Electives (as approved by DUS)",
+          "description": "Seven electives with at least one in each of three areas (Anthropology, Classics, Earth & Planetary Sciences, Environmental Studies, History, History of Art, NELC, or Religious Studies). Up to three may be in research-related fields, with DUS approval.",
+          "required": 7,
+          "options": []
+        },
+        {
+          "name": "Summer Fieldwork or Research",
+          "description": "Participation in a Yale-affiliated or DUS-approved archaeological field school or research project.",
+          "required": 1,
+          "options": []
+        },
+        {
+          "name": "Senior Research Project",
+          "required": 1,
+          "options": [
+            {
+              "type": "course",
+              "code": "ARCG 4491"
+            },
+            {
+              "type": "course",
+              "code": "ARCG 491"
+            }
+          ]
+        }
+      ]
+    },
+    "AMTH_BA": {
+      "id": "AMTH_BA",
+      "name": "Applied Mathematics, B.A.",
+      "description": "Bachelor of Arts in Applied Mathematics",
+      "creditRequirements": {
+        "total": 15
+      },
+      "requirements": [
+        {
+          "name": "Computer Programming",
+          "required": 2,
+          "options": [
+            {
+              "type": "course",
+              "code": "ENAS 1300"
+            },
+            {
+              "type": "course",
+              "code": "CPSC 1001"
+            }
+          ]
+        },
+        {
+          "name": "Multivariable Calculus",
+          "required": 1,
+          "options": [
+            {
+              "type": "course",
+              "code": "MATH 1200"
+            },
+            {
+              "type": "course",
+              "code": "ENAS 1510"
+            }
+          ]
+        },
+        {
+          "name": "Linear Algebra",
+          "required": 1,
+          "options": [
+            {
+              "type": "course",
+              "code": "AMTH 2220"
+            },
+            {
+              "type": "course",
+              "code": "MATH 2250"
+            },
+            {
+              "type": "course",
+              "code": "MATH 2260"
+            }
+          ]
+        },
+        {
+          "name": "Differential Equations",
+          "required": 1,
+          "options": [
+            {
+              "type": "course",
+              "code": "ENAS 1940"
+            },
+            {
+              "type": "course",
+              "code": "MATH 2460"
+            }
+          ]
+        },
+        {
+          "name": "Probability",
+          "required": 1,
+          "options": [
+            {
+              "type": "course",
+              "code": "S&DS 2410"
+            },
+            {
+              "type": "course",
+              "code": "S&DS 2380"
+            }
+          ]
+        },
+        {
+          "name": "Data Analysis",
+          "required": 1,
+          "options": [
+            {
+              "type": "course",
+              "code": "S&DS 3610"
+            },
+            {
+              "type": "course",
+              "code": "S&DS 2300"
+            }
+          ]
+        },
+        {
+          "name": "Discrete Mathematics",
+          "required": 1,
+          "options": [
+            {
+              "type": "course",
+              "code": "AMTH 2440"
+            },
+            {
+              "type": "course",
+              "code": "CPSC 2020"
+            }
+          ]
+        },
+        {
+          "name": "Breadth Areas",
+          "description": "Choose one course from each of three different areas (categories a–m)",
+          "required": 3,
+          "options": [
+            {
+              "type": "course",
+              "code": "AMTH 4310"
+            },
+            {
+              "type": "course",
+              "code": "AMTH 4370"
+            },
+            {
+              "type": "course",
+              "code": "EENG 4330"
+            },
+            {
+              "type": "course",
+              "code": "CPSC 4850"
+            },
+            {
+              "type": "course",
+              "code": "S&DS 4320"
+            },
+            {
+              "type": "course",
+              "code": "S&DS 2420"
+            },
+            {
+              "type": "course",
+              "code": "S&DS 3120"
+            },
+            {
+              "type": "course",
+              "code": "AMTH 4280"
+            },
+            {
+              "type": "course",
+              "code": "CPSC 3650"
+            },
+            {
+              "type": "course",
+              "code": "AMTH 3620"
+            }
+          ]
+        },
+        {
+          "name": "Concentration Courses",
+          "description": "Choose three advanced courses in one area (at least two at 3000+ level)",
+          "required": 3,
+          "options": [
+            {
+              "type": "course",
+              "code": "AMTH 4200"
+            },
+            {
+              "type": "course",
+              "code": "AMTH 4820"
+            },
+            {
+              "type": "course",
+              "code": "AMTH 6750"
+            },
+            {
+              "type": "course",
+              "code": "AMTH 8650"
+            }
+          ]
+        },
+        {
+          "name": "Senior Project",
+          "required": 1,
+          "options": [
+            {
+              "type": "course",
+              "code": "AMTH 4910"
+            }
+          ]
+        }
+      ]
+    },
+    "AMTH_BS": {
+      "id": "AMTH_BS",
+      "name": "Applied Mathematics, B.S.",
+      "description": "Bachelor of Science in Applied Mathematics",
+      "creditRequirements": {
+        "total": 18
+      },
+      "requirements": [
+        {
+          "name": "Computer Programming",
+          "required": 2,
+          "options": [
+            {
+              "type": "course",
+              "code": "ENAS 1300"
+            },
+            {
+              "type": "course",
+              "code": "CPSC 1001"
+            }
+          ]
+        },
+        {
+          "name": "Multivariable Calculus",
+          "required": 1,
+          "options": [
+            {
+              "type": "course",
+              "code": "MATH 1200"
+            },
+            {
+              "type": "course",
+              "code": "ENAS 1510"
+            }
+          ]
+        },
+        {
+          "name": "Linear Algebra",
+          "required": 1,
+          "options": [
+            {
+              "type": "course",
+              "code": "AMTH 2220"
+            },
+            {
+              "type": "course",
+              "code": "MATH 2250"
+            },
+            {
+              "type": "course",
+              "code": "MATH 2260"
+            }
+          ]
+        },
+        {
+          "name": "Differential Equations",
+          "required": 1,
+          "options": [
+            {
+              "type": "course",
+              "code": "ENAS 1940"
+            },
+            {
+              "type": "course",
+              "code": "MATH 2460"
+            }
+          ]
+        },
+        {
+          "name": "Probability",
+          "required": 1,
+          "options": [
+            {
+              "type": "course",
+              "code": "S&DS 2410"
+            },
+            {
+              "type": "course",
+              "code": "S&DS 2380"
+            }
+          ]
+        },
+        {
+          "name": "Data Analysis",
+          "required": 1,
+          "options": [
+            {
+              "type": "course",
+              "code": "S&DS 3610"
+            },
+            {
+              "type": "course",
+              "code": "S&DS 2300"
+            }
+          ]
+        },
+        {
+          "name": "Discrete Mathematics",
+          "required": 1,
+          "options": [
+            {
+              "type": "course",
+              "code": "AMTH 2440"
+            },
+            {
+              "type": "course",
+              "code": "CPSC 2020"
+            }
+          ]
+        },
+        {
+          "name": "Breadth Areas",
+          "required": 3,
+          "options": [
+            {
+              "type": "course",
+              "code": "AMTH 4310"
+            },
+            {
+              "type": "course",
+              "code": "AMTH 4370"
+            },
+            {
+              "type": "course",
+              "code": "EENG 4330"
+            }
+          ]
+        },
+        {
+          "name": "Concentration Courses",
+          "required": 3,
+          "options": [
+            {
+              "type": "course",
+              "code": "AMTH 4200"
+            },
+            {
+              "type": "course",
+              "code": "AMTH 4820"
+            },
+            {
+              "type": "course",
+              "code": "AMTH 6750"
+            }
+          ]
+        },
+        {
+          "name": "Vector Analysis",
+          "required": 1,
+          "options": [
+            {
+              "type": "course",
+              "code": "MATH 3020"
+            },
+            {
+              "type": "course",
+              "code": "MATH 3050"
+            }
+          ]
+        },
+        {
+          "name": "Additional Course from Breadth or 3000+",
+          "required": 1,
+          "options": [
+            {
+              "type": "course",
+              "code": "AMTH 4200"
+            },
+            {
+              "type": "course",
+              "code": "AMTH 4820"
+            }
+          ]
+        },
+        {
+          "name": "Senior Project",
+          "required": 1,
+          "options": [
+            {
+              "type": "course",
+              "code": "AMTH 4910"
+            }
+          ]
+        }
+      ]
+    },
+    "ANTH": {
+      "id": "ANTH",
+      "name": "Anthropology, B.A.",
+      "description": "Bachelor of Arts in Anthropology",
+      "creditRequirements": {
+        "total": 12,
+        "core": 6,
+        "electives": 6
+      },
+      "requirements": [
+        {
+          "name": "Evolutionary Anthropology (1000–2000 level)",
+          "required": 1,
+          "options": [
+            {
+              "type": "course",
+              "code": "ANTH 1400"
+            },
+            {
+              "type": "course",
+              "code": "ANTH 1482"
+            },
+            {
+              "type": "course",
+              "code": "ANTH 2442"
+            },
+            {
+              "type": "course",
+              "code": "ANTH 2504"
+            },
+            {
+              "type": "course",
+              "code": "ANTH 2530"
+            },
+            {
+              "type": "course",
+              "code": "ANTH 2660"
+            }
+          ]
+        },
+        {
+          "name": "Archaeological Anthropology (1000–2000 level)",
+          "required": 1,
+          "options": [
+            {
+              "type": "course",
+              "code": "ANTH 1172"
+            },
+            {
+              "type": "course",
+              "code": "ANTH 1200"
+            },
+            {
+              "type": "course",
+              "code": "ANTH 1840"
+            },
+            {
+              "type": "course",
+              "code": "ANTH 2252"
+            },
+            {
+              "type": "course",
+              "code": "ANTH 2275"
+            },
+            {
+              "type": "course",
+              "code": "ANTH 2294"
+            },
+            {
+              "type": "course",
+              "code": "ANTH 2403"
+            },
+            {
+              "type": "course",
+              "code": "ANTH 2480"
+            }
+          ]
+        },
+        {
+          "name": "Sociocultural & Linguistic Anthropology (1000–2000 level)",
+          "required": 1,
+          "options": [
+            {
+              "type": "course",
+              "code": "ANTH 1700"
+            }
+          ]
+        },
+        {
+          "name": "Advanced Anthropology (3000–4000 level)",
+          "required": 3,
+          "options": [
+            {
+              "type": "course",
+              "code": "ANTH 3075"
+            },
+            {
+              "type": "course",
+              "code": "ANTH 3116L"
+            },
+            {
+              "type": "course",
+              "code": "ANTH 3136"
+            },
+            {
+              "type": "course",
+              "code": "ANTH 3185"
+            },
+            {
+              "type": "course",
+              "code": "ANTH 3297"
+            },
+            {
+              "type": "course",
+              "code": "ANTH 3304"
+            },
+            {
+              "type": "course",
+              "code": "ANTH 3594"
+            },
+            {
+              "type": "course",
+              "code": "ANTH 3595"
+            },
+            {
+              "type": "course",
+              "code": "ANTH 3684"
+            },
+            {
+              "type": "course",
+              "code": "ANTH 3710"
+            },
+            {
+              "type": "course",
+              "code": "ANTH 3720"
+            },
+            {
+              "type": "course",
+              "code": "ANTH 3807"
+            },
+            {
+              "type": "course",
+              "code": "ANTH 3809"
+            },
+            {
+              "type": "course",
+              "code": "ANTH 3820"
+            },
+            {
+              "type": "course",
+              "code": "ANTH 3821"
+            },
+            {
+              "type": "course",
+              "code": "ANTH 3858"
+            },
+            {
+              "type": "course",
+              "code": "ANTH 3873"
+            },
+            {
+              "type": "course",
+              "code": "ANTH 3880"
+            },
+            {
+              "type": "course",
+              "code": "ANTH 3950"
+            },
+            {
+              "type": "course",
+              "code": "ANTH 3968"
+            }
+          ]
+        },
+        {
+          "name": "Senior Requirement",
+          "required": 1,
+          "options": [
+            {
+              "type": "course",
+              "code": "ANTH 4091"
+            },
+            {
+              "type": "course",
+              "code": "ANTH 4071"
+            }
+          ]
+        }
+      ]
+    },
+    "BENG": {
+      "id": "BENG",
+      "name": "Biomedical Engineering, B.S.",
+      "description": "Bachelor of Science in Biomedical Engineering",
+      "creditRequirements": {
+        "total": 21
+      },
+      "requirements": [
+        {
+          "name": "Introductory Biology",
+          "description": "Two semesters of introductory biology or a higher level MCDB or MB&B course, with DUS permission",
+          "required": 2,
+          "options": [
+            {
+              "type": "course",
+              "code": "BIOL 1010"
+            },
+            {
+              "type": "course",
+              "code": "BIOL 1020"
+            }
+          ]
+        },
+        {
+          "name": "Chemistry",
+          "required": 1,
+          "options": [
+            {
+              "type": "course",
+              "code": "CHEM 1610"
+            },
+            {
+              "type": "course",
+              "code": "CHEM 1650"
+            }
+          ]
+        },
+        {
+          "name": "Calculus II",
+          "description": "Take if not placed into MATH 1200 or ENAS 1510",
+          "required": 1,
+          "options": [
+            {
+              "type": "course",
+              "code": "MATH 1150"
+            },
+            {
+              "type": "course",
+              "code": "MATH 1160"
+            }
+          ]
+        },
+        {
+          "name": "Calculus III",
+          "required": 1,
+          "options": [
+            {
+              "type": "course",
+              "code": "MATH 1200"
+            },
+            {
+              "type": "course",
+              "code": "ENAS 1510"
+            }
+          ]
+        },
+        {
+          "name": "Ordinary Differential Equations",
+          "required": 1,
+          "options": [
+            {
+              "type": "course",
+              "code": "ENAS 1940"
+            }
+          ]
+        },
+        {
+          "name": "Physics Intro Sequence",
+          "required": 2,
+          "options": [
+            {
+              "type": "course",
+              "code": "PHYS 1800"
+            },
+            {
+              "type": "course",
+              "code": "PHYS 1810"
+            }
+          ]
+        },
+        {
+          "name": "Physics Lab Sequence",
+          "required": 1,
+          "options": [
+            {
+              "type": "course",
+              "code": "PHYS 1650L"
+            },
+            {
+              "type": "course",
+              "code": "PHYS 1660L"
+            },
+            {
+              "type": "course",
+              "code": "PHYS 2050L"
+            },
+            {
+              "type": "course",
+              "code": "PHYS 2060L"
+            }
+          ]
+        },
+        {
+          "name": "Introduction to Biomedical Computation",
+          "required": 1,
+          "options": [
+            {
+              "type": "course",
+              "code": "BENG 2800"
+            }
+          ]
+        },
+        {
+          "name": "Sophomore Seminar",
+          "required": 0.5,
+          "options": [
+            {
+              "type": "course",
+              "code": "BENG 2080"
+            }
+          ]
+        },
+        {
+          "name": "Physiological Systems",
+          "required": 1,
+          "options": [
+            {
+              "type": "course",
+              "code": "BENG 3200"
+            }
+          ]
+        },
+        {
+          "name": "Biotransport and Kinetics",
+          "required": 1,
+          "options": [
+            {
+              "type": "course",
+              "code": "BENG 3600"
+            }
+          ]
+        },
+        {
+          "name": "Biomedical Signals and Images",
+          "required": 1,
+          "options": [
+            {
+              "type": "course",
+              "code": "BENG 3400"
+            }
+          ]
+        },
+        {
+          "name": "Introduction to Biomechanics",
+          "required": 1,
+          "options": [
+            {
+              "type": "course",
+              "code": "BENG 3500"
+            }
+          ]
+        },
+        {
+          "name": "Physiological Systems Laboratory",
+          "required": 0.5,
+          "options": [
+            {
+              "type": "course",
+              "code": "BENG 3100"
+            }
+          ]
+        },
+        {
+          "name": "Biomedical Engineering Laboratory",
+          "required": 0.5,
+          "options": [
+            {
+              "type": "course",
+              "code": "BENG 3110"
+            }
+          ]
+        },
+        {
+          "name": "Senior Seminar",
+          "required": 0.5,
+          "options": [
+            {
+              "type": "course",
+              "code": "BENG 4080"
+            }
+          ]
+        },
+        {
+          "name": "Concentration-Specific Electives",
+          "description": "Three courses from chosen concentration; see major Overview page or consult DUS for suggested options.",
+          "required": 3,
+          "options": []
+        },
+        {
+          "name": "Senior Project I",
+          "description": "Complete either BENG 4974, or both BENG 4973 and BENG 4974 for a yearlong project.",
+          "required": 1,
+          "options": [
+            {
+              "type": "course",
+              "code": "BENG 4974"
+            }
+          ]
+        }
+      ]
+    },
+    "CPSC": {
+      "id": "CPSC",
+      "name": "Computer Science, B.S.",
+      "description": "Bachelor of Science in Computer Science",
+      "creditRequirements": {
+        "total": 12,
+        "core": 6,
+        "electives": 6
+      },
+      "requirements": [
+        {
+          "name": "Intro Course",
+          "required": 1,
+          "options": [
+            {
+              "type": "course",
+              "code": "CPSC 2010"
+            }
+          ]
+        },
+        {
+          "name": "Mathematics for Computer Science",
+          "description": "CPSC 2020 or MATH 2440",
+          "required": 1,
+          "options": [
+            {
+              "type": "course",
+              "code": "CPSC 2020"
+            },
+            {
+              "type": "course",
+              "code": "MATH 2440"
+            }
+          ]
+        },
+        {
+          "name": "Data Structures & Programming",
+          "required": 1,
+          "options": [
+            {
+              "type": "course",
+              "code": "CPSC 2230"
+            }
+          ]
+        },
+        {
+          "name": "Systems Programming",
+          "required": 1,
+          "options": [
+            {
+              "type": "course",
+              "code": "CPSC 3230"
+            }
+          ]
+        },
+        {
+          "name": "Algorithms",
+          "description": "CPSC 3650 or CPSC 3660",
+          "required": 1,
+          "options": [
+            {
+              "type": "course",
+              "code": "CPSC 3650"
+            },
+            {
+              "type": "course",
+              "code": "CPSC 3660"
+            }
+          ]
+        },
+        {
+          "name": "Senior Project",
+          "required": 1,
+          "options": [
+            {
+              "type": "course",
+              "code": "CPSC 4900"
+            }
+          ]
+        },
+        {
+          "name": "Intermediate/Advanced CPSC Electives",
+          "description": "Six additional intermediate or advanced CPSC courses",
+          "required": 6,
+          "options": []
+        }
+      ]
+    },
+    "CENG_ABET": {
+      "id": "CENG_ABET_BS",
+      "name": "Chemical Engineering, B.S. (ABET)",
+      "description": "Bachelor of Science in Chemical Engineering (ABET-accredited)",
+      "creditRequirements": {
+        "total": 27
+      },
+      "requirements": [
+        {
+          "name": "Calculus I",
+          "required": 1,
+          "options": [
+            {
+              "type": "course",
+              "code": "MATH 1120"
+            }
+          ]
+        },
+        {
+          "name": "Calculus II",
+          "required": 1,
+          "options": [
+            {
+              "type": "course",
+              "code": "MATH 1150"
+            }
+          ]
+        },
+        {
+          "name": "Calculus III",
+          "required": 1,
+          "options": [
+            {
+              "type": "course",
+              "code": "ENAS 1510"
+            },
+            {
+              "type": "course",
+              "code": "MATH 1200"
+            }
+          ]
+        },
+        {
+          "name": "General Chemistry Sequence",
+          "required": 2,
+          "options": [
+            {
+              "type": "course",
+              "code": "CHEM 1610"
+            },
+            {
+              "type": "course",
+              "code": "CHEM 1650"
+            },
+            {
+              "type": "course",
+              "code": "CHEM 1630"
+            },
+            {
+              "type": "course",
+              "code": "CHEM 1670"
+            }
+          ]
+        },
+        {
+          "name": "General Chemistry Laboratory",
+          "required": 2,
+          "options": [
+            {
+              "type": "course",
+              "code": "CHEM 1340L"
+            },
+            {
+              "type": "course",
+              "code": "CHEM 1360L"
+            }
+          ]
+        },
+        {
+          "name": "Physics Sequence",
+          "required": 2,
+          "options": [
+            {
+              "type": "course",
+              "code": "PHYS 1800"
+            },
+            {
+              "type": "course",
+              "code": "PHYS 1810"
+            },
+            {
+              "type": "course",
+              "code": "PHYS 2000"
+            },
+            {
+              "type": "course",
+              "code": "PHYS 2010"
+            },
+            {
+              "type": "course",
+              "code": "PHYS 2600"
+            },
+            {
+              "type": "course",
+              "code": "PHYS 2610"
+            }
+          ]
+        },
+        {
+          "name": "Computing",
+          "required": 1,
+          "options": [
+            {
+              "type": "course",
+              "code": "ENAS 1300"
+            },
+            {
+              "type": "course",
+              "code": "CPSC 1001"
+            },
+            {
+              "type": "course",
+              "code": "CPSC 2000"
+            }
+          ]
+        },
+        {
+          "name": "Diff Eqs",
+          "required": 1,
+          "options": [
+            {
+              "type": "course",
+              "code": "ENAS 1940"
+            }
+          ]
+        },
+        {
+          "name": "Organic Chemistry",
+          "required": 1,
+          "options": [
+            {
+              "type": "course",
+              "code": "CHEM 1740"
+            },
+            {
+              "type": "course",
+              "code": "CHEM 2200"
+            }
+          ]
+        },
+        {
+          "name": "Orgo Laboratory",
+          "required": 1,
+          "options": [
+            {
+              "type": "course",
+              "code": "CHEM 2220L"
+            }
+          ]
+        },
+        {
+          "name": "Physical Chemistry I",
+          "required": 1,
+          "options": [
+            {
+              "type": "course",
+              "code": "CHEM 3320"
+            }
+          ]
+        },
+        {
+          "name": "Physical Chemistry II",
+          "required": 1,
+          "options": [
+            {
+              "type": "course",
+              "code": "CHEM 3330"
+            }
+          ]
+        },
+        {
+          "name": "Modeling and Analysis",
+          "required": 1,
+          "options": [
+            {
+              "type": "course",
+              "code": "CENG 1500"
+            },
+            {
+              "type": "course",
+              "code": "CENG 2100"
+            }
+          ]
+        },
+        {
+          "name": "Chemical Engineering Thermodynamics",
+          "required": 1,
+          "options": [
+            {
+              "type": "course",
+              "code": "CENG 3000"
+            }
+          ]
+        },
+        {
+          "name": "Chemical Kinetics and Reactors",
+          "required": 1,
+          "options": [
+            {
+              "type": "course",
+              "code": "CENG 3010"
+            }
+          ]
+        },
+        {
+          "name": "Transport Phenomena I",
+          "required": 1,
+          "options": [
+            {
+              "type": "course",
+              "code": "CENG 3140"
+            },
+            {
+              "type": "course",
+              "code": "MENG 3422"
+            }
+          ]
+        },
+        {
+          "name": "Transport Phenomena II",
+          "required": 1,
+          "options": [
+            {
+              "type": "course",
+              "code": "CENG 3150"
+            }
+          ]
+        },
+        {
+          "name": "Separation and Purification Processes",
+          "required": 1,
+          "options": [
+            {
+              "type": "course",
+              "code": "CENG 4110"
+            }
+          ]
+        },
+        {
+          "name": "Chemical Engineering Laboratory and Design",
+          "required": 1,
+          "options": [
+            {
+              "type": "course",
+              "code": "CENG 4120L"
+            }
+          ]
+        },
+        {
+          "name": "Chemical Engineering Process Control",
+          "required": 1,
+          "options": [
+            {
+              "type": "course",
+              "code": "CENG 4800"
+            }
+          ]
+        },
+        {
+          "name": "Engineering Electives",
+          "description": "Four engineering electives, chosen in consultation with the DUS.",
+          "required": 4,
+          "options": []
+        },
+        {
+          "name": "Senior Requirement: Chemical Engineering Process Design",
+          "required": 1,
+          "options": [
+            {
+              "type": "course",
+              "code": "CENG 4160"
+            }
+          ]
+        }
+      ]
+    },
+    "CENG_ES_BS": {
+      "id": "CENG_ES_BS",
+      "name": "Engineering Sciences (Chemical), B.S.",
+      "description": "Bachelor of Science in Engineering Sciences (Chemical)",
+      "creditRequirements": {
+        "total": 20
+      },
+      "requirements": [
+        {
+          "name": "Calculus I",
+          "required": 1,
+          "options": [
+            {
+              "type": "course",
+              "code": "MATH 1120"
+            }
+          ]
+        },
+        {
+          "name": "Calculus II",
+          "required": 1,
+          "options": [
+            {
+              "type": "course",
+              "code": "MATH 1150"
+            }
+          ]
+        },
+        {
+          "name": "Calculus III",
+          "required": 1,
+          "options": [
+            {
+              "type": "course",
+              "code": "ENAS 1510"
+            },
+            {
+              "type": "course",
+              "code": "MATH 1200"
+            }
+          ]
+        },
+        {
+          "name": "General Chemistry Sequence",
+          "required": 2,
+          "options": [
+            {
+              "type": "course",
+              "code": "CHEM 1610"
+            },
+            {
+              "type": "course",
+              "code": "CHEM 1650"
+            },
+            {
+              "type": "course",
+              "code": "CHEM 1630"
+            },
+            {
+              "type": "course",
+              "code": "CHEM 1670"
+            }
+          ]
+        },
+        {
+          "name": "General Chemistry Laboratory",
+          "required": 2,
+          "options": [
+            {
+              "type": "course",
+              "code": "CHEM 1340L"
+            },
+            {
+              "type": "course",
+              "code": "CHEM 1360L"
+            }
+          ]
+        },
+        {
+          "name": "Physics Sequence",
+          "required": 2,
+          "options": [
+            {
+              "type": "course",
+              "code": "PHYS 1800"
+            },
+            {
+              "type": "course",
+              "code": "PHYS 1810"
+            },
+            {
+              "type": "course",
+              "code": "PHYS 2000"
+            },
+            {
+              "type": "course",
+              "code": "PHYS 2010"
+            },
+            {
+              "type": "course",
+              "code": "PHYS 2600"
+            },
+            {
+              "type": "course",
+              "code": "PHYS 2610"
+            }
+          ]
+        },
+        {
+          "name": "Computing",
+          "required": 1,
+          "options": [
+            {
+              "type": "course",
+              "code": "ENAS 1300"
+            },
+            {
+              "type": "course",
+              "code": "CPSC 1001"
+            },
+            {
+              "type": "course",
+              "code": "CPSC 2000"
+            }
+          ]
+        },
+        {
+          "name": "Differential Equations",
+          "required": 1,
+          "options": [
+            {
+              "type": "course",
+              "code": "ENAS 1940"
+            }
+          ]
+        },
+        {
+          "name": "Organic Chemistry",
+          "required": 1,
+          "options": [
+            {
+              "type": "course",
+              "code": "CHEM 1740"
+            },
+            {
+              "type": "course",
+              "code": "CHEM 2200"
+            }
+          ]
+        },
+        {
+          "name": "Physical Chemistry I",
+          "required": 1,
+          "options": [
+            {
+              "type": "course",
+              "code": "CHEM 3320"
+            }
+          ]
+        },
+        {
+          "name": "Modeling and Analysis",
+          "required": 1,
+          "options": [
+            {
+              "type": "course",
+              "code": "CENG 1500"
+            },
+            {
+              "type": "course",
+              "code": "CENG 2100"
+            }
+          ]
+        },
+        {
+          "name": "Chemical Engineering Thermodynamics",
+          "required": 1,
+          "options": [
+            {
+              "type": "course",
+              "code": "CENG 3000"
+            }
+          ]
+        },
+        {
+          "name": "Chemical Kinetics and Reactors",
+          "required": 1,
+          "options": [
+            {
+              "type": "course",
+              "code": "CENG 3010"
+            }
+          ]
+        },
+        {
+          "name": "Transport Phenomena I",
+          "required": 1,
+          "options": [
+            {
+              "type": "course",
+              "code": "CENG 3140"
+            },
+            {
+              "type": "course",
+              "code": "MENG 3422"
+            }
+          ]
+        },
+        {
+          "name": "Transport Phenomena II",
+          "required": 1,
+          "options": [
+            {
+              "type": "course",
+              "code": "CENG 3150"
+            }
+          ]
+        },
+        {
+          "name": "Separation and Purification Processes",
+          "required": 1,
+          "options": [
+            {
+              "type": "course",
+              "code": "CENG 4110"
+            }
+          ]
+        },
+        {
+          "name": "Engineering Elective",
+          "description": "One engineering elective, chosen in consultation with the DUS.",
+          "required": 1,
+          "options": []
+        },
+        {
+          "name": "Senior Requirement",
+          "description": "Complete either CENG 4160 or CENG 4900 in the senior year.",
+          "required": 1,
+          "options": [
+            {
+              "type": "course",
+              "code": "CENG 4160"
+            },
+            {
+              "type": "course",
+              "code": "CENG 4900"
+            }
+          ]
+        }
+      ]
+    },
+    "ART_BA": {
+      "id": "ART_BA",
+      "name": "Art, B.A.",
+      "description": "Bachelor of Arts in Art (Studio Art)",
+      "creditRequirements": {
+        "total": 14
+      },
+      "requirements": [
+        {
+          "name": "Visual Thinking",
+          "required": 1,
+          "options": [
+            {
+              "type": "course",
+              "code": "ART 1111"
+            }
+          ]
+        },
+        {
+          "name": "Basic Drawing",
+          "required": 1,
+          "options": [
+            {
+              "type": "course",
+              "code": "ART 1514"
+            }
+          ]
+        },
+        {
+          "name": "Introductory Courses (0001-1999, excluding ART 1111 and 1514)",
+          "required": 3,
+          "options": []
+        },
+        {
+          "name": "Sophomore Review",
+          "required": 1,
+          "options": []
+        },
+        {
+          "name": "2000-level or Above Studio Art",
+          "description": "Any ART course numbered 2000 or above (if 6th 0001-1999 is taken, it may count here)",
+          "required": 4,
+          "options": []
+        },
+        {
+          "name": "History of Art or DUS-approved Equivalent",
+          "required": 2,
+          "options": []
+        },
+        {
+          "name": "Junior Seminar",
+          "required": 1,
+          "options": [
+            {
+              "type": "course",
+              "code": "ART 3995"
+            }
+          ]
+        },
+        {
+          "name": "Senior Project I",
+          "required": 1,
+          "options": [
+            {
+              "type": "course",
+              "code": "ART 4995"
+            }
+          ]
+        },
+        {
+          "name": "Senior Project II",
+          "required": 1,
+          "options": [
+            {
+              "type": "course",
+              "code": "ART 4996"
+            }
+          ]
+        },
+        {
+          "name": "Area of Concentration (Graphic Design, Painting/Printmaking, Photography, Sculpture, or Filmmaking)",
+          "description": "Five courses from chosen area of concentration; see DUS and guidelines for recommended options.",
+          "required": 5,
+          "options": []
+        }
+      ]
+    },
+    "ARCH_CONCEN_DESIGN": {
+      "id": "ARCH_CONCEN_DESIGN",
+      "name": "Architecture, B.A. - Design Concentration",
+      "description": "Design Concentration for the B.A. in Architecture",
+      "creditRequirements": {
+        "total": 15
+      },
+      "requirements": [
+        {
+          "name": "Introduction to Architecture",
+          "required": 1,
+          "options": [
+            {
+              "type": "course",
+              "code": "ARCH 1001"
+            },
+            {
+              "type": "course",
+              "code": "ARCH 150"
+            }
+          ]
+        },
+        {
+          "name": "Scales of Design",
+          "required": 1,
+          "options": [
+            {
+              "type": "course",
+              "code": "ARCH 2000"
+            },
+            {
+              "type": "course",
+              "code": "ARCH 200"
+            }
+          ]
+        },
+        {
+          "name": "Architecture Topics",
+          "required": 1,
+          "options": [
+            {
+              "type": "course",
+              "code": "ARCH 2103"
+            },
+            {
+              "type": "course",
+              "code": "ARCH 2600"
+            },
+            {
+              "type": "course",
+              "code": "ARCH 2601"
+            }
+          ]
+        },
+        {
+          "name": "Methods and Form I",
+          "required": 1.5,
+          "options": [
+            {
+              "type": "course",
+              "code": "ARCH 3000"
+            }
+          ]
+        },
+        {
+          "name": "Methods and Form II",
+          "required": 1.5,
+          "options": [
+            {
+              "type": "course",
+              "code": "ARCH 3001"
+            }
+          ]
+        },
+        {
+          "name": "History of Architecture to 1750",
+          "required": 1,
+          "options": [
+            {
+              "type": "course",
+              "code": "ARCH 2001"
+            }
+          ]
+        },
+        {
+          "name": "Modern Architecture",
+          "required": 1,
+          "options": [
+            {
+              "type": "course",
+              "code": "ARCH 2003"
+            }
+          ]
+        },
+        {
+          "name": "History & Theory of Architecture and the City Elective",
+          "required": 1,
+          "options": []
+        },
+        {
+          "name": "Urbanism and Landscape Elective",
+          "required": 1,
+          "options": []
+        },
+        {
+          "name": "Materials and Design Elective",
+          "required": 1,
+          "options": []
+        },
+        {
+          "name": "Structures and Computation Elective",
+          "required": 1,
+          "options": []
+        },
+        {
+          "name": "Senior Studio I",
+          "required": 1.5,
+          "options": [
+            {
+              "type": "course",
+              "code": "ARCH 4000"
+            }
+          ]
+        },
+        {
+          "name": "Senior Studio II",
+          "required": 1.5,
+          "options": [
+            {
+              "type": "course",
+              "code": "ARCH 4001"
+            }
+          ]
+        }
+      ]
+    },
+    "ARCH_CONCEN_HIST": {
+      "id": "ARCH_CONCEN_HIST",
+      "name": "Architecture, B.A. - History, Theory, Criticism, and Urbanism Concentration",
+      "description": "History, Theory, Criticism of Architecture, and Urbanism Concentration for the B.A. in Architecture",
+      "creditRequirements": {
+        "total": 15
+      },
+      "requirements": [
+        {
+          "name": "Introduction to Architecture",
+          "required": 1,
+          "options": [
+            {
+              "type": "course",
+              "code": "ARCH 1001"
+            }
+          ]
+        },
+        {
+          "name": "Scales of Design",
+          "required": 1,
+          "options": [
+            {
+              "type": "course",
+              "code": "ARCH 2000"
+            }
+          ]
+        },
+        {
+          "name": "Architecture Topics",
+          "required": 1,
+          "options": [
+            {
+              "type": "course",
+              "code": "ARCH 2103"
+            },
+            {
+              "type": "course",
+              "code": "ARCH 2600"
+            },
+            {
+              "type": "course",
+              "code": "ARCH 2601"
+            }
+          ]
+        },
+        {
+          "name": "History of Architecture to 1750",
+          "required": 1,
+          "options": [
+            {
+              "type": "course",
+              "code": "ARCH 2001"
+            }
+          ]
+        },
+        {
+          "name": "Modern Architecture",
+          "required": 1,
+          "options": [
+            {
+              "type": "course",
+              "code": "ARCH 2003"
+            }
+          ]
+        },
+        {
+          "name": "Methods and Form I",
+          "required": 1.5,
+          "options": [
+            {
+              "type": "course",
+              "code": "ARCH 3000"
+            }
+          ]
+        },
+        {
+          "name": "Urban Lab",
+          "required": 1.5,
+          "options": [
+            {
+              "type": "course",
+              "code": "ARCH 3301"
+            },
+            {
+              "type": "course",
+              "code": "ARCH 3305"
+            }
+          ]
+        },
+        {
+          "name": "History & Theory of Architecture and the City Electives",
+          "required": 4,
+          "options": []
+        },
+        {
+          "name": "Other elective",
+          "description": "1 elective in urbanism and landscape, materials and design, or structures and computation or other relevant course approved by the DUS",
+          "required": 1,
+          "options": []
+        },
+        {
+          "name": "Senior Research Colloquium",
+          "required": 1,
+          "options": [
+            {
+              "type": "course",
+              "code": "ARCH 4900"
+            }
+          ]
+        },
+        {
+          "name": "Senior Project",
+          "required": 1,
+          "options": [
+            {
+              "type": "course",
+              "code": "ARCH 4910"
+            }
+          ]
+        }
+      ]
+    },
+    "AFAM": {
+      "id": "AFAM",
+      "name": "African American Studies, B.A.",
+      "description": "Bachelor of Arts in African American Studies",
+      "creditRequirements": {
+        "total": 12,
+        "core": 7,
+        "electives": 5
+      },
+      "requirements": [
+        {
+          "name": "Foundations of African American Studies I",
+          "required": 1,
+          "options": [
+            {
+              "type": "course",
+              "code": "AFAM 1160"
+            }
+          ]
+        },
+        {
+          "name": "Foundations of African American Studies II",
+          "required": 1,
+          "options": [
+            {
+              "type": "course",
+              "code": "AFAM 1162"
+            }
+          ]
+        },
+        {
+          "name": "African American Literature (HU)",
+          "description": "One African American literature course with HU designation",
+          "required": 1,
+          "options": []
+        },
+        {
+          "name": "African American Studies (SO)",
+          "description": "One African American studies course with SO designation",
+          "required": 1,
+          "options": []
+        },
+        {
+          "name": "Junior Seminar",
+          "required": 1,
+          "options": [
+            {
+              "type": "course",
+              "code": "AFAM 4310"
+            }
+          ]
+        },
+        {
+          "name": "Senior Colloquium",
+          "required": 1,
+          "options": [
+            {
+              "type": "course",
+              "code": "AFAM 4380"
+            }
+          ]
+        },
+        {
+          "name": "Senior Essay",
+          "required": 1,
+          "options": [
+            {
+              "type": "course",
+              "code": "AFAM 4391"
+            }
+          ]
+        },
+        {
+          "name": "Focus Area Electives",
+          "description": "Five electives in a declared focus area, selected in consultation with DUS",
+          "required": 5,
+          "options": [
+            {
+              "type": "course",
+              "code": "AFAM 1398"
+            },
+            {
+              "type": "course",
+              "code": "AFAM 1952"
+            },
+            {
+              "type": "course",
+              "code": "AFAM 1986"
+            },
+            {
+              "type": "course",
+              "code": "AFAM 2150"
+            },
+            {
+              "type": "course",
+              "code": "AFAM 2317"
+            }
+          ]
+        }
+      ]
+    },
+    "AMST": {
+      "id": "AMST",
+      "name": "American Studies, B.A.",
+      "description": "Bachelor of Arts in American Studies",
+      "creditRequirements": {
+        "total": 14,
+        "core": 9,
+        "electives": 5
+      },
+      "requirements": [
+        {
+          "name": "Gateway Courses",
+          "description": "Four AMST courses numbered 1000–2999, one must carry the 'Early Americas' attribute",
+          "required": 4,
+          "options": [
+            {
+              "type": "course",
+              "code": "AMST 0031"
+            },
+            {
+              "type": "course",
+              "code": "AMST 0039"
+            },
+            {
+              "type": "course",
+              "code": "AMST 1109"
+            },
+            {
+              "type": "course",
+              "code": "AMST 1110"
+            },
+            {
+              "type": "course",
+              "code": "AMST 1115"
+            },
+            {
+              "type": "course",
+              "code": "AMST 1120"
+            },
+            {
+              "type": "course",
+              "code": "AMST 1142"
+            },
+            {
+              "type": "course",
+              "code": "AMST 1160"
+            },
+            {
+              "type": "course",
+              "code": "AMST 1184"
+            },
+            {
+              "type": "course",
+              "code": "AMST 1197"
+            },
+            {
+              "type": "course",
+              "code": "AMST 2233"
+            },
+            {
+              "type": "course",
+              "code": "AMST 2243"
+            },
+            {
+              "type": "course",
+              "code": "AMST 2246"
+            },
+            {
+              "type": "course",
+              "code": "AMST 2253"
+            },
+            {
+              "type": "course",
+              "code": "AMST 2262"
+            },
+            {
+              "type": "course",
+              "code": "AMST 2265"
+            },
+            {
+              "type": "course",
+              "code": "AMST 2272"
+            },
+            {
+              "type": "course",
+              "code": "AMST 2228"
+            }
+          ]
+        },
+        {
+          "name": "Cultural History/Cultural Studies",
+          "description": "Two courses in cultural history or cultural studies",
+          "required": 2,
+          "options": [
+            {
+              "type": "course",
+              "code": "AMST 0039"
+            },
+            {
+              "type": "course",
+              "code": "AMST 2243"
+            },
+            {
+              "type": "course",
+              "code": "AMST 2262"
+            },
+            {
+              "type": "course",
+              "code": "AMST 2272"
+            },
+            {
+              "type": "course",
+              "code": "AMST 3361"
+            },
+            {
+              "type": "course",
+              "code": "AMST 6612"
+            },
+            {
+              "type": "course",
+              "code": "AMST 7741"
+            }
+          ]
+        },
+        {
+          "name": "American Literature Survey",
+          "description": "One broad survey course in American literature",
+          "required": 1,
+          "options": [
+            {
+              "type": "course",
+              "code": "AMST 0039"
+            },
+            {
+              "type": "course",
+              "code": "AMST 4443"
+            },
+            {
+              "type": "course",
+              "code": "AMST 4481"
+            },
+            {
+              "type": "course",
+              "code": "AMST 4485"
+            }
+          ]
+        },
+        {
+          "name": "Preparation for Area of Concentration",
+          "description": "One course that prepares for a chosen area of concentration",
+          "required": 1,
+          "options": []
+        },
+        {
+          "name": "Junior Seminars",
+          "description": "Two AMST courses numbered 3000–3999, must be taken in junior year (or sophomore spring if studying abroad); one must be in area of concentration",
+          "required": 2,
+          "options": [
+            {
+              "type": "course",
+              "code": "AMST 3300"
+            },
+            {
+              "type": "course",
+              "code": "AMST 3302"
+            },
+            {
+              "type": "course",
+              "code": "AMST 3303"
+            },
+            {
+              "type": "course",
+              "code": "AMST 3304"
+            },
+            {
+              "type": "course",
+              "code": "AMST 3321"
+            },
+            {
+              "type": "course",
+              "code": "AMST 3325"
+            },
+            {
+              "type": "course",
+              "code": "AMST 3333"
+            },
+            {
+              "type": "course",
+              "code": "AMST 3334"
+            },
+            {
+              "type": "course",
+              "code": "AMST 3336"
+            },
+            {
+              "type": "course",
+              "code": "AMST 3339"
+            },
+            {
+              "type": "course",
+              "code": "AMST 3355"
+            },
+            {
+              "type": "course",
+              "code": "AMST 3361"
+            },
+            {
+              "type": "course",
+              "code": "AMST 3365"
+            },
+            {
+              "type": "course",
+              "code": "AMST 3391"
+            },
+            {
+              "type": "course",
+              "code": "AMST 3399"
+            },
+            {
+              "type": "course",
+              "code": "AMST 3831"
+            }
+          ]
+        },
+        {
+          "name": "Area of Concentration",
+          "description": "Five courses in the student's area of concentration, one must cover a related topic from a non-U.S. perspective",
+          "required": 5,
+          "options": [
+            {
+              "type": "course",
+              "code": "AMST 2243"
+            },
+            {
+              "type": "course",
+              "code": "AMST 2262"
+            },
+            {
+              "type": "course",
+              "code": "AMST 2272"
+            },
+            {
+              "type": "course",
+              "code": "AMST 3302"
+            },
+            {
+              "type": "course",
+              "code": "AMST 3361"
+            },
+            {
+              "type": "course",
+              "code": "AMST 3365"
+            },
+            {
+              "type": "course",
+              "code": "AMST 3391"
+            },
+            {
+              "type": "course",
+              "code": "AMST 6612"
+            },
+            {
+              "type": "course",
+              "code": "AMST 7741"
+            }
+          ]
+        },
+        {
+          "name": "AMST Electives",
+          "description": "Two additional AMST courses",
+          "required": 2,
+          "options": [
+            {
+              "type": "course",
+              "code": "AMST 2255"
+            },
+            {
+              "type": "course",
+              "code": "AMST 2265"
+            },
+            {
+              "type": "course",
+              "code": "AMST 3303"
+            },
+            {
+              "type": "course",
+              "code": "AMST 4441"
+            },
+            {
+              "type": "course",
+              "code": "AMST 4463"
+            }
+          ]
+        },
+        {
+          "name": "Senior Requirement",
+          "description": "One senior seminar (AMST 4000–4999) or AMST 4491; intensive major requires AMST 4493 and 4494 (one counts toward concentration)",
+          "required": 1,
+          "options": [
+            {
+              "type": "course",
+              "code": "AMST 4443"
+            },
+            {
+              "type": "course",
+              "code": "AMST 4491"
+            },
+            {
+              "type": "course",
+              "code": "AMST 4493"
+            },
+            {
+              "type": "course",
+              "code": "AMST 4494"
+            }
+          ]
+        }
+      ]
+    },
+    "MENG": {
+    "id": "MENG",
+    "name": "Mechanical Engineering (ABET), B.S.",
+    "description": "Bachelor of Science in Mechanical Engineering (ABET)",
+    "creditRequirements": {
+      "total": 27.5
+    },
+    "requirements": [
+      {
+        "name": "Calculus I",
+        "required": 1,
+        "options": [{ "type": "course", "code": "MATH 1120" }]
+      },
+      {
+        "name": "Calculus II",
+        "required": 1,
+        "options": [{ "type": "course", "code": "MATH 1150" }]
+      },
+      {
+        "name": "Calculus III",
+        "description": "ENAS 1510 or equivalent",
+        "required": 1,
+        "options": [{ "type": "course", "code": "ENAS 1510" }, { "type": "course", "code": "MATH 1200" }]
+      },
+      {
+        "name": "Physics Sequence",
+        "description": "PHYS 1800 + 1810 or PHYS 2000 + 2010",
+        "required": 2,
+        "options": [
+            { "type": "course", "code": "PHYS 1800" },
+            { "type": "course", "code": "PHYS 1810" },
+            { "type": "course", "code": "PHYS 2000" },
+            { "type": "course", "code": "PHYS 2010" },
+            { "type": "course", "code": "PHYS 2600" },
+            { "type": "course", "code": "PHYS 2610" }
+        ]
+      },
+      {
+        "name": "Physics Labs",
+        "description": "Two labs from PHYS 1650L, 1660L, 2050L, or 2060L",
+        "required": 1,
+        "options": [
+          { "type": "course", "code": "PHYS 1650L" },
+          { "type": "course", "code": "PHYS 1660L" },
+          { "type": "course", "code": "PHYS 2050L" },
+          { "type": "course", "code": "PHYS 2060L" }
+        ]
+      },
+      {
+        "name": "Introductory Chemistry",
+        "required": 1,
+        "options": [{ "type": "course", "code": "CHEM 1610" }, { "type": "course", "code": "CHEM 163" }]
+      },
+      {
+        "name": "Intro to Engineering",
+        "required": 1,
+        "options": [{ "type": "course", "code": "ENAS 1300" }]
+      },
+      {
+        "name": "Diff Eqs",
+        "required": 1,
+        "options": [{ "type": "course", "code": "ENAS 1940" }]
+      },
+      {
+        "name": "Electrical Engineering",
+        "required": 1,
+        "options": [{ "type": "course", "code": "ECE 2000" }]
+      },
+      {
+        "name": "Linear Algebra",
+        "required": 1,
+        "options": [{ "type": "course", "code": "MATH 2250" }, { "type": "course", "code": "MATH 2220" }]
+      },
+      {
+        "name": "Mechanical Design",
+        "required": 1,
+        "options": [{ "type": "course", "code": "MENG 1105" }]
+      },
+      {
+        "name": "Thermodynamics",
+        "required": 1,
+        "options": [{ "type": "course", "code": "MENG 2511" }]
+      },
+      {
+        "name": "Strength of Materials",
+        "required": 1,
+        "options": [{ "type": "course", "code": "MENG 2311" }]
+      },
+      {
+        "name": "Materials Science",
+        "required": 1,
+        "options": [{ "type": "course", "code": "MENG 2615" }]
+      },
+      {
+        "name": "Solid Mechanics Lab",
+        "required": 1,
+        "options": [{ "type": "course", "code": "MENG 2616L" }]
+      },
+      {
+        "name": "Manufacturing & Design",
+        "required": 1,
+        "options": [{ "type": "course", "code": "MENG 3125" }]
+      },
+      {
+        "name": "Fluid Mechanics",
+        "required": 1,
+        "options": [{ "type": "course", "code": "MENG 3422" }]
+      },
+      {
+        "name": "Fluid Mechanics Lab",
+        "required": 1,
+        "options": [{ "type": "course", "code": "MENG 3423L" }]
+      },
+      {
+        "name": "Dynamics",
+        "required": 1,
+        "options": [{ "type": "course", "code": "MENG 3323" }]
+      },
+      {
+        "name": "Thermal Systems",
+        "required": 1,
+        "options": [{ "type": "course", "code": "MENG 3424" }]
+      },
+      {
+        "name": "Mechatronics Lab",
+        "required": 1,
+        "options": [{ "type": "course", "code": "MENG 3020L" }]
+      },
+      {
+        "name": "Technical Electives",
+        "description": "Three required; max one from MENG 4991 or MENG 4992",
+        "required": 3,
+        "options": [
+          { "type": "course", "code": "MENG 2050" },
+          { "type": "course", "code": "MENG 2147" },
+          { "type": "course", "code": "MENG 3465" },
+          { "type": "course", "code": "MENG 3675" },
+          { "type": "course", "code": "MENG 4041" },
+          { "type": "course", "code": "MENG 4145" },
+          { "type": "course", "code": "MENG 4154" },
+          { "type": "course", "code": "MENG 4359" },
+          { "type": "course", "code": "MENG 4370" },
+          { "type": "course", "code": "MENG 4469" },
+          { "type": "course", "code": "MENG 4475" },
+          { "type": "course", "code": "MENG 4664" },
+          { "type": "course", "code": "MENG 4672" },
+          { "type": "course", "code": "MENG 4673" },
+          { "type": "course", "code": "MENG 4774" },
+          { "type": "course", "code": "MENG 4991" },
+          { "type": "course", "code": "MENG 4992" }
+        ]
+      },
+      {
+        "name": "Senior Design I",
+        "required": 1,
+        "options": [{ "type": "course", "code": "MENG 4137L" }]
+      },
+      {
+        "name": "Senior Design II",
+        "required": 1,
+        "options": [{ "type": "course", "code": "MENG 4138L" }]
+      }
+    ]
+  }
+  }

@@ -26,8 +26,8 @@ import {
 } from "firebase/firestore";
 import { Course } from "@/lib/types";
 import { db } from "@/config/firebase";
-import { gradePoints, subjects } from "@/lib/constants";
-import { calculateMajorProgress } from "@/lib/majors";
+import { gradePoints } from "@/lib/constants";
+import { calculateMajorProgress, MAJORS } from "@/lib/majors";
 import MajorProgressView from "@/components/MajorProgressView";
 import StatsView from "@/components/StatsView";
 import MajorSelectionFlow from "@/components/MajorSelectionFlow";
@@ -467,7 +467,7 @@ export default function Home() {
                           }}
                           className="w-full appearance-none bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 pr-8 focus:outline-none focus:ring-2 focus:ring-blue-500"
                         >
-                          {Object.entries(subjects).map(([code, name]) => (
+                          {Object.entries(MAJORS).map(([code, name]) => (
                             <option key={code} value={code}>
                               {code} - {name}
                             </option>
@@ -862,7 +862,7 @@ export default function Home() {
                                   : "border-gray-800 hover:border-gray-700 hover:bg-gray-800/50"
                               }`}
                             >
-                              {major} - {subjects[major] || major}
+                              {major} - {MAJORS[major] || major}
                             </button>
                           ))}
                         </div>

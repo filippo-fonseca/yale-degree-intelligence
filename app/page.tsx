@@ -151,9 +151,9 @@ export default function Home() {
     setCourses((prevCourses) => {
       // Only update if there are actual changes to prevent unnecessary re-renders
       if (JSON.stringify(prevCourses) !== JSON.stringify(coursesData)) {
-        return coursesData.filter((course) => !course.skipped); // Filter out skipped courses
+        return coursesData;
       }
-      return prevCourses.filter((course) => !course.skipped); // Filter out skipped courses
+      return prevCourses;
     });
 
     setHasData(coursesData.length > 0);
@@ -715,7 +715,11 @@ export default function Home() {
                       </div>
                       <div className="space-y-8">
                         {Array.from(
-                          new Set(courses.map((c) => `${c.semester} ${c.year}`))
+                          new Set(
+                            courses
+                              .filter((course) => !course.skipped)
+                              .map((c) => `${c.semester} ${c.year}`)
+                          )
                         ).map((semester) => (
                           <motion.div
                             key={semester}

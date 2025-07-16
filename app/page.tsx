@@ -618,7 +618,12 @@ export default function Home() {
           transition={{ duration: 0.5 }}
           className="flex justify-between items-center py-8"
         >
-          <CompoundLogo />
+          <div
+            onClick={() => setActiveTab("upload")}
+            className="cursor-pointer transition-all hover:scale-105"
+          >
+            <CompoundLogo />
+          </div>
 
           <div className="flex items-center space-x-3">
             <button

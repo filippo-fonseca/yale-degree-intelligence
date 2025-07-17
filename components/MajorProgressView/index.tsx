@@ -82,6 +82,7 @@ export default function MajorProgressView({
       code: string;
       name: string;
       status: "completed" | "in-progress" | "not-taken" | "skipped";
+      skipped: boolean;
     } | null;
   }>({ isOpen: false, course: null });
 
@@ -298,6 +299,7 @@ export default function MajorProgressView({
                                       : opt.completed
                                       ? "completed"
                                       : "not-taken",
+                                    skipped: opt.skipped || false,
                                   },
                                 });
                               }}
@@ -430,6 +432,7 @@ export default function MajorProgressView({
                                             : opt.completed
                                             ? "completed"
                                             : "not-taken",
+                                          skipped: opt.skipped || false,
                                         },
                                       });
                                     }
@@ -479,6 +482,7 @@ export default function MajorProgressView({
         course={modalOpen.course}
         onClose={() => setModalOpen({ isOpen: false, course: null })}
         onSkip={handleSkip}
+        onRefresh={onRequirementChange}
       />
     </div>
   );

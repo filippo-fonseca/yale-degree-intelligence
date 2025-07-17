@@ -77,7 +77,11 @@ export default function MajorProgressView({
 
   const [modalOpen, setModalOpen] = useState<{
     isOpen: boolean;
-    course: { code: string; name: string } | null;
+    course: {
+      code: string;
+      name: string;
+      status: "completed" | "in-progress" | "not-taken" | "skipped";
+    } | null;
   }>({ isOpen: false, course: null });
 
   const handleSkip = async (courseCode: string, courseName: string) => {
@@ -275,11 +279,27 @@ export default function MajorProgressView({
                           {req.options.map((opt, j) => (
                             <div
                               key={`opt-${j}`}
-                              className={`relative px-2 py-0.5 rounded-full text-xs flex items-center transition-all duration-150 ${
+                              className={`relative px-2 py-0.5 rounded-full text-xs flex items-center transition-all duration-150 cursor-pointer ${
                                 opt.completed
                                   ? "bg-emerald-900/20 text-emerald-300 border border-emerald-700"
                                   : "bg-gray-900/20 text-gray-300 border border-gray-700"
                               }`}
+                              onClick={() => {
+                                setModalOpen({
+                                  isOpen: true,
+                                  course: {
+                                    code: opt.code,
+                                    name: opt.name,
+                                    status: opt.skipped
+                                      ? "skipped"
+                                      : opt.inProgress
+                                      ? "in-progress"
+                                      : opt.completed
+                                      ? "completed"
+                                      : "not-taken",
+                                  },
+                                });
+                              }}
                             >
                               {opt.code}
                               <span className="ml-1 text-[0.65rem]">
@@ -402,6 +422,13 @@ export default function MajorProgressView({
                                         course: {
                                           code: opt.code,
                                           name: opt.name,
+                                          status: opt.skipped
+                                            ? "skipped"
+                                            : opt.inProgress
+                                            ? "in-progress"
+                                            : opt.completed
+                                            ? "completed"
+                                            : "not-taken",
                                         },
                                       });
                                     }
@@ -446,6 +473,7 @@ export default function MajorProgressView({
         )}
       </div>
       {/* Course Info Modal */}
+      {/* Course Info Modal */}
       <AnimatePresence>
         {modalOpen.isOpen && modalOpen.course && (
           <motion.div
@@ -471,46 +499,69 @@ export default function MajorProgressView({
                     Previously {getOtherCodesForCourse(modalOpen.course.code)}
                   </p>
                 </div>
-                <div className="relative">
-                  <button
-                    onClick={() =>
-                      setDropdownOpen(modalOpen.course?.code || null)
-                    }
-                    className="text-gray-400 hover:text-white"
+                <div className="flex items-center gap-2">
+                  <span
+                    className={`text-xs px-2 py-1 rounded-full ${
+                      modalOpen.course.status === "completed"
+                        ? "bg-emerald-900/20 text-emerald-300"
+                        : modalOpen.course.status === "in-progress"
+                        ? "bg-blue-900/20 text-blue-300"
+                        : modalOpen.course.status === "skipped"
+                        ? "bg-gray-800/20 text-gray-300"
+                        : "bg-amber-900/20 text-amber-300"
+                    }`}
                   >
-                    <FiMoreVertical />
-                  </button>
-                  {dropdownOpen === modalOpen.course?.code && (
-                    <motion.div
-                      ref={dropdownRef}
-                      initial={{ opacity: 0, y: -10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -10 }}
-                      className="absolute right-0 z-[999] mt-2 w-40 rounded-md bg-gray-700 shadow-lg border border-gray-600 overflow-visible"
-                    >
+                    {modalOpen.course.status === "completed"
+                      ? "Completed"
+                      : modalOpen.course.status === "in-progress"
+                      ? "In Progress"
+                      : modalOpen.course.status === "skipped"
+                      ? "Skipped"
+                      : "Not Taken"}
+                  </span>
+                  {modalOpen.course.status !== "completed" && (
+                    <div className="relative">
                       <button
-                        className="flex items-center gap-2 w-full px-3 py-2 text-sm text-gray-200 hover:bg-gray-600"
-                        onClick={() => {
-                          if (modalOpen.course) {
-                            handleSkip(
-                              modalOpen.course.code,
-                              modalOpen.course.name
-                            );
-                            setDropdownOpen(null);
-                          }
-                        }}
+                        onClick={() =>
+                          setDropdownOpen(modalOpen.course?.code || null)
+                        }
+                        className="text-gray-400 hover:text-white"
                       >
-                        <FiCornerDownLeft />
-                        Mark as skipped
+                        <FiMoreVertical />
                       </button>
-                      <button
-                        className="flex items-center gap-2 w-full px-3 py-2 text-sm text-gray-400 hover:bg-gray-600"
-                        onClick={() => setDropdownOpen(null)}
-                      >
-                        <FiX />
-                        Cancel
-                      </button>
-                    </motion.div>
+                      {dropdownOpen === modalOpen.course?.code && (
+                        <motion.div
+                          ref={dropdownRef}
+                          initial={{ opacity: 0, y: -10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: -10 }}
+                          className="absolute right-0 z-[999] mt-2 w-40 rounded-md bg-gray-700 shadow-lg border border-gray-600 overflow-visible"
+                        >
+                          <button
+                            className="flex items-center gap-2 w-full px-3 py-2 text-sm text-gray-200 hover:bg-gray-600"
+                            onClick={() => {
+                              if (modalOpen.course) {
+                                handleSkip(
+                                  modalOpen.course.code,
+                                  modalOpen.course.name
+                                );
+                                setDropdownOpen(null);
+                              }
+                            }}
+                          >
+                            <FiCornerDownLeft />
+                            Mark as skipped
+                          </button>
+                          <button
+                            className="flex items-center gap-2 w-full px-3 py-2 text-sm text-gray-400 hover:bg-gray-600"
+                            onClick={() => setDropdownOpen(null)}
+                          >
+                            <FiX />
+                            Cancel
+                          </button>
+                        </motion.div>
+                      )}
+                    </div>
                   )}
                 </div>
               </div>

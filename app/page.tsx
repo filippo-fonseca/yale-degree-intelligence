@@ -47,9 +47,37 @@ interface UserProfile {
   updatedAt: Date;
 }
 
+const useLocalStorage = <T,>(
+  key: string,
+  initialValue: T
+): [T, (value: T) => void] => {
+  const [storedValue, setStoredValue] = useState<T>(() => {
+    if (typeof window === "undefined") return initialValue;
+    try {
+      const item = window.localStorage.getItem(key);
+      return item ? JSON.parse(item) : initialValue;
+    } catch (error) {
+      console.error(error);
+      return initialValue;
+    }
+  });
+
+  const setValue = (value: T) => {
+    try {
+      setStoredValue(value);
+      if (typeof window !== "undefined") {
+        window.localStorage.setItem(key, JSON.stringify(value));
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  return [storedValue, setValue];
+};
+
 export default function Home() {
   const { user, loading, logout } = useAuth();
-  const [activeTab, setActiveTab] = useState("upload");
   const [courses, setCourses] = useState<Course[]>([]);
   const [hasData, setHasData] = useState(false);
   const [selectedMajor, setSelectedMajor] = useState<string>("");
@@ -57,6 +85,12 @@ export default function Home() {
   const [showMajorSelection, setShowMajorSelection] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+
+  //tabs:
+  const [activeTab, setActiveTab] = useLocalStorage(
+    "dashboardActiveTab",
+    "upload"
+  );
 
   const navItems = [
     {
@@ -350,13 +384,13 @@ export default function Home() {
     }
   };
 
-  useEffect(() => {
-    // Play sound on tab change
-    if (typeof window === "undefined") return;
+  // useEffect(() => {
+  //   // Play sound on tab change
+  //   if (typeof window === "undefined") return;
 
-    // Only play if we have data (for tabs that require it) or if it's the upload tab
-    void new Audio("/audio/pop.mp3").play().catch(() => null);
-  }, [activeTab, hasData]);
+  //   // Only play if we have data (for tabs that require it) or if it's the upload tab
+  //   void new Audio("/audio/pop.mp3").play().catch(() => null);
+  // }, [activeTab, hasData]);
 
   if (loading)
     return (
@@ -661,7 +695,14 @@ export default function Home() {
                 <motion.button
                   key={item.id}
                   whileHover={!item.disabled ? { x: 4 } : {}}
-                  onClick={() => !item.disabled && setActiveTab(item.id)}
+                  // Modify your navItems map to use this onClick handler:
+                  onClick={() => {
+                    if (!item.disabled) {
+                      setActiveTab(item.id);
+                      // Play sound on tab change
+                      void new Audio("/audio/pop.mp3").play().catch(() => null);
+                    }
+                  }}
                   className={`w-full flex items-center justify-between px-4 py-3 text-left rounded-xl transition-all ${
                     activeTab === item.id
                       ? "bg-gray-900/50 border border-gray-800 text-white"

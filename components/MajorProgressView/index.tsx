@@ -14,6 +14,7 @@ import {
 } from "react-icons/fi";
 import { skipCourse, unskipCourse } from "@/lib/utils/courseOperations";
 import { getOtherCodesForCourse } from "@/lib/courseCatalog";
+import CourseModal from "./CourseModal";
 
 // Status color mapping for course pills
 function getCourseStatusColor({
@@ -473,103 +474,12 @@ export default function MajorProgressView({
         )}
       </div>
       {/* Course Info Modal */}
-      {/* Course Info Modal */}
-      <AnimatePresence>
-        {modalOpen.isOpen && modalOpen.course && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/70 z-[999] flex items-center justify-center p-4"
-            onClick={() => setModalOpen({ isOpen: false, course: null })}
-          >
-            <motion.div
-              initial={{ scale: 0.9, y: 20 }}
-              animate={{ scale: 1, y: 0 }}
-              exit={{ scale: 0.9, y: 20 }}
-              className="bg-gray-800 rounded-xl border border-gray-700 max-w-md w-full p-4"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className="flex justify-between items-start mb-4">
-                <div>
-                  <h3 className="text-lg font-medium">
-                    {modalOpen.course.code}
-                  </h3>
-                  <p className="text-gray-400 text-sm">
-                    Previously {getOtherCodesForCourse(modalOpen.course.code)}
-                  </p>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span
-                    className={`text-xs px-2 py-1 rounded-full ${
-                      modalOpen.course.status === "completed"
-                        ? "bg-emerald-900/20 text-emerald-300"
-                        : modalOpen.course.status === "in-progress"
-                        ? "bg-blue-900/20 text-blue-300"
-                        : modalOpen.course.status === "skipped"
-                        ? "bg-gray-800/20 text-gray-300"
-                        : "bg-amber-900/20 text-amber-300"
-                    }`}
-                  >
-                    {modalOpen.course.status === "completed"
-                      ? "Completed"
-                      : modalOpen.course.status === "in-progress"
-                      ? "In Progress"
-                      : modalOpen.course.status === "skipped"
-                      ? "Skipped"
-                      : "Not Taken"}
-                  </span>
-                  {modalOpen.course.status !== "completed" && (
-                    <div className="relative">
-                      <button
-                        onClick={() =>
-                          setDropdownOpen(modalOpen.course?.code || null)
-                        }
-                        className="text-gray-400 hover:text-white"
-                      >
-                        <FiMoreVertical />
-                      </button>
-                      {dropdownOpen === modalOpen.course?.code && (
-                        <motion.div
-                          ref={dropdownRef}
-                          initial={{ opacity: 0, y: -10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          exit={{ opacity: 0, y: -10 }}
-                          className="absolute right-0 z-[999] mt-2 w-40 rounded-md bg-gray-700 shadow-lg border border-gray-600 overflow-visible"
-                        >
-                          <button
-                            className="flex items-center gap-2 w-full px-3 py-2 text-sm text-gray-200 hover:bg-gray-600"
-                            onClick={() => {
-                              if (modalOpen.course) {
-                                handleSkip(
-                                  modalOpen.course.code,
-                                  modalOpen.course.name
-                                );
-                                setDropdownOpen(null);
-                              }
-                            }}
-                          >
-                            <FiCornerDownLeft />
-                            Mark as skipped
-                          </button>
-                          <button
-                            className="flex items-center gap-2 w-full px-3 py-2 text-sm text-gray-400 hover:bg-gray-600"
-                            onClick={() => setDropdownOpen(null)}
-                          >
-                            <FiX />
-                            Cancel
-                          </button>
-                        </motion.div>
-                      )}
-                    </div>
-                  )}
-                </div>
-              </div>
-              <p className="text-gray-300">{modalOpen.course.name}</p>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      <CourseModal
+        isOpen={modalOpen.isOpen}
+        course={modalOpen.course}
+        onClose={() => setModalOpen({ isOpen: false, course: null })}
+        onSkip={handleSkip}
+      />
     </div>
   );
 }

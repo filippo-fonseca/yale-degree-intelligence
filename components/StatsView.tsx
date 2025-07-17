@@ -191,10 +191,7 @@ export default function StatsView({ courses }: { courses: Course[] }) {
     .slice(0, 3);
 
   // Progress to graduation (assuming 120 credits needed)
-  const progressToGraduation = Math.min(
-    100,
-    (summary.totalCredits / 120) * 100
-  );
+  const progressToGraduation = Math.min(100, (summary.totalCredits / 36) * 100);
 
   return (
     <div className={`space-y-8 font-louize text-gray-200`}>
@@ -238,14 +235,21 @@ export default function StatsView({ courses }: { courses: Course[] }) {
           value={
             semesterData.length
               ? (
-                  semesterData.reduce((acc, s) => acc + s.credits, 0) /
-                  semesterData.length
+                  semesterData
+                    .filter((elem) => !elem.semester.includes("Summer"))
+                    .reduce((acc, s) => acc + s.credits, 0) /
+                  semesterData.filter(
+                    (elem) => !elem.semester.includes("Summer")
+                  ).length
                 ).toFixed(1)
               : "0"
           }
           color="text-blue-300"
           icon={<Clock className="h-5 w-5" />}
-          secondaryLabel={`Across ${semesterData.length} semesters`}
+          secondaryLabel={`Across ${
+            semesterData.filter((elem) => !elem.semester.includes("Summer"))
+              .length
+          } semesters`}
         />
       </motion.div>
 
@@ -683,93 +687,6 @@ export default function StatsView({ courses }: { courses: Course[] }) {
             </ResponsiveContainer>
           </ChartBox>
         )}
-      </div>
-
-      {/* Additional Insights */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Best Courses */}
-        <ChartBox
-          title="Top Performing Courses"
-          icon={<Award className="h-5 w-5" />}
-          description="Your highest achieving courses"
-        >
-          <div className="space-y-3">
-            {bestCourses.map((course, idx) => (
-              <div
-                key={course.code}
-                className="flex items-center justify-between p-3 bg-gray-800/50 rounded-lg border border-gray-700"
-              >
-                <div className="flex items-center space-x-3">
-                  <div
-                    className={`w-8 h-8 rounded-full flex items-center justify-center ${getGPAColor(
-                      gradePoints[course.grade!].toFixed(2)
-                    )} bg-opacity-20`}
-                  >
-                    {idx + 1}
-                  </div>
-                  <div>
-                    <h4 className="font-medium">{course.code}</h4>
-                    <p className="text-sm text-gray-400">{course.code}</p>
-                  </div>
-                </div>
-                <div className="text-right">
-                  <p
-                    className={`font-bold ${getGPAColor(
-                      gradePoints[course.grade!].toFixed(2)
-                    )}`}
-                  >
-                    {course.grade} ({gradePoints[course.grade!].toFixed(1)})
-                  </p>
-                  <p className="text-xs text-gray-400">
-                    {course.credits} credit{course.credits !== 1 ? "s" : ""}
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </ChartBox>
-
-        {/* Worst Courses */}
-        <ChartBox
-          title="Courses Needing Improvement"
-          icon={<Award className="h-5 w-5" />}
-          description="Courses with the most room for growth"
-        >
-          <div className="space-y-3">
-            {worstCourses.map((course, idx) => (
-              <div
-                key={course.code}
-                className="flex items-center justify-between p-3 bg-gray-800/50 rounded-lg border border-gray-700"
-              >
-                <div className="flex items-center space-x-3">
-                  <div
-                    className={`w-8 h-8 rounded-full flex items-center justify-center ${getGPAColor(
-                      gradePoints[course.grade!].toFixed(2)
-                    )} bg-opacity-20`}
-                  >
-                    {idx + 1}
-                  </div>
-                  <div>
-                    <h4 className="font-medium">{course.code}</h4>
-                    <p className="text-sm text-gray-400">{course.code}</p>
-                  </div>
-                </div>
-                <div className="text-right">
-                  <p
-                    className={`font-bold ${getGPAColor(
-                      gradePoints[course.grade!].toFixed(2)
-                    )}`}
-                  >
-                    {course.grade} ({gradePoints[course.grade!].toFixed(1)})
-                  </p>
-                  <p className="text-xs text-gray-400">
-                    {course.credits} credit{course.credits !== 1 ? "s" : ""}
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </ChartBox>
       </div>
     </div>
   );

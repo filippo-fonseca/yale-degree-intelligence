@@ -11,6 +11,7 @@ import {
   FiCheck,
   FiChevronDown,
   FiCornerDownLeft,
+  FiInfo,
 } from "react-icons/fi";
 import { skipCourse, unskipCourse } from "@/lib/utils/courseOperations";
 import { getOtherCodesForCourse } from "@/lib/courseCatalog";
@@ -145,6 +146,13 @@ export default function MajorProgressView({
 
   return (
     <div className="space-y-6 font-louize">
+      <div className="flex items-start gap-2 p-3 bg-gray-800/50 rounded-lg border border-gray-700 text-sm text-gray-300">
+        <FiInfo className="w-4 h-4 mt-0.5 flex-shrink-0" />
+        <span>
+          Pro tip: Click on each course's code for actions and more info.
+        </span>
+      </div>
+
       {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
@@ -281,7 +289,7 @@ export default function MajorProgressView({
                           {req.options.map((opt, j) => (
                             <div
                               key={`opt-${j}`}
-                              className={`relative px-2 py-0.5 rounded-full text-xs flex items-center transition-all duration-150 cursor-pointer ${
+                              className={`relative px-2 py-0.5 rounded-full text-xs flex items-center transition-all duration-150 hover:scale-[1.05] cursor-pointer ${
                                 opt.completed
                                   ? "bg-emerald-900/20 text-emerald-300 border border-emerald-700"
                                   : "bg-gray-900/20 text-gray-300 border border-gray-700"
@@ -410,7 +418,7 @@ export default function MajorProgressView({
                               return (
                                 <div
                                   key={`opt-${optIdx}`}
-                                  className={`relative px-2 py-0.5 rounded-full text-xs flex items-center transition-all duration-150 cursor-pointer ${getCourseStatusColor(
+                                  className={`relative px-2 py-0.5 rounded-full text-xs flex items-center transition-all duration-150 cursor-pointer hover:scale-[1.05] ${getCourseStatusColor(
                                     {
                                       completed: opt.completed,
                                       inProgress: opt.inProgress,

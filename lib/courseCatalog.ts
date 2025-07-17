@@ -46,3 +46,9 @@ export const getCourseDistributionalsFromCode = (code: string): string[] | undef
   const course = getCourseInfo(code);
   return course?.distributionals;
 }
+
+//get all OTHER codes for a course (excluding the canonical one)
+export const getOtherCodesForCourse = (code: string): string[] => {
+  const course = getCourseInfo(code);
+  return course ? course.codes.slice(1) : [];
+}

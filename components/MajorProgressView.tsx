@@ -13,6 +13,7 @@ import {
   FiCornerDownLeft,
 } from "react-icons/fi";
 import { skipCourse, unskipCourse } from "@/lib/utils/courseOperations";
+import { getOtherCodesForCourse } from "@/lib/courseCatalog";
 
 // Status color mapping for course pills
 function getCourseStatusColor({
@@ -73,6 +74,11 @@ export default function MajorProgressView({
   const [showInProgressStats, setShowInProgressStats] = useState(false);
   //course options:
   const dropdownRef = useRef<HTMLDivElement | null>(null);
+
+  const [modalOpen, setModalOpen] = useState<{
+    isOpen: boolean;
+    course: { code: string; name: string } | null;
+  }>({ isOpen: false, course: null });
 
   const handleSkip = async (courseCode: string, courseName: string) => {
     if (!user) return;
@@ -379,87 +385,52 @@ export default function MajorProgressView({
                             {req.options.map((opt, optIdx) => {
                               const dropdownKey = `${reqIdx}-${optIdx}`;
                               return (
-                                <div key={`opt-${optIdx}`} className="relative">
-                                  <div
-                                    className={`px-2 py-0.5 rounded-full text-xs flex items-center transition-all duration-150 cursor-pointer ${
-                                      opt.inProgress
-                                        ? "bg-blue-900/20 text-blue-300 border border-blue-700"
-                                        : "bg-amber-900/20 text-amber-300 border border-amber-700"
-                                    }`}
-                                    onClick={() => {
-                                      if (!opt.completed && !opt.skipped) {
-                                        toggleDropdown(reqIdx, optIdx);
-                                      }
-                                    }}
-                                  >
-                                    {opt.code}
-                                    <span className="ml-1 text-[0.65rem]">
-                                      ({opt.credits}cr
-                                      {opt.skipped
-                                        ? ", skipped"
-                                        : opt.inProgress
-                                        ? ", in progress"
-                                        : opt.completed
-                                        ? ", complete"
-                                        : ""}
-                                      )
-                                    </span>
-                                    {opt.skipped && (
-                                      <button
-                                        onClick={(e) => {
-                                          e.stopPropagation();
-                                          handleUnskip(opt.code);
-                                        }}
-                                        className="ml-1 text-[0.65rem] text-gray-400 hover:text-gray-200"
-                                        title="Unskip this course"
-                                      >
-                                        <FiX size={10} />
-                                      </button>
-                                    )}
-                                    {!opt.completed && !opt.skipped && (
-                                      <button
-                                        onClick={(e) => {
-                                          e.stopPropagation();
-                                          toggleDropdown(reqIdx, optIdx);
-                                        }}
-                                        className="ml-1 text-[0.65rem] text-gray-400 hover:text-gray-200"
-                                        title="More options"
-                                      >
-                                        <FiMoreVertical size={12} />
-                                      </button>
-                                    )}
-                                  </div>
-
-                                  {/* Skip/Unskip menu */}
-                                  <AnimatePresence>
-                                    {dropdownOpen === dropdownKey && (
-                                      <motion.div
-                                        ref={dropdownRef}
-                                        initial={{ opacity: 0, y: -10 }}
-                                        animate={{ opacity: 1, y: 0 }}
-                                        exit={{ opacity: 0, y: -10 }}
-                                        className="absolute left-0 z-[999] mt-1 w-40 rounded-md bg-gray-800 shadow-lg border border-gray-700 overflow-visible"
-                                      >
-                                        <button
-                                          className="flex items-center gap-2 w-full px-3 py-2 text-sm text-gray-200 hover:bg-gray-700"
-                                          onClick={() => {
-                                            handleSkip(opt.code, opt.name);
-                                            setDropdownOpen(null);
-                                          }}
-                                        >
-                                          <FiCornerDownLeft />
-                                          Mark as skipped
-                                        </button>
-                                        <button
-                                          className="flex items-center gap-2 w-full px-3 py-2 text-sm text-gray-400 hover:bg-gray-700"
-                                          onClick={() => setDropdownOpen(null)}
-                                        >
-                                          <FiX />
-                                          Cancel
-                                        </button>
-                                      </motion.div>
-                                    )}
-                                  </AnimatePresence>
+                                <div
+                                  key={`opt-${optIdx}`}
+                                  className={`relative px-2 py-0.5 rounded-full text-xs flex items-center transition-all duration-150 cursor-pointer ${getCourseStatusColor(
+                                    {
+                                      completed: opt.completed,
+                                      inProgress: opt.inProgress,
+                                      skipped: opt.skipped,
+                                      // grade: opt.grade,
+                                    }
+                                  )}`}
+                                  onClick={() => {
+                                    if (!opt.completed && !opt.skipped) {
+                                      setModalOpen({
+                                        isOpen: true,
+                                        course: {
+                                          code: opt.code,
+                                          name: opt.name,
+                                        },
+                                      });
+                                    }
+                                  }}
+                                >
+                                  {opt.code}
+                                  <span className="ml-1 text-[0.65rem]">
+                                    ({opt.credits}cr
+                                    {opt.skipped
+                                      ? ", skipped"
+                                      : opt.inProgress
+                                      ? ", in progress"
+                                      : opt.completed
+                                      ? ", complete"
+                                      : ""}
+                                    )
+                                  </span>
+                                  {opt.skipped && (
+                                    <button
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleUnskip(opt.code);
+                                      }}
+                                      className="ml-1 text-[0.65rem] text-gray-400 hover:text-gray-200"
+                                      title="Unskip this course"
+                                    >
+                                      <FiX size={10} />
+                                    </button>
+                                  )}
                                 </div>
                               );
                             })}
@@ -474,6 +445,80 @@ export default function MajorProgressView({
           </div>
         )}
       </div>
+      {/* Course Info Modal */}
+      <AnimatePresence>
+        {modalOpen.isOpen && modalOpen.course && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/70 z-[999] flex items-center justify-center p-4"
+            onClick={() => setModalOpen({ isOpen: false, course: null })}
+          >
+            <motion.div
+              initial={{ scale: 0.9, y: 20 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.9, y: 20 }}
+              className="bg-gray-800 rounded-xl border border-gray-700 max-w-md w-full p-4"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex justify-between items-start mb-4">
+                <div>
+                  <h3 className="text-lg font-medium">
+                    {modalOpen.course.code}
+                  </h3>
+                  <p className="text-gray-400 text-sm">
+                    Previously {getOtherCodesForCourse(modalOpen.course.code)}
+                  </p>
+                </div>
+                <div className="relative">
+                  <button
+                    onClick={() =>
+                      setDropdownOpen(modalOpen.course?.code || null)
+                    }
+                    className="text-gray-400 hover:text-white"
+                  >
+                    <FiMoreVertical />
+                  </button>
+                  {dropdownOpen === modalOpen.course?.code && (
+                    <motion.div
+                      ref={dropdownRef}
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      className="absolute right-0 z-[999] mt-2 w-40 rounded-md bg-gray-700 shadow-lg border border-gray-600 overflow-visible"
+                    >
+                      <button
+                        className="flex items-center gap-2 w-full px-3 py-2 text-sm text-gray-200 hover:bg-gray-600"
+                        onClick={() => {
+                          if (modalOpen.course) {
+                            handleSkip(
+                              modalOpen.course.code,
+                              modalOpen.course.name
+                            );
+                            setDropdownOpen(null);
+                          }
+                        }}
+                      >
+                        <FiCornerDownLeft />
+                        Mark as skipped
+                      </button>
+                      <button
+                        className="flex items-center gap-2 w-full px-3 py-2 text-sm text-gray-400 hover:bg-gray-600"
+                        onClick={() => setDropdownOpen(null)}
+                      >
+                        <FiX />
+                        Cancel
+                      </button>
+                    </motion.div>
+                  )}
+                </div>
+              </div>
+              <p className="text-gray-300">{modalOpen.course.name}</p>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

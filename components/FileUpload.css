@@ -1,0 +1,25 @@
+/* FileUpload.css */
+.custom-filepond .filepond--root,
+.custom-filepond .filepond--panel-root,
+.custom-filepond .filepond--drop-label {
+  background-color: #f3f4f6 !important;
+}
+
+.custom-filepond .filepond--root {
+  border: 2px dashed #9ca3af !important;
+  border-radius: 0.5rem !important;
+}
+
+.custom-filepond .filepond--drop-label {
+  color: #4b5563 !important;
+  font-size: 0.875rem !important;
+}
+
+.custom-filepond .filepond--label-action {
+  color: #3b82f6 !important;
+  text-decoration: underline !important;
+}
+
+.custom-filepond .filepond--file {
+  background-color: #3b82f6 !important;
+}

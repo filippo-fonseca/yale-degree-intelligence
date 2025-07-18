@@ -28,7 +28,7 @@ type MajorRequirement = {
 };
 
 // Create a typed version of allReqs
-const majorRequirements: Record<string, MajorRequirement> = allReqs as Record<string, MajorRequirement>;
+export const majorRequirements: Record<string, MajorRequirement> = allReqs as Record<string, MajorRequirement>;
 
 export const MAJORS = Object.values(majorRequirements).reduce((acc, major) => {
   acc[major.id] = major.name;

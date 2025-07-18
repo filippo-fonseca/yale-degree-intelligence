@@ -23,11 +23,17 @@ import {
   doc,
   setDoc,
   getDoc,
+  addDoc,
+  Timestamp,
 } from "firebase/firestore";
 import { Course } from "@/lib/types";
 import { db } from "@/config/firebase";
 import { gradePoints } from "@/lib/constants";
-import { calculateMajorProgress, MAJORS } from "@/lib/majors";
+import {
+  calculateMajorProgress,
+  majorRequirements,
+  MAJORS,
+} from "@/lib/majors";
 import MajorProgressView from "@/components/MajorProgressView";
 import StatsView from "@/components/StatsView";
 import MajorSelectionFlow from "@/components/MajorSelectionFlow";
@@ -89,6 +95,7 @@ export default function Home() {
     "showBetaBanner",
     true
   );
+  const [latestAdvice, setLatestAdvice] = useState<string | null>(null);
 
   const [coursesLoading, setCoursesLoading] = useState(true);
 
@@ -297,6 +304,59 @@ export default function Home() {
       });
 
       await Promise.all(batchWrites);
+    }
+
+    //AI UPLOAD:
+    const now = new Date();
+    let currentSemester: string;
+    const month = now.getMonth() + 1;
+    if (month >= 1 && month <= 5) {
+      currentSemester = "Spring";
+    } else if (month >= 6 && month <= 8) {
+      currentSemester = "Summer";
+    } else {
+      currentSemester = "Fall";
+    }
+    const currentYear = now.getFullYear();
+
+    try {
+      console.log("Fetching AI advice...");
+      const res = await fetch("/api/generate-advice", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          courses,
+          requirementsJson: majorRequirements,
+          selectedMajor: userProfile?.majors[0],
+          userId: user.uid,
+          currentDate: now.toISOString().slice(0, 10),
+          graduationYear: userProfile?.graduationYear,
+          currentSemester,
+          currentYear,
+        }),
+      });
+      const data = await res.json();
+      if (res.ok && data.advice) {
+        // Store in Firestore
+        await addDoc(collection(db, "ai_responses"), {
+          advice: data.advice,
+          userId: user.uid,
+          dateGenerated: Timestamp.fromDate(now),
+          params: {
+            selectedMajor: userProfile?.majors,
+            graduationYear: userProfile?.graduationYear,
+            currentDate: now.toISOString().slice(0, 10),
+            currentSemester,
+            currentYear,
+          },
+        });
+        setLatestAdvice(data.advice); // Optionally show in UI
+      } else {
+        setLatestAdvice(null);
+      }
+    } catch (err) {
+      console.error("AI advice fetch error", err);
+      setLatestAdvice(null);
     }
 
     await fetchCourses();

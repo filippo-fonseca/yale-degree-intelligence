@@ -1,0 +1,170 @@
+// /app/api/generate-advice/route.ts
+import { Course } from "@/lib/types";
+import { NextRequest, NextResponse } from "next/server";
+import { OpenAI } from "openai";
+
+type MajorRequirements = Record<string, any>;
+
+export async function POST(req: NextRequest) {
+  try {
+    console.log("Received request to generate advice");
+    const body = await req.json();
+    const {
+      courses,
+      requirementsJson,
+      selectedMajor,
+      currentDate,
+      graduationYear,
+      currentSemester,
+      currentYear,
+    }: {
+      courses: Course[];
+      requirementsJson: MajorRequirements;
+      selectedMajor: string;
+      currentDate: string;
+      graduationYear: number;
+      currentSemester: string;
+      currentYear: number;
+    } = body;
+
+    // --- Prompt logic, transcript formatting, etc. ---
+    const majorRequirements = requirementsJson[selectedMajor];
+    if (!majorRequirements) {
+      return NextResponse.json(
+        { error: `Major "${selectedMajor}" not found.` },
+        { status: 400 }
+      );
+    }
+
+    const coursesBySemester: Record<string, Course[]> = {};
+    courses.forEach((course) => {
+      const key = `${course.semester} ${course.year}`;
+      if (!coursesBySemester[key]) coursesBySemester[key] = [];
+      coursesBySemester[key].push(course);
+    });
+
+    const transcriptBlurb = Object.entries(coursesBySemester)
+      .sort(([aSem], [bSem]) => {
+        const [aS, aY] = aSem.split(" ");
+        const [bS, bY] = bSem.split(" ");
+        if (aY !== bY) return Number(aY) - Number(bY);
+        return aS.localeCompare(bS);
+      })
+      .map(([sem, semCourses]) =>
+        [
+          `Semester: ${sem}`,
+          ...semCourses.map(
+            (c) =>
+              `- ${c.code}: ${c.grade ?? "In Progress"} (${c.credits})${c.skipped ? " [skipped]" : ""}`
+          ),
+        ].join("\n")
+      )
+      .join("\n\n");
+
+    // Semesters left logic...
+    const semesterOrder = ["Spring", "Summer", "Fall"];
+    const getSemestersLeft = (
+      currentSemester: string,
+      currentYear: number,
+      gradYear: number
+    ): string[] => {
+      const semesters: string[] = [];
+      let year = currentYear;
+      let semIdx = semesterOrder.indexOf(currentSemester);
+      while (!(year === gradYear && semesterOrder[semIdx] === "Spring")) {
+        semIdx++;
+        if (semIdx >= semesterOrder.length) {
+          semIdx = 0;
+          year++;
+        }
+        if (!(year === gradYear && semesterOrder[semIdx] === "Spring")) {
+          semesters.push(`${semesterOrder[semIdx]} ${year}`);
+        }
+        if (year > gradYear) break;
+      }
+      return semesters;
+    }
+    const semestersLeftArr = getSemestersLeft(
+      currentSemester,
+      currentYear,
+      graduationYear
+    );
+    const semestersLeft = semestersLeftArr.length;
+
+    const totalMajorCredits = majorRequirements.creditRequirements?.total ?? 0;
+    const allMajorCourseCodes = new Set(
+      (majorRequirements.requirements ?? [])
+        .flatMap((req: any) => req.options?.map((opt: any) => opt.code) ?? [])
+        .filter(Boolean)
+        .map((code: string) => code.replace(":", ""))
+    );
+
+    const completedCredits = courses
+      .filter(
+        (c) =>
+          c.status === "completed" &&
+          allMajorCourseCodes.has(c.code.replace(":", ""))
+      )
+      .reduce((sum, c) => sum + c.credits, 0);
+
+    const remainingCredits = Math.max(totalMajorCredits - completedCredits, 0);
+    const avgPerSemester =
+      semestersLeft > 0
+        ? Math.round((remainingCredits / semestersLeft) * 10) / 10
+        : remainingCredits;
+
+    const prompt = `
+You are an experienced academic advisor for undergraduates at a top U.S. university. Given a student's course history, their major, the official requirements (in JSON), the current semester and year, today's date, and expected graduation, write a concise, supportive, actionable blurb of advice.
+Address whether they're on track, ahead, or behind; recommend next steps; highlight strengths/risks; and mention if anything is missing or should be planned ahead. 
+
+In your advice, please include the following planning information:
+- The current semester and year.
+- The number of semesters remaining after this one (list them).
+- The total number of major credits required, major credits completed, and major credits still needed.
+- The average number of major credits the student should take per remaining semester to graduate on time. If this is low, note that they have space for electives or lighter semesters.
+
+Keep your advice student-centered and friendly, like a Yale College advisor. Use 3-5 sentences.
+
+Student's transcript:
+${transcriptBlurb}
+
+Major requirements (JSON):
+${JSON.stringify(majorRequirements, null, 2)}
+
+Today's date: ${currentDate}
+Current semester: ${currentSemester} ${currentYear}
+Semesters remaining after this one: ${semestersLeft} (${semestersLeftArr.join(
+      ", "
+    )})
+Major credits required: ${totalMajorCredits}
+Major credits completed: ${completedCredits}
+Major credits still needed: ${remainingCredits}
+Average major credits per remaining semester needed to finish on time: ${avgPerSemester}
+    `.trim();
+
+    const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY! });
+    const completion = await openai.chat.completions.create({
+      model: "gpt-4o",
+      messages: [{ role: "user", content: prompt }],
+      max_tokens: 300,
+      temperature: 0.5,
+    });
+
+    const advice =
+      completion.choices[0]?.message?.content?.trim() ||
+      "Could not generate advice at this time.";
+
+    console.log("Generated advice:", advice);
+    if (!advice) {
+      console.warn("No advice generated, returning default message.");
+    }
+
+    return NextResponse.json({ advice }, { status: 200 });
+  } catch (err: any) {
+    console.error(err);
+    return NextResponse.json(
+      { error: "sp,e server error" + err?.message || "Unknown error" },
+      { status: 500 }
+    );
+  }
+}

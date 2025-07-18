@@ -45,6 +45,53 @@ export default function CourseModal({
   const dropdownRef = useRef<HTMLDivElement | null>(null);
   const [dropdownOpen, setDropdownOpen] = useState<string | null>(null);
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
+  const [courseGrade, setCourseGrade] = useState<string | null>(null);
+  const [courseSemesterTaken, setCourseSemesterTaken] = useState<string | null>(
+    null
+  );
+
+  //fetch courseGrade from "courses" backend
+  useEffect(() => {
+    if (!user) return;
+
+    if (course?.status == "completed" && !course.skipped) {
+      //all possible course codes
+
+      const fetchCourseBackend = async () => {
+        try {
+          const otherCodes = getOtherCodesForCourse(course.code);
+          const allCodesToCheck = [course.code, ...otherCodes];
+
+          // Try each code sequentially until we find a match
+          for (const code of allCodesToCheck) {
+            const q = query(
+              collection(db, "courses"),
+              where("userId", "==", user.uid),
+              where("code", "==", code)
+            );
+
+            const snapshot = await getDocs(q);
+            if (!snapshot.empty) {
+              const courseData = snapshot.docs[0].data();
+              setCourseGrade(courseData.grade || "N/A");
+              setCourseSemesterTaken(
+                courseData.semester + " " + courseData.year || "N/A"
+              );
+              return; // Exit early if we found a match
+            }
+          }
+
+          // If we get here, no matches were found
+          setCourseGrade(null);
+          setCourseSemesterTaken(null);
+        } catch (err) {
+          console.error("Error fetching course grade:", err);
+          setCourseGrade("N/A");
+        }
+      };
+      fetchCourseBackend();
+    }
+  }, [course, isOpen, user]);
 
   useEffect(() => {
     if (!dropdownOpen) return;
@@ -128,6 +175,24 @@ export default function CourseModal({
                     ? "Skipped"
                     : "Not Taken"}
                 </span>
+                {course.status == "completed" &&
+                  !course.skipped &&
+                  courseGrade && (
+                    <span
+                      className={`text-xs px-2 py-1 rounded-full bg-emerald-900/20 text-emerald-300`}
+                    >
+                      {courseSemesterTaken}
+                    </span>
+                  )}
+                {course.status == "completed" &&
+                  !course.skipped &&
+                  courseGrade && (
+                    <span
+                      className={`text-xs px-2 py-1 rounded-full bg-emerald-900/20 text-emerald-300`}
+                    >
+                      {courseGrade}
+                    </span>
+                  )}
                 <div className="relative">
                   {course.status !== "completed" && (
                     <button
@@ -160,6 +225,7 @@ export default function CourseModal({
                             className="flex items-center gap-2 w-full px-3 py-2 text-sm text-gray-200 hover:bg-gray-600"
                             onClick={() => {
                               onClose();
+                              setCourseGrade(null);
                               onSkip(course.code, course.name);
                               setDropdownOpen(null);
                             }}

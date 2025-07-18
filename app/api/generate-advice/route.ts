@@ -1,15 +1,18 @@
+import { calculateMajorProgress } from "@/lib/majors";
 import { Course } from "@/lib/types";
+import { coursesToPromptString } from "@/lib/utils/utils";
 import { NextRequest, NextResponse } from "next/server";
 import { OpenAI } from "openai";
 
 type MajorRequirements = Record<string, any>;
 
 export async function POST(req: NextRequest) {
+  
   try {
     console.log("Received request to generate advice");
     const body = await req.json();
     const {
-      courses,
+      coursesToAdd: courses,
       requirementsJson,
       selectedMajor,
       currentDate,
@@ -71,7 +74,8 @@ const formatTranscript = (courses: Course[]) => {
   }).join('\n\n');
   };
 
-  const transcriptBlurb = formatTranscript(courses);
+  // const transcriptBlurb = formatTranscript(courses);
+  const transcriptBlurb = coursesToPromptString(courses);
 
     // const transcriptBlurb = Object.entries(coursesBySemester)
     //   .sort(([aSem], [bSem]) => {
@@ -91,42 +95,76 @@ const formatTranscript = (courses: Course[]) => {
     //   )
     //   .join("\n\n");
 
-    // Improved semester counting logic
-    const getSemestersLeft = (currentSemester: string, currentYear: number, gradYear: number) => {
-      const semesters: string[] = [];
-      let year = currentYear;
-      let semester = currentSemester;
-      
-      const now = new Date();
-      const currentMonth = now.getMonth() + 1; // 1-12
-      
-      if (currentMonth >= 1 && currentMonth <= 8) {
-        semester = "Fall"; // Next is Fall of current year
+   /**
+ * Return an array of semesters (e.g. ["Fall 2025","Spring 2026",…])
+ * during which the student can still choose courses,
+ * up through the final Spring semester in gradYear.
+ *
+ * @param currentSemester  "Spring" or "Fall"
+ * @param currentYear      e.g. 2025
+ * @param gradYear         expected graduation year, e.g. 2028
+ * @param currentDateStr   ISO date string, e.g. "2025-07-18"
+ */
+   const getSemestersLeft = (
+    currentSemester: "Spring" | "Fall",
+    currentYear: number,
+    gradYear: number,
+    currentDateStr: string
+  ): string[] => {
+    const now = new Date(currentDateStr);
+    const month = now.getMonth() + 1;  // 1 = Jan … 12 = Dec
+  
+    // Determine if current semester is still open for registration
+    const includeCurrent =
+      (currentSemester === "Spring" && month <= 1) ||
+      (currentSemester === "Fall"   && month <= 9);
+  
+    const semesters: string[] = [];
+    let year = currentYear;
+    let sem  = currentSemester;
+  
+    // If it’s still open, count it — then bump
+    if (includeCurrent) {
+      semesters.push(`${sem} ${year}`);
+      if (sem === "Spring") {
+        sem = "Fall";
       } else {
-        semester = "Spring"; // Next is Spring of next year
+        sem = "Spring";
         year++;
       }
-      
-      while (year < gradYear || (year === gradYear && semester === "Spring")) {
-        semesters.push(`${semester} ${year}`);
-        
-        if (semester === "Spring") {
-          semester = "Fall";
-        } else {
-          semester = "Spring";
-          year++;
-        }
+    } else {
+      // Already past registration: start at next one
+      if (sem === "Spring") {
+        sem = "Fall";
+      } else {
+        sem = "Spring";
+        year++;
       }
-      
-      return semesters;
-    };
+    }
+  
+    // Now collect through the final Spring of gradYear
+    while (year < gradYear || (year === gradYear && sem === "Spring")) {
+      semesters.push(`${sem} ${year}`);
+      if (sem === "Spring") {
+        sem = "Fall";
+      } else {
+        sem = "Spring";
+        year++;
+      }
+    }
+  
+    return semesters;
+  };
+  
 
-    const semestersLeftArr = getSemestersLeft(
-      currentSemester,
-      currentYear,
-      graduationYear
-    );
-    const semestersLeft = semestersLeftArr.length;
+// …and then, in your POST handler, swap out the old call:
+const semestersLeftArr = getSemestersLeft(
+  currentSemester as "Spring" | "Fall",
+  currentYear,
+  graduationYear,
+  currentDate    // pass in the string you already have
+);
+const semestersLeft = semestersLeftArr.length;
 
     // Calculate major credits properly
     const totalMajorCredits = majorRequirements.creditRequirements?.total ?? 0;
@@ -153,20 +191,55 @@ const formatTranscript = (courses: Course[]) => {
       .reduce((sum: any, c: { credits: any; }) => sum + (c.credits || 0), 0);
 
     // Calculate in-progress credits
-    const inProgressCredits = courses
-      .filter(
-        (c: { grade: string; skipped: any; code: string; }) =>
-          c.grade === "In Progress" &&
-          !c.skipped &&
-          allMajorCourseCodes.has(c.code.replace(":", "").trim())
-      )
-      .reduce((sum: any, c: { credits: any; }) => sum + (c.credits || 0), 0);
+    // const inProgressCredits = courses
+    //   .filter(
+    //     (c: { grade: string; skipped: any; code: string; }) =>
+    //       c.grade === "In Progress" &&
+    //       !c.skipped &&
+    //       allMajorCourseCodes.has(c.code.replace(":", "").trim())
+    //   )
+    //   .reduce((sum: any, c: { credits: any; }) => sum + (c.credits || 0), 0);
 
-    const remainingCredits = Math.max(totalMajorCredits - completedCredits, 0);
+    // const remainingCredits = Math.max(totalMajorCredits - completedCredits, 0);
+    // const avgPerSemester =
+    //   semestersLeft > 0
+    //     ? Math.round((remainingCredits / semestersLeft) * 10) / 10
+    //     : remainingCredits;
+
+    const getMajorProgress = () => {
+      const completedCourseCodes = courses
+        .filter(
+          (course: Course) =>
+            course.status === "completed" &&
+            ((course.grade !== null && course.grade !== "In Progress") ||
+              course.skipped)
+        )
+        .map((course: Course) => course.code);
+  
+      const inProgressCourseCodes = courses
+        .filter((course: Course) => course.grade === "In Progress" && !course.skipped)
+        .map((course: Course) => course.code);
+  
+      const skippedCourseCodes = courses
+        .filter((course: Course) => course.skipped)
+        .map((course: Course) => course.code);
+  
+      return calculateMajorProgress(
+        selectedMajor,
+        completedCourseCodes,
+        inProgressCourseCodes,
+        skippedCourseCodes
+      );
+    };
+
+    const { remainingCredits } = getMajorProgress();
+
     const avgPerSemester =
       semestersLeft > 0
         ? Math.round((remainingCredits / semestersLeft) * 10) / 10
         : remainingCredits;
+    console.log("Remaining credits:", remainingCredits);
+    console.log("Average per semester:", avgPerSemester);
 
     const prompt = `
 You are an experienced academic advisor for undergraduates at a top U.S. university. Given a student's course history, their major, the official requirements (in JSON), the current semester and year, today's date, and expected graduation, write a concise, supportive, actionable blurb of advice.

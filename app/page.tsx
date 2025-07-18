@@ -306,6 +306,8 @@ export default function Home() {
       await Promise.all(batchWrites);
     }
 
+    console.log("the courses to add BAD BO", coursesToAdd);
+
     //AI UPLOAD:
     const now = new Date();
     let currentSemester: string;
@@ -325,7 +327,7 @@ export default function Home() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          courses,
+          coursesToAdd,
           requirementsJson: majorRequirements,
           selectedMajor: userProfile?.majors[0],
           userId: user.uid,

@@ -2116,7 +2116,8 @@
   {
     "codes": [
       "MATH 2220",
-      "MATH 222"
+      "MATH 222",
+      "AMTH 222"
     ],
     "name": "Linear Algebra with Applications",
     "credits": 1.0,
@@ -6080,7 +6081,7 @@
       "CPSC 201"
     ],
     "name": "Introduction to Computer Science",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "CPSC"
   },
   {
@@ -6089,7 +6090,7 @@
       "CPSC 202"
     ],
     "name": "Mathematical Tools for Computer Science",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "CPSC"
   },
   {

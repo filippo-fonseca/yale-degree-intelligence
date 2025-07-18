@@ -242,7 +242,7 @@ const semestersLeft = semestersLeftArr.length;
     console.log("Average per semester:", avgPerSemester);
 
     const prompt = `
-You are an experienced academic advisor for undergraduates at a top U.S. university. Given a student's course history, their major, the official requirements (in JSON), the current semester and year, today's date, and expected graduation, write a concise, supportive, actionable blurb of advice.
+You are an experienced academic advisor for undergraduates at a top U.S. university (Yale). Given a student's course history, their major, the official requirements (in JSON), the current semester and year, today's date, and expected graduation, write a concise, supportive, actionable blurb of advice.
 Address whether they're on track, ahead, or behind; recommend next steps; highlight strengths/risks; and mention if anything is missing or should be planned ahead. 
 
 In your advice, please include the following planning information:
@@ -266,6 +266,8 @@ Major credits required: ${totalMajorCredits}
 Major credits completed: ${completedCredits}
 Major credits still needed: ${remainingCredits}
 Average major credits per remaining semester needed to finish on time: ${avgPerSemester}
+
+Remember to be nice, but also be critical and don't be afraid to tell them to lock in if they have to - these are Yale students, so be supportvive and realistic but if they're slacking let em know.
     `.trim();
 
     console.log("Generated prompt:", prompt);

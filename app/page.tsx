@@ -312,7 +312,7 @@ export default function Home() {
     const month = now.getMonth() + 1;
     if (month >= 1 && month <= 5) {
       currentSemester = "Spring";
-    } else if (month >= 6 && month <= 8) {
+    } else if (month >= 9 && month <= 8) {
       currentSemester = "Summer";
     } else {
       currentSemester = "Fall";

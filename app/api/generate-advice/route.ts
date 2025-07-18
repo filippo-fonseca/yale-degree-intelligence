@@ -1,4 +1,3 @@
-// /app/api/generate-advice/route.ts
 import { Course } from "@/lib/types";
 import { NextRequest, NextResponse } from "next/server";
 import { OpenAI } from "openai";
@@ -17,17 +16,9 @@ export async function POST(req: NextRequest) {
       graduationYear,
       currentSemester,
       currentYear,
-    }: {
-      courses: Course[];
-      requirementsJson: MajorRequirements;
-      selectedMajor: string;
-      currentDate: string;
-      graduationYear: number;
-      currentSemester: string;
-      currentYear: number;
+      userId, 
     } = body;
 
-    // --- Prompt logic, transcript formatting, etc. ---
     const majorRequirements = requirementsJson[selectedMajor];
     if (!majorRequirements) {
       return NextResponse.json(
@@ -36,54 +27,100 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Format transcript for display
     const coursesBySemester: Record<string, Course[]> = {};
-    courses.forEach((course) => {
+    courses.forEach((course: Course) => {
       const key = `${course.semester} ${course.year}`;
       if (!coursesBySemester[key]) coursesBySemester[key] = [];
       coursesBySemester[key].push(course);
     });
 
-    const transcriptBlurb = Object.entries(coursesBySemester)
-      .sort(([aSem], [bSem]) => {
-        const [aS, aY] = aSem.split(" ");
-        const [bS, bY] = bSem.split(" ");
-        if (aY !== bY) return Number(aY) - Number(bY);
-        return aS.localeCompare(bS);
-      })
-      .map(([sem, semCourses]) =>
-        [
-          `Semester: ${sem}`,
-          ...semCourses.map(
-            (c) =>
-              `- ${c.code}: ${c.grade ?? "In Progress"} (${c.credits})${c.skipped ? " [skipped]" : ""}`
-          ),
-        ].join("\n")
-      )
-      .join("\n\n");
+    // Format transcript for display
+const formatTranscript = (courses: Course[]) => {
+  // Group by semester
+  const coursesBySemester: Record<string, Course[]> = {};
+  courses.forEach((course) => {
+    const key = `${course.semester} ${course.year}`;
+    if (!coursesBySemester[key]) coursesBySemester[key] = [];
+    coursesBySemester[key].push(course);
+  });
 
-    // Semesters left logic...
-    const semesterOrder = ["Spring", "Summer", "Fall"];
-    const getSemestersLeft = (
-      currentSemester: string,
-      currentYear: number,
-      gradYear: number
-    ): string[] => {
+  // Sort semesters chronologically
+  const sortedSemesters = Object.entries(coursesBySemester).sort(([aSem], [bSem]) => {
+    const [aSeason, aYear] = aSem.split(' ');
+    const [bSeason, bYear] = bSem.split(' ');
+    
+    // Convert to comparable format
+    const aValue = parseInt(aYear) * 2 + (aSeason === 'Spring' ? 0 : 1);
+    const bValue = parseInt(bYear) * 2 + (bSeason === 'Spring' ? 0 : 1);
+    
+    return aValue - bValue;
+  });
+
+  // Format each semester's courses
+  return sortedSemesters.map(([semester, semCourses]) => {
+    const coursesList = semCourses.map(course => {
+      let status = '';
+      if (course.skipped) status = ' [skipped]';
+      else if (course.grade === 'In Progress') status = ' [in progress]';
+      
+      return `- ${course.code}: ${course.grade || 'No grade'} (${course.credits} credits)${status}`;
+    }).join('\n');
+    
+    return `Semester: ${semester}\n${coursesList}`;
+  }).join('\n\n');
+  };
+
+  const transcriptBlurb = formatTranscript(courses);
+
+    // const transcriptBlurb = Object.entries(coursesBySemester)
+    //   .sort(([aSem], [bSem]) => {
+    //     const [aS, aY] = aSem.split(" ");
+    //     const [bS, bY] = bSem.split(" ");
+    //     if (aY !== bY) return Number(aY) - Number(bY);
+    //     return aS.localeCompare(bS);
+    //   })
+    //   .map(([sem, semCourses]) =>
+    //     [
+    //       `Semester: ${sem}`,
+    //       ...semCourses.map(
+    //         (c) =>
+    //           `- ${c.code}: ${c.grade ?? "In Progress"} (${c.credits})${c.skipped ? " [skipped]" : ""}`
+    //       ),
+    //     ].join("\n")
+    //   )
+    //   .join("\n\n");
+
+    // Improved semester counting logic
+    const getSemestersLeft = (currentSemester: string, currentYear: number, gradYear: number) => {
       const semesters: string[] = [];
       let year = currentYear;
-      let semIdx = semesterOrder.indexOf(currentSemester);
-      while (!(year === gradYear && semesterOrder[semIdx] === "Spring")) {
-        semIdx++;
-        if (semIdx >= semesterOrder.length) {
-          semIdx = 0;
+      let semester = currentSemester;
+      
+      const now = new Date();
+      const currentMonth = now.getMonth() + 1; // 1-12
+      
+      if (currentMonth >= 1 && currentMonth <= 8) {
+        semester = "Fall"; // Next is Fall of current year
+      } else {
+        semester = "Spring"; // Next is Spring of next year
+        year++;
+      }
+      
+      while (year < gradYear || (year === gradYear && semester === "Spring")) {
+        semesters.push(`${semester} ${year}`);
+        
+        if (semester === "Spring") {
+          semester = "Fall";
+        } else {
+          semester = "Spring";
           year++;
         }
-        if (!(year === gradYear && semesterOrder[semIdx] === "Spring")) {
-          semesters.push(`${semesterOrder[semIdx]} ${year}`);
-        }
-        if (year > gradYear) break;
       }
+      
       return semesters;
-    }
+    };
+
     const semestersLeftArr = getSemestersLeft(
       currentSemester,
       currentYear,
@@ -91,21 +128,39 @@ export async function POST(req: NextRequest) {
     );
     const semestersLeft = semestersLeftArr.length;
 
+    // Calculate major credits properly
     const totalMajorCredits = majorRequirements.creditRequirements?.total ?? 0;
-    const allMajorCourseCodes = new Set(
-      (majorRequirements.requirements ?? [])
-        .flatMap((req: any) => req.options?.map((opt: any) => opt.code) ?? [])
-        .filter(Boolean)
-        .map((code: string) => code.replace(":", ""))
-    );
+    
+    // Get all major course codes from requirements (handling colon variations)
+    const allMajorCourseCodes = new Set<string>();
+    (majorRequirements.requirements || []).forEach((req: any) => {
+      (req.options || []).forEach((opt: any) => {
+        if (opt.code) {
+          const cleanCode = opt.code.replace(":", "").trim();
+          allMajorCourseCodes.add(cleanCode);
+        }
+      });
+    });
 
+    // Calculate completed credits (only count completed courses that are in major requirements)
     const completedCredits = courses
       .filter(
-        (c) =>
+        (c: Course) =>
           c.status === "completed" &&
-          allMajorCourseCodes.has(c.code.replace(":", ""))
+          !c.skipped &&
+          allMajorCourseCodes.has(c.code.replace(":", "").trim())
       )
-      .reduce((sum, c) => sum + c.credits, 0);
+      .reduce((sum: any, c: { credits: any; }) => sum + (c.credits || 0), 0);
+
+    // Calculate in-progress credits
+    const inProgressCredits = courses
+      .filter(
+        (c: { grade: string; skipped: any; code: string; }) =>
+          c.grade === "In Progress" &&
+          !c.skipped &&
+          allMajorCourseCodes.has(c.code.replace(":", "").trim())
+      )
+      .reduce((sum: any, c: { credits: any; }) => sum + (c.credits || 0), 0);
 
     const remainingCredits = Math.max(totalMajorCredits - completedCredits, 0);
     const avgPerSemester =
@@ -133,14 +188,14 @@ ${JSON.stringify(majorRequirements, null, 2)}
 
 Today's date: ${currentDate}
 Current semester: ${currentSemester} ${currentYear}
-Semesters remaining after this one: ${semestersLeft} (${semestersLeftArr.join(
-      ", "
-    )})
+Semesters remaining after this one: ${semestersLeft} (${semestersLeftArr.join(", ")})
 Major credits required: ${totalMajorCredits}
 Major credits completed: ${completedCredits}
 Major credits still needed: ${remainingCredits}
 Average major credits per remaining semester needed to finish on time: ${avgPerSemester}
     `.trim();
+
+    console.log("Generated prompt:", prompt);
 
     const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY! });
     const completion = await openai.chat.completions.create({
@@ -154,16 +209,11 @@ Average major credits per remaining semester needed to finish on time: ${avgPerS
       completion.choices[0]?.message?.content?.trim() ||
       "Could not generate advice at this time.";
 
-    console.log("Generated advice:", advice);
-    if (!advice) {
-      console.warn("No advice generated, returning default message.");
-    }
-
     return NextResponse.json({ advice }, { status: 200 });
   } catch (err: any) {
     console.error(err);
     return NextResponse.json(
-      { error: "sp,e server error" + err?.message || "Unknown error" },
+      { error: "some server error" + err?.message || "Unknown error" },
       { status: 500 }
     );
   }

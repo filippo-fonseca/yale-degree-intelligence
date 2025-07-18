@@ -5,17 +5,10 @@ import { MAJORS } from "@/lib/majors";
 import { useAuth } from "@/context/AuthContext";
 import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import {
-  FiMoreVertical,
-  FiX,
-  FiCheck,
-  FiChevronDown,
-  FiCornerDownLeft,
-  FiInfo,
-} from "react-icons/fi";
+import { FiX, FiChevronDown, FiInfo } from "react-icons/fi";
 import { skipCourse, unskipCourse } from "@/lib/utils/courseOperations";
-import { getOtherCodesForCourse } from "@/lib/courseCatalog";
 import CourseModal from "./CourseModal";
+import DegreeIntelligenceBlurb from "./DegreeIntelligenceBlurb";
 
 // Status color mapping for course pills
 function getCourseStatusColor({
@@ -38,20 +31,30 @@ function getCourseStatusColor({
   return "bg-amber-900/20 text-amber-300 border border-amber-700";
 }
 
-function StatCard({
+function MajorStatCard({
   label,
   value,
   color = "text-white",
+  infoTooltip,
 }: {
   label: string;
   value: string | number;
   color?: string;
+  infoTooltip?: string;
 }) {
   return (
     <motion.div
       whileHover={{ y: -2 }}
-      className="p-4 rounded-xl bg-gray-900/50 backdrop-blur-sm border border-gray-800 hover:border-gray-700 transition-all"
+      className="p-4 rounded-xl bg-gray-900/50 backdrop-blur-sm border border-gray-800 hover:border-gray-700 transition-all relative"
     >
+      {infoTooltip && (
+        <div className="absolute top-2 right-2 group">
+          <FiInfo className="w-4 h-4 text-gray-400 hover:text-gray-300" />
+          <div className="absolute z-10 right-0 w-48 p-2 text-xs text-gray-300 bg-gray-800 rounded-md shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
+            {infoTooltip}
+          </div>
+        </div>
+      )}
       <p className="text-sm text-gray-400">{label}</p>
       <p className={`text-xl font-medium mt-1 ${color}`}>{value}</p>
     </motion.div>
@@ -148,9 +151,7 @@ export default function MajorProgressView({
     <div className="space-y-6 font-louize">
       <div className="flex items-start gap-2 p-3 bg-gray-800/50 rounded-lg border border-gray-700 text-sm text-gray-300">
         <FiInfo className="w-4 h-4 mt-0.5 flex-shrink-0" />
-        <span>
-          Pro tip: Click on each course's code for actions and more info.
-        </span>
+        <span>Pro tip: Click on each course for actions and more info.</span>
       </div>
 
       {/* Header */}
@@ -198,7 +199,7 @@ export default function MajorProgressView({
               : "bg-gray-800 text-gray-400 hover:bg-gray-700"
           }`}
         >
-          Completed Only
+          Completed Credits Only
         </button>
         <button
           onClick={() => setShowInProgressStats(true)}
@@ -208,13 +209,13 @@ export default function MajorProgressView({
               : "bg-gray-800 text-gray-400 hover:bg-gray-700"
           }`}
         >
-          Including In Progress
+          Including In Progress Credits
         </button>
       </div>
 
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <StatCard
+        <MajorStatCard
           label="Total Credits"
           value={
             showInProgressStats
@@ -222,8 +223,9 @@ export default function MajorProgressView({
               : `${completedCredits}/${totalCredits}`
           }
           color={showInProgressStats ? "text-purple-300" : "text-blue-300"}
+          infoTooltip="This shows your completed credits out of the total—including any prereqs!—required for your indicated major."
         />
-        <StatCard
+        <MajorStatCard
           label="Completion"
           value={`${(showInProgressStats
             ? withInProgressPercentage
@@ -233,6 +235,7 @@ export default function MajorProgressView({
         />
       </div>
 
+      <DegreeIntelligenceBlurb />
       {/* Requirements Sections */}
       <div className="space-y-6">
         {/* Completed Requirements */}

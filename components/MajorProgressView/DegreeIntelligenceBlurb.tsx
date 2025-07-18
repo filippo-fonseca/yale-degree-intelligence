@@ -1,6 +1,105 @@
 import { motion } from "framer-motion";
+import { useEffect, useState } from "react";
+import { collection, query, where, getDocs } from "firebase/firestore";
+import { Timestamp } from "firebase/firestore";
+import { db } from "@/config/firebase";
+import { useAuth } from "@/context/AuthContext";
+
+type Major = {
+  id: string;
+  name: string;
+};
+
+type AdviceParams = {
+  selectedMajor: Major[];
+  graduationYear: string;
+  currentDate: string;
+  currentSemester: string;
+  currentYear: string;
+};
+
+type AIAdvice = {
+  id: string;
+  advice: string;
+  userId: string;
+  dateGenerated: Timestamp;
+  params: AdviceParams;
+};
 
 export default function DegreeIntelligence() {
+  const [advice, setAdvice] = useState<AIAdvice | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const { user } = useAuth();
+
+  useEffect(() => {
+    const fetchUserAdvice = async () => {
+      if (!user?.uid) return;
+
+      try {
+        const adviceRef = collection(db, "ai_responses");
+        const q = query(adviceRef, where("userId", "==", user.uid));
+
+        const querySnapshot = await getDocs(q);
+
+        if (!querySnapshot.empty) {
+          // Convert to array of advice with ids
+          const allAdvice = querySnapshot.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+          })) as AIAdvice[];
+
+          // Sort by dateGenerated (newest first)
+          const sortedAdvice = [...allAdvice].sort(
+            (a, b) => b.dateGenerated.toMillis() - a.dateGenerated.toMillis()
+          );
+
+          setAdvice(sortedAdvice[0]);
+        }
+      } catch (err) {
+        console.error("Error fetching advice:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUserAdvice();
+  }, [user?.uid]);
+
+  if (loading) {
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="p-5 rounded-xl bg-gradient-to-br from-gray-800/50 to-gray-900/50 border border-gray-700/50 shadow-neumorphic"
+      >
+        <div className="flex items-center gap-3">
+          <div className="animate-pulse w-10 h-10 rounded-lg bg-gray-700/50"></div>
+          <div className="space-y-2 flex-1">
+            <div className="animate-pulse h-4 w-1/3 rounded bg-gray-700/50"></div>
+            <div className="animate-pulse h-3 w-full rounded bg-gray-700/50"></div>
+            <div className="animate-pulse h-3 w-2/3 rounded bg-gray-700/50"></div>
+          </div>
+        </div>
+      </motion.div>
+    );
+  }
+
+  if (!advice) {
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="p-5 rounded-xl bg-gradient-to-br from-gray-800/50 to-gray-900/50 border border-gray-700/50 shadow-neumorphic"
+      >
+        <div className="text-gray-400 text-sm">
+          No advice found for your account
+        </div>
+      </motion.div>
+    );
+  }
+
+  const formattedDate = advice.dateGenerated.toDate().toLocaleDateString();
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -38,19 +137,9 @@ export default function DegreeIntelligence() {
             </span>
           </h4>
           <div className="mt-2 text-sm text-gray-300 space-y-2">
-            <p>
-              Based on your current progress, you're{" "}
-              <span className="font-medium text-white">on track</span> to
-              complete your major in 4 semesters.
-            </p>
-            <p>
-              Consider taking{" "}
-              <span className="font-medium text-blue-300">CS 301</span> next
-              term—students who complete it early have 25% higher graduation
-              rates.
-            </p>
+            <p>{advice.advice}</p>
             <p className="text-xs text-gray-400 mt-3">
-              Analysis updated: {new Date().toLocaleDateString()}
+              Analysis updated: {formattedDate}
             </p>
           </div>
         </div>

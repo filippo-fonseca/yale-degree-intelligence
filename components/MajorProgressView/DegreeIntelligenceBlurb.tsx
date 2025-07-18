@@ -7,7 +7,7 @@ export default function DegreeIntelligence() {
       animate={{ opacity: 1, y: 0 }}
       className="p-5 rounded-xl bg-gradient-to-br from-gray-800/50 to-gray-900/50 border border-gray-700/50 shadow-neumorphic"
     >
-      <div className="flex items-start gap-3">
+      <div className="flex items-start gap-5">
         <div className="flex-shrink-0">
           <div className="relative">
             <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center text-white shadow-lg">
@@ -25,15 +25,15 @@ export default function DegreeIntelligence() {
                 />
               </svg>
             </div>
-            <div className="absolute -bottom-1 -right-1 bg-emerald-500 text-white text-xs px-1.5 py-0.5 rounded-full border-2 border-gray-900">
+            <div className="absolute -bottom-2 -right-3 bg-purple-500 text-white text-xs px-1.5 py-0.5 rounded-full border-2 border-gray-900">
               AI
             </div>
           </div>
         </div>
         <div className="flex-1">
           <h4 className="font-medium text-white/90 flex items-center gap-2">
-            Degree Intelligence
-            <span className="text-xs bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded-full">
+            Cleo
+            <span className="text-xs bg-purple-500/20 text-purple-300 px-2 py-0.5 rounded-full">
               Beta
             </span>
           </h4>

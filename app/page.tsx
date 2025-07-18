@@ -85,6 +85,12 @@ export default function Home() {
   const [showMajorSelection, setShowMajorSelection] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+  const [showBetaBanner, setShowBetaBanner] = useLocalStorage(
+    "showBetaBanner",
+    true
+  );
+
+  const [coursesLoading, setCoursesLoading] = useState(true);
 
   //tabs:
   const [activeTab, setActiveTab] = useLocalStorage(
@@ -191,6 +197,8 @@ export default function Home() {
     });
 
     setHasData(coursesData.length > 0);
+
+    setCoursesLoading(false);
   };
 
   // Update the parseAndStoreCourses function in src/app/page.tsx
@@ -392,7 +400,7 @@ export default function Home() {
   //   void new Audio("/audio/pop.mp3").play().catch(() => null);
   // }, [activeTab, hasData]);
 
-  if (loading)
+  if (loading || coursesLoading)
     return (
       <div className="flex items-center justify-center min-h-screen bg-gray-950">
         <motion.div
@@ -406,6 +414,52 @@ export default function Home() {
 
   return (
     <main className={`min-h-screen bg-gray-950 text-gray-100 font-louize`}>
+      {showBetaBanner && (
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="w-full bg-red-900 border-b border-gray-800"
+        >
+          <div className="max-w-7xl mx-auto px-6 py-2.5 flex items-center justify-center">
+            <div className="flex items-center space-x-3">
+              <span className="px-2 py-1 bg-blue-500/10 text-blue-400 rounded text-xs font-medium border border-blue-500/20">
+                BETA
+              </span>
+              <p className="text-sm text-gray-300">
+                Initial version - features may change.{" "}
+                <a
+                  href="/methodology"
+                  className="text-blue-400 hover:text-blue-300 hover:underline"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  View methodology
+                </a>
+              </p>
+            </div>
+            <button
+              onClick={() => setShowBetaBanner(false)}
+              className="p-1 rounded-md hover:bg-gray-800 transition-colors text-gray-400 hover:text-gray-200"
+              aria-label="Dismiss banner"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-4 w-4"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={2}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+            </button>
+          </div>
+        </motion.div>
+      )}
       {/* Major Selection Flow */}
       {showMajorSelection && (
         <MajorSelectionFlow onComplete={() => setShowMajorSelection(false)} />

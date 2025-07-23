@@ -47,6 +47,7 @@ import {
 import DistributionalsView from "@/components/DistributionalProgress";
 import { FaBuildingCircleCheck } from "react-icons/fa6";
 import CustomLoader from "@/components/ui/CustomLoader";
+import UserSettingsModal from "@/components/UserSettingsModal/UserSettingsModal";
 
 interface UserProfile {
   majors: string[];
@@ -520,205 +521,14 @@ export default function Home() {
         <MajorSelectionFlow onComplete={() => setShowMajorSelection(false)} />
       )}
 
-      {/* Settings Modal */}
       {showSettings && userProfile && (
-        <div className="fixed inset-0 bg-gray-950/90 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="w-full max-w-md bg-gray-900 rounded-xl border border-gray-800 p-6"
-          >
-            <div className="flex flex-col items-center mb-6">
-              <div className="relative mb-4">
-                {user.photoURL ? (
-                  <img
-                    src={user.photoURL}
-                    alt="Profile"
-                    className="w-16 h-16 rounded-full object-cover border-2 border-gray-700"
-                  />
-                ) : (
-                  <div className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-2xl font-medium border-2 border-gray-700">
-                    {user.displayName?.charAt(0) ||
-                      user.email?.charAt(0).toUpperCase()}
-                  </div>
-                )}
-              </div>
-              <h2 className="text-xl font-medium text-center text-gray-200">
-                {user.displayName || "User"}
-              </h2>
-              <p className="text-gray-400 text-sm mt-1">{user.email}</p>
-
-              {/* Graduation Year Badge */}
-              {userProfile.graduationYear && (
-                <div className="mt-3 flex items-center">
-                  <span className="text-xs font-medium px-2.5 py-0.5 rounded-full flex items-center">
-                    <span
-                      className={`w-2 h-2 rounded-full mr-1.5 ${
-                        getYearStatus(userProfile.graduationYear) === "Freshman"
-                          ? "bg-green-400"
-                          : getYearStatus(userProfile.graduationYear) ===
-                            "Sophomore"
-                          ? "bg-blue-400"
-                          : getYearStatus(userProfile.graduationYear) ===
-                            "Junior"
-                          ? "bg-yellow-400"
-                          : "bg-purple-400"
-                      }`}
-                    ></span>
-                    <span className="text-gray-300">
-                      {getYearStatus(userProfile.graduationYear)} • Class of{" "}
-                      {userProfile.graduationYear}
-                    </span>
-                  </span>
-                </div>
-              )}
-              <motion.button
-                onHoverStart={() => setIsHoveringLogout(true)}
-                onHoverEnd={() => setIsHoveringLogout(false)}
-                onClick={logout}
-                className="flex items-center justify-center space-x-2 text-xs px-4 py-2 rounded-lg hover:bg-gray-900/50 transition-all border border-gray-800 hover:border-gray-700 mt-4"
-              >
-                <span>Sign out</span>
-                <motion.div
-                  animate={isHoveringLogout ? { x: 2 } : { x: 0 }}
-                  transition={{ type: "spring", stiffness: 500 }}
-                >
-                  <FiLogOut size={14} />
-                </motion.div>
-              </motion.button>
-            </div>
-
-            {/* Rest of the settings modal content remains the same */}
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-400 mb-2">
-                  Majors
-                </label>
-                <div className="space-y-2">
-                  {userProfile.majors.map((major, index) => (
-                    <div key={index} className="flex items-center space-x-2">
-                      <div className="relative flex-1">
-                        <select
-                          value={major}
-                          onChange={(e) => {
-                            const newMajors = [...userProfile.majors];
-                            newMajors[index] = e.target.value;
-                            setUserProfile({
-                              ...userProfile,
-                              majors: newMajors,
-                            });
-                          }}
-                          className="w-full appearance-none bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 pr-8 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        >
-                          {Object.entries(MAJORS).map(([code, name]) => (
-                            <option key={code} value={code}>
-                              {code} - {name}
-                            </option>
-                          ))}
-                        </select>
-                        <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                          <svg
-                            className="h-5 w-5 text-gray-400"
-                            xmlns="http://www.w3.org/2000/svg"
-                            viewBox="0 0 20 20"
-                            fill="currentColor"
-                          >
-                            <path
-                              fillRule="evenodd"
-                              d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                              clipRule="evenodd"
-                            />
-                          </svg>
-                        </div>
-                      </div>
-                      {index > 0 && (
-                        <button
-                          onClick={() => {
-                            const newMajors = [...userProfile.majors];
-                            newMajors.splice(index, 1);
-                            setUserProfile({
-                              ...userProfile,
-                              majors: newMajors,
-                            });
-                          }}
-                          className="text-red-400 hover:text-red-300 p-2"
-                        >
-                          ×
-                        </button>
-                      )}
-                    </div>
-                  ))}
-                  {userProfile.majors.length < 2 && (
-                    <button
-                      onClick={() => {
-                        setUserProfile({
-                          ...userProfile,
-                          majors: [...userProfile.majors, "MENG"],
-                        });
-                      }}
-                      className="text-sm text-blue-400 hover:text-blue-300 flex items-center"
-                    >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-4 w-4 mr-1"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-                        />
-                      </svg>
-                      Add another major
-                    </button>
-                  )}
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-400 mb-2">
-                  Graduation Year
-                </label>
-                <input
-                  type="number"
-                  min={new Date().getFullYear()}
-                  max={new Date().getFullYear() + 4}
-                  value={userProfile.graduationYear}
-                  onChange={(e) =>
-                    setUserProfile({
-                      ...userProfile,
-                      graduationYear: parseInt(e.target.value),
-                    })
-                  }
-                  className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-            </div>
-
-            <div className="flex justify-end space-x-3 mt-6">
-              <button
-                onClick={() => setShowSettings(false)}
-                className="px-4 py-2 rounded-lg border border-gray-700 hover:bg-gray-800/50 transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={() =>
-                  handleProfileUpdate({
-                    majors: userProfile.majors,
-                    graduationYear: userProfile.graduationYear,
-                  })
-                }
-                className="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 transition-colors"
-              >
-                Save Changes
-              </button>
-            </div>
-          </motion.div>
-        </div>
+        <UserSettingsModal
+          user={user}
+          userProfile={userProfile}
+          onClose={() => setShowSettings(false)}
+          onSave={handleProfileUpdate}
+          onLogout={logout}
+        />
       )}
 
       {/* Background elements */}

@@ -46,6 +46,7 @@ import {
 } from "@/lib/courseCatalog";
 import DistributionalsView from "@/components/DistributionalProgress";
 import { FaBuildingCircleCheck } from "react-icons/fa6";
+import CustomLoader from "@/components/ui/CustomLoader";
 
 interface UserProfile {
   majors: string[];
@@ -462,16 +463,8 @@ export default function Home() {
   //   void new Audio("/audio/pop.mp3").play().catch(() => null);
   // }, [activeTab, hasData]);
 
-  if (loading || coursesLoading)
-    return (
-      <div className="flex items-center justify-center min-h-screen bg-gray-950">
-        <motion.div
-          animate={{ rotate: 360 }}
-          transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
-          className="w-8 h-8 rounded-full border-2 border-transparent border-t-blue-500 border-r-blue-500/50"
-        />
-      </div>
-    );
+  if (loading || coursesLoading) return <CustomLoader />;
+
   if (!user) return <LoginPage />;
 
   return (

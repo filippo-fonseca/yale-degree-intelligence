@@ -40,7 +40,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       } else {
         setUser(null);
       }
-      setLoading(false);
+      setTimeout(() => {
+        setLoading(false);
+      }, 1000); // Put the loading animation there a bit for aesthetics
     });
 
     return () => unsubscribe();

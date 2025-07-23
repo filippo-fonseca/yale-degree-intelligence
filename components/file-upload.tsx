@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { FilePond } from "react-filepond";
 import "filepond/dist/filepond.min.css";
+import CustomLoader from "./ui/CustomLoader";
 
 type FileUploadProps = {
   onSuccess: (extractedText: string) => Promise<void>;
@@ -86,6 +87,9 @@ export default function FileUpload({ onSuccess }: FileUploadProps) {
     }
   }
 
+  if (isProcessing) {
+    return <CustomLoader />;
+  }
   return (
     <div className="space-y-4">
       <FilePond
@@ -95,11 +99,6 @@ export default function FileUpload({ onSuccess }: FileUploadProps) {
         acceptedFileTypes={["application/pdf"]}
         // maxFileSize="5MB"
       />
-      {isProcessing && (
-        <div className="text-center text-sm text-gray-500">
-          Processing transcript... (this may take a moment)
-        </div>
-      )}
       {error && (
         <div className="p-3 text-sm text-red-600 bg-red-50 rounded-md">
           <strong>Error:</strong> {error}

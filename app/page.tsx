@@ -14,6 +14,7 @@ import {
   FiChevronRight,
   FiUser,
   FiChevronDown,
+  FiCoffee,
 } from "react-icons/fi";
 import {
   collection,
@@ -482,8 +483,10 @@ export default function Home() {
   if (!user) return <LoginPage />;
 
   return (
-    <main className={`min-h-screen bg-gray-950 text-gray-100 font-louize`}>
-      {showBetaBanner && (
+    <main
+      className={`min-h-screen bg-gray-950 text-gray-100 font-louize overflow-hidden`}
+    >
+      {/* {showBetaBanner && (
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -528,7 +531,7 @@ export default function Home() {
             </button>
           </div>
         </motion.div>
-      )}
+      )} */}
       {/* Major Selection Flow */}
       {showMajorSelection && (
         <MajorSelectionFlow onComplete={() => setShowMajorSelection(false)} />
@@ -620,18 +623,17 @@ export default function Home() {
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.2, duration: 0.5 }}
-            className="w-full lg:w-56"
+            className="w-full lg:w-56 flex flex-col justify-between"
           >
-            <nav className="space-y-1">
+            {/* Navigation Items */}
+            <nav className="space-y-1 flex-1">
               {navItems.map((item) => (
                 <motion.button
                   key={item.id}
                   whileHover={!item.disabled ? { x: 4 } : {}}
-                  // Modify your navItems map to use this onClick handler:
                   onClick={() => {
                     if (!item.disabled) {
                       setActiveTab(item.id);
-                      // Play sound on tab change
                       void new Audio("/audio/pop.mp3").play().catch(() => null);
                     }
                   }}
@@ -660,6 +662,47 @@ export default function Home() {
                 </motion.button>
               ))}
             </nav>
+
+            {/* Fixed Bottom Section */}
+            <div className="sticky bottom-0 left-0 right-0 pt-4 bg-gradient-to-t from-gray-950/90 via-gray-950/90 to-transparent">
+              <div className="space-y-3">
+                {/* Neumorphic Action Card */}
+                <motion.div
+                  whileHover={{ y: -2 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="p-3 rounded-xl bg-gray-900 border border-gray-800 shadow-[0_4px_20px_rgba(0,0,0,0.25)]"
+                >
+                  <div className="flex flex-col space-y-2.5">
+                    <button className="w-full flex items-center space-x-2.5 p-2 rounded-lg hover:bg-gray-800/40 transition-all duration-200 text-gray-300 hover:text-white">
+                      <div className="p-1.5 rounded-lg bg-blue-900/30 border border-blue-800/50 flex items-center justify-center">
+                        <FiBook className="text-blue-400" size={14} />
+                      </div>
+                      <span className="text-sm font-medium">Our Mission</span>
+                    </button>
+
+                    <button className="w-full flex items-center space-x-2.5 p-2 rounded-lg hover:bg-gray-800/40 transition-all duration-200 text-gray-300 hover:text-white">
+                      <div className="p-1.5 rounded-lg bg-amber-900/30 border border-amber-800/50 flex items-center justify-center">
+                        <FiCoffee className="text-amber-400" size={14} />
+                      </div>
+                      <span className="text-sm font-medium">
+                        Buy us a coffee
+                      </span>
+                    </button>
+                  </div>
+                </motion.div>
+
+                {/* Disclaimer Text */}
+                <div className="px-1 pb-2">
+                  <p className="text-[11px] text-gray-500 leading-tight">
+                    Yale DegreeIntelligence is unaffiliated with Yale
+                    University. Data may be inaccurate - please verify
+                    everything with your DUS. We take no responsibility for any
+                    errors or omissions. This is purely a tool developed for
+                    ourselves that we wished to share, as it's helped us a ton!
+                  </p>
+                </div>
+              </div>
+            </div>
           </motion.aside>
 
           {/* Main Content Area */}
@@ -667,7 +710,8 @@ export default function Home() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3, duration: 0.5 }}
-            className="flex-1"
+            className="flex-1 overflow-y-auto" // Add overflow-y-auto here
+            style={{ maxHeight: "calc(80vh)" }} // Adjust this value based on your header/footer heights
           >
             <AnimatePresence mode="wait">
               {activeTab === "upload" && (
@@ -881,20 +925,6 @@ export default function Home() {
             </AnimatePresence>
           </motion.div>
         </div>
-
-        {/* Footer */}
-        <motion.footer
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.8 }}
-          className="py-8 text-center text-sm text-gray-500 border-t border-gray-900"
-        >
-          <p>
-            Yale DegreeIntelligence can be wrong. Not affiliated with Yale
-            University. We do not take responsibility for any wrong
-            advice/deductions. We make no money from this.
-          </p>
-        </motion.footer>
       </div>
     </main>
   );

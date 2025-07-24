@@ -48,6 +48,7 @@ import DistributionalsView from "@/components/DistributionalProgress";
 import { FaBuildingCircleCheck } from "react-icons/fa6";
 import CustomLoader from "@/components/ui/CustomLoader";
 import UserSettingsModal from "@/components/UserSettingsModal/UserSettingsModal";
+import Link from "next/link";
 
 interface UserProfile {
   majors: string[];
@@ -769,12 +770,20 @@ export default function Home() {
                   ) : (
                     <div className="flex flex-col items-center justify-center py-12">
                       <h2 className="text-xl font-medium mb-6 bg-clip-text text-transparent bg-gradient-to-r from-blue-200 to-purple-200">
-                        Begin Your Academic Analysis
+                        Let's begin your journey to better contextualize & plan
+                        your Yale degree.
                       </h2>
                       <div className="w-full max-w-lg bg-gray-900/50 backdrop-blur-sm p-8 rounded-xl border border-gray-800">
                         <FileUpload onSuccess={parseAndStoreCourses} />
                         <p className="text-center text-gray-500 text-sm mt-4">
-                          Upload your Yale transcript to unlock insights
+                          By uploading your transcript, you agree to our{" "}
+                          <Link
+                            href="/terms"
+                            className="text-gray-400 hover:text-gray-300 hover:underline transition-all hover:scale-[1.3]"
+                            target="_blank"
+                          >
+                            terms.
+                          </Link>
                         </p>
                       </div>
                     </div>

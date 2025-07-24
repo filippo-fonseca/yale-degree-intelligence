@@ -7,7 +7,10 @@ import {
   FiCornerDownLeft,
   FiTrash2,
 } from "react-icons/fi";
-import { getOtherCodesForCourse } from "@/lib/courseCatalog";
+import {
+  getCourseCreditsFromCode,
+  getOtherCodesForCourse,
+} from "@/lib/courseCatalog";
 import { useEffect, useRef, useState } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { db } from "@/config/firebase";
@@ -49,10 +52,15 @@ export default function CourseModal({
   const [courseSemesterTaken, setCourseSemesterTaken] = useState<string | null>(
     null
   );
+  const [courseCredits, setCourseCredits] = useState<number | undefined>();
 
   //fetch courseGrade from "courses" backend
   useEffect(() => {
     if (!user) return;
+
+    if (course) {
+      setCourseCredits(getCourseCreditsFromCode(course.code));
+    }
 
     if (course?.status == "completed" && !course.skipped) {
       //all possible course codes
@@ -247,7 +255,10 @@ export default function CourseModal({
                 </div>
               </div>
             </div>
-            <p className="text-gray-300">{course.name}</p>
+            <p className="text-gray-300">
+              {course.name} <br /> {courseCredits}{" "}
+              {courseCredits === 1 ? "credit" : "credits"}
+            </p>
           </motion.div>
         </motion.div>
       )}

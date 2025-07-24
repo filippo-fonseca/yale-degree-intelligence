@@ -28,7 +28,7 @@ type MajorRequirement = {
 };
 
 // Create a typed version of allReqs
-const majorRequirements: Record<string, MajorRequirement> = allReqs as Record<string, MajorRequirement>;
+export const majorRequirements: Record<string, MajorRequirement> = allReqs as Record<string, MajorRequirement>;
 
 export const MAJORS = Object.values(majorRequirements).reduce((acc, major) => {
   acc[major.id] = major.name;
@@ -49,6 +49,7 @@ type CompletedRequirement = {
     required: boolean;
     credits: number;
     skipped?: boolean;
+    manual?: boolean;
   }[];
 };
 
@@ -68,7 +69,8 @@ export const calculateMajorProgress = (
   majorId: string,
   completedCourseCodes: string[],
   inProgressCourseCodes: string[] = [],
-  skippedCourseCodes: string[] = []
+  skippedCourseCodes: string[] = [],
+  manualRequirements: {code: string, requirement: string}[] = []
 ): MajorProgress => {
   const major = majorRequirements[majorId];
   if (!major) throw new Error(`Major ${majorId} not found`);
@@ -77,6 +79,21 @@ export const calculateMajorProgress = (
   const canonicalCompleted = completedCourseCodes.map(code => getCanonicalCode(code) || code);
   const canonicalInProgress = inProgressCourseCodes.map(code => getCanonicalCode(code) || code);
   const canonicalSkipped = skippedCourseCodes.map(code => getCanonicalCode(code) || code);
+  
+  // Group manual requirements by requirement name
+  const manualByRequirement: Record<string, {code: string, credits: number}[]> = {};
+  manualRequirements.forEach(m => {
+    const course = getCourseInfo(m.code);
+    if (!course) return;
+    
+    if (!manualByRequirement[m.requirement]) {
+      manualByRequirement[m.requirement] = [];
+    }
+    manualByRequirement[m.requirement].push({
+      code: course.codes[0], // Use canonical code
+      credits: course.credits
+    });
+  });
 
   let totalCompletedCredits = 0;
   let totalInProgressCredits = 0;
@@ -87,9 +104,31 @@ export const calculateMajorProgress = (
     let reqInProgress = 0;
     const reqOptions: CompletedRequirement['options'] = [];
 
+    // Check for manual fulfillments for this requirement
+    const manualFulfillments = manualByRequirement[req.name] || [];
+
+    // Process manual fulfillments
+    manualFulfillments.forEach(({code, credits}) => {
+      reqOptions.push({
+        code,
+        name: getCourseInfo(code)?.name || code,
+        completed: true,
+        inProgress: false,
+        required: true,
+        credits: credits,
+        manual: true
+      });
+      reqCompleted += 1;
+      totalCompletedCredits += credits;
+    });
+
+    // Process regular requirements
     for (const option of req.options) {
       if (option.type === 'course') {
         const code = option.code;
+        // Skip if this course was already added manually
+        if (manualFulfillments.some(m => m.code === code)) continue;
+        
         const course = getCourseInfo(code);
         if (!course) continue;
 
@@ -108,7 +147,7 @@ export const calculateMajorProgress = (
         });
 
         if (completed || skipped) {
-          reqCompleted += 1; // Count courses, not credits for requirement completion
+          reqCompleted += 1;
           totalCompletedCredits += course.credits;
         } else if (inProgress) {
           reqInProgress += 1;
@@ -120,6 +159,9 @@ export const calculateMajorProgress = (
         let groupCredits = 0;
 
         option.options.forEach((code: string) => {
+          // Skip if this course was already added manually
+          if (manualFulfillments.some(m => m.code === code)) return;
+          
           const course = getCourseInfo(code);
           if (!course) return;
 
@@ -156,18 +198,25 @@ export const calculateMajorProgress = (
       description: req.description,
       completed: reqCompleted,
       required: req.required,
-      satisfied: reqCompleted >= req.required,
+      satisfied: reqCompleted >= req.required || manualFulfillments.length >= (req.required - reqCompleted), // Mark as satisfied if manually fulfilled
       options: reqOptions
     });
   }
 
   // Categorize requirements
-  const completedReqs = requirementProgress.filter(r => r.satisfied);
-  const inProgressReqs = requirementProgress.filter(r => 
-    !r.satisfied && r.completed > 0
+  // Replace the current categorization code with this:
+  const completedReqs = requirementProgress.filter(r => 
+    r.satisfied || 
+    r.options.some(o => o.manual || o.completed) // Include requirements with any completed or manual courses
   );
+  
+  const inProgressReqs = requirementProgress.filter(r => 
+    !completedReqs.includes(r) && // Don't include requirements already marked as completed
+    (r.completed > 0 || r.options.some(o => o.inProgress))
+  );
+  
   const remainingReqs = requirementProgress.filter(r => 
-    !r.satisfied && r.completed === 0
+    r.completed < r.required
   );
 
   // Calculate percentages

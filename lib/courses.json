@@ -2017,6 +2017,287 @@
   },
   {
     "codes": [
+      "ARCG 1110",
+      "ARCG 110"
+    ],
+    "name": "Introduction to the History of Art: Global Decorative Arts",
+    "credits": 1.0,
+    "department": "ARCG"
+  },
+  {
+    "codes": [
+      "ARCG 2143"
+    ],
+    "name": "Greek Art and Architecture",
+    "credits": 1.0,
+    "department": "ARCG"
+  },
+  {
+    "codes": [
+      "ARCG 2275"
+    ],
+    "name": "The Green Hell and the Mother Serpent: Amazonian Archaeology, Ethnography, and Politics",
+    "credits": 1.0,
+    "department": "ARCG"
+  },
+  {
+    "codes": [
+      "ARCG 2345"
+    ],
+    "name": "Archaeology of Ancient Egypt - The Age of the Pyramids",
+    "credits": 1.0,
+    "department": "ARCG"
+  },
+  {
+    "codes": [
+      "ARCG 2660"
+    ],
+    "name": "Being Human: The Neanderthal Dilemma",
+    "credits": 1.0,
+    "department": "ARCG"
+  },
+  {
+    "codes": [
+      "ARCG 3116L",
+      "ARCG 316L"
+    ],
+    "name": "Introduction to Archaeological Laboratory Sciences",
+    "credits": 1.0,
+    "department": "ARCG"
+  },
+  {
+    "codes": [
+      "ARCG 3297"
+    ],
+    "name": "Archaeology of East Asia",
+    "credits": 1.0,
+    "department": "ARCG"
+  },
+  {
+    "codes": [
+      "ARCG 4150",
+      "ARCG 450"
+    ],
+    "name": "Analysis of Lithic Technology",
+    "credits": 1.0,
+    "department": "ARCG"
+  },
+  {
+    "codes": [
+      "ARCG 4217"
+    ],
+    "name": "Maya Hieroglyphic Writing",
+    "credits": 1.0,
+    "department": "ARCG"
+  },
+  {
+    "codes": [
+      "ARCG 4471",
+      "ARCG 471"
+    ],
+    "name": "Directed Reading and Research in Archaeology",
+    "credits": 1.0,
+    "department": "ARCG"
+  },
+  {
+    "codes": [
+      "ARCG 4491",
+      "ARCG 491"
+    ],
+    "name": "Senior Research Project in Archaeology",
+    "credits": 1.0,
+    "department": "ARCG"
+  },
+  {
+    "codes": [
+      "ARCG 4564",
+      "ARCG 464"
+    ],
+    "name": "Human Osteology",
+    "credits": 1.0,
+    "department": "ARCG"
+  },
+  {
+    "codes": [
+      "ARCG 7280",
+      "ARCG 780"
+    ],
+    "name": "Archaeology of Religion",
+    "credits": 1.0,
+    "department": "ARCG"
+  },
+  {
+    "codes": [
+      "ARCG 9053",
+      "ARCG 953"
+    ],
+    "name": "Directed Research in Archaeology and Prehistory",
+    "credits": 1.0,
+    "department": "ARCG"
+  },
+  {
+    "codes": [
+      "ARCG 9900"
+    ],
+    "name": "Dir Reading",
+    "credits": 1.0,
+    "department": "ARCG"
+  },
+  {
+    "codes": [
+      "ARCG 9901"
+    ],
+    "name": "Master's Thesis",
+    "credits": 1.0,
+    "department": "ARCG"
+  },
+  {
+    "codes": [
+      "ARCG 9950"
+    ],
+    "name": "Master's Essay",
+    "credits": 1.0,
+    "department": "ARCG"
+  },
+  {
+    "codes": [
+      "ARCG 1172",
+      "ARCG 172"
+    ],
+    "name": "Great Hoaxes and Fantasies in Archaeology",
+    "credits": 1.0,
+    "department": "ARCG"
+  },
+  {
+    "codes": [
+      "ARCG 2242"
+    ],
+    "name": "Ancient Egyptian Materials and Techniques: Their Histories and Socio-Economic Implications",
+    "credits": 1.0,
+    "department": "ARCG"
+  },
+  {
+    "codes": [
+      "ARCG 2294",
+      "ARCG 294"
+    ],
+    "name": "The Ancient Maya",
+    "credits": 1.0,
+    "department": "ARCG"
+  },
+  {
+    "codes": [
+      "ARCG 3075",
+      "ARCG 379"
+    ],
+    "name": "Anthropology of Mobile Societies",
+    "credits": 1.0,
+    "department": "ARCG"
+  },
+  {
+    "codes": [
+      "ARCG 3136",
+      "ARCG 336"
+    ],
+    "name": "Geoarchaeology",
+    "credits": 1.0,
+    "department": "ARCG"
+  },
+  {
+    "codes": [
+      "ARCG 3185",
+      "ARCG 385"
+    ],
+    "name": "Archaeological Ceramics",
+    "credits": 1.0,
+    "department": "ARCG"
+  },
+  {
+    "codes": [
+      "ARCG 3684"
+    ],
+    "name": "Zooarchaeology",
+    "credits": 1.0,
+    "department": "ARCG"
+  },
+  {
+    "codes": [
+      "ARCG 4101"
+    ],
+    "name": "Archaeological Plant Remains from East Asia and Beyond",
+    "credits": 1.0,
+    "department": "ARCG"
+  },
+  {
+    "codes": [
+      "ARCG 4292",
+      "ARCG 492"
+    ],
+    "name": "Imaging Ancient Worlds in Museum Collections",
+    "credits": 1.0,
+    "department": "ARCG"
+  },
+  {
+    "codes": [
+      "ARCG 4669"
+    ],
+    "name": "Evolution of Human Diet",
+    "credits": 1.0,
+    "department": "ARCG"
+  },
+  {
+    "codes": [
+      "ARCG 5328"
+    ],
+    "name": "Magic and Ritual in Ancient Egypt and the Near East",
+    "credits": 1.0,
+    "department": "ARCG"
+  },
+  {
+    "codes": [
+      "ARCG 6136",
+      "ARCG 636"
+    ],
+    "name": "Geoarchaeology: Earth and Environmental Sciences in Archaeological Investigations",
+    "credits": 1.0,
+    "department": "ARCG"
+  },
+  {
+    "codes": [
+      "ARCG 6242"
+    ],
+    "name": "Ancient Egyptian Materials and Techniques: Their Histories and Socioeconomic Implications",
+    "credits": 1.0,
+    "department": "ARCG"
+  },
+  {
+    "codes": [
+      "ARCG 7185",
+      "ARCG 785"
+    ],
+    "name": "Archaeological Ceramics I",
+    "credits": 1.0,
+    "department": "ARCG"
+  },
+  {
+    "codes": [
+      "ARCG 7259"
+    ],
+    "name": "Social Complexity in Ancient China",
+    "credits": 1.0,
+    "department": "ARCG"
+  },
+  {
+    "codes": [
+      "ARCG 7272",
+      "ARCG 772"
+    ],
+    "name": "Cities in Antiquity: The Archaeology of Urbanism",
+    "credits": 1.0,
+    "department": "ARCG"
+  },
+  {
+    "codes": [
       "IMED 5630",
       "IMED 630"
     ],
@@ -4613,6 +4894,83 @@
   },
   {
     "codes": [
+      "LATN 2003",
+      "LATN 131"
+    ],
+    "name": "Latin Prose: An Introduction",
+    "credits": 1.0,
+    "department": "LATN"
+  },
+  {
+    "codes": [
+      "LATN 3305"
+    ],
+    "name": "Early Rome from Aeneas to Romulus",
+    "credits": 1.0,
+    "department": "LATN"
+  },
+  {
+    "codes": [
+      "LATN 3315"
+    ],
+    "name": "Ovid's Poetic Career",
+    "credits": 1.0,
+    "department": "LATN"
+  },
+  {
+    "codes": [
+      "LATN 4465"
+    ],
+    "name": "Martial",
+    "credits": 1.0,
+    "department": "LATN"
+  },
+  {
+    "codes": [
+      "LATN 4525"
+    ],
+    "name": "Readings in Roman Environmental Thought",
+    "credits": 1.0,
+    "department": "LATN"
+  },
+  {
+    "codes": [
+      "LATN 1001",
+      "LATN 110"
+    ],
+    "name": "Beginning Latin: The Elements of Latin Grammar",
+    "credits": 1.5,
+    "department": "LATN"
+  },
+  {
+    "codes": [
+      "LATN 1012",
+      "LATN 125"
+    ],
+    "name": "Intensive Beginning Latin",
+    "credits": 2.0,
+    "department": "LATN"
+  },
+  {
+    "codes": [
+      "LATN 2004",
+      "LATN 141"
+    ],
+    "name": "Latin Poetry: An Introduction",
+    "credits": 1.0,
+    "department": "LATN"
+  },
+  {
+    "codes": [
+      "LATN 1002",
+      "LATN 120"
+    ],
+    "name": "Beginning Latin: Review of Grammar and Selected Readings",
+    "credits": 1.5,
+    "department": "LATN"
+  },
+  {
+    "codes": [
       "BENG 2080",
       "BENG 280"
     ],
@@ -6017,7 +6375,7 @@
       "CPSC 112"
     ],
     "name": "Introduction to Programming",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "CPSC"
   },
   {
@@ -6026,7 +6384,7 @@
       "CPSC 110"
     ],
     "name": "Python Programming for Humanities and Social Sciences",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "CPSC"
   },
   {
@@ -6035,7 +6393,7 @@
       "CPSC 123"
     ],
     "name": "YData: An Introduction to Data Science",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "CPSC"
   },
   {
@@ -6044,7 +6402,7 @@
       "CPSC 150"
     ],
     "name": "Computer Science and the Modern Intellectual Agenda",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "CPSC"
   },
   {
@@ -6053,7 +6411,7 @@
       "CPSC 171"
     ],
     "name": "Introduction to AI Applications",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "CPSC"
   },
   {
@@ -6062,7 +6420,7 @@
       "CPSC 183"
     ],
     "name": "Law, Technology, and Culture",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "CPSC"
   },
   {
@@ -6071,7 +6429,7 @@
       "CPSC 200"
     ],
     "name": "Introduction to Information Systems",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "CPSC"
   },
   {
@@ -6080,7 +6438,7 @@
       "CPSC 201"
     ],
     "name": "Introduction to Computer Science",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "CPSC"
   },
   {
@@ -6089,7 +6447,7 @@
       "CPSC 202"
     ],
     "name": "Mathematical Tools for Computer Science",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "CPSC"
   },
   {
@@ -6098,7 +6456,7 @@
       "CPSC 223"
     ],
     "name": "Data Structures and Programming Techniques",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "CPSC"
   },
   {
@@ -6106,7 +6464,7 @@
       "CPSC 2265"
     ],
     "name": "Topics in Critical Computing",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "CPSC"
   },
   {
@@ -6115,7 +6473,7 @@
       "CPSC 280"
     ],
     "name": "Directed Reading",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "CPSC"
   },
   {
@@ -6124,7 +6482,7 @@
       "CPSC 290"
     ],
     "name": "Directed Research",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "CPSC"
   },
   {
@@ -6133,7 +6491,7 @@
       "CPSC 323"
     ],
     "name": "Introduction to Systems Programming and Computer Organization",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "CPSC"
   },
   {
@@ -6142,7 +6500,7 @@
       "CPSC 327"
     ],
     "name": "Object-Oriented Programming",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "CPSC"
   },
   {
@@ -6151,7 +6509,7 @@
       "CPSC 334"
     ],
     "name": "Creative Embedded Systems",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "CPSC"
   },
   {
@@ -6160,7 +6518,7 @@
       "CPSC 365"
     ],
     "name": "Algorithms",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "CPSC"
   },
   {
@@ -6168,7 +6526,7 @@
       "CPSC 3700"
     ],
     "name": "Artificial Intelligence",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "CPSC"
   },
   {
@@ -6177,7 +6535,7 @@
       "CPSC 416"
     ],
     "name": "Lattices and Post-Quantum Cryptography",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "CPSC"
   },
   {
@@ -6186,7 +6544,7 @@
       "CPSC 419"
     ],
     "name": "Full Stack Web Programming",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "CPSC"
   },
   {
@@ -6195,7 +6553,7 @@
       "CPSC 421"
     ],
     "name": "Compilers and Interpreters",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "CPSC"
   },
   {
@@ -6203,7 +6561,7 @@
       "CPSC 4261"
     ],
     "name": "Building AI Infra Systems",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "CPSC"
   },
   {
@@ -6212,7 +6570,7 @@
       "CPSC 427"
     ],
     "name": "C++ Programming for Stability, Security, and Speed",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "CPSC"
   },
   {
@@ -6221,7 +6579,7 @@
       "CPSC 431"
     ],
     "name": "Computer Music: Algorithmic and Heuristic Composition",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "CPSC"
   },
   {
@@ -6230,7 +6588,7 @@
       "CPSC 437"
     ],
     "name": "Database Systems",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "CPSC"
   },
   {
@@ -6239,7 +6597,7 @@
       "CPSC 440"
     ],
     "name": "Database Design and Implementation",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "CPSC"
   },
   {
@@ -6247,7 +6605,7 @@
       "CPSC 4380"
     ],
     "name": "Big Data Systems: Trends & Challenges",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "CPSC"
   },
   {
@@ -6256,7 +6614,7 @@
       "CPSC 439"
     ],
     "name": "Software Engineering",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "CPSC"
   },
   {
@@ -6264,7 +6622,7 @@
       "CPSC 4410"
     ],
     "name": "Verifiable, Private, Decentralized Computing in the Age of AI",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "CPSC"
   },
   {
@@ -6272,7 +6630,7 @@
       "CPSC 4420"
     ],
     "name": "Theory of Computation",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "CPSC"
   },
   {
@@ -6281,7 +6639,7 @@
       "CPSC 446"
     ],
     "name": "Data and Information Visualization",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "CPSC"
   },
   {
@@ -6290,7 +6648,7 @@
       "CPSC 447"
     ],
     "name": "Introduction to Quantum Computing",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "CPSC"
   },
   {
@@ -6299,7 +6657,7 @@
       "CPSC 454"
     ],
     "name": "Software Analysis and Verification",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "CPSC"
   },
   {
@@ -6308,7 +6666,7 @@
       "CPSC 455"
     ],
     "name": "Algorithmic Game Theory",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "CPSC"
   },
   {
@@ -6317,7 +6675,7 @@
       "CPSC 459"
     ],
     "name": "Building Interactive Machines",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "CPSC"
   },
   {
@@ -6326,7 +6684,7 @@
       "CPSC 768"
     ],
     "name": "Scalable and Private Graph Algorithms",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "CPSC"
   },
   {
@@ -6335,7 +6693,7 @@
       "CPSC 464"
     ],
     "name": "Algorithms and their Societal Implications",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "CPSC"
   },
   {
@@ -6344,7 +6702,7 @@
       "CPSC 467"
     ],
     "name": "Introduction to Cryptography",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "CPSC"
   },
   {
@@ -6353,7 +6711,7 @@
       "CPSC 469"
     ],
     "name": "Randomized Algorithms",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "CPSC"
   },
   {
@@ -6362,7 +6720,7 @@
       "CPSC 471"
     ],
     "name": "Trustworthy Deep Learning",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "CPSC"
   },
   {
@@ -6371,7 +6729,7 @@
       "CPSC 474"
     ],
     "name": "Computational Intelligence for Games",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "CPSC"
   },
   {
@@ -6380,7 +6738,7 @@
       "CPSC 475"
     ],
     "name": "Computational Vision and Biological Perception",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "CPSC"
   },
   {
@@ -6389,7 +6747,7 @@
       "CPSC 411"
     ],
     "name": "Building Game Engines",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "CPSC"
   },
   {
@@ -6397,7 +6755,7 @@
       "CPSC 4794"
     ],
     "name": "Applied Computational Geometry Programming",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "CPSC"
   },
   {
@@ -6405,7 +6763,7 @@
       "CPSC 4800"
     ],
     "name": "Introduction to Computer Vision",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "CPSC"
   },
   {
@@ -6413,7 +6771,7 @@
       "CPSC 4850"
     ],
     "name": "Applied Planning and Optimization",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "CPSC"
   },
   {
@@ -6422,7 +6780,7 @@
       "CPSC 490"
     ],
     "name": "Senior Project",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "CPSC"
   },
   {
@@ -6430,7 +6788,7 @@
       "CPSC 5380"
     ],
     "name": "Big Data Systems: Trends and Challenges",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "CPSC"
   },
   {
@@ -6439,7 +6797,7 @@
       "CPSC 611"
     ],
     "name": "Topics in Computer Science and Global Affairs",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "CPSC"
   },
   {
@@ -6447,7 +6805,7 @@
       "CPSC 6130"
     ],
     "name": "Digital Identity Infrastructure",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "CPSC"
   },
   {
@@ -6455,7 +6813,7 @@
       "CPSC 6440"
     ],
     "name": "Geometric and Topological Methods in Machine Learning",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "CPSC"
   },
   {
@@ -6464,7 +6822,7 @@
       "CPSC 690"
     ],
     "name": "Independent Project I",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "CPSC"
   },
   {
@@ -6473,7 +6831,7 @@
       "CPSC 691"
     ],
     "name": "Independent Project II",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "CPSC"
   },
   {
@@ -6482,7 +6840,7 @@
       "CPSC 692"
     ],
     "name": "Independent Project",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "CPSC"
   },
   {
@@ -6491,7 +6849,7 @@
       "CPSC 693"
     ],
     "name": "MS Thesis Research I",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "CPSC"
   },
   {
@@ -6499,34 +6857,7 @@
       "CPSC 6940"
     ],
     "name": "MS Thesis Research II",
-    "credits": 0.5,
-    "department": "CPSC"
-  },
-  {
-    "codes": [
-      "CPSC 9900",
-      "CPSC 990"
-    ],
-    "name": "Ethical Conduct of Research for Master’s Students",
-    "credits": 0.5,
-    "department": "CPSC"
-  },
-  {
-    "codes": [
-      "CPSC 9910",
-      "CPSC 991"
-    ],
-    "name": "Ethical Conduct of Research",
-    "credits": 0.5,
-    "department": "CPSC"
-  },
-  {
-    "codes": [
-      "CPSC 9920",
-      "CPSC 992"
-    ],
-    "name": "Academic Writing",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "CPSC"
   },
   {
@@ -6535,7 +6866,7 @@
       "CPSC 035"
     ],
     "name": "Twenty-First Century Electronic and Computer Music Techniques",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "CPSC"
   },
   {
@@ -6544,7 +6875,7 @@
       "CPSC 184"
     ],
     "name": "Intellectual Property in the Digital Age",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "CPSC"
   },
   {
@@ -6553,7 +6884,7 @@
       "CPSC 185"
     ],
     "name": "Control, Privacy, and Technology",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "CPSC"
   },
   {
@@ -6561,7 +6892,7 @@
       "CPSC 2155"
     ],
     "name": "Artificial Intelligence, Ethics, and Society",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "CPSC"
   },
   {
@@ -6570,7 +6901,7 @@
       "CPSC 338"
     ],
     "name": "Digital Systems",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "CPSC"
   },
   {
@@ -6579,7 +6910,7 @@
       "CPSC 366"
     ],
     "name": "Intensive Algorithms",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "CPSC"
   },
   {
@@ -6588,7 +6919,7 @@
       "CPSC 413"
     ],
     "name": "Computer System Security",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "CPSC"
   },
   {
@@ -6596,7 +6927,7 @@
       "CPSC 4150"
     ],
     "name": "Law and Large Language Models",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "CPSC"
   },
   {
@@ -6605,7 +6936,7 @@
       "CPSC 420"
     ],
     "name": "Computer Architecture",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "CPSC"
   },
   {
@@ -6614,7 +6945,7 @@
       "CPSC 422"
     ],
     "name": "Design and Implementation of Operating Systems",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "CPSC"
   },
   {
@@ -6622,7 +6953,7 @@
       "CPSC 4240"
     ],
     "name": "Parallel Programming Techniques",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "CPSC"
   },
   {
@@ -6631,7 +6962,7 @@
       "CPSC 432"
     ],
     "name": "Computer Music: Sound Representation and Synthesis",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "CPSC"
   },
   {
@@ -6640,7 +6971,7 @@
       "CPSC 433"
     ],
     "name": "Computer Networks",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "CPSC"
   },
   {
@@ -6649,7 +6980,7 @@
       "CPSC 435"
     ],
     "name": "Building an Internet Router",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "CPSC"
   },
   {
@@ -6657,7 +6988,7 @@
       "CPSC 4391"
     ],
     "name": "Advanced Software Engineering",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "CPSC"
   },
   {
@@ -6665,7 +6996,7 @@
       "CPSC 4440"
     ],
     "name": "Real-World Cryptography",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "CPSC"
   },
   {
@@ -6674,7 +7005,7 @@
       "CPSC 449"
     ],
     "name": "Quantum Information Systems",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "CPSC"
   },
   {
@@ -6682,7 +7013,7 @@
       "CPSC 4510"
     ],
     "name": "The User Interface",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "CPSC"
   },
   {
@@ -6691,7 +7022,7 @@
       "CPSC 452"
     ],
     "name": "Deep Learning Theory and Applications",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "CPSC"
   },
   {
@@ -6700,7 +7031,7 @@
       "CPSC 458"
     ],
     "name": "Automated Decision Systems",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "CPSC"
   },
   {
@@ -6708,7 +7039,7 @@
       "CPSC 4630"
     ],
     "name": "Algorithms via Convex Optimization",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "CPSC"
   },
   {
@@ -6716,7 +7047,7 @@
       "CPSC 4650"
     ],
     "name": "Theory of Distributed Systems",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "CPSC"
   },
   {
@@ -6724,7 +7055,7 @@
       "CPSC 4660"
     ],
     "name": "Web3, Blockchains, and Cryptocurrencies",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "CPSC"
   },
   {
@@ -6733,7 +7064,7 @@
       "CPSC 417"
     ],
     "name": "Advanced Topics in Cryptography: Cryptography and Computation",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "CPSC"
   },
   {
@@ -6742,7 +7073,7 @@
       "CPSC 468"
     ],
     "name": "Computational Complexity",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "CPSC"
   },
   {
@@ -6751,7 +7082,7 @@
       "CPSC 477"
     ],
     "name": "Natural Language Processing",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "CPSC"
   },
   {
@@ -6760,7 +7091,7 @@
       "CPSC 478"
     ],
     "name": "Computer Graphics",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "CPSC"
   },
   {
@@ -6769,7 +7100,7 @@
       "CPSC 479"
     ],
     "name": "Advanced Topics in Computer Graphics",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "CPSC"
   },
   {
@@ -6777,7 +7108,7 @@
       "CPSC 4792"
     ],
     "name": "Real-Time 3D Computer Graphics Programming",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "CPSC"
   },
   {
@@ -6786,7 +7117,7 @@
       "CPSC 483"
     ],
     "name": "Deep Learning on Graph-Structured Data",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "CPSC"
   },
   {
@@ -6795,7 +7126,7 @@
       "CPSC 484"
     ],
     "name": "Introduction to Human-Computer Interaction",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "CPSC"
   },
   {
@@ -6804,7 +7135,7 @@
       "CPSC 487"
     ],
     "name": "3D Spatial Modeling and Computing",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "CPSC"
   },
   {
@@ -6813,7 +7144,7 @@
       "CPSC 489"
     ],
     "name": "Robot Learning",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "CPSC"
   },
   {
@@ -6822,7 +7153,7 @@
       "CPSC 522"
     ],
     "name": "Operating Systems",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "CPSC"
   },
   {
@@ -6831,7 +7162,7 @@
       "CPSC 381"
     ],
     "name": "Introduction to Machine Learning",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "CPSC"
   },
   {
@@ -6840,7 +7171,7 @@
       "CPSC 486"
     ],
     "name": "Probabilistic Machine Learning",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "CPSC"
   },
   {
@@ -6849,7 +7180,7 @@
       "CPSC 612"
     ],
     "name": "Topics in Algorithmic Game Theory",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "CPSC"
   },
   {
@@ -6858,7 +7189,7 @@
       "CPSC 640"
     ],
     "name": "Topics in Numerical Computation",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "CPSC"
   },
   {
@@ -6867,7 +7198,7 @@
       "CPSC 752"
     ],
     "name": "Biomedical Data Science: Mining and Modeling",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "CPSC"
   },
   {
@@ -6876,7 +7207,7 @@
       "CPSC 776"
     ],
     "name": "Topics in Industrial AI Applications",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "CPSC"
   },
   {
@@ -9853,6 +10184,441 @@
     "name": "Entertainment Law",
     "credits": 1.0,
     "department": "CSMY"
+  },
+  {
+    "codes": [
+      "ASTR 1550",
+      "ASTR 155"
+    ],
+    "name": "Introduction to Astronomical Observing",
+    "credits": 0.5,
+    "department": "ASTR"
+  },
+  {
+    "codes": [
+      "ASTR 0400",
+      "ASTR 040"
+    ],
+    "name": "Expanding Ideas of Time and Space",
+    "credits": 1.0,
+    "department": "ASTR"
+  },
+  {
+    "codes": [
+      "ASTR 1100",
+      "ASTR 110"
+    ],
+    "name": "Planets and Stars",
+    "credits": 1.0,
+    "department": "ASTR"
+  },
+  {
+    "codes": [
+      "ASTR 1800",
+      "ASTR 180"
+    ],
+    "name": "Introduction to Relativity and Black Holes",
+    "credits": 1.0,
+    "department": "ASTR"
+  },
+  {
+    "codes": [
+      "ASTR 2100",
+      "ASTR 210"
+    ],
+    "name": "Stars and Their Evolution",
+    "credits": 1.0,
+    "department": "ASTR"
+  },
+  {
+    "codes": [
+      "ASTR 2550",
+      "ASTR 255"
+    ],
+    "name": "Research Methods in Astrophysics",
+    "credits": 1.0,
+    "department": "ASTR"
+  },
+  {
+    "codes": [
+      "ASTR 3550",
+      "ASTR 355"
+    ],
+    "name": "Observational Astronomy",
+    "credits": 1.0,
+    "department": "ASTR"
+  },
+  {
+    "codes": [
+      "ASTR 3560",
+      "ASTR 356"
+    ],
+    "name": "Astrostatistics and Data Mining",
+    "credits": 1.0,
+    "department": "ASTR"
+  },
+  {
+    "codes": [
+      "ASTR 3850",
+      "ASTR 385"
+    ],
+    "name": "Introduction to Radio Astronomy",
+    "credits": 1.0,
+    "department": "ASTR"
+  },
+  {
+    "codes": [
+      "ASTR 4200",
+      "ASTR 420"
+    ],
+    "name": "Computational Methods for Astrophysics",
+    "credits": 1.0,
+    "department": "ASTR"
+  },
+  {
+    "codes": [
+      "ASTR 4710",
+      "ASTR 472"
+    ],
+    "name": "Independent Project in Astronomy",
+    "credits": 1.0,
+    "department": "ASTR"
+  },
+  {
+    "codes": [
+      "ASTR 4900",
+      "ASTR 491"
+    ],
+    "name": "The Two-Term Senior Project",
+    "credits": 1.0,
+    "department": "ASTR"
+  },
+  {
+    "codes": [
+      "ASTR 4920",
+      "ASTR 492"
+    ],
+    "name": "The One-Term Senior Project",
+    "credits": 1.0,
+    "department": "ASTR"
+  },
+  {
+    "codes": [
+      "ASTR 5010"
+    ],
+    "name": "Dynamics of Astrophysical Many-Body Systems",
+    "credits": 1.0,
+    "department": "ASTR"
+  },
+  {
+    "codes": [
+      "ASTR 5200",
+      "ASTR 520"
+    ],
+    "name": "Computational Methods in Astrophysics and Geophysics",
+    "credits": 1.0,
+    "department": "ASTR"
+  },
+  {
+    "codes": [
+      "ASTR 7100",
+      "ASTR 711"
+    ],
+    "name": "Professional Seminar",
+    "credits": 1.0,
+    "department": "ASTR"
+  },
+  {
+    "codes": [
+      "ASTR 7460"
+    ],
+    "name": "Global Properties of Nonlinear Relativistic Fields",
+    "credits": 1.0,
+    "department": "ASTR"
+  },
+  {
+    "codes": [
+      "ASTR 0300"
+    ],
+    "name": "Search for Extraterrestrial Life",
+    "credits": 1.0,
+    "department": "ASTR"
+  },
+  {
+    "codes": [
+      "ASTR 1200",
+      "ASTR 120"
+    ],
+    "name": "Galaxies and the Universe",
+    "credits": 1.0,
+    "department": "ASTR"
+  },
+  {
+    "codes": [
+      "ASTR 1700",
+      "ASTR 170"
+    ],
+    "name": "Introduction to Cosmology",
+    "credits": 1.0,
+    "department": "ASTR"
+  },
+  {
+    "codes": [
+      "ASTR 3100",
+      "ASTR 310"
+    ],
+    "name": "Galactic and Extragalactic Astronomy",
+    "credits": 1.0,
+    "department": "ASTR"
+  },
+  {
+    "codes": [
+      "ASTR 3200"
+    ],
+    "name": "Physical Processes in Astronomy",
+    "credits": 1.0,
+    "department": "ASTR"
+  },
+  {
+    "codes": [
+      "ASTR 3800",
+      "ASTR 380"
+    ],
+    "name": "Stellar Populations",
+    "credits": 1.0,
+    "department": "ASTR"
+  },
+  {
+    "codes": [
+      "ASTR 4000"
+    ],
+    "name": "Orbital Mechanics and Mission Design",
+    "credits": 1.0,
+    "department": "ASTR"
+  },
+  {
+    "codes": [
+      "ASTR 5000",
+      "ASTR 500"
+    ],
+    "name": "The Physics of Astrophysics",
+    "credits": 1.0,
+    "department": "ASTR"
+  },
+  {
+    "codes": [
+      "ASTR 5650",
+      "ASTR 465"
+    ],
+    "name": "The Evolving Universe",
+    "credits": 1.0,
+    "department": "ASTR"
+  },
+  {
+    "codes": [
+      "ASTR 5700",
+      "ASTR 570"
+    ],
+    "name": "High-Energy Astrophysics",
+    "credits": 1.0,
+    "department": "ASTR"
+  },
+  {
+    "codes": [
+      "ASTR 6000"
+    ],
+    "name": "Cosmology",
+    "credits": 1.0,
+    "department": "ASTR"
+  },
+  {
+    "codes": [
+      "CENG 1200"
+    ],
+    "name": "Introduction to Environmental Engineering",
+    "credits": 1.0,
+    "department": "CENG"
+  },
+  {
+    "codes": [
+      "CENG 2100",
+      "CENG 210"
+    ],
+    "name": "Principles of Chemical Engineering and Process Modeling",
+    "credits": 1.0,
+    "department": "CENG"
+  },
+  {
+    "codes": [
+      "CENG 3140",
+      "CENG 314"
+    ],
+    "name": "Transport Phenomena I",
+    "credits": 1.0,
+    "department": "CENG"
+  },
+  {
+    "codes": [
+      "CENG 3730",
+      "CENG 373"
+    ],
+    "name": "Air Pollution Control",
+    "credits": 1.0,
+    "department": "CENG"
+  },
+  {
+    "codes": [
+      "CENG 4110",
+      "CENG 411"
+    ],
+    "name": "Separation and Purification Processes",
+    "credits": 1.0,
+    "department": "CENG"
+  },
+  {
+    "codes": [
+      "CENG 4710",
+      "CENG 471"
+    ],
+    "name": "Independent Research",
+    "credits": 1.0,
+    "department": "CENG"
+  },
+  {
+    "codes": [
+      "CENG 4800",
+      "CENG 480"
+    ],
+    "name": "Chemical Engineering Process Control",
+    "credits": 1.0,
+    "department": "CENG"
+  },
+  {
+    "codes": [
+      "CENG 4900",
+      "CENG 490"
+    ],
+    "name": "Senior Research Project",
+    "credits": 1.0,
+    "department": "CENG"
+  },
+  {
+    "codes": [
+      "CENG 6020"
+    ],
+    "name": "Chemical Reaction Engineering",
+    "credits": 1.0,
+    "department": "CENG"
+  },
+  {
+    "codes": [
+      "CENG 6050"
+    ],
+    "name": "Colloid Science and Engineering",
+    "credits": 1.0,
+    "department": "CENG"
+  },
+  {
+    "codes": [
+      "CENG 6090"
+    ],
+    "name": "Principles and Design of Energy Devices",
+    "credits": 1.0,
+    "department": "CENG"
+  },
+  {
+    "codes": [
+      "CENG 6150"
+    ],
+    "name": "Synthesis of Nanomaterials",
+    "credits": 1.0,
+    "department": "CENG"
+  },
+  {
+    "codes": [
+      "CENG 6200"
+    ],
+    "name": "Fundamentals of Molecular Modeling",
+    "credits": 1.0,
+    "department": "CENG"
+  },
+  {
+    "codes": [
+      "CENG 3010",
+      "CENG 301"
+    ],
+    "name": "Chemical Kinetics and Chemical Reactors",
+    "credits": 1.0,
+    "department": "CENG"
+  },
+  {
+    "codes": [
+      "CENG 3150",
+      "CENG 315"
+    ],
+    "name": "Transport Phenomena II",
+    "credits": 1.0,
+    "department": "CENG"
+  },
+  {
+    "codes": [
+      "CENG 3450",
+      "CENG 345"
+    ],
+    "name": "Principles and Applications of Interfacial Phenomena",
+    "credits": 1.0,
+    "department": "CENG"
+  },
+  {
+    "codes": [
+      "CENG 3770",
+      "CENG 377"
+    ],
+    "name": "Water-Energy Nexus",
+    "credits": 1.0,
+    "department": "CENG"
+  },
+  {
+    "codes": [
+      "CENG 4120L",
+      "CENG 412L"
+    ],
+    "name": "Chemical Engineering Laboratory and Design",
+    "credits": 1.0,
+    "department": "CENG"
+  },
+  {
+    "codes": [
+      "CENG 4160",
+      "CENG 416"
+    ],
+    "name": "Chemical Engineering Process Design",
+    "credits": 1.0,
+    "department": "CENG"
+  },
+  {
+    "codes": [
+      "CENG 5210"
+    ],
+    "name": "Classical and Statistical Thermodynamics",
+    "credits": 1.0,
+    "department": "CENG"
+  },
+  {
+    "codes": [
+      "CENG 6030"
+    ],
+    "name": "Energy, Mass, and Momentum Processes",
+    "credits": 1.0,
+    "department": "CENG"
+  },
+  {
+    "codes": [
+      "CENG 6140"
+    ],
+    "name": "Surface and Thin Film Characterization",
+    "credits": 1.0,
+    "department": "CENG"
   },
   {
     "codes": [
@@ -13033,18 +13799,9 @@
   {
     "codes": [
       "PHYS 1650L",
-      "PHYS 165L"
-    ],
-    "name": "General Physics Laboratory I",
-    "credits": 0.5,
-    "department": "PHYS"
-  },
-  {
-    "codes": [
-      "PHYS 1660L",
       "PHYS 166L"
     ],
-    "name": "General Physics Laboratory II",
+    "name": "General Physics Laboratory",
     "credits": 0.5,
     "department": "PHYS"
   },
@@ -13053,16 +13810,7 @@
       "PHYS 2050L",
       "PHYS 205L"
     ],
-    "name": "Modern Physical Measurement I",
-    "credits": 0.5,
-    "department": "PHYS"
-  },
-  {
-    "codes": [
-      "PHYS 2060L",
-      "PHYS 206L"
-    ],
-    "name": "Modern Physical Measurement II",
+    "name": "Modern Physical Measurement",
     "credits": 0.5,
     "department": "PHYS"
   },
@@ -13120,9 +13868,18 @@
   {
     "codes": [
       "PHYS 1700",
+      "PHYS 170"
+    ],
+    "name": "University Physics for the Life Sciences I",
+    "credits": 1.0,
+    "department": "PHYS"
+  },
+  {
+    "codes": [
+      "PHYS 1710",
       "PHYS 171"
     ],
-    "name": "University Physics for the Life Sciences",
+    "name": "University Physics for the Life Sciences II",
     "credits": 1.0,
     "department": "PHYS"
   },
@@ -13149,7 +13906,7 @@
       "PHYS 2000",
       "PHYS 200"
     ],
-    "name": "Fundamentals of Physics",
+    "name": "Fundamentals of Physics I",
     "credits": 1.0,
     "department": "PHYS"
   },
@@ -13176,7 +13933,7 @@
       "PHYS 2610",
       "PHYS 261"
     ],
-    "name": "Intensive Introductory Physics I",
+    "name": "Intensive Introductory Physics II",
     "credits": 1.0,
     "department": "PHYS"
   },
@@ -13697,7 +14454,7 @@
       "EENG 200"
     ],
     "name": "Introduction to Electronics",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "ECE"
   },
   {
@@ -13706,7 +14463,7 @@
       "EENG 202"
     ],
     "name": "Introduction to Communications and Control",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "ECE"
   },
   {
@@ -13724,7 +14481,7 @@
       "EENG 320"
     ],
     "name": "Semiconductor Devices",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "ECE"
   },
   {
@@ -13733,7 +14490,7 @@
       "EENG 325"
     ],
     "name": "Microelectronic Circuits",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "ECE"
   },
   {
@@ -13741,7 +14498,7 @@
       "ECE 4250"
     ],
     "name": "Introduction to VLSI System Design",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "ECE"
   },
   {
@@ -13750,7 +14507,7 @@
       "EENG 432"
     ],
     "name": "Linear Systems",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "ECE"
   },
   {
@@ -13759,7 +14516,7 @@
       "EENG 439"
     ],
     "name": "Neural Networks and Learning Systems",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "ECE"
   },
   {
@@ -13768,7 +14525,7 @@
       "EENG 450"
     ],
     "name": "Applied Digital Signal Processing",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "ECE"
   },
   {
@@ -13777,7 +14534,7 @@
       "EENG 452"
     ],
     "name": "Internet Engineering",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "ECE"
   },
   {
@@ -13786,7 +14543,7 @@
       "EENG 469"
     ],
     "name": "Advanced Special Projects",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "ECE"
   },
   {
@@ -13795,7 +14552,7 @@
       "EENG 472"
     ],
     "name": "Senior Advanced Special Projects",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "ECE"
   },
   {
@@ -13804,7 +14561,7 @@
       "EENG 475"
     ],
     "name": "Computational Vision and Biological Perception",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "ECE"
   },
   {
@@ -13812,7 +14569,7 @@
       "ECE 8400"
     ],
     "name": "Detection and Estimation",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "ECE"
   },
   {
@@ -13820,7 +14577,7 @@
       "ECE 8680"
     ],
     "name": "Emerging Materials and Technologies toward Sustainability",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "ECE"
   },
   {
@@ -13828,7 +14585,7 @@
       "ECE 8880"
     ],
     "name": "FPGA-Based Accelerator Design and Implementation",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "ECE"
   },
   {
@@ -13836,7 +14593,7 @@
       "ECE 9051"
     ],
     "name": "Applied Digital Signal Process",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "ECE"
   },
   {
@@ -13844,7 +14601,7 @@
       "ECE 9100"
     ],
     "name": "Topics in Denoising and Structure Recovery from Data",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "ECE"
   },
   {
@@ -13852,7 +14609,7 @@
       "ECE 9500"
     ],
     "name": "How to Wirelessly Sense Almost Anything",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "ECE"
   },
   {
@@ -13861,7 +14618,7 @@
       "EENG 990"
     ],
     "name": "Special Investigations",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "ECE"
   },
   {
@@ -13870,7 +14627,7 @@
       "EENG 201"
     ],
     "name": "Introduction to Computer Engineering",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "ECE"
   },
   {
@@ -13879,7 +14636,7 @@
       "EENG 203"
     ],
     "name": "Circuits and Systems Design",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "ECE"
   },
   {
@@ -13888,7 +14645,7 @@
       "EENG 310"
     ],
     "name": "Signals and Systems",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "ECE"
   },
   {
@@ -13897,7 +14654,7 @@
       "EENG 348"
     ],
     "name": "Digital Systems",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "ECE"
   },
   {
@@ -13906,7 +14663,7 @@
       "EENG 402"
     ],
     "name": "Advanced Electron Devices",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "ECE"
   },
   {
@@ -13914,7 +14671,7 @@
       "ECE 4061"
     ],
     "name": "Photovoltaic Energy",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "ECE"
   },
   {
@@ -13923,7 +14680,7 @@
       "EENG 420"
     ],
     "name": "Computer Architecture",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "ECE"
   },
   {
@@ -13932,7 +14689,7 @@
       "EENG 455"
     ],
     "name": "Network Algorithms and Stochastic Optimization",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "ECE"
   },
   {
@@ -13941,7 +14698,7 @@
       "EENG 481"
     ],
     "name": "Advanced ABET Projects",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "ECE"
   },
   {
@@ -13950,7 +14707,7 @@
       "EENG 434"
     ],
     "name": "Stochastic Processes",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "ECE"
   },
   {
@@ -13958,7 +14715,7 @@
       "ECE 7181"
     ],
     "name": "Advanced Electronic Devices",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "ECE"
   },
   {
@@ -13967,7 +14724,7 @@
       "EENG 435"
     ],
     "name": "Decisions and Computations across Networks",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "ECE"
   },
   {
@@ -14803,22 +15560,149 @@
     "department": "PLSC"
   },
   {
-    "codes": [
-      "YDSH 1100",
-      "YDSH 110"
-    ],
-    "name": "Elementary Yiddish I",
-    "credits": 1.5,
-    "department": "YDSH"
-  },
-  {
-    "codes": [
-      "YDSH 1300",
-      "YDSH 130"
-    ],
-    "name": "Intermediate Yiddish I",
-    "credits": 1.5,
-    "department": "YDSH"
+    "ART_BA": {
+      "id": "ART_BA",
+      "name": "Art, B.A.",
+      "description": "Bachelor of Arts in Art (Studio Art)",
+      "creditRequirements": {
+        "total": 14
+      },
+      "requirements": [
+        {
+          "name": "Visual Thinking",
+          "required": 1,
+          "options": [
+            {
+              "type": "course",
+              "code": "ART 1111"
+            }
+          ]
+        },
+        {
+          "name": "Basic Drawing",
+          "required": 1,
+          "options": [
+            {
+              "type": "course",
+              "code": "ART 1514"
+            }
+          ]
+        },
+        {
+          "name": "Introductory Courses (0001-1999, excluding ART 1111 and 1514)",
+          "required": 3,
+          "options": [
+            {
+              "type": "course",
+              "code": "ART 0610"
+            },
+            {
+              "type": "course",
+              "code": "ART 0615"
+            },
+            {
+              "type": "course",
+              "code": "ART 0706"
+            },
+            {
+              "type": "course",
+              "code": "ART 1516"
+            },
+            {
+              "type": "course",
+              "code": "ART 1530"
+            },
+            {
+              "type": "course",
+              "code": "ART 1610"
+            },
+            {
+              "type": "course",
+              "code": "ART 1620"
+            },
+            {
+              "type": "course",
+              "code": "ART 1621"
+            },
+            {
+              "type": "course",
+              "code": "ART 1732"
+            },
+            {
+              "type": "course",
+              "code": "ART 1745"
+            },
+            {
+              "type": "course",
+              "code": "ART 1784"
+            },
+            {
+              "type": "course",
+              "code": "ART 1836"
+            },
+            {
+              "type": "course",
+              "code": "ART 1838"
+            },
+            {
+              "type": "course",
+              "code": "ART 1942"
+            },
+            {
+              "type": "course",
+              "code": "ART 1985"
+            }
+          ]
+        },
+        {
+          "name": "2000-level or Above Studio Art",
+          "description": "Any ART course numbered 2000 or above",
+          "required": 4,
+          "options": []
+        },
+        {
+          "name": "History of Art Courses",
+          "required": 2,
+          "options": []
+        },
+        {
+          "name": "Junior Seminar",
+          "required": 1,
+          "options": [
+            {
+              "type": "course",
+              "code": "ART 3995"
+            }
+          ]
+        },
+        {
+          "name": "Senior Project I",
+          "required": 1,
+          "options": [
+            {
+              "type": "course",
+              "code": "ART 4995"
+            }
+          ]
+        },
+        {
+          "name": "Senior Project II",
+          "required": 1,
+          "options": [
+            {
+              "type": "course",
+              "code": "ART 4996"
+            }
+          ]
+        },
+        {
+          "name": "Area of Concentration (Graphic Design, Painting/Printmaking, Photography, Sculpture, or Filmmaking)",
+          "description": "Five courses from chosen area of concentration; see DUS and guidelines for recommended options.",
+          "required": 5,
+          "options": []
+        }
+      ]
+    }
   },
   {
     "codes": [
@@ -15306,6 +16190,492 @@
   },
   {
     "codes": [
+      "CPLT 0290"
+    ],
+    "name": "Literatures of Canada: Colony, Nation, Postcolony",
+    "credits": 1.0,
+    "department": "CPLT"
+  },
+  {
+    "codes": [
+      "CPLT 0310"
+    ],
+    "name": "Six Global Perspectives on Poetry",
+    "credits": 1.0,
+    "department": "CPLT"
+  },
+  {
+    "codes": [
+      "CPLT 1010"
+    ],
+    "name": "Writing Literature: Doubles, Doppelgängers, and the Boundaries of the Self",
+    "credits": 1.0,
+    "department": "CPLT"
+  },
+  {
+    "codes": [
+      "CPLT 1300"
+    ],
+    "name": "Fundamentals of Comparison",
+    "credits": 1.0,
+    "department": "CPLT"
+  },
+  {
+    "codes": [
+      "CPLT 1540"
+    ],
+    "name": "The Bible as a Literature",
+    "credits": 1.0,
+    "department": "CPLT"
+  },
+  {
+    "codes": [
+      "CPLT 1680"
+    ],
+    "name": "Tragedy in the European Literary Tradition",
+    "credits": 1.0,
+    "department": "CPLT"
+  },
+  {
+    "codes": [
+      "CPLT 1690"
+    ],
+    "name": "Epic in the European Literary Tradition",
+    "credits": 1.0,
+    "department": "CPLT"
+  },
+  {
+    "codes": [
+      "CPLT 1830"
+    ],
+    "name": "Dante in Translation",
+    "credits": 1.0,
+    "department": "CPLT"
+  },
+  {
+    "codes": [
+      "CPLT 1950"
+    ],
+    "name": "Medieval Songlines",
+    "credits": 1.0,
+    "department": "CPLT"
+  },
+  {
+    "codes": [
+      "CPLT 2000"
+    ],
+    "name": "From Gilgamesh to Persepolis: Introduction to Near Eastern Literatures",
+    "credits": 1.0,
+    "department": "CPLT"
+  },
+  {
+    "codes": [
+      "CPLT 2005"
+    ],
+    "name": "Memory and Memoir in Russian Culture",
+    "credits": 1.0,
+    "department": "CPLT"
+  },
+  {
+    "codes": [
+      "CPLT 2180"
+    ],
+    "name": "Medicine and the Humanities: Certainty and Unknowing",
+    "credits": 1.0,
+    "department": "CPLT"
+  },
+  {
+    "codes": [
+      "CPLT 2190"
+    ],
+    "name": "The Waste Land",
+    "credits": 1.0,
+    "department": "CPLT"
+  },
+  {
+    "codes": [
+      "CPLT 2560",
+      "CPLT 657"
+    ],
+    "name": "Clarice Lispector: The Short Stories",
+    "credits": 1.0,
+    "department": "CPLT"
+  },
+  {
+    "codes": [
+      "CPLT 2607"
+    ],
+    "name": "East/West European New Waves: Life and Revolution in the 1960s",
+    "credits": 1.0,
+    "department": "CPLT"
+  },
+  {
+    "codes": [
+      "CPLT 2900"
+    ],
+    "name": "Machado de Assis: Major Novels",
+    "credits": 1.0,
+    "department": "CPLT"
+  },
+  {
+    "codes": [
+      "CPLT 3000"
+    ],
+    "name": "Introduction to Theory of Literature",
+    "credits": 1.0,
+    "department": "CPLT"
+  },
+  {
+    "codes": [
+      "CPLT 3006"
+    ],
+    "name": "Translating Theory",
+    "credits": 1.0,
+    "department": "CPLT"
+  },
+  {
+    "codes": [
+      "CPLT 3042"
+    ],
+    "name": "Introduction to Jewish Literatures",
+    "credits": 1.0,
+    "department": "CPLT"
+  },
+  {
+    "codes": [
+      "CPLT 3048",
+      "CPLT 925"
+    ],
+    "name": "The Practice of Literary Translation",
+    "credits": 1.0,
+    "department": "CPLT"
+  },
+  {
+    "codes": [
+      "CPLT 3049"
+    ],
+    "name": "Tragedy and Drama of Reconciliation",
+    "credits": 1.0,
+    "department": "CPLT"
+  },
+  {
+    "codes": [
+      "CPLT 3065"
+    ],
+    "name": "Bad Books",
+    "credits": 1.0,
+    "department": "CPLT"
+  },
+  {
+    "codes": [
+      "CPLT 3180"
+    ],
+    "name": "Artificial Life: (Re)Production and the Limits of Humanity",
+    "credits": 1.0,
+    "department": "CPLT"
+  },
+  {
+    "codes": [
+      "CPLT 3351"
+    ],
+    "name": "The Nigerian ‘Video Novel’ and Nollywood",
+    "credits": 1.0,
+    "department": "CPLT"
+  },
+  {
+    "codes": [
+      "CPLT 3385"
+    ],
+    "name": "Hemispheric Poetics & Politics",
+    "credits": 1.0,
+    "department": "CPLT"
+  },
+  {
+    "codes": [
+      "CPLT 3401"
+    ],
+    "name": "The Stranger: Travel and Belonging Across Empires",
+    "credits": 1.0,
+    "department": "CPLT"
+  },
+  {
+    "codes": [
+      "CPLT 3450"
+    ],
+    "name": "Climate Change and the Humanities",
+    "credits": 1.0,
+    "department": "CPLT"
+  },
+  {
+    "codes": [
+      "CPLT 3500"
+    ],
+    "name": "Uwe Johnson's Anniversaries: From A Year in the Life of Gesine Cresspahl",
+    "credits": 1.0,
+    "department": "CPLT"
+  },
+  {
+    "codes": [
+      "CPLT 3565"
+    ],
+    "name": "Staging Early Iberian Drama",
+    "credits": 1.0,
+    "department": "CPLT"
+  },
+  {
+    "codes": [
+      "CPLT 3880"
+    ],
+    "name": "The Education of Princes: Medieval Advice Literature of Rulership and Counsel",
+    "credits": 1.0,
+    "department": "CPLT"
+  },
+  {
+    "codes": [
+      "CPLT 3891"
+    ],
+    "name": "Introduction to Critical Sleep Studies: The Politics of Sleep and Sleeplessness",
+    "credits": 1.0,
+    "department": "CPLT"
+  },
+  {
+    "codes": [
+      "CPLT 3940"
+    ],
+    "name": "Weimar Cinema",
+    "credits": 1.0,
+    "department": "CPLT"
+  },
+  {
+    "codes": [
+      "CPLT 4230"
+    ],
+    "name": "Politics and Literature in Modern Iran and Afghanistan",
+    "credits": 1.0,
+    "department": "CPLT"
+  },
+  {
+    "codes": [
+      "CPLT 4910"
+    ],
+    "name": "The Senior Essay",
+    "credits": 1.0,
+    "department": "CPLT"
+  },
+  {
+    "codes": [
+      "CPLT 4920"
+    ],
+    "name": "The Yearlong Senior Essay",
+    "credits": 1.0,
+    "department": "CPLT"
+  },
+  {
+    "codes": [
+      "CPLT 5004",
+      "CPLT 504"
+    ],
+    "name": "Proseminar in Translation Studies",
+    "credits": 1.0,
+    "department": "CPLT"
+  },
+  {
+    "codes": [
+      "CPLT 5020"
+    ],
+    "name": "Capitalism as a Form of Life",
+    "credits": 1.0,
+    "department": "CPLT"
+  },
+  {
+    "codes": [
+      "CPLT 5140"
+    ],
+    "name": "What the University Was",
+    "credits": 1.0,
+    "department": "CPLT"
+  },
+  {
+    "codes": [
+      "CPLT 5150",
+      "CPLT 515"
+    ],
+    "name": "Proseminar in Comparative Literature",
+    "credits": 1.0,
+    "department": "CPLT"
+  },
+  {
+    "codes": [
+      "CPLT 5550"
+    ],
+    "name": "Postcolonial Middle Ages",
+    "credits": 1.0,
+    "department": "CPLT"
+  },
+  {
+    "codes": [
+      "CPLT 6220",
+      "CPLT 822"
+    ],
+    "name": "Working Group on Globalization and Culture",
+    "credits": 1.0,
+    "department": "CPLT"
+  },
+  {
+    "codes": [
+      "CPLT 6351"
+    ],
+    "name": "The Nigerian “Video Novel” and Nollywood",
+    "credits": 1.0,
+    "department": "CPLT"
+  },
+  {
+    "codes": [
+      "CPLT 6640",
+      "CPLT 664"
+    ],
+    "name": "Taking Leave: Meditations on Art, Death, and the Afterlife from the Bible to the Twentieth Century",
+    "credits": 1.0,
+    "department": "CPLT"
+  },
+  {
+    "codes": [
+      "CPLT 8355"
+    ],
+    "name": "Ciencia Ficción, Fantasía y Neogótico en la Narrativa Hispanoamericana Contemporánea",
+    "credits": 1.0,
+    "department": "CPLT"
+  },
+  {
+    "codes": [
+      "CPLT 8810"
+    ],
+    "name": "Literary Theory",
+    "credits": 1.0,
+    "department": "CPLT"
+  },
+  {
+    "codes": [
+      "CPLT 8980"
+    ],
+    "name": "Fin-de-siècle France",
+    "credits": 1.0,
+    "department": "CPLT"
+  },
+  {
+    "codes": [
+      "CPLT 9013"
+    ],
+    "name": "Third Cinema: Arts and Politics in Latin America",
+    "credits": 1.0,
+    "department": "CPLT"
+  },
+  {
+    "codes": [
+      "CPLT 9053"
+    ],
+    "name": "Topics in Sinophone and Chinese Studies",
+    "credits": 1.0,
+    "department": "CPLT"
+  },
+  {
+    "codes": [
+      "CPLT 9170"
+    ],
+    "name": "Foundations of Film and Media",
+    "credits": 1.0,
+    "department": "CPLT"
+  },
+  {
+    "codes": [
+      "CPLT 1400"
+    ],
+    "name": "Methods of Comparison",
+    "credits": 1.0,
+    "department": "CPLT"
+  },
+  {
+    "codes": [
+      "CPLT 1960"
+    ],
+    "name": "Hebrew Poetry in Muslim Spain",
+    "credits": 1.0,
+    "department": "CPLT"
+  },
+  {
+    "codes": [
+      "CPLT 2390"
+    ],
+    "name": "Dionysus in Modernity",
+    "credits": 1.0,
+    "department": "CPLT"
+  },
+  {
+    "codes": [
+      "CPLT 2650"
+    ],
+    "name": "China in the World",
+    "credits": 1.0,
+    "department": "CPLT"
+  },
+  {
+    "codes": [
+      "CPLT 3005"
+    ],
+    "name": "Advanced Literary Translation",
+    "credits": 1.0,
+    "department": "CPLT"
+  },
+  {
+    "codes": [
+      "CPLT 4730"
+    ],
+    "name": "Politics and Literature in the Middle East",
+    "credits": 1.0,
+    "department": "CPLT"
+  },
+  {
+    "codes": [
+      "CPLT 4890"
+    ],
+    "name": "Critique and Crisis",
+    "credits": 1.0,
+    "department": "CPLT"
+  },
+  {
+    "codes": [
+      "CPLT 6180"
+    ],
+    "name": "Walter Benjamin’s Critical Theory",
+    "credits": 1.0,
+    "department": "CPLT"
+  },
+  {
+    "codes": [
+      "CPLT 6631"
+    ],
+    "name": "Neoplatonism Across Time and Faith",
+    "credits": 1.0,
+    "department": "CPLT"
+  },
+  {
+    "codes": [
+      "CPLT 7290"
+    ],
+    "name": "On Violence: Politics and Aesthetics across the Maghreb",
+    "credits": 1.0,
+    "department": "CPLT"
+  },
+  {
+    "codes": [
+      "CPLT 7880"
+    ],
+    "name": "Robert Musil’s Man without Qualities: The End of the Novel",
+    "credits": 1.0,
+    "department": "CPLT"
+  },
+  {
+    "codes": [
       "SWED 1300"
     ],
     "name": "Intermediate Swedish I",
@@ -15765,6 +17135,78 @@
   },
   {
     "codes": [
+      "HELN 1500"
+    ],
+    "name": "Advanced Modern Greek",
+    "credits": 1.0,
+    "department": "HELN"
+  },
+  {
+    "codes": [
+      "HELN 2230"
+    ],
+    "name": "The Greater War (1911–1923)",
+    "credits": 1.0,
+    "department": "HELN"
+  },
+  {
+    "codes": [
+      "HELN 2380"
+    ],
+    "name": "Weird Greek Wave Cinema",
+    "credits": 1.0,
+    "department": "HELN"
+  },
+  {
+    "codes": [
+      "HELN 3000"
+    ],
+    "name": "The Olympic Games, Ancient and Modern",
+    "credits": 1.0,
+    "department": "HELN"
+  },
+  {
+    "codes": [
+      "HELN 3050"
+    ],
+    "name": "The Age of Revolutions",
+    "credits": 1.0,
+    "department": "HELN"
+  },
+  {
+    "codes": [
+      "HELN 1100"
+    ],
+    "name": "Elementary Modern Greek I",
+    "credits": 1.5,
+    "department": "HELN"
+  },
+  {
+    "codes": [
+      "HELN 1300"
+    ],
+    "name": "Intermediate Modern Greek I",
+    "credits": 1.5,
+    "department": "HELN"
+  },
+  {
+    "codes": [
+      "HELN 1200"
+    ],
+    "name": "Elementary Modern Greek II",
+    "credits": 1.5,
+    "department": "HELN"
+  },
+  {
+    "codes": [
+      "HELN 1400"
+    ],
+    "name": "Intermediate Modern Greek II",
+    "credits": 1.5,
+    "department": "HELN"
+  },
+  {
+    "codes": [
       "MGRK 1200",
       "MGRK 120"
     ],
@@ -15863,6 +17305,545 @@
     "name": "Portuguese for Romance Language Speakers II",
     "credits": 1.5,
     "department": "PORT"
+  },
+  {
+    "codes": [
+      "ART 0610",
+      "ART 010"
+    ],
+    "name": "Interdisciplinary Exploration For Making Fictional Worlds, Flying Machines, and Shaking Things Up",
+    "credits": 1.0,
+    "department": "ART"
+  },
+  {
+    "codes": [
+      "ART 0615",
+      "ART 015"
+    ],
+    "name": "Sculpture, Irrational Collaborative Play and Channeling Creativity",
+    "credits": 1.0,
+    "department": "ART"
+  },
+  {
+    "codes": [
+      "ART 0706",
+      "ART 106"
+    ],
+    "name": "Art of the Printed Word",
+    "credits": 1.0,
+    "department": "ART"
+  },
+  {
+    "codes": [
+      "ART 1111",
+      "ART 111"
+    ],
+    "name": "Visual Thinking",
+    "credits": 1.0,
+    "department": "ART"
+  },
+  {
+    "codes": [
+      "ART 1514",
+      "ART 114"
+    ],
+    "name": "Basic Drawing",
+    "credits": 1.0,
+    "department": "ART"
+  },
+  {
+    "codes": [
+      "ART 1516",
+      "ART 116"
+    ],
+    "name": "Color Practice",
+    "credits": 1.0,
+    "department": "ART"
+  },
+  {
+    "codes": [
+      "ART 1530",
+      "ART 130"
+    ],
+    "name": "Painting Basics",
+    "credits": 1.0,
+    "department": "ART"
+  },
+  {
+    "codes": [
+      "ART 1621"
+    ],
+    "name": "Introduction to Sculpture: Metal",
+    "credits": 1.0,
+    "department": "ART"
+  },
+  {
+    "codes": [
+      "ART 1732",
+      "ART 132"
+    ],
+    "name": "Introduction to Graphic Design",
+    "credits": 1.0,
+    "department": "ART"
+  },
+  {
+    "codes": [
+      "ART 1784",
+      "ART 184"
+    ],
+    "name": "3D Modeling for Creative Practice",
+    "credits": 1.0,
+    "department": "ART"
+  },
+  {
+    "codes": [
+      "ART 1836",
+      "ART 136"
+    ],
+    "name": "Black & White Photography Capturing Light",
+    "credits": 1.0,
+    "department": "ART"
+  },
+  {
+    "codes": [
+      "ART 1838",
+      "ART 138"
+    ],
+    "name": "Digital Photography Seeing in Color",
+    "credits": 1.0,
+    "department": "ART"
+  },
+  {
+    "codes": [
+      "ART 1942",
+      "ART 142"
+    ],
+    "name": "Introductory Documentary Filmmaking",
+    "credits": 1.0,
+    "department": "ART"
+  },
+  {
+    "codes": [
+      "ART 1985"
+    ],
+    "name": "Principles of Animation",
+    "credits": 1.0,
+    "department": "ART"
+  },
+  {
+    "codes": [
+      "ART 2545",
+      "ART 245"
+    ],
+    "name": "Digital Drawing",
+    "credits": 1.0,
+    "department": "ART"
+  },
+  {
+    "codes": [
+      "ART 2611"
+    ],
+    "name": "Sculpture as Object: Documentation, Preservation, Conservation",
+    "credits": 1.0,
+    "department": "ART"
+  },
+  {
+    "codes": [
+      "ART 2743"
+    ],
+    "name": "Introduction to Typeface Design",
+    "credits": 1.0,
+    "department": "ART"
+  },
+  {
+    "codes": [
+      "ART 2764",
+      "ART 264"
+    ],
+    "name": "Typography!",
+    "credits": 1.0,
+    "department": "ART"
+  },
+  {
+    "codes": [
+      "ART 2766",
+      "ART 266"
+    ],
+    "name": "Graphic Design Histories",
+    "credits": 1.0,
+    "department": "ART"
+  },
+  {
+    "codes": [
+      "ART 2839"
+    ],
+    "name": "Photographic Storytelling",
+    "credits": 1.0,
+    "department": "ART"
+  },
+  {
+    "codes": [
+      "ART 2941",
+      "ART 241"
+    ],
+    "name": "Introductory Film Writing and Directing",
+    "credits": 1.0,
+    "department": "ART"
+  },
+  {
+    "codes": [
+      "ART 2943"
+    ],
+    "name": "Cinematography: History, Theory, Practice",
+    "credits": 1.0,
+    "department": "ART"
+  },
+  {
+    "codes": [
+      "ART 3155"
+    ],
+    "name": "Cave Paintings to Graffiti: History of Mural Painting",
+    "credits": 1.0,
+    "department": "ART"
+  },
+  {
+    "codes": [
+      "ART 3485"
+    ],
+    "name": "Choreographies of Everyday Life",
+    "credits": 1.0,
+    "department": "ART"
+  },
+  {
+    "codes": [
+      "ART 3532",
+      "ART 332"
+    ],
+    "name": "Painting Time",
+    "credits": 1.0,
+    "department": "ART"
+  },
+  {
+    "codes": [
+      "ART 3555",
+      "ART 355"
+    ],
+    "name": "Silkscreen Printing",
+    "credits": 1.0,
+    "department": "ART"
+  },
+  {
+    "codes": [
+      "ART 3556",
+      "ART 356"
+    ],
+    "name": "Printmaking I",
+    "credits": 1.0,
+    "department": "ART"
+  },
+  {
+    "codes": [
+      "ART 3558"
+    ],
+    "name": "Introduction to Intaglio Printmaking",
+    "credits": 1.0,
+    "department": "ART"
+  },
+  {
+    "codes": [
+      "ART 3769",
+      "ART 369"
+    ],
+    "name": "Interactive Design and the Internet: Software for People",
+    "credits": 1.0,
+    "department": "ART"
+  },
+  {
+    "codes": [
+      "ART 3794"
+    ],
+    "name": "Text, Speech, and Moving Image",
+    "credits": 1.0,
+    "department": "ART"
+  },
+  {
+    "codes": [
+      "ART 3839",
+      "ART 339"
+    ],
+    "name": "Narrative Forms and Documentary Style In Photography after 1967",
+    "credits": 1.0,
+    "department": "ART"
+  },
+  {
+    "codes": [
+      "ART 3995",
+      "ART 395"
+    ],
+    "name": "Junior Seminar",
+    "credits": 1.0,
+    "department": "ART"
+  },
+  {
+    "codes": [
+      "ART 4171",
+      "ART 472"
+    ],
+    "name": "Independent Projects",
+    "credits": 1.0,
+    "department": "ART"
+  },
+  {
+    "codes": [
+      "ART 4514",
+      "ART 421"
+    ],
+    "name": "Advanced Drawing",
+    "credits": 1.0,
+    "department": "ART"
+  },
+  {
+    "codes": [
+      "ART 4645"
+    ],
+    "name": "Advanced Sculpture Studio Practice I",
+    "credits": 1.0,
+    "department": "ART"
+  },
+  {
+    "codes": [
+      "ART 4942",
+      "ART 443"
+    ],
+    "name": "Advanced Film Writing and Directing",
+    "credits": 1.0,
+    "department": "ART"
+  },
+  {
+    "codes": [
+      "ART 4995",
+      "ART 495"
+    ],
+    "name": "Senior Project I",
+    "credits": 1.0,
+    "department": "ART"
+  },
+  {
+    "codes": [
+      "ART 0514",
+      "ART 014"
+    ],
+    "name": "Research in the Making",
+    "credits": 1.0,
+    "department": "ART"
+  },
+  {
+    "codes": [
+      "ART 0517"
+    ],
+    "name": "Spaces of Marginality",
+    "credits": 1.0,
+    "department": "ART"
+  },
+  {
+    "codes": [
+      "ART 0740",
+      "ART 040"
+    ],
+    "name": "Writer as Designer, Designer as Writer",
+    "credits": 1.0,
+    "department": "ART"
+  },
+  {
+    "codes": [
+      "ART 0907",
+      "ART 007"
+    ],
+    "name": "Art of the Game",
+    "credits": 1.0,
+    "department": "ART"
+  },
+  {
+    "codes": [
+      "ART 1610",
+      "ART 110"
+    ],
+    "name": "Sculpture Basics",
+    "credits": 1.0,
+    "department": "ART"
+  },
+  {
+    "codes": [
+      "ART 1620",
+      "ART 120"
+    ],
+    "name": "Introduction to Sculpture: Wood",
+    "credits": 1.0,
+    "department": "ART"
+  },
+  {
+    "codes": [
+      "ART 1745",
+      "ART 145"
+    ],
+    "name": "Introduction to Digital Video",
+    "credits": 1.0,
+    "department": "ART"
+  },
+  {
+    "codes": [
+      "ART 2525",
+      "ART 225"
+    ],
+    "name": "Adventures in Self-Publishing",
+    "credits": 1.0,
+    "department": "ART"
+  },
+  {
+    "codes": [
+      "ART 2836",
+      "ART 236"
+    ],
+    "name": "Picturing at the Peabody",
+    "credits": 1.0,
+    "department": "ART"
+  },
+  {
+    "codes": [
+      "ART 2984",
+      "ART 294"
+    ],
+    "name": "Technology and the Promise of Transformation",
+    "credits": 1.0,
+    "department": "ART"
+  },
+  {
+    "codes": [
+      "ART 2985",
+      "ART 285"
+    ],
+    "name": "Digital Animation",
+    "credits": 1.0,
+    "department": "ART"
+  },
+  {
+    "codes": [
+      "ART 3531",
+      "ART 331"
+    ],
+    "name": "Intermediate Painting",
+    "credits": 1.0,
+    "department": "ART"
+  },
+  {
+    "codes": [
+      "ART 3559"
+    ],
+    "name": "Introduction to Lithography",
+    "credits": 1.0,
+    "department": "ART"
+  },
+  {
+    "codes": [
+      "ART 3560"
+    ],
+    "name": "Print Series",
+    "credits": 1.0,
+    "department": "ART"
+  },
+  {
+    "codes": [
+      "ART 3649",
+      "ART 349"
+    ],
+    "name": "Advanced Video Installation",
+    "credits": 1.0,
+    "department": "ART"
+  },
+  {
+    "codes": [
+      "ART 3768",
+      "ART 368"
+    ],
+    "name": "Graphic Design Methodologies",
+    "credits": 1.0,
+    "department": "ART"
+  },
+  {
+    "codes": [
+      "ART 3770"
+    ],
+    "name": "Motion Design: Communicating with Time, Motion, and Sound",
+    "credits": 1.0,
+    "department": "ART"
+  },
+  {
+    "codes": [
+      "ART 3879",
+      "ART 379"
+    ],
+    "name": "Form For Content in Large Format",
+    "credits": 1.0,
+    "department": "ART"
+  },
+  {
+    "codes": [
+      "ART 3941",
+      "ART 341"
+    ],
+    "name": "Intermediate Film Writing and Directing",
+    "credits": 1.0,
+    "department": "ART"
+  },
+  {
+    "codes": [
+      "ART 3942",
+      "ART 342"
+    ],
+    "name": "Intermediate Documentary Filmmaking",
+    "credits": 1.0,
+    "department": "ART"
+  },
+  {
+    "codes": [
+      "ART 4545"
+    ],
+    "name": "Advanced Digital Drawing",
+    "credits": 1.0,
+    "department": "ART"
+  },
+  {
+    "codes": [
+      "ART 4648"
+    ],
+    "name": "Sculpture and Questions of Definition",
+    "credits": 1.0,
+    "department": "ART"
+  },
+  {
+    "codes": [
+      "ART 4768"
+    ],
+    "name": "Advanced Graphic Design: Ad Hoc Series and Systems",
+    "credits": 1.0,
+    "department": "ART"
+  },
+  {
+    "codes": [
+      "ART 4803"
+    ],
+    "name": "Picture Collection",
+    "credits": 1.0,
+    "department": "ART"
+  },
+  {
+    "codes": [
+      "ART 4996",
+      "ART 496"
+    ],
+    "name": "Senior Project II",
+    "credits": 1.0,
+    "department": "ART"
   },
   {
     "codes": [
@@ -21714,6 +23695,320 @@
   },
   {
     "codes": [
+      "ARCH 4701",
+      "ARCH 472"
+    ],
+    "name": "Individual Tutorial Lab",
+    "credits": 0.5,
+    "department": "ARCH"
+  },
+  {
+    "codes": [
+      "ARCH 1001",
+      "ARCH 150"
+    ],
+    "name": "Introduction to Architecture",
+    "credits": 1.0,
+    "department": "ARCH"
+  },
+  {
+    "codes": [
+      "ARCH 2001",
+      "ARCH 260"
+    ],
+    "name": "History of Architecture to 1750",
+    "credits": 1.0,
+    "department": "ARCH"
+  },
+  {
+    "codes": [
+      "ARCH 2104"
+    ],
+    "name": "How to Design a Renaissance Building",
+    "credits": 1.0,
+    "department": "ARCH"
+  },
+  {
+    "codes": [
+      "ARCH 2105"
+    ],
+    "name": "Reckoning Environmental Uncertainty: A Global History since 1100",
+    "credits": 1.0,
+    "department": "ARCH"
+  },
+  {
+    "codes": [
+      "ARCH 2600"
+    ],
+    "name": "American Architecture and Urbanism",
+    "credits": 1.0,
+    "department": "ARCH"
+  },
+  {
+    "codes": [
+      "ARCH 2601",
+      "ARCH 4011"
+    ],
+    "name": "Introduction to Urban Design",
+    "credits": 1.0,
+    "department": "ARCH"
+  },
+  {
+    "codes": [
+      "ARCH 3102",
+      "ARCH 314"
+    ],
+    "name": "History of Landscape in Western Europe and the United States: Antiquity to 1950",
+    "credits": 1.0,
+    "department": "ARCH"
+  },
+  {
+    "codes": [
+      "ARCH 3120"
+    ],
+    "name": "Nonfiction Writing: Writing About Architecture",
+    "credits": 1.0,
+    "department": "ARCH"
+  },
+  {
+    "codes": [
+      "ARCH 3601",
+      "ARCH 327"
+    ],
+    "name": "Difference and the City",
+    "credits": 1.0,
+    "department": "ARCH"
+  },
+  {
+    "codes": [
+      "ARCH 4700",
+      "ARCH 471"
+    ],
+    "name": "Individual Tutorial",
+    "credits": 1.0,
+    "department": "ARCH"
+  },
+  {
+    "codes": [
+      "ARCH 4900",
+      "ARCH 490"
+    ],
+    "name": "Senior Research Colloquium",
+    "credits": 1.0,
+    "department": "ARCH"
+  },
+  {
+    "codes": [
+      "ARCH 9901",
+      "ARCH 551"
+    ],
+    "name": "Ph.D. Seminar: History/Theory I: Adv. Topics in the History & Theory of Arch. since World War II",
+    "credits": 1.0,
+    "department": "ARCH"
+  },
+  {
+    "codes": [
+      "ARCH 9903"
+    ],
+    "name": "Ph.D. Seminar: History/Theory III",
+    "credits": 1.0,
+    "department": "ARCH"
+  },
+  {
+    "codes": [
+      "ARCH 9905"
+    ],
+    "name": "PhD Independent Course Work: Reasserting the Aesthetic",
+    "credits": 1.0,
+    "department": "ARCH"
+  },
+  {
+    "codes": [
+      "ARCH 9906",
+      "ARCH 558"
+    ],
+    "name": "Ph.D. Seminar: Ecosystems in Architecture I",
+    "credits": 1.0,
+    "department": "ARCH"
+  },
+  {
+    "codes": [
+      "ARCH 9908",
+      "ARCH 568"
+    ],
+    "name": "Ph.D. Seminar: Ecosystems in Architecture III",
+    "credits": 1.0,
+    "department": "ARCH"
+  },
+  {
+    "codes": [
+      "ARCH 3000",
+      "ARCH 250"
+    ],
+    "name": "Methods and Form in Architecture I",
+    "credits": 1.5,
+    "department": "ARCH"
+  },
+  {
+    "codes": [
+      "ARCH 3304",
+      "ARCH 360"
+    ],
+    "name": "Urban Lab: An Urban World",
+    "credits": 1.5,
+    "department": "ARCH"
+  },
+  {
+    "codes": [
+      "ARCH 4000",
+      "ARCH 450"
+    ],
+    "name": "Senior Studio",
+    "credits": 1.5,
+    "department": "ARCH"
+  },
+  {
+    "codes": [
+      "ARCH 1300",
+      "ARCH 154"
+    ],
+    "name": "Drawing Architecture",
+    "credits": 1.0,
+    "department": "ARCH"
+  },
+  {
+    "codes": [
+      "ARCH 1301",
+      "ARCH 162"
+    ],
+    "name": "Materials in Architecture",
+    "credits": 1.0,
+    "department": "ARCH"
+  },
+  {
+    "codes": [
+      "ARCH 1400"
+    ],
+    "name": "Introduction to Structures",
+    "credits": 1.0,
+    "department": "ARCH"
+  },
+  {
+    "codes": [
+      "ARCH 1600",
+      "ARCH 160"
+    ],
+    "name": "Introduction to Urban Studies",
+    "credits": 1.0,
+    "department": "ARCH"
+  },
+  {
+    "codes": [
+      "ARCH 2000",
+      "ARCH 200"
+    ],
+    "name": "Scales of Design",
+    "credits": 1.0,
+    "department": "ARCH"
+  },
+  {
+    "codes": [
+      "ARCH 3103",
+      "ARCH 316"
+    ],
+    "name": "Revolutionary Cities: Protest, Rebellion and Representation in Modern Urban Space",
+    "credits": 1.0,
+    "department": "ARCH"
+  },
+  {
+    "codes": [
+      "ARCH 3106",
+      "ARCH 330"
+    ],
+    "name": "Creativity, Innovation, and “The New”",
+    "credits": 1.0,
+    "department": "ARCH"
+  },
+  {
+    "codes": [
+      "ARCH 3108"
+    ],
+    "name": "Groundlessness",
+    "credits": 1.0,
+    "department": "ARCH"
+  },
+  {
+    "codes": [
+      "ARCH 3109"
+    ],
+    "name": "Making the Inclusive Museum: Race, Gender, Disability and the Politics of Display",
+    "credits": 1.0,
+    "department": "ARCH"
+  },
+  {
+    "codes": [
+      "ARCH 4910",
+      "ARCH 491"
+    ],
+    "name": "Senior Project",
+    "credits": 1.0,
+    "department": "ARCH"
+  },
+  {
+    "codes": [
+      "ARCH 9902",
+      "ARCH 552"
+    ],
+    "name": "Ph.D. Seminar: History/Theory II",
+    "credits": 1.0,
+    "department": "ARCH"
+  },
+  {
+    "codes": [
+      "ARCH 9904",
+      "ARCH 554"
+    ],
+    "name": "Ph.D. Seminar: History/Theory IV",
+    "credits": 1.0,
+    "department": "ARCH"
+  },
+  {
+    "codes": [
+      "ARCH 9907",
+      "ARCH 559"
+    ],
+    "name": "Ph.D. Seminar: Ecosystems in Architecture II",
+    "credits": 1.0,
+    "department": "ARCH"
+  },
+  {
+    "codes": [
+      "ARCH 9909"
+    ],
+    "name": "Ph.D. Seminar: Ecosystems in Architecture IV",
+    "credits": 1.0,
+    "department": "ARCH"
+  },
+  {
+    "codes": [
+      "ARCH 3001",
+      "ARCH 251"
+    ],
+    "name": "Methods and Form in Architecture II",
+    "credits": 1.5,
+    "department": "ARCH"
+  },
+  {
+    "codes": [
+      "ARCH 4001",
+      "ARCH 494"
+    ],
+    "name": "Senior Project Design Studio",
+    "credits": 1.5,
+    "department": "ARCH"
+  },
+  {
+    "codes": [
       "MENG 1105",
       "MENG 185"
     ],
@@ -22002,1328 +24297,5 @@
     "name": "Topics in Computational and Systems Biology",
     "credits": 1.0,
     "department": "MENG"
-  },
-  {
-    "codes": [
-      "ARCG 1110",
-      "ARCG 110"
-    ],
-    "name": "Introduction to the History of Art: Global Decorative Arts",
-    "credits": 1.0,
-    "department": "ARCG"
-  },
-  {
-    "codes": [
-      "ARCG 2143"
-    ],
-    "name": "Greek Art and Architecture",
-    "credits": 1.0,
-    "department": "ARCG"
-  },
-  {
-    "codes": [
-      "ARCG 2275"
-    ],
-    "name": "The Green Hell and the Mother Serpent: Amazonian Archaeology, Ethnography, and Politics",
-    "credits": 1.0,
-    "department": "ARCG"
-  },
-  {
-    "codes": [
-      "ARCG 2345"
-    ],
-    "name": "Archaeology of Ancient Egypt - The Age of the Pyramids",
-    "credits": 1.0,
-    "department": "ARCG"
-  },
-  {
-    "codes": [
-      "ARCG 2660"
-    ],
-    "name": "Being Human: The Neanderthal Dilemma",
-    "credits": 1.0,
-    "department": "ARCG"
-  },
-  {
-    "codes": [
-      "ARCG 3116L",
-      "ARCG 316L"
-    ],
-    "name": "Introduction to Archaeological Laboratory Sciences",
-    "credits": 1.0,
-    "department": "ARCG"
-  },
-  {
-    "codes": [
-      "ARCG 3297"
-    ],
-    "name": "Archaeology of East Asia",
-    "credits": 1.0,
-    "department": "ARCG"
-  },
-  {
-    "codes": [
-      "ARCG 4150",
-      "ARCG 450"
-    ],
-    "name": "Analysis of Lithic Technology",
-    "credits": 1.0,
-    "department": "ARCG"
-  },
-  {
-    "codes": [
-      "ARCG 4217"
-    ],
-    "name": "Maya Hieroglyphic Writing",
-    "credits": 1.0,
-    "department": "ARCG"
-  },
-  {
-    "codes": [
-      "ARCG 4471",
-      "ARCG 471"
-    ],
-    "name": "Directed Reading and Research in Archaeology",
-    "credits": 1.0,
-    "department": "ARCG"
-  },
-  {
-    "codes": [
-      "ARCG 4491",
-      "ARCG 491"
-    ],
-    "name": "Senior Research Project in Archaeology",
-    "credits": 1.0,
-    "department": "ARCG"
-  },
-  {
-    "codes": [
-      "ARCG 4564",
-      "ARCG 464"
-    ],
-    "name": "Human Osteology",
-    "credits": 1.0,
-    "department": "ARCG"
-  },
-  {
-    "codes": [
-      "ARCG 7280",
-      "ARCG 780"
-    ],
-    "name": "Archaeology of Religion",
-    "credits": 1.0,
-    "department": "ARCG"
-  },
-  {
-    "codes": [
-      "ARCG 9053",
-      "ARCG 953"
-    ],
-    "name": "Directed Research in Archaeology and Prehistory",
-    "credits": 1.0,
-    "department": "ARCG"
-  },
-  {
-    "codes": [
-      "ARCG 9900"
-    ],
-    "name": "Dir Reading",
-    "credits": 1.0,
-    "department": "ARCG"
-  },
-  {
-    "codes": [
-      "ARCG 9901"
-    ],
-    "name": "Master's Thesis",
-    "credits": 1.0,
-    "department": "ARCG"
-  },
-  {
-    "codes": [
-      "ARCG 9950"
-    ],
-    "name": "Master's Essay",
-    "credits": 1.0,
-    "department": "ARCG"
-  },
-  {
-    "codes": [
-      "ARCG 1172",
-      "ARCG 172"
-    ],
-    "name": "Great Hoaxes and Fantasies in Archaeology",
-    "credits": 1.0,
-    "department": "ARCG"
-  },
-  {
-    "codes": [
-      "ARCG 2242"
-    ],
-    "name": "Ancient Egyptian Materials and Techniques: Their Histories and Socio-Economic Implications",
-    "credits": 1.0,
-    "department": "ARCG"
-  },
-  {
-    "codes": [
-      "ARCG 2294",
-      "ARCG 294"
-    ],
-    "name": "The Ancient Maya",
-    "credits": 1.0,
-    "department": "ARCG"
-  },
-  {
-    "codes": [
-      "ARCG 3075",
-      "ARCG 379"
-    ],
-    "name": "Anthropology of Mobile Societies",
-    "credits": 1.0,
-    "department": "ARCG"
-  },
-  {
-    "codes": [
-      "ARCG 3136",
-      "ARCG 336"
-    ],
-    "name": "Geoarchaeology",
-    "credits": 1.0,
-    "department": "ARCG"
-  },
-  {
-    "codes": [
-      "ARCG 3185",
-      "ARCG 385"
-    ],
-    "name": "Archaeological Ceramics",
-    "credits": 1.0,
-    "department": "ARCG"
-  },
-  {
-    "codes": [
-      "ARCG 3684"
-    ],
-    "name": "Zooarchaeology",
-    "credits": 1.0,
-    "department": "ARCG"
-  },
-  {
-    "codes": [
-      "ARCG 4101"
-    ],
-    "name": "Archaeological Plant Remains from East Asia and Beyond",
-    "credits": 1.0,
-    "department": "ARCG"
-  },
-  {
-    "codes": [
-      "ARCG 4292",
-      "ARCG 492"
-    ],
-    "name": "Imaging Ancient Worlds in Museum Collections",
-    "credits": 1.0,
-    "department": "ARCG"
-  },
-  {
-    "codes": [
-      "ARCG 4669"
-    ],
-    "name": "Evolution of Human Diet",
-    "credits": 1.0,
-    "department": "ARCG"
-  },
-  {
-    "codes": [
-      "ARCG 5328"
-    ],
-    "name": "Magic and Ritual in Ancient Egypt and the Near East",
-    "credits": 1.0,
-    "department": "ARCG"
-  },
-  {
-    "codes": [
-      "ARCG 6136",
-      "ARCG 636"
-    ],
-    "name": "Geoarchaeology: Earth and Environmental Sciences in Archaeological Investigations",
-    "credits": 1.0,
-    "department": "ARCG"
-  },
-  {
-    "codes": [
-      "ARCG 6242"
-    ],
-    "name": "Ancient Egyptian Materials and Techniques: Their Histories and Socioeconomic Implications",
-    "credits": 1.0,
-    "department": "ARCG"
-  },
-  {
-    "codes": [
-      "ARCG 7185",
-      "ARCG 785"
-    ],
-    "name": "Archaeological Ceramics I",
-    "credits": 1.0,
-    "department": "ARCG"
-  },
-  {
-    "codes": [
-      "ARCG 7259"
-    ],
-    "name": "Social Complexity in Ancient China",
-    "credits": 1.0,
-    "department": "ARCG"
-  },
-  {
-    "codes": [
-      "ARCG 7272",
-      "ARCG 772"
-    ],
-    "name": "Cities in Antiquity: The Archaeology of Urbanism",
-    "credits": 1.0,
-    "department": "ARCG"
-  },
-    {
-      "codes": [
-        "ARCH 4701",
-        "ARCH 472"
-      ],
-      "name": "Individual Tutorial Lab",
-      "credits": 0.5,
-      "department": "ARCH"
-    },
-    {
-      "codes": [
-        "ARCH 1001",
-        "ARCH 150"
-      ],
-      "name": "Introduction to Architecture",
-      "credits": 1.0,
-      "department": "ARCH"
-    },
-    {
-      "codes": [
-        "ARCH 2001",
-        "ARCH 260"
-      ],
-      "name": "History of Architecture to 1750",
-      "credits": 1.0,
-      "department": "ARCH"
-    },
-    {
-      "codes": [
-        "ARCH 2104"
-      ],
-      "name": "How to Design a Renaissance Building",
-      "credits": 1.0,
-      "department": "ARCH"
-    },
-    {
-      "codes": [
-        "ARCH 2105"
-      ],
-      "name": "Reckoning Environmental Uncertainty: A Global History since 1100",
-      "credits": 1.0,
-      "department": "ARCH"
-    },
-    {
-      "codes": [
-        "ARCH 2600"
-      ],
-      "name": "American Architecture and Urbanism",
-      "credits": 1.0,
-      "department": "ARCH"
-    },
-    {
-      "codes": [
-        "ARCH 2601",
-        "ARCH 4011"
-      ],
-      "name": "Introduction to Urban Design",
-      "credits": 1.0,
-      "department": "ARCH"
-    },
-    {
-      "codes": [
-        "ARCH 3102",
-        "ARCH 314"
-      ],
-      "name": "History of Landscape in Western Europe and the United States: Antiquity to 1950",
-      "credits": 1.0,
-      "department": "ARCH"
-    },
-    {
-      "codes": [
-        "ARCH 3120"
-      ],
-      "name": "Nonfiction Writing: Writing About Architecture",
-      "credits": 1.0,
-      "department": "ARCH"
-    },
-    {
-      "codes": [
-        "ARCH 3601",
-        "ARCH 327"
-      ],
-      "name": "Difference and the City",
-      "credits": 1.0,
-      "department": "ARCH"
-    },
-    {
-      "codes": [
-        "ARCH 4700",
-        "ARCH 471"
-      ],
-      "name": "Individual Tutorial",
-      "credits": 1.0,
-      "department": "ARCH"
-    },
-    {
-      "codes": [
-        "ARCH 4900",
-        "ARCH 490"
-      ],
-      "name": "Senior Research Colloquium",
-      "credits": 1.0,
-      "department": "ARCH"
-    },
-    {
-      "codes": [
-        "ARCH 9901",
-        "ARCH 551"
-      ],
-      "name": "Ph.D. Seminar: History/Theory I: Adv. Topics in the History & Theory of Arch. since World War II",
-      "credits": 1.0,
-      "department": "ARCH"
-    },
-    {
-      "codes": [
-        "ARCH 9903"
-      ],
-      "name": "Ph.D. Seminar: History/Theory III",
-      "credits": 1.0,
-      "department": "ARCH"
-    },
-    {
-      "codes": [
-        "ARCH 9905"
-      ],
-      "name": "PhD Independent Course Work: Reasserting the Aesthetic",
-      "credits": 1.0,
-      "department": "ARCH"
-    },
-    {
-      "codes": [
-        "ARCH 9906",
-        "ARCH 558"
-      ],
-      "name": "Ph.D. Seminar: Ecosystems in Architecture I",
-      "credits": 1.0,
-      "department": "ARCH"
-    },
-    {
-      "codes": [
-        "ARCH 9908",
-        "ARCH 568"
-      ],
-      "name": "Ph.D. Seminar: Ecosystems in Architecture III",
-      "credits": 1.0,
-      "department": "ARCH"
-    },
-    {
-      "codes": [
-        "ARCH 3000",
-        "ARCH 250"
-      ],
-      "name": "Methods and Form in Architecture I",
-      "credits": 1.5,
-      "department": "ARCH"
-    },
-    {
-      "codes": [
-        "ARCH 3304",
-        "ARCH 360"
-      ],
-      "name": "Urban Lab: An Urban World",
-      "credits": 1.5,
-      "department": "ARCH"
-    },
-    {
-      "codes": [
-        "ARCH 4000",
-        "ARCH 450"
-      ],
-      "name": "Senior Studio",
-      "credits": 1.5,
-      "department": "ARCH"
-    },
-    {
-      "codes": [
-        "ARCH 1300",
-        "ARCH 154"
-      ],
-      "name": "Drawing Architecture",
-      "credits": 1.0,
-      "department": "ARCH"
-    },
-    {
-      "codes": [
-        "ARCH 1301",
-        "ARCH 162"
-      ],
-      "name": "Materials in Architecture",
-      "credits": 1.0,
-      "department": "ARCH"
-    },
-    {
-      "codes": [
-        "ARCH 1400"
-      ],
-      "name": "Introduction to Structures",
-      "credits": 1.0,
-      "department": "ARCH"
-    },
-    {
-      "codes": [
-        "ARCH 1600",
-        "ARCH 160"
-      ],
-      "name": "Introduction to Urban Studies",
-      "credits": 1.0,
-      "department": "ARCH"
-    },
-    {
-      "codes": [
-        "ARCH 2000",
-        "ARCH 200"
-      ],
-      "name": "Scales of Design",
-      "credits": 1.0,
-      "department": "ARCH"
-    },
-    {
-      "codes": [
-        "ARCH 3103",
-        "ARCH 316"
-      ],
-      "name": "Revolutionary Cities: Protest, Rebellion and Representation in Modern Urban Space",
-      "credits": 1.0,
-      "department": "ARCH"
-    },
-    {
-      "codes": [
-        "ARCH 3106",
-        "ARCH 330"
-      ],
-      "name": "Creativity, Innovation, and \u201cThe New\u201d",
-      "credits": 1.0,
-      "department": "ARCH"
-    },
-    {
-      "codes": [
-        "ARCH 3108"
-      ],
-      "name": "Groundlessness",
-      "credits": 1.0,
-      "department": "ARCH"
-    },
-    {
-      "codes": [
-        "ARCH 3109"
-      ],
-      "name": "Making the Inclusive Museum: Race, Gender, Disability and the Politics of Display",
-      "credits": 1.0,
-      "department": "ARCH"
-    },
-    {
-      "codes": [
-        "ARCH 4910",
-        "ARCH 491"
-      ],
-      "name": "Senior Project",
-      "credits": 1.0,
-      "department": "ARCH"
-    },
-    {
-      "codes": [
-        "ARCH 9902",
-        "ARCH 552"
-      ],
-      "name": "Ph.D. Seminar: History/Theory II",
-      "credits": 1.0,
-      "department": "ARCH"
-    },
-    {
-      "codes": [
-        "ARCH 9904",
-        "ARCH 554"
-      ],
-      "name": "Ph.D. Seminar: History/Theory IV",
-      "credits": 1.0,
-      "department": "ARCH"
-    },
-    {
-      "codes": [
-        "ARCH 9907",
-        "ARCH 559"
-      ],
-      "name": "Ph.D. Seminar: Ecosystems in Architecture II",
-      "credits": 1.0,
-      "department": "ARCH"
-    },
-    {
-      "codes": [
-        "ARCH 9909"
-      ],
-      "name": "Ph.D. Seminar: Ecosystems in Architecture IV",
-      "credits": 1.0,
-      "department": "ARCH"
-    },
-    {
-      "codes": [
-        "ARCH 3001",
-        "ARCH 251"
-      ],
-      "name": "Methods and Form in Architecture II",
-      "credits": 1.5,
-      "department": "ARCH"
-    },
-    {
-      "codes": [
-        "ARCH 4001",
-        "ARCH 494"
-      ],
-      "name": "Senior Project Design Studio",
-      "credits": 1.5,
-      "department": "ARCH"
-    },
-    {
-      "codes": [
-        "ART 0610",
-        "ART 010"
-      ],
-      "name": "Interdisciplinary Exploration For Making Fictional Worlds, Flying Machines, and Shaking Things Up",
-      "credits": 1.0,
-      "department": "ART"
-    },
-    {
-      "codes": [
-        "ART 0615",
-        "ART 015"
-      ],
-      "name": "Sculpture, Irrational Collaborative Play and Channeling Creativity",
-      "credits": 1.0,
-      "department": "ART"
-    },
-    {
-      "codes": [
-        "ART 0706",
-        "ART 106"
-      ],
-      "name": "Art of the Printed Word",
-      "credits": 1.0,
-      "department": "ART"
-    },
-    {
-      "codes": [
-        "ART 1111",
-        "ART 111"
-      ],
-      "name": "Visual Thinking",
-      "credits": 1.0,
-      "department": "ART"
-    },
-    {
-      "codes": [
-        "ART 1514",
-        "ART 114"
-      ],
-      "name": "Basic Drawing",
-      "credits": 1.0,
-      "department": "ART"
-    },
-    {
-      "codes": [
-        "ART 1516",
-        "ART 116"
-      ],
-      "name": "Color Practice",
-      "credits": 1.0,
-      "department": "ART"
-    },
-    {
-      "codes": [
-        "ART 1530",
-        "ART 130"
-      ],
-      "name": "Painting Basics",
-      "credits": 1.0,
-      "department": "ART"
-    },
-    {
-      "codes": [
-        "ART 1621"
-      ],
-      "name": "Introduction to Sculpture: Metal",
-      "credits": 1.0,
-      "department": "ART"
-    },
-    {
-      "codes": [
-        "ART 1732",
-        "ART 132"
-      ],
-      "name": "Introduction to Graphic Design",
-      "credits": 1.0,
-      "department": "ART"
-    },
-    {
-      "codes": [
-        "ART 1784",
-        "ART 184"
-      ],
-      "name": "3D Modeling for Creative Practice",
-      "credits": 1.0,
-      "department": "ART"
-    },
-    {
-      "codes": [
-        "ART 1836",
-        "ART 136"
-      ],
-      "name": "Black & White Photography Capturing Light",
-      "credits": 1.0,
-      "department": "ART"
-    },
-    {
-      "codes": [
-        "ART 1838",
-        "ART 138"
-      ],
-      "name": "Digital Photography Seeing in Color",
-      "credits": 1.0,
-      "department": "ART"
-    },
-    {
-      "codes": [
-        "ART 1942",
-        "ART 142"
-      ],
-      "name": "Introductory Documentary Filmmaking",
-      "credits": 1.0,
-      "department": "ART"
-    },
-    {
-      "codes": [
-        "ART 1985"
-      ],
-      "name": "Principles of Animation",
-      "credits": 1.0,
-      "department": "ART"
-    },
-    {
-      "codes": [
-        "ART 2545",
-        "ART 245"
-      ],
-      "name": "Digital Drawing",
-      "credits": 1.0,
-      "department": "ART"
-    },
-    {
-      "codes": [
-        "ART 2611"
-      ],
-      "name": "Sculpture as Object: Documentation, Preservation, Conservation",
-      "credits": 1.0,
-      "department": "ART"
-    },
-    {
-      "codes": [
-        "ART 2743"
-      ],
-      "name": "Introduction to Typeface Design",
-      "credits": 1.0,
-      "department": "ART"
-    },
-    {
-      "codes": [
-        "ART 2764",
-        "ART 264"
-      ],
-      "name": "Typography!",
-      "credits": 1.0,
-      "department": "ART"
-    },
-    {
-      "codes": [
-        "ART 2766",
-        "ART 266"
-      ],
-      "name": "Graphic Design Histories",
-      "credits": 1.0,
-      "department": "ART"
-    },
-    {
-      "codes": [
-        "ART 2839"
-      ],
-      "name": "Photographic Storytelling",
-      "credits": 1.0,
-      "department": "ART"
-    },
-    {
-      "codes": [
-        "ART 2941",
-        "ART 241"
-      ],
-      "name": "Introductory Film Writing and Directing",
-      "credits": 1.0,
-      "department": "ART"
-    },
-    {
-      "codes": [
-        "ART 2943"
-      ],
-      "name": "Cinematography: History, Theory, Practice",
-      "credits": 1.0,
-      "department": "ART"
-    },
-    {
-      "codes": [
-        "ART 3155"
-      ],
-      "name": "Cave Paintings to Graffiti: History of Mural Painting",
-      "credits": 1.0,
-      "department": "ART"
-    },
-    {
-      "codes": [
-        "ART 3485"
-      ],
-      "name": "Choreographies of Everyday Life",
-      "credits": 1.0,
-      "department": "ART"
-    },
-    {
-      "codes": [
-        "ART 3532",
-        "ART 332"
-      ],
-      "name": "Painting Time",
-      "credits": 1.0,
-      "department": "ART"
-    },
-    {
-      "codes": [
-        "ART 3555",
-        "ART 355"
-      ],
-      "name": "Silkscreen Printing",
-      "credits": 1.0,
-      "department": "ART"
-    },
-    {
-      "codes": [
-        "ART 3556",
-        "ART 356"
-      ],
-      "name": "Printmaking I",
-      "credits": 1.0,
-      "department": "ART"
-    },
-    {
-      "codes": [
-        "ART 3558"
-      ],
-      "name": "Introduction to Intaglio Printmaking",
-      "credits": 1.0,
-      "department": "ART"
-    },
-    {
-      "codes": [
-        "ART 3769",
-        "ART 369"
-      ],
-      "name": "Interactive Design and the Internet: Software for People",
-      "credits": 1.0,
-      "department": "ART"
-    },
-    {
-      "codes": [
-        "ART 3794"
-      ],
-      "name": "Text, Speech, and Moving Image",
-      "credits": 1.0,
-      "department": "ART"
-    },
-    {
-      "codes": [
-        "ART 3839",
-        "ART 339"
-      ],
-      "name": "Narrative Forms and Documentary Style In Photography after 1967",
-      "credits": 1.0,
-      "department": "ART"
-    },
-    {
-      "codes": [
-        "ART 3995",
-        "ART 395"
-      ],
-      "name": "Junior Seminar",
-      "credits": 1.0,
-      "department": "ART"
-    },
-    {
-      "codes": [
-        "ART 4171",
-        "ART 472"
-      ],
-      "name": "Independent Projects",
-      "credits": 1.0,
-      "department": "ART"
-    },
-    {
-      "codes": [
-        "ART 4514",
-        "ART 421"
-      ],
-      "name": "Advanced Drawing",
-      "credits": 1.0,
-      "department": "ART"
-    },
-    {
-      "codes": [
-        "ART 4645"
-      ],
-      "name": "Advanced Sculpture Studio Practice I",
-      "credits": 1.0,
-      "department": "ART"
-    },
-    {
-      "codes": [
-        "ART 4942",
-        "ART 443"
-      ],
-      "name": "Advanced Film Writing and Directing",
-      "credits": 1.0,
-      "department": "ART"
-    },
-    {
-      "codes": [
-        "ART 4995",
-        "ART 495"
-      ],
-      "name": "Senior Project I",
-      "credits": 1.0,
-      "department": "ART"
-    },
-    {
-      "codes": [
-        "ART 0514",
-        "ART 014"
-      ],
-      "name": "Research in the Making",
-      "credits": 1.0,
-      "department": "ART"
-    },
-    {
-      "codes": [
-        "ART 0517"
-      ],
-      "name": "Spaces of Marginality",
-      "credits": 1.0,
-      "department": "ART"
-    },
-    {
-      "codes": [
-        "ART 0740",
-        "ART 040"
-      ],
-      "name": "Writer as Designer, Designer as Writer",
-      "credits": 1.0,
-      "department": "ART"
-    },
-    {
-      "codes": [
-        "ART 0907",
-        "ART 007"
-      ],
-      "name": "Art of the Game",
-      "credits": 1.0,
-      "department": "ART"
-    },
-    {
-      "codes": [
-        "ART 1610",
-        "ART 110"
-      ],
-      "name": "Sculpture Basics",
-      "credits": 1.0,
-      "department": "ART"
-    },
-    {
-      "codes": [
-        "ART 1620",
-        "ART 120"
-      ],
-      "name": "Introduction to Sculpture: Wood",
-      "credits": 1.0,
-      "department": "ART"
-    },
-    {
-      "codes": [
-        "ART 1745",
-        "ART 145"
-      ],
-      "name": "Introduction to Digital Video",
-      "credits": 1.0,
-      "department": "ART"
-    },
-    {
-      "codes": [
-        "ART 2525",
-        "ART 225"
-      ],
-      "name": "Adventures in Self-Publishing",
-      "credits": 1.0,
-      "department": "ART"
-    },
-    {
-      "codes": [
-        "ART 2836",
-        "ART 236"
-      ],
-      "name": "Picturing at the Peabody",
-      "credits": 1.0,
-      "department": "ART"
-    },
-    {
-      "codes": [
-        "ART 2984",
-        "ART 294"
-      ],
-      "name": "Technology and the Promise of Transformation",
-      "credits": 1.0,
-      "department": "ART"
-    },
-    {
-      "codes": [
-        "ART 2985",
-        "ART 285"
-      ],
-      "name": "Digital Animation",
-      "credits": 1.0,
-      "department": "ART"
-    },
-    {
-      "codes": [
-        "ART 3531",
-        "ART 331"
-      ],
-      "name": "Intermediate Painting",
-      "credits": 1.0,
-      "department": "ART"
-    },
-    {
-      "codes": [
-        "ART 3559"
-      ],
-      "name": "Introduction to Lithography",
-      "credits": 1.0,
-      "department": "ART"
-    },
-    {
-      "codes": [
-        "ART 3560"
-      ],
-      "name": "Print Series",
-      "credits": 1.0,
-      "department": "ART"
-    },
-    {
-      "codes": [
-        "ART 3649",
-        "ART 349"
-      ],
-      "name": "Advanced Video Installation",
-      "credits": 1.0,
-      "department": "ART"
-    },
-    {
-      "codes": [
-        "ART 3768",
-        "ART 368"
-      ],
-      "name": "Graphic Design Methodologies",
-      "credits": 1.0,
-      "department": "ART"
-    },
-    {
-      "codes": [
-        "ART 3770"
-      ],
-      "name": "Motion Design: Communicating with Time, Motion, and Sound",
-      "credits": 1.0,
-      "department": "ART"
-    },
-    {
-      "codes": [
-        "ART 3879",
-        "ART 379"
-      ],
-      "name": "Form For Content in Large Format",
-      "credits": 1.0,
-      "department": "ART"
-    },
-    {
-      "codes": [
-        "ART 3941",
-        "ART 341"
-      ],
-      "name": "Intermediate Film Writing and Directing",
-      "credits": 1.0,
-      "department": "ART"
-    },
-    {
-      "codes": [
-        "ART 3942",
-        "ART 342"
-      ],
-      "name": "Intermediate Documentary Filmmaking",
-      "credits": 1.0,
-      "department": "ART"
-    },
-    {
-      "codes": [
-        "ART 4545"
-      ],
-      "name": "Advanced Digital Drawing",
-      "credits": 1.0,
-      "department": "ART"
-    },
-    {
-      "codes": [
-        "ART 4648"
-      ],
-      "name": "Sculpture and Questions of Definition",
-      "credits": 1.0,
-      "department": "ART"
-    },
-    {
-      "codes": [
-        "ART 4768"
-      ],
-      "name": "Advanced Graphic Design: Ad Hoc Series and Systems",
-      "credits": 1.0,
-      "department": "ART"
-    },
-    {
-      "codes": [
-        "ART 4803"
-      ],
-      "name": "Picture Collection",
-      "credits": 1.0,
-      "department": "ART"
-    },
-    {
-      "codes": [
-        "ART 4996",
-        "ART 496"
-      ],
-      "name": "Senior Project II",
-      "credits": 1.0,
-      "department": "ART"
-    },
-    {
-      "codes": [
-        "CENG 1200"
-      ],
-      "name": "Introduction to Environmental Engineering",
-      "credits": 1.0,
-      "department": "CENG"
-    },
-    {
-      "codes": [
-        "CENG 2100",
-        "CENG 210"
-      ],
-      "name": "Principles of Chemical Engineering and Process Modeling",
-      "credits": 1.0,
-      "department": "CENG"
-    },
-    {
-      "codes": [
-        "CENG 3140",
-        "CENG 314"
-      ],
-      "name": "Transport Phenomena I",
-      "credits": 1.0,
-      "department": "CENG"
-    },
-    {
-      "codes": [
-        "CENG 3730",
-        "CENG 373"
-      ],
-      "name": "Air Pollution Control",
-      "credits": 1.0,
-      "department": "CENG"
-    },
-    {
-      "codes": [
-        "CENG 4110",
-        "CENG 411"
-      ],
-      "name": "Separation and Purification Processes",
-      "credits": 1.0,
-      "department": "CENG"
-    },
-    {
-      "codes": [
-        "CENG 4710",
-        "CENG 471"
-      ],
-      "name": "Independent Research",
-      "credits": 1.0,
-      "department": "CENG"
-    },
-    {
-      "codes": [
-        "CENG 4800",
-        "CENG 480"
-      ],
-      "name": "Chemical Engineering Process Control",
-      "credits": 1.0,
-      "department": "CENG"
-    },
-    {
-      "codes": [
-        "CENG 4900",
-        "CENG 490"
-      ],
-      "name": "Senior Research Project",
-      "credits": 1.0,
-      "department": "CENG"
-    },
-    {
-      "codes": [
-        "CENG 6020"
-      ],
-      "name": "Chemical Reaction Engineering",
-      "credits": 1.0,
-      "department": "CENG"
-    },
-    {
-      "codes": [
-        "CENG 6050"
-      ],
-      "name": "Colloid Science and Engineering",
-      "credits": 1.0,
-      "department": "CENG"
-    },
-    {
-      "codes": [
-        "CENG 6090"
-      ],
-      "name": "Principles and Design of Energy Devices",
-      "credits": 1.0,
-      "department": "CENG"
-    },
-    {
-      "codes": [
-        "CENG 6150"
-      ],
-      "name": "Synthesis of Nanomaterials",
-      "credits": 1.0,
-      "department": "CENG"
-    },
-    {
-      "codes": [
-        "CENG 6200"
-      ],
-      "name": "Fundamentals of Molecular Modeling",
-      "credits": 1.0,
-      "department": "CENG"
-    },
-    {
-      "codes": [
-        "CENG 3010",
-        "CENG 301"
-      ],
-      "name": "Chemical Kinetics and Chemical Reactors",
-      "credits": 1.0,
-      "department": "CENG"
-    },
-    {
-      "codes": [
-        "CENG 3150",
-        "CENG 315"
-      ],
-      "name": "Transport Phenomena II",
-      "credits": 1.0,
-      "department": "CENG"
-    },
-    {
-      "codes": [
-        "CENG 3450",
-        "CENG 345"
-      ],
-      "name": "Principles and Applications of Interfacial Phenomena",
-      "credits": 1.0,
-      "department": "CENG"
-    },
-    {
-      "codes": [
-        "CENG 3770",
-        "CENG 377"
-      ],
-      "name": "Water-Energy Nexus",
-      "credits": 1.0,
-      "department": "CENG"
-    },
-    {
-      "codes": [
-        "CENG 4120L",
-        "CENG 412L"
-      ],
-      "name": "Chemical Engineering Laboratory and Design",
-      "credits": 1.0,
-      "department": "CENG"
-    },
-    {
-      "codes": [
-        "CENG 4160",
-        "CENG 416"
-      ],
-      "name": "Chemical Engineering Process Design",
-      "credits": 1.0,
-      "department": "CENG"
-    },
-    {
-      "codes": [
-        "CENG 5210"
-      ],
-      "name": "Classical and Statistical Thermodynamics",
-      "credits": 1.0,
-      "department": "CENG"
-    },
-    {
-      "codes": [
-        "CENG 6030"
-      ],
-      "name": "Energy, Mass, and Momentum Processes",
-      "credits": 1.0,
-      "department": "CENG"
-    },
-    {
-      "codes": [
-        "CENG 6140"
-      ],
-      "name": "Surface and Thin Film Characterization",
-      "credits": 1.0,
-      "department": "CENG"
-    }
+  }
 ]

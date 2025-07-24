@@ -1071,6 +1071,11 @@ async-function@^1.0.0:
   resolved "https://registry.npmjs.org/async-function/-/async-function-1.0.0.tgz"
   integrity sha512-hsU18Ae8CDTR6Kgu9DYf0EbCr/a5iGL0rytQDobUcdpYOKokk8LEjVphnXkDkgpi0wYVsqrXuP0bZxJaTqdgoA==
 
+async@0.1.x:
+  version "0.1.22"
+  resolved "https://registry.npmjs.org/async/-/async-0.1.22.tgz"
+  integrity sha512-2tEzliJmf5fHNafNwQLJXUasGzQCVctvsNkXmnlELHwypU0p08/rHohYvkqKIjyXpx+0rkrYv6QbhJ+UF4QkBg==
+
 autoprefixer@10.4.14:
   version "10.4.14"
   resolved "https://registry.npmjs.org/autoprefixer/-/autoprefixer-10.4.14.tgz"
@@ -1472,6 +1477,15 @@ dom-helpers@^3.4.0:
   integrity sha512-LnuPJ+dwqKDIyotW1VzmOZ5TONUN7CwkCR5hrgawTUbkBGYdeoNLZo6nNfGkCrjtE1nXXaj7iMMpDa8/d9WoIA==
   dependencies:
     "@babel/runtime" "^7.1.2"
+
+dref@0.0.x:
+  version "0.0.6"
+  resolved "https://registry.npmjs.org/dref/-/dref-0.0.6.tgz"
+  integrity sha512-mavsfoF9FiDt11eQccNaBpxRQUNHUOruQX732cYn/L7IJLLo5KXa/FsHwnx4Z2x8hMro9heTo+S/KccdU76J2Q==
+  dependencies:
+    dref "0.0.x"
+    structr "0.2.x"
+    type-component "0.0.x"
 
 dunder-proto@^1.0.0, dunder-proto@^1.0.1:
   version "1.0.1"
@@ -1917,7 +1931,12 @@ file-entry-cache@^8.0.0:
   dependencies:
     flat-cache "^4.0.0"
 
-filepond@^4.30.4, "filepond@>=3.7.x < 5.x":
+filepond-plugin-file-validate-type@^1.2.9:
+  version "1.2.9"
+  resolved "https://registry.npmjs.org/filepond-plugin-file-validate-type/-/filepond-plugin-file-validate-type-1.2.9.tgz"
+  integrity sha512-Tzv07aNdZvjUXDRA3XL16QMEvh6llDrXlcZ6W0eTHQ+taHaVg/JKJTFs/AViO+6ZcpPCcQStbhYEL2HoS+vldw==
+
+filepond@^4.30.4, "filepond@>=1.x <5.x", "filepond@>=3.7.x < 5.x":
   version "4.30.4"
   resolved "https://registry.npmjs.org/filepond/-/filepond-4.30.4.tgz"
   integrity sha512-FCwsMvG9iiEs6uobdDrTaKsCgsqys0NuLgPPD8n37AYVYBiiDkrPkk9MSIU5rT2FahYcL1bScYI9huIPtlzqyA==
@@ -2805,6 +2824,11 @@ optionator@^0.9.3:
     type-check "^0.4.0"
     word-wrap "^1.2.5"
 
+outcome@0.0.x:
+  version "0.0.18"
+  resolved "https://registry.npmjs.org/outcome/-/outcome-0.0.18.tgz"
+  integrity sha512-r5lBTvoSOO1a4J/bjCy5wOKs0CUEp4+DlL3WnGLgnpWLzNVF7KIUPlYUETbZ81IQHWmvVDZ8c1913uQW65ePNg==
+
 own-keys@^1.0.1:
   version "1.0.1"
   resolved "https://registry.npmjs.org/own-keys/-/own-keys-1.0.1.tgz"
@@ -2886,6 +2910,21 @@ pirates@^4.0.1:
   version "4.0.6"
   resolved "https://registry.npmjs.org/pirates/-/pirates-4.0.6.tgz"
   integrity sha512-saLsH7WeYYPiD25LDuLRRY/i+6HaPYr6G1OUlN39otzkSTxKnubR9RTxS3/Kk50s1g2JTgFwWQDQyplC5/SHZg==
+
+plugin@^0.3.3:
+  version "0.3.3"
+  resolved "https://registry.npmjs.org/plugin/-/plugin-0.3.3.tgz"
+  integrity sha512-iYStLjk2ROAxvOmC5pAuF6Bl+0LI5BGaJLReXNQkJDTuGd0ytohluSf/EE2iFaej2AdV0llOyBW/BWrLRkOqTg==
+  dependencies:
+    async "0.1.x"
+    dref "0.0.x"
+    outcome "0.0.x"
+    resolve "0.2.x"
+    sift "0.0.x"
+    step "0.0.x"
+    structr "0.2.x"
+    toarray "0.0.x"
+    underscore "1.4.x"
 
 possible-typed-array-names@^1.0.0:
   version "1.1.0"
@@ -3173,6 +3212,11 @@ resolve@^2.0.0-next.5:
     path-parse "^1.0.7"
     supports-preserve-symlinks-flag "^1.0.0"
 
+resolve@0.2.x:
+  version "0.2.8"
+  resolved "https://registry.npmjs.org/resolve/-/resolve-0.2.8.tgz"
+  integrity sha512-/u93d172yGtNlqM9641bKSdPmgaJ/X9TiD/7Mrb3DtrZ/CAvfNEXAdRABvayxLst7GGWMKkD0oGFQvwn0exevg==
+
 reusify@^1.0.4:
   version "1.0.4"
   resolved "https://registry.npmjs.org/reusify/-/reusify-1.0.4.tgz"
@@ -3349,6 +3393,11 @@ side-channel@^1.1.0:
     side-channel-map "^1.0.1"
     side-channel-weakmap "^1.0.2"
 
+sift@0.0.x:
+  version "0.0.18"
+  resolved "https://registry.npmjs.org/sift/-/sift-0.0.18.tgz"
+  integrity sha512-AGLWQiwxBbdCWGl9g8oOEAnc/2/VmvEL2ZmiQJXg4rLbNA+Wi8beTJV4pemehLAjiqtNNUyLYCFkNmHNm4E6QQ==
+
 simple-swizzle@^0.2.2:
   version "0.2.2"
   resolved "https://registry.npmjs.org/simple-swizzle/-/simple-swizzle-0.2.2.tgz"
@@ -3365,6 +3414,11 @@ stable-hash@^0.0.5:
   version "0.0.5"
   resolved "https://registry.npmjs.org/stable-hash/-/stable-hash-0.0.5.tgz"
   integrity sha512-+L3ccpzibovGXFK+Ap/f8LOS0ahMrHTf3xu7mMLSpEGU0EO9ucaysSylKo9eRDFNhWve/y275iPmIZ4z39a9iA==
+
+step@0.0.x:
+  version "0.0.6"
+  resolved "https://registry.npmjs.org/step/-/step-0.0.6.tgz"
+  integrity sha512-qSSeQinUJk2w38vUFobjFoE307GqsozMC8VisOCkJLpklvKPT0ptPHwWOrENoag8rgLudvTkfP3bancwP93/Jw==
 
 stop-iteration-iterator@^1.1.0:
   version "1.1.0"
@@ -3473,6 +3527,11 @@ strip-json-comments@^3.1.1:
   resolved "https://registry.npmjs.org/strip-json-comments/-/strip-json-comments-3.1.1.tgz"
   integrity sha512-6fPc+R4ihwqP6N/aIv2f1gMH8lOVtWQHoqC4yK6oSDVVocumAsfCqjkXnqiYMhmMwS/mEHLp7Vehlt3ql6lEig==
 
+structr@0.2.x:
+  version "0.2.4"
+  resolved "https://registry.npmjs.org/structr/-/structr-0.2.4.tgz"
+  integrity sha512-hL77hWtJhhuhDb4od5ywwAnVUlq9Krzk4BCoWhfiPtTEHvqBqRUm6lJ5PQlCrMWyi8Cv4+AXA/Mu6dbeTN/fGA==
+
 styled-jsx@5.1.6:
   version "5.1.6"
   resolved "https://registry.npmjs.org/styled-jsx/-/styled-jsx-5.1.6.tgz"
@@ -3567,6 +3626,11 @@ to-regex-range@^5.0.1:
   dependencies:
     is-number "^7.0.0"
 
+toarray@0.0.x:
+  version "0.0.1"
+  resolved "https://registry.npmjs.org/toarray/-/toarray-0.0.1.tgz"
+  integrity sha512-4EEt1cngMyDQvStibtjwHav7mCYf0mLAXYQ3z03zNacXjWjIHN01j1AtjGpEuCKX5sea+ZzyZcDXgjitxOVaww==
+
 ts-api-utils@^2.1.0:
   version "2.1.0"
   resolved "https://registry.npmjs.org/ts-api-utils/-/ts-api-utils-2.1.0.tgz"
@@ -3598,6 +3662,11 @@ type-check@^0.4.0, type-check@~0.4.0:
   integrity sha512-XleUoc9uwGXqjWwXaUTZAmzMcFZ5858QA2vvx1Ur5xIcixXIP+8LnFDgRplU30us6teqdlskFfu+ae4K79Ooew==
   dependencies:
     prelude-ls "^1.2.1"
+
+type-component@0.0.x:
+  version "0.0.1"
+  resolved "https://registry.npmjs.org/type-component/-/type-component-0.0.1.tgz"
+  integrity sha512-mDZRBQS2yZkwRQKfjJvQ8UIYJeBNNWCq+HBNstl9N5s9jZ4dkVYXEGkVPsSCEh5Ld4JM1kmrZTzjnrqSAIQ7dw==
 
 typed-array-buffer@^1.0.3:
   version "1.0.3"
@@ -3658,6 +3727,11 @@ unbox-primitive@^1.1.0:
     has-bigints "^1.0.2"
     has-symbols "^1.1.0"
     which-boxed-primitive "^1.1.1"
+
+underscore@1.4.x:
+  version "1.4.4"
+  resolved "https://registry.npmjs.org/underscore/-/underscore-1.4.4.tgz"
+  integrity sha512-ZqGrAgaqqZM7LGRzNjLnw5elevWb5M8LEoDMadxIW3OWbcv72wMMgKdwOKpd5Fqxe8choLD8HN3iSj3TUh/giQ==
 
 unrs-resolver@^1.6.2:
   version "1.11.0"

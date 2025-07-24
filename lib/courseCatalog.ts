@@ -12,7 +12,7 @@ export type CourseInfo = {
 const COURSE_CODE_MAP: Record<string, CourseInfo> = {};
 
 (courses as CourseInfo[]).forEach(course => {
-  course.codes.forEach(code => {
+  course.codes?.forEach(code => {
     COURSE_CODE_MAP[code] = course;
   });
 });

@@ -23,11 +23,17 @@ import {
   doc,
   setDoc,
   getDoc,
+  addDoc,
+  Timestamp,
 } from "firebase/firestore";
 import { Course } from "@/lib/types";
 import { db } from "@/config/firebase";
 import { gradePoints } from "@/lib/constants";
-import { calculateMajorProgress, MAJORS } from "@/lib/majors";
+import {
+  calculateMajorProgress,
+  majorRequirements,
+  MAJORS,
+} from "@/lib/majors";
 import MajorProgressView from "@/components/MajorProgressView";
 import StatsView from "@/components/StatsView";
 import MajorSelectionFlow from "@/components/MajorSelectionFlow";
@@ -40,6 +46,9 @@ import {
 } from "@/lib/courseCatalog";
 import DistributionalsView from "@/components/DistributionalProgress";
 import { FaBuildingCircleCheck } from "react-icons/fa6";
+import CustomLoader from "@/components/ui/CustomLoader";
+import UserSettingsModal from "@/components/UserSettingsModal/UserSettingsModal";
+import Link from "next/link";
 
 interface UserProfile {
   majors: string[];
@@ -89,6 +98,7 @@ export default function Home() {
     "showBetaBanner",
     true
   );
+  const [latestAdvice, setLatestAdvice] = useState<string | null>(null);
 
   const [coursesLoading, setCoursesLoading] = useState(true);
 
@@ -147,6 +157,7 @@ export default function Home() {
 
   const getMajorProgress = () => {
     if (!user || courses.length === 0 || !selectedMajor) return null;
+
     const completedCourseCodes = courses
       .filter(
         (course) =>
@@ -164,11 +175,22 @@ export default function Home() {
       .filter((course) => course.skipped)
       .map((course) => course.code);
 
+    // Extract manual requirements
+    const manualRequirements = courses.flatMap((course) =>
+      (course.manualRequirementsFulfilled || [])
+        .filter((m) => m.major_id === selectedMajor)
+        .map((m) => ({
+          code: course.code,
+          requirement: m.requirement_title,
+        }))
+    );
+
     return calculateMajorProgress(
       selectedMajor,
       completedCourseCodes,
       inProgressCourseCodes,
-      skippedCourseCodes
+      skippedCourseCodes,
+      manualRequirements
     );
   };
 
@@ -299,6 +321,61 @@ export default function Home() {
       await Promise.all(batchWrites);
     }
 
+    console.log("the courses to add BAD BO", coursesToAdd);
+
+    //AI UPLOAD:
+    const now = new Date();
+    let currentSemester: string;
+    const month = now.getMonth() + 1;
+    if (month >= 1 && month <= 5) {
+      currentSemester = "Spring";
+    } else if (month >= 9 && month <= 8) {
+      currentSemester = "Summer";
+    } else {
+      currentSemester = "Fall";
+    }
+    const currentYear = now.getFullYear();
+
+    try {
+      console.log("Fetching AI advice...");
+      const res = await fetch("/api/generate-advice", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          coursesToAdd,
+          requirementsJson: majorRequirements,
+          selectedMajor: userProfile?.majors[0],
+          userId: user.uid,
+          currentDate: now.toISOString().slice(0, 10),
+          graduationYear: userProfile?.graduationYear,
+          currentSemester,
+          currentYear,
+        }),
+      });
+      const data = await res.json();
+      if (res.ok && data.advice) {
+        // Store in Firestore
+        await addDoc(collection(db, "ai_responses"), {
+          advice: data.advice,
+          userId: user.uid,
+          dateGenerated: Timestamp.fromDate(now),
+          params: {
+            selectedMajor: userProfile?.majors,
+            graduationYear: userProfile?.graduationYear,
+            currentDate: now.toISOString().slice(0, 10),
+            currentSemester,
+            currentYear,
+          },
+        });
+        setLatestAdvice(data.advice); // Optionally show in UI
+      } else {
+        setLatestAdvice(null);
+      }
+    } catch (err) {
+      console.error("AI advice fetch error", err);
+      setLatestAdvice(null);
+    }
+
     await fetchCourses();
   };
 
@@ -400,16 +477,8 @@ export default function Home() {
   //   void new Audio("/audio/pop.mp3").play().catch(() => null);
   // }, [activeTab, hasData]);
 
-  if (loading || coursesLoading)
-    return (
-      <div className="flex items-center justify-center min-h-screen bg-gray-950">
-        <motion.div
-          animate={{ rotate: 360 }}
-          transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
-          className="w-8 h-8 rounded-full border-2 border-transparent border-t-blue-500 border-r-blue-500/50"
-        />
-      </div>
-    );
+  if (loading || coursesLoading) return <CustomLoader />;
+
   if (!user) return <LoginPage />;
 
   return (
@@ -465,205 +534,14 @@ export default function Home() {
         <MajorSelectionFlow onComplete={() => setShowMajorSelection(false)} />
       )}
 
-      {/* Settings Modal */}
       {showSettings && userProfile && (
-        <div className="fixed inset-0 bg-gray-950/90 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="w-full max-w-md bg-gray-900 rounded-xl border border-gray-800 p-6"
-          >
-            <div className="flex flex-col items-center mb-6">
-              <div className="relative mb-4">
-                {user.photoURL ? (
-                  <img
-                    src={user.photoURL}
-                    alt="Profile"
-                    className="w-16 h-16 rounded-full object-cover border-2 border-gray-700"
-                  />
-                ) : (
-                  <div className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-2xl font-medium border-2 border-gray-700">
-                    {user.displayName?.charAt(0) ||
-                      user.email?.charAt(0).toUpperCase()}
-                  </div>
-                )}
-              </div>
-              <h2 className="text-xl font-medium text-center text-gray-200">
-                {user.displayName || "User"}
-              </h2>
-              <p className="text-gray-400 text-sm mt-1">{user.email}</p>
-
-              {/* Graduation Year Badge */}
-              {userProfile.graduationYear && (
-                <div className="mt-3 flex items-center">
-                  <span className="text-xs font-medium px-2.5 py-0.5 rounded-full flex items-center">
-                    <span
-                      className={`w-2 h-2 rounded-full mr-1.5 ${
-                        getYearStatus(userProfile.graduationYear) === "Freshman"
-                          ? "bg-green-400"
-                          : getYearStatus(userProfile.graduationYear) ===
-                            "Sophomore"
-                          ? "bg-blue-400"
-                          : getYearStatus(userProfile.graduationYear) ===
-                            "Junior"
-                          ? "bg-yellow-400"
-                          : "bg-purple-400"
-                      }`}
-                    ></span>
-                    <span className="text-gray-300">
-                      {getYearStatus(userProfile.graduationYear)} • Class of{" "}
-                      {userProfile.graduationYear}
-                    </span>
-                  </span>
-                </div>
-              )}
-              <motion.button
-                onHoverStart={() => setIsHoveringLogout(true)}
-                onHoverEnd={() => setIsHoveringLogout(false)}
-                onClick={logout}
-                className="flex items-center justify-center space-x-2 text-xs px-4 py-2 rounded-lg hover:bg-gray-900/50 transition-all border border-gray-800 hover:border-gray-700 mt-4"
-              >
-                <span>Sign out</span>
-                <motion.div
-                  animate={isHoveringLogout ? { x: 2 } : { x: 0 }}
-                  transition={{ type: "spring", stiffness: 500 }}
-                >
-                  <FiLogOut size={14} />
-                </motion.div>
-              </motion.button>
-            </div>
-
-            {/* Rest of the settings modal content remains the same */}
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-400 mb-2">
-                  Majors
-                </label>
-                <div className="space-y-2">
-                  {userProfile.majors.map((major, index) => (
-                    <div key={index} className="flex items-center space-x-2">
-                      <div className="relative flex-1">
-                        <select
-                          value={major}
-                          onChange={(e) => {
-                            const newMajors = [...userProfile.majors];
-                            newMajors[index] = e.target.value;
-                            setUserProfile({
-                              ...userProfile,
-                              majors: newMajors,
-                            });
-                          }}
-                          className="w-full appearance-none bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 pr-8 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        >
-                          {Object.entries(MAJORS).map(([code, name]) => (
-                            <option key={code} value={code}>
-                              {code} - {name}
-                            </option>
-                          ))}
-                        </select>
-                        <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                          <svg
-                            className="h-5 w-5 text-gray-400"
-                            xmlns="http://www.w3.org/2000/svg"
-                            viewBox="0 0 20 20"
-                            fill="currentColor"
-                          >
-                            <path
-                              fillRule="evenodd"
-                              d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                              clipRule="evenodd"
-                            />
-                          </svg>
-                        </div>
-                      </div>
-                      {index > 0 && (
-                        <button
-                          onClick={() => {
-                            const newMajors = [...userProfile.majors];
-                            newMajors.splice(index, 1);
-                            setUserProfile({
-                              ...userProfile,
-                              majors: newMajors,
-                            });
-                          }}
-                          className="text-red-400 hover:text-red-300 p-2"
-                        >
-                          ×
-                        </button>
-                      )}
-                    </div>
-                  ))}
-                  {userProfile.majors.length < 2 && (
-                    <button
-                      onClick={() => {
-                        setUserProfile({
-                          ...userProfile,
-                          majors: [...userProfile.majors, "MENG"],
-                        });
-                      }}
-                      className="text-sm text-blue-400 hover:text-blue-300 flex items-center"
-                    >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-4 w-4 mr-1"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-                        />
-                      </svg>
-                      Add another major
-                    </button>
-                  )}
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-400 mb-2">
-                  Graduation Year
-                </label>
-                <input
-                  type="number"
-                  min={new Date().getFullYear()}
-                  max={new Date().getFullYear() + 4}
-                  value={userProfile.graduationYear}
-                  onChange={(e) =>
-                    setUserProfile({
-                      ...userProfile,
-                      graduationYear: parseInt(e.target.value),
-                    })
-                  }
-                  className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-            </div>
-
-            <div className="flex justify-end space-x-3 mt-6">
-              <button
-                onClick={() => setShowSettings(false)}
-                className="px-4 py-2 rounded-lg border border-gray-700 hover:bg-gray-800/50 transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={() =>
-                  handleProfileUpdate({
-                    majors: userProfile.majors,
-                    graduationYear: userProfile.graduationYear,
-                  })
-                }
-                className="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 transition-colors"
-              >
-                Save Changes
-              </button>
-            </div>
-          </motion.div>
-        </div>
+        <UserSettingsModal
+          user={user}
+          userProfile={userProfile}
+          onClose={() => setShowSettings(false)}
+          onSave={handleProfileUpdate}
+          onLogout={logout}
+        />
       )}
 
       {/* Background elements */}
@@ -892,12 +770,20 @@ export default function Home() {
                   ) : (
                     <div className="flex flex-col items-center justify-center py-12">
                       <h2 className="text-xl font-medium mb-6 bg-clip-text text-transparent bg-gradient-to-r from-blue-200 to-purple-200">
-                        Begin Your Academic Analysis
+                        Let's begin your journey to better contextualize & plan
+                        your Yale degree.
                       </h2>
                       <div className="w-full max-w-lg bg-gray-900/50 backdrop-blur-sm p-8 rounded-xl border border-gray-800">
                         <FileUpload onSuccess={parseAndStoreCourses} />
                         <p className="text-center text-gray-500 text-sm mt-4">
-                          Upload your Yale transcript to unlock insights
+                          By uploading your transcript, you agree to our{" "}
+                          <Link
+                            href="/terms"
+                            className="text-gray-400 hover:text-gray-300 hover:underline transition-all hover:scale-[1.3]"
+                            target="_blank"
+                          >
+                            terms.
+                          </Link>
                         </p>
                       </div>
                     </div>
@@ -976,6 +862,7 @@ export default function Home() {
                     selectedMajor={selectedMajor}
                     progress={getMajorProgress()!}
                     onRequirementChange={fetchCourses}
+                    courses={courses}
                   />
                 </motion.div>
               )}

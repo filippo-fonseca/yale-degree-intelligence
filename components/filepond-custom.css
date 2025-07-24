@@ -1,0 +1,88 @@
+/* filepond-custom.css */
+.filepond--root {
+  font-family: inherit;
+  max-width: 100%;
+  margin: 0 auto;
+  background-color: #111827;
+  border: 1px solid #1f2937;
+  border-radius: 0.5rem;
+  cursor: pointer;
+}
+
+.filepond--root:hover {
+  border-color: #f6339a;
+}
+
+.filepond--root:hover svg {
+    stroke: #f6339a;
+}
+
+.filepond--panel-root {
+  background-color: transparent;
+  border-radius: 0.5rem;
+  padding: 2rem; /* Add padding to the entire panel */
+}
+
+.filepond--drop-label {
+  color: #9ca3af;
+  min-height: 180px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+
+  
+}
+
+.filepond--drop-label:hover {
+    color: #f6339a;
+}
+
+/* Icon container with top margin */
+.filepond--label-icon {
+  display: flex;
+  justify-content: center;
+  /* margin: 1.5rem 0 1rem 0; top right bottom left */
+}
+
+.filepond--label-icon svg {
+  width: 2rem;
+  height: 2rem;
+  stroke: #9ca3af;
+}
+
+/* Text container with bottom margin */
+.filepond--label-text {
+  display: block;
+  margin: 1rem 0 1.5rem 0; /* top right bottom left */
+  text-align: center;
+}
+
+.filepond--label-action {
+  color: #60a5fa;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.filepond--file-action-button {
+  cursor: pointer;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.filepond--file {
+  color: white;
+}
+
+.filepond--item-panel {
+  background-color: #1f2937;
+  border-radius: 0.375rem;
+}
+
+[data-filepond-item-state*='error'] .filepond--item-panel {
+  background-color: #7f1d1d;
+}
+
+[data-filepond-item-state='processing-complete'] .filepond--item-panel {
+  background-color: #064e3b;
+}

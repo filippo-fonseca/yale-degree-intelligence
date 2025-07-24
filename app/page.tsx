@@ -156,6 +156,7 @@ export default function Home() {
 
   const getMajorProgress = () => {
     if (!user || courses.length === 0 || !selectedMajor) return null;
+
     const completedCourseCodes = courses
       .filter(
         (course) =>
@@ -173,11 +174,22 @@ export default function Home() {
       .filter((course) => course.skipped)
       .map((course) => course.code);
 
+    // Extract manual requirements
+    const manualRequirements = courses.flatMap((course) =>
+      (course.manualRequirementsFulfilled || [])
+        .filter((m) => m.major_id === selectedMajor)
+        .map((m) => ({
+          code: course.code,
+          requirement: m.requirement_title,
+        }))
+    );
+
     return calculateMajorProgress(
       selectedMajor,
       completedCourseCodes,
       inProgressCourseCodes,
-      skippedCourseCodes
+      skippedCourseCodes,
+      manualRequirements
     );
   };
 

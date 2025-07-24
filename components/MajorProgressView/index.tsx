@@ -5,10 +5,11 @@ import { MAJORS } from "@/lib/majors";
 import { useAuth } from "@/context/AuthContext";
 import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { FiX, FiChevronDown, FiInfo } from "react-icons/fi";
+import { FiX, FiChevronDown, FiInfo, FiPlus } from "react-icons/fi";
 import { skipCourse, unskipCourse } from "@/lib/utils/courseOperations";
 import CourseModal from "./CourseModal";
 import DegreeIntelligenceBlurb from "./DegreeIntelligenceBlurb";
+import AddManualCourseModal from "../AddManualCourseModal/AddManualCourseModal";
 
 // Status color mapping for course pills
 function getCourseStatusColor({
@@ -79,6 +80,12 @@ export default function MajorProgressView({
   const [showInProgressStats, setShowInProgressStats] = useState(false);
   //course options:
   const dropdownRef = useRef<HTMLDivElement | null>(null);
+
+  //manual add:
+  const [manualCourseModal, setManualCourseModal] = useState<{
+    isOpen: boolean;
+    requirement: string;
+  }>({ isOpen: false, requirement: "" });
 
   const [modalOpen, setModalOpen] = useState<{
     isOpen: boolean;
@@ -279,7 +286,7 @@ export default function MajorProgressView({
                           </h5>
                           <div className="flex items-center gap-2">
                             <span className="text-xs bg-emerald-900/20 text-emerald-300 px-2 py-1 rounded-full">
-                              ✓ Complete
+                              ✓
                             </span>
                           </div>
                         </div>
@@ -289,58 +296,58 @@ export default function MajorProgressView({
                           </p>
                         )}
                         <div className="flex flex-wrap gap-1.5">
-                          {req.options.map((opt, j) => (
-                            <div
-                              key={`opt-${j}`}
-                              className={`relative px-2 py-0.5 rounded-full text-xs flex items-center transition-all duration-150 hover:scale-[1.05] cursor-pointer ${
-                                opt.completed
-                                  ? "bg-emerald-900/20 text-emerald-300 border border-emerald-700"
-                                  : "bg-gray-900/20 text-gray-300 border border-gray-700"
-                              }`}
-                              onClick={() => {
-                                setModalOpen({
-                                  isOpen: true,
-                                  course: {
-                                    code: opt.code,
-                                    name: opt.name,
-                                    status: opt.skipped
-                                      ? "skipped"
-                                      : opt.inProgress
-                                      ? "in-progress"
-                                      : opt.completed
-                                      ? "completed"
-                                      : "not-taken",
-                                    skipped: opt.skipped || false,
-                                  },
-                                });
-                              }}
-                            >
-                              {opt.code}
-                              <span className="ml-1 text-[0.65rem]">
-                                ({opt.credits}cr
-                                {opt.skipped
-                                  ? ", skipped"
-                                  : opt.inProgress
-                                  ? ", in progress"
-                                  : opt.completed
-                                  ? ", complete"
-                                  : ""}
-                                )
-                              </span>
-                              {opt.skipped && (
-                                <button
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleUnskip(opt.code);
-                                  }}
-                                  className="ml-1 text-[0.65rem] text-gray-400 hover:text-gray-200"
-                                  title="Unskip this course"
-                                >
-                                  <FiX size={10} />
-                                </button>
-                              )}
-                            </div>
-                          ))}
+                          {req.options
+                            .filter((opt) => opt.completed || opt.manual) // Show both completed and manual courses
+                            .map((opt, j) => (
+                              <div
+                                key={`opt-${j}`}
+                                className={`relative px-2 py-0.5 rounded-full text-xs flex items-center transition-all duration-150 hover:scale-[1.05] cursor-pointer ${
+                                  opt.completed || opt.manual
+                                    ? "bg-emerald-900/20 text-emerald-300 border border-emerald-700"
+                                    : "bg-gray-900/20 text-gray-300 border border-gray-700"
+                                }`}
+                                onClick={() => {
+                                  setModalOpen({
+                                    isOpen: true,
+                                    course: {
+                                      code: opt.code,
+                                      name: opt.name,
+                                      status: opt.skipped
+                                        ? "skipped"
+                                        : opt.inProgress
+                                        ? "in-progress"
+                                        : opt.completed || opt.manual
+                                        ? "completed"
+                                        : "not-taken",
+                                      skipped: opt.skipped || false,
+                                    },
+                                  });
+                                }}
+                              >
+                                {opt.code}
+                                <span className="ml-1 text-[0.65rem]">
+                                  ({opt.credits}cr
+                                  {opt.skipped
+                                    ? ", skipped"
+                                    : opt.inProgress
+                                    ? ", in progress"
+                                    : ", complete"}
+                                  {opt.manual && ", manual"})
+                                </span>
+                                {opt.skipped && (
+                                  <button
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleUnskip(opt.code);
+                                    }}
+                                    className="ml-1 text-[0.65rem] text-gray-400 hover:text-gray-200"
+                                    title="Unskip this course"
+                                  >
+                                    <FiX size={10} />
+                                  </button>
+                                )}
+                              </div>
+                            ))}
                         </div>
                       </motion.div>
                     ))}
@@ -426,7 +433,6 @@ export default function MajorProgressView({
                                       completed: opt.completed,
                                       inProgress: opt.inProgress,
                                       skipped: opt.skipped,
-                                      // grade: opt.grade,
                                     }
                                   )}`}
                                   onClick={() => {
@@ -476,6 +482,20 @@ export default function MajorProgressView({
                                 </div>
                               );
                             })}
+                            {/* Add manual course button */}
+                            <button
+                              onClick={() =>
+                                setManualCourseModal({
+                                  isOpen: true,
+                                  requirement: `${selectedMajor}|${req.name}`,
+                                })
+                              }
+                              className="px-2 py-0.5 rounded-full text-xs flex items-center gap-1 bg-gray-800 text-gray-400 hover:bg-gray-700 hover:text-gray-300 transition-colors"
+                              title="Add a course manually for this requirement"
+                            >
+                              <FiPlus size={12} />
+                              Add Course
+                            </button>
                           </div>
                         </motion.div>
                       );
@@ -494,6 +514,12 @@ export default function MajorProgressView({
         onClose={() => setModalOpen({ isOpen: false, course: null })}
         onSkip={handleSkip}
         onRefresh={onRequirementChange}
+      />
+      <AddManualCourseModal
+        isOpen={manualCourseModal.isOpen}
+        requirement={manualCourseModal.requirement}
+        onClose={() => setManualCourseModal({ isOpen: false, requirement: "" })}
+        onSuccess={onRequirementChange}
       />
     </div>
   );

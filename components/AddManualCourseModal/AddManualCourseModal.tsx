@@ -1,79 +1,73 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { FiX, FiPlus } from "react-icons/fi";
-import { collection, addDoc } from "firebase/firestore";
+import { FiX, FiPlus, FiSearch } from "react-icons/fi";
+import { doc, updateDoc, arrayUnion } from "firebase/firestore";
 import { db } from "@/config/firebase";
 import { useAuth } from "@/context/AuthContext";
-import { isValidCourseCode, getCourseInfo } from "@/lib/courseCatalog";
-import { gradePoints } from "@/lib/constants";
-
-const grades = Object.keys(gradePoints).filter((g) => g !== "In Progress");
+import { Course } from "@/lib/types";
+import { getCourseNameFromCode } from "@/lib/courseCatalog";
 
 export default function AddManualCourseModal({
   isOpen,
   requirement,
   onClose,
   onSuccess,
+  userCourses,
 }: {
   isOpen: boolean;
   requirement: string;
   onClose: () => void;
   onSuccess: () => void;
+  userCourses: Course[];
 }) {
   const { user } = useAuth();
-  const [courseCode, setCourseCode] = useState("");
-  const [selectedGrade, setSelectedGrade] = useState("A");
+  const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // Filter courses based on search query
+  const filteredCourses = userCourses.filter((course) =>
+    course.code.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   const handleSubmit = async () => {
-    if (!user || !courseCode.trim()) return;
-
-    // Validate course code
-    if (!isValidCourseCode(courseCode)) {
-      setError("Invalid course code");
-      return;
-    }
-
-    const courseInfo = getCourseInfo(courseCode);
-    if (!courseInfo) {
-      setError("Course not found in catalog");
-      return;
-    }
+    if (!user || !selectedCourse) return;
 
     setIsSubmitting(true);
     setError("");
 
     try {
-      // Create a new course with manual fulfillment
-      const newCourse = {
-        code: courseInfo.codes[0], // Use canonical code
-        status: "completed",
-        grade: selectedGrade,
-        semester: "Manual",
-        year: new Date().getFullYear(),
-        userId: user.uid,
-        credits: courseInfo.credits,
-        manualRequirementsFulfilled: [
-          {
-            major_id: requirement.split("|")[0],
-            requirement_title: requirement.split("|")[1],
-          },
-        ],
-      };
+      // Update the existing course document
+      const courseRef = doc(db, "courses", selectedCourse.id);
 
-      await addDoc(collection(db, "courses"), newCourse);
+      await updateDoc(courseRef, {
+        manualRequirementsFulfilled: arrayUnion({
+          major_id: requirement.split("|")[0],
+          requirement_title: requirement.split("|")[1],
+        }),
+      });
+
       onSuccess();
       onClose();
     } catch (err) {
-      console.error("Error adding manual course:", err);
-      setError("Failed to add course");
+      console.error("Error updating course:", err);
+      setError("Failed to add requirement to course");
     } finally {
       setIsSubmitting(false);
     }
   };
+
+  // Reset form when modal opens/closes
+  useEffect(() => {
+    if (isOpen) {
+      setSelectedCourse(null);
+      setSearchQuery("");
+      setError("");
+    }
+  }, [isOpen]);
 
   return (
     <AnimatePresence>
@@ -94,7 +88,8 @@ export default function AddManualCourseModal({
           >
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-lg font-medium">
-                Add Course for {requirement.split("|")[1]}
+                Add a course to fulfill the requirement:
+                <br /> <i>{requirement.split("|")[1]}</i>
               </h3>
               <button
                 onClick={onClose}
@@ -107,34 +102,66 @@ export default function AddManualCourseModal({
             <div className="space-y-4">
               <div>
                 <label className="block text-sm text-gray-400 mb-1">
-                  Course Code
+                  Search Your Courses
                 </label>
-                <input
-                  type="text"
-                  value={courseCode}
-                  onChange={(e) => setCourseCode(e.target.value.toUpperCase())}
-                  className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="e.g. CPSC 201"
-                />
-                {error && <p className="text-red-400 text-sm mt-1">{error}</p>}
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <FiSearch className="text-gray-400" />
+                  </div>
+                  <input
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full bg-gray-800 border border-gray-700 rounded-lg pl-10 pr-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="Search courses..."
+                  />
+                </div>
               </div>
 
               <div>
                 <label className="block text-sm text-gray-400 mb-1">
-                  Grade Received
+                  Select Course
                 </label>
-                <select
-                  value={selectedGrade}
-                  onChange={(e) => setSelectedGrade(e.target.value)}
-                  className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
-                  {grades.map((grade) => (
-                    <option key={grade} value={grade}>
-                      {grade}
-                    </option>
-                  ))}
-                </select>
+                <div className="max-h-60 overflow-y-auto border border-gray-700 rounded-lg">
+                  {filteredCourses.length > 0 ? (
+                    filteredCourses.map((course) => (
+                      <div
+                        key={course.id}
+                        onClick={() => setSelectedCourse(course)}
+                        className={`p-3 hover:bg-gray-800 cursor-pointer transition-colors ${
+                          selectedCourse?.id === course.id
+                            ? "bg-gray-800 border-l-4 border-blue-500"
+                            : "border-l-4 border-transparent"
+                        }`}
+                      >
+                        <div className="flex justify-between items-center">
+                          <span className="font-medium">{course.code}</span>
+                          <span className="text-xs text-gray-400">
+                            {course.status}
+                          </span>
+                        </div>
+                        <div className="text-sm text-gray-400 truncate">
+                          {getCourseNameFromCode(course.code)}
+                        </div>
+                        {course.grade && (
+                          <div className="text-xs text-gray-500 mt-1">
+                            Grade: {course.grade} • {course.semester}{" "}
+                            {course.year}
+                          </div>
+                        )}
+                      </div>
+                    ))
+                  ) : (
+                    <div className="p-4 text-center text-gray-400">
+                      {searchQuery
+                        ? "No courses match your search"
+                        : "No courses available"}
+                    </div>
+                  )}
+                </div>
               </div>
+
+              {error && <p className="text-red-400 text-sm">{error}</p>}
 
               <div className="flex justify-end gap-2">
                 <button
@@ -145,7 +172,7 @@ export default function AddManualCourseModal({
                 </button>
                 <button
                   onClick={handleSubmit}
-                  disabled={isSubmitting || !courseCode.trim()}
+                  disabled={isSubmitting || !selectedCourse}
                   className="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                 >
                   {isSubmitting ? (
@@ -153,7 +180,7 @@ export default function AddManualCourseModal({
                   ) : (
                     <>
                       <FiPlus size={16} />
-                      Add Course
+                      Add course to this req
                     </>
                   )}
                 </button>

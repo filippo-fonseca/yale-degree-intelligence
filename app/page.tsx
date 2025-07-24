@@ -853,6 +853,7 @@ export default function Home() {
                     selectedMajor={selectedMajor}
                     progress={getMajorProgress()!}
                     onRequirementChange={fetchCourses}
+                    courses={courses}
                   />
                 </motion.div>
               )}

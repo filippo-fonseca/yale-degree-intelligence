@@ -10,6 +10,7 @@ import { skipCourse, unskipCourse } from "@/lib/utils/courseOperations";
 import CourseModal from "./CourseModal";
 import DegreeIntelligenceBlurb from "./DegreeIntelligenceBlurb";
 import AddManualCourseModal from "../AddManualCourseModal/AddManualCourseModal";
+import { Course } from "@/lib/types";
 
 // Status color mapping for course pills
 function getCourseStatusColor({
@@ -66,10 +67,12 @@ export default function MajorProgressView({
   selectedMajor,
   progress,
   onRequirementChange,
+  courses,
 }: {
   selectedMajor: string;
   progress: MajorProgress;
   onRequirementChange: () => void;
+  courses: Course[];
 }) {
   const { user } = useAuth();
   const [dropdownOpen, setDropdownOpen] = useState<string | null>(null);
@@ -520,6 +523,7 @@ export default function MajorProgressView({
         requirement={manualCourseModal.requirement}
         onClose={() => setManualCourseModal({ isOpen: false, requirement: "" })}
         onSuccess={onRequirementChange}
+        userCourses={courses}
       />
     </div>
   );

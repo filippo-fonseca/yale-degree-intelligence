@@ -249,6 +249,7 @@ export default function MajorProgressView({
       {/* Requirements Sections */}
       <div className="space-y-6">
         {/* Completed Requirements */}
+        // Update the Completed Requirements section with this code:
         {progress.completedRequirements.length > 0 && (
           <div className="space-y-4">
             <button
@@ -275,93 +276,111 @@ export default function MajorProgressView({
                   className="overflow-hidden"
                 >
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {progress.completedRequirements.map((req, i) => (
-                      <motion.div
-                        key={`completed-${i}`}
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: i * 0.05 }}
-                        className="p-4 rounded-xl border bg-emerald-900/10 border-emerald-800/30 hover:border-emerald-500/30"
-                      >
-                        <div className="flex justify-between items-start mb-2">
-                          <h5 className="font-medium text-emerald-300">
-                            {req.name}
-                          </h5>
-                          <div className="flex items-center gap-2">
-                            <span className="text-xs bg-emerald-900/20 text-emerald-300 px-2 py-1 rounded-full">
-                              ✓
-                            </span>
-                          </div>
-                        </div>
-                        {req.description && (
-                          <p className="text-xs mb-3 text-emerald-300/80">
-                            {req.description}
-                          </p>
-                        )}
-                        <div className="flex flex-wrap gap-1.5">
-                          {req.options
-                            .filter((opt) => opt.completed || opt.manual) // Show both completed and manual courses
-                            .map((opt, j) => (
-                              <div
-                                key={`opt-${j}`}
-                                className={`relative px-2 py-0.5 rounded-full text-xs flex items-center transition-all duration-150 hover:scale-[1.05] cursor-pointer ${
-                                  opt.completed || opt.manual
-                                    ? "bg-emerald-900/20 text-emerald-300 border border-emerald-700"
-                                    : "bg-gray-900/20 text-gray-300 border border-gray-700"
-                                }`}
-                                onClick={() => {
-                                  setModalOpen({
-                                    isOpen: true,
-                                    course: {
-                                      code: opt.code,
-                                      name: opt.name,
-                                      status: opt.skipped
-                                        ? "skipped"
-                                        : opt.inProgress
-                                        ? "in-progress"
-                                        : opt.completed || opt.manual
-                                        ? "completed"
-                                        : "not-taken",
-                                      skipped: opt.skipped || false,
-                                    },
-                                  });
-                                }}
+                    {progress.completedRequirements.map((req, i) => {
+                      const isFullyCompleted = req.completed >= req.required;
+                      const hasManualCourses = req.options.some(
+                        (o) => o.manual
+                      );
+
+                      return (
+                        <motion.div
+                          key={`completed-${i}`}
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: i * 0.05 }}
+                          className={`p-4 rounded-xl border ${
+                            isFullyCompleted && !hasManualCourses
+                              ? "bg-emerald-900/10 border-emerald-800/30"
+                              : "bg-amber-900/10 border-amber-800/30"
+                          }`}
+                        >
+                          <div className="flex justify-between items-start mb-2">
+                            <h5
+                              className={`font-medium ${
+                                isFullyCompleted && !hasManualCourses
+                                  ? "text-emerald-300"
+                                  : "text-amber-300"
+                              }`}
+                            >
+                              {req.name}
+                            </h5>
+                            <div className="flex items-center gap-2">
+                              <span
+                                className={`text-xs ${
+                                  isFullyCompleted && !hasManualCourses
+                                    ? "bg-emerald-900/20 text-emerald-300"
+                                    : "bg-amber-900/20 text-amber-300"
+                                } px-2 py-1 rounded-full`}
                               >
-                                {opt.code}
-                                <span className="ml-1 text-[0.65rem]">
-                                  ({opt.credits}cr
-                                  {opt.skipped
-                                    ? ", skipped"
-                                    : opt.inProgress
-                                    ? ", in progress"
-                                    : ", complete"}
-                                  {opt.manual && ", manual"})
-                                </span>
-                                {opt.skipped && (
-                                  <button
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      handleUnskip(opt.code);
-                                    }}
-                                    className="ml-1 text-[0.65rem] text-gray-400 hover:text-gray-200"
-                                    title="Unskip this course"
-                                  >
-                                    <FiX size={10} />
-                                  </button>
-                                )}
-                              </div>
-                            ))}
-                        </div>
-                      </motion.div>
-                    ))}
+                                {isFullyCompleted && !hasManualCourses
+                                  ? "✓"
+                                  : `${req.completed}/${req.required}`}
+                              </span>
+                            </div>
+                          </div>
+                          {req.description && (
+                            <p
+                              className={`text-xs mb-3 ${
+                                isFullyCompleted && !hasManualCourses
+                                  ? "text-emerald-300/80"
+                                  : "text-amber-300/80"
+                              }`}
+                            >
+                              {req.description}
+                            </p>
+                          )}
+                          <div className="flex flex-wrap gap-1.5">
+                            {req.options
+                              .filter(
+                                (opt) =>
+                                  opt.completed || opt.manual || opt.skipped
+                              )
+                              .map((opt, j) => (
+                                <div
+                                  key={`opt-${j}`}
+                                  className={`relative px-2 py-0.5 rounded-full text-xs flex items-center ${
+                                    opt.manual
+                                      ? "bg-purple-900/20 text-purple-300 border border-purple-700"
+                                      : opt.completed
+                                      ? "bg-emerald-900/20 text-emerald-300 border border-emerald-700"
+                                      : "bg-gray-900/20 text-gray-300 border border-dashed border-gray-600"
+                                  }`}
+                                >
+                                  {opt.code}
+                                  <span className="ml-1 text-[0.65rem]">
+                                    ({opt.credits}cr
+                                    {opt.manual && ", manual"}
+                                    {opt.skipped && ", skipped"})
+                                  </span>
+                                  {(opt.skipped || opt.manual) && (
+                                    <button
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        if (opt.skipped) {
+                                          handleUnskip(opt.code);
+                                        } else if (opt.manual) {
+                                          // Add logic here to handle removing manual courses if needed
+                                        }
+                                      }}
+                                      className="ml-1 text-[0.65rem] text-gray-400 hover:text-gray-200"
+                                    >
+                                      <FiX size={10} />
+                                    </button>
+                                  )}
+                                </div>
+                              ))}
+                          </div>
+                        </motion.div>
+                      );
+                    })}
                   </div>
                 </motion.div>
               )}
             </AnimatePresence>
           </div>
         )}
-
         {/* Remaining Requirements */}
+        // Update the Remaining Requirements section with this code:
         {progress.remainingRequirements.length > 0 && (
           <div className="space-y-4">
             <button
@@ -400,27 +419,50 @@ export default function MajorProgressView({
                         .filter((o) => o.inProgress)
                         .reduce((sum, o) => sum + o.credits, 0);
 
+                      const notStarted =
+                        reqCompleted === 0 && reqInProgress === 0;
+
                       return (
                         <motion.div
                           key={`remaining-${reqIdx}`}
                           initial={{ opacity: 0, y: 10 }}
                           animate={{ opacity: 1, y: 0 }}
                           transition={{ delay: reqIdx * 0.05 }}
-                          className="p-4 rounded-xl bg-gray-900/50 backdrop-blur-sm border border-gray-800 hover:border-amber-500/30 transition-all relative"
+                          className={`p-4 rounded-xl bg-gray-900/50 backdrop-blur-sm border ${
+                            notStarted
+                              ? "border-red-800/30 hover:border-red-500/30"
+                              : "border-amber-800/30 hover:border-amber-500/30"
+                          } transition-all relative`}
                         >
                           <div className="flex justify-between items-start mb-2">
-                            <h5 className="font-medium text-amber-300">
+                            <h5
+                              className={`font-medium ${
+                                notStarted ? "text-red-300" : "text-amber-300"
+                              }`}
+                            >
                               {req.name}
                             </h5>
                             <div className="flex items-center gap-2">
-                              <span className="text-xs bg-amber-900/20 text-amber-300 px-2 py-1 rounded-full">
+                              <span
+                                className={`text-xs ${
+                                  notStarted
+                                    ? "bg-red-900/20 text-red-300"
+                                    : "bg-amber-900/20 text-amber-300"
+                                } px-2 py-1 rounded-full`}
+                              >
                                 {reqInProgress + reqCompleted}/{req.required}
                               </span>
                             </div>
                           </div>
 
                           {req.description && (
-                            <p className="text-xs text-amber-300/80 mb-3">
+                            <p
+                              className={`text-xs ${
+                                notStarted
+                                  ? "text-red-300/80"
+                                  : "text-amber-300/80"
+                              } mb-3`}
+                            >
                               {req.description}
                             </p>
                           )}
@@ -431,13 +473,19 @@ export default function MajorProgressView({
                               return (
                                 <div
                                   key={`opt-${optIdx}`}
-                                  className={`relative px-2 py-0.5 rounded-full text-xs flex items-center transition-all duration-150 cursor-pointer hover:scale-[1.05] ${getCourseStatusColor(
-                                    {
-                                      completed: opt.completed,
-                                      inProgress: opt.inProgress,
-                                      skipped: opt.skipped,
-                                    }
-                                  )}`}
+                                  className={`relative px-2 py-0.5 rounded-full text-xs flex items-center transition-all duration-150 cursor-pointer hover:scale-[1.05] ${
+                                    opt.manual
+                                      ? "bg-purple-900/20 text-purple-300 border border-purple-700"
+                                      : opt.completed
+                                      ? "bg-emerald-900/20 text-emerald-300 border border-emerald-700"
+                                      : opt.inProgress
+                                      ? "bg-blue-900/20 text-blue-300 border border-blue-700"
+                                      : opt.skipped
+                                      ? "bg-gray-900/20 text-gray-300 border border-dashed border-gray-600"
+                                      : notStarted
+                                      ? "bg-red-900/20 text-red-300 border border-red-700"
+                                      : "bg-amber-900/20 text-amber-300 border border-amber-700"
+                                  }`}
                                   onClick={() => {
                                     if (!opt.completed && !opt.skipped) {
                                       setModalOpen({
@@ -461,7 +509,9 @@ export default function MajorProgressView({
                                   {opt.code}
                                   <span className="ml-1 text-[0.65rem]">
                                     ({opt.credits}cr
-                                    {opt.skipped
+                                    {opt.manual
+                                      ? ", manual"
+                                      : opt.skipped
                                       ? ", skipped"
                                       : opt.inProgress
                                       ? ", in progress"
@@ -470,14 +520,20 @@ export default function MajorProgressView({
                                       : ""}
                                     )
                                   </span>
-                                  {opt.skipped && (
+                                  {(opt.skipped || opt.manual) && (
                                     <button
                                       onClick={(e) => {
                                         e.stopPropagation();
-                                        handleUnskip(opt.code);
+                                        if (opt.skipped) {
+                                          handleUnskip(opt.code);
+                                        }
                                       }}
                                       className="ml-1 text-[0.65rem] text-gray-400 hover:text-gray-200"
-                                      title="Unskip this course"
+                                      title={
+                                        opt.manual
+                                          ? "Remove manual course"
+                                          : "Unskip this course"
+                                      }
                                     >
                                       <FiX size={10} />
                                     </button>
@@ -493,7 +549,11 @@ export default function MajorProgressView({
                                   requirement: `${selectedMajor}|${req.name}`,
                                 })
                               }
-                              className="px-2 py-0.5 rounded-full text-xs flex items-center gap-1 bg-gray-800 text-gray-400 hover:bg-gray-700 hover:text-gray-300 transition-colors"
+                              className={`px-2 py-0.5 rounded-full text-xs flex items-center gap-1 ${
+                                notStarted
+                                  ? "bg-red-900/20 text-red-300 hover:bg-red-800/30"
+                                  : "bg-gray-800 text-gray-400 hover:bg-gray-700 hover:text-gray-300"
+                              } transition-colors`}
                               title="Add a course manually for this requirement"
                             >
                               <FiPlus size={12} />

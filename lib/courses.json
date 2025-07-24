@@ -13868,36 +13868,72 @@
   {
     "codes": [
       "PHYS 1700",
+      "PHYS 170"
+    ],
+    "name": "University Physics for the Life Sciences I",
+    "credits": 1.0,
+    "department": "PHYS"
+  },
+  {
+    "codes": [
+      "PHYS 1710",
       "PHYS 171"
     ],
-    "name": "University Physics for the Life Sciences",
+    "name": "University Physics for the Life Sciences II",
     "credits": 1.0,
     "department": "PHYS"
   },
   {
     "codes": [
       "PHYS 1800",
+      "PHYS 180"
+    ],
+    "name": "University Physics I",
+    "credits": 1.0,
+    "department": "PHYS"
+  },
+  {
+    "codes": [
+      "PHYS 1810",
       "PHYS 181"
     ],
-    "name": "University Physics",
+    "name": "University Physics II",
     "credits": 1.0,
     "department": "PHYS"
   },
   {
     "codes": [
       "PHYS 2000",
+      "PHYS 200"
+    ],
+    "name": "Fundamentals of Physics I",
+    "credits": 1.0,
+    "department": "PHYS"
+  },
+  {
+    "codes": [
+      "PHYS 2010",
       "PHYS 201"
     ],
-    "name": "Fundamentals of Physics",
+    "name": "Fundamentals of Physics II",
     "credits": 1.0,
     "department": "PHYS"
   },
   {
     "codes": [
       "PHYS 2600",
+      "PHYS 260"
+    ],
+    "name": "Intensive Introductory Physics I",
+    "credits": 1.0,
+    "department": "PHYS"
+  },
+  {
+    "codes": [
+      "PHYS 2610",
       "PHYS 261"
     ],
-    "name": "Intensive Introductory Physics",
+    "name": "Intensive Introductory Physics II",
     "credits": 1.0,
     "department": "PHYS"
   },
@@ -14418,7 +14454,7 @@
       "EENG 200"
     ],
     "name": "Introduction to Electronics",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "ECE"
   },
   {
@@ -14427,7 +14463,7 @@
       "EENG 202"
     ],
     "name": "Introduction to Communications and Control",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "ECE"
   },
   {
@@ -14445,7 +14481,7 @@
       "EENG 320"
     ],
     "name": "Semiconductor Devices",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "ECE"
   },
   {
@@ -14454,7 +14490,7 @@
       "EENG 325"
     ],
     "name": "Microelectronic Circuits",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "ECE"
   },
   {
@@ -14462,7 +14498,7 @@
       "ECE 4250"
     ],
     "name": "Introduction to VLSI System Design",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "ECE"
   },
   {
@@ -14471,7 +14507,7 @@
       "EENG 432"
     ],
     "name": "Linear Systems",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "ECE"
   },
   {
@@ -14480,7 +14516,7 @@
       "EENG 439"
     ],
     "name": "Neural Networks and Learning Systems",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "ECE"
   },
   {
@@ -14489,7 +14525,7 @@
       "EENG 450"
     ],
     "name": "Applied Digital Signal Processing",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "ECE"
   },
   {
@@ -14498,7 +14534,7 @@
       "EENG 452"
     ],
     "name": "Internet Engineering",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "ECE"
   },
   {
@@ -14507,7 +14543,7 @@
       "EENG 469"
     ],
     "name": "Advanced Special Projects",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "ECE"
   },
   {
@@ -14516,7 +14552,7 @@
       "EENG 472"
     ],
     "name": "Senior Advanced Special Projects",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "ECE"
   },
   {
@@ -14525,7 +14561,7 @@
       "EENG 475"
     ],
     "name": "Computational Vision and Biological Perception",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "ECE"
   },
   {
@@ -14533,7 +14569,7 @@
       "ECE 8400"
     ],
     "name": "Detection and Estimation",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "ECE"
   },
   {
@@ -14541,7 +14577,7 @@
       "ECE 8680"
     ],
     "name": "Emerging Materials and Technologies toward Sustainability",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "ECE"
   },
   {
@@ -14549,7 +14585,7 @@
       "ECE 8880"
     ],
     "name": "FPGA-Based Accelerator Design and Implementation",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "ECE"
   },
   {
@@ -14557,7 +14593,7 @@
       "ECE 9051"
     ],
     "name": "Applied Digital Signal Process",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "ECE"
   },
   {
@@ -14565,7 +14601,7 @@
       "ECE 9100"
     ],
     "name": "Topics in Denoising and Structure Recovery from Data",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "ECE"
   },
   {
@@ -14573,7 +14609,7 @@
       "ECE 9500"
     ],
     "name": "How to Wirelessly Sense Almost Anything",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "ECE"
   },
   {
@@ -14582,7 +14618,7 @@
       "EENG 990"
     ],
     "name": "Special Investigations",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "ECE"
   },
   {
@@ -14591,7 +14627,7 @@
       "EENG 201"
     ],
     "name": "Introduction to Computer Engineering",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "ECE"
   },
   {
@@ -14600,7 +14636,7 @@
       "EENG 203"
     ],
     "name": "Circuits and Systems Design",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "ECE"
   },
   {
@@ -14609,7 +14645,7 @@
       "EENG 310"
     ],
     "name": "Signals and Systems",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "ECE"
   },
   {
@@ -14618,7 +14654,7 @@
       "EENG 348"
     ],
     "name": "Digital Systems",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "ECE"
   },
   {
@@ -14627,7 +14663,7 @@
       "EENG 402"
     ],
     "name": "Advanced Electron Devices",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "ECE"
   },
   {
@@ -14635,7 +14671,7 @@
       "ECE 4061"
     ],
     "name": "Photovoltaic Energy",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "ECE"
   },
   {
@@ -14644,7 +14680,7 @@
       "EENG 420"
     ],
     "name": "Computer Architecture",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "ECE"
   },
   {
@@ -14653,7 +14689,7 @@
       "EENG 455"
     ],
     "name": "Network Algorithms and Stochastic Optimization",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "ECE"
   },
   {
@@ -14662,7 +14698,7 @@
       "EENG 481"
     ],
     "name": "Advanced ABET Projects",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "ECE"
   },
   {
@@ -14671,7 +14707,7 @@
       "EENG 434"
     ],
     "name": "Stochastic Processes",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "ECE"
   },
   {
@@ -14679,7 +14715,7 @@
       "ECE 7181"
     ],
     "name": "Advanced Electronic Devices",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "ECE"
   },
   {
@@ -14688,7 +14724,7 @@
       "EENG 435"
     ],
     "name": "Decisions and Computations across Networks",
-    "credits": 0.5,
+    "credits": 1.0,
     "department": "ECE"
   },
   {

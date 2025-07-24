@@ -5375,8 +5375,12 @@
         "description": "PHYS 1800 + 1810 or PHYS 2000 + 2010",
         "required": 2,
         "options": [
-          { "type": "group", "options": ["PHYS 1800", "PHYS 1810"], "required": 2 },
-          { "type": "group", "options": ["PHYS 2000", "PHYS 2010"], "required": 2 }
+          { "type": "course", "code": "PHYS 1800" },
+          { "type": "course", "code": "PHYS 1810" },
+          { "type": "course", "code": "PHYS 2000" },
+          { "type": "course", "code": "PHYS 2010" },
+          { "type": "course", "code": "PHYS 2600" },
+          { "type": "course", "code": "PHYS 2610" }
         ]
       },
       {

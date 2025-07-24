@@ -207,18 +207,17 @@ export const calculateMajorProgress = (
   // Replace the current categorization code with this:
   const completedReqs = requirementProgress.filter(r => 
     r.satisfied || 
-    r.options.some(o => o.manual) // Include requirements with manual courses
+    r.options.some(o => o.manual || o.completed) // Include requirements with any completed or manual courses
   );
-
+  
   const inProgressReqs = requirementProgress.filter(r => 
-  !completedReqs.includes(r) && // Don't include requirements already marked as completed
-  (r.completed > 0 || r.options.some(o => o.inProgress))
+    !completedReqs.includes(r) && // Don't include requirements already marked as completed
+    (r.completed > 0 || r.options.some(o => o.inProgress))
   );
-
-const remainingReqs = requirementProgress.filter(r => 
-  !completedReqs.includes(r) && 
-  !inProgressReqs.includes(r)
-);
+  
+  const remainingReqs = requirementProgress.filter(r => 
+    r.completed < r.required
+  );
 
   // Calculate percentages
   const percentage = Math.min(100, (totalCompletedCredits / major.creditRequirements.total) * 100);

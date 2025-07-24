@@ -249,7 +249,6 @@ export default function MajorProgressView({
       {/* Requirements Sections */}
       <div className="space-y-6">
         {/* Completed Requirements */}
-        // Update the Completed Requirements section with this code:
         {progress.completedRequirements.length > 0 && (
           <div className="space-y-4">
             <button
@@ -380,7 +379,6 @@ export default function MajorProgressView({
           </div>
         )}
         {/* Remaining Requirements */}
-        // Update the Remaining Requirements section with this code:
         {progress.remainingRequirements.length > 0 && (
           <div className="space-y-4">
             <button

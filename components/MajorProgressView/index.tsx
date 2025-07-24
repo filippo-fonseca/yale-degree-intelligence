@@ -11,6 +11,9 @@ import CourseModal from "./CourseModal";
 import DegreeIntelligenceBlurb from "./DegreeIntelligenceBlurb";
 import AddManualCourseModal from "../AddManualCourseModal/AddManualCourseModal";
 import { Course } from "@/lib/types";
+import { db } from "@/config/firebase";
+import { setDoc, doc, where } from "firebase/firestore";
+import { getCourseInfo } from "@/lib/courseCatalog";
 
 // Status color mapping for course pills
 function getCourseStatusColor({
@@ -147,6 +150,58 @@ export default function MajorProgressView({
       ...prev,
       [section]: !prev[section],
     }));
+  };
+
+  const handleRemoveManualCourse = async (
+    courseCode: string,
+    requirementTitle: string
+  ) => {
+    if (!user) return;
+
+    console.log("Removing manual course:");
+
+    try {
+      // Find the course in the courses array by checking all possible codes
+      const courseToUpdate = courses.find((c) => {
+        // Get all possible codes for this course
+        const courseInfo = getCourseInfo(c.code);
+        if (!courseInfo) return false;
+
+        // Check if the input courseCode matches any of this course's codes
+        return courseInfo.codes.includes(courseCode);
+      });
+
+      if (!courseToUpdate) {
+        console.error("Course not found:", courseCode);
+        return;
+      }
+
+      // Remove the manual requirement from the array
+      const updatedManualRequirements =
+        courseToUpdate.manualRequirementsFulfilled?.filter(
+          (m) =>
+            !(
+              m.major_id === selectedMajor &&
+              m.requirement_title === requirementTitle
+            )
+        );
+
+      console.log("the id of the course to update:", courseToUpdate.id);
+
+      // Update the course in Firestore
+      await setDoc(
+        doc(db, "courses", courseToUpdate.id),
+        {
+          ...courseToUpdate,
+          manualRequirementsFulfilled: null,
+        },
+        { merge: true }
+      );
+
+      await onRequirementChange();
+    } catch (error) {
+      console.error("Error removing manual course:", error);
+    }
   };
 
   // Calculate stats
@@ -358,10 +413,18 @@ export default function MajorProgressView({
                                         if (opt.skipped) {
                                           handleUnskip(opt.code);
                                         } else if (opt.manual) {
-                                          // Add logic here to handle removing manual courses if needed
+                                          handleRemoveManualCourse(
+                                            opt.code,
+                                            req.name
+                                          );
                                         }
                                       }}
                                       className="ml-1 text-[0.65rem] text-gray-400 hover:text-gray-200"
+                                      title={
+                                        opt.manual
+                                          ? "Remove manual course"
+                                          : "Unskip this course"
+                                      }
                                     >
                                       <FiX size={10} />
                                     </button>
@@ -524,6 +587,11 @@ export default function MajorProgressView({
                                         e.stopPropagation();
                                         if (opt.skipped) {
                                           handleUnskip(opt.code);
+                                        } else if (opt.manual) {
+                                          handleRemoveManualCourse(
+                                            opt.code,
+                                            req.name
+                                          );
                                         }
                                       }}
                                       className="ml-1 text-[0.65rem] text-gray-400 hover:text-gray-200"

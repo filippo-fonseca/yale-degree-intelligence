@@ -828,8 +828,9 @@ export default function Home() {
                         {user?.displayName?.split(" ")[0]}.
                       </h2>
                       <p>
-                        This is based on data from your transcript and the
-                        major(s) you indicated to us.
+                        This is based on data from your transcript and the{" "}
+                        {userProfile?.majors?.length > 1 ? "majors" : "major"}{" "}
+                        you indicated to us.
                       </p>
                     </div>
                   )}

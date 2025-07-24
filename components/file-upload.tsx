@@ -76,7 +76,7 @@ export default function FileUpload({ onSuccess }: FileUploadProps) {
   }
 
   if (isProcessing) {
-    return <CustomLoader />;
+    return <CustomLoader fullScreen={false} />;
   }
 
   return (

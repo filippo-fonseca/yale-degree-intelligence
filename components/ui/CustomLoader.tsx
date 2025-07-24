@@ -3,7 +3,11 @@
 import { motion } from "framer-motion";
 import React, { useState, useEffect } from "react";
 
-const CustomLoader = () => {
+interface CustomLoaderProps {
+  fullScreen?: boolean;
+}
+
+const CustomLoader = ({ fullScreen = true }: CustomLoaderProps) => {
   const [randomPhrase, setRandomPhrase] = useState(
     "Loading your academic rizz..."
   );
@@ -43,7 +47,11 @@ const CustomLoader = () => {
   // Static fallback for server-side rendering
   if (!isClient) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-gray-950 overflow-hidden">
+      <div
+        className={`flex items-center justify-center ${
+          fullScreen ? "min-h-screen" : "min-h-[200px]"
+        } bg-gray-950 overflow-hidden`}
+      >
         <div className="relative w-64 h-64">
           <div className="absolute inset-0 flex items-center justify-center">
             <div className="w-28 h-28 rounded-full bg-gradient-to-br from-gray-900 to-gray-800 border-2 border-gray-700 shadow-inner" />
@@ -57,7 +65,11 @@ const CustomLoader = () => {
   }
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-950 overflow-hidden">
+    <div
+      className={`flex items-center justify-center ${
+        fullScreen ? "min-h-screen" : "min-h-[200px]"
+      } bg-gray-950 overflow-hidden`}
+    >
       <div className="relative w-64 h-64">
         {/* The hole */}
         <div className="absolute inset-0 flex items-center justify-center">
@@ -80,10 +92,10 @@ const CustomLoader = () => {
               rotate: 360,
             }}
             transition={{
-              delay: i * 0.15, // Reduced delay between items
-              duration: 0.8, // Faster animation
+              delay: i * 0.15,
+              duration: 0.8,
               repeat: Infinity,
-              repeatDelay: 3, // Reduced pause before repeating
+              repeatDelay: 3,
               ease: "easeInOut",
             }}
             style={{
@@ -109,10 +121,10 @@ const CustomLoader = () => {
               y: 0,
             }}
             transition={{
-              delay: 0.5 + i * 0.1, // Start sooner with smaller gap
-              duration: 0.6, // Faster animation
+              delay: 0.5 + i * 0.1,
+              duration: 0.6,
               repeat: Infinity,
-              repeatDelay: 3, // Reduced pause
+              repeatDelay: 3,
               ease: "anticipate",
             }}
           />

@@ -137,7 +137,11 @@ export default function DegreeIntelligence() {
             </span>
           </h4>
           <div className="mt-2 text-sm text-gray-300 space-y-2">
-            <p>{advice.advice}</p>
+            {/* <p>{advice.advice}</p> */}
+            <p>
+              I'm coming to your DegreeIntelligence platform soon! Stay tuned.
+              {":)"}
+            </p>
             <p className="text-xs text-gray-400 mt-3">
               Analysis updated: {formattedDate}
             </p>

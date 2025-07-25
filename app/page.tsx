@@ -50,6 +50,7 @@ import { FaBuildingCircleCheck } from "react-icons/fa6";
 import CustomLoader from "@/components/ui/CustomLoader";
 import UserSettingsModal from "@/components/UserSettingsModal/UserSettingsModal";
 import Link from "next/link";
+import LogoIcon from "@/icons/LogoIcon";
 
 interface UserProfile {
   majors: string[];
@@ -114,25 +115,32 @@ export default function Home() {
       id: "upload",
       icon: HiDocumentDuplicate,
       label: "My courses",
-      disabled: false, // Always enabled
+      disabled: false,
     },
     {
       id: "stats",
       icon: FiBarChart2,
       label: "Academic stats",
-      disabled: !hasData, // Disabled if no data
+      disabled: !hasData,
     },
     {
       id: "major",
       icon: RiProgress3Fill,
       label: "My major",
-      disabled: !hasData, // Disabled if no data
+      disabled: !hasData,
     },
     {
       id: "distributionals",
       icon: FaBuildingCircleCheck,
       label: "Distributionals",
-      disabled: !hasData, // Disabled if no data
+      disabled: true, // Always disabled
+      tooltip: "Coming Soon", // Add tooltip text
+    },
+    {
+      id: "cleoai",
+      icon: LogoIcon, // Using the coffee icon as a placeholder - you might want a different icon
+      label: "CleoAI",
+      disabled: !hasData,
     },
   ];
 
@@ -637,7 +645,7 @@ export default function Home() {
                       void new Audio("/audio/pop.mp3").play().catch(() => null);
                     }
                   }}
-                  className={`w-full flex items-center justify-between px-4 py-3 text-left rounded-xl transition-all ${
+                  className={`w-full flex items-center justify-between px-4 py-3 text-left rounded-xl transition-all relative ${
                     activeTab === item.id
                       ? "bg-gray-900/50 border border-gray-800 text-white"
                       : item.disabled
@@ -647,7 +655,7 @@ export default function Home() {
                   disabled={item.disabled}
                 >
                   <div className="flex items-center space-x-3">
-                    <item.icon size={18} />
+                    <item.icon size={activeTab === "cleoai" ? 18 : 12} />
                     <span>{item.label}</span>
                   </div>
                   {activeTab === item.id && (
@@ -658,6 +666,11 @@ export default function Home() {
                     >
                       <FiChevronRight />
                     </motion.div>
+                  )}
+                  {item.disabled && item.tooltip && (
+                    <div className="absolute left-full ml-2 px-2 py-1 bg-gray-800 text-gray-200 text-xs rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                      {item.tooltip}
+                    </div>
                   )}
                 </motion.button>
               ))}
@@ -928,6 +941,66 @@ export default function Home() {
                   transition={{ duration: 0.3 }}
                 >
                   <DistributionalsView courses={courses} />
+                </motion.div>
+              )}
+              {activeTab === "cleoai" && (
+                <motion.div
+                  key="cleoai"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <div className="mb-6 flex items-start justify-between">
+                    <div className="m-0">
+                      <h2 className="text-3xl m-0 font-medium bg-clip-text text-transparent bg-gradient-to-r from-blue-200 to-purple-200">
+                        CleoAI – Context-Powered Academic Insight
+                      </h2>
+                      <p className="text-gray-400 mt-2">
+                        More than just a chatbot – CleoAI is your tailored
+                        academic advisor, powered by your actual transcript
+                        data.
+                      </p>
+                    </div>
+
+                    <span className="inline-block px-3 py-1 text-sm bg-yellow-900/30 border border-yellow-800 text-yellow-400 rounded-full">
+                      Coming Soon
+                    </span>
+                  </div>
+
+                  <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-6 space-y-4">
+                    <p className="text-lg text-gray-200 font-medium">
+                      Sure, you could copy-paste your transcript into ChatGPT…
+                    </p>
+                    <p className="text-gray-400">But good luck supplying:</p>
+                    <ul className="list-disc list-inside text-gray-400 space-y-1 pl-2">
+                      <li>Thousands of lines of course history and grades</li>
+                      <li>Raw and computed academic stats</li>
+                      <li>Dynamic progress toward major and graduation</li>
+                      <li>
+                        Distributional fulfillment, GPA, and degree requirements
+                      </li>
+                    </ul>
+
+                    <p className="text-gray-400">
+                      CleoAI already knows all of that — because it lives inside
+                      your DegreeIntelligence dashboard. No need to re-explain
+                      yourself.
+                    </p>
+
+                    <div className="p-4 rounded-lg bg-blue-900/20 border border-blue-800 text-blue-300 text-sm italic">
+                      This isn’t just AI with words. This is AI with{" "}
+                      <span className="font-semibold text-blue-200">
+                        context
+                      </span>
+                      .
+                    </div>
+
+                    <p className="text-gray-500 text-sm pt-2">
+                      We are actively working on making CleoAI better. Stay
+                      tuned. {":)"}
+                    </p>
+                  </div>
                 </motion.div>
               )}
             </AnimatePresence>

@@ -130,17 +130,17 @@ export default function Home() {
       disabled: !hasData,
     },
     {
+      id: "cleoai",
+      icon: LogoIcon, // Using the coffee icon as a placeholder - you might want a different icon
+      label: "CleoAI",
+      disabled: !hasData,
+    },
+    {
       id: "distributionals",
       icon: FaBuildingCircleCheck,
       label: "Distributionals",
       disabled: true, // Always disabled
       tooltip: "Coming Soon", // Add tooltip text
-    },
-    {
-      id: "cleoai",
-      icon: LogoIcon, // Using the coffee icon as a placeholder - you might want a different icon
-      label: "CleoAI",
-      disabled: !hasData,
     },
   ];
 
@@ -830,6 +830,61 @@ export default function Home() {
                             </div>
                           </motion.div>
                         ))}
+                        {courses.some((c) => c.skipped) && (
+                          <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            className="mb-8"
+                          >
+                            <div className="mb-4">
+                              <h3 className="text-lg font-medium text-gray-300">
+                                Skipped Courses
+                              </h3>
+                              <p className="text-sm text-gray-500">
+                                You have indicated to us in the <i>My major</i>{" "}
+                                page that you qualify to "skip" these classes,
+                                which count for your major.
+                              </p>
+                            </div>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                              {courses
+                                .filter((c) => c.skipped)
+                                .map((course) => (
+                                  <motion.div
+                                    key={course.id}
+                                    whileHover={{ y: -2 }}
+                                    className="p-4 rounded-xl bg-gray-900/50 backdrop-blur-sm border border-gray-800 hover:border-gray-700 transition-all border-l-2 border-gray-600"
+                                  >
+                                    <div className="flex justify-between items-start">
+                                      <div>
+                                        <h4 className="font-medium">
+                                          {course.code}
+                                        </h4>
+                                        <p className="text-sm text-gray-400">
+                                          {getCourseNameFromCode(course.code)}
+                                        </p>
+                                        <div className="flex items-center mt-1 space-x-2">
+                                          <span className="text-xs text-gray-500">
+                                            {course.credits} credit
+                                            {course.credits !== 1 ? "s" : ""}
+                                          </span>
+                                        </div>
+                                      </div>
+                                      {course.grade && (
+                                        <span
+                                          className={`text-lg font-medium ${getGPAColor(
+                                            course.grade
+                                          )}`}
+                                        >
+                                          {course.grade}
+                                        </span>
+                                      )}
+                                    </div>
+                                  </motion.div>
+                                ))}
+                            </div>
+                          </motion.div>
+                        )}
                       </div>
                     </div>
                   ) : (

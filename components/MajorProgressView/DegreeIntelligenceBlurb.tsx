@@ -140,11 +140,11 @@ export default function DegreeIntelligence() {
             {/* <p>{advice.advice}</p> */}
             <p>
               I'm coming to your DegreeIntelligence platform soon! Stay tuned.
-              {":)"}
+              {" :)"}
             </p>
-            <p className="text-xs text-gray-400 mt-3">
+            {/* <p className="text-xs text-gray-400 mt-3">
               Analysis updated: {formattedDate}
-            </p>
+            </p> */}
           </div>
         </div>
       </div>

@@ -673,21 +673,29 @@ export default function Home() {
                   className="p-3 rounded-xl bg-gray-900 border border-gray-800 shadow-[0_4px_20px_rgba(0,0,0,0.25)]"
                 >
                   <div className="flex flex-col space-y-2.5">
-                    <button className="w-full flex items-center space-x-2.5 p-2 rounded-lg hover:bg-gray-800/40 transition-all duration-200 text-gray-300 hover:text-white">
+                    <Link
+                      href="/about"
+                      target="_blank"
+                      className="w-full flex items-center space-x-2.5 p-2 rounded-lg hover:bg-gray-800/40 transition-all duration-200 text-gray-300 hover:text-white"
+                    >
                       <div className="p-1.5 rounded-lg bg-blue-900/30 border border-blue-800/50 flex items-center justify-center">
                         <FiBook className="text-blue-400" size={14} />
                       </div>
-                      <span className="text-sm font-medium">Our Mission</span>
-                    </button>
+                      <span className="text-sm font-medium">Our mission</span>
+                    </Link>
 
-                    <button className="w-full flex items-center space-x-2.5 p-2 rounded-lg hover:bg-gray-800/40 transition-all duration-200 text-gray-300 hover:text-white">
+                    <Link
+                      href="https://coff.ee/filippofonseca"
+                      target="_blank"
+                      className="w-full flex items-center space-x-2.5 p-2 rounded-lg hover:bg-gray-800/40 transition-all duration-200 text-gray-300 hover:text-white"
+                    >
                       <div className="p-1.5 rounded-lg bg-amber-900/30 border border-amber-800/50 flex items-center justify-center">
                         <FiCoffee className="text-amber-400" size={14} />
                       </div>
                       <span className="text-sm font-medium">
                         Buy us a coffee
                       </span>
-                    </button>
+                    </Link>
                   </div>
                 </motion.div>
 

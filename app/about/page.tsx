@@ -1,9 +1,16 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { FiGithub, FiMail, FiUsers } from "react-icons/fi";
+import {
+  FiArrowRight,
+  FiGithub,
+  FiMail,
+  FiUsers,
+  FiExternalLink,
+} from "react-icons/fi";
 import LogoIcon from "@/icons/LogoIcon";
 import CompoundLogo from "@/components/ui/CompoundLogo";
+import Link from "next/link";
 
 export default function AboutPage() {
   const features = [
@@ -29,6 +36,30 @@ export default function AboutPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-blue-900/80 to-purple-900 font-louize">
+      {/* Access Platform Button - Top Right */}
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="fixed top-6 right-6 z-50"
+      >
+        <Link href="/" target="_blank">
+          <motion.button
+            className="flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-md rounded-xl border border-white/20 text-white hover:bg-white/20 transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-xl"
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            <span>Access the platform!</span>
+            <motion.span
+              animate={{ x: [0, 2, 0] }}
+              transition={{ duration: 1.5, repeat: Infinity }}
+            >
+              <FiArrowRight />
+            </motion.span>
+          </motion.button>
+        </Link>
+      </motion.div>
+
       {/* Hero Section */}
       <div className="relative overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 pt-20 pb-4 sm:px-6 lg:px-8 relative z-10">
@@ -95,7 +126,7 @@ export default function AboutPage() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.6, delay: i * 0.1 }}
-                className="bg-gray-800/50 p-6 rounded-xl border border-gray-700/50 hover:border-blue-500/30 transition-all"
+                className="bg-gray-800/50 p-6 rounded-xl border border-gray-700/50 hover:border-blue-500/30 transition-all hover:scale-[1.02]"
               >
                 <div className="text-3xl mb-4">{feature.emoji}</div>
                 <h3 className="text-xl font-medium text-blue-200 mb-2">
@@ -128,6 +159,8 @@ export default function AboutPage() {
               bio: "Built the first version as a shell script after one too many long sessions trying to plan courses.",
               contact: "filippo.fonseca@yale.edu",
               photoRoute: "/team/filippo.jpeg",
+              github: "https://github.com/filippo-fonseca",
+              website: "https://filippofonseca.com",
             },
             {
               name: "Emir Ahmed",
@@ -135,6 +168,8 @@ export default function AboutPage() {
               bio: "Joined forces to turn a hacky solution into something all Yalies could use.",
               contact: "emir.ahmed@yale.edu",
               photoRoute: "/team/emir.JPG",
+              github: "https://github.com/EmirkataG",
+              website: "",
             },
           ].map((person, i) => (
             <motion.div
@@ -143,7 +178,7 @@ export default function AboutPage() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6, delay: i * 0.1 }}
-              className="bg-gray-900/70 backdrop-blur-sm p-6 rounded-xl border border-gray-800/50 flex-1 max-w-md"
+              className="bg-gray-900/70 backdrop-blur-sm p-6 rounded-xl border border-gray-800/50 flex-1 max-w-md hover:scale-[1.02] transition-transform"
             >
               <div className="flex items-center gap-4 mb-4">
                 <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
@@ -161,12 +196,30 @@ export default function AboutPage() {
                 </div>
               </div>
               <p className="text-gray-300 mb-4">{person.bio}</p>
-              <a
-                href={`mailto:${person.contact}`}
-                className="text-blue-400 hover:text-blue-300 text-sm flex items-center gap-2"
-              >
-                <FiMail /> {person.contact}
-              </a>
+              <div className="flex flex-wrap gap-3">
+                <a
+                  href={`mailto:${person.contact}`}
+                  className="text-blue-400 hover:text-blue-300 text-sm flex items-center gap-2"
+                >
+                  <FiMail /> Email
+                </a>
+                <a
+                  href={person.github}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-400 hover:text-blue-300 text-sm flex items-center gap-2"
+                >
+                  <FiGithub /> GitHub
+                </a>
+                <a
+                  href={person.website}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-400 hover:text-blue-300 text-sm flex items-center gap-2"
+                >
+                  <FiExternalLink /> Website
+                </a>
+              </div>
             </motion.div>
           ))}
         </div>
@@ -195,13 +248,13 @@ export default function AboutPage() {
               href="https://github.com/your-repo"
               target="_blank"
               rel="noopener noreferrer"
-              className="px-6 py-3 bg-gray-800 hover:bg-gray-700 rounded-lg text-white flex items-center gap-2 transition-colors"
+              className="px-6 py-3 bg-gray-800 hover:bg-gray-700 rounded-lg text-white flex items-center gap-2 transition-colors hover:scale-105"
             >
               <FiGithub /> GitHub
             </a>
             <a
               href="mailto:filippo.fonseca@yale.edu,emir.ahmed@yale.edu"
-              className="px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 rounded-lg text-white flex items-center gap-2 transition-all"
+              className="px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 rounded-lg text-white flex items-center gap-2 transition-all hover:scale-105"
             >
               <FiMail /> Email Us
             </a>

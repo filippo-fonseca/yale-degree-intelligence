@@ -21,6 +21,7 @@ import {
   getDocs,
   deleteDoc,
 } from "firebase/firestore";
+import { getGPAColor } from "@/lib/utils/utils";
 
 type CourseStatus = "completed" | "in-progress" | "not-taken" | "skipped";
 
@@ -193,7 +194,9 @@ export default function CourseModal({
                   !course.skipped &&
                   courseGrade && (
                     <span
-                      className={`text-xs px-2 py-1 rounded-full bg-emerald-900/20 text-emerald-300`}
+                      className={`text-xs px-2 py-1 rounded-full bg-emerald-900/20 ${getGPAColor(
+                        courseGrade
+                      )}`}
                     >
                       {courseGrade}
                     </span>

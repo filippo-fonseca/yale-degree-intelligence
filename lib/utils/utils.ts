@@ -15,3 +15,10 @@ export function coursesToPromptString(courses: Course[]): string {
     `${i + 1}. ${c.code} - ${getCourseNameFromCode(c.code)}${c.credits ? ` (${c.credits} credits)` : ""}${c.grade ? `, Grade: ${c.grade}` : ""}${c.semester ? `, Semester: ${c.semester}` : ""}`
   ).join('\n');
 }
+
+export const getGPAColor = (gpa: string) => {
+  if (gpa == "A" || gpa == "A-") return "text-emerald-400";
+  if (gpa == "B+" || gpa == "B" || gpa == "B-") return "text-amber-400";
+  if (gpa == "In Progress") return "text-blue-400";
+  return "text-red-400";
+};

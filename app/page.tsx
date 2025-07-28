@@ -53,6 +53,7 @@ import UserSettingsModal from "@/components/UserSettingsModal/UserSettingsModal"
 import Link from "next/link";
 import LogoIcon from "@/icons/LogoIcon";
 import CourseModal from "@/components/MajorProgressView/CourseModal";
+import { getGPAColor } from "@/lib/utils/utils";
 
 interface UserProfile {
   majors: string[];
@@ -463,13 +464,6 @@ export default function Home() {
 
   const stats = calculateStats();
 
-  const getGPAColor = (gpa: string) => {
-    if (gpa == "A" || gpa == "A-") return "text-emerald-400";
-    if (gpa == "B+" || gpa == "B" || gpa == "B-") return "text-amber-400";
-    if (gpa == "In Progress") return "text-blue-400";
-    return "text-red-400";
-  };
-
   const getYearStatus = (graduationYear: number): string => {
     const now = new Date();
     const currentYear = now.getFullYear();
@@ -863,7 +857,7 @@ export default function Home() {
                                       <motion.div
                                         key={course.id}
                                         whileHover={{ y: -2 }}
-                                        className={`p-4 rounded-xl bg-gray-900/50 backdrop-blur-sm border border-gray-800 hover:border-gray-700 transition-all`}
+                                        className={`p-4 cursor-pointer rounded-xl bg-gray-900/50 backdrop-blur-sm border border-gray-800 hover:border-gray-700 transition-all`}
                                         onClick={() => {
                                           setModalOpen({
                                             isOpen: true,

@@ -15,6 +15,7 @@ import {
   FiUser,
   FiChevronDown,
   FiCoffee,
+  FiRefreshCw,
 } from "react-icons/fi";
 import {
   collection,
@@ -109,6 +110,8 @@ export default function Home() {
     "dashboardActiveTab",
     "upload"
   );
+
+  const [showUpdateModal, setShowUpdateModal] = useState(false);
 
   const navItems = [
     {
@@ -232,7 +235,6 @@ export default function Home() {
     setCoursesLoading(false);
   };
 
-  // Update the parseAndStoreCourses function in src/app/page.tsx
   const parseAndStoreCourses = async (extractedText: string) => {
     if (!user) return;
 
@@ -242,9 +244,14 @@ export default function Home() {
       where("userId", "==", user.uid)
     );
     const existingSnapshot = await getDocs(existingCoursesQuery);
+
+    // Create a comprehensive key for duplicate detection (semester-year-code-grade)
     const existingCourseKeys = new Set(
       existingSnapshot.docs.map(
-        (doc) => `${doc.data().semester}-${doc.data().year}-${doc.data().code}`
+        (doc) =>
+          `${doc.data().semester}-${doc.data().year}-${doc.data().code}-${
+            doc.data().grade || "null"
+          }`
       )
     );
 
@@ -253,7 +260,7 @@ export default function Home() {
       .filter((block) => block.trim() !== "");
     const coursesToAdd: Omit<Course, "id">[] = [];
 
-    // Track seen courses in this parse to prevent duplicates
+    // Track seen courses in this parse to prevent duplicates within the same upload
     const seenInThisParse = new Set<string>();
 
     for (const block of semesterBlocks) {
@@ -269,14 +276,21 @@ export default function Home() {
         );
         if (completedMatch) {
           const [, code, name, grade, credits] = completedMatch;
-          const courseKey = `${season.trim()}-${year.trim()}-${code.trim()}`;
+          const courseKey = `${season.trim()}-${year.trim()}-${code.trim()}-${grade.trim()}`;
 
-          // Skip if already exists or seen in this parse
-          if (
-            existingCourseKeys.has(courseKey) ||
-            seenInThisParse.has(courseKey)
-          )
+          // Skip if already exists in DB or seen in this parse
+          if (existingCourseKeys.has(courseKey)) {
+            console.log(
+              `Skipping duplicate course (existing in DB): ${courseKey}`
+            );
             continue;
+          }
+          if (seenInThisParse.has(courseKey)) {
+            console.log(
+              `Skipping duplicate course (current parse): ${courseKey}`
+            );
+            continue;
+          }
           seenInThisParse.add(courseKey);
 
           coursesToAdd.push({
@@ -297,14 +311,21 @@ export default function Home() {
         );
         if (inProgressMatch) {
           const [, code, name, credits] = inProgressMatch;
-          const courseKey = `${season.trim()}-${year.trim()}-${code.trim()}`;
+          const courseKey = `${season.trim()}-${year.trim()}-${code.trim()}-null`;
 
-          // Skip if already exists or seen in this parse
-          if (
-            existingCourseKeys.has(courseKey) ||
-            seenInThisParse.has(courseKey)
-          )
+          // Skip if already exists in DB or seen in this parse
+          if (existingCourseKeys.has(courseKey)) {
+            console.log(
+              `Skipping duplicate in-progress course (existing in DB): ${courseKey}`
+            );
             continue;
+          }
+          if (seenInThisParse.has(courseKey)) {
+            console.log(
+              `Skipping duplicate in-progress course (current parse): ${courseKey}`
+            );
+            continue;
+          }
           seenInThisParse.add(courseKey);
 
           coursesToAdd.push({
@@ -322,17 +343,20 @@ export default function Home() {
 
     // Only proceed if there are new courses to add
     if (coursesToAdd.length > 0) {
+      console.log(`Adding ${coursesToAdd.length} new courses`);
       const batchWrites = coursesToAdd.map((course) => {
         const docRef = doc(collection(db, "courses"));
         return setDoc(docRef, course);
       });
 
       await Promise.all(batchWrites);
+    } else {
+      console.log("No new courses to add");
     }
 
-    console.log("the courses to add BAD BO", coursesToAdd);
+    console.log("Courses to add:", coursesToAdd);
 
-    //AI UPLOAD:
+    // AI UPLOAD:
     const now = new Date();
     let currentSemester: string;
     const month = now.getMonth() + 1;
@@ -384,6 +408,9 @@ export default function Home() {
       console.error("AI advice fetch error", err);
       setLatestAdvice(null);
     }
+
+    // Close the modal if it was open (i.e. if it's an update)
+    showUpdateModal && setShowUpdateModal(false);
 
     await fetchCourses();
   };
@@ -745,16 +772,26 @@ export default function Home() {
                 >
                   {hasData ? (
                     <div>
-                      <div className="mb-6">
-                        <h2 className="text-3xl font-medium bg-clip-text text-transparent bg-gradient-to-r from-blue-200 to-purple-200">
-                          Your academic journey at Yale,{" "}
-                          {user?.displayName?.split(" ")[0]}.
-                        </h2>
-                        <p>
-                          These are all the classes you've taken, including
-                          their grades and in-progress ones. You can always
-                          upload a more recent transcript to update this data.
-                        </p>
+                      <div className="mb-6 flex justify-between items-start">
+                        <div>
+                          <h2 className="text-3xl font-medium bg-clip-text text-transparent bg-gradient-to-r from-blue-200 to-purple-200">
+                            Your academic journey at Yale,{" "}
+                            {user?.displayName?.split(" ")[0]}.
+                          </h2>
+                          <p>
+                            These are all the classes you've taken, including
+                            their grades and in-progress ones. You can always
+                            upload a more recent transcript to update this data.
+                          </p>
+                        </div>
+                        <motion.button
+                          whileHover={{ scale: 1.03 }}
+                          whileTap={{ scale: 0.98 }}
+                          onClick={() => setShowUpdateModal(true)}
+                          className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gray-900 border border-gray-800 hover:border-gray-700 text-gray-300 hover:text-white transition-all shadow-[0_4px_20px_rgba(0,0,0,0.25)]"
+                        >
+                          <FiRefreshCw className="text-blue-400" />
+                        </motion.button>
                       </div>
                       <div className="space-y-8">
                         {Array.from(
@@ -853,7 +890,7 @@ export default function Home() {
                                   <motion.div
                                     key={course.id}
                                     whileHover={{ y: -2 }}
-                                    className="p-4 rounded-xl bg-gray-900/50 backdrop-blur-sm border border-gray-800 hover:border-gray-700 transition-all border-l-2 border-gray-600"
+                                    className="p-4 rounded-xl bg-gray-900/50 backdrop-blur-sm border border-gray-800 hover:border-gray-700 transition-all border-l-2"
                                   >
                                     <div className="flex justify-between items-start">
                                       <div>
@@ -908,6 +945,51 @@ export default function Home() {
                       </div>
                     </div>
                   )}
+                </motion.div>
+              )}
+              {showUpdateModal && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+                  onClick={() => setShowUpdateModal(false)}
+                >
+                  <motion.div
+                    initial={{ scale: 0.9, y: 20 }}
+                    animate={{ scale: 1, y: 0 }}
+                    onClick={(e) => e.stopPropagation()}
+                    className="w-full max-w-lg bg-gray-900/90 backdrop-blur-sm p-8 rounded-xl border border-gray-800 relative"
+                  >
+                    <button
+                      onClick={() => setShowUpdateModal(false)}
+                      className="absolute top-4 right-4 p-1 rounded-full hover:bg-gray-800 transition-colors"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-5 w-5 text-gray-400"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M6 18L18 6M6 6l12 12"
+                        />
+                      </svg>
+                    </button>
+                    <h3 className="text-xl font-medium mb-4 text-gray-200">
+                      Update your transcript
+                    </h3>
+                    <p className="text-gray-400 mb-6">
+                      Upload a new transcript to update your course history.
+                      We'll only add new courses that aren't already in your
+                      record.
+                    </p>
+                    <FileUpload onSuccess={parseAndStoreCourses} />
+                  </motion.div>
                 </motion.div>
               )}
 

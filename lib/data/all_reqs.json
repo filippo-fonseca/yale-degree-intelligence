@@ -5368,7 +5368,7 @@
         "name": "Calculus III",
         "description": "ENAS 1510 or equivalent",
         "required": 1,
-        "options": [{ "type": "course", "code": "ENAS 1510" }]
+        "options": [{ "type": "course", "code": "ENAS 1510" }, { "type": "course", "code": "MATH 1200" }]
       },
       {
         "name": "Physics Sequence",

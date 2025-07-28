@@ -52,6 +52,7 @@ import CustomLoader from "@/components/ui/CustomLoader";
 import UserSettingsModal from "@/components/UserSettingsModal/UserSettingsModal";
 import Link from "next/link";
 import LogoIcon from "@/icons/LogoIcon";
+import CourseModal from "@/components/MajorProgressView/CourseModal";
 
 interface UserProfile {
   majors: string[];
@@ -104,6 +105,17 @@ export default function Home() {
   const [latestAdvice, setLatestAdvice] = useState<string | null>(null);
 
   const [coursesLoading, setCoursesLoading] = useState(true);
+
+  //for the "My courses" section:
+  const [modalOpen, setModalOpen] = useState<{
+    isOpen: boolean;
+    course: {
+      code: string;
+      name: string;
+      status: "completed" | "in-progress" | "not-taken" | "skipped";
+      skipped: boolean;
+    } | null;
+  }>({ isOpen: false, course: null });
 
   //tabs:
   const [activeTab, setActiveTab] = useLocalStorage(
@@ -299,7 +311,8 @@ export default function Home() {
             semester: season.trim(),
             year: parseInt(year.trim()),
             userId: user.uid,
-            status: "completed",
+            status:
+              grade.trim() === "In Progress" ? "in-progress" : "completed",
             credits: parseFloat(credits),
           });
           continue;
@@ -815,55 +828,77 @@ export default function Home() {
                                 .filter(
                                   (c) => `${c.semester} ${c.year}` === semester
                                 )
-                                .map((course) => (
-                                  <motion.div
-                                    key={course.id}
-                                    whileHover={{ y: -2 }}
-                                    className={`p-4 rounded-xl bg-gray-900/50 backdrop-blur-sm border border-gray-800 hover:border-gray-700 transition-all ${
-                                      course.status === "in-progress"
-                                        ? "border-l-2 border-blue-400/80"
-                                        : course.skipped
-                                        ? "border-l-2 border-gray-600"
-                                        : ""
-                                    }`}
-                                  >
-                                    <div className="flex justify-between items-start">
-                                      <div>
-                                        <h4 className="font-medium">
-                                          {course.code}
-                                          {course.skipped && (
-                                            <span className="ml-2 text-xs text-gray-500">
-                                              (skipped)
+                                .map((course) => {
+                                  // console.log(
+                                  //   "the course name and status",
+                                  //   course.code,
+                                  //   course.status
+                                  // );
+                                  return (
+                                    <motion.div
+                                      key={course.id}
+                                      whileHover={{ y: -2 }}
+                                      className={`p-4 rounded-xl bg-gray-900/50 backdrop-blur-sm border border-gray-800 hover:border-gray-700 transition-all`}
+                                      onClick={() => {
+                                        setModalOpen({
+                                          isOpen: true,
+                                          course: {
+                                            code: course.code,
+                                            name:
+                                              getCourseNameFromCode(
+                                                course.code
+                                              ) ?? "Course",
+                                            status: course.status,
+                                            skipped: course.skipped || false,
+                                          },
+                                        });
+                                      }}
+                                    >
+                                      <div className="flex justify-between items-start">
+                                        <div>
+                                          <h4 className="font-medium">
+                                            {course.code}
+                                            {course.skipped && (
+                                              <span className="ml-2 text-xs text-gray-500">
+                                                (skipped)
+                                              </span>
+                                            )}
+                                          </h4>
+                                          <p className="text-sm text-gray-400">
+                                            {getCourseNameFromCode(course.code)}
+                                          </p>
+                                          <div className="flex items-center mt-1 space-x-2">
+                                            <span
+                                              className={`text-xs px-2 py-1 rounded-full ${
+                                                course.status === "completed" &&
+                                                !course.skipped
+                                                  ? getGPAColor(
+                                                      course.grade || ""
+                                                    ) + " bg-emerald-900/20"
+                                                  : course.status ===
+                                                    "in-progress"
+                                                  ? "text-purple-300 bg-purple-900/20"
+                                                  : "text-gray-300 bg-gray-800/20"
+                                              }`}
+                                            >
+                                              {course.status === "completed" &&
+                                              !course.skipped
+                                                ? course.grade || "Completed"
+                                                : course.status ===
+                                                  "in-progress"
+                                                ? "In Progress"
+                                                : "Skipped"}
                                             </span>
-                                          )}
-                                        </h4>
-                                        <p className="text-sm text-gray-400">
-                                          {getCourseNameFromCode(course.code)}
-                                        </p>
-                                        <div className="flex items-center mt-1 space-x-2">
-                                          {course.status === "in-progress" && (
-                                            <span className="inline-block px-2 py-0.5 bg-blue-900/20 text-blue-400 rounded-full text-xs">
-                                              In Progress
+                                            <span className="text-xs text-gray-500">
+                                              {course.credits} credit
+                                              {course.credits !== 1 ? "s" : ""}
                                             </span>
-                                          )}
-                                          <span className="text-xs text-gray-500">
-                                            {course.credits} credit
-                                            {course.credits !== 1 ? "s" : ""}
-                                          </span>
+                                          </div>
                                         </div>
                                       </div>
-                                      {course.grade && !course.skipped && (
-                                        <span
-                                          className={`text-lg font-medium ${getGPAColor(
-                                            course.grade
-                                          )}`}
-                                        >
-                                          {course.grade}
-                                        </span>
-                                      )}
-                                    </div>
-                                  </motion.div>
-                                ))}
+                                    </motion.div>
+                                  );
+                                })}
                             </div>
                           </motion.div>
                         ))}
@@ -1144,6 +1179,12 @@ export default function Home() {
           </motion.div>
         </div>
       </div>
+      <CourseModal
+        isOpen={modalOpen.isOpen}
+        course={modalOpen.course}
+        onClose={() => setModalOpen({ isOpen: false, course: null })}
+        allowSkip={false} // Disables skip functionality
+      />
     </main>
   );
 }

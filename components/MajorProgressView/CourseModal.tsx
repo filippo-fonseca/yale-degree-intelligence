@@ -33,8 +33,9 @@ interface CourseModalProps {
     skipped?: boolean;
   } | null;
   onClose: () => void;
-  onSkip: (code: string, name: string) => void;
-  onRefresh: () => void;
+  onSkip?: (code: string, name: string) => void; // Made optional
+  onRefresh?: () => void; // Made optional
+  allowSkip?: boolean; // New prop to control skip functionality
 }
 
 export default function CourseModal({
@@ -43,6 +44,7 @@ export default function CourseModal({
   onClose,
   onSkip,
   onRefresh,
+  allowSkip = true, // Default to true for backward compatibility
 }: CourseModalProps) {
   const { user } = useAuth();
   const dropdownRef = useRef<HTMLDivElement | null>(null);
@@ -54,7 +56,6 @@ export default function CourseModal({
   );
   const [courseCredits, setCourseCredits] = useState<number | undefined>();
 
-  //fetch courseGrade from "courses" backend
   useEffect(() => {
     if (!user) return;
 
@@ -63,14 +64,11 @@ export default function CourseModal({
     }
 
     if (course?.status == "completed" && !course.skipped) {
-      //all possible course codes
-
       const fetchCourseBackend = async () => {
         try {
           const otherCodes = getOtherCodesForCourse(course.code);
           const allCodesToCheck = [course.code, ...otherCodes];
 
-          // Try each code sequentially until we find a match
           for (const code of allCodesToCheck) {
             const q = query(
               collection(db, "courses"),
@@ -85,11 +83,10 @@ export default function CourseModal({
               setCourseSemesterTaken(
                 courseData.semester + " " + courseData.year || "N/A"
               );
-              return; // Exit early if we found a match
+              return;
             }
           }
 
-          // If we get here, no matches were found
           setCourseGrade(null);
           setCourseSemesterTaken(null);
         } catch (err) {
@@ -116,7 +113,7 @@ export default function CourseModal({
   }, [dropdownOpen]);
 
   const handleDeleteCourse = async () => {
-    if (!user || !course) return;
+    if (!user || !course || !onRefresh) return;
     try {
       const q = query(
         collection(db, "courses"),
@@ -128,7 +125,7 @@ export default function CourseModal({
       const batchDeletes = snapshot.docs.map((doc) => deleteDoc(doc.ref));
       await Promise.all(batchDeletes);
 
-      onRefresh?.();
+      onRefresh();
       setShowConfirmDelete(false);
       setDropdownOpen(null);
       onClose();
@@ -201,58 +198,57 @@ export default function CourseModal({
                       {courseGrade}
                     </span>
                   )}
-                <div className="relative">
-                  {course.status !== "completed" && (
+                {allowSkip && course.status !== "completed" && (
+                  <div className="relative">
                     <button
                       onClick={() => setDropdownOpen(course.code)}
                       className="text-gray-400 hover:text-white"
                     >
                       <FiMoreVertical />
                     </button>
-                  )}
-                  {dropdownOpen === course.code && (
-                    <motion.div
-                      ref={dropdownRef}
-                      initial={{ opacity: 0, y: -10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -10 }}
-                      className="absolute right-0 z-[999] mt-2 w-48 rounded-md bg-gray-700 shadow-lg border border-gray-600 overflow-visible"
-                    >
-                      {course.skipped ? (
-                        <button
-                          className="flex items-center gap-2 w-full px-3 py-2 text-sm text-red-300 hover:bg-gray-600"
-                          onClick={() => handleDeleteCourse()}
-                        >
-                          <FiTrash2 />
-                          Mark as Not Taken
-                        </button>
-                      ) : (
-                        <>
-                          {/* For in-progress or not-taken courses */}
+                    {dropdownOpen === course.code && (
+                      <motion.div
+                        ref={dropdownRef}
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -10 }}
+                        className="absolute right-0 z-[999] mt-2 w-48 rounded-md bg-gray-700 shadow-lg border border-gray-600 overflow-visible"
+                      >
+                        {course.skipped ? (
                           <button
-                            className="flex items-center gap-2 w-full px-3 py-2 text-sm text-gray-200 hover:bg-gray-600"
-                            onClick={() => {
-                              onClose();
-                              setCourseGrade(null);
-                              onSkip(course.code, course.name);
-                              setDropdownOpen(null);
-                            }}
+                            className="flex items-center gap-2 w-full px-3 py-2 text-sm text-red-300 hover:bg-gray-600"
+                            onClick={() => handleDeleteCourse()}
                           >
-                            <FiCornerDownLeft />
-                            Mark as skipped
+                            <FiTrash2 />
+                            Mark as Not Taken
                           </button>
-                          <button
-                            className="flex items-center gap-2 w-full px-3 py-2 text-sm text-gray-400 hover:bg-gray-600"
-                            onClick={() => setDropdownOpen(null)}
-                          >
-                            <FiX />
-                            Cancel
-                          </button>
-                        </>
-                      )}
-                    </motion.div>
-                  )}
-                </div>
+                        ) : (
+                          <>
+                            <button
+                              className="flex items-center gap-2 w-full px-3 py-2 text-sm text-gray-200 hover:bg-gray-600"
+                              onClick={() => {
+                                onClose();
+                                setCourseGrade(null);
+                                onSkip?.(course.code, course.name);
+                                setDropdownOpen(null);
+                              }}
+                            >
+                              <FiCornerDownLeft />
+                              Mark as skipped
+                            </button>
+                            <button
+                              className="flex items-center gap-2 w-full px-3 py-2 text-sm text-gray-400 hover:bg-gray-600"
+                              onClick={() => setDropdownOpen(null)}
+                            >
+                              <FiX />
+                              Cancel
+                            </button>
+                          </>
+                        )}
+                      </motion.div>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
             <p className="text-gray-300">

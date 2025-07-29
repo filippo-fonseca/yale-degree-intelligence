@@ -65,7 +65,7 @@ export function MajorDropdown({
         className="w-full text-left p-3 rounded-lg border border-gray-700 bg-gray-800 hover:bg-gray-800/50 flex justify-between items-center"
       >
         <div className="flex items-center">
-          <div className="w-4 h-4 rounded-full bg-blue-500 mr-3 flex-shrink-0" />
+          <div className="w-4 h-4 rounded-full bg-pink-500 mr-3 flex-shrink-0" />
           <div>
             <div className="font-medium">{value}</div>
             <div className="text-sm text-gray-400">{selectedMajorName}</div>
@@ -99,7 +99,7 @@ export function MajorDropdown({
                 placeholder="Search majors at Yale..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full bg-gray-900 text-gray-200 px-3 py-2 pl-8 rounded-md border border-gray-700 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="w-full bg-gray-900 text-gray-200 px-3 py-2 pl-8 rounded-md border border-gray-700 focus:outline-none focus:ring-1 focus:ring-pink-500"
               />
               <svg
                 className="absolute left-2 top-2.5 h-4 w-4 text-gray-400"
@@ -130,7 +130,7 @@ export function MajorDropdown({
                   }}
                   disabled={disabledOptions.includes(code)}
                   className={`w-full text-left p-3 hover:bg-gray-700/50 ${
-                    value === code ? "bg-blue-900/20" : ""
+                    value === code ? "bg-pink-900/20" : ""
                   } ${
                     disabledOptions.includes(code)
                       ? "opacity-50 cursor-not-allowed"
@@ -139,7 +139,7 @@ export function MajorDropdown({
                 >
                   <div className="flex items-center">
                     {value === code && (
-                      <div className="w-4 h-4 rounded-full bg-blue-500 mr-3 flex-shrink-0" />
+                      <div className="w-4 h-4 rounded-full bg-pink-500 mr-3 flex-shrink-0" />
                     )}
                     <div>
                       <div className="font-medium">{code}</div>

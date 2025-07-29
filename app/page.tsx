@@ -787,8 +787,8 @@ export default function Home() {
                           </h2>
                           <p>
                             These are all the classes you've taken, including
-                            their grades and in-progress ones. You can always
-                            upload a more recent transcript to update this data.
+                            their grades and in-progress ones. Upload a more
+                            recent transcript on the top right.
                           </p>
                         </div>
                         <motion.button

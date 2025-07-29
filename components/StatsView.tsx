@@ -228,8 +228,8 @@ export default function StatsView({ courses }: { courses: Course[] }) {
     <div className={`space-y-8 font-louize text-gray-200`}>
       {/* Summary Cards */}
       <InfoCard>
-        We're working on more statistics and insights. Stay tuned for updates
-        very soon, including a cumulative GPA chart.
+        We're working on more statistics and insights. Stay tuned; this includes
+        a cumulative GPA chart.
       </InfoCard>
       <motion.div
         initial={{ opacity: 0, y: 20 }}

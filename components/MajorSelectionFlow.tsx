@@ -7,6 +7,7 @@ import { doc, setDoc } from "firebase/firestore";
 import { db } from "@/config/firebase";
 import { useAuth } from "@/context/AuthContext";
 import { MAJORS } from "@/lib/majors";
+import { MajorDropdown } from "./ui/MajorDropdown";
 
 interface MajorSelectionFlowProps {
   onComplete: () => void;
@@ -80,7 +81,7 @@ export default function MajorSelectionFlow({
         )}
 
         {step === "majors" && (
-          <div className="space-y-6">
+          <div className="space-y-4">
             <h2 className="text-xl font-medium text-center text-gray-200">
               Select Your Major(s)
             </h2>
@@ -89,30 +90,48 @@ export default function MajorSelectionFlow({
               settings.
             </p>
 
-            <div className="max-h-[60vh] overflow-y-auto pr-2">
-              <div className="grid grid-cols-1 gap-2">
-                {Object.entries(MAJORS).map(([code, name]) => (
-                  <button
-                    key={code}
-                    onClick={() => handleMajorToggle(code)}
-                    className={`text-left p-3 rounded-lg border transition-all ${
-                      selectedMajors.includes(code)
-                        ? "border-blue-500 bg-blue-900/20 text-blue-100"
-                        : "border-gray-800 hover:border-gray-700 hover:bg-gray-800/50"
-                    }`}
+            <div className="space-y-3">
+              {selectedMajors.map((major, index) => (
+                <MajorDropdown
+                  key={index}
+                  value={major}
+                  onChange={(newMajor) => {
+                    const newMajors = [...selectedMajors];
+                    newMajors[index] = newMajor;
+                    setSelectedMajors(newMajors);
+                  }}
+                  disabledOptions={selectedMajors.filter((m) => m !== major)}
+                />
+              ))}
+
+              {selectedMajors.length < 2 && (
+                <button
+                  onClick={() =>
+                    setSelectedMajors([
+                      ...selectedMajors,
+                      Object.keys(MAJORS)[0],
+                    ])
+                  }
+                  disabled={selectedMajors.length >= 2}
+                  className="w-full py-2 px-4 rounded-lg border border-gray-700 hover:bg-gray-800/50 text-gray-400 hover:text-gray-200 flex items-center justify-center"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-5 w-5 mr-1"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
                   >
-                    <div className="flex items-center">
-                      {selectedMajors.includes(code) && (
-                        <div className="w-4 h-4 rounded-full bg-blue-500 mr-3 flex-shrink-0" />
-                      )}
-                      <div>
-                        <div className="font-medium">{code}</div>
-                        <div className="text-sm text-gray-400">{name}</div>
-                      </div>
-                    </div>
-                  </button>
-                ))}
-              </div>
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                    />
+                  </svg>
+                  Add Major
+                </button>
+              )}
             </div>
 
             <div className="flex justify-between pt-4">

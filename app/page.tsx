@@ -585,7 +585,11 @@ export default function Home() {
           userProfile={userProfile}
           onClose={() => setShowSettings(false)}
           onSave={handleProfileUpdate}
-          onLogout={logout}
+          onLogout={() => {
+            setShowSettings(false);
+            setActiveTab("upload");
+            logout();
+          }}
         />
       )}
 

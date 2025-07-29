@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { FiLogOut } from "react-icons/fi";
 import { User } from "firebase/auth";
 import { MAJORS } from "@/lib/majors";
+import { MajorDropdown } from "../ui/MajorDropdown";
 
 interface UserProfile {
   majors: string[];
@@ -33,6 +34,14 @@ export default function UserSettingsModal({
     null
   );
   const modalRef = useRef<HTMLDivElement>(null);
+
+  const [activeDropdownIndex, setActiveDropdownIndex] = useState<number | null>(
+    null
+  );
+
+  const handleToggleDropdown = (index: number) => {
+    setActiveDropdownIndex(activeDropdownIndex === index ? null : index);
+  };
 
   // Initialize local profile state
   useEffect(() => {
@@ -240,40 +249,13 @@ export default function UserSettingsModal({
             <div className="space-y-2">
               {localProfile.majors.map((major, index) => (
                 <div key={index} className="flex items-center space-x-2">
-                  <div className="relative flex-1">
-                    <select
-                      value={major}
-                      onChange={(e) => handleMajorChange(index, e.target.value)}
-                      className="w-full appearance-none bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 pr-8 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    >
-                      {Object.entries(MAJORS).map(([code, name]) => (
-                        <option
-                          key={code}
-                          value={code}
-                          disabled={
-                            localProfile.majors.includes(code) &&
-                            localProfile.majors[index] !== code
-                          }
-                        >
-                          {code} - {name}
-                        </option>
-                      ))}
-                    </select>
-                    <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                      <svg
-                        className="h-5 w-5 text-gray-400"
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 20 20"
-                        fill="currentColor"
-                      >
-                        <path
-                          fillRule="evenodd"
-                          d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                    </div>
-                  </div>
+                  <MajorDropdown
+                    value={major}
+                    onChange={(newMajor) => handleMajorChange(index, newMajor)}
+                    disabledOptions={localProfile.majors.filter(
+                      (m) => m !== major
+                    )}
+                  />
                   {index > 0 && (
                     <button
                       onClick={() => handleRemoveMajor(index)}

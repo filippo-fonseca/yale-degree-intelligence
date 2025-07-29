@@ -37,6 +37,7 @@ import {
   ChevronRight,
 } from "lucide-react";
 import PieChartWrapper from "./ui/PieChartWrapper";
+import { InfoCard } from "./ui/InfoCard";
 
 const COLORS = [
   "#8B5CF6", // purple
@@ -226,6 +227,10 @@ export default function StatsView({ courses }: { courses: Course[] }) {
   return (
     <div className={`space-y-8 font-louize text-gray-200`}>
       {/* Summary Cards */}
+      <InfoCard>
+        We're working on more statistics and insights. Stay tuned for updates
+        very soon, including a cumulative GPA chart.
+      </InfoCard>
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}

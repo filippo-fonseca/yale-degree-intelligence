@@ -14,6 +14,7 @@ import { Course } from "@/lib/types";
 import { db } from "@/config/firebase";
 import { setDoc, doc, where } from "firebase/firestore";
 import { getCourseInfo } from "@/lib/courseCatalog";
+import { InfoCard } from "../ui/InfoCard";
 
 // Status color mapping for course pills
 function getCourseStatusColor({
@@ -214,10 +215,9 @@ export default function MajorProgressView({
 
   return (
     <div className="space-y-6 font-louize">
-      <div className="flex items-start gap-2 p-3 bg-gray-800/50 rounded-lg border border-gray-700 text-sm text-gray-300">
-        <FiInfo className="w-4 h-4 mt-0.5 flex-shrink-0" />
-        <span>Pro tip: Click on each course for actions and more info.</span>
-      </div>
+      <InfoCard>
+        Pro tip: Click on each course for actions and more info.
+      </InfoCard>
 
       {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">

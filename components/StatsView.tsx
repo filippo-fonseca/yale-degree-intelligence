@@ -304,7 +304,7 @@ export default function StatsView({ courses }: { courses: Course[] }) {
         </ChartBox>
 
         {/* Cumulative GPA - Area Chart */}
-        <ChartBox
+        {/* <ChartBox
           title="Cumulative Academic Trajectory"
           icon={<AreaChartIcon className="h-5 w-5" />}
           description="The progression of your cumulative GPA over time."
@@ -408,10 +408,10 @@ export default function StatsView({ courses }: { courses: Course[] }) {
               />
             </AreaChart>
           </ResponsiveContainer>
-        </ChartBox>
+        </ChartBox> */}
 
         {/* Semester GPA - Area Chart */}
-        <ChartBox
+        {/* <ChartBox
           title="Individual Performance by Semester"
           icon={<AreaChartIcon className="h-5 w-5" />}
           description="GPA and credits for each completed semester (includes summer)."
@@ -511,7 +511,7 @@ export default function StatsView({ courses }: { courses: Course[] }) {
               />
             </AreaChart>
           </ResponsiveContainer>
-        </ChartBox>
+        </ChartBox> */}
 
         {/* Department Performance - Fixed Bar Chart */}
         {/* <ChartBox

@@ -29,7 +29,7 @@ export default function AboutPage() {
     {
       title: "Built by Yalies, for Yalies.",
       description:
-        "Born from our own frustrations with double major planning. We're solving the problems we actually faced.",
+        "Born from our own frustrations with double major planning. We're solving the problems we actually faced. Rather than gatekeeping, we decided to make it clean and publish it.",
       emoji: "🎓",
     },
   ];
@@ -45,17 +45,12 @@ export default function AboutPage() {
       >
         <Link href="/" target="_blank">
           <motion.button
-            className="flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-md rounded-xl border border-white/20 text-white hover:bg-white/20 transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-xl"
+            className="flex items-center gap-2 px-4 py-2 border border-blue-500 bg-blue-500/30 hover:bg-blue-500/40 backdrop-blur-md rounded-lg text-white font-medium transition-all shadow-sm hover:shadow-md"
             whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
+            whileTap={{ scale: 0.98 }}
           >
-            <span>Access the platform!</span>
-            <motion.span
-              animate={{ x: [0, 2, 0] }}
-              transition={{ duration: 1.5, repeat: Infinity }}
-            >
-              <FiArrowRight />
-            </motion.span>
+            <span>Log in with CAS</span>
+            <FiArrowRight className="opacity-80" />
           </motion.button>
         </Link>
       </motion.div>
@@ -87,16 +82,45 @@ export default function AboutPage() {
             </div>
 
             <h1 className="flex items-center justify-center text-5xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-blue-200 to-purple-300 mb-4">
-              <CompoundLogo hideLogo animated size="xl" />
+              <CompoundLogo hideLogo animated size="lg" />
             </h1>
 
-            <p className="text-xl text-gray-300 max-w-3xl mx-auto">
+            <h2 className="text-4xl font-bold text-white mb-6">
+              Your Yale Degree,{" "}
+              <span className="text-blue-300">made easy.</span>
+            </h2>
+
+            <p className="text-xl text-gray-300 max-w-3xl mx-auto mb-8">
               Democratizing academic planning at Yale—one major at a time.
             </p>
+
+            <motion.div className="flex justify-center gap-4">
+              <Link href="/demo">
+                <motion.button
+                  className="px-6 py-3 border border-pink-500 bg-pink-500/30 hover:bg-pink-500/40 backdrop-blur-md rounded-lg text-white font-medium flex items-center gap-2 transition-all shadow-sm hover:shadow-md"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  View Demo
+                  <FiArrowRight className="opacity-80" />
+                </motion.button>
+              </Link>
+              <Link href="/" target="_blank">
+                <motion.button
+                  className="px-6 py-3 border border-blue-500 bg-blue-500/30 hover:bg-blue-500/40 backdrop-blur-md rounded-lg text-white font-medium flex items-center gap-2 transition-all shadow-sm hover:shadow-md"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  Access Platform
+                  <FiArrowRight className="opacity-80" />
+                </motion.button>
+              </Link>
+            </motion.div>
           </motion.div>
         </div>
       </div>
 
+      {/* Rest of the code remains exactly the same */}
       {/* Mission Section */}
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <motion.div
@@ -108,7 +132,7 @@ export default function AboutPage() {
         >
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-200 to-purple-200 mb-4">
-              Why we built this.
+              What it is and why we built this.
             </h2>
             <p className="text-lg text-gray-300 max-w-3xl mx-auto">
               Trying to plan our majors, we kept running into the same problem:
@@ -143,11 +167,11 @@ export default function AboutPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="text-center mb-12">
           <h2 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-200 to-purple-200 mb-4">
-            The Team
+            It's nice to meet you!
           </h2>
           <p className="text-lg text-gray-300 max-w-3xl mx-auto">
-            Just two Yalies who got tired of spreadsheet hell and decided to do
-            something about it.
+            We're just two Yale students who got tired of spreadsheet hell and
+            decided to do something about it.
           </p>
         </div>
 

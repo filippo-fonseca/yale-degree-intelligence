@@ -147,9 +147,7 @@ const CustomLoader = ({ fullScreen = true }: CustomLoaderProps) => {
         </motion.div>
         {/* Text */}
         <motion.div
-          className={`absolute bottom-0 left-0 right-0 text-center text-sm text-gray-400 ${
-            fullScreen ? "mt-4" : "mt-1"
-          }`}
+          className={`absolute bottom-0 left-0 right-0 text-center text-sm text-gray-400`}
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5 }}

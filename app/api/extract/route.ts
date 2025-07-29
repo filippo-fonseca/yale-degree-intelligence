@@ -38,6 +38,7 @@ Important Rules:
 5. Course codes should preserve their original formatting
 6. Course names should be properly capitalized
 7. Credits should be in the format (X.X) where X.X is the number of credits (like 0.5, 1.0, 1.5, etc.)
+8. NOTE: Some transcripts may have a course code that has "YC" appended to the end. Remove this in your output. Example: if MENG 185YC is obtained, output it as MENG 185.
 
 Transcript:
 ${text}

@@ -15357,6 +15357,10 @@
           {
             "type": "course",
             "code": "ENAS 1510"
+          },
+          {
+            "type": "course",
+            "code": "MATH 1200"
           }
         ]
       },

@@ -528,7 +528,7 @@ export default function Home() {
   //   void new Audio("/audio/pop.mp3").play().catch(() => null);
   // }, [activeTab, hasData]);
 
-  if (loading || (user && coursesLoading)) return <CustomLoader />;
+  if (loading || coursesLoading) return <CustomLoader />;
 
   if (!user) return <LoginPage />;
 
@@ -956,12 +956,15 @@ export default function Home() {
                           >
                             <div className="mb-4">
                               <h3 className="text-lg font-medium text-gray-300">
-                                Skipped Courses
+                                "Skipped" Courses for your major
+                                {userProfile && userProfile?.majors.length > 0
+                                  ? "s"
+                                  : ""}
                               </h3>
                               <p className="text-sm text-gray-500">
                                 You have indicated to us in the <i>My major</i>{" "}
                                 page that you qualify to "skip" these classes,
-                                which count for your major.
+                                which fulfill requirements.
                               </p>
                             </div>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">

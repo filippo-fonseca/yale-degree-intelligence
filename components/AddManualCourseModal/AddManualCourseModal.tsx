@@ -112,8 +112,8 @@ export default function AddManualCourseModal({
                     type="text"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full bg-gray-800 border border-gray-700 rounded-lg pl-10 pr-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="Search courses..."
+                    className="w-full bg-gray-800 border border-gray-700 rounded-lg pl-10 pr-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-pink-500"
+                    placeholder="Search courses from your transcript..."
                   />
                 </div>
               </div>
@@ -130,14 +130,18 @@ export default function AddManualCourseModal({
                         onClick={() => setSelectedCourse(course)}
                         className={`p-3 hover:bg-gray-800 cursor-pointer transition-colors ${
                           selectedCourse?.id === course.id
-                            ? "bg-gray-800 border-l-4 border-blue-500"
+                            ? "bg-gray-800 border-l-4 border-pink-500"
                             : "border-l-4 border-transparent"
                         }`}
                       >
                         <div className="flex justify-between items-center">
                           <span className="font-medium">{course.code}</span>
                           <span className="text-xs text-gray-400">
-                            {course.status}
+                            {course.status === "in-progress"
+                              ? "In Progress"
+                              : course.status === "completed"
+                              ? "Completed"
+                              : "Not Taken"}
                           </span>
                         </div>
                         <div className="text-sm text-gray-400 truncate">
@@ -173,7 +177,7 @@ export default function AddManualCourseModal({
                 <button
                   onClick={handleSubmit}
                   disabled={isSubmitting || !selectedCourse}
-                  className="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                  className="px-4 py-2 rounded-lg bg-pink-600 text-white hover:bg-pink-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                 >
                   {isSubmitting ? (
                     "Adding..."

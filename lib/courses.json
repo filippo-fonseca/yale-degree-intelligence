@@ -6371,6 +6371,475 @@
   },
   {
     "codes": [
+      "HSHM 4200",
+      "HSHM 420"
+    ],
+    "name": "Senior Project Workshop",
+    "credits": 0.5,
+    "department": "HSHM"
+  },
+  {
+    "codes": [
+      "HSHM 5250",
+      "HSHM 525"
+    ],
+    "name": "Field Studies",
+    "credits": 0.5,
+    "department": "HSHM"
+  },
+  {
+    "codes": [
+      "HSHM 7691",
+      "HSHM 692"
+    ],
+    "name": "Topics in the Environmental Humanities",
+    "credits": 0.5,
+    "department": "HSHM"
+  },
+  {
+    "codes": [
+      "HSHM 7900",
+      "HSHM 790"
+    ],
+    "name": "HSHM Program Seminar",
+    "credits": 0.5,
+    "department": "HSHM"
+  },
+  {
+    "codes": [
+      "HSHM 2010",
+      "HSHM 201"
+    ],
+    "name": "Sustainable Energy: Physics and History",
+    "credits": 1.0,
+    "department": "HSHM"
+  },
+  {
+    "codes": [
+      "HSHM 2040"
+    ],
+    "name": "American Environmental History",
+    "credits": 1.0,
+    "department": "HSHM"
+  },
+  {
+    "codes": [
+      "HSHM 2060"
+    ],
+    "name": "Histories of American Reproductive Health, Rights, and Activism from 1800",
+    "credits": 1.0,
+    "department": "HSHM"
+  },
+  {
+    "codes": [
+      "HSHM 2210"
+    ],
+    "name": "What Was the University?",
+    "credits": 1.0,
+    "department": "HSHM"
+  },
+  {
+    "codes": [
+      "HSHM 2240",
+      "HSHM 224"
+    ],
+    "name": "Nature and Art, or The History of Almost Everything",
+    "credits": 1.0,
+    "department": "HSHM"
+  },
+  {
+    "codes": [
+      "HSHM 2260",
+      "HSHM 226"
+    ],
+    "name": "The Global Scientific Revolution",
+    "credits": 1.0,
+    "department": "HSHM"
+  },
+  {
+    "codes": [
+      "HSHM 2330",
+      "HSHM 233"
+    ],
+    "name": "The Politics of Global Health, 1850-Present",
+    "credits": 1.0,
+    "department": "HSHM"
+  },
+  {
+    "codes": [
+      "HSHM 2520"
+    ],
+    "name": "History of Anti-Black Racism and Medicine",
+    "credits": 1.0,
+    "department": "HSHM"
+  },
+  {
+    "codes": [
+      "HSHM 4060",
+      "HSHM 406"
+    ],
+    "name": "Healthcare for the Urban Underserved",
+    "credits": 1.0,
+    "department": "HSHM"
+  },
+  {
+    "codes": [
+      "HSHM 4090"
+    ],
+    "name": "Community Histories: Reproductive Health in New Haven",
+    "credits": 1.0,
+    "department": "HSHM"
+  },
+  {
+    "codes": [
+      "HSHM 4180"
+    ],
+    "name": "Queer Science",
+    "credits": 1.0,
+    "department": "HSHM"
+  },
+  {
+    "codes": [
+      "HSHM 4230",
+      "HSHM 423"
+    ],
+    "name": "Healing Spaces in U.S. History",
+    "credits": 1.0,
+    "department": "HSHM"
+  },
+  {
+    "codes": [
+      "HSHM 4280",
+      "HSHM 428"
+    ],
+    "name": "Technology and American Medicine",
+    "credits": 1.0,
+    "department": "HSHM"
+  },
+  {
+    "codes": [
+      "HSHM 4330"
+    ],
+    "name": "Gender and Science",
+    "credits": 1.0,
+    "department": "HSHM"
+  },
+  {
+    "codes": [
+      "HSHM 4380",
+      "HSHM 438"
+    ],
+    "name": "Unnatural History: Colonialism and Inequality in the Making of Nature",
+    "credits": 1.0,
+    "department": "HSHM"
+  },
+  {
+    "codes": [
+      "HSHM 4410"
+    ],
+    "name": "Museums: Power and Politics",
+    "credits": 1.0,
+    "department": "HSHM"
+  },
+  {
+    "codes": [
+      "HSHM 4480"
+    ],
+    "name": "American Medicine and the Cold War",
+    "credits": 1.0,
+    "department": "HSHM"
+  },
+  {
+    "codes": [
+      "HSHM 4580"
+    ],
+    "name": "Scientific Instruments & the History of Science",
+    "credits": 1.0,
+    "department": "HSHM"
+  },
+  {
+    "codes": [
+      "HSHM 4630"
+    ],
+    "name": "Care Work: Intersectional Pedagogical, Experiential, and Theoretical Approaches to Healing",
+    "credits": 1.0,
+    "department": "HSHM"
+  },
+  {
+    "codes": [
+      "HSHM 4640",
+      "HSHM 464"
+    ],
+    "name": "Nature and Human Nature",
+    "credits": 1.0,
+    "department": "HSHM"
+  },
+  {
+    "codes": [
+      "HSHM 4680",
+      "HSHM 468"
+    ],
+    "name": "Sex, Life, and Generation",
+    "credits": 1.0,
+    "department": "HSHM"
+  },
+  {
+    "codes": [
+      "HSHM 4700",
+      "HSHM 470"
+    ],
+    "name": "Directed Reading",
+    "credits": 1.0,
+    "department": "HSHM"
+  },
+  {
+    "codes": [
+      "HSHM 4740",
+      "HSHM 474"
+    ],
+    "name": "Health, Medicine and Science in Modern South Asia",
+    "credits": 1.0,
+    "department": "HSHM"
+  },
+  {
+    "codes": [
+      "HSHM 4900",
+      "HSHM 490"
+    ],
+    "name": "Yearlong Senior Project",
+    "credits": 1.0,
+    "department": "HSHM"
+  },
+  {
+    "codes": [
+      "HSHM 4930"
+    ],
+    "name": "Technology, Race and Gender",
+    "credits": 1.0,
+    "department": "HSHM"
+  },
+  {
+    "codes": [
+      "HSHM 7010",
+      "HSHM 703"
+    ],
+    "name": "Problems in the History of Medicine and Public Health",
+    "credits": 1.0,
+    "department": "HSHM"
+  },
+  {
+    "codes": [
+      "HSHM 7100",
+      "HSHM 710"
+    ],
+    "name": "Problems in Science Studies",
+    "credits": 1.0,
+    "department": "HSHM"
+  },
+  {
+    "codes": [
+      "HSHM 7130"
+    ],
+    "name": "Geography and History",
+    "credits": 1.0,
+    "department": "HSHM"
+  },
+  {
+    "codes": [
+      "HSHM 7520"
+    ],
+    "name": "Historicizing the Atmosphere",
+    "credits": 1.0,
+    "department": "HSHM"
+  },
+  {
+    "codes": [
+      "HSHM 7920",
+      "HSHM 792"
+    ],
+    "name": "Enduring Conditions: Chronic Illness, Disability, Care, and Access",
+    "credits": 1.0,
+    "department": "HSHM"
+  },
+  {
+    "codes": [
+      "HSHM 9200",
+      "HSHM 920"
+    ],
+    "name": "Independent Reading",
+    "credits": 1.0,
+    "department": "HSHM"
+  },
+  {
+    "codes": [
+      "HSHM 9200"
+    ],
+    "name": "Independent Reading: Architectures of Care",
+    "credits": 1.0,
+    "department": "HSHM"
+  },
+  {
+    "codes": [
+      "HSHM 9300",
+      "HSHM 930"
+    ],
+    "name": "Independent Research",
+    "credits": 1.0,
+    "department": "HSHM"
+  },
+  {
+    "codes": [
+      "HSHM 2090",
+      "HSHM 006"
+    ],
+    "name": "Making Climate Knowledge",
+    "credits": 1.0,
+    "department": "HSHM"
+  },
+  {
+    "codes": [
+      "HSHM 2140"
+    ],
+    "name": "Extraterrestrials in History",
+    "credits": 1.0,
+    "department": "HSHM"
+  },
+  {
+    "codes": [
+      "HSHM 2270"
+    ],
+    "name": "Botanical Bodies: Plants, Medicine and Colonial Science",
+    "credits": 1.0,
+    "department": "HSHM"
+  },
+  {
+    "codes": [
+      "HSHM 2321",
+      "HSHM 321"
+    ],
+    "name": "Cultures of Western Medicine",
+    "credits": 1.0,
+    "department": "HSHM"
+  },
+  {
+    "codes": [
+      "HSHM 2490"
+    ],
+    "name": "The Good Death: A History",
+    "credits": 1.0,
+    "department": "HSHM"
+  },
+  {
+    "codes": [
+      "HSHM 4020"
+    ],
+    "name": "Literature and the Sciences of Life",
+    "credits": 1.0,
+    "department": "HSHM"
+  },
+  {
+    "codes": [
+      "HSHM 4150"
+    ],
+    "name": "Historical Perspectives on Science and Religion",
+    "credits": 1.0,
+    "department": "HSHM"
+  },
+  {
+    "codes": [
+      "HSHM 4240"
+    ],
+    "name": "Health Activism in U.S. History",
+    "credits": 1.0,
+    "department": "HSHM"
+  },
+  {
+    "codes": [
+      "HSHM 4440"
+    ],
+    "name": "Health, Humanitarianism, and Refugee Politics",
+    "credits": 1.0,
+    "department": "HSHM"
+  },
+  {
+    "codes": [
+      "HSHM 4450",
+      "HSHM 445"
+    ],
+    "name": "Fetal Histories: Pregnancy, Life, and Personhood in the American Cultural Imagination",
+    "credits": 1.0,
+    "department": "HSHM"
+  },
+  {
+    "codes": [
+      "HSHM 4550"
+    ],
+    "name": "Eugenics and its Afterlives",
+    "credits": 1.0,
+    "department": "HSHM"
+  },
+  {
+    "codes": [
+      "HSHM 4670",
+      "HSHM 467"
+    ],
+    "name": "History of the Body",
+    "credits": 1.0,
+    "department": "HSHM"
+  },
+  {
+    "codes": [
+      "HSHM 4730",
+      "HSHM 473"
+    ],
+    "name": "Vaccination in Historical Perspective",
+    "credits": 1.0,
+    "department": "HSHM"
+  },
+  {
+    "codes": [
+      "HSHM 7020"
+    ],
+    "name": "Problems in the History of Science",
+    "credits": 1.0,
+    "department": "HSHM"
+  },
+  {
+    "codes": [
+      "HSHM 7160"
+    ],
+    "name": "Early Modern Science and Medicine",
+    "credits": 1.0,
+    "department": "HSHM"
+  },
+  {
+    "codes": [
+      "HSHM 7360",
+      "HSHM 736"
+    ],
+    "name": "Health Politics, Body Politics",
+    "credits": 1.0,
+    "department": "HSHM"
+  },
+  {
+    "codes": [
+      "HSHM 7610"
+    ],
+    "name": "Researching and Writing Medicine, Health, and Empire",
+    "credits": 1.0,
+    "department": "HSHM"
+  },
+  {
+    "codes": [
+      "HSHM 7710",
+      "HSHM 771"
+    ],
+    "name": "Researching and Writing Histories of Health, Medicine, and Science",
+    "credits": 1.0,
+    "department": "HSHM"
+  },
+  {
+    "codes": [
       "CPSC 1001",
       "CPSC 112"
     ],
@@ -9585,6 +10054,149 @@
     "name": "Individual Reading and Research",
     "credits": 1.0,
     "department": "ECON"
+  },
+  {
+    "codes": [
+      "MB&B 1050",
+      "MB&B 105"
+    ],
+    "name": "Biology, the World, and Us",
+    "credits": 1.0,
+    "department": "MB&B"
+  },
+  {
+    "codes": [
+      "MB&B 2000",
+      "MB&B 200"
+    ],
+    "name": "Biochemistry",
+    "credits": 1.0,
+    "department": "MB&B"
+  },
+  {
+    "codes": [
+      "MB&B 2750",
+      "MB&B 275"
+    ],
+    "name": "Biology at the Molecular Level",
+    "credits": 1.0,
+    "department": "MB&B"
+  },
+  {
+    "codes": [
+      "MB&B 3000",
+      "MB&B 300"
+    ],
+    "name": "Principles of Biochemistry I",
+    "credits": 1.0,
+    "department": "MB&B"
+  },
+  {
+    "codes": [
+      "MB&B 3640",
+      "MB&B 364"
+    ],
+    "name": "Light Microscopy: Techniques and Image Analysis",
+    "credits": 1.0,
+    "department": "MB&B"
+  },
+  {
+    "codes": [
+      "MB&B 4200",
+      "MB&B 420"
+    ],
+    "name": "Macromolecular Structure and Biophysical Analysis",
+    "credits": 1.0,
+    "department": "MB&B"
+  },
+  {
+    "codes": [
+      "MB&B 4350",
+      "MB&B 435"
+    ],
+    "name": "Quantitative Methods in Biology",
+    "credits": 1.0,
+    "department": "MB&B"
+  },
+  {
+    "codes": [
+      "MB&B 4490",
+      "MB&B 449"
+    ],
+    "name": "Medical Impact of Basic Science",
+    "credits": 1.0,
+    "department": "MB&B"
+  },
+  {
+    "codes": [
+      "MB&B 4700"
+    ],
+    "name": "Research in Biochemistry and Biophysics for the Major I",
+    "credits": 1.0,
+    "department": "MB&B"
+  },
+  {
+    "codes": [
+      "MB&B 4900",
+      "MB&B 490"
+    ],
+    "name": "The Senior Literature Essay",
+    "credits": 1.0,
+    "department": "MB&B"
+  },
+  {
+    "codes": [
+      "MB&B 4910",
+      "MB&B 491"
+    ],
+    "name": "The Senior Research Essay",
+    "credits": 1.0,
+    "department": "MB&B"
+  },
+  {
+    "codes": [
+      "MB&B 6500",
+      "MB&B 651"
+    ],
+    "name": "Lab Rotation for BQBS First-Year Students",
+    "credits": 1.0,
+    "department": "MB&B"
+  },
+  {
+    "codes": [
+      "MB&B 6750",
+      "MB&B 675"
+    ],
+    "name": "Seminar for First-Year Students",
+    "credits": 1.0,
+    "department": "MB&B"
+  },
+  {
+    "codes": [
+      "MB&B 7300",
+      "MB&B 445"
+    ],
+    "name": "Methods and Logic in Molecular Biology",
+    "credits": 1.0,
+    "department": "MB&B"
+  },
+  {
+    "codes": [
+      "MB&B 8000",
+      "MB&B 800"
+    ],
+    "name": "Advanced Topics in Molecular Medicine",
+    "credits": 1.0,
+    "department": "MB&B"
+  },
+  {
+    "codes": [
+      "MB&B 9000",
+      "MB&B 901"
+    ],
+    "name": "Reading Course in Molecular Biophysics and Biochemistry",
+    "credits": 1.0,
+    "department": "MB&B"
   },
   {
     "codes": [
@@ -13551,6 +14163,376 @@
   },
   {
     "codes": [
+      "S&DS 1080"
+    ],
+    "name": "Introduction to Statistics: Advanced Fundamentals",
+    "credits": 0.5,
+    "department": "S&DS"
+  },
+  {
+    "codes": [
+      "S&DS 1090"
+    ],
+    "name": "Introduction to Statistics: Fundamentals",
+    "credits": 0.5,
+    "department": "S&DS"
+  },
+  {
+    "codes": [
+      "S&DS 6270",
+      "S&DS 628"
+    ],
+    "name": "Statistical Consulting",
+    "credits": 0.5,
+    "department": "S&DS"
+  },
+  {
+    "codes": [
+      "AMST 4491",
+      "S&DS 492"
+    ],
+    "name": "Senior Project",
+    "credits": 1.0,
+    "department": "S&DS"
+  },
+  {
+    "codes": [
+      "CPSC 1230",
+      "S&DS 123"
+    ],
+    "name": "YData: An Introduction to Data Science",
+    "credits": 1.0,
+    "department": "S&DS"
+  },
+  {
+    "codes": [
+      "E&RS 9400",
+      "S&DS 690"
+    ],
+    "name": "Independent Study",
+    "credits": 1.0,
+    "department": "S&DS"
+  },
+  {
+    "codes": [
+      "EP&E 4328",
+      "S&DS 172"
+    ],
+    "name": "YData: Data Science for Political Campaigns",
+    "credits": 1.0,
+    "department": "S&DS"
+  },
+  {
+    "codes": [
+      "MATH 2410",
+      "S&DS 241"
+    ],
+    "name": "Probability Theory",
+    "credits": 1.0,
+    "department": "S&DS"
+  },
+  {
+    "codes": [
+      "MATH 3300",
+      "S&DS 400"
+    ],
+    "name": "Advanced Probability",
+    "credits": 1.0,
+    "department": "S&DS"
+  },
+  {
+    "codes": [
+      "MATH 4700",
+      "S&DS 480"
+    ],
+    "name": "Individual Studies",
+    "credits": 1.0,
+    "department": "S&DS"
+  },
+  {
+    "codes": [
+      "S&DS 1000",
+      "S&DS 100"
+    ],
+    "name": "Introductory Statistics",
+    "credits": 1.0,
+    "department": "S&DS"
+  },
+  {
+    "codes": [
+      "S&DS 1790",
+      "S&DS 179"
+    ],
+    "name": "Data Science Applications in Insurance",
+    "credits": 1.0,
+    "department": "S&DS"
+  },
+  {
+    "codes": [
+      "S&DS 2240",
+      "S&DS 224"
+    ],
+    "name": "Dice, Data, and Decisions - The Statistics of Board Game Strategy",
+    "credits": 1.0,
+    "department": "S&DS"
+  },
+  {
+    "codes": [
+      "S&DS 2300",
+      "S&DS 230"
+    ],
+    "name": "Data Exploration and Analysis",
+    "credits": 1.0,
+    "department": "S&DS"
+  },
+  {
+    "codes": [
+      "S&DS 2380",
+      "S&DS 238"
+    ],
+    "name": "Probability and Bayesian Statistics",
+    "credits": 1.0,
+    "department": "S&DS"
+  },
+  {
+    "codes": [
+      "S&DS 3120",
+      "S&DS 312"
+    ],
+    "name": "Linear Models",
+    "credits": 1.0,
+    "department": "S&DS"
+  },
+  {
+    "codes": [
+      "S&DS 3650",
+      "S&DS 365"
+    ],
+    "name": "Intermediate Machine Learning",
+    "credits": 1.0,
+    "department": "S&DS"
+  },
+  {
+    "codes": [
+      "S&DS 4100",
+      "S&DS 410"
+    ],
+    "name": "Statistical Inference",
+    "credits": 1.0,
+    "department": "S&DS"
+  },
+  {
+    "codes": [
+      "S&DS 4250",
+      "S&DS 425"
+    ],
+    "name": "Statistical Case Studies",
+    "credits": 1.0,
+    "department": "S&DS"
+  },
+  {
+    "codes": [
+      "S&DS 5380",
+      "S&DS 538"
+    ],
+    "name": "Probability and Statistics",
+    "credits": 1.0,
+    "department": "S&DS"
+  },
+  {
+    "codes": [
+      "S&DS 6020",
+      "S&DS 602"
+    ],
+    "name": "High-Dimensional Probability and Applications",
+    "credits": 1.0,
+    "department": "S&DS"
+  },
+  {
+    "codes": [
+      "S&DS 6030"
+    ],
+    "name": "Advanced Stochastic Processes",
+    "credits": 1.0,
+    "department": "S&DS"
+  },
+  {
+    "codes": [
+      "S&DS 6260",
+      "S&DS 626"
+    ],
+    "name": "Practical Work",
+    "credits": 1.0,
+    "department": "S&DS"
+  },
+  {
+    "codes": [
+      "S&DS 6540"
+    ],
+    "name": "Topics in Bayesian Inference and Data Analysis",
+    "credits": 1.0,
+    "department": "S&DS"
+  },
+  {
+    "codes": [
+      "S&DS 6690",
+      "S&DS 669"
+    ],
+    "name": "Statistical Learning Theory",
+    "credits": 1.0,
+    "department": "S&DS"
+  },
+  {
+    "codes": [
+      "S&DS 6890",
+      "S&DS 689"
+    ],
+    "name": "Scientific Machine Learning",
+    "credits": 1.0,
+    "department": "S&DS"
+  },
+  {
+    "codes": [
+      "S&DS 6980"
+    ],
+    "name": "Research Seminar in Mathematical Statistics",
+    "credits": 1.0,
+    "department": "S&DS"
+  },
+  {
+    "codes": [
+      "AMTH 3610",
+      "S&DS 361"
+    ],
+    "name": "Data Analysis",
+    "credits": 1.0,
+    "department": "S&DS"
+  },
+  {
+    "codes": [
+      "AMTH 3640",
+      "S&DS 364"
+    ],
+    "name": "Information Theory",
+    "credits": 1.0,
+    "department": "S&DS"
+  },
+  {
+    "codes": [
+      "ECE 5021",
+      "S&DS 351"
+    ],
+    "name": "Stochastic Processes",
+    "credits": 1.0,
+    "department": "S&DS"
+  },
+  {
+    "codes": [
+      "MATH 2420",
+      "S&DS 242"
+    ],
+    "name": "Theory of Statistics",
+    "credits": 1.0,
+    "department": "S&DS"
+  },
+  {
+    "codes": [
+      "S&DS 1730"
+    ],
+    "name": "YData: Analysis of Baseball Data",
+    "credits": 1.0,
+    "department": "S&DS"
+  },
+  {
+    "codes": [
+      "S&DS 2200",
+      "S&DS 220"
+    ],
+    "name": "Introductory Statistics, Intensive",
+    "credits": 1.0,
+    "department": "S&DS"
+  },
+  {
+    "codes": [
+      "S&DS 2400"
+    ],
+    "name": "An Introduction to Probability Theory",
+    "credits": 1.0,
+    "department": "S&DS"
+  },
+  {
+    "codes": [
+      "S&DS 2650",
+      "S&DS 265"
+    ],
+    "name": "Introductory Machine Learning",
+    "credits": 1.0,
+    "department": "S&DS"
+  },
+  {
+    "codes": [
+      "S&DS 3630",
+      "S&DS 363"
+    ],
+    "name": "Multivariate Statistics for Social Sciences",
+    "credits": 1.0,
+    "department": "S&DS"
+  },
+  {
+    "codes": [
+      "S&DS 5200",
+      "S&DS 520"
+    ],
+    "name": "Intensive Introductory Statistics",
+    "credits": 1.0,
+    "department": "S&DS"
+  },
+  {
+    "codes": [
+      "S&DS 5630",
+      "S&DS 563"
+    ],
+    "name": "Multivariate Statistical Methods for the Social Sciences",
+    "credits": 1.0,
+    "department": "S&DS"
+  },
+  {
+    "codes": [
+      "S&DS 6010"
+    ],
+    "name": "Advanced Topics in Probability",
+    "credits": 1.0,
+    "department": "S&DS"
+  },
+  {
+    "codes": [
+      "S&DS 6180",
+      "S&DS 618"
+    ],
+    "name": "Asymptotic Statistics",
+    "credits": 1.0,
+    "department": "S&DS"
+  },
+  {
+    "codes": [
+      "S&DS 6630",
+      "S&DS 663"
+    ],
+    "name": "Computational Mathematics Situational Awareness and Survival Skills",
+    "credits": 1.0,
+    "department": "S&DS"
+  },
+  {
+    "codes": [
+      "S&DS 6950",
+      "S&DS 695"
+    ],
+    "name": "Summer Internship in Statistics and Data Science",
+    "credits": 1.0,
+    "department": "S&DS"
+  },
+  {
+    "codes": [
       "YORU 1150",
       "YORU 150"
     ],
@@ -13707,6 +14689,14 @@
     "name": "Intermediate isiZulu II",
     "credits": 1.5,
     "department": "ZULU"
+  },
+  {
+    "codes": [
+      "CSLI 4900"
+    ],
+    "name": "Senior Capstone in Computing and Linguistics",
+    "credits": 1.0,
+    "department": "CSLI"
   },
   {
     "codes": [
@@ -15703,6 +16693,142 @@
         }
       ]
     }
+  },
+  {
+    "codes": [
+      "ENVE 1200"
+    ],
+    "name": "Introduction to Environmental Engineering",
+    "credits": 1.0,
+    "department": "ENVE"
+  },
+  {
+    "codes": [
+      "ENVE 3140",
+      "ENVE 314"
+    ],
+    "name": "Transport Phenomena I",
+    "credits": 1.0,
+    "department": "ENVE"
+  },
+  {
+    "codes": [
+      "ENVE 3730",
+      "ENVE 373"
+    ],
+    "name": "Air Pollution Control",
+    "credits": 1.0,
+    "department": "ENVE"
+  },
+  {
+    "codes": [
+      "ENVE 4400"
+    ],
+    "name": "Aquatic Chemistry",
+    "credits": 1.0,
+    "department": "ENVE"
+  },
+  {
+    "codes": [
+      "ENVE 4420"
+    ],
+    "name": "Environmental Physicochemical Processes",
+    "credits": 1.0,
+    "department": "ENVE"
+  },
+  {
+    "codes": [
+      "ENVE 4640"
+    ],
+    "name": "Engineering Solutions to Climate Change",
+    "credits": 1.0,
+    "department": "ENVE"
+  },
+  {
+    "codes": [
+      "ENVE 4900",
+      "ENVE 490"
+    ],
+    "name": "Senior Project",
+    "credits": 1.0,
+    "department": "ENVE"
+  },
+  {
+    "codes": [
+      "ENVE 6490"
+    ],
+    "name": "Policy Modeling",
+    "credits": 1.0,
+    "department": "ENVE"
+  },
+  {
+    "codes": [
+      "ENVE 3150",
+      "ENVE 315"
+    ],
+    "name": "Transport Phenomena II",
+    "credits": 1.0,
+    "department": "ENVE"
+  },
+  {
+    "codes": [
+      "ENVE 3600"
+    ],
+    "name": "Bio-Inspired and Sustainable Design",
+    "credits": 1.0,
+    "department": "ENVE"
+  },
+  {
+    "codes": [
+      "ENVE 3770",
+      "ENVE 377"
+    ],
+    "name": "Water-Energy Nexus",
+    "credits": 1.0,
+    "department": "ENVE"
+  },
+  {
+    "codes": [
+      "ENVE 4160",
+      "ENVE 416"
+    ],
+    "name": "Chemical Engineering Process Design",
+    "credits": 1.0,
+    "department": "ENVE"
+  },
+  {
+    "codes": [
+      "ENVE 4380",
+      "ENVE 438"
+    ],
+    "name": "Environmental Organic Chemistry",
+    "credits": 1.0,
+    "department": "ENVE"
+  },
+  {
+    "codes": [
+      "ENVE 4410",
+      "ENVE 441"
+    ],
+    "name": "Biological Processes in Environmental Engineering",
+    "credits": 1.0,
+    "department": "ENVE"
+  },
+  {
+    "codes": [
+      "ENVE 4730"
+    ],
+    "name": "Air Quality and Energy",
+    "credits": 1.0,
+    "department": "ENVE"
+  },
+  {
+    "codes": [
+      "ENVE 6600"
+    ],
+    "name": "Green Engineering and Sustainability",
+    "credits": 1.0,
+    "department": "ENVE"
   },
   {
     "codes": [
@@ -20129,6 +21255,334 @@
   },
   {
     "codes": [
+      "TDPS 0001"
+    ],
+    "name": "Worlds in Performance",
+    "credits": 1.0,
+    "department": "TDPS"
+  },
+  {
+    "codes": [
+      "TDPS 0006"
+    ],
+    "name": "Composing and Performing the One Person Play",
+    "credits": 1.0,
+    "department": "TDPS"
+  },
+  {
+    "codes": [
+      "TDPS 1000"
+    ],
+    "name": "Collaboration",
+    "credits": 1.0,
+    "department": "TDPS"
+  },
+  {
+    "codes": [
+      "TDPS 1005"
+    ],
+    "name": "Tragedy in the European Literary Tradition",
+    "credits": 1.0,
+    "department": "TDPS"
+  },
+  {
+    "codes": [
+      "TDPS 2000"
+    ],
+    "name": "Introduction to Theatrical Violence",
+    "credits": 1.0,
+    "department": "TDPS"
+  },
+  {
+    "codes": [
+      "TDPS 2003"
+    ],
+    "name": "Introduction to Dramaturgy",
+    "credits": 1.0,
+    "department": "TDPS"
+  },
+  {
+    "codes": [
+      "TDPS 2004"
+    ],
+    "name": "Performance Concepts",
+    "credits": 1.0,
+    "department": "TDPS"
+  },
+  {
+    "codes": [
+      "TDPS 2011"
+    ],
+    "name": "Introduction to Directing",
+    "credits": 1.0,
+    "department": "TDPS"
+  },
+  {
+    "codes": [
+      "TDPS 2012"
+    ],
+    "name": "Queer Caribbean Performance",
+    "credits": 1.0,
+    "department": "TDPS"
+  },
+  {
+    "codes": [
+      "TDPS 2016"
+    ],
+    "name": "History of Russian Theater",
+    "credits": 1.0,
+    "department": "TDPS"
+  },
+  {
+    "codes": [
+      "TDPS 2017"
+    ],
+    "name": "Introduction to Scenic Design",
+    "credits": 1.0,
+    "department": "TDPS"
+  },
+  {
+    "codes": [
+      "TDPS 2301"
+    ],
+    "name": "Writing Dance",
+    "credits": 1.0,
+    "department": "TDPS"
+  },
+  {
+    "codes": [
+      "TDPS 2500"
+    ],
+    "name": "Musical Theater Performance I",
+    "credits": 1.0,
+    "department": "TDPS"
+  },
+  {
+    "codes": [
+      "TDPS 2502"
+    ],
+    "name": "American Musical Theater History",
+    "credits": 1.0,
+    "department": "TDPS"
+  },
+  {
+    "codes": [
+      "TDPS 3000"
+    ],
+    "name": "The Director and the Text I",
+    "credits": 1.0,
+    "department": "TDPS"
+  },
+  {
+    "codes": [
+      "TDPS 3006"
+    ],
+    "name": "Performing Design",
+    "credits": 1.0,
+    "department": "TDPS"
+  },
+  {
+    "codes": [
+      "TDPS 3012"
+    ],
+    "name": "Tragedy and Drama of Reconciliation",
+    "credits": 1.0,
+    "department": "TDPS"
+  },
+  {
+    "codes": [
+      "TDPS 3018"
+    ],
+    "name": "Waiting: Tragicomedy",
+    "credits": 1.0,
+    "department": "TDPS"
+  },
+  {
+    "codes": [
+      "TDPS 3046"
+    ],
+    "name": "Modern European Drama",
+    "credits": 1.0,
+    "department": "TDPS"
+  },
+  {
+    "codes": [
+      "TDPS 3049"
+    ],
+    "name": "American Experimental Theater",
+    "credits": 1.0,
+    "department": "TDPS"
+  },
+  {
+    "codes": [
+      "TDPS 3051"
+    ],
+    "name": "Staging Early Iberian Drama",
+    "credits": 1.0,
+    "department": "TDPS"
+  },
+  {
+    "codes": [
+      "TDPS 3053"
+    ],
+    "name": "From Sodom to Stonewall: The Queer Past on Stage",
+    "credits": 1.0,
+    "department": "TDPS"
+  },
+  {
+    "codes": [
+      "TDPS 3054"
+    ],
+    "name": "Dramaturgy for Dance and Devised Performance",
+    "credits": 1.0,
+    "department": "TDPS"
+  },
+  {
+    "codes": [
+      "TDPS 3301"
+    ],
+    "name": "Embodying Story",
+    "credits": 1.0,
+    "department": "TDPS"
+  },
+  {
+    "codes": [
+      "TDPS 3302"
+    ],
+    "name": "West African Dance: Traditional to Contemporary",
+    "credits": 1.0,
+    "department": "TDPS"
+  },
+  {
+    "codes": [
+      "TDPS 3303"
+    ],
+    "name": "Ballet Now",
+    "credits": 1.0,
+    "department": "TDPS"
+  },
+  {
+    "codes": [
+      "TDPS 3307"
+    ],
+    "name": "Choreographic Landscapes: Space, Time, and Contexts for Movement Composition",
+    "credits": 1.0,
+    "department": "TDPS"
+  },
+  {
+    "codes": [
+      "TDPS 3308"
+    ],
+    "name": "Choreographies of Everyday Life",
+    "credits": 1.0,
+    "department": "TDPS"
+  },
+  {
+    "codes": [
+      "TDPS 3400"
+    ],
+    "name": "Playwriting",
+    "credits": 1.0,
+    "department": "TDPS"
+  },
+  {
+    "codes": [
+      "TDPS 3403"
+    ],
+    "name": "Advanced Playwriting",
+    "credits": 1.0,
+    "department": "TDPS"
+  },
+  {
+    "codes": [
+      "TDPS 4004"
+    ],
+    "name": "Special Topics in Performance Studies",
+    "credits": 1.0,
+    "department": "TDPS"
+  },
+  {
+    "codes": [
+      "TDPS 4012"
+    ],
+    "name": "Creativity: Strategies and Practices for Getting Unstuck",
+    "credits": 1.0,
+    "department": "TDPS"
+  },
+  {
+    "codes": [
+      "TDPS 4016"
+    ],
+    "name": "Feminist Theater and Performance Art",
+    "credits": 1.0,
+    "department": "TDPS"
+  },
+  {
+    "codes": [
+      "TDPS 4020"
+    ],
+    "name": "Acting: Constructing a Character",
+    "credits": 1.0,
+    "department": "TDPS"
+  },
+  {
+    "codes": [
+      "TDPS 4023"
+    ],
+    "name": "Documentary Film Workshop",
+    "credits": 1.0,
+    "department": "TDPS"
+  },
+  {
+    "codes": [
+      "TDPS 4028"
+    ],
+    "name": "The Spirit of the Original: Adaptation Lab",
+    "credits": 1.0,
+    "department": "TDPS"
+  },
+  {
+    "codes": [
+      "TDPS 4501"
+    ],
+    "name": "Lyric Writing for Musical Theater",
+    "credits": 1.0,
+    "department": "TDPS"
+  },
+  {
+    "codes": [
+      "TDPS 4701"
+    ],
+    "name": "Directed Independent Study",
+    "credits": 1.0,
+    "department": "TDPS"
+  },
+  {
+    "codes": [
+      "TDPS 4900"
+    ],
+    "name": "Senior Independent Study",
+    "credits": 1.0,
+    "department": "TDPS"
+  },
+  {
+    "codes": [
+      "TDPS 4901"
+    ],
+    "name": "Senior Project in Theater, Dance, and Performance Studies",
+    "credits": 1.0,
+    "department": "TDPS"
+  },
+  {
+    "codes": [
+      "TDPS 4902"
+    ],
+    "name": "Senior Seminar in Theater, Dance, and Performance Studies",
+    "credits": 1.0,
+    "department": "TDPS"
+  },
+  {
+    "codes": [
       "JAPN 1100",
       "JAPN 110"
     ],
@@ -21203,6 +22657,220 @@
   },
   {
     "codes": [
+      "CHNS 1500",
+      "CHNS 150"
+    ],
+    "name": "Advanced Modern Chinese I",
+    "credits": 1.0,
+    "department": "CHNS"
+  },
+  {
+    "codes": [
+      "CHNS 1520",
+      "CHNS 153"
+    ],
+    "name": "Advanced Modern Chinese for Heritage Speakers",
+    "credits": 1.0,
+    "department": "CHNS"
+  },
+  {
+    "codes": [
+      "CHNS 1580",
+      "CHNS 158"
+    ],
+    "name": "Advanced Chinese III through Films and Stories",
+    "credits": 1.0,
+    "department": "CHNS"
+  },
+  {
+    "codes": [
+      "CHNS 1600"
+    ],
+    "name": "Chinese Through the Lens: Discovering Modern China",
+    "credits": 1.0,
+    "department": "CHNS"
+  },
+  {
+    "codes": [
+      "CHNS 1620",
+      "CHNS 162"
+    ],
+    "name": "Advanced Chinese through History and Culture",
+    "credits": 1.0,
+    "department": "CHNS"
+  },
+  {
+    "codes": [
+      "CHNS 1640",
+      "CHNS 164"
+    ],
+    "name": "Chinese for Reading Contemporary Fiction",
+    "credits": 1.0,
+    "department": "CHNS"
+  },
+  {
+    "codes": [
+      "CHNS 1660",
+      "CHNS 167"
+    ],
+    "name": "Chinese for Current Affairs",
+    "credits": 1.0,
+    "department": "CHNS"
+  },
+  {
+    "codes": [
+      "CHNS 1680",
+      "CHNS 169"
+    ],
+    "name": "Chinese for Global Enterprises",
+    "credits": 1.0,
+    "department": "CHNS"
+  },
+  {
+    "codes": [
+      "CHNS 1700",
+      "CHNS 170"
+    ],
+    "name": "Introduction to Literary Chinese I",
+    "credits": 1.0,
+    "department": "CHNS"
+  },
+  {
+    "codes": [
+      "CHNS 1720",
+      "CHNS 172"
+    ],
+    "name": "Chinese for Scholarly Conversation",
+    "credits": 1.0,
+    "department": "CHNS"
+  },
+  {
+    "codes": [
+      "CHNS 2000",
+      "CHNS 200"
+    ],
+    "name": "The Chinese Tradition",
+    "credits": 1.0,
+    "department": "CHNS"
+  },
+  {
+    "codes": [
+      "CHNS 1100",
+      "CHNS 110"
+    ],
+    "name": "Elementary Modern Chinese I",
+    "credits": 1.5,
+    "department": "CHNS"
+  },
+  {
+    "codes": [
+      "CHNS 1120",
+      "CHNS 122"
+    ],
+    "name": "Elementary Modern Chinese for Heritage Speakers",
+    "credits": 1.5,
+    "department": "CHNS"
+  },
+  {
+    "codes": [
+      "CHNS 1200",
+      "CHNS 120"
+    ],
+    "name": "Elementary Modern Chinese II",
+    "credits": 1.5,
+    "department": "CHNS"
+  },
+  {
+    "codes": [
+      "CHNS 1300",
+      "CHNS 130"
+    ],
+    "name": "Intermediate Modern Chinese I",
+    "credits": 1.5,
+    "department": "CHNS"
+  },
+  {
+    "codes": [
+      "CHNS 1320",
+      "CHNS 142"
+    ],
+    "name": "Intermediate Modern Chinese for Heritage Speakers",
+    "credits": 1.5,
+    "department": "CHNS"
+  },
+  {
+    "codes": [
+      "CHNS 1510",
+      "CHNS 151"
+    ],
+    "name": "Advanced Modern Chinese II",
+    "credits": 1.0,
+    "department": "CHNS"
+  },
+  {
+    "codes": [
+      "CHNS 1570",
+      "CHNS 157"
+    ],
+    "name": "Advanced Modern Chinese through Film for Heritage Speakers",
+    "credits": 1.0,
+    "department": "CHNS"
+  },
+  {
+    "codes": [
+      "CHNS 1590",
+      "CHNS 159"
+    ],
+    "name": "Advanced Chinese IV through Films and Stories",
+    "credits": 1.0,
+    "department": "CHNS"
+  },
+  {
+    "codes": [
+      "CHNS 1610"
+    ],
+    "name": "Chinese for the Food Culture of China",
+    "credits": 1.0,
+    "department": "CHNS"
+  },
+  {
+    "codes": [
+      "CHNS 1630",
+      "CHNS 163"
+    ],
+    "name": "Advanced Chinese through History and Art",
+    "credits": 1.0,
+    "department": "CHNS"
+  },
+  {
+    "codes": [
+      "CHNS 1650",
+      "CHNS 165"
+    ],
+    "name": "Readings in Modern Chinese Fiction",
+    "credits": 1.0,
+    "department": "CHNS"
+  },
+  {
+    "codes": [
+      "CHNS 1710",
+      "CHNS 171"
+    ],
+    "name": "Introduction to Literary Chinese II",
+    "credits": 1.0,
+    "department": "CHNS"
+  },
+  {
+    "codes": [
+      "CHNS 1400",
+      "CHNS 140"
+    ],
+    "name": "Intermediate Modern Chinese II",
+    "credits": 1.5,
+    "department": "CHNS"
+  },
+  {
+    "codes": [
       "WLOF 1150",
       "WLOF 150"
     ],
@@ -21395,6 +23063,334 @@
   },
   {
     "codes": [
+      "EEB 2256L"
+    ],
+    "name": "Laboratory for Invertebrates",
+    "credits": 0.5,
+    "department": "EEB"
+  },
+  {
+    "codes": [
+      "EEB 3343L"
+    ],
+    "name": "Ecosystem Measurements for Conservation and Restoration",
+    "credits": 0.5,
+    "department": "EEB"
+  },
+  {
+    "codes": [
+      "EEB 1106"
+    ],
+    "name": "Biology of Malaria, Lyme, and Other Vector-Borne Diseases",
+    "credits": 1.0,
+    "department": "EEB"
+  },
+  {
+    "codes": [
+      "EEB 1115"
+    ],
+    "name": "Conservation Biology",
+    "credits": 1.0,
+    "department": "EEB"
+  },
+  {
+    "codes": [
+      "EEB 2220"
+    ],
+    "name": "General Ecology",
+    "credits": 1.0,
+    "department": "EEB"
+  },
+  {
+    "codes": [
+      "EEB 2230"
+    ],
+    "name": "Field Ecology",
+    "credits": 1.0,
+    "department": "EEB"
+  },
+  {
+    "codes": [
+      "EEB 2255"
+    ],
+    "name": "Invertebrates",
+    "credits": 1.0,
+    "department": "EEB"
+  },
+  {
+    "codes": [
+      "EEB 2269"
+    ],
+    "name": "Bird Behavior",
+    "credits": 1.0,
+    "department": "EEB"
+  },
+  {
+    "codes": [
+      "EEB 2280"
+    ],
+    "name": "Ecology and Evolution of Marine Vertebrates",
+    "credits": 1.0,
+    "department": "EEB"
+  },
+  {
+    "codes": [
+      "EEB 2295"
+    ],
+    "name": "Life in Motion: Ecological and Evolutionary Physiology",
+    "credits": 1.0,
+    "department": "EEB"
+  },
+  {
+    "codes": [
+      "EEB 3340"
+    ],
+    "name": "Microbial Ecology",
+    "credits": 1.0,
+    "department": "EEB"
+  },
+  {
+    "codes": [
+      "EEB 3375"
+    ],
+    "name": "Topics in Vertebrate Ecomorphology",
+    "credits": 1.0,
+    "department": "EEB"
+  },
+  {
+    "codes": [
+      "EEB 3464"
+    ],
+    "name": "Human Osteology",
+    "credits": 1.0,
+    "department": "EEB"
+  },
+  {
+    "codes": [
+      "EEB 4469"
+    ],
+    "name": "Tutorial",
+    "credits": 1.0,
+    "department": "EEB"
+  },
+  {
+    "codes": [
+      "EEB 4470"
+    ],
+    "name": "Senior Tutorial",
+    "credits": 1.0,
+    "department": "EEB"
+  },
+  {
+    "codes": [
+      "EEB 4474"
+    ],
+    "name": "Research",
+    "credits": 1.0,
+    "department": "EEB"
+  },
+  {
+    "codes": [
+      "EEB 4475"
+    ],
+    "name": "Fall Senior Research",
+    "credits": 1.0,
+    "department": "EEB"
+  },
+  {
+    "codes": [
+      "EEB 6500"
+    ],
+    "name": "Advanced Topics in Ecology and Evolutionary Biology",
+    "credits": 1.0,
+    "department": "EEB"
+  },
+  {
+    "codes": [
+      "EEB 6901"
+    ],
+    "name": "Research Rotation I",
+    "credits": 1.0,
+    "department": "EEB"
+  },
+  {
+    "codes": [
+      "EEB 6902"
+    ],
+    "name": "Research Rotation II",
+    "credits": 1.0,
+    "department": "EEB"
+  },
+  {
+    "codes": [
+      "EEB 7713"
+    ],
+    "name": "New Technologies for Biodiversity Monitoring and Conservation",
+    "credits": 1.0,
+    "department": "EEB"
+  },
+  {
+    "codes": [
+      "EEB 7725"
+    ],
+    "name": "Scientific Writing for Ecology and Evolutionary Biology",
+    "credits": 1.0,
+    "department": "EEB"
+  },
+  {
+    "codes": [
+      "EEB 7820"
+    ],
+    "name": "Darwinian Thought and Society",
+    "credits": 1.0,
+    "department": "EEB"
+  },
+  {
+    "codes": [
+      "EEB 7870"
+    ],
+    "name": "Ecological Genomics",
+    "credits": 1.0,
+    "department": "EEB"
+  },
+  {
+    "codes": [
+      "EEB 7930"
+    ],
+    "name": "Seminar in Systematics",
+    "credits": 1.0,
+    "department": "EEB"
+  },
+  {
+    "codes": [
+      "EEB 4495"
+    ],
+    "name": "Fall Intensive Senior Research",
+    "credits": 2.0,
+    "department": "EEB"
+  },
+  {
+    "codes": [
+      "EEB 2223L"
+    ],
+    "name": "Laboratory for Principles of Ecology, Evolutionary Biology, and the Tree of Life",
+    "credits": 0.5,
+    "department": "EEB"
+  },
+  {
+    "codes": [
+      "EEB 2265L"
+    ],
+    "name": "Laboratory for Ichthyology",
+    "credits": 0.5,
+    "department": "EEB"
+  },
+  {
+    "codes": [
+      "EEB 2291L"
+    ],
+    "name": "Comparative Anatomy of Vertebrates Laboratory",
+    "credits": 0.5,
+    "department": "EEB"
+  },
+  {
+    "codes": [
+      "EEB 1145"
+    ],
+    "name": "Plants and People",
+    "credits": 1.0,
+    "department": "EEB"
+  },
+  {
+    "codes": [
+      "EEB 2212"
+    ],
+    "name": "Data Science for Ecology and Conservation",
+    "credits": 1.0,
+    "department": "EEB"
+  },
+  {
+    "codes": [
+      "EEB 2225"
+    ],
+    "name": "Evolutionary Biology",
+    "credits": 1.0,
+    "department": "EEB"
+  },
+  {
+    "codes": [
+      "EEB 2228"
+    ],
+    "name": "Ecology and Evolution of Infectious Diseases",
+    "credits": 1.0,
+    "department": "EEB"
+  },
+  {
+    "codes": [
+      "EEB 2264"
+    ],
+    "name": "Ichthyology",
+    "credits": 1.0,
+    "department": "EEB"
+  },
+  {
+    "codes": [
+      "EEB 2275"
+    ],
+    "name": "Biological Oceanography",
+    "credits": 1.0,
+    "department": "EEB"
+  },
+  {
+    "codes": [
+      "EEB 2290"
+    ],
+    "name": "Comparative Anatomy of the Vertebrates",
+    "credits": 1.0,
+    "department": "EEB"
+  },
+  {
+    "codes": [
+      "EEB 4476"
+    ],
+    "name": "Spring Senior Research",
+    "credits": 1.0,
+    "department": "EEB"
+  },
+  {
+    "codes": [
+      "EEB 5223L"
+    ],
+    "name": "Laboratory for Evolution, Functional Traits, and the Tree of Life",
+    "credits": 1.0,
+    "department": "EEB"
+  },
+  {
+    "codes": [
+      "EEB 5228"
+    ],
+    "name": "Ecology and Evolution of Infectious Disease",
+    "credits": 1.0,
+    "department": "EEB"
+  },
+  {
+    "codes": [
+      "EEB 7712"
+    ],
+    "name": "Foundations of Ecology",
+    "credits": 1.0,
+    "department": "EEB"
+  },
+  {
+    "codes": [
+      "EEB 4496"
+    ],
+    "name": "Spring Intensive Senior Research",
+    "credits": 2.0,
+    "department": "EEB"
+  },
+  {
+    "codes": [
       "MGMT 7206",
       "MGMT 742"
     ],
@@ -21568,11 +23564,56 @@
   },
   {
     "codes": [
-      "MCDB 0500",
-      "MCDB 050"
+      "MCDB 2030L",
+      "MCDB 203L"
     ],
-    "name": "Immunity and Microbes",
-    "credits": 1.0,
+    "name": "Laboratory for Genetics",
+    "credits": 0.5,
+    "department": "MCDB"
+  },
+  {
+    "codes": [
+      "MCDB 2210L",
+      "MCDB 221L"
+    ],
+    "name": "Laboratory for Foundations of Biology",
+    "credits": 0.5,
+    "department": "MCDB"
+  },
+  {
+    "codes": [
+      "MCDB 3010L",
+      "MCDB 301L"
+    ],
+    "name": "Laboratory for Biochemistry",
+    "credits": 0.5,
+    "department": "MCDB"
+  },
+  {
+    "codes": [
+      "MCDB 3210L",
+      "MCDB 321L"
+    ],
+    "name": "Laboratory for Neurobiology",
+    "credits": 0.5,
+    "department": "MCDB"
+  },
+  {
+    "codes": [
+      "MCDB 3420L",
+      "MCDB 342L"
+    ],
+    "name": "Laboratory in Nucleic Acids I",
+    "credits": 0.5,
+    "department": "MCDB"
+  },
+  {
+    "codes": [
+      "MCDB 3430L",
+      "MCDB 343L"
+    ],
+    "name": "Laboratory in Nucleic Acids II",
+    "credits": 0.5,
     "department": "MCDB"
   },
   {
@@ -21845,6 +23886,24 @@
   },
   {
     "codes": [
+      "MCDB 4950",
+      "MCDB 495"
+    ],
+    "name": "Senior Research Intensive",
+    "credits": 2.0,
+    "department": "MCDB"
+  },
+  {
+    "codes": [
+      "MCDB 5950",
+      "MCDB 595"
+    ],
+    "name": "Intensive Research in MCDB for B.S./M.S. Candidates",
+    "credits": 2.0,
+    "department": "MCDB"
+  },
+  {
+    "codes": [
       "MCDB 2010L",
       "MCDB 201L"
     ],
@@ -21872,15 +23931,6 @@
   },
   {
     "codes": [
-      "MCDB 3010L",
-      "MCDB 301L"
-    ],
-    "name": "Laboratory for Biochemistry",
-    "credits": 0.5,
-    "department": "MCDB"
-  },
-  {
-    "codes": [
       "MCDB 3440L",
       "MCDB 344L"
     ],
@@ -21899,28 +23949,10 @@
   },
   {
     "codes": [
-      "MCDB 4960",
-      "MCDB 495"
-    ],
-    "name": "Senior Research Intensive",
-    "credits": 2.0,
-    "department": "MCDB"
-  },
-  {
-    "codes": [
       "MCDB 5850",
       "MCDB 585"
     ],
     "name": "Research in MCDB for B.S./M.S. Candidates",
-    "credits": 2.0,
-    "department": "MCDB"
-  },
-  {
-    "codes": [
-      "MCDB 5960",
-      "MCDB 595"
-    ],
-    "name": "Intensive Research in MCDB for B.S./M.S. Candidates",
     "credits": 2.0,
     "department": "MCDB"
   },

@@ -47,7 +47,7 @@ import {
   getCourseNameFromCode,
 } from "@/lib/courseCatalog";
 import DistributionalsView from "@/components/DistributionalProgress";
-import { FaBuildingCircleCheck } from "react-icons/fa6";
+import { FaBuildingCircleCheck, FaHeart } from "react-icons/fa6";
 import CustomLoader from "@/components/ui/CustomLoader";
 import UserSettingsModal from "@/components/UserSettingsModal/UserSettingsModal";
 import Link from "next/link";
@@ -729,10 +729,20 @@ export default function Home() {
                       target="_blank"
                       className="w-full flex items-center space-x-2.5 p-2 rounded-lg hover:bg-gray-800/40 transition-all duration-200 text-gray-300 hover:text-white"
                     >
+                      <div className="p-1.5 rounded-lg bg-emerald-900/30 border border-emerald-800/50 flex items-center justify-center">
+                        <FaHeart className="text-emerald-400" size={14} />
+                      </div>
+                      <span className="text-sm font-medium">Our mission</span>
+                    </Link>
+                    <Link
+                      href="/terms"
+                      target="_blank"
+                      className="w-full flex items-center space-x-2.5 p-2 rounded-lg hover:bg-gray-800/40 transition-all duration-200 text-gray-300 hover:text-white"
+                    >
                       <div className="p-1.5 rounded-lg bg-blue-900/30 border border-blue-800/50 flex items-center justify-center">
                         <FiBook className="text-blue-400" size={14} />
                       </div>
-                      <span className="text-sm font-medium">Our mission</span>
+                      <span className="text-sm font-medium">Terms</span>
                     </Link>
 
                     <Link

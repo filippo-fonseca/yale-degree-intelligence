@@ -327,7 +327,7 @@ export default function UserSettingsModal({
             disabled={!hasChanges() || hasDuplicateMajors()}
             className={`px-4 py-2 rounded-lg transition-colors ${
               hasChanges() && !hasDuplicateMajors()
-                ? "bg-blue-600 hover:bg-blue-700"
+                ? "bg-pink-600 hover:bg-pink-700"
                 : "bg-gray-800 text-gray-500 cursor-not-allowed"
             }`}
           >

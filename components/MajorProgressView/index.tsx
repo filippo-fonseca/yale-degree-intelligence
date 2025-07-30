@@ -215,10 +215,6 @@ export default function MajorProgressView({
 
   return (
     <div className="space-y-6 font-louize">
-      <InfoCard>
-        Pro tip: Click on each course for actions and more info.
-      </InfoCard>
-
       {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
@@ -301,6 +297,21 @@ export default function MajorProgressView({
       </div>
 
       <DegreeIntelligenceBlurb />
+      <InfoCard
+        autoHide
+        previewText="A few tips on how to navegate this page. It's complex at first, we get it!"
+      >
+        Pro tip: Click on each course for actions and more info. Also, while our
+        infrastructure is robust, sometimes there are cases where we weren't
+        able to garner all plausible options for a given requirement; this is
+        why we have enabled manual course fulfillment. Just click on the
+        "Fulfill manually" button for that requirement and add a course from
+        your transcript; we'll automatically count it towards your major
+        progress and requirements stats. This also applies, for example, for
+        interdepartmental courses and/or excpetions that your DUS has perhaps
+        given you permission to use for a certain requirement, etc. Our platform
+        is modular!
+      </InfoCard>
       {/* Requirements Sections */}
       <div className="space-y-6">
         {/* Completed Requirements */}
@@ -343,7 +354,7 @@ export default function MajorProgressView({
                           animate={{ opacity: 1, y: 0 }}
                           transition={{ delay: i * 0.05 }}
                           className={`p-4 rounded-xl border ${
-                            isFullyCompleted && !hasManualCourses
+                            isFullyCompleted
                               ? "bg-emerald-900/10 border-emerald-800/30"
                               : "bg-amber-900/10 border-amber-800/30"
                           }`}
@@ -351,7 +362,7 @@ export default function MajorProgressView({
                           <div className="flex justify-between items-start mb-2">
                             <h5
                               className={`font-medium ${
-                                isFullyCompleted && !hasManualCourses
+                                isFullyCompleted
                                   ? "text-emerald-300"
                                   : "text-amber-300"
                               }`}
@@ -361,7 +372,7 @@ export default function MajorProgressView({
                             <div className="flex items-center gap-2">
                               <span
                                 className={`text-xs ${
-                                  isFullyCompleted && !hasManualCourses
+                                  isFullyCompleted
                                     ? "bg-emerald-900/20 text-emerald-300"
                                     : "bg-amber-900/20 text-amber-300"
                                 } px-2 py-1 rounded-full`}
@@ -384,53 +395,54 @@ export default function MajorProgressView({
                             </p>
                           )}
                           <div className="flex flex-wrap gap-1.5">
-                            {req.options
-                              .filter(
-                                (opt) =>
-                                  opt.completed || opt.manual || opt.skipped
-                              )
-                              .map((opt, j) => (
-                                <div
-                                  key={`opt-${j}`}
-                                  className={`relative px-2 py-0.5 rounded-full text-xs flex items-center ${
-                                    opt.manual
-                                      ? "bg-purple-900/20 text-purple-300 border border-purple-700"
-                                      : opt.completed
-                                      ? "bg-emerald-900/20 text-emerald-300 border border-emerald-700"
-                                      : "bg-gray-900/20 text-gray-300 border border-dashed border-gray-600"
-                                  }`}
-                                >
-                                  {opt.code}
-                                  <span className="ml-1 text-[0.65rem]">
-                                    ({opt.credits}cr
-                                    {opt.manual && ", manual"}
-                                    {opt.skipped && ", skipped"})
-                                  </span>
-                                  {(opt.skipped || opt.manual) && (
-                                    <button
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        if (opt.skipped) {
-                                          handleUnskip(opt.code);
-                                        } else if (opt.manual) {
-                                          handleRemoveManualCourse(
-                                            opt.code,
-                                            req.name
-                                          );
+                            {req.options.length > 0 &&
+                              req.options
+                                .filter(
+                                  (opt) =>
+                                    opt.completed || opt.manual || opt.skipped
+                                )
+                                .map((opt, j) => (
+                                  <div
+                                    key={`opt-${j}`}
+                                    className={`relative px-2 py-0.5 rounded-full text-xs flex items-center ${
+                                      opt.manual
+                                        ? "bg-purple-900/20 text-purple-300 border border-purple-700"
+                                        : opt.completed
+                                        ? "bg-emerald-900/20 text-emerald-300 border border-emerald-700"
+                                        : "bg-gray-900/20 text-gray-300 border border-dashed border-gray-600"
+                                    }`}
+                                  >
+                                    {opt.code}
+                                    <span className="ml-1 text-[0.65rem]">
+                                      ({opt.credits}cr
+                                      {opt.manual && ", manual"}
+                                      {opt.skipped && ", skipped"})
+                                    </span>
+                                    {(opt.skipped || opt.manual) && (
+                                      <button
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          if (opt.skipped) {
+                                            handleUnskip(opt.code);
+                                          } else if (opt.manual) {
+                                            handleRemoveManualCourse(
+                                              opt.code,
+                                              req.name
+                                            );
+                                          }
+                                        }}
+                                        className="ml-1 text-[0.65rem] text-gray-400 hover:text-gray-200"
+                                        title={
+                                          opt.manual
+                                            ? "Remove manual course"
+                                            : "Unskip this course"
                                         }
-                                      }}
-                                      className="ml-1 text-[0.65rem] text-gray-400 hover:text-gray-200"
-                                      title={
-                                        opt.manual
-                                          ? "Remove manual course"
-                                          : "Unskip this course"
-                                      }
-                                    >
-                                      <FiX size={10} />
-                                    </button>
-                                  )}
-                                </div>
-                              ))}
+                                      >
+                                        <FiX size={10} />
+                                      </button>
+                                    )}
+                                  </div>
+                                ))}
                           </div>
                         </motion.div>
                       );
@@ -623,7 +635,7 @@ export default function MajorProgressView({
                               title="Add a course manually for this requirement"
                             >
                               <FiPlus size={12} />
-                              Add Course
+                              Fulfill manually
                             </button>
                           </div>
                         </motion.div>

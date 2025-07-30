@@ -15,7 +15,7 @@ type RequirementOption = {
 type MajorRequirement = {
   id: string;
   name: string;
-  description: string;
+  description?: string;
   requirements: {
     name: string;
     description?: string;

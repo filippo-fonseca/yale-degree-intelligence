@@ -440,6 +440,7 @@
   "ECON_BA": {
     "id": "ECON_BA",
     "name": "Economics, B.A.",
+    "description": "Bachelor of Arts in Economics",
     "creditRequirements": {
       "total": 12
     },
@@ -1717,6 +1718,7 @@
   "EECS": {
     "id": "EECS",
     "name": "Electrical Engineering and Computer Science, B.S.",
+    "description": "Bachelor of Science in Electrical Engineering and Computer Science (EECS). A comprehensive program covering both electrical engineering and computer science fundamentals, preparing students for careers in technology and engineering.",
     "creditRequirements": {
       "total": 21
     },
@@ -6659,6 +6661,7 @@
   "EEB_BS_BIODIVERSITY_ENVIRONMENT": {
     "id": "EEB_BS_BIODIVERSITY_ENVIRONMENT",
     "name": "Ecology and Evolutionary Biology, B.S. - Biodiversity and the Environment",
+    "description": "The Biodiversity and the Environment concentration focuses on understanding ecological systems, conservation biology, and the interactions between organisms and their environments.",
     "creditRequirements": {
       "total": 18.5
     },
@@ -6809,6 +6812,7 @@
   "EEB_BS_ORGANISMAL_BIOLOGY": {
     "id": "EEB_BS_ORGANISMAL_BIOLOGY",
     "name": "Ecology and Evolutionary Biology, B.S. - Organismal Biology",
+    "description": "The Organismal Biology concentration emphasizes the study of individual organisms, their physiology, behavior, and evolutionary adaptations.",
     "creditRequirements": {
       "total": 18.5
     },
@@ -6981,6 +6985,7 @@
   "EEB_BA_BIODIVERSITY_ENVIRONMENT": {
     "id": "EEB_BA_BIODIVERSITY_ENVIRONMENT",
     "name": "Ecology and Evolutionary Biology, B.A. - Biodiversity and the Environment",
+    "description": "The Biodiversity and the Environment concentration focuses on understanding ecological systems, conservation biology, and the interactions between organisms and their environments.",
     "creditRequirements": {
       "total": 16.5
     },
@@ -7119,6 +7124,7 @@
   "EEB_BA_ORGANISMAL_BIOLOGY": {
     "id": "EEB_BA_ORGANISMAL_BIOLOGY",
     "name": "Ecology and Evolutionary Biology, B.A. - Organismal Biology",
+    "description": "The Organismal Biology concentration emphasizes the study of individual organisms, their physiology, behavior, and evolutionary adaptations.",
     "creditRequirements": {
       "total": 16.5
     },
@@ -8374,6 +8380,7 @@
   "EE_BS_ABET": {
     "id": "EE_BS_ABET",
     "name": "Electrical Engineering, B.S. (ABET)",
+    "description": "Bachelor of Science in Electrical Engineering, accredited by ABET.",
     "creditRequirements": {
       "total": 23
     },

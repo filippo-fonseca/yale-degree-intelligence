@@ -54,6 +54,7 @@ import Link from "next/link";
 import LogoIcon from "@/icons/LogoIcon";
 import CourseModal from "@/components/MajorProgressView/CourseModal";
 import { getGPAColor } from "@/lib/utils/utils";
+import PublicFacingPage from "@/screens/PublicFacingPage";
 
 interface UserProfile {
   majors: string[];
@@ -530,7 +531,7 @@ export default function Home() {
 
   if (loading || coursesLoading) return <CustomLoader />;
 
-  if (!user) return <LoginPage />;
+  if (!user) return <PublicFacingPage />;
 
   return (
     <main

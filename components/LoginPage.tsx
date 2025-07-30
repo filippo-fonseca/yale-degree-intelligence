@@ -7,7 +7,11 @@ import { motion, AnimatePresence } from "framer-motion";
 import CompoundLogo from "./ui/CompoundLogo";
 import LogoIcon from "@/icons/LogoIcon";
 
-export default function LoginPage() {
+export default function LoginPage({
+  onBackClick,
+}: {
+  onBackClick: () => void;
+}) {
   const { signInWithGoogle, loading } = useAuth();
   const [isHovering, setIsHovering] = useState(false);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
@@ -228,6 +232,21 @@ export default function LoginPage() {
                   MADE BY YALIES, FOR YALIES.
                 </span>
               </div>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.7 }}
+              className="text-center mt-4"
+              onClick={onBackClick}
+            >
+              <a
+                href="/"
+                className="text-sm text-gray-400 hover:text-white transition-colors inline-flex items-center"
+              >
+                <span>←</span> Return to homepage
+              </a>
             </motion.div>
           </div>
         </div>

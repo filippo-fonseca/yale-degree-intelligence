@@ -8852,7 +8852,7 @@
       {
         "name": "Introduction to Computer Science",
         "required": 1,
-        "description": "Required core course for all majors.",
+        "description": "Core CS course at Yale.",
         "options": [
           {
             "type": "course",
@@ -8941,7 +8941,7 @@
       {
         "name": "Introduction to Computer Science",
         "required": 1,
-        "description": "Required core course for all majors.",
+        "description": "Core CS course at Yale.",
         "options": [
           {
             "type": "course",

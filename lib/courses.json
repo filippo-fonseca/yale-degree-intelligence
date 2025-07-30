@@ -14789,9 +14789,18 @@
   {
     "codes": [
       "PHYS 1650L",
+      "PHYS 165L"
+    ],
+    "name": "General Physics Laboratory I",
+    "credits": 0.5,
+    "department": "PHYS"
+  },
+  {
+    "codes": [
+      "PHYS 1660L",
       "PHYS 166L"
     ],
-    "name": "General Physics Laboratory",
+    "name": "General Physics Laboratory II",
     "credits": 0.5,
     "department": "PHYS"
   },
@@ -14800,7 +14809,16 @@
       "PHYS 2050L",
       "PHYS 205L"
     ],
-    "name": "Modern Physical Measurement",
+    "name": "Modern Physical Measurement I",
+    "credits": 0.5,
+    "department": "PHYS"
+  },
+  {
+    "codes": [
+      "PHYS 2060L",
+      "PHYS 206L"
+    ],
+    "name": "Modern Physical Measurement II",
     "credits": 0.5,
     "department": "PHYS"
   },

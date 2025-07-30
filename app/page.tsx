@@ -528,7 +528,7 @@ export default function Home() {
   //   void new Audio("/audio/pop.mp3").play().catch(() => null);
   // }, [activeTab, hasData]);
 
-  if (loading || coursesLoading) return <CustomLoader />;
+  if (loading || (user && coursesLoading)) return <CustomLoader />;
 
   if (!user) return <LoginPage />;
 

@@ -107,6 +107,14 @@ export default function Home() {
 
   const [coursesLoading, setCoursesLoading] = useState(true);
 
+  useEffect(() => {
+    if (!user) {
+      setCoursesLoading(false);
+      setCourses([]);
+      setHasData(false);
+    }
+  }, [user]);
+
   //for the "My courses" section:
   const [modalOpen, setModalOpen] = useState<{
     isOpen: boolean;

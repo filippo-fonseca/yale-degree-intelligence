@@ -8848,7 +8848,6 @@
     "creditRequirements": {
       "total": 12
     },
-    "prerequisites": [],
     "requirements": [
       {
         "name": "Introduction to Computer Science",
@@ -8938,7 +8937,6 @@
     "creditRequirements": {
       "total": 10
     },
-    "prerequisites": [],
     "requirements": [
       {
         "name": "Introduction to Computer Science",
@@ -10008,7 +10006,6 @@
     "creditRequirements": {
       "total": 12
     },
-    "prerequisites": [],
     "requirements": [
       {
         "name": "Core Seminar: Fundamentals of Comparison",
@@ -10084,7 +10081,6 @@
     "creditRequirements": {
       "total": 12
     },
-    "prerequisites": [],
     "requirements": [
       {
         "name": "Core Seminar: Fundamentals of Comparison",
@@ -10160,7 +10156,6 @@
     "creditRequirements": {
       "total": 12
     },
-    "prerequisites": [],
     "requirements": [
       {
         "name": "Core Seminar: Fundamentals of Comparison",

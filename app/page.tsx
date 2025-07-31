@@ -702,7 +702,12 @@ export default function Home() {
                   disabled={item.disabled}
                 >
                   <div className="flex items-center space-x-3">
-                    <item.icon size={activeTab === "cleoai" ? 18 : 12} />
+                    <item.icon
+                      size={activeTab === "cleoai" ? 18 : 12}
+                      opacity={
+                        item.id == "cleoai" && activeTab !== "cleoai" ? 0.5 : 1
+                      }
+                    />
                     <span>{item.label}</span>
                   </div>
                   {activeTab === item.id && (

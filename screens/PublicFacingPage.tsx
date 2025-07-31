@@ -25,7 +25,7 @@ export default function AboutPage() {
       emoji: "📊",
     },
     {
-      title: "Major requirements at a glance.",
+      title: "Major (and even concentration) reqs at a glance.",
       description:
         "See exactly what you've completed and what remains for your major—no more digging through PDF requirements or five different poorly organized websites 4 clicks deep.",
       emoji: "🔍",

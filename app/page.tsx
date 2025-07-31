@@ -734,7 +734,7 @@ export default function Home() {
                 >
                   <div className="flex flex-col space-y-2.5">
                     <Link
-                      href="/about"
+                      href="/mission"
                       target="_blank"
                       className="w-full flex items-center space-x-2.5 p-2 rounded-lg hover:bg-gray-800/40 transition-all duration-200 text-gray-300 hover:text-white"
                     >

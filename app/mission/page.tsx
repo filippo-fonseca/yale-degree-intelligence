@@ -138,12 +138,14 @@ export default function MissionPage() {
             Yale attracts some of the world's brightest minds, yet we force
             students to navigate degree requirements with tools that look like
             tech straight out of the early 2000s. This isn't just about
-            convenience—it's about unlocking potential. When we remove
-            bureaucratic friction, we free students to focus on what actually
-            matters: learning, research, and building the future.
+            convenience... it's about the removal of bureaucratic friction.
+            Without it, we free students can focus on what actually matters:
+            learning, research, and building the future.
           </p>
           <p className="text-lg text-gray-300">
-            This is our small contribution to that vision.
+            This silly manifesto is our way of holding ourselves accountable to
+            these principles, while D.I. is our simple contribution to this
+            vision.
           </p>
         </motion.div>
       </main>

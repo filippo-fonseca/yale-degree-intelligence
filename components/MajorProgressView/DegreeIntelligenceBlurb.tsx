@@ -31,39 +31,44 @@ export default function DegreeIntelligence() {
   const [loading, setLoading] = useState<boolean>(true);
   const { user } = useAuth();
 
+  // useEffect(() => {
+  //   const fetchUserAdvice = async () => {
+  //     if (!user?.uid) return;
+
+  //     try {
+  //       const adviceRef = collection(db, "ai_responses");
+  //       const q = query(adviceRef, where("userId", "==", user.uid));
+
+  //       const querySnapshot = await getDocs(q);
+
+  //       if (!querySnapshot.empty) {
+  //         // Convert to array of advice with ids
+  //         const allAdvice = querySnapshot.docs.map((doc) => ({
+  //           id: doc.id,
+  //           ...doc.data(),
+  //         })) as AIAdvice[];
+
+  //         // Sort by dateGenerated (newest first)
+  //         const sortedAdvice = [...allAdvice].sort(
+  //           (a, b) => b.dateGenerated.toMillis() - a.dateGenerated.toMillis()
+  //         );
+
+  //         setAdvice(sortedAdvice[0]);
+  //       }
+  //     } catch (err) {
+  //       console.error("Error fetching advice:", err);
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
+
+  //   fetchUserAdvice();
+  // }, [user?.uid]);
+
+  //TODO: remove this once the AI is implemented!!
   useEffect(() => {
-    const fetchUserAdvice = async () => {
-      if (!user?.uid) return;
-
-      try {
-        const adviceRef = collection(db, "ai_responses");
-        const q = query(adviceRef, where("userId", "==", user.uid));
-
-        const querySnapshot = await getDocs(q);
-
-        if (!querySnapshot.empty) {
-          // Convert to array of advice with ids
-          const allAdvice = querySnapshot.docs.map((doc) => ({
-            id: doc.id,
-            ...doc.data(),
-          })) as AIAdvice[];
-
-          // Sort by dateGenerated (newest first)
-          const sortedAdvice = [...allAdvice].sort(
-            (a, b) => b.dateGenerated.toMillis() - a.dateGenerated.toMillis()
-          );
-
-          setAdvice(sortedAdvice[0]);
-        }
-      } catch (err) {
-        console.error("Error fetching advice:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchUserAdvice();
-  }, [user?.uid]);
+    setLoading(false);
+  }, []);
 
   if (loading) {
     return (
@@ -84,21 +89,21 @@ export default function DegreeIntelligence() {
     );
   }
 
-  if (!advice) {
-    return (
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="p-5 rounded-xl bg-gradient-to-br from-gray-800/50 to-gray-900/50 border border-gray-700/50 shadow-neumorphic"
-      >
-        <div className="text-gray-400 text-sm">
-          No advice found for your account
-        </div>
-      </motion.div>
-    );
-  }
+  // if (!advice) {
+  //   return (
+  //     <motion.div
+  //       initial={{ opacity: 0, y: 20 }}
+  //       animate={{ opacity: 1, y: 0 }}
+  //       className="p-5 rounded-xl bg-gradient-to-br from-gray-800/50 to-gray-900/50 border border-gray-700/50 shadow-neumorphic"
+  //     >
+  //       <div className="text-gray-400 text-sm">
+  //         No advice found for your account
+  //       </div>
+  //     </motion.div>
+  //   );
+  // }
 
-  const formattedDate = advice.dateGenerated.toDate().toLocaleDateString();
+  // const formattedDate = advice.dateGenerated.toDate().toLocaleDateString();
 
   return (
     <motion.div

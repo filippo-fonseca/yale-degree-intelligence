@@ -392,45 +392,45 @@ export default function Home() {
     }
     const currentYear = now.getFullYear();
 
-    try {
-      console.log("Fetching AI advice...");
-      const res = await fetch("/api/generate-advice", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          coursesToAdd,
-          requirementsJson: majorRequirements,
-          selectedMajor: userProfile?.majors[0],
-          userId: user.uid,
-          currentDate: now.toISOString().slice(0, 10),
-          graduationYear: userProfile?.graduationYear,
-          currentSemester,
-          currentYear,
-        }),
-      });
-      const data = await res.json();
-      if (res.ok && data.advice) {
-        // Store in Firestore
-        await addDoc(collection(db, "ai_responses"), {
-          advice: data.advice,
-          userId: user.uid,
-          dateGenerated: Timestamp.fromDate(now),
-          params: {
-            selectedMajor: userProfile?.majors,
-            graduationYear: userProfile?.graduationYear,
-            currentDate: now.toISOString().slice(0, 10),
-            currentSemester,
-            currentYear,
-          },
-        });
-        setLatestAdvice(data.advice); // Optionally show in UI
-      } else {
-        setLatestAdvice(null);
-      }
-    } catch (err) {
-      console.error("AI advice fetch error", err);
-      setLatestAdvice(null);
-    }
+    // try {
+    //   console.log("Fetching AI advice...");
+    //   const res = await fetch("/api/generate-advice", {
+    //     method: "POST",
+    //     headers: { "Content-Type": "application/json" },
+    //     body: JSON.stringify({
+    //       coursesToAdd,
+    //       requirementsJson: majorRequirements,
+    //       selectedMajor: userProfile?.majors[0],
+    //       userId: user.uid,
+    //       currentDate: now.toISOString().slice(0, 10),
+    //       graduationYear: userProfile?.graduationYear,
+    //       currentSemester,
+    //       currentYear,
+    //     }),
+    //   });
+    //   const data = await res.json();
+    //   if (res.ok && data.advice) {
+    //     // Store in Firestore
+    //     await addDoc(collection(db, "ai_responses"), {
+    //       advice: data.advice,
+    //       userId: user.uid,
+    //       dateGenerated: Timestamp.fromDate(now),
+    //       params: {
+    //         selectedMajor: userProfile?.majors,
+    //         graduationYear: userProfile?.graduationYear,
+    //         currentDate: now.toISOString().slice(0, 10),
+    //         currentSemester,
+    //         currentYear,
+    //       },
+    //     });
+    //     setLatestAdvice(data.advice); // Optionally show in UI
+    //   } else {
+    //     setLatestAdvice(null);
+    //   }
+    // } catch (err) {
+    //   console.error("AI advice fetch error", err);
+    //   setLatestAdvice(null);
+    // }
 
     // Close the modal if it was open (i.e. if it's an update)
     showUpdateModal && setShowUpdateModal(false);

@@ -4,29 +4,6 @@ import { Course } from "@/lib/types";
 import { gradePoints } from "@/lib/constants";
 import { motion } from "framer-motion";
 import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-  ResponsiveContainer,
-  PieChart,
-  Pie,
-  Cell,
-  AreaChart,
-  Area,
-  RadarChart,
-  PolarGrid,
-  PolarAngleAxis,
-  PolarRadiusAxis,
-  Radar,
-  Label,
-  ReferenceLine,
-  Brush,
-} from "recharts";
-import {
   GraduationCap,
   BookOpen,
   Award,
@@ -34,7 +11,6 @@ import {
   BarChart2,
   PieChart as PieChartIcon,
   Radar as RadarIcon,
-  ChevronRight,
 } from "lucide-react";
 import PieChartWrapper from "./ui/PieChartWrapper";
 import { InfoCard } from "./ui/InfoCard";
@@ -57,14 +33,6 @@ const seasonOrder: Record<string, number> = {
   Summer: 2,
   Fall: 3,
   Winter: 4,
-};
-
-const getAxisTicks = (min: number, max: number, step: number) => {
-  const ticks = [];
-  for (let i = min; i <= max; i += step) {
-    ticks.push(i);
-  }
-  return ticks;
 };
 
 export default function StatsView({ courses }: { courses: Course[] }) {
@@ -90,19 +58,12 @@ export default function StatsView({ courses }: { courses: Course[] }) {
       ? summary.totalGradePoints / summary.totalCredits
       : 0;
 
-  // Grade distribution with all possible grades for completeness
+  // Grade distribution
   const allGrades = Object.keys(gradePoints);
   const gradeDistribution = allGrades.map((grade) => {
     const count = activeCourses.filter((c) => c.grade === grade).length;
     return { grade, count };
   });
-
-  const maxGradeCount = Math.max(...gradeDistribution.map((g) => g.count), 5);
-  const gradeTicks = getAxisTicks(
-    0,
-    maxGradeCount,
-    Math.ceil(maxGradeCount / 5)
-  );
 
   // Semester data
   const semesterGroups = activeCourses.reduce((acc, c) => {
@@ -175,30 +136,6 @@ export default function StatsView({ courses }: { courses: Course[] }) {
     .filter((dept) => dept.gpa > 0)
     .sort((a, b) => b.credits - a.credits);
 
-  const topDepartments = [...departmentData].slice(0, 6);
-  const radarData = topDepartments.map((dept) => ({
-    subject: dept.department,
-    GPA: dept.gpa,
-    Courses: dept.courseCount,
-    fullMark: 4,
-  }));
-
-  const gpaTicks = getAxisTicks(0, 4, 0.5);
-  const creditTicks = getAxisTicks(
-    0,
-    Math.max(...departmentData.map((d) => d.credits)),
-    3
-  );
-
-  // Best/worst courses
-  const bestCourses = [...activeCourses]
-    .sort((a, b) => gradePoints[b.grade!] - gradePoints[a.grade!])
-    .slice(0, 3);
-
-  const worstCourses = [...activeCourses]
-    .sort((a, b) => gradePoints[a.grade!] - gradePoints[b.grade!])
-    .slice(0, 3);
-
   // Progress to graduation (assuming 120 credits needed)
   const progressToGraduation = Math.min(100, (summary.totalCredits / 36) * 100);
 
@@ -230,9 +167,10 @@ export default function StatsView({ courses }: { courses: Course[] }) {
     <div className={`space-y-8 font-louize text-gray-200`}>
       {/* Summary Cards */}
       <InfoCard>
-        We're working on more statistics and insights. Stay tuned; this includes
-        a cumulative GPA chart.
+        View your academic progress through detailed statistics and
+        visualizations.
       </InfoCard>
+
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -289,94 +227,163 @@ export default function StatsView({ courses }: { courses: Course[] }) {
           } semesters`}
         />
       </motion.div>
-      {/* Cumulative GPA - Line Chart */}
-      <ChartBox
-        title="Cumulative GPA Progression"
-        icon={<AreaChartIcon className="h-5 w-5" />}
-        description="The progression of your cumulative GPA over time."
-      >
-        <div className="h-[400px] w-full">
-          <LineChart
-            xAxis={[
-              {
-                scaleType: "point",
-                data: cumulativeData.map((item) => item.semester),
-                label: "Semester",
-                tickLabelStyle: {
-                  angle: 45,
-                  textAnchor: "start",
-                  fontSize: 12,
+
+      {/* GPA Charts Section */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Cumulative GPA Chart */}
+        <ChartBox
+          title="Cumulative GPA Progression"
+          icon={<GraduationCap className="h-5 w-5" />}
+          description="The overall progression of your cumulative GPA over time."
+        >
+          <div className="h-[400px] w-full">
+            <LineChart
+              xAxis={[
+                {
+                  scaleType: "point",
+                  data: cumulativeData.map((item) => item.semester),
+                  tickLabelStyle: {
+                    angle: 45,
+                    textAnchor: "start",
+                    fontSize: 12,
+                    fill: "#9CA3AF",
+                  },
+                },
+              ]}
+              yAxis={[
+                {
+                  label: "GPA",
+                  min: Math.floor(
+                    Math.min(
+                      ...cumulativeData.map((item) => item.cumulativeGpa)
+                    )
+                  ),
+                  max: 4,
+                  tickInterval: [0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4],
+                },
+              ]}
+              series={[
+                {
+                  data: cumulativeData.map((item) => item.cumulativeGpa),
+                  showMark: true,
+                  color: "#8B5CF6", // purple
+                  curve: "natural",
+                },
+              ]}
+              grid={{ vertical: true, horizontal: true }}
+              margin={{ left: 70, right: 30, top: 30, bottom: 100 }}
+              sx={{
+                [`.${axisClasses.left} .${axisClasses.label}`]: {
+                  transform: "translate(-20px, 0)",
                   fill: "#9CA3AF",
                 },
-              },
-            ]}
-            yAxis={[
-              {
-                label: "GPA",
-                //find the closest whole number to the lowest GPA
-                min: Math.floor(
-                  Math.min(...cumulativeData.map((item) => item.cumulativeGpa))
-                ),
-                max: 4,
-                tickInterval: [0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4],
-              },
-            ]}
-            series={[
-              {
-                data: cumulativeData.map((item) => item.cumulativeGpa),
-                label: "Cumulative GPA",
-                showMark: true,
-                color: "#10B981", // emerald color
-                area: false,
-              },
-            ]}
-            grid={{ vertical: true, horizontal: true }}
-            margin={{ left: 70, right: 30, top: 30, bottom: 100 }}
-            sx={{
-              [`.${axisClasses.left} .${axisClasses.label}`]: {
-                transform: "translate(-20px, 0)",
-                fill: "#9CA3AF",
-              },
-              [`.${axisClasses.bottom} .${axisClasses.label}`]: {
-                transform: "translate(0, 60px)",
-                fill: "#9CA3AF",
-              },
-              [`.${axisClasses.root} line`]: {
-                stroke: "#374151",
-                opacity: 0.3,
-              },
-              [`.${axisClasses.root} text`]: {
-                fill: "#9CA3AF",
-              },
-              backgroundColor: "transparent",
-            }}
-            slotProps={{
-              legend: {
-                // labelStyle: {
-                //   fill: "#E5E7EB",
-                //   fontSize: 12,
-                // },
-              },
-              tooltip: {
-                sx: {
-                  backgroundColor: "#1F2937",
-                  borderColor: "#374151",
-                  color: "#F3F4F6",
-                  borderRadius: "0.5rem",
+                [`.${axisClasses.bottom} .${axisClasses.label}`]: {
+                  transform: "translate(0, 60px)",
+                  fill: "#9CA3AF",
                 },
-              },
-            }}
-          />
-        </div>
-      </ChartBox>
+                [`.${axisClasses.root} line`]: {
+                  stroke: "#374151",
+                  opacity: 0.3,
+                },
+                [`.${axisClasses.root} text`]: {
+                  fill: "#9CA3AF",
+                },
+                backgroundColor: "transparent",
+              }}
+              slotProps={{
+                tooltip: {
+                  sx: {
+                    backgroundColor: "#1F2937",
+                    borderColor: "#374151",
+                    color: "#F3F4F6",
+                    borderRadius: "0.5rem",
+                  },
+                },
+              }}
+            />
+          </div>
+        </ChartBox>
 
-      {/* Charts Grid */}
+        {/* Semester GPA Chart */}
+        <ChartBox
+          title="Semester GPA Performance"
+          icon={<BookOpen className="h-5 w-5" />}
+          description="Your GPA for each individual semester (in isolation)."
+        >
+          <div className="h-[400px] w-full">
+            <LineChart
+              xAxis={[
+                {
+                  scaleType: "point",
+                  data: sortedSemData.map((item) => item.semester),
+                  tickLabelStyle: {
+                    angle: 45,
+                    textAnchor: "start",
+                    fontSize: 12,
+                    fill: "#9CA3AF",
+                  },
+                },
+              ]}
+              yAxis={[
+                {
+                  label: "GPA",
+                  min: Math.floor(
+                    Math.min(...sortedSemData.map((item) => item.gpa))
+                  ),
+                  max: 4,
+                  tickInterval: [0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4],
+                },
+              ]}
+              series={[
+                {
+                  data: sortedSemData.map((item) => item.gpa),
+                  showMark: true,
+                  color: "#3B82F6", // blue
+                  area: true,
+                },
+              ]}
+              grid={{ vertical: true, horizontal: true }}
+              margin={{ left: 70, right: 30, top: 30, bottom: 100 }}
+              sx={{
+                [`.${axisClasses.left} .${axisClasses.label}`]: {
+                  transform: "translate(-20px, 0)",
+                  fill: "#9CA3AF",
+                },
+                [`.${axisClasses.bottom} .${axisClasses.label}`]: {
+                  transform: "translate(0, 60px)",
+                  fill: "#9CA3AF",
+                },
+                [`.${axisClasses.root} line`]: {
+                  stroke: "#374151",
+                  opacity: 0.3,
+                },
+                [`.${axisClasses.root} text`]: {
+                  fill: "#9CA3AF",
+                },
+                backgroundColor: "transparent",
+              }}
+              slotProps={{
+                tooltip: {
+                  sx: {
+                    backgroundColor: "#1F2937",
+                    borderColor: "#374151",
+                    color: "#F3F4F6",
+                    borderRadius: "0.5rem",
+                  },
+                },
+              }}
+            />
+          </div>
+        </ChartBox>
+      </div>
+
+      {/* Additional Charts Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Grade Distribution - Now a Pie Chart */}
+        {/* Grade Distribution */}
         <ChartBox
           title="Grade Distribution"
           icon={<PieChartIcon className="h-5 w-5" />}
-          description="A breakdown of how many grades of each type you've received."
+          description="Breakdown of your grades across all courses"
         >
           <PieChartWrapper
             data={{
@@ -386,363 +393,16 @@ export default function StatsView({ courses }: { courses: Course[] }) {
                 borderColor: Array(ds.data.length).fill(ds.borderColor),
               })),
             }}
-            showLegend={false}
+            showLegend={true}
           />
         </ChartBox>
 
-        {/* Cumulative GPA - Area Chart */}
-        {/* <ChartBox
-          title="Cumulative Academic Trajectory"
-          icon={<AreaChartIcon className="h-5 w-5" />}
-          description="The progression of your cumulative GPA over time."
-        >
-          <ResponsiveContainer width="100%" height={400}>
-            <AreaChart
-              data={cumulativeData}
-              margin={{ top: 20, right: 30, left: 20, bottom: 80 }}
-            >
-              <defs>
-                <linearGradient id="cumGpaGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor={COLORS[2]} stopOpacity={0.8} />
-                  <stop offset="95%" stopColor={COLORS[2]} stopOpacity={0.2} />
-                </linearGradient>
-              </defs>
-              <CartesianGrid
-                strokeDasharray="3 3"
-                stroke="#374151"
-                opacity={0.3}
-              />
-              <XAxis
-                dataKey="semester"
-                angle={-45}
-                textAnchor="end"
-                height={70}
-                tick={{ fill: "#9CA3AF", fontSize: 12 }}
-              >
-                <Label
-                  value="Semester"
-                  position="insideBottom"
-                  offset={-60}
-                  fill="#9CA3AF"
-                  fontSize={12}
-                />
-              </XAxis>
-              <YAxis
-                domain={[0, 4]}
-                ticks={[0, 1, 2, 3, 3.5, 4]}
-                tick={{ fill: "#9CA3AF" }}
-              >
-                <Label
-                  value="Cumulative GPA"
-                  angle={-90}
-                  position="insideLeft"
-                  offset={15}
-                  fill="#9CA3AF"
-                  fontSize={12}
-                />
-              </YAxis>
-              <Tooltip
-                contentStyle={{
-                  backgroundColor: "#1F2937",
-                  borderColor: "#374151",
-                  borderRadius: "0.5rem",
-                  color: "#F3F4F6",
-                }}
-                formatter={(value, name, props) => {
-                  if (name === "Cumulative GPA") {
-                    return [value, `Total Credits: ${props.payload.credits}`];
-                  }
-                  return [value, name];
-                }}
-                labelFormatter={(label) => `Semester: ${label}`}
-              />
-              <Area
-                type="monotone"
-                dataKey="cumulativeGpa"
-                name="Cumulative GPA"
-                stroke={COLORS[2]}
-                fill="url(#cumGpaGradient)"
-                strokeWidth={2}
-              />
-              <ReferenceLine
-                y={3.0}
-                stroke="#6B7280"
-                strokeDasharray="3 3"
-                opacity={0.5}
-              />
-              <ReferenceLine
-                y={3.5}
-                stroke="#6B7280"
-                strokeDasharray="3 3"
-                opacity={0.5}
-              />
-              <ReferenceLine
-                y={4.0}
-                stroke="#6B7280"
-                strokeDasharray="3 3"
-                opacity={0.5}
-              />
-              <ReferenceLine
-                y={overallGpa}
-                stroke="#F59E0B"
-                strokeDasharray="3 3"
-                label={{
-                  value: `Current: ${overallGpa.toFixed(2)}`,
-                  position: "right",
-                  fill: "#F59E0B",
-                  fontSize: 12,
-                }}
-              />
-            </AreaChart>
-          </ResponsiveContainer>
-        </ChartBox> */}
-
-        {/* Semester GPA - Area Chart */}
-        {/* <ChartBox
-          title="Individual Performance by Semester"
-          icon={<AreaChartIcon className="h-5 w-5" />}
-          description="GPA and credits for each completed semester (includes summer)."
-        >
-          <ResponsiveContainer width="100%" height={400}>
-            <AreaChart
-              data={sortedSemData}
-              margin={{ top: 20, right: 30, left: 20, bottom: 80 }}
-            >
-              <defs>
-                <linearGradient id="semGpaGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor={COLORS[0]} stopOpacity={0.8} />
-                  <stop offset="95%" stopColor={COLORS[0]} stopOpacity={0.2} />
-                </linearGradient>
-              </defs>
-              <CartesianGrid
-                strokeDasharray="3 3"
-                stroke="#374151"
-                opacity={0.3}
-              />
-              <XAxis
-                dataKey="semester"
-                angle={-45}
-                textAnchor="end"
-                height={70}
-                tick={{ fill: "#9CA3AF", fontSize: 12 }}
-              >
-                <Label
-                  value="Semester"
-                  position="insideBottom"
-                  offset={-60}
-                  fill="#9CA3AF"
-                  fontSize={12}
-                />
-              </XAxis>
-              <YAxis
-                domain={[0, 4]}
-                ticks={[0, 1, 2, 3, 3.5, 4]}
-                tick={{ fill: "#9CA3AF" }}
-              >
-                <Label
-                  value="GPA"
-                  angle={-90}
-                  position="insideLeft"
-                  offset={15}
-                  fill="#9CA3AF"
-                  fontSize={12}
-                />
-              </YAxis>
-              <Tooltip
-                contentStyle={{
-                  backgroundColor: "#1F2937",
-                  borderColor: "#374151",
-                  borderRadius: "0.5rem",
-                  color: "#F3F4F6",
-                }}
-                formatter={(value, name, props) => {
-                  if (name === "GPA") {
-                    return [
-                      value,
-                      `Semester GPA (${props.payload.courseCount} ${
-                        props.payload.courseCount > 1 ? "courses" : "course"
-                      }, ${props.payload.credits} ${
-                        props.payload.credits > 1 ? "credits" : "credit"
-                      })`,
-                    ];
-                  }
-                  return [value, name];
-                }}
-                labelFormatter={(label) => `Semester: ${label}`}
-              />
-              <Area
-                type="monotone"
-                dataKey="gpa"
-                name="GPA"
-                stroke={COLORS[0]}
-                fill="url(#semGpaGradient)"
-                strokeWidth={2}
-              />
-              <ReferenceLine
-                y={3.0}
-                stroke="#6B7280"
-                strokeDasharray="3 3"
-                opacity={0.5}
-              />
-              <ReferenceLine
-                y={3.5}
-                stroke="#6B7280"
-                strokeDasharray="3 3"
-                opacity={0.5}
-              />
-              <ReferenceLine
-                y={4.0}
-                stroke="#6B7280"
-                strokeDasharray="3 3"
-                opacity={0.5}
-              />
-            </AreaChart>
-          </ResponsiveContainer>
-        </ChartBox> */}
-
-        {/* Department Performance - Fixed Bar Chart */}
-        {/* <ChartBox
-          title="Department Analysis"
-          icon={<BarChart2 className="h-5 w-5" />}
-          description="GPA performance by academic department"
-        >
-          <ResponsiveContainer width="100%" height={400}>
-            <BarChart
-              data={departmentData.slice(0, 8)}
-              margin={{ top: 20, right: 30, left: 20, bottom: 80 }}
-            >
-              <CartesianGrid
-                strokeDasharray="3 3"
-                stroke="#374151"
-                opacity={0.3}
-              />
-              <XAxis
-                dataKey="department"
-                angle={-45}
-                textAnchor="end"
-                height={70}
-                tick={{ fill: "#9CA3AF", fontSize: 12 }}
-              >
-                <Label
-                  value="Department"
-                  position="insideBottom"
-                  offset={-60}
-                  fill="#9CA3AF"
-                  fontSize={12}
-                />
-              </XAxis>
-              <YAxis
-                domain={[0, 4]}
-                ticks={[0, 1, 2, 3, 3.5, 4]}
-                tick={{ fill: "#9CA3AF" }}
-              >
-                <Label
-                  value="GPA"
-                  angle={-90}
-                  position="insideLeft"
-                  offset={15}
-                  fill="#9CA3AF"
-                  fontSize={12}
-                />
-              </YAxis>
-              <Tooltip
-                contentStyle={{
-                  backgroundColor: "#1F2937",
-                  borderColor: "#374151",
-                  borderRadius: "0.5rem",
-                  color: "#F3F4F6",
-                }}
-                formatter={(value, name, props) => [
-                  value,
-                  `GPA (${props.payload.courseCount} courses, ${props.payload.credits} credits)`,
-                ]}
-                labelFormatter={(label) => `Department: ${label}`}
-              />
-              <Bar
-                dataKey="gpa"
-                fill={COLORS[1]}
-                name="GPA"
-                radius={[4, 4, 0, 0]}
-              />
-              <ReferenceLine
-                y={3.0}
-                stroke="#6B7280"
-                strokeDasharray="3 3"
-                opacity={0.5}
-              />
-              <ReferenceLine
-                y={3.5}
-                stroke="#6B7280"
-                strokeDasharray="3 3"
-                opacity={0.5}
-              />
-            </BarChart>
-          </ResponsiveContainer>
-        </ChartBox> */}
-
-        {/* Department Radar Chart - Fixed */}
-        {/* {topDepartments.length > 2 && (
-          <ChartBox
-            title="Top Departments"
-            icon={<RadarIcon className="h-5 w-5" />}
-            description="Comparative performance across departments"
-          >
-            <ResponsiveContainer width="100%" height={400}>
-              <RadarChart
-                outerRadius={120}
-                data={radarData}
-                margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
-              >
-                <PolarGrid gridType="circle" stroke="#374151" opacity={0.3} />
-                <PolarAngleAxis
-                  dataKey="subject"
-                  tick={{ fill: "#9CA3AF", fontSize: 12 }}
-                />
-                <PolarRadiusAxis
-                  angle={30}
-                  domain={[0, 4]}
-                  tickCount={5}
-                  tick={{ fill: "#9CA3AF" }}
-                />
-                <Radar
-                  name="GPA"
-                  dataKey="GPA"
-                  stroke={COLORS[3]}
-                  fill={COLORS[3]}
-                  fillOpacity={0.2}
-                  strokeWidth={2}
-                />
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: "#1F2937",
-                    borderColor: "#374151",
-                    borderRadius: "0.5rem",
-                    color: "#F3F4F6",
-                  }}
-                  formatter={(value, name, props) => [
-                    value,
-                    `GPA (${props.payload.Courses} courses)`,
-                  ]}
-                  labelFormatter={(label) => `Department: ${label}`}
-                />
-                <Legend
-                  wrapperStyle={{
-                    color: "#E5E7EB",
-                    paddingTop: "20px",
-                    fontSize: "12px",
-                  }}
-                />
-              </RadarChart>
-            </ResponsiveContainer>
-          </ChartBox>
-        )} */}
-
-        {/* Credits Distribution - Pie Chart */}
+        {/* Credits Distribution */}
         {departmentData.length > 0 && (
           <ChartBox
             title="Credit Allocation"
             icon={<PieChartIcon className="h-5 w-5" />}
-            description="Distribution of your course credits across Yale College departments."
+            description="Distribution of credits across departments"
           >
             <PieChartWrapper
               data={{
@@ -752,6 +412,7 @@ export default function StatsView({ courses }: { courses: Course[] }) {
                   borderColor: Array(ds.data.length).fill(ds.borderColor),
                 })),
               }}
+              showLegend={true}
             />
           </ChartBox>
         )}

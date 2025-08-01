@@ -38,6 +38,8 @@ import {
 } from "lucide-react";
 import PieChartWrapper from "./ui/PieChartWrapper";
 import { InfoCard } from "./ui/InfoCard";
+import { LineChart } from "@mui/x-charts/LineChart";
+import { axisClasses } from "@mui/x-charts";
 
 const COLORS = [
   "#8B5CF6", // purple
@@ -287,6 +289,86 @@ export default function StatsView({ courses }: { courses: Course[] }) {
           } semesters`}
         />
       </motion.div>
+      {/* Cumulative GPA - Line Chart */}
+      <ChartBox
+        title="Cumulative GPA Progression"
+        icon={<AreaChartIcon className="h-5 w-5" />}
+        description="The progression of your cumulative GPA over time."
+      >
+        <div className="h-[400px] w-full">
+          <LineChart
+            xAxis={[
+              {
+                scaleType: "point",
+                data: cumulativeData.map((item) => item.semester),
+                label: "Semester",
+                tickLabelStyle: {
+                  angle: 45,
+                  textAnchor: "start",
+                  fontSize: 12,
+                  fill: "#9CA3AF",
+                },
+              },
+            ]}
+            yAxis={[
+              {
+                label: "GPA",
+                //find the closest whole number to the lowest GPA
+                min: Math.floor(
+                  Math.min(...cumulativeData.map((item) => item.cumulativeGpa))
+                ),
+                max: 4,
+                tickInterval: [0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4],
+              },
+            ]}
+            series={[
+              {
+                data: cumulativeData.map((item) => item.cumulativeGpa),
+                label: "Cumulative GPA",
+                showMark: true,
+                color: "#10B981", // emerald color
+                area: false,
+              },
+            ]}
+            grid={{ vertical: true, horizontal: true }}
+            margin={{ left: 70, right: 30, top: 30, bottom: 100 }}
+            sx={{
+              [`.${axisClasses.left} .${axisClasses.label}`]: {
+                transform: "translate(-20px, 0)",
+                fill: "#9CA3AF",
+              },
+              [`.${axisClasses.bottom} .${axisClasses.label}`]: {
+                transform: "translate(0, 60px)",
+                fill: "#9CA3AF",
+              },
+              [`.${axisClasses.root} line`]: {
+                stroke: "#374151",
+                opacity: 0.3,
+              },
+              [`.${axisClasses.root} text`]: {
+                fill: "#9CA3AF",
+              },
+              backgroundColor: "transparent",
+            }}
+            slotProps={{
+              legend: {
+                // labelStyle: {
+                //   fill: "#E5E7EB",
+                //   fontSize: 12,
+                // },
+              },
+              tooltip: {
+                sx: {
+                  backgroundColor: "#1F2937",
+                  borderColor: "#374151",
+                  color: "#F3F4F6",
+                  borderRadius: "0.5rem",
+                },
+              },
+            }}
+          />
+        </div>
+      </ChartBox>
 
       {/* Charts Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

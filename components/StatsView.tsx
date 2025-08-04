@@ -268,6 +268,7 @@ export default function StatsView({ courses }: { courses: Course[] }) {
                   showMark: true,
                   color: "#8B5CF6", // purple
                   curve: "natural",
+                  area: true,
                 },
               ]}
               grid={{ vertical: true, horizontal: true }}

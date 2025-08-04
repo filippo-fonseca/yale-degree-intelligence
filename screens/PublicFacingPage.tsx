@@ -5,17 +5,18 @@ import {
   FiArrowRight,
   FiGithub,
   FiMail,
-  FiUsers,
   FiExternalLink,
+  FiChevronRight,
 } from "react-icons/fi";
 import LogoIcon from "@/icons/LogoIcon";
 import CompoundLogo from "@/components/ui/CompoundLogo";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import LoginPage from "@/components/LoginPage";
 
 export default function AboutPage() {
   const [logInFlow, setLogInFlow] = useState(false);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   const features = [
     {
@@ -38,10 +39,38 @@ export default function AboutPage() {
     },
   ];
 
+  const extensions = [
+    {
+      title: "Degree Tracker",
+      description: "Track your progress towards graduation in real-time",
+      command: "F10.02",
+    },
+    {
+      title: "Course Planner",
+      description: "Plan your semesters with intelligent recommendations",
+      command: "F10.03",
+    },
+    {
+      title: "Requirement Checker",
+      description: "Instantly see which requirements any course fulfills",
+      command: "F10.04",
+    },
+    {
+      title: "Schedule Generator",
+      description: "Generate conflict-free schedules in seconds",
+      command: "F10.05",
+    },
+    {
+      title: "Peer Insights",
+      description: "See what courses others in your major are taking",
+      command: "F10.06",
+    },
+  ];
+
   if (logInFlow) return <LoginPage onBackClick={() => setLogInFlow(false)} />;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-blue-900/80 to-purple-900 font-louize">
+    <div className="min-h-screen overflow-x-hidden bg-gradient-to-br from-gray-950 via-gray-900 to-gray-900 font-louize">
       {/* Access Platform Button - Top Right */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
@@ -61,8 +90,10 @@ export default function AboutPage() {
       </motion.div>
 
       {/* Hero Section */}
-      <div className="relative overflow-hidden">
-        <div className="max-w-7xl mx-auto px-4 pt-20 pb-4 sm:px-6 lg:px-8 relative z-10">
+      <div className="relative">
+        <div className="max-w-7xl mx-auto px-4 pb-4 sm:px-6 lg:px-8 relative z-10">
+          {" "}
+          {/* pt-32 adds extra margin to the top */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -124,7 +155,132 @@ export default function AboutPage() {
         </div>
       </div>
 
-      {/* Rest of the code remains exactly the same */}
+      {/* Blueprint Section */}
+      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <motion.div
+          viewport={{ once: true }}
+          transition={{ duration: 0.8 }}
+          className="bg-gray-900/80 backdrop-blur-lg rounded-2xl p-8 border border-gray-800/50 shadow-xl"
+        >
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-200 to-purple-200 mb-4">
+              The Degree Intelligence Blueprint
+            </h2>
+            <p className="text-lg text-gray-300 max-w-3xl mx-auto">
+              How we transformed frustration into an elegant solution for Yale's
+              academic planning
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {/* Problem */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+              className="bg-gray-800/50 p-6 rounded-xl border border-gray-700/50 hover:border-blue-500/30 transition-all"
+            >
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 rounded-lg bg-red-500/20 flex items-center justify-center">
+                  <span className="text-red-400 text-xl">❗</span>
+                </div>
+                <h3 className="text-xl font-medium text-white">The Problem</h3>
+              </div>
+              <ul className="space-y-3 text-gray-300">
+                <li className="flex items-start gap-2">
+                  <FiChevronRight className="text-red-400 mt-1" />
+                  <span>Scattered requirements across PDFs and websites</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <FiChevronRight className="text-red-400 mt-1" />
+                  <span>Manual tracking in error-prone spreadsheets</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <FiChevronRight className="text-red-400 mt-1" />
+                  <span>No centralized view of progress</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <FiChevronRight className="text-red-400 mt-1" />
+                  <span>Planning nightmares (esp. double majors)</span>
+                </li>
+              </ul>
+            </motion.div>
+
+            {/* Solution */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.1 }}
+              className="bg-gray-800/50 p-6 rounded-xl border border-gray-700/50 hover:border-blue-500/30 transition-all"
+            >
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 rounded-lg bg-blue-500/20 flex items-center justify-center">
+                  <span className="text-blue-400 text-xl">💡</span>
+                </div>
+                <h3 className="text-xl font-medium text-white">Our Solution</h3>
+              </div>
+              <ul className="space-y-3 text-gray-300">
+                <li className="flex items-start gap-2">
+                  <FiChevronRight className="text-blue-400 mt-1" />
+                  <span>Unified requirements database</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <FiChevronRight className="text-blue-400 mt-1" />
+                  <span>Real-time progress stats + visualization</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <FiChevronRight className="text-blue-400 mt-1" />
+                  <span>Intelligent course recommendations</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <FiChevronRight className="text-blue-400 mt-1" />
+                  <span>Clean, intuitive interface</span>
+                </li>
+              </ul>
+            </motion.div>
+
+            {/* Impact */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              className="bg-gray-800/50 p-6 rounded-xl border border-gray-700/50 hover:border-blue-500/30 transition-all"
+            >
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 rounded-lg bg-green-500/20 flex items-center justify-center">
+                  <span className="text-green-400 text-xl">🚀</span>
+                </div>
+                <h3 className="text-xl font-medium text-white">The Impact</h3>
+              </div>
+              <ul className="space-y-3 text-gray-300">
+                <li className="flex items-start gap-2">
+                  <FiChevronRight className="text-green-400 mt-1" />
+                  <span>Hours saved on academic planning</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <FiChevronRight className="text-green-400 mt-1" />
+                  <span>Reduced errors in requirement tracking</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <FiChevronRight className="text-green-400 mt-1" />
+                  <span>
+                    Empowered students can make space for things like fun
+                    classes
+                  </span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <FiChevronRight className="text-green-400 mt-1" />
+                  <span>Democratized access to academic insights</span>
+                </li>
+              </ul>
+            </motion.div>
+          </div>
+        </motion.div>
+      </div>
+
       {/* Mission Section */}
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <motion.div
@@ -237,14 +393,16 @@ export default function AboutPage() {
                 >
                   <FiGithub /> GitHub
                 </a>
-                <a
-                  href={person.website}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-blue-400 hover:text-blue-300 text-sm flex items-center gap-2"
-                >
-                  <FiExternalLink /> Website
-                </a>
+                {person.website && (
+                  <a
+                    href={person.website}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-400 hover:text-blue-300 text-sm flex items-center gap-2"
+                  >
+                    <FiExternalLink /> Website
+                  </a>
+                )}
               </div>
             </motion.div>
           ))}
@@ -291,13 +449,24 @@ export default function AboutPage() {
       {/* Footer */}
       <div className="py-8 text-center text-gray-400 text-sm">
         <p>
-          Made with 💙 in New Haven | Not officially affiliated with Yale
-          University
+          Made with 💙 | Not officially affiliated with Yale University. We make
+          no money from this and this is NOT a business or job for any of us.
         </p>
         <p className="mt-2">
           v0.0.1 - © {new Date().getFullYear()} Yale DegreeIntelligence
         </p>
       </div>
+
+      {/* Hide scrollbar styling */}
+      <style jsx global>{`
+        .hide-scrollbar::-webkit-scrollbar {
+          display: none;
+        }
+        .hide-scrollbar {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+        }
+      `}</style>
     </div>
   );
 }

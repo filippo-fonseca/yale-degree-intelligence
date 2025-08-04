@@ -49,6 +49,8 @@ export default function MajorSelectionFlow({
         majors: selectedMajors,
         graduationYear: parseInt(graduationYear),
         updatedAt: new Date(),
+        email: user.email,
+        photoURL: user.photoURL,
       });
       onComplete();
     } catch (error) {

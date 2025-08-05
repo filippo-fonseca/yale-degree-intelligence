@@ -20,6 +20,8 @@ import { FiBook, FiCreditCard } from "react-icons/fi";
 import CompoundLogo from "@/components/ui/CompoundLogo";
 import { gradePoints } from "@/lib/constants";
 import { useAuth } from "@/context/AuthContext";
+import { useRouter } from "next/navigation";
+import { FiArrowLeft } from "react-icons/fi";
 
 interface UserProfile {
   displayName?: string;
@@ -39,6 +41,7 @@ export default function UserProfilePage() {
   const [authLoading, setAuthLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [hasPermission, setHasPermission] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -182,6 +185,13 @@ export default function UserProfilePage() {
       </div>
 
       <div className="relative max-w-4xl mx-auto px-6 py-12">
+        <button
+          onClick={() => router.push("/")}
+          className="mb-6 inline-flex items-center gap-2 text-sm text-pink-500 hover:text-pink-300 transition"
+        >
+          <FiArrowLeft />
+          Back to the platform
+        </button>
         {/* Header */}
         <header className="flex flex-col items-center mb-12">
           <motion.div
@@ -366,8 +376,11 @@ export default function UserProfilePage() {
           transition={{ delay: 0.8 }}
           className="text-center text-gray-500 text-sm mt-12"
         >
-          <p>Profile powered by DegreeIntelligence</p>
-          <p className="mt-1">Not officially affiliated with Yale University</p>
+          <p>Profile powered by Yale DegreeIntelligence.</p>
+          <p className="mt-1">
+            Not officially affiliated with Yale University. There can be
+            mistakes.
+          </p>
         </motion.footer>
       </div>
     </main>

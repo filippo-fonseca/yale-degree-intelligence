@@ -2,6 +2,7 @@ import "./globals.css";
 import localFont from "next/font/local";
 import { type Metadata } from "next";
 import { AuthProvider } from "@/context/AuthContext";
+import { Toaster } from "react-hot-toast";
 
 export const metadata: Metadata = {
   title: "Yale DegreeIntelligence",
@@ -76,6 +77,31 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" className={`${louize.variable} ${sf.variable}`}>
+      <Toaster
+        position="top-center"
+        toastOptions={{
+          // Global styles
+          style: {
+            background: "#1f1f1f", // dark gray
+            color: "#fff", // white text
+            fontSize: "0.875rem", // smaller text (Tailwind `text-sm`)
+            borderRadius: "8px",
+            padding: "12px 16px",
+          },
+          success: {
+            iconTheme: {
+              primary: "#ec4899", // Tailwind pink-500
+              secondary: "#1f1f1f", // match background
+            },
+          },
+          error: {
+            iconTheme: {
+              primary: "#ef4444", // Tailwind red-500
+              secondary: "#1f1f1f",
+            },
+          },
+        }}
+      />
       <AuthProvider>
         <body className="bg-black text-white">{children}</body>
       </AuthProvider>

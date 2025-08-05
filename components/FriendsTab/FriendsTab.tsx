@@ -79,7 +79,7 @@ function ProfilePic({
     />
   ) : (
     <div
-      className="rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-medium border-2 border-gray-700"
+      className="rounded-full bg-gradient-to-br from-pink-500 to-purple-600 flex items-center justify-center text-white font-medium border-2 border-gray-700"
       style={{ width: size, height: size, fontSize: size / 2 }}
     >
       {getDisplayName(profile).charAt(0).toUpperCase()}
@@ -227,6 +227,10 @@ export default function FriendsTab() {
   const sendFriendRequest = async (toId: string) => {
     if (!user) return;
 
+    //close modal
+    setShowSearchModal(false);
+    setSearchTerm("");
+
     // Don't allow sending to self or if already friends/requested
     if (toId === user.uid) {
       toast.error("You can't send a friend request to yourself");
@@ -336,14 +340,14 @@ export default function FriendsTab() {
 
   return (
     <div className="w-full max-w-3xl mx-auto font-louize">
-      <h2 className="text-3xl font-medium bg-clip-text text-transparent bg-gradient-to-r from-blue-200 to-purple-200 mb-8">
+      <h2 className="text-3xl font-medium bg-clip-text text-transparent bg-gradient-to-r from-pink-200 to-purple-200 mb-8">
         Friends & Connections
       </h2>
 
       {/* Loading state */}
       {loading && (
         <div className="flex justify-center items-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-pink-500"></div>
         </div>
       )}
 
@@ -352,10 +356,10 @@ export default function FriendsTab() {
         <>
           <div className="flex justify-end mb-6">
             <button
-              className="px-4 py-2 bg-blue-700 text-white rounded-md hover:bg-blue-800 transition"
+              className="px-4 py-2 bg-pink-700 text-white rounded-md hover:bg-pink-800 transition"
               onClick={() => setShowSearchModal(true)}
             >
-              Find Students
+              Add a friend
             </button>
           </div>
 
@@ -375,7 +379,7 @@ export default function FriendsTab() {
                 >
                   <div className="flex justify-between items-center mb-4">
                     <h3 className="text-xl font-semibold text-white">
-                      Find Students
+                      Add a friend on DegreeIntelligence
                     </h3>
                     <button
                       onClick={() => {
@@ -389,16 +393,17 @@ export default function FriendsTab() {
                   </div>
 
                   <div className="flex items-center gap-3 mb-4">
-                    <FiSearch className="text-blue-400" />
+                    <FiSearch className="text-pink-500 w-5 h-5" />
                     <input
+                      type="text"
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
-                      className="bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 w-full text-gray-200"
+                      className="bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 w-full text-gray-200 focus:outline-none focus:ring-3 focus:ring-pink-500 focus:border-pink-500"
                       placeholder="Find students by name, email, major..."
                     />
                   </div>
 
-                  <div className="space-y-2 max-h-[50vh] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-600">
+                  <div className="space-y-2 max-h-[50vh]overflow-y-auto scrollbar-thin scrollbar-thumb-gray-600">
                     {searchTerm.length === 0 ? (
                       <div className="flex flex-col items-center justify-center gap-4 text-gray-400 text-center py-10">
                         <Panda size={32} />
@@ -420,8 +425,8 @@ export default function FriendsTab() {
                       filteredUsers.slice(0, 10).map((u) => (
                         <motion.div
                           key={u.uid}
-                          className="flex items-center justify-between p-3 rounded-xl bg-gray-800 border border-gray-700 hover:border-blue-400 transition-all"
-                          whileHover={{ scale: 1.02 }}
+                          className="flex items-center justify-between p-3 rounded-xl bg-gray-800 border border-gray-700 hover:border-pink-400 transition-all"
+                          whileHover={{ scale: 1.01 }}
                         >
                           <div className="flex items-center gap-4">
                             <ProfilePic profile={u} size={36} />
@@ -437,7 +442,7 @@ export default function FriendsTab() {
                             </div>
                           </div>
                           <button
-                            className="flex items-center gap-1 px-3 py-1.5 bg-blue-900/60 text-blue-200 rounded-lg border border-blue-800 hover:bg-blue-800 hover:text-white transition"
+                            className="flex items-center gap-1 px-3 py-1.5 bg-pink-900/60 text-pink-200 rounded-lg border border-pink-800 hover:bg-pink-800 hover:text-white transition"
                             onClick={() => sendFriendRequest(u.uid)}
                           >
                             <FiUserPlus />
@@ -459,7 +464,7 @@ export default function FriendsTab() {
           {/* 2. Friend Requests */}
           <section className="mb-12 grid grid-cols-1 md:grid-cols-2 gap-8">
             <div>
-              <h3 className="text-lg font-medium text-blue-200 mb-2 flex items-center gap-2">
+              <h3 className="text-lg font-medium text-pink-200 mb-2 flex items-center gap-2">
                 <FiMail /> Incoming Requests ({incomingRequests.length})
               </h3>
               <div className="space-y-2">
@@ -512,7 +517,7 @@ export default function FriendsTab() {
               </div>
             </div>
             <div>
-              <h3 className="text-lg font-medium text-blue-200 mb-2 flex items-center gap-2">
+              <h3 className="text-lg font-medium text-pink-200 mb-2 flex items-center gap-2">
                 <FiUserCheck /> Sent Requests ({sentRequests.length})
               </h3>
               <div className="space-y-2">
@@ -559,7 +564,7 @@ export default function FriendsTab() {
 
           {/* 3. Friends List */}
           <section>
-            <h3 className="text-lg font-medium text-blue-200 mb-2 flex items-center gap-2">
+            <h3 className="text-lg font-medium text-pink-200 mb-2 flex items-center gap-2">
               <FiUsers /> Your Friends ({friendProfiles.length})
             </h3>
             <div className="space-y-2">
@@ -583,7 +588,7 @@ export default function FriendsTab() {
                       <div>
                         <Link
                           href={`/user/${f.uid}`}
-                          className="font-medium text-blue-200 hover:underline hover:text-blue-300"
+                          className="font-medium text-pink-200 hover:underline hover:text-pink-300"
                         >
                           {getDisplayName(f)}
                         </Link>

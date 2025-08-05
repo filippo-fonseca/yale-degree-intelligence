@@ -32,6 +32,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import CompoundLogo from "@/components/ui/CompoundLogo";
 import { toast } from "react-hot-toast";
+import { Panda } from "lucide-react";
 
 type UserProfile = {
   uid: string;
@@ -99,7 +100,7 @@ function CopyButton() {
   return (
     <button
       onClick={handleCopy}
-      className="inline-flex items-center gap-1 text-blue-400 hover:text-blue-200 underline hover:no-underline transition"
+      className="inline-flex items-center gap-1 font-semibold text-pink-500 hover:text-pink-200 underline hover:no-underline transition"
     >
       {copied ? (
         <>
@@ -367,7 +368,7 @@ export default function FriendsTab() {
                 exit={{ opacity: 0 }}
               >
                 <motion.div
-                  className="bg-gray-900 p-6 rounded-lg shadow-xl max-w-2xl w-full h-[250px] flex flex-col"
+                  className="bg-gray-900 p-6 rounded-lg shadow-xl max-w-2xl w-full h-[400px] flex flex-col"
                   initial={{ scale: 0.95, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
                   exit={{ scale: 0.95, opacity: 0 }}
@@ -399,10 +400,21 @@ export default function FriendsTab() {
 
                   <div className="space-y-2 max-h-[50vh] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-600">
                     {searchTerm.length === 0 ? (
-                      <div className="text-gray-400 text-center py-10">
-                        Can't find your friends? <CopyButton />
-                        <br />
-                        and text it to them! You'll be helping them out.
+                      <div className="flex flex-col items-center justify-center gap-4 text-gray-400 text-center py-10">
+                        <Panda size={32} />
+                        <div>
+                          Can't find your friends? <CopyButton />
+                          <br />
+                          and{" "}
+                          <span className="text-white">
+                            text it to them!
+                          </span>{" "}
+                          You'll be helping them (and us)
+                          <br />
+                          out with our mission of making academic planning{" "}
+                          <br />
+                          easier and more accessible for all Yale students.
+                        </div>
                       </div>
                     ) : filteredUsers.length > 0 ? (
                       filteredUsers.slice(0, 10).map((u) => (

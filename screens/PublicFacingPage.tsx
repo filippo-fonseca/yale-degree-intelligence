@@ -346,7 +346,7 @@ export default function AboutPage() {
               bio: "Joined forces to continue scaling the platform and make it more robust.",
               contact: "emir.ahmed@yale.edu",
               photoRoute: "/team/emir.JPG",
-              github: "https://github.com/EmirkataG",
+              github: "https://github.com/EmirataG",
               website: "",
             },
           ].map((person, i) => (

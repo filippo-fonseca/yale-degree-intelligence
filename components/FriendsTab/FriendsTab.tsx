@@ -340,9 +340,18 @@ export default function FriendsTab() {
 
   return (
     <div className="w-full max-w-3xl mx-auto font-louize">
-      <h2 className="text-3xl font-medium bg-clip-text text-transparent bg-gradient-to-r from-pink-200 to-purple-200 mb-8">
-        Friends & Connections
-      </h2>
+      <div className="flex items-center justify-between w-full mb-8">
+        {" "}
+        <h2 className="text-3xl font-medium bg-clip-text text-transparent bg-gradient-to-r from-blue-200 to-purple-200">
+          Friends & Connections
+        </h2>
+        <button
+          className="w-max px-4 py-2 bg-pink-700 text-white rounded-md hover:bg-pink-800 transition flex items-center justify-end gap-2"
+          onClick={() => setShowSearchModal(true)}
+        >
+          <FiUserPlus /> Add a friend
+        </button>
+      </div>
 
       {/* Loading state */}
       {loading && (
@@ -357,14 +366,6 @@ export default function FriendsTab() {
           {/* Top section with requests and add friend button */}
           <div className="flex flex-col md:flex-row gap-6 mb-8">
             {/* Add Friend Button */}
-            <div className="md:w-1/3">
-              <button
-                className="w-full px-4 py-2 bg-pink-700 text-white rounded-md hover:bg-pink-800 transition flex items-center justify-center gap-2"
-                onClick={() => setShowSearchModal(true)}
-              >
-                <FiUserPlus /> Add a friend
-              </button>
-            </div>
 
             {/* Incoming Requests */}
             <div className="md:w-1/3">
@@ -597,13 +598,6 @@ export default function FriendsTab() {
                       </div>
                     </div>
                     <div className="flex gap-2">
-                      <Link
-                        href={`/user/${f.uid}`}
-                        className="flex items-center gap-1 px-3 py-1.5 bg-gray-800/60 text-gray-300 rounded-lg border border-gray-700 hover:bg-gray-700 hover:text-white transition"
-                      >
-                        <FiUser className="inline-block" />
-                        Open Profile
-                      </Link>
                       <button
                         className="flex items-center gap-1 px-3 py-1.5 bg-gray-800/60 text-gray-300 rounded-lg border border-gray-700 hover:bg-red-800 hover:text-white hover:border-red-600 transition"
                         onClick={() => friend.id && removeFriend(friend.id)}
@@ -612,6 +606,13 @@ export default function FriendsTab() {
                         <FiX />
                         Remove
                       </button>
+                      <Link
+                        href={`/user/${f.uid}`}
+                        className="flex items-center gap-1 px-3 py-1.5 bg-gray-800/60 text-gray-300 rounded-lg border border-gray-700 hover:bg-pink-500 hover:text-white transition"
+                      >
+                        <FiUser className="inline-block" />
+                        Open Profile
+                      </Link>
                     </div>
                   </motion.div>
                 );

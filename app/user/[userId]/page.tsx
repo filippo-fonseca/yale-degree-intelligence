@@ -187,7 +187,7 @@ export default function UserProfilePage() {
       <div className="relative max-w-4xl mx-auto px-6 py-12">
         <button
           onClick={() => router.push("/")}
-          className="mb-6 inline-flex items-center gap-2 text-sm text-pink-500 hover:text-pink-300 transition"
+          className="mb-6 inline-flex items-center gap-2 text-sm text-pink-500 hover:text-pink-300 transition hover:underline"
         >
           <FiArrowLeft />
           Back to the platform

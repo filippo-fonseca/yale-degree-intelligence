@@ -46,6 +46,7 @@ export default function MajorSelectionFlow({
     setIsSubmitting(true);
     try {
       await setDoc(doc(db, "users", user.uid), {
+        displayName: user.displayName,
         majors: selectedMajors,
         graduationYear: parseInt(graduationYear),
         updatedAt: new Date(),
@@ -259,7 +260,8 @@ export default function MajorSelectionFlow({
               later in settings.
             </p>
             <InfoCard className="text-sm">
-              Our goal is to support all majors. If yours isn't there,{" "}
+              Our goal is to support all majors & concentrations. If yours isn't
+              there,{" "}
               <Link
                 href="mailto:filippo.fonseca@yale.edu,emir.ahmed@yale.edu"
                 className="text-white font-normal hover:underline"

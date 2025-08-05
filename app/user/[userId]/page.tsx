@@ -19,6 +19,7 @@ import { Course } from "@/lib/types";
 import { FiBook, FiCreditCard } from "react-icons/fi";
 import CompoundLogo from "@/components/ui/CompoundLogo";
 import { gradePoints } from "@/lib/constants";
+import { useAuth } from "@/context/AuthContext";
 
 interface UserProfile {
   displayName?: string;
@@ -31,10 +32,13 @@ interface UserProfile {
 
 export default function UserProfilePage() {
   const { userId } = useParams();
+  const { user } = useAuth();
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
+  const [authLoading, setAuthLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [hasPermission, setHasPermission] = useState(false);
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -116,26 +120,56 @@ export default function UserProfilePage() {
       .reduce((sum, course) => sum + (course.credits || 0), 0);
   };
 
-  if (loading) {
+  // 1. Permission check
+  useEffect(() => {
+    if (!user) return; // or handle not-logged-in edge case
+    setAuthLoading(true);
+    const checkFriend = async () => {
+      try {
+        // Allow viewing own profile
+        if (user.uid === userId) {
+          setHasPermission(true);
+          return setAuthLoading(false);
+        }
+        // Check "friends" collection for mutual friendship
+        const friendsQ = query(
+          collection(db, "friends"),
+          where("users", "array-contains", user.uid)
+        );
+        const friendsSnap = await getDocs(friendsQ);
+        let allowed = false;
+        friendsSnap.forEach((doc) => {
+          const users: string[] = doc.data().users;
+          if (users.includes(userId as string)) allowed = true;
+        });
+        setHasPermission(allowed);
+      } catch {
+        setHasPermission(false);
+      } finally {
+        setAuthLoading(false);
+      }
+    };
+    checkFriend();
+  }, [user, userId]);
+
+  // 3. Early return logic
+  if (!user || authLoading)
     return (
       <div className="min-h-screen bg-gray-950 flex items-center justify-center">
         <div className="animate-pulse text-gray-400">Loading profile...</div>
       </div>
     );
-  }
 
-  if (error) {
+  if (!hasPermission) {
     return (
-      <div className="min-h-screen bg-gray-950 flex items-center justify-center">
-        <div className="text-red-400">{error}</div>
-      </div>
-    );
-  }
-
-  if (!userProfile) {
-    return (
-      <div className="min-h-screen bg-gray-950 flex items-center justify-center">
-        <div className="text-gray-400">User not found</div>
+      <div className="min-h-screen bg-gray-950 flex flex-col items-center justify-center">
+        <div className="text-2xl font-semibold text-blue-300 mb-3">
+          Private Profile
+        </div>
+        <div className="text-gray-400 text-center max-w-md">
+          You must be friends with this user to view their profile. Try sending
+          a friend request!
+        </div>
       </div>
     );
   }
@@ -167,7 +201,7 @@ export default function UserProfilePage() {
           >
             <div className="flex flex-col items-center text-center">
               <div className="relative mb-4">
-                {userProfile.photoURL ? (
+                {userProfile?.photoURL ? (
                   <img
                     src={userProfile.photoURL}
                     alt={getDisplayNameFromEmail(userProfile.email)}
@@ -175,7 +209,7 @@ export default function UserProfilePage() {
                   />
                 ) : (
                   <div className="w-24 h-24 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-4xl font-medium border-2 border-gray-700">
-                    {getDisplayNameFromEmail(userProfile.email)
+                    {getDisplayNameFromEmail(userProfile?.email)
                       .charAt(0)
                       .toUpperCase()}
                   </div>
@@ -183,10 +217,10 @@ export default function UserProfilePage() {
               </div>
 
               <h1 className="text-2xl font-medium text-transparent bg-clip-text bg-gradient-to-r from-blue-200 to-purple-200">
-                {getDisplayNameFromEmail(userProfile.email)}
+                {getDisplayNameFromEmail(userProfile?.email)}
               </h1>
 
-              {userProfile.graduationYear && (
+              {userProfile?.graduationYear && (
                 <p className="text-gray-400 mt-1">
                   Class of {userProfile.graduationYear}
                 </p>
@@ -195,7 +229,7 @@ export default function UserProfilePage() {
               <div className="mt-6 w-full">
                 <div className="p-4 rounded-lg bg-gray-800/30 border border-gray-700">
                   <p className="text-gray-300">
-                    {userProfile.bio ||
+                    {userProfile?.bio ||
                       "This student hasn't written a bio yet."}
                   </p>
                 </div>
@@ -247,7 +281,7 @@ export default function UserProfilePage() {
         </motion.section>
 
         {/* Majors Section */}
-        {userProfile.majors?.length > 0 && (
+        {userProfile?.majors && userProfile.majors.length > 0 && (
           <motion.section
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}

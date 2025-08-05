@@ -343,7 +343,7 @@ export default function AboutPage() {
             {
               name: "Emir Ahmed",
               role: "Computer Science & Applied Math '28",
-              bio: "Joined forces to turn a hacky solution into something all Yalies could use.",
+              bio: "Joined forces to continue scaling the platform and make it more robust.",
               contact: "emir.ahmed@yale.edu",
               photoRoute: "/team/emir.JPG",
               github: "https://github.com/EmirkataG",

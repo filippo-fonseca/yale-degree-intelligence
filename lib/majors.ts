@@ -237,3 +237,8 @@ export const calculateMajorProgress = (
     inProgressPercentage
   };
 };
+
+export const getFullMajorNameById = (majorId: string): string => {
+  const major = majorRequirements[majorId];
+  return major ? major.name : "Unknown Major";
+};

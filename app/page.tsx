@@ -16,6 +16,7 @@ import {
   FiChevronDown,
   FiCoffee,
   FiRefreshCw,
+  FiUsers,
 } from "react-icons/fi";
 import {
   collection,
@@ -55,6 +56,7 @@ import LogoIcon from "@/icons/LogoIcon";
 import CourseModal from "@/components/MajorProgressView/CourseModal";
 import { getGPAColor } from "@/lib/utils/utils";
 import PublicFacingPage from "@/screens/PublicFacingPage";
+import FriendsTab from "@/components/FriendsTab/FriendsTab";
 
 interface UserProfile {
   majors: string[];
@@ -153,6 +155,12 @@ export default function Home() {
       icon: RiProgress3Fill,
       label: "My major",
       disabled: !hasData,
+    },
+    {
+      id: "friends",
+      icon: FiUsers,
+      label: "Friends",
+      disabled: false,
     },
     {
       id: "cleoai",
@@ -719,6 +727,7 @@ export default function Home() {
                       <FiChevronRight />
                     </motion.div>
                   )}
+
                   {item.disabled && item.tooltip && (
                     <div className="absolute left-full ml-2 px-2 py-1 bg-gray-800 text-gray-200 text-xs rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
                       {item.tooltip}
@@ -1168,6 +1177,17 @@ export default function Home() {
                   transition={{ duration: 0.3 }}
                 >
                   <DistributionalsView courses={courses} />
+                </motion.div>
+              )}
+              {activeTab === "friends" && (
+                <motion.div
+                  key="friends"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <FriendsTab />
                 </motion.div>
               )}
               {activeTab === "cleoai" && (

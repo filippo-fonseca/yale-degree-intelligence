@@ -1,4 +1,3 @@
-// src/app/user/[userId]/page.tsx
 "use client";
 
 import { useParams } from "next/navigation";
@@ -22,6 +21,8 @@ import { gradePoints } from "@/lib/constants";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
 import { FiArrowLeft } from "react-icons/fi";
+import Link from "next/link";
+import { getCourseNameFromCode } from "@/lib/courseCatalog";
 
 interface UserProfile {
   displayName?: string;
@@ -121,6 +122,15 @@ export default function UserProfilePage() {
     return courses
       .filter((c) => c.status === "completed")
       .reduce((sum, course) => sum + (course.credits || 0), 0);
+  };
+
+  const getGPAColor = (grade: string) => {
+    if (!gradePoints[grade]) return "text-gray-400";
+    const gpa = gradePoints[grade];
+    if (gpa >= 4.0) return "text-purple-400";
+    if (gpa >= 3.0) return "text-blue-400";
+    if (gpa >= 2.0) return "text-yellow-400";
+    return "text-red-400";
   };
 
   // 1. Permission check
@@ -290,12 +300,209 @@ export default function UserProfilePage() {
           </div>
         </motion.section>
 
+        {/* Course Timeline Section */}
+        <motion.section
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.6 }}
+          className="mb-12"
+        >
+          <h2 className="text-xl font-medium mb-6 text-transparent bg-clip-text bg-gradient-to-r from-blue-200 to-purple-200">
+            Academic Journey
+          </h2>
+
+          <div className="space-y-12">
+            {Array.from(
+              new Set(
+                courses
+                  .map((c) => c.year)
+                  .filter((y): y is number => y !== undefined)
+              )
+            )
+              .sort((a, b) => a - b)
+              .map((year) => {
+                const yearCourses = courses.filter((c) => c.year === year);
+                const semesters = Array.from(
+                  new Set(yearCourses.map((c) => c.semester))
+                )
+                  .filter((s): s is string => s !== undefined)
+                  .sort((a, b) => {
+                    // Sort semesters in chronological order
+                    const order: Record<string, number> = {
+                      Spring: 0,
+                      Summer: 1,
+                      Fall: 2,
+                    };
+                    return (order[a] || 0) - (order[b] || 0);
+                  });
+
+                return (
+                  <motion.div
+                    key={year}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="rounded-xl bg-gray-900/50 backdrop-blur-sm border border-gray-800 overflow-hidden"
+                  >
+                    <div className="p-6 border-b border-gray-800 bg-gradient-to-r from-gray-900/70 to-gray-900/30">
+                      <h3 className="text-lg font-medium text-blue-200">
+                        Year {year}
+                      </h3>
+                    </div>
+
+                    <div className="divide-y divide-gray-800">
+                      {semesters.map((semester) => {
+                        const semesterCourses = yearCourses.filter(
+                          (c) => c.semester === semester
+                        );
+                        const semesterCredits = semesterCourses.reduce(
+                          (sum: number, c) => sum + (c.credits || 0),
+                          0
+                        );
+
+                        return (
+                          <div key={`${year}-${semester}`} className="p-6">
+                            <div className="flex items-center justify-between mb-4">
+                              <h4 className="font-medium text-gray-300">
+                                {semester} {year}
+                              </h4>
+                              <span className="text-sm text-gray-500">
+                                {semesterCredits} credit
+                                {semesterCredits !== 1 ? "s" : ""}
+                              </span>
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                              {semesterCourses.map((course) => (
+                                <motion.div
+                                  key={course.id}
+                                  whileHover={{ y: -2 }}
+                                  className={`p-4 rounded-lg ${
+                                    course.status === "completed" &&
+                                    !course.skipped
+                                      ? "bg-emerald-900/10 border-emerald-800/50"
+                                      : course.status === "in-progress"
+                                      ? "bg-purple-900/10 border-purple-800/50"
+                                      : "bg-gray-800/10 border-gray-700/50"
+                                  } border`}
+                                >
+                                  <div className="flex justify-between items-start">
+                                    <div>
+                                      <h5 className="font-medium">
+                                        {course.code}
+                                        {course.skipped && (
+                                          <span className="ml-2 text-xs text-gray-500">
+                                            (skipped)
+                                          </span>
+                                        )}
+                                      </h5>
+                                      <p className="text-sm text-gray-400">
+                                        {getCourseNameFromCode(course.code) ||
+                                          "Course"}
+                                      </p>
+                                    </div>
+                                    <div className="flex flex-col items-end">
+                                      {/* {course.grade && (
+                                        <span
+                                          className={`text-sm font-medium ${
+                                            course.status === "completed"
+                                              ? getGPAColor(course.grade)
+                                              : "text-gray-400"
+                                          }`}
+                                        >
+                                          {course.grade}
+                                        </span>
+                                      )} */}
+                                      <span className="text-xs text-gray-500">
+                                        {course.credits} cr
+                                      </span>
+                                    </div>
+                                  </div>
+                                </motion.div>
+                              ))}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </motion.div>
+                );
+              })}
+
+            {/* Courses without year/semester */}
+            {courses.filter((c) => !c.year || !c.semester).length > 0 && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="rounded-xl bg-gray-900/50 backdrop-blur-sm border border-gray-800 overflow-hidden"
+              >
+                <div className="p-6 border-b border-gray-800 bg-gradient-to-r from-gray-900/70 to-gray-900/30">
+                  <h3 className="text-lg font-medium text-blue-200">
+                    Other Courses
+                  </h3>
+                </div>
+
+                <div className="p-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    {courses
+                      .filter((c) => !c.year || !c.semester)
+                      .map((course) => (
+                        <motion.div
+                          key={course.id}
+                          whileHover={{ y: -2 }}
+                          className={`p-4 rounded-lg ${
+                            course.status === "completed" && !course.skipped
+                              ? "bg-emerald-900/10 border-emerald-800/50"
+                              : course.status === "in-progress"
+                              ? "bg-purple-900/10 border-purple-800/50"
+                              : "bg-gray-800/10 border-gray-700/50"
+                          } border`}
+                        >
+                          <div className="flex justify-between items-start">
+                            <div>
+                              <h5 className="font-medium">
+                                {course.code}
+                                {course.skipped && (
+                                  <span className="ml-2 text-xs text-gray-500">
+                                    (skipped)
+                                  </span>
+                                )}
+                              </h5>
+                              <p className="text-sm text-gray-400">
+                                {getCourseNameFromCode(course.code) || "Course"}
+                              </p>
+                            </div>
+                            <div className="flex flex-col items-end">
+                              {course.grade && (
+                                <span
+                                  className={`text-sm font-medium ${
+                                    course.status === "completed"
+                                      ? getGPAColor(course.grade)
+                                      : "text-gray-400"
+                                  }`}
+                                >
+                                  {course.grade}
+                                </span>
+                              )}
+                              <span className="text-xs text-gray-500">
+                                {course.credits} cr
+                              </span>
+                            </div>
+                          </div>
+                        </motion.div>
+                      ))}
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </div>
+        </motion.section>
+
         {/* Majors Section */}
         {userProfile?.majors && userProfile.majors.length > 0 && (
           <motion.section
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 0.6 }}
+            transition={{ delay: 0.8 }}
             className="mb-12"
           >
             <h2 className="text-xl font-medium mb-6 text-transparent bg-clip-text bg-gradient-to-r from-blue-200 to-purple-200">
@@ -373,7 +580,7 @@ export default function UserProfilePage() {
         <motion.footer
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 0.8 }}
+          transition={{ delay: 1 }}
           className="text-center text-gray-500 text-sm mt-12"
         >
           <p>Profile powered by Yale DegreeIntelligence.</p>

@@ -1,4 +1,3 @@
-// components/MajorSelectionFlow.tsx
 "use client";
 
 import { motion } from "framer-motion";
@@ -12,7 +11,7 @@ import { InfoCard } from "./ui/InfoCard";
 import Link from "next/link";
 import CompoundLogo from "./ui/CompoundLogo";
 import LogoIcon from "@/icons/LogoIcon";
-import { FiArrowRight } from "react-icons/fi";
+import { FiArrowRight, FiX } from "react-icons/fi";
 
 interface MajorSelectionFlowProps {
   onComplete: () => void;
@@ -22,11 +21,12 @@ export default function MajorSelectionFlow({
   onComplete,
 }: MajorSelectionFlowProps) {
   const { user } = useAuth();
-  const [step, setStep] = useState<"welcome" | "majors" | "year" | "complete">(
-    "welcome"
-  );
+  const [step, setStep] = useState<
+    "welcome" | "majors" | "bio" | "year" | "complete"
+  >("welcome");
   const [selectedMajors, setSelectedMajors] = useState<string[]>([]);
-  const [graduationYear, setGraduationYear] = useState<string>("");
+  const [graduationYear, setGraduationYear] = useState<string>("2027");
+  const [bio, setBio] = useState<string>("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleMajorToggle = (majorCode: string) => {
@@ -40,6 +40,11 @@ export default function MajorSelectionFlow({
     });
   };
 
+  const handleRemoveMajor = (index: number) => {
+    if (selectedMajors.length <= 1) return;
+    setSelectedMajors(selectedMajors.filter((_, i) => i !== index));
+  };
+
   const handleSubmit = async () => {
     if (!user || selectedMajors.length === 0 || !graduationYear) return;
 
@@ -49,6 +54,7 @@ export default function MajorSelectionFlow({
         displayName: user.displayName,
         majors: selectedMajors,
         graduationYear: parseInt(graduationYear),
+        bio: bio,
         updatedAt: new Date(),
         email: user.email,
         photoURL: user.photoURL,
@@ -70,20 +76,6 @@ export default function MajorSelectionFlow({
       >
         {step === "welcome" && (
           <div className="space-y-8">
-            {/* <motion.div
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 }}
-              className="text-center"
-            >
-              <h2 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-pink-300 to-purple-300 pb-2">
-                Welcome to
-              </h2>
-              <CompoundLogo />
-              <p className="text-gray-300 mt-2">
-                Your intelligent academic companion
-              </p>
-            </motion.div> */}
             <div className="flex justify-center mb-6">
               <div className="relative w-24 h-24">
                 <motion.div
@@ -105,7 +97,6 @@ export default function MajorSelectionFlow({
             </div>
 
             <div className="grid grid-cols-2 gap-4">
-              {/* Feature Cards */}
               {[
                 {
                   icon: (
@@ -192,7 +183,6 @@ export default function MajorSelectionFlow({
                   key={index}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  // transition={{ delay: 0.2 + index * 0.1 }}
                   whileHover={{ y: -5 }}
                   className="neumorphic-card p-4 rounded-xl bg-gray-900 border border-gray-800 hover:border-pink-500/30 transition-all duration-300 cursor-default"
                 >
@@ -226,26 +216,6 @@ export default function MajorSelectionFlow({
                 I'm excited
                 <FiArrowRight className="opacity-80" />
               </motion.button>
-              {/* <button
-                onClick={() => setStep("majors")}
-                className="w-full py-3 px-6 rounded-xl bg-gradient-to-r from-pink-600 to-pink-600 hover:from-pink-500 hover:to-pink-500 font-medium transition-all duration-300 shadow-lg hover:shadow-pink-500/20 flex items-center justify-center space-x-2"
-              >
-                <span>Get Started</span>
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-5 w-5"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M13 7l5 5m0 0l-5 5m5-5H6"
-                  />
-                </svg>
-              </button> */}
             </motion.div>
           </div>
         )}
@@ -272,26 +242,39 @@ export default function MajorSelectionFlow({
 
             <div className="space-y-3">
               {selectedMajors.map((major, index) => (
-                <MajorDropdown
-                  key={index}
-                  value={major}
-                  onChange={(newMajor) => {
-                    const newMajors = [...selectedMajors];
-                    newMajors[index] = newMajor;
-                    setSelectedMajors(newMajors);
-                  }}
-                  disabledOptions={selectedMajors.filter((m) => m !== major)}
-                />
+                <div key={index} className="flex items-center gap-2">
+                  <MajorDropdown
+                    value={major}
+                    onChange={(newMajor) => {
+                      const newMajors = [...selectedMajors];
+                      newMajors[index] = newMajor;
+                      setSelectedMajors(newMajors);
+                    }}
+                    disabledOptions={selectedMajors.filter((m) => m !== major)}
+                  />
+                  {index > 0 && (
+                    <button
+                      onClick={() => handleRemoveMajor(index)}
+                      className="text-gray-400 hover:text-gray-200 p-1 rounded-full hover:bg-gray-800 transition-colors"
+                      title="Remove major"
+                    >
+                      <FiX size={18} />
+                    </button>
+                  )}
+                </div>
               ))}
 
               {selectedMajors.length < 2 && (
                 <button
-                  onClick={() =>
-                    setSelectedMajors([
-                      ...selectedMajors,
-                      Object.keys(MAJORS)[0],
-                    ])
-                  }
+                  onClick={() => {
+                    // Find first major not already selected
+                    const availableMajor = Object.keys(MAJORS).find(
+                      (major) => !selectedMajors.includes(major)
+                    );
+                    if (availableMajor) {
+                      setSelectedMajors([...selectedMajors, availableMajor]);
+                    }
+                  }}
                   disabled={selectedMajors.length >= 2}
                   className="w-full py-2 px-4 rounded-lg border border-gray-700 hover:bg-gray-800/50 text-gray-400 hover:text-gray-200 flex items-center justify-center"
                 >
@@ -322,7 +305,7 @@ export default function MajorSelectionFlow({
                 Back
               </button>
               <button
-                onClick={() => setStep("year")}
+                onClick={() => setStep("bio")}
                 disabled={selectedMajors.length === 0}
                 className={`py-2 px-4 rounded-lg font-medium transition-colors ${
                   selectedMajors.length === 0
@@ -331,6 +314,58 @@ export default function MajorSelectionFlow({
                 }`}
               >
                 Next
+              </button>
+            </div>
+          </div>
+        )}
+
+        {step === "bio" && (
+          <div className="space-y-6">
+            <h2 className="text-xl font-medium text-center text-gray-200">
+              Tell your friends about yourself.
+            </h2>
+            <p className="text-gray-400 text-center text-sm">
+              This will be visible on your profile to your accepted friends.
+              It's totally optional.
+            </p>
+
+            <div className="mt-4">
+              <textarea
+                autoFocus
+                value={bio}
+                onChange={(e) => {
+                  // Remove newlines and limit to 200 characters
+                  const filteredValue = e.target.value.replace(/[\r\n]/g, "");
+                  setBio(filteredValue.slice(0, 200));
+                }}
+                placeholder="What are your interests? Future plans? Fun facts? We don't care. Anything."
+                className="w-full h-32 bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-pink-500 text-gray-200"
+                maxLength={200}
+                style={{ overflow: "hidden", resize: "none" }}
+                onKeyDown={(e) => {
+                  // Prevent Enter key from creating new lines
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                  }
+                }}
+              />
+              <p className="text-xs text-gray-500 text-right mt-1">
+                {bio.length}/200
+              </p>
+            </div>
+
+            <div className="flex justify-between pt-4">
+              <button
+                onClick={() => setStep("majors")}
+                className="py-2 px-4 text-gray-400 hover:text-gray-200"
+              >
+                Back
+              </button>
+              <button
+                onClick={() => setStep("year")}
+                className={`py-2 px-4 rounded-lg font-medium transition-colors ${"bg-pink-600 hover:bg-pink-700 text-white"}`}
+              >
+                {bio.length === 0 ? "Skip" : "Next"}
               </button>
             </div>
           </div>
@@ -345,6 +380,7 @@ export default function MajorSelectionFlow({
             <div className="flex justify-center">
               <input
                 type="number"
+                autoFocus
                 min={new Date().getFullYear()}
                 max={new Date().getFullYear() + 10}
                 value={graduationYear}
@@ -356,7 +392,7 @@ export default function MajorSelectionFlow({
 
             <div className="flex justify-between pt-4">
               <button
-                onClick={() => setStep("majors")}
+                onClick={() => setStep("bio")}
                 className="py-2 px-4 text-gray-400 hover:text-gray-200"
               >
                 Back

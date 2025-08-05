@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
-import { FiLogOut } from "react-icons/fi";
+import { FiLogOut, FiEdit2 } from "react-icons/fi";
 import { User } from "firebase/auth";
 import { MAJORS } from "@/lib/majors";
 import { MajorDropdown } from "../ui/MajorDropdown";
@@ -10,6 +10,7 @@ import { MajorDropdown } from "../ui/MajorDropdown";
 interface UserProfile {
   majors: string[];
   graduationYear: number;
+  bio?: string;
   updatedAt: Date;
 }
 
@@ -33,20 +34,19 @@ export default function UserSettingsModal({
   const [duplicateMajorError, setDuplicateMajorError] = useState<string | null>(
     null
   );
+  const [isEditingBio, setIsEditingBio] = useState(false);
+  const [tempBio, setTempBio] = useState("");
   const modalRef = useRef<HTMLDivElement>(null);
 
   const [activeDropdownIndex, setActiveDropdownIndex] = useState<number | null>(
     null
   );
 
-  const handleToggleDropdown = (index: number) => {
-    setActiveDropdownIndex(activeDropdownIndex === index ? null : index);
-  };
-
   // Initialize local profile state
   useEffect(() => {
     if (userProfile) {
       setLocalProfile(userProfile);
+      setTempBio(userProfile.bio || "");
     }
   }, [userProfile]);
 
@@ -67,16 +67,16 @@ export default function UserSettingsModal({
     };
   }, [onClose]);
 
-  if (!localProfile) return null;
+  const handleToggleDropdown = (index: number) => {
+    setActiveDropdownIndex(activeDropdownIndex === index ? null : index);
+  };
 
   const getYearStatus = (graduationYear: number): string => {
     const now = new Date();
     const currentYear = now.getFullYear();
-    const currentMonth = now.getMonth(); // 0 = Jan, 8 = Sep
+    const currentMonth = now.getMonth();
 
-    // Academic year starts in September
     const academicYear = currentMonth >= 8 ? currentYear + 1 : currentYear;
-
     const yearsRemaining = graduationYear - academicYear;
 
     if (yearsRemaining > 4) return "High School";
@@ -89,33 +89,30 @@ export default function UserSettingsModal({
     return "Unknown";
   };
 
-  // Check if there are any changes compared to the original profile
   const hasChanges = () => {
     if (!userProfile || !localProfile) return false;
     return (
       JSON.stringify(userProfile.majors) !==
         JSON.stringify(localProfile.majors) ||
-      userProfile.graduationYear !== localProfile.graduationYear
+      userProfile.graduationYear !== localProfile.graduationYear ||
+      userProfile.bio !== localProfile.bio
     );
   };
 
-  // Check for duplicate majors
   const hasDuplicateMajors = () => {
     if (!localProfile) return false;
     const uniqueMajors = new Set(localProfile.majors);
     return uniqueMajors.size !== localProfile.majors.length;
   };
 
-  // Handle adding a new major
   const handleAddMajor = () => {
-    if (localProfile.majors.length >= 3) return; // Limit to 3 majors
+    if (localProfile && localProfile?.majors.length >= 3) return;
 
-    // Find first major not already selected
     const availableMajor = Object.keys(MAJORS).find(
-      (major) => !localProfile.majors.includes(major)
+      (major) => !localProfile?.majors.includes(major)
     );
 
-    if (availableMajor) {
+    if (availableMajor && localProfile) {
       setLocalProfile({
         ...localProfile,
         majors: [...localProfile.majors, availableMajor],
@@ -124,8 +121,10 @@ export default function UserSettingsModal({
     }
   };
 
-  // Handle major change
   const handleMajorChange = (index: number, newMajor: string) => {
+    if (!localProfile) {
+      return;
+    }
     if (
       localProfile.majors.includes(newMajor) &&
       localProfile.majors[index] !== newMajor
@@ -143,9 +142,8 @@ export default function UserSettingsModal({
     });
   };
 
-  // Handle major removal
   const handleRemoveMajor = (index: number) => {
-    if (localProfile.majors.length <= 1) return; // Must have at least one major
+    if (!localProfile || localProfile.majors.length <= 1) return;
 
     const newMajors = [...localProfile.majors];
     newMajors.splice(index, 1);
@@ -156,18 +154,31 @@ export default function UserSettingsModal({
     setDuplicateMajorError(null);
   };
 
-  // Handle save
+  const handleSaveBio = () => {
+    if (!localProfile) return;
+    setLocalProfile({
+      ...localProfile,
+      bio: tempBio,
+    });
+    setIsEditingBio(false);
+  };
+
   const handleSave = async () => {
     if (hasDuplicateMajors()) {
       setDuplicateMajorError("Please remove duplicate majors before saving");
       return;
     }
 
+    if (!localProfile) return;
+
     await onSave({
       majors: localProfile.majors,
       graduationYear: localProfile.graduationYear,
+      bio: localProfile.bio,
     });
   };
+
+  if (!localProfile) return null;
 
   return (
     <div className="fixed inset-0 bg-gray-950/90 backdrop-blur-sm z-50 flex items-center justify-center p-4">
@@ -186,7 +197,7 @@ export default function UserSettingsModal({
                 className="w-16 h-16 rounded-full object-cover border-2 border-gray-700"
               />
             ) : (
-              <div className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-2xl font-medium border-2 border-gray-700">
+              <div className="w-16 h-16 rounded-full bg-gradient-to-br from-pink-500 to-purple-600 flex items-center justify-center text-white text-2xl font-medium border-2 border-gray-700">
                 {user.displayName?.charAt(0) ||
                   user.email?.charAt(0).toUpperCase()}
               </div>
@@ -196,6 +207,51 @@ export default function UserSettingsModal({
             {user.displayName || "User"}
           </h2>
           <p className="text-gray-400 text-sm mt-1">{user.email}</p>
+
+          {/* Bio Section */}
+          {!isEditingBio ? (
+            <div className="mt-3 w-full text-center relative group">
+              {localProfile.bio ? (
+                <p className="text-gray-300 text-sm px-4 py-2 rounded-lg bg-gray-800/50">
+                  {localProfile.bio}
+                </p>
+              ) : (
+                <p className="text-gray-500 text-sm italic">No bio yet</p>
+              )}
+              <button
+                onClick={() => setIsEditingBio(true)}
+                className="absolute right-1 top-1 p-2 text-gray-200 hover:text-white bg-pink-500 rounded-full hover:bg-pink-600 opacity-0 group-hover:opacity-100 transition-opacity"
+              >
+                <FiEdit2 size={14} />
+              </button>
+            </div>
+          ) : (
+            <div className="mt-3 w-full">
+              <textarea
+                autoFocus
+                value={tempBio}
+                onChange={(e) => setTempBio(e.target.value)}
+                placeholder="Tell us about yourself..."
+                className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-pink-500 text-gray-200 resize-none"
+                maxLength={200}
+                rows={3}
+              />
+              <div className="flex justify-end mt-2 space-x-2">
+                <button
+                  onClick={() => setIsEditingBio(false)}
+                  className="px-3 py-1 text-sm text-gray-400 hover:text-gray-200"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleSaveBio}
+                  className="px-3 py-1 text-sm bg-pink-600 hover:bg-pink-700 rounded-lg"
+                >
+                  Set bio
+                </button>
+              </div>
+            </div>
+          )}
 
           {/* Graduation Year Badge */}
           {localProfile.graduationYear && (
@@ -270,7 +326,7 @@ export default function UserSettingsModal({
               {localProfile.majors.length < 2 && (
                 <button
                   onClick={handleAddMajor}
-                  className="text-sm text-blue-400 hover:text-blue-300 flex items-center"
+                  className="text-sm text-pink-400 hover:text-pink-300 flex items-center"
                   disabled={
                     Object.keys(MAJORS).length === localProfile.majors.length
                   }
@@ -310,7 +366,7 @@ export default function UserSettingsModal({
                   graduationYear: parseInt(e.target.value),
                 })
               }
-              className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-pink-500"
             />
           </div>
         </div>

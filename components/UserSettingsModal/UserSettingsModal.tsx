@@ -267,7 +267,7 @@ export default function UserSettingsModal({
                   )}
                 </div>
               ))}
-              {localProfile.majors.length < 3 && (
+              {localProfile.majors.length < 2 && (
                 <button
                   onClick={handleAddMajor}
                   className="text-sm text-blue-400 hover:text-blue-300 flex items-center"

@@ -73,7 +73,7 @@ export default function AboutPage() {
     <div className="min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-gray-900 font-louize">
       {/* Access Platform Button - Top Right */}
       <motion.div
-        initial={{ opacity: 0, y: -20 }}
+        initial={{ opacity: 1, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
         className="fixed top-6 right-6 z-50"
@@ -95,7 +95,7 @@ export default function AboutPage() {
           {" "}
           {/* pt-32 adds extra margin to the top */}
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 1, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
             className="text-center"
@@ -157,11 +157,7 @@ export default function AboutPage() {
 
       {/* Blueprint Section */}
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <motion.div
-          viewport={{ once: true }}
-          transition={{ duration: 0.8 }}
-          className="bg-gray-900/80 backdrop-blur-lg rounded-2xl p-8 border border-gray-800/50 shadow-xl"
-        >
+        <div className="bg-gray-900/80 backdrop-blur-lg rounded-2xl p-8 border border-gray-800/50 shadow-xl">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-200 to-purple-200 mb-4">
               Our blueprint, broken down.
@@ -175,7 +171,7 @@ export default function AboutPage() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {/* Problem */}
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 1, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6 }}
@@ -209,7 +205,7 @@ export default function AboutPage() {
 
             {/* Solution */}
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 1, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6, delay: 0.1 }}
@@ -243,10 +239,10 @@ export default function AboutPage() {
 
             {/* Impact */}
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 1, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: 0.2 }}
+              transition={{ duration: 0.6 }}
               className="bg-gray-800/50 p-6 rounded-xl border border-gray-700/50 hover:border-blue-500/30 transition-all"
             >
               <div className="flex items-center gap-3 mb-4">
@@ -278,7 +274,7 @@ export default function AboutPage() {
               </ul>
             </motion.div>
           </div>
-        </motion.div>
+        </div>
       </div>
 
       {/* Mission Section */}
@@ -356,7 +352,7 @@ export default function AboutPage() {
           ].map((person, i) => (
             <motion.div
               key={i}
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 1, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6, delay: i * 0.1 }}
@@ -412,7 +408,7 @@ export default function AboutPage() {
       {/* CTA Section */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <motion.div
-          initial={{ opacity: 0 }}
+          initial={{ opacity: 0.75 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8 }}

@@ -167,8 +167,13 @@ export default function StatsView({ courses }: { courses: Course[] }) {
     <div className={`space-y-8 font-louize text-gray-200`}>
       {/* Summary Cards */}
       <InfoCard>
-        View your academic progress through detailed statistics and
-        visualizations.
+        We're actively working on new stats. Have any suggestions?{" "}
+        <a
+          href="mailto:filippo.fonseca@yale.edu,emir.ahmed@yale.edu"
+          className="text-white hover:underline hover:scale-110 transition-transform duration-200"
+        >
+          Let us know.
+        </a>
       </InfoCard>
 
       <motion.div

@@ -70,7 +70,7 @@ export default function AboutPage() {
   if (logInFlow) return <LoginPage onBackClick={() => setLogInFlow(false)} />;
 
   return (
-    <div className="min-h-screen overflow-x-hidden bg-gradient-to-br from-gray-950 via-gray-900 to-gray-900 font-louize">
+    <div className="min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-gray-900 font-louize">
       {/* Access Platform Button - Top Right */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
@@ -90,7 +90,7 @@ export default function AboutPage() {
       </motion.div>
 
       {/* Hero Section */}
-      <div className="relative">
+      <div className="relative mt-8">
         <div className="max-w-7xl mx-auto px-4 pb-4 sm:px-6 lg:px-8 relative z-10">
           {" "}
           {/* pt-32 adds extra margin to the top */}
@@ -164,11 +164,11 @@ export default function AboutPage() {
         >
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-200 to-purple-200 mb-4">
-              The Degree Intelligence Blueprint
+              Our blueprint, broken down.
             </h2>
             <p className="text-lg text-gray-300 max-w-3xl mx-auto">
-              How we transformed frustration into an elegant solution for Yale's
-              academic planning
+              How we believe we transformed frustration into an elegant solution
+              for academic planning and visualization at Yale.
             </p>
           </div>
 

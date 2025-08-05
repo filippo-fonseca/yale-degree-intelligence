@@ -354,15 +354,117 @@ export default function FriendsTab() {
       {/* Main content when not loading */}
       {!loading && (
         <>
-          <div className="flex justify-end mb-6">
-            <button
-              className="px-4 py-2 bg-pink-700 text-white rounded-md hover:bg-pink-800 transition"
-              onClick={() => setShowSearchModal(true)}
-            >
-              Add a friend
-            </button>
+          {/* Top section with requests and add friend button */}
+          <div className="flex flex-col md:flex-row gap-6 mb-8">
+            {/* Add Friend Button */}
+            <div className="md:w-1/3">
+              <button
+                className="w-full px-4 py-2 bg-pink-700 text-white rounded-md hover:bg-pink-800 transition flex items-center justify-center gap-2"
+                onClick={() => setShowSearchModal(true)}
+              >
+                <FiUserPlus /> Add a friend
+              </button>
+            </div>
+
+            {/* Incoming Requests */}
+            <div className="md:w-1/3">
+              <h3 className="text-lg font-medium text-pink-200 mb-2 flex items-center gap-2">
+                <FiMail /> Incoming ({incomingRequests.length})
+              </h3>
+              <div className="space-y-2">
+                {incomingRequests.length === 0 && (
+                  <div className="text-gray-400 text-sm">
+                    No incoming requests.
+                  </div>
+                )}
+                {incomingRequests.slice(0, 2).map((req) => {
+                  const sender = userProfilesById[req.from];
+                  if (!sender) return null;
+                  return (
+                    <motion.div
+                      key={req.id}
+                      className="flex items-center justify-between p-3 rounded-xl bg-gray-900/50 border border-gray-800"
+                      whileHover={{ scale: 1.01 }}
+                    >
+                      <div className="flex items-center gap-2">
+                        <ProfilePic profile={sender} size={28} />
+                        <div className="text-sm font-medium text-gray-200 truncate">
+                          {getDisplayName(sender)}
+                        </div>
+                      </div>
+                      <div className="flex gap-1">
+                        <button
+                          className="bg-emerald-900/40 text-emerald-200 rounded-lg p-1 border border-emerald-800 hover:bg-emerald-700/60"
+                          onClick={() => acceptFriendRequest(req)}
+                          title="Accept"
+                        >
+                          <FiCheck size={14} />
+                        </button>
+                        <button
+                          className="bg-red-900/40 text-red-200 rounded-lg p-1 border border-red-800 hover:bg-red-700/60"
+                          onClick={() => rejectFriendRequest(req)}
+                          title="Reject"
+                        >
+                          <FiX size={14} />
+                        </button>
+                      </div>
+                    </motion.div>
+                  );
+                })}
+                {incomingRequests.length > 2 && (
+                  <div className="text-gray-400 text-sm">
+                    +{incomingRequests.length - 2} more requests
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Outgoing Requests */}
+            <div className="md:w-1/3">
+              <h3 className="text-lg font-medium text-pink-200 mb-2 flex items-center gap-2">
+                <FiUserCheck /> Sent ({sentRequests.length})
+              </h3>
+              <div className="space-y-2">
+                {sentRequests.length === 0 && (
+                  <div className="text-gray-400 text-sm">No sent requests.</div>
+                )}
+                {sentRequests.slice(0, 2).map((req) => {
+                  const recipient = userProfilesById[req.to];
+                  if (!recipient) return null;
+                  return (
+                    <motion.div
+                      key={req.id}
+                      className="flex items-center justify-between p-3 rounded-xl bg-gray-900/50 border border-gray-800"
+                      whileHover={{ scale: 1.01 }}
+                    >
+                      <div className="flex items-center gap-2">
+                        <ProfilePic profile={recipient} size={28} />
+                        <div className="text-sm font-medium text-gray-200 truncate">
+                          {getDisplayName(recipient)}
+                        </div>
+                      </div>
+                      <div className="flex gap-1">
+                        <button
+                          className="bg-red-900/40 text-red-200 rounded-lg p-1 border border-red-800 hover:bg-red-700/60"
+                          onClick={() => cancelSentRequest(req.id)}
+                          title="Cancel request"
+                        >
+                          <FiX size={14} />
+                        </button>
+                      </div>
+                    </motion.div>
+                  );
+                })}
+                {sentRequests.length > 2 && (
+                  <div className="text-gray-400 text-sm">
+                    +{sentRequests.length - 2} more requests
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
 
+          {/* Friend Search Modal */}
           <AnimatePresence>
             {showSearchModal && (
               <motion.div
@@ -461,113 +563,12 @@ export default function FriendsTab() {
             )}
           </AnimatePresence>
 
-          {/* 2. Friend Requests */}
-          <section className="mb-12 grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div>
-              <h3 className="text-lg font-medium text-pink-200 mb-2 flex items-center gap-2">
-                <FiMail /> Incoming Requests ({incomingRequests.length})
-              </h3>
-              <div className="space-y-2">
-                {incomingRequests.length === 0 && (
-                  <div className="text-gray-400 text-sm">
-                    No incoming requests.
-                  </div>
-                )}
-                {incomingRequests.map((req) => {
-                  const sender = userProfilesById[req.from];
-                  if (!sender) return null;
-                  return (
-                    <motion.div
-                      key={req.id}
-                      className="flex items-center justify-between p-3 rounded-xl bg-gray-900/50 border border-gray-800"
-                      whileHover={{ scale: 1.01 }}
-                    >
-                      <div className="flex items-center gap-4">
-                        <ProfilePic profile={sender} size={32} />
-                        <div>
-                          <div className="font-medium text-gray-200">
-                            {getDisplayName(sender)}
-                          </div>
-                          <div className="text-xs text-gray-400">
-                            {sender.majors?.join(", ")} &middot;{" "}
-                            {sender.graduationYear &&
-                              `Class of ${sender.graduationYear}`}
-                          </div>
-                        </div>
-                      </div>
-                      <div className="flex gap-1">
-                        <button
-                          className="bg-emerald-900/40 text-emerald-200 rounded-lg px-3 py-1.5 border border-emerald-800 hover:bg-emerald-700/60"
-                          onClick={() => acceptFriendRequest(req)}
-                          title="Accept"
-                        >
-                          <FiCheck />
-                        </button>
-                        <button
-                          className="bg-red-900/40 text-red-200 rounded-lg px-3 py-1.5 border border-red-800 hover:bg-red-700/60"
-                          onClick={() => rejectFriendRequest(req)}
-                          title="Reject"
-                        >
-                          <FiX />
-                        </button>
-                      </div>
-                    </motion.div>
-                  );
-                })}
-              </div>
-            </div>
-            <div>
-              <h3 className="text-lg font-medium text-pink-200 mb-2 flex items-center gap-2">
-                <FiUserCheck /> Sent Requests ({sentRequests.length})
-              </h3>
-              <div className="space-y-2">
-                {sentRequests.length === 0 && (
-                  <div className="text-gray-400 text-sm">No sent requests.</div>
-                )}
-                {sentRequests.map((req) => {
-                  const recipient = userProfilesById[req.to];
-                  if (!recipient) return null;
-                  return (
-                    <motion.div
-                      key={req.id}
-                      className="flex items-center justify-between p-3 rounded-xl bg-gray-900/50 border border-gray-800"
-                      whileHover={{ scale: 1.01 }}
-                    >
-                      <div className="flex items-center gap-4">
-                        <ProfilePic profile={recipient} size={32} />
-                        <div>
-                          <div className="font-medium text-gray-200">
-                            {getDisplayName(recipient)}
-                          </div>
-                          <div className="text-xs text-gray-400">
-                            {recipient.majors?.join(", ")} &middot;{" "}
-                            {recipient.graduationYear &&
-                              `Class of ${recipient.graduationYear}`}
-                          </div>
-                        </div>
-                      </div>
-                      <div className="flex gap-1">
-                        <button
-                          className="bg-red-900/40 text-red-200 rounded-lg px-3 py-1.5 border border-red-800 hover:bg-red-700/60"
-                          onClick={() => cancelSentRequest(req.id)}
-                          title="Cancel request"
-                        >
-                          <FiX />
-                        </button>
-                      </div>
-                    </motion.div>
-                  );
-                })}
-              </div>
-            </div>
-          </section>
-
-          {/* 3. Friends List */}
+          {/* Friends List Section */}
           <section>
-            <h3 className="text-lg font-medium text-pink-200 mb-2 flex items-center gap-2">
+            <h3 className="text-lg font-medium text-pink-200 mb-4 flex items-center gap-2">
               <FiUsers /> Your Friends ({friendProfiles.length})
             </h3>
-            <div className="space-y-2">
+            <div className="space-y-3">
               {friendProfiles.length === 0 && (
                 <div className="text-gray-400 text-sm">
                   No friends yet. Go add some above!
@@ -580,32 +581,38 @@ export default function FriendsTab() {
                 return (
                   <motion.div
                     key={f.uid}
-                    className="flex items-center justify-between p-3 rounded-xl bg-gray-900/50 border border-gray-800 hover:border-purple-400 transition-all"
+                    className="flex items-center justify-between p-4 rounded-xl bg-gray-900/50 border border-gray-800 hover:border-purple-400 transition-all"
                     whileHover={{ scale: 1.015 }}
                   >
                     <div className="flex items-center gap-4">
-                      <ProfilePic profile={f} size={36} />
+                      <ProfilePic profile={f} size={40} />
                       <div>
-                        <Link
-                          href={`/user/${f.uid}`}
-                          className="font-medium text-pink-200 hover:underline hover:text-pink-300"
-                        >
+                        <div className="font-medium text-pink-200">
                           {getDisplayName(f)}
-                        </Link>
+                        </div>
                         <div className="text-xs text-gray-400">
                           {f.majors?.join(", ")} &middot;{" "}
                           {f.graduationYear && `Class of ${f.graduationYear}`}
                         </div>
                       </div>
                     </div>
-                    <button
-                      className="flex items-center gap-1 px-3 py-1.5 bg-gray-800/60 text-gray-300 rounded-lg border border-gray-700 hover:bg-red-800 hover:text-white hover:border-red-600 transition"
-                      onClick={() => friend.id && removeFriend(friend.id)}
-                      title="Remove friend"
-                    >
-                      <FiX />
-                      Remove
-                    </button>
+                    <div className="flex gap-2">
+                      <Link
+                        href={`/user/${f.uid}`}
+                        className="flex items-center gap-1 px-3 py-1.5 bg-gray-800/60 text-gray-300 rounded-lg border border-gray-700 hover:bg-gray-700 hover:text-white transition"
+                      >
+                        <FiUser className="inline-block" />
+                        Open Profile
+                      </Link>
+                      <button
+                        className="flex items-center gap-1 px-3 py-1.5 bg-gray-800/60 text-gray-300 rounded-lg border border-gray-700 hover:bg-red-800 hover:text-white hover:border-red-600 transition"
+                        onClick={() => friend.id && removeFriend(friend.id)}
+                        title="Remove friend"
+                      >
+                        <FiX />
+                        Remove
+                      </button>
+                    </div>
                   </motion.div>
                 );
               })}

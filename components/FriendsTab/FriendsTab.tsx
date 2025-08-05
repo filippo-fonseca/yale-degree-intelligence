@@ -26,6 +26,7 @@ import {
   FiUser,
   FiUserCheck,
   FiMail,
+  FiCopy,
 } from "react-icons/fi";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
@@ -85,6 +86,36 @@ function ProfilePic({
   );
 }
 
+function CopyButton() {
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(window.location.href);
+    setCopied(true);
+    toast.success("Link copied to clipboard!");
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  return (
+    <button
+      onClick={handleCopy}
+      className="inline-flex items-center gap-1 text-blue-400 hover:text-blue-200 underline hover:no-underline transition"
+    >
+      {copied ? (
+        <>
+          <span>Copied!</span>
+          <FiCheck className="inline-block" />
+        </>
+      ) : (
+        <>
+          <span>Click to copy this link</span>
+          <FiCopy className="inline-block" />
+        </>
+      )}
+    </button>
+  );
+}
+
 export default function FriendsTab() {
   const { user } = useAuth();
   const [searchTerm, setSearchTerm] = useState("");
@@ -97,6 +128,7 @@ export default function FriendsTab() {
     Record<string, UserProfile>
   >({});
   const [loading, setLoading] = useState(true);
+  const [showSearchModal, setShowSearchModal] = useState(false);
 
   // Set up real-time listeners
   useEffect(() => {
@@ -317,52 +349,100 @@ export default function FriendsTab() {
       {/* Main content when not loading */}
       {!loading && (
         <>
-          {/* 1. Search and Add Friends */}
-          <section className="mb-12">
-            <div className="flex items-center gap-3 mb-4">
-              <FiSearch className="text-blue-400" />
-              <input
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 w-full text-gray-200"
-                placeholder="Find students by name, email, major..."
-              />
-            </div>
-            <div className="space-y-2">
-              {filteredUsers.slice(0, 10).map((u) => (
+          <div className="flex justify-end mb-6">
+            <button
+              className="px-4 py-2 bg-blue-700 text-white rounded-md hover:bg-blue-800 transition"
+              onClick={() => setShowSearchModal(true)}
+            >
+              Find Students
+            </button>
+          </div>
+
+          <AnimatePresence>
+            {showSearchModal && (
+              <motion.div
+                className="fixed inset-0 z-50 flex items-center justify-center bg-black/60"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+              >
                 <motion.div
-                  key={u.uid}
-                  className="flex items-center justify-between p-3 rounded-xl bg-gray-900/50 border border-gray-800 hover:border-blue-400 transition-all"
-                  whileHover={{ scale: 1.02 }}
+                  className="bg-gray-900 p-6 rounded-lg shadow-xl max-w-2xl w-full h-[250px] flex flex-col"
+                  initial={{ scale: 0.95, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  exit={{ scale: 0.95, opacity: 0 }}
                 >
-                  <div className="flex items-center gap-4">
-                    <ProfilePic profile={u} size={36} />
-                    <div>
-                      <div className="font-medium text-gray-200">
-                        {getDisplayName(u)}
-                      </div>
-                      <div className="text-sm text-gray-400">
-                        {u.majors?.join(", ")} &middot;{" "}
-                        {u.graduationYear && `Class of ${u.graduationYear}`}
-                      </div>
-                    </div>
+                  <div className="flex justify-between items-center mb-4">
+                    <h3 className="text-xl font-semibold text-white">
+                      Find Students
+                    </h3>
+                    <button
+                      onClick={() => {
+                        setSearchTerm("");
+                        setShowSearchModal(false);
+                      }}
+                      className="text-gray-400 hover:text-red-400 transition"
+                    >
+                      <FiX size={20} />
+                    </button>
                   </div>
-                  <button
-                    className="flex items-center gap-1 px-3 py-1.5 bg-blue-900/60 text-blue-200 rounded-lg border border-blue-800 hover:bg-blue-800 hover:text-white transition"
-                    onClick={() => sendFriendRequest(u.uid)}
-                  >
-                    <FiUserPlus />
-                    Add
-                  </button>
+
+                  <div className="flex items-center gap-3 mb-4">
+                    <FiSearch className="text-blue-400" />
+                    <input
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      className="bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 w-full text-gray-200"
+                      placeholder="Find students by name, email, major..."
+                    />
+                  </div>
+
+                  <div className="space-y-2 max-h-[50vh] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-600">
+                    {searchTerm.length === 0 ? (
+                      <div className="text-gray-400 text-center py-10">
+                        Can't find your friends? <CopyButton />
+                        <br />
+                        and text it to them! You'll be helping them out.
+                      </div>
+                    ) : filteredUsers.length > 0 ? (
+                      filteredUsers.slice(0, 10).map((u) => (
+                        <motion.div
+                          key={u.uid}
+                          className="flex items-center justify-between p-3 rounded-xl bg-gray-800 border border-gray-700 hover:border-blue-400 transition-all"
+                          whileHover={{ scale: 1.02 }}
+                        >
+                          <div className="flex items-center gap-4">
+                            <ProfilePic profile={u} size={36} />
+                            <div>
+                              <div className="font-medium text-gray-200">
+                                {getDisplayName(u)}
+                              </div>
+                              <div className="text-sm text-gray-400">
+                                {u.majors?.join(", ")} &middot;{" "}
+                                {u.graduationYear &&
+                                  `Class of ${u.graduationYear}`}
+                              </div>
+                            </div>
+                          </div>
+                          <button
+                            className="flex items-center gap-1 px-3 py-1.5 bg-blue-900/60 text-blue-200 rounded-lg border border-blue-800 hover:bg-blue-800 hover:text-white transition"
+                            onClick={() => sendFriendRequest(u.uid)}
+                          >
+                            <FiUserPlus />
+                            Add
+                          </button>
+                        </motion.div>
+                      ))
+                    ) : (
+                      <div className="text-gray-500 text-sm text-center py-10">
+                        No matching users found!
+                      </div>
+                    )}
+                  </div>
                 </motion.div>
-              ))}
-              {filteredUsers.length === 0 && (
-                <div className="text-gray-500 text-sm p-4 text-center">
-                  No matching users found!
-                </div>
-              )}
-            </div>
-          </section>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
           {/* 2. Friend Requests */}
           <section className="mb-12 grid grid-cols-1 md:grid-cols-2 gap-8">

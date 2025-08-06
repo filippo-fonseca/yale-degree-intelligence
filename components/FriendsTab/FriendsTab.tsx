@@ -34,6 +34,7 @@ import Link from "next/link";
 import CompoundLogo from "@/components/ui/CompoundLogo";
 import { toast } from "react-hot-toast";
 import { Panda } from "lucide-react";
+import { YearBadge } from "../ui/YearBadge";
 
 type UserProfile = {
   uid: string;
@@ -540,8 +541,12 @@ export default function FriendsTab() {
                               </div>
                               <div className="text-sm text-gray-400">
                                 {u.majors?.join(", ")} &middot;{" "}
-                                {u.graduationYear &&
-                                  `Class of ${u.graduationYear}`}
+                                {u.graduationYear && (
+                                  <YearBadge
+                                    graduationYear={u.graduationYear}
+                                    noPadding
+                                  />
+                                )}
                               </div>
                             </div>
                           </div>
@@ -586,7 +591,7 @@ export default function FriendsTab() {
                     className="flex items-center justify-between p-4 rounded-xl bg-gray-900/50 border border-gray-800 hover:border-purple-400 transition-all"
                     whileHover={{ scale: 1.015 }}
                   >
-                    <div className="flex items-center gap-4">
+                    <div className="flex gap-4">
                       <ProfilePic profile={f} size={40} />
                       <div>
                         <div className="font-medium text-pink-200">
@@ -594,7 +599,14 @@ export default function FriendsTab() {
                         </div>
                         <div className="text-xs text-gray-400">
                           {f.majors?.join(", ")} &middot;{" "}
-                          {f.graduationYear && `Class of ${f.graduationYear}`}
+                          {f.graduationYear && (
+                            <div className="mt-1">
+                              <YearBadge
+                                graduationYear={f.graduationYear}
+                                noPadding
+                              />
+                            </div>
+                          )}
                         </div>
                       </div>
                     </div>

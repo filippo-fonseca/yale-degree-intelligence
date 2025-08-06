@@ -4,6 +4,7 @@ import React from "react";
 
 interface YearBadgeProps {
   graduationYear: number;
+  noPadding?: boolean; // ✅ new optional prop
 }
 
 const getYearStatus = (graduationYear: number): string => {
@@ -24,7 +25,10 @@ const getYearStatus = (graduationYear: number): string => {
   return "Unknown";
 };
 
-export const YearBadge: React.FC<YearBadgeProps> = ({ graduationYear }) => {
+export const YearBadge: React.FC<YearBadgeProps> = ({
+  graduationYear,
+  noPadding = false,
+}) => {
   const yearStatus = getYearStatus(graduationYear);
 
   const getDotColor = (status: string) => {
@@ -44,7 +48,11 @@ export const YearBadge: React.FC<YearBadgeProps> = ({ graduationYear }) => {
 
   return (
     <div className="flex items-center">
-      <span className="text-xs font-medium px-2.5 py-0.5 rounded-full flex items-center">
+      <span
+        className={`text-xs font-medium rounded-full flex items-center ${
+          noPadding ? "" : "px-2.5 py-0.5"
+        }`}
+      >
         <span
           className={`w-2 h-2 rounded-full mr-1.5 ${getDotColor(yearStatus)}`}
         ></span>

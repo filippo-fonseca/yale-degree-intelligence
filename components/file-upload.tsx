@@ -6,6 +6,7 @@ import "filepond/dist/filepond.min.css";
 import "./filepond-custom.css";
 import FilePondPluginFileValidateType from "filepond-plugin-file-validate-type";
 import CustomLoader from "./ui/CustomLoader";
+import Link from "next/link";
 
 registerPlugin(FilePondPluginFileValidateType);
 

@@ -29,6 +29,7 @@ import {
   addDoc,
   Timestamp,
   writeBatch,
+  deleteDoc,
 } from "firebase/firestore";
 import { Course } from "@/lib/types";
 import { db } from "@/config/firebase";
@@ -58,6 +59,7 @@ import CourseModal from "@/components/MajorProgressView/CourseModal";
 import { getGPAColor } from "@/lib/utils/utils";
 import PublicFacingPage from "@/screens/PublicFacingPage";
 import FriendsTab from "@/components/FriendsTab/FriendsTab";
+import { Printer } from "lucide-react";
 
 interface UserProfile {
   majors: string[];
@@ -328,29 +330,27 @@ export default function Home() {
   const parseAndStoreCourses = async (extractedText: string) => {
     if (!user) return;
 
-    // Get existing courses to prevent duplicates
     const existingCoursesQuery = query(
       collection(db, "courses"),
       where("userId", "==", user.uid)
     );
     const existingSnapshot = await getDocs(existingCoursesQuery);
 
-    // Create a comprehensive key for duplicate detection (semester-year-code-grade)
-    const existingCourseKeys = new Set(
-      existingSnapshot.docs.map(
-        (doc) =>
-          `${doc.data().semester}-${doc.data().year}-${doc.data().code}-${
-            doc.data().grade || "null"
-          }`
-      )
-    );
+    const existingCoursesMap = new Map<
+      string,
+      { docId: string; grade: string | null }
+    >();
+    existingSnapshot.docs.forEach((doc) => {
+      const data = doc.data();
+      const key = `${data.semester}-${data.year}-${data.code}`;
+      existingCoursesMap.set(key, { docId: doc.id, grade: data.grade || null });
+    });
 
     const semesterBlocks = extractedText
       .split("Semester: ")
       .filter((block) => block.trim() !== "");
     const coursesToAdd: Omit<Course, "id">[] = [];
 
-    // Track seen courses in this parse to prevent duplicates within the same upload
     const seenInThisParse = new Set<string>();
 
     for (const block of semesterBlocks) {
@@ -360,28 +360,33 @@ export default function Home() {
       for (const line of courseLines) {
         if (line.trim() === "") continue;
 
-        // Match completed courses (with grades and credits)
         const completedMatch = line.match(
           /^- (.+?): (.+?) — (.+?) \((\d+\.\d+)\)$/
         );
         if (completedMatch) {
           const [, code, name, grade, credits] = completedMatch;
-          const courseKey = `${season.trim()}-${year.trim()}-${code.trim()}-${grade.trim()}`;
+          const key = `${season.trim()}-${year.trim()}-${code.trim()}`;
+          const courseKey = `${key}-${grade.trim()}`;
 
-          // Skip if already exists in DB or seen in this parse
-          if (existingCourseKeys.has(courseKey)) {
-            console.log(
-              `Skipping duplicate course (existing in DB): ${courseKey}`
-            );
-            continue;
-          }
-          if (seenInThisParse.has(courseKey)) {
-            console.log(
-              `Skipping duplicate course (current parse): ${courseKey}`
-            );
-            continue;
-          }
+          if (seenInThisParse.has(courseKey)) continue;
           seenInThisParse.add(courseKey);
+
+          const existingCourse = existingCoursesMap.get(key);
+          if (existingCourse) {
+            if (existingCourse.grade !== grade.trim()) {
+              // Grade changed → delete old course
+              console.log(
+                `Deleting outdated course: ${key} (old grade: ${
+                  existingCourse.grade
+                }, new grade: ${grade.trim()})`
+              );
+              await deleteDoc(doc(db, "courses", existingCourse.docId));
+            } else {
+              // Already exists with same grade → skip
+              console.log(`Skipping duplicate: ${courseKey}`);
+              continue;
+            }
+          }
 
           coursesToAdd.push({
             code: code.trim(),
@@ -396,28 +401,31 @@ export default function Home() {
           continue;
         }
 
-        // Match in-progress courses (without grades but with credits)
         const inProgressMatch = line.match(
           /^- (.+?): (.+?) — (?:In Progress|IP) \((\d+\.\d+)\)$/
         );
         if (inProgressMatch) {
           const [, code, name, credits] = inProgressMatch;
-          const courseKey = `${season.trim()}-${year.trim()}-${code.trim()}-null`;
+          const key = `${season.trim()}-${year.trim()}-${code.trim()}`;
+          const courseKey = `${key}-null`;
 
-          // Skip if already exists in DB or seen in this parse
-          if (existingCourseKeys.has(courseKey)) {
-            console.log(
-              `Skipping duplicate in-progress course (existing in DB): ${courseKey}`
-            );
-            continue;
-          }
-          if (seenInThisParse.has(courseKey)) {
-            console.log(
-              `Skipping duplicate in-progress course (current parse): ${courseKey}`
-            );
-            continue;
-          }
+          if (seenInThisParse.has(courseKey)) continue;
           seenInThisParse.add(courseKey);
+
+          const existingCourse = existingCoursesMap.get(key);
+          if (existingCourse) {
+            if (existingCourse.grade !== null) {
+              // Grade changed from completed to in-progress → delete old
+              console.log(
+                `Deleting outdated course: ${key} (old grade: ${existingCourse.grade}, new: null)`
+              );
+              await deleteDoc(doc(db, "courses", existingCourse.docId));
+            } else {
+              // Already exists with same null grade → skip
+              console.log(`Skipping duplicate in-progress: ${courseKey}`);
+              continue;
+            }
+          }
 
           coursesToAdd.push({
             code: code.trim(),
@@ -432,87 +440,28 @@ export default function Home() {
       }
     }
 
-    // Only proceed if there are new courses to add
     if (coursesToAdd.length > 0) {
-      console.log(`Adding ${coursesToAdd.length} new courses`);
+      console.log(`Adding ${coursesToAdd.length} new/updated courses`);
       const batchWrites = coursesToAdd.map((course) => {
         const docRef = doc(collection(db, "courses"));
         return setDoc(docRef, course);
       });
-
       await Promise.all(batchWrites);
     } else {
-      console.log("No new courses to add");
+      console.log("No new or updated courses to add");
     }
 
-    console.log("Courses to add:", coursesToAdd);
-
-    // AI UPLOAD:
-    const now = new Date();
-    let currentSemester: string;
-    const month = now.getMonth() + 1;
-    if (month >= 1 && month <= 5) {
-      currentSemester = "Spring";
-    } else if (month >= 9 && month <= 8) {
-      currentSemester = "Summer";
-    } else {
-      currentSemester = "Fall";
-    }
-    const currentYear = now.getFullYear();
-
-    // try {
-    //   console.log("Fetching AI advice...");
-    //   const res = await fetch("/api/generate-advice", {
-    //     method: "POST",
-    //     headers: { "Content-Type": "application/json" },
-    //     body: JSON.stringify({
-    //       coursesToAdd,
-    //       requirementsJson: majorRequirements,
-    //       selectedMajor: userProfile?.majors[0],
-    //       userId: user.uid,
-    //       currentDate: now.toISOString().slice(0, 10),
-    //       graduationYear: userProfile?.graduationYear,
-    //       currentSemester,
-    //       currentYear,
-    //     }),
-    //   });
-    //   const data = await res.json();
-    //   if (res.ok && data.advice) {
-    //     // Store in Firestore
-    //     await addDoc(collection(db, "ai_responses"), {
-    //       advice: data.advice,
-    //       userId: user.uid,
-    //       dateGenerated: Timestamp.fromDate(now),
-    //       params: {
-    //         selectedMajor: userProfile?.majors,
-    //         graduationYear: userProfile?.graduationYear,
-    //         currentDate: now.toISOString().slice(0, 10),
-    //         currentSemester,
-    //         currentYear,
-    //       },
-    //     });
-    //     setLatestAdvice(data.advice); // Optionally show in UI
-    //   } else {
-    //     setLatestAdvice(null);
-    //   }
-    // } catch (err) {
-    //   console.error("AI advice fetch error", err);
-    //   setLatestAdvice(null);
-    // }
-
-    // Close the modal if it was open (i.e. if it's an update)
-    showUpdateModal && setShowUpdateModal(false);
-
+    // Refresh
     await fetchCourses();
 
     try {
       await checkAndRemoveDuplicates(user.uid);
-      // Refresh courses again after potential deletions
       await fetchCourses();
     } catch (error) {
       console.error("Error during duplicate check:", error);
-      // Don't fail the whole operation because of duplicate check
     }
+
+    if (showUpdateModal) setShowUpdateModal(false);
   };
 
   const calculateStats = () => {
@@ -854,12 +803,12 @@ export default function Home() {
 
                 {/* Disclaimer Text */}
                 <div className="px-1 pb-2">
-                  <p className="text-[11px] text-gray-500 leading-tight">
-                    Yale DegreeIntelligence is unaffiliated with Yale
-                    University. Data may be inaccurate - please verify
-                    everything with your DUS. We take no responsibility for any
-                    errors or omissions. This is purely a tool developed for
-                    ourselves that we wished to share, as it's helped us a ton!
+                  <p className="text-[11px] text-gray-500 leading-tight text-justify">
+                    Yale DegreeIntelligence is purely a student-built toolData
+                    may be inaccurate - please verify everything with your DUS.
+                    We take no responsibility for any errors or omissions. This
+                    is purely a tool developed for ourselves that we wished to
+                    share, as it's helped us a ton! Enjoy.
                   </p>
                 </div>
               </div>
@@ -1097,18 +1046,55 @@ export default function Home() {
                       <h2 className="text-xl font-medium mb-6 bg-clip-text text-transparent bg-gradient-to-r from-blue-200 to-purple-200">
                         Let's begin your journey to better contextualize & plan
                         your Yale degree.
+                        <br /> This whole process takes{" "}
+                        <span className="underline">31.97 seconds</span> on
+                        average. Ready, set, go!
                       </h2>
+                      <div className="filepond--label-text">
+                        {"1)"} Go to{" "}
+                        <Link
+                          href="https://yub.yale.edu"
+                          className="text-white font-bold underline hover:text-pink-500 transition-all"
+                          target="_blank"
+                        >
+                          YHub
+                        </Link>{" "}
+                        and download your unofficial transcript.
+                        <p className="text-gray-600 text-center mt-2">
+                          Simply navigate to the <i>Academics</i> tab on the
+                          sidebar and click "Unofficial Transcript —
+                          Undergraduate".
+                          <br /> Then, click the{" "}
+                          <span className="inline-flex p-0 text-gray-400">
+                            <Printer className="w-4 h-4 mr-1" />
+                            "Print"
+                          </span>{" "}
+                          button on the top right of the page and{" "}
+                          <span className="text-gray-400">
+                            save it as a PDF to your computer.
+                          </span>
+                        </p>
+                        <br />
+                        <p className="mt-6 text-center text-lg font-semibold text-transparent bg-clip-text bg-gradient-to-r from-pink-400 via-purple-400 to-pink-200 animate-[pulse_4s_ease-in-out_infinite] drop-shadow-lg">
+                          {"2)"} Upload it below and let us cook. It's that
+                          simple. 🔥
+                        </p>
+                      </div>
                       <div className="w-full max-w-lg bg-gray-900/50 backdrop-blur-sm p-8 rounded-xl border border-gray-800">
                         <FileUpload onSuccess={parseAndStoreCourses} />
                         <p className="text-center text-gray-500 text-sm mt-4">
                           By uploading your transcript, you agree to our{" "}
                           <Link
                             href="/terms"
-                            className="text-gray-400 hover:text-gray-300 hover:underline transition-all hover:scale-[1.3]"
+                            className="text-gray-300 hover:text-gray-300 hover:underline transition-all hover:scale-[1.3]"
                             target="_blank"
                           >
                             terms.
-                          </Link>
+                          </Link>{" "}
+                          We will NEVER store your actual transcript file in our
+                          database, and all analysis of GPA, etc. are handled
+                          locally on your device, so <strong>no one</strong>{" "}
+                          will ever get access to your stats.
                         </p>
                       </div>
                     </div>

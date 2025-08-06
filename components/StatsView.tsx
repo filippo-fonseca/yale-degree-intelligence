@@ -139,12 +139,16 @@ export default function StatsView({ courses }: { courses: Course[] }) {
   // Progress to graduation (assuming 120 credits needed)
   const progressToGraduation = Math.min(100, (summary.totalCredits / 36) * 100);
 
+  const filteredGradeDistribution = gradeDistribution.filter(
+    (g) => g.count > 0
+  );
+
   const gradeChartData = {
-    labels: gradeDistribution.map((g) => g.grade),
+    labels: filteredGradeDistribution.map((g) => g.grade),
     datasets: [
       {
-        data: gradeDistribution.map((g) => g.count),
-        backgroundColor: COLORS,
+        data: filteredGradeDistribution.map((g) => g.count),
+        backgroundColor: COLORS.slice(0, filteredGradeDistribution.length),
         borderColor: "#1F2937",
         borderWidth: 1,
       },
@@ -192,6 +196,7 @@ export default function StatsView({ courses }: { courses: Course[] }) {
                 cumulativeData[cumulativeData.length - 2].cumulativeGpa
               : 0
           }
+          changeText="since last semester"
         />
         <StatCard
           label="Total Credits"
@@ -393,11 +398,20 @@ export default function StatsView({ courses }: { courses: Course[] }) {
         >
           <PieChartWrapper
             data={{
-              ...gradeChartData,
-              datasets: gradeChartData.datasets.map((ds) => ({
-                ...ds,
-                borderColor: Array(ds.data.length).fill(ds.borderColor),
-              })),
+              labels: filteredGradeDistribution.map((g) => g.grade),
+              datasets: [
+                {
+                  data: filteredGradeDistribution.map((g) => g.count),
+                  backgroundColor: COLORS.slice(
+                    0,
+                    filteredGradeDistribution.length
+                  ),
+                  borderColor: Array(filteredGradeDistribution.length).fill(
+                    "#1F2937"
+                  ),
+                  borderWidth: 1,
+                },
+              ],
             }}
             showLegend={true}
           />
@@ -433,6 +447,7 @@ function StatCard({
   color = "text-white",
   icon,
   change = 0,
+  changeText = null,
   secondaryLabel,
 }: {
   label: string;
@@ -440,6 +455,7 @@ function StatCard({
   color?: string;
   icon?: React.ReactNode;
   change?: number;
+  changeText?: string | null;
   secondaryLabel?: string;
 }) {
   return (
@@ -453,19 +469,24 @@ function StatCard({
       </div>
       <div className="flex items-end justify-between mt-2">
         <p className={`text-3xl font-medium ${color}`}>{value}</p>
-        {change !== 0 && (
-          <p
-            className={`text-sm ${
-              change > 0 ? "text-emerald-400" : "text-red-400"
-            }`}
-          >
-            {change > 0 ? "+" : ""}
-            {change.toFixed(2)}
-          </p>
-        )}
       </div>
       {secondaryLabel && (
         <p className="text-xs text-gray-400 mt-1">{secondaryLabel}</p>
+      )}
+      {change !== 0 && (
+        <p
+          className={`text-xs mt-1 ${
+            change > 0
+              ? "text-emerald-400"
+              : change > -0.05
+              ? "text-gray-400"
+              : "text-red-400"
+          }`}
+        >
+          {change > 0 ? "+" : ""}
+          {change.toFixed(2)}{" "}
+          <span className="text-gray-400">{changeText}</span>
+        </p>
       )}
     </motion.div>
   );
@@ -532,7 +553,7 @@ function getGPAColor(gpa: string) {
   const numericGPA = parseFloat(gpa);
   if (numericGPA >= 3.7) return "text-emerald-400";
   if (numericGPA >= 3.3) return "text-blue-400";
-  if (numericGPA >= 2.7) return "text-amber-400";
+  if (numericGPA >= 2.9) return "text-emerald-400";
   return "text-red-400";
 }
 

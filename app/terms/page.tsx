@@ -73,13 +73,15 @@ export default function TermsOfService() {
           <p>We take your data seriously. Here's what you should know:</p>
           <ul className="list-disc list-inside space-y-1">
             <li>
-              <strong>We do not store your raw transcript documents.</strong>
+              <strong>We do NOT store your raw transcript documents.</strong>
             </li>
             <li>
               <strong>
-                We do store structured data extracted from transcripts
+                We DO store structured data extracted from transcripts
               </strong>
-              , such as courses, semesters, grades, and majors.
+              , such as courses, semesters, grades, and majors, as it's
+              essential for the platform's operation and we have no other
+              choice.
             </li>
             <li>
               This information is used solely to provide insights and planning

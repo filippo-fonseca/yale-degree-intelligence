@@ -179,12 +179,18 @@ export default function UserProfilePage() {
     return (
       <div className="min-h-screen bg-gray-950 flex flex-col items-center justify-center">
         <div className="text-2xl font-semibold text-blue-300 mb-3">
-          Private Profile
+          Oop. You're not friends with this person on DegreeIntelligence.
         </div>
         <div className="text-gray-400 text-center max-w-md">
           You must be friends with this user to view their profile. Try sending
-          a friend request!
+          them a friend request in the "Friends" tab.
         </div>
+        <Link
+          href="/"
+          className="mt-6 px-4 py-2 text-sm font-semibold border-2 border-pink-500 hover:bg-pink-700 text-white rounded-lg transition"
+        >
+          Go to dashboard
+        </Link>
       </div>
     );
   }

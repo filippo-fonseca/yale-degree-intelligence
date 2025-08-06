@@ -35,6 +35,7 @@ import CompoundLogo from "@/components/ui/CompoundLogo";
 import { toast } from "react-hot-toast";
 import { Panda } from "lucide-react";
 import { YearBadge } from "../ui/YearBadge";
+import { InfoCard } from "../ui/InfoCard";
 
 type UserProfile = {
   uid: string;
@@ -342,7 +343,7 @@ export default function FriendsTab() {
 
   return (
     <div className="w-full max-w-3xl mx-auto font-louize">
-      <div className="flex items-center justify-between w-full mb-8">
+      <div className="flex items-center justify-between w-full mb-4">
         {" "}
         <h2 className="text-3xl font-medium bg-clip-text text-transparent bg-gradient-to-r from-blue-200 to-purple-200">
           Friends & Connections
@@ -354,6 +355,25 @@ export default function FriendsTab() {
           <FiUserPlus /> Add a friend
         </button>
       </div>
+      <InfoCard className="mb-8" autoHide previewText="Why add friends?">
+        The friends feature lets you see what classes your friends (or other
+        Yale students you know) have taken.
+        <br />
+        <br />
+        It’s useful if you're curious about someone in your year or just want to
+        explore different academic paths, but we see it as <i>
+          most powerful
+        </i>{" "}
+        when used to connect with people in your <strong>major</strong>,
+        especially older students or a student in your year who has perhaps
+        planned better (😅), , for example, who have already walked the path
+        you're striving to follow.
+        <br />
+        <br />
+        See what courses they took, how they structured their academic journey,
+        and get inspiration or guidance for planning your own — all while
+        keeping it social.
+      </InfoCard>
 
       {/* Loading state */}
       {loading && (

@@ -163,7 +163,7 @@ export default function Home() {
       id: "friends",
       icon: FiUsers,
       label: "Friends",
-      disabled: false,
+      disabled: !hasData,
     },
     {
       id: "cleoai",
@@ -1043,12 +1043,14 @@ export default function Home() {
                     </div>
                   ) : (
                     <div className="flex flex-col items-center justify-center py-12">
-                      <h2 className="text-xl font-medium mb-6 bg-clip-text text-transparent bg-gradient-to-r from-blue-200 to-purple-200">
+                      <h2 className="text-xl text-center font-medium mb-6 bg-clip-text text-transparent bg-gradient-to-r from-blue-200 to-purple-200">
                         Let's begin your journey to better contextualize & plan
                         your Yale degree.
-                        <br /> This whole process takes{" "}
-                        <span className="underline">31.97 seconds</span> on
-                        average. Ready, set, go!
+                      </h2>
+                      <h2 className="text-xl text-center font-medium mb-6 bg-clip-text text-transparent bg-gradient-to-r from-blue-200 to-purple-200">
+                        This whole process, <i>including our deep analysis,</i>{" "}
+                        takes <span className="underline">31.97 seconds</span>{" "}
+                        on average. Ready, set, go!
                       </h2>
                       <div className="filepond--label-text">
                         {"1)"} Go to{" "}

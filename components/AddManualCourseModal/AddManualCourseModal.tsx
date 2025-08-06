@@ -101,9 +101,9 @@ export default function AddManualCourseModal({
 
             <div className="space-y-4">
               <div>
-                <label className="block text-sm text-gray-400 mb-1">
+                {/* <label className="block text-sm text-gray-400 mb-1">
                   Search Your Courses
-                </label>
+                </label> */}
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                     <FiSearch className="text-gray-400" />
@@ -120,7 +120,7 @@ export default function AddManualCourseModal({
 
               <div>
                 <label className="block text-sm text-gray-400 mb-1">
-                  Select Course
+                  Make sure you're ABSOLUTELY sure it's accepted by your DUS.
                 </label>
                 <div className="max-h-60 overflow-y-auto border border-gray-700 rounded-lg">
                   {filteredCourses.length > 0 ? (

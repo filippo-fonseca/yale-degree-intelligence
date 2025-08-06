@@ -1,6 +1,5 @@
 // Grade point mapping (Yale's grading scale)
 export const gradePoints: Record<string, number> = {
-    'A+': 4.3,
     'A': 4.0,
     'A-': 3.7,
     'B+': 3.3,

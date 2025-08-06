@@ -64,7 +64,11 @@ export default function CourseModal({
       setCourseCredits(getCourseCreditsFromCode(course.code));
     }
 
-    if (course?.status == "completed" && !course.skipped) {
+    // Fetch semester info for both completed and in-progress courses
+    if (
+      (course?.status === "completed" || course?.status === "in-progress") &&
+      !course.skipped
+    ) {
       const fetchCourseBackend = async () => {
         try {
           const otherCodes = getOtherCodesForCourse(course.code);
@@ -80,10 +84,15 @@ export default function CourseModal({
             const snapshot = await getDocs(q);
             if (!snapshot.empty) {
               const courseData = snapshot.docs[0].data();
-              setCourseGrade(courseData.grade || "N/A");
+              setCourseGrade(courseData.grade || null);
               setCourseSemesterTaken(
-                courseData.semester + " " + courseData.year || "N/A"
+                courseData.semester + " " + courseData.year || null
               );
+
+              //if fsr we don't have the course in our backend, we can still fulfill the number of credits for the UI from the backend of the user transcript parse:
+              if (!courseCredits) {
+                setCourseCredits(courseData.credits || null);
+              }
               return;
             }
           }
@@ -91,8 +100,9 @@ export default function CourseModal({
           setCourseGrade(null);
           setCourseSemesterTaken(null);
         } catch (err) {
-          console.error("Error fetching course grade:", err);
-          setCourseGrade("N/A");
+          console.error("Error fetching course data:", err);
+          setCourseGrade(null);
+          setCourseSemesterTaken(null);
         }
       };
       fetchCourseBackend();
@@ -181,16 +191,25 @@ export default function CourseModal({
                     ? "Skipped"
                     : "Not Taken"}
                 </span>
-                {course.status == "completed" &&
+
+                {/* Show semester for both completed and in-progress courses */}
+                {(course.status === "completed" ||
+                  course.status === "in-progress") &&
                   !course.skipped &&
-                  courseGrade && (
+                  courseSemesterTaken && (
                     <span
-                      className={`text-xs px-2 py-1 rounded-full bg-emerald-900/20 text-emerald-300`}
+                      className={`text-xs px-2 py-1 rounded-full ${
+                        course.status === "completed"
+                          ? "bg-emerald-900/20 text-emerald-300"
+                          : "bg-blue-900/20 text-blue-300"
+                      }`}
                     >
                       {courseSemesterTaken}
                     </span>
                   )}
-                {course.status == "completed" &&
+
+                {/* Show grade only for completed courses */}
+                {course.status === "completed" &&
                   !course.skipped &&
                   courseGrade && (
                     <span
@@ -201,57 +220,23 @@ export default function CourseModal({
                       {courseGrade}
                     </span>
                   )}
-                {allowSkip && course.status !== "completed" && (
-                  <div className="relative">
+
+                {/* Skip button for non-completed, non-in-progress courses */}
+                {allowSkip &&
+                  course.status !== "completed" &&
+                  course.status !== "in-progress" && (
                     <button
-                      onClick={() => setDropdownOpen(course.code)}
-                      className="text-gray-400 hover:text-white"
+                      onClick={() => {
+                        onClose();
+                        setCourseGrade(null);
+                        onSkip?.(course.code, course.name);
+                      }}
+                      className="flex items-center gap-1 text-xs px-2 py-1 rounded-full bg-blue-900/20 text-blue-300 hover:bg-blue-900/30 transition-colors"
                     >
-                      <FiMoreVertical />
+                      <FiCornerDownLeft size={12} />
+                      Mark as skipped
                     </button>
-                    {dropdownOpen === course.code && (
-                      <motion.div
-                        ref={dropdownRef}
-                        initial={{ opacity: 0, y: -10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -10 }}
-                        className="absolute right-0 z-[999] mt-2 w-48 rounded-md bg-gray-700 shadow-lg border border-gray-600 overflow-visible"
-                      >
-                        {course.skipped ? (
-                          <button
-                            className="flex items-center gap-2 w-full px-3 py-2 text-sm text-red-300 hover:bg-gray-600"
-                            onClick={() => handleDeleteCourse()}
-                          >
-                            <FiTrash2 />
-                            Mark as Not Taken
-                          </button>
-                        ) : (
-                          <>
-                            <button
-                              className="flex items-center gap-2 w-full px-3 py-2 text-sm text-gray-200 hover:bg-gray-600"
-                              onClick={() => {
-                                onClose();
-                                setCourseGrade(null);
-                                onSkip?.(course.code, course.name);
-                                setDropdownOpen(null);
-                              }}
-                            >
-                              <FiCornerDownLeft />
-                              Mark as skipped
-                            </button>
-                            <button
-                              className="flex items-center gap-2 w-full px-3 py-2 text-sm text-gray-400 hover:bg-gray-600"
-                              onClick={() => setDropdownOpen(null)}
-                            >
-                              <FiX />
-                              Cancel
-                            </button>
-                          </>
-                        )}
-                      </motion.div>
-                    )}
-                  </div>
-                )}
+                  )}
               </div>
             </div>
             <p className="text-gray-300">

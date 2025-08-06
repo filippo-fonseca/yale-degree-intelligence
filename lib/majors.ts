@@ -70,7 +70,7 @@ export const calculateMajorProgress = (
   completedCourseCodes: string[],
   inProgressCourseCodes: string[] = [],
   skippedCourseCodes: string[] = [],
-  manualRequirements: {code: string, requirement: string}[] = []
+  manualRequirements: {code: string, requirement: string, credits: number}[] = []
 ): MajorProgress => {
   const major = majorRequirements[majorId];
   if (!major) throw new Error(`Major ${majorId} not found`);
@@ -83,15 +83,14 @@ export const calculateMajorProgress = (
   // Group manual requirements by requirement name
   const manualByRequirement: Record<string, {code: string, credits: number}[]> = {};
   manualRequirements.forEach(m => {
-    const course = getCourseInfo(m.code);
-    if (!course) return;
     
     if (!manualByRequirement[m.requirement]) {
       manualByRequirement[m.requirement] = [];
     }
+
     manualByRequirement[m.requirement].push({
-      code: course.codes[0], // Use canonical code
-      credits: course.credits
+      code: m.code,
+      credits: m.credits,
     });
   });
 

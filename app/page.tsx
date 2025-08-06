@@ -28,6 +28,7 @@ import {
   getDoc,
   addDoc,
   Timestamp,
+  writeBatch,
 } from "firebase/firestore";
 import { Course } from "@/lib/types";
 import { db } from "@/config/firebase";
@@ -224,6 +225,7 @@ export default function Home() {
         .map((m) => ({
           code: course.code,
           requirement: m.requirement_title,
+          credits: course.credits || 1, //putting 1 as the default, as it's the most likely!
         }))
     );
 
@@ -263,6 +265,64 @@ export default function Home() {
     setHasData(coursesData.length > 0);
 
     setCoursesLoading(false);
+  };
+
+  const checkAndRemoveDuplicates = async (userId: string) => {
+    if (!userId) return;
+
+    try {
+      // Fetch all courses for the user
+      const q = query(collection(db, "courses"), where("userId", "==", userId));
+      const querySnapshot = await getDocs(q);
+
+      const coursesMap = new Map<string, { id: string; count: number }>();
+
+      // Identify duplicates
+      querySnapshot.forEach((doc) => {
+        const course = doc.data() as Course;
+        // Create a unique key combining semester, year, code, and grade
+        const key = `${course.semester}-${course.year}-${course.code}-${
+          course.grade || "null"
+        }`;
+
+        if (coursesMap.has(key)) {
+          // Increment count if duplicate exists
+          const existing = coursesMap.get(key)!;
+          coursesMap.set(key, { ...existing, count: existing.count + 1 });
+        } else {
+          // Add new entry
+          coursesMap.set(key, { id: doc.id, count: 1 });
+        }
+      });
+
+      // Prepare batch delete for duplicates
+      const batch = writeBatch(db);
+      let duplicatesFound = 0;
+
+      coursesMap.forEach((value, key) => {
+        if (value.count > 1) {
+          // Add to batch delete (we'll keep one copy)
+          batch.delete(doc(db, "courses", value.id));
+          duplicatesFound++;
+          console.log(`Found duplicate course: ${key}`);
+        }
+      });
+
+      if (duplicatesFound > 0) {
+        console.log(`Found ${duplicatesFound} duplicates, removing...`);
+        await batch.commit();
+        console.log(
+          `Successfully removed ${duplicatesFound} duplicate courses`
+        );
+      } else {
+        console.log("No duplicate courses found");
+      }
+
+      return duplicatesFound;
+    } catch (error) {
+      console.error("Error checking for duplicates:", error);
+      throw error;
+    }
   };
 
   const parseAndStoreCourses = async (extractedText: string) => {
@@ -444,6 +504,15 @@ export default function Home() {
     showUpdateModal && setShowUpdateModal(false);
 
     await fetchCourses();
+
+    try {
+      await checkAndRemoveDuplicates(user.uid);
+      // Refresh courses again after potential deletions
+      await fetchCourses();
+    } catch (error) {
+      console.error("Error during duplicate check:", error);
+      // Don't fail the whole operation because of duplicate check
+    }
   };
 
   const calculateStats = () => {

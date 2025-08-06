@@ -389,7 +389,7 @@ export default function StatsView({ courses }: { courses: Course[] }) {
         <ChartBox
           title="Grade Distribution"
           icon={<PieChartIcon className="h-5 w-5" />}
-          description="Breakdown of your grades across all courses"
+          description="A breakdown of your grades across all courses."
         >
           <PieChartWrapper
             data={{
@@ -408,7 +408,7 @@ export default function StatsView({ courses }: { courses: Course[] }) {
           <ChartBox
             title="Credit Allocation"
             icon={<PieChartIcon className="h-5 w-5" />}
-            description="Distribution of credits across departments"
+            description="A fun way to visualize your degree of class variedness at Yale!"
           >
             <PieChartWrapper
               data={{

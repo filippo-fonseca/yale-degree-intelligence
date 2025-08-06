@@ -371,8 +371,14 @@ export default function FriendsTab() {
         <br />
         <br />
         See what courses they took, how they structured their academic journey,
-        and get inspiration or guidance for planning your own — all while
-        keeping it social.
+        and get inspiration or guidance for planning your own (all while keeping
+        it kinda fun and social).
+        <br />
+        <br />
+        NOTE: Sensitive/private info and statistics such as your GPA are NEVER
+        made public, not even to your friends. Only you can see them. In fact,
+        they're processed locally on your device, so we don't even store them on
+        our database.
       </InfoCard>
 
       {/* Loading state */}

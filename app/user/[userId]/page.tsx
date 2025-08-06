@@ -3,7 +3,7 @@
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { MAJORS } from "@/lib/majors";
+import { getFullMajorNameById, MAJORS } from "@/lib/majors";
 import { calculateMajorProgress } from "@/lib/majors";
 import { db } from "@/config/firebase";
 import {
@@ -241,6 +241,14 @@ export default function UserProfilePage() {
               <h1 className="text-2xl font-medium text-transparent bg-clip-text bg-gradient-to-r from-blue-200 to-purple-200">
                 {getDisplayNameFromEmail(userProfile?.email)}
               </h1>
+
+              {userProfile?.majors && userProfile.majors.length > 0 && (
+                <p className="text-sm text-gray-400 mt-1">
+                  {userProfile.majors.map((m) => {
+                    return (getFullMajorNameById(m) || m) + " ";
+                  })}
+                </p>
+              )}
 
               {userProfile?.graduationYear && (
                 <YearBadge graduationYear={userProfile.graduationYear} />

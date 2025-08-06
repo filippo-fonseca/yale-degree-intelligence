@@ -108,7 +108,8 @@ export default function FileUpload({ onSuccess }: FileUploadProps) {
           <div className="font-medium">Error processing transcript</div>
           <div className="mt-1">{error}</div>
           <div className="text-xs text-red-500/70 mt-2">
-            Please ensure you're uploading a valid Yale transcript PDF.
+            Please ensure you're uploading a valid Yale unofficial transcript
+            PDF from YHub.
           </div>
         </div>
       )}

@@ -7,6 +7,10 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
+export const truncate = (str: string | null, n: number) => {
+  return str && str?.length > n ? `${str?.substring(0, n - 1)}...` : str ?? "";
+};
+
 export function coursesToPromptString(courses: Course[]): string {
   if (!courses.length) return "No courses available.";
 

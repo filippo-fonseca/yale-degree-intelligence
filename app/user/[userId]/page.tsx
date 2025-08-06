@@ -23,6 +23,7 @@ import { useRouter } from "next/navigation";
 import { FiArrowLeft } from "react-icons/fi";
 import Link from "next/link";
 import { getCourseNameFromCode } from "@/lib/courseCatalog";
+import { truncate } from "@/lib/utils/utils";
 
 interface UserProfile {
   displayName?: string;
@@ -396,8 +397,11 @@ export default function UserProfilePage() {
                                         )}
                                       </h5>
                                       <p className="text-sm text-gray-400">
-                                        {getCourseNameFromCode(course.code) ||
-                                          "Course"}
+                                        {truncate(
+                                          getCourseNameFromCode(course.code) ||
+                                            "Course",
+                                          50
+                                        )}
                                       </p>
                                     </div>
                                     <div className="flex flex-col items-end">

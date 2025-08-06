@@ -27,6 +27,7 @@ import {
   FiUserCheck,
   FiMail,
   FiCopy,
+  FiMoreVertical,
 } from "react-icons/fi";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
@@ -598,14 +599,6 @@ export default function FriendsTab() {
                       </div>
                     </div>
                     <div className="flex gap-2">
-                      <button
-                        className="flex items-center gap-1 px-3 py-1.5 bg-gray-800/60 text-gray-300 rounded-lg border border-gray-700 hover:bg-red-800 hover:text-white hover:border-red-600 transition"
-                        onClick={() => friend.id && removeFriend(friend.id)}
-                        title="Remove friend"
-                      >
-                        <FiX />
-                        Remove
-                      </button>
                       <Link
                         href={`/user/${f.uid}`}
                         className="flex items-center gap-1 px-3 py-1.5 bg-gray-800/60 text-gray-300 rounded-lg border border-gray-700 hover:bg-pink-500 hover:text-white transition"
@@ -613,6 +606,7 @@ export default function FriendsTab() {
                         <FiUser className="inline-block" />
                         Open Profile
                       </Link>
+                      <FriendActionsDropdown friend={friend} profile={f} />
                     </div>
                   </motion.div>
                 );
@@ -623,4 +617,75 @@ export default function FriendsTab() {
       )}
     </div>
   );
+
+  function FriendActionsDropdown({
+    friend,
+    profile,
+  }: {
+    friend: Friend;
+    profile: UserProfile;
+  }) {
+    const [isOpen, setIsOpen] = useState(false);
+    const dropdownRef = useRef<HTMLDivElement>(null);
+
+    // Close dropdown when clicking outside
+    useEffect(() => {
+      function handleClickOutside(event: MouseEvent) {
+        if (
+          dropdownRef.current &&
+          !dropdownRef.current.contains(event.target as Node)
+        ) {
+          setIsOpen(false);
+        }
+      }
+      document.addEventListener("mousedown", handleClickOutside);
+      return () => {
+        document.removeEventListener("mousedown", handleClickOutside);
+      };
+    }, []);
+
+    return (
+      <div className="relative" ref={dropdownRef}>
+        <button
+          onClick={() => setIsOpen(!isOpen)}
+          className="p-2 rounded-full hover:bg-gray-700 transition"
+          aria-label="Friend actions"
+        >
+          <FiMoreVertical />
+        </button>
+
+        <AnimatePresence>
+          {isOpen && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              className="absolute right-0 mt-2 w-48 bg-gray-800 rounded-md shadow-lg z-10 border border-gray-700"
+            >
+              <div className="py-1">
+                <Link
+                  href={`/user/${profile.uid}`}
+                  className="flex items-center gap-2 px-4 py-2 text-sm text-gray-200 hover:bg-gray-700"
+                  onClick={() => setIsOpen(false)}
+                >
+                  <FiUser className="inline-block" />
+                  View Profile
+                </Link>
+                <button
+                  onClick={() => {
+                    if (friend.id) removeFriend(friend.id);
+                    setIsOpen(false);
+                  }}
+                  className="flex items-center gap-2 w-full text-left px-4 py-2 text-sm text-red-300 hover:bg-red-900/30"
+                >
+                  <FiX />
+                  Remove Friend
+                </button>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+    );
+  }
 }

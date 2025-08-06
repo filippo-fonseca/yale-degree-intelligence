@@ -22,6 +22,7 @@ import {
   deleteDoc,
 } from "firebase/firestore";
 import { getGPAColor } from "@/lib/utils/utils";
+import { Info } from "lucide-react";
 
 type CourseStatus = "completed" | "in-progress" | "not-taken" | "skipped";
 
@@ -225,17 +226,34 @@ export default function CourseModal({
                 {allowSkip &&
                   course.status !== "completed" &&
                   course.status !== "in-progress" && (
-                    <button
-                      onClick={() => {
-                        onClose();
-                        setCourseGrade(null);
-                        onSkip?.(course.code, course.name);
-                      }}
-                      className="flex items-center gap-1 text-xs px-2 py-1 rounded-full bg-blue-900/20 text-blue-300 hover:bg-blue-900/30 transition-colors"
-                    >
-                      <FiCornerDownLeft size={12} />
-                      Mark as skipped
-                    </button>
+                    <div className="relative group flex items-center gap-2">
+                      <button
+                        onClick={() => {
+                          onClose();
+                          setCourseGrade(null);
+                          onSkip?.(course.code, course.name);
+                        }}
+                        className="flex items-center gap-1 text-xs px-2 py-1 rounded-full bg-blue-900/20 text-blue-300 hover:bg-blue-900/30 transition-all transform hover:scale-105"
+                      >
+                        <FiCornerDownLeft size={12} />
+                        Mark as skipped
+                      </button>
+
+                      <div className="relative group">
+                        <Info className="h-4 w-4 text-gray-400 hover:text-gray-200 transition-colors cursor-pointer" />
+                        <div className="absolute border border-pink-500 top-full mt-2 left-1/2 -translate-x-1/2 bg-gray-800 text-gray-300 text-xs p-2 rounded-md opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-50 pointer-events-none">
+                          Sometimes you can count a class as "taken" without
+                          necessarily taking the exact course
+                          <br /> (like via placement or another class). In that
+                          case, mark it as "skipped!". If you instead
+                          <br />
+                          took ANOTHER class you want to use for this
+                          requirement, use the "Fulfill manually"
+                          <br /> button present on the card for this requirement
+                          (exit out of this modal first).
+                        </div>
+                      </div>
+                    </div>
                   )}
               </div>
             </div>

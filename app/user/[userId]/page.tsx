@@ -257,7 +257,9 @@ export default function UserProfilePage() {
               )}
 
               {userProfile?.graduationYear && (
-                <YearBadge graduationYear={userProfile.graduationYear} />
+                <div className="mt-2">
+                  <YearBadge graduationYear={userProfile.graduationYear} />
+                </div>
               )}
 
               {userProfile?.bio && (

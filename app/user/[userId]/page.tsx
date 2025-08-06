@@ -24,6 +24,7 @@ import { FiArrowLeft } from "react-icons/fi";
 import Link from "next/link";
 import { getCourseNameFromCode } from "@/lib/courseCatalog";
 import { truncate } from "@/lib/utils/utils";
+import { YearBadge } from "@/components/ui/YearBadge";
 
 interface UserProfile {
   displayName?: string;
@@ -242,19 +243,18 @@ export default function UserProfilePage() {
               </h1>
 
               {userProfile?.graduationYear && (
-                <p className="text-gray-400 mt-1">
-                  Class of {userProfile.graduationYear}
-                </p>
+                <YearBadge graduationYear={userProfile.graduationYear} />
               )}
 
-              <div className="mt-6 w-full">
-                <div className="p-4 rounded-lg bg-gray-800/30 border border-gray-700">
-                  <p className="text-gray-300">
-                    {userProfile?.bio ||
-                      "This student hasn't written a bio yet."}
-                  </p>
+              {userProfile?.bio && (
+                <div className="mt-6 w-full">
+                  <div className="p-4 rounded-lg bg-gray-800/30 border border-gray-700">
+                    <p className="text-gray-300">
+                      {userProfile?.bio || "Yale student."}
+                    </p>
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
           </motion.div>
         </header>

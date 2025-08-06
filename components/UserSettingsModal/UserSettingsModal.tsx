@@ -6,6 +6,10 @@ import { FiLogOut, FiEdit2 } from "react-icons/fi";
 import { User } from "firebase/auth";
 import { MAJORS } from "@/lib/majors";
 import { MajorDropdown } from "../ui/MajorDropdown";
+import { YearBadge } from "../ui/YearBadge";
+import Link from "next/link";
+import { InfoCard } from "../ui/InfoCard";
+import { Info } from "lucide-react";
 
 interface UserProfile {
   majors: string[];
@@ -255,41 +259,26 @@ export default function UserSettingsModal({
 
           {/* Graduation Year Badge */}
           {localProfile.graduationYear && (
-            <div className="mt-3 flex items-center">
-              <span className="text-xs font-medium px-2.5 py-0.5 rounded-full flex items-center">
-                <span
-                  className={`w-2 h-2 rounded-full mr-1.5 ${
-                    getYearStatus(localProfile.graduationYear) === "Freshman"
-                      ? "bg-green-400"
-                      : getYearStatus(localProfile.graduationYear) ===
-                        "Sophomore"
-                      ? "bg-blue-400"
-                      : getYearStatus(localProfile.graduationYear) === "Junior"
-                      ? "bg-yellow-400"
-                      : "bg-purple-400"
-                  }`}
-                ></span>
-                <span className="text-gray-300">
-                  {getYearStatus(localProfile.graduationYear)} • Class of{" "}
-                  {localProfile.graduationYear}
-                </span>
-              </span>
+            <div className="mt-3">
+              <YearBadge graduationYear={localProfile.graduationYear} />
             </div>
           )}
-          <motion.button
-            onHoverStart={() => setIsHoveringLogout(true)}
-            onHoverEnd={() => setIsHoveringLogout(false)}
-            onClick={onLogout}
-            className="flex items-center justify-center space-x-2 text-xs px-4 py-2 rounded-lg hover:bg-gray-900/50 transition-all border border-gray-800 hover:border-gray-700 mt-4"
-          >
-            <span>Sign out</span>
-            <motion.div
-              animate={isHoveringLogout ? { x: 2 } : { x: 0 }}
-              transition={{ type: "spring", stiffness: 500 }}
+          <div className="mt-4 flex items-center justify-center gap-2 relative">
+            <Link
+              href={`/user/${user.uid}`}
+              className="cursor-pointer text-xs px-4 py-2 rounded-lg border border-gray-800 hover:border-pink-500 hover:bg-gray-900/50 transition-all text-center"
             >
-              <FiLogOut size={14} />
-            </motion.div>
-          </motion.button>
+              View your public profile
+            </Link>
+
+            <div className="relative group">
+              <Info className="h-4 w-4 text-gray-400 hover:text-gray-200 transition-colors cursor-pointer" />
+              <div className="absolute top-full mt-2 left-1/2 -translate-x-1/2 bg-gray-800 text-gray-300 text-xs px-3 py-1 rounded-md opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-50 pointer-events-none">
+                This is only visible to friends you’ve added on
+                DegreeIntelligence.
+              </div>
+            </div>
+          </div>
         </div>
 
         <div className="space-y-4">
@@ -371,24 +360,42 @@ export default function UserSettingsModal({
           </div>
         </div>
 
-        <div className="flex justify-end space-x-3 mt-6">
-          <button
-            onClick={onClose}
-            className="px-4 py-2 rounded-lg border border-gray-700 hover:bg-gray-800/50 transition-colors"
-          >
-            Cancel
-          </button>
-          <button
-            onClick={handleSave}
-            disabled={!hasChanges() || hasDuplicateMajors()}
-            className={`px-4 py-2 rounded-lg transition-colors ${
-              hasChanges() && !hasDuplicateMajors()
-                ? "bg-pink-600 hover:bg-pink-700"
-                : "bg-gray-800 text-gray-500 cursor-not-allowed"
-            }`}
-          >
-            Save Changes
-          </button>
+        <div className="flex justify-between mt-6">
+          <div>
+            <motion.button
+              onHoverStart={() => setIsHoveringLogout(true)}
+              onHoverEnd={() => setIsHoveringLogout(false)}
+              onClick={onLogout}
+              className="flex items-center justify-center space-x-2 px-4 py-2 rounded-lg hover:bg-gray-900/50 transition-all border border-gray-800 hover:border-gray-700"
+            >
+              <span>Sign out</span>
+              <motion.div
+                animate={isHoveringLogout ? { x: 2 } : { x: 0 }}
+                transition={{ type: "spring", stiffness: 500 }}
+              >
+                <FiLogOut size={14} />
+              </motion.div>
+            </motion.button>
+          </div>
+          <div className="flex gap-3 items-center justify-end">
+            <button
+              onClick={onClose}
+              className="px-4 py-2 rounded-lg border border-gray-700 hover:bg-gray-800/50 transition-colors"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handleSave}
+              disabled={!hasChanges() || hasDuplicateMajors()}
+              className={`px-4 py-2 rounded-lg transition-colors ${
+                hasChanges() && !hasDuplicateMajors()
+                  ? "bg-pink-600 hover:bg-pink-700"
+                  : "bg-gray-800 text-gray-500 cursor-not-allowed"
+              }`}
+            >
+              Save Changes
+            </button>
+          </div>
         </div>
       </motion.div>
     </div>

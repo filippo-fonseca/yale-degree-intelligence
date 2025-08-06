@@ -11,7 +11,7 @@ export type Course = {
   semester: string;
   year: number;
   userId: string;
-  status: "completed" | "in-progress";
+  status: "completed" | "in-progress" | "skipped" | "not-taken";
   credits: number;
   skipped?: boolean; // Add this new property
   manualRequirementsFulfilled?: ManualRequirement[];

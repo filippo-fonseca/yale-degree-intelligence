@@ -60,6 +60,7 @@ import { getGPAColor } from "@/lib/utils/utils";
 import PublicFacingPage from "@/screens/PublicFacingPage";
 import FriendsTab from "@/components/FriendsTab/FriendsTab";
 import { Printer } from "lucide-react";
+import Simulator from "@/components/Simulator";
 
 interface UserProfile {
   majors: string[];
@@ -157,6 +158,12 @@ export default function Home() {
       id: "major",
       icon: RiProgress3Fill,
       label: "My major",
+      disabled: !hasData,
+    },
+    {
+      id: "simulator",
+      icon: FiBook,
+      label: "Simulator",
       disabled: !hasData,
     },
     {
@@ -1148,7 +1155,6 @@ export default function Home() {
                   </motion.div>
                 </motion.div>
               )}
-
               {activeTab === "stats" && (
                 <motion.div
                   key="stats"
@@ -1169,7 +1175,6 @@ export default function Home() {
                   <StatsView courses={courses} />
                 </motion.div>
               )}
-
               {activeTab === "major" && getMajorProgress() && (
                 <motion.div
                   key="major"
@@ -1225,6 +1230,107 @@ export default function Home() {
                   />
                 </motion.div>
               )}
+              {activeTab === "simulator" && (
+                <motion.div
+                  key="simulator"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  {userProfile && (
+                    <Simulator
+                      remainingCourses={
+                        // 1. Aggregate all remaining courses across ALL majors
+                        userProfile.majors
+                          .flatMap((major) => {
+                            // You'll need to compute progress for each major
+                            const completedCourseCodes = courses
+                              .filter(
+                                (course) =>
+                                  course.status === "completed" &&
+                                  ((course.grade !== null &&
+                                    course.grade !== "In Progress") ||
+                                    course.skipped)
+                              )
+                              .map((course) => course.code);
+
+                            const inProgressCourseCodes = courses
+                              .filter(
+                                (course) =>
+                                  course.grade === "In Progress" &&
+                                  !course.skipped
+                              )
+                              .map((course) => course.code);
+
+                            const skippedCourseCodes = courses
+                              .filter((course) => course.skipped)
+                              .map((course) => course.code);
+
+                            const manualRequirements = courses.flatMap(
+                              (course) =>
+                                (course.manualRequirementsFulfilled || [])
+                                  .filter((m) => m.major_id === major)
+                                  .map((m) => ({
+                                    code: course.code,
+                                    requirement: m.requirement_title,
+                                    credits: course.credits || 1,
+                                  }))
+                            );
+
+                            // Get progress for this major
+                            const progress = calculateMajorProgress(
+                              major,
+                              completedCourseCodes,
+                              inProgressCourseCodes,
+                              skippedCourseCodes,
+                              manualRequirements
+                            );
+
+                            // Extract all "not taken" requirements
+                            return (
+                              progress?.remainingRequirements.flatMap((req) =>
+                                req.options
+                                  .filter(
+                                    (opt) =>
+                                      !opt.completed &&
+                                      !opt.inProgress &&
+                                      !opt.skipped
+                                  )
+                                  .map(
+                                    (opt) =>
+                                      ({
+                                        id: `${opt.code}-sim-${major}`,
+                                        code: opt.code,
+                                        name: opt.name,
+                                        grade: null,
+                                        semester: "TBD",
+                                        year: 0,
+                                        userId: user?.uid || "",
+                                        status: "not-taken" as const, // This is the key fix
+                                        credits: opt.credits,
+                                        skipped: false,
+                                      } as Course)
+                                  )
+                              ) || []
+                            );
+                          })
+                          .filter(
+                            (course, idx, arr) =>
+                              arr.findIndex((c) => c.code === course.code) ===
+                              idx
+                          )
+                      }
+                      completedCourses={courses.filter(
+                        (c) =>
+                          c.status === "completed" || c.status === "in-progress"
+                      )}
+                      graduationYear={userProfile.graduationYear}
+                    />
+                  )}
+                </motion.div>
+              )}
+
               {activeTab === "distributionals" && (
                 <motion.div
                   key="distributionals"

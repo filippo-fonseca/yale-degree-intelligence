@@ -60,7 +60,7 @@ import { getGPAColor } from "@/lib/utils/utils";
 import PublicFacingPage from "@/screens/PublicFacingPage";
 import FriendsTab from "@/components/FriendsTab/FriendsTab";
 import { Printer } from "lucide-react";
-import Simulator from "@/components/Simulator";
+import Simulator from "@/components/Simulator/Simulator";
 
 interface UserProfile {
   majors: string[];

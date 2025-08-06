@@ -2,12 +2,13 @@
 
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { FiChevronDown, FiInfo } from "react-icons/fi";
+import { FiChevronDown, FiInfo, FiPlus } from "react-icons/fi";
 import { Course } from "@/lib/types";
 import { getCourseNameFromCode } from "@/lib/courseCatalog";
 import { useAuth } from "@/context/AuthContext";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import { db } from "@/config/firebase";
+import ManualCourseLookupModal from "./ManualCourseLookupModal";
 
 interface Semester {
   id: string;
@@ -48,6 +49,8 @@ export default function Simulator({
   const [planName, setPlanName] = useState("");
   const [showSaveModal, setShowSaveModal] = useState(false);
   const [showPlansModal, setShowPlansModal] = useState(false);
+
+  const [lookupSemesterId, setLookupSemesterId] = useState<string | null>(null);
 
   // ----------- INITIALIZE SEMESTERS ----------- //
   useEffect(() => {
@@ -164,7 +167,9 @@ export default function Simulator({
         sem.id === semesterId
           ? {
               ...sem,
-              courses: sem.courses.filter((c) => c.code !== courseCode),
+              courses: sem.courses.filter(
+                (c): c is Course => !!c && c.code !== courseCode
+              ),
             }
           : sem
       )
@@ -394,7 +399,18 @@ export default function Simulator({
             className="bg-gray-900/50 rounded-xl border border-gray-800 p-4 min-h-[180px] flex flex-col"
             style={{ transition: "background 0.2s" }}
           >
-            <h4 className="font-medium text-gray-300 mb-3">{semester.name}</h4>
+            <div className="flex justify-between items-center mb-3">
+              <h4 className="font-medium text-gray-300">{semester.name}</h4>
+              <button
+                onClick={() => setLookupSemesterId(semester.id)}
+                className="ml-2 px-2 py-1 text-xs rounded-lg bg-blue-800/30 text-blue-200 hover:bg-blue-700/60 border border-blue-900"
+                type="button"
+              >
+                <FiPlus className="inline-block mr-1" />
+                Manual course lookup
+              </button>
+            </div>
+
             {semester.courses.length === 0 ? (
               <div className="flex-1 flex items-center justify-center border-2 border-dashed border-gray-700 rounded-lg p-4 min-h-[52px] transition-all">
                 <p className="text-sm text-gray-500 text-center opacity-70">
@@ -549,6 +565,35 @@ export default function Simulator({
           </motion.div>
         )}
       </AnimatePresence>
+      <ManualCourseLookupModal
+        isOpen={lookupSemesterId !== null}
+        onClose={() => setLookupSemesterId(null)}
+        onSelect={(manualCourse) => {
+          if (!lookupSemesterId || !manualCourse?.code) return;
+          setSemesters((prev) =>
+            prev.map((sem) =>
+              sem.id === lookupSemesterId
+                ? {
+                    ...sem,
+                    courses: [...sem.courses, manualCourse],
+                  }
+                : sem
+            )
+          );
+          setLookupSemesterId(null);
+        }}
+        alreadyAddedCodes={[
+          ...semesters.flatMap((s) =>
+            (s.courses ?? [])
+              .filter((c): c is Course => !!c && typeof c.code === "string")
+              .map((c) => c.code)
+          ),
+          ...availableCourses
+            .filter((c): c is Course => !!c && typeof c.code === "string")
+            .map((c) => c.code),
+        ]}
+        userId={user?.uid || ""}
+      />
     </div>
   );
 }

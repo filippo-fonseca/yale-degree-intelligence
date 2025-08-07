@@ -10,6 +10,7 @@ import { doc, getDoc, setDoc } from "firebase/firestore";
 import { db } from "@/config/firebase";
 import ManualCourseLookupModal from "./ManualCourseLookupModal";
 import { truncate } from "@/lib/utils/utils";
+import { Info } from "lucide-react";
 
 interface Semester {
   id: string;
@@ -385,20 +386,25 @@ export default function Simulator({
       {/* Available Courses Pool */}
       <div
         className="
-    sticky top-0 z-30 
-    bg-gray-900/80 backdrop-blur 
-    border-b border-gray-800 
-    rounded-xl p-4 mb-2
-  "
+          sticky top-0 z-30 
+          bg-pink-900/20 backdrop-blur 
+          border border-pink-800/50
+          rounded-xl p-4 mb-2
+          shadow-lg shadow-indigo-900/10
+        "
         style={{
-          // This ensures it doesn't overlap if there's a navbar
-          // If your navbar is taller than 0, adjust accordingly
           top: "0px",
         }}
       >
-        <h4 className="font-medium text-gray-300 mb-3">
-          Pool of courses from your major
-        </h4>
+        <div className="flex items-center justify-start gap-2 font-medium text-gray-300 mb-3">
+          <h4>Quick-add: Pool of courses from your major </h4>
+          <div className="relative group">
+            <Info className="h-4 w-4 text-gray-400 hover:text-gray-200 transition-colors cursor-pointer" />
+            <div className="absolute z-50 bottom-full mt-2 left-1/2 -translate-x-1/2 bg-gray-800 text-gray-300 text-xs px-3 py-1 rounded-md opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+              May not include all. Add manually if not.
+            </div>
+          </div>
+        </div>
         {availableCourses.length === 0 ? (
           <p className="text-sm text-gray-500 italic">
             All available courses have been scheduled. Remove one from a
@@ -413,7 +419,7 @@ export default function Simulator({
                 onDragStart={() => handleDragStart(course)}
                 whileHover={{ scale: 1.03 }}
                 whileTap={{ scale: 0.97 }}
-                className="px-3 py-1.5 rounded-full bg-blue-900/20 text-blue-300 border border-blue-700 text-sm cursor-grab active:cursor-grabbing select-none"
+                className="px-3 py-1.5 rounded-full bg-pink-900/20 text-pink-300 border border-pink-700 text-sm cursor-grab active:cursor-grabbing select-none"
               >
                 {course.code}
                 <span className="text-xs text-blue-200/70 ml-1">

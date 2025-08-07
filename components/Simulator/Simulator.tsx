@@ -9,6 +9,7 @@ import { useAuth } from "@/context/AuthContext";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import { db } from "@/config/firebase";
 import ManualCourseLookupModal from "./ManualCourseLookupModal";
+import { truncate } from "@/lib/utils/utils";
 
 interface Semester {
   id: string;
@@ -50,61 +51,51 @@ export default function Simulator({
   const [showSaveModal, setShowSaveModal] = useState(false);
   const [showPlansModal, setShowPlansModal] = useState(false);
 
+  const [hoveredSemester, setHoveredSemester] = useState<string | null>(null);
+
   const [lookupSemesterId, setLookupSemesterId] = useState<string | null>(null);
 
   // ----------- INITIALIZE SEMESTERS ----------- //
   useEffect(() => {
-    const now = new Date();
-    const currentYear = now.getFullYear();
-    const currentMonth = now.getMonth(); // 0=Jan
+    // 1. Get the earliest semester from completed courses, or default to (graduationYear - 4, "Fall")
+    let startYear = graduationYear - 4;
+    let startSemester: "Fall" | "Spring" = "Fall";
 
-    // Determine current (possibly unmodifiable) semester
-    let semesterType: "Spring" | "Fall";
-    if (currentMonth >= 8 || currentMonth < 2) {
-      semesterType = "Fall";
-    } else {
-      semesterType = "Spring";
-    }
-
-    // Determine if we should skip current semester
-    let year = currentYear;
-    let semester = semesterType;
-
-    const shouldSkipCurrentSemester =
-      (semester === "Fall" && currentMonth >= 9) ||
-      (semester === "Spring" && currentMonth >= 2);
-
-    if (shouldSkipCurrentSemester) {
-      if (semester === "Fall") {
-        year += 1;
-        semester = "Spring";
-      } else {
-        semester = "Fall";
+    // If you want to find the actual earliest semester (recommended for gap years)
+    if (completedCourses.length > 0) {
+      // Find oldest by year, then by semester
+      let minYear = Math.min(...completedCourses.map((c) => c.year));
+      let minSem = "Fall";
+      const coursesInMinYear = completedCourses.filter(
+        (c) => c.year === minYear
+      );
+      if (coursesInMinYear.some((c) => c.semester === "Spring")) {
+        minSem = "Spring";
       }
+      startYear = minYear;
+      startSemester = minSem as "Fall" | "Spring";
     }
 
-    // Generate all future semesters through graduation year
+    // 2. Build semesters up to graduationYear, ending with Spring of graduationYear
     const semestersArr: Semester[] = [];
-    let done = false;
-    while (!done) {
+    let year = startYear;
+    let semester: "Fall" | "Spring" = startSemester;
+    while (
+      year < graduationYear ||
+      (year === graduationYear && semester === "Spring")
+    ) {
       semestersArr.push({
         id: `${semester}-${year}`,
         name: `${semester} ${year}`,
         courses: [],
       });
-
-      // Move to next semester
-      if (semester === "Spring") {
-        semester = "Fall";
-      } else {
+      if (semester === "Fall") {
         semester = "Spring";
-        year += 1;
+        year++;
+      } else {
+        semester = "Fall";
       }
-      if (year > graduationYear) done = true;
     }
-
-    // Ensure correct order: Spring before Fall for a given year
-    semestersArr.sort((a, b) => compareSemesters(a.name, b.name));
     setSemesters(semestersArr);
 
     // "Available" = those not already completed or in-progress
@@ -138,6 +129,22 @@ export default function Simulator({
 
     setSemesters(updatedSemesters);
   }, [completedCourses, semesters.length]); // Only runs when semester count or completedCourses changes
+
+  function isPastSemester(semesterName: string) {
+    // "Fall 2024"
+    const [sem, yearStr] = semesterName.split(" ");
+    const year = parseInt(yearStr, 10);
+    const now = new Date();
+    const currentYear = now.getFullYear();
+    const currentMonth = now.getMonth(); // 0 = Jan
+
+    // Logic: Fall = Sept-Jan (show until Feb), Spring = Feb-May (show until June)
+    if (year < currentYear) return true;
+    if (year > currentYear) return false;
+    if (sem === "Fall" && currentMonth > 1) return true; // after Feb, Fall is in past
+    if (sem === "Spring" && currentMonth > 5) return true; // after June, Spring is in past
+    return false;
+  }
 
   // ----------- DRAG-AND-DROP LOGIC ----------- //
   const handleDragStart = (course: Course) => setDraggedCourse(course);
@@ -278,9 +285,13 @@ export default function Simulator({
     );
   };
 
+  function hasInProgress(semester: Semester) {
+    return semester.courses.some((c) => c.status === "in-progress");
+  }
+
   // ----------- RENDER ----------- //
   return (
-    <div className="space-y-6 font-louize">
+    <div className="space-y-4 font-louize">
       {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div className="mb-6">
@@ -372,7 +383,19 @@ export default function Simulator({
       </AnimatePresence>
 
       {/* Available Courses Pool */}
-      <div className="bg-gray-900/50 rounded-xl border border-gray-800 p-4">
+      <div
+        className="
+    sticky top-0 z-30 
+    bg-gray-900/80 backdrop-blur 
+    border-b border-gray-800 
+    rounded-xl p-4 mb-2
+  "
+        style={{
+          // This ensures it doesn't overlap if there's a navbar
+          // If your navbar is taller than 0, adjust accordingly
+          top: "0px",
+        }}
+      >
         <h4 className="font-medium text-gray-300 mb-3">
           Pool of courses from your major
         </h4>
@@ -382,7 +405,7 @@ export default function Simulator({
             semester to add it back.
           </p>
         ) : (
-          <div className="flex flex-wrap gap-2">
+          <div className="max-h-32 overflow-y-auto pr-1 flex flex-wrap gap-2">
             {availableCourses.map((course) => (
               <motion.div
                 key={course.code}
@@ -394,7 +417,8 @@ export default function Simulator({
               >
                 {course.code}
                 <span className="text-xs text-blue-200/70 ml-1">
-                  {getCourseNameFromCode(course.code)}
+                  {truncate(getCourseNameFromCode(course.code) ?? "", 20)}
+                  {/* {getCourseNameFromCode(course.code) ?? "Unknown Course"} */}
                 </span>
               </motion.div>
             ))}
@@ -407,26 +431,59 @@ export default function Simulator({
         {semesters.map((semester) => (
           <motion.div
             key={semester.id}
-            onDragOver={(e) => e.preventDefault()}
-            onDrop={() => handleDrop(semester.id)}
-            whileHover={{ scale: 1.01 }}
-            className="bg-gray-900/50 rounded-xl border border-gray-800 p-4 min-h-[180px] flex flex-col"
-            style={{ transition: "background 0.2s" }}
+            onDragOver={(e) => {
+              e.preventDefault();
+              if (!isPastSemester(semester.name)) {
+                setHoveredSemester(semester.id);
+              }
+            }}
+            onDragLeave={() => setHoveredSemester(null)}
+            onDrop={() => {
+              if (isPastSemester(semester.name)) return;
+              handleDrop(semester.id);
+              setHoveredSemester(null);
+            }}
+            className={`bg-gray-900/50 rounded-xl border p-4 min-h-[180px] flex flex-col transition-all
+            ${
+              hasInProgress(semester)
+                ? "border-blue-600/70 ring-2 ring-blue-400/40"
+                : "border-gray-800"
+            }
+            ${
+              hoveredSemester === semester.id &&
+              draggedCourse &&
+              !isPastSemester(semester.name)
+                ? "ring-2 ring-pink-400 ml-1 bg-gray-800/70"
+                : ""
+            }
+          `}
           >
             <div className="flex justify-between items-center mb-3">
               <h4 className="font-medium text-gray-300">{semester.name}</h4>
-              <button
-                onClick={() => setLookupSemesterId(semester.id)}
-                className="ml-2 px-2 py-1 text-xs rounded-lg bg-blue-800/30 text-blue-200 hover:bg-blue-700/60 border border-blue-900"
-                type="button"
-              >
-                <FiPlus className="inline-block mr-1" />
-                Manual course lookup
-              </button>
+              {!isPastSemester(semester.name) && (
+                <button
+                  onClick={() => setLookupSemesterId(semester.id)}
+                  className="ml-2 px-2 py-1 text-xs rounded-lg bg-blue-800/30 text-blue-200 hover:bg-blue-700/60 border border-blue-900"
+                  type="button"
+                >
+                  <FiPlus className="inline-block mr-1" />
+                  Manual course lookup
+                </button>
+              )}
             </div>
 
             {semester.courses.length === 0 ? (
-              <div className="flex-1 flex items-center justify-center border-2 border-dashed border-gray-700 rounded-lg p-4 min-h-[52px] transition-all">
+              <div
+                className={`flex-1 flex items-center justify-center border-2 border-dashed rounded-lg p-4 min-h-[52px] transition-all
+              ${
+                hoveredSemester === semester.id &&
+                draggedCourse &&
+                !isPastSemester(semester.name)
+                  ? "border-pink-400 bg-purple-900/20"
+                  : "border-gray-700"
+              }
+            `}
+              >
                 <p className="text-sm text-gray-500 text-center opacity-70">
                   Drag courses here
                 </p>
@@ -443,7 +500,7 @@ export default function Simulator({
                         ? removeCourseFromSemester(semester.id, course.code)
                         : undefined
                     }
-                    className={`px-3 py-1.5 rounded-full text-sm cursor-pointer select-none transition-all border
+                    className={`px-3 py-1.5 w-full rounded-full text-sm cursor-pointer select-none transition-all border
                       ${
                         course.status === "completed"
                           ? "bg-emerald-900/20 text-emerald-300 border-emerald-700"
@@ -454,7 +511,13 @@ export default function Simulator({
                   >
                     {course.code}
                     <span className="text-xs opacity-70 ml-1">
-                      {getCourseNameFromCode(course.code)}
+                      {truncate(
+                        getCourseNameFromCode(course.code) ?? "",
+                        course.status === "completed" ||
+                          course.status === "in-progress"
+                          ? 30
+                          : 15
+                      )}
                     </span>
                     {course.status === "not-taken" && (
                       <span className="ml-2 text-xs text-gray-500">

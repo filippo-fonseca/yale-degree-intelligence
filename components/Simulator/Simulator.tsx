@@ -25,14 +25,12 @@ interface SimulatorProps {
 }
 
 function compareSemesters(a: string, b: string) {
-  // a, b are like "Spring 2025" or "Fall 2025"
   const [semA, yearA] = a.split(" ");
   const [semB, yearB] = b.split(" ");
   const yA = parseInt(yearA, 10);
   const yB = parseInt(yearB, 10);
 
   if (yA !== yB) return yA - yB;
-  // Order: Spring (0) before Fall (1)
   const order = { Spring: 0, Fall: 1 };
   return order[semA as keyof typeof order] - order[semB as keyof typeof order];
 }
@@ -51,20 +49,21 @@ export default function Simulator({
   const [planName, setPlanName] = useState("");
   const [showSaveModal, setShowSaveModal] = useState(false);
   const [showPlansModal, setShowPlansModal] = useState(false);
-
   const [hoveredSemester, setHoveredSemester] = useState<string | null>(null);
-
   const [lookupSemesterId, setLookupSemesterId] = useState<string | null>(null);
+  const [selectedPlanToOverwrite, setSelectedPlanToOverwrite] = useState<
+    number | null
+  >(null);
+  const [hasChanges, setHasChanges] = useState(false);
+  const initialSemestersRef = useRef<Semester[]>([]);
 
-  // ----------- INITIALIZE SEMESTERS ----------- //
+  // Track initial state and changes
   useEffect(() => {
-    // 1. Get the earliest semester from completed courses, or default to (graduationYear - 4, "Fall")
+    const semestersArr: Semester[] = [];
     let startYear = graduationYear - 4;
     let startSemester: "Fall" | "Spring" = "Fall";
 
-    // If you want to find the actual earliest semester (recommended for gap years)
     if (completedCourses.length > 0) {
-      // Find oldest by year, then by semester
       let minYear = Math.min(...completedCourses.map((c) => c.year));
       let minSem = "Fall";
       const coursesInMinYear = completedCourses.filter(
@@ -77,8 +76,6 @@ export default function Simulator({
       startSemester = minSem as "Fall" | "Spring";
     }
 
-    // 2. Build semesters up to graduationYear, ending with Spring of graduationYear
-    const semestersArr: Semester[] = [];
     let year = startYear;
     let semester: "Fall" | "Spring" = startSemester;
     while (
@@ -98,8 +95,8 @@ export default function Simulator({
       }
     }
     setSemesters(semestersArr);
+    initialSemestersRef.current = JSON.parse(JSON.stringify(semestersArr));
 
-    // "Available" = those not already completed or in-progress
     setAvailableCourses(
       remainingCourses.filter(
         (rc) =>
@@ -109,11 +106,29 @@ export default function Simulator({
     );
   }, [graduationYear, remainingCourses, completedCourses]);
 
-  // ----------- ASSIGN COMPLETED COURSES TO SEMESTERS ----------- //
+  // Check for changes
+  useEffect(() => {
+    if (initialSemestersRef.current.length === 0) return;
+
+    const currentCourses = semesters.flatMap((s) =>
+      s.courses.map((c) => c.code)
+    );
+    const initialCourses = initialSemestersRef.current.flatMap((s) =>
+      s.courses.map((c) => c.code)
+    );
+
+    const coursesChanged =
+      currentCourses.length !== initialCourses.length ||
+      !currentCourses.every((code) => initialCourses.includes(code)) ||
+      !initialCourses.every((code) => currentCourses.includes(code));
+
+    setHasChanges(coursesChanged);
+  }, [semesters]);
+
+  // Assign completed courses to semesters
   useEffect(() => {
     if (!semesters.length || !completedCourses.length) return;
 
-    // Copy semesters, assign completed/in-progress courses
     const updatedSemesters = semesters.map((sem) => ({
       ...sem,
       courses: [],
@@ -129,25 +144,23 @@ export default function Simulator({
     });
 
     setSemesters(updatedSemesters);
-  }, [completedCourses, semesters.length]); // Only runs when semester count or completedCourses changes
+  }, [completedCourses, semesters.length]);
 
   function isPastSemester(semesterName: string) {
-    // "Fall 2024"
     const [sem, yearStr] = semesterName.split(" ");
     const year = parseInt(yearStr, 10);
     const now = new Date();
     const currentYear = now.getFullYear();
-    const currentMonth = now.getMonth(); // 0 = Jan
+    const currentMonth = now.getMonth();
 
-    // Logic: Fall = Sept-Jan (show until Feb), Spring = Feb-May (show until June)
     if (year < currentYear) return true;
     if (year > currentYear) return false;
-    if (sem === "Fall" && currentMonth > 1) return true; // after Feb, Fall is in past
-    if (sem === "Spring" && currentMonth > 5) return true; // after June, Spring is in past
+    if (sem === "Fall" && currentMonth > 1) return true;
+    if (sem === "Spring" && currentMonth > 5) return true;
     return false;
   }
 
-  // ----------- DRAG-AND-DROP LOGIC ----------- //
+  // DRAG-AND-DROP LOGIC
   const handleDragStart = (course: Course) => setDraggedCourse(course);
 
   const handleDrop = (semesterId: string) => {
@@ -156,8 +169,7 @@ export default function Simulator({
     setSemesters((prev) =>
       prev.map((sem) =>
         sem.id === semesterId
-          ? // Only add if not already present
-            sem.courses.some((c) => c.code === draggedCourse.code)
+          ? sem.courses.some((c) => c.code === draggedCourse.code)
             ? sem
             : { ...sem, courses: [...sem.courses, draggedCourse] }
           : sem
@@ -182,7 +194,6 @@ export default function Simulator({
           : sem
       )
     );
-    // Only add back to pool if it is a "not-taken" (not a completed/in-progress class)
     const rc = remainingCourses.find((c) => c.code === courseCode);
     if (rc && rc.status === "not-taken") {
       setAvailableCourses((prev) =>
@@ -191,7 +202,7 @@ export default function Simulator({
     }
   };
 
-  // ----------- SAVING & LOADING PLANS ----------- //
+  // SAVING & LOADING PLANS
   useEffect(() => {
     if (!user) return;
     const loadSavedPlans = async () => {
@@ -216,7 +227,15 @@ export default function Simulator({
         semesters,
         createdAt: new Date().toISOString(),
       };
-      const updatedPlans = [...savedPlans, newPlan];
+
+      let updatedPlans;
+      if (selectedPlanToOverwrite !== null) {
+        updatedPlans = [...savedPlans];
+        updatedPlans[selectedPlanToOverwrite] = newPlan;
+      } else {
+        updatedPlans = [...savedPlans, newPlan];
+      }
+
       await setDoc(
         doc(db, "users", user.uid),
         { savedPlans: updatedPlans },
@@ -224,6 +243,7 @@ export default function Simulator({
       );
       setSavedPlans(updatedPlans);
       setPlanName("");
+      setSelectedPlanToOverwrite(null);
       setShowSaveModal(false);
     } catch (error) {
       console.error("Error saving plan:", error);
@@ -234,13 +254,12 @@ export default function Simulator({
     if (planIndex < 0 || planIndex >= savedPlans.length) return;
     const plan = savedPlans[planIndex];
     setSemesters(plan.semesters);
+    initialSemestersRef.current = JSON.parse(JSON.stringify(plan.semesters));
 
-    // Used codes
     const usedCodes = new Set<string>();
     plan.semesters.forEach((sem: Semester) =>
       sem.courses.forEach((course: Course) => usedCodes.add(course.code))
     );
-    // Available = not in use, not already completed
     setAvailableCourses(
       remainingCourses.filter(
         (c) =>
@@ -268,7 +287,6 @@ export default function Simulator({
   };
 
   const resetSimulator = () => {
-    // Only wipe "not-taken" courses, keep completed/in-progress in place
     setSemesters((prev) =>
       prev.map((sem) => ({
         ...sem,
@@ -560,7 +578,9 @@ export default function Simulator({
               className="w-full max-w-md bg-gray-900/90 backdrop-blur-sm p-6 rounded-xl border border-gray-800 relative"
             >
               <h4 className="text-lg font-medium mb-4 text-gray-200">
-                Save Current Plan
+                {selectedPlanToOverwrite !== null
+                  ? "Overwrite Plan"
+                  : "Save New Plan"}
               </h4>
               <input
                 type="text"
@@ -569,23 +589,58 @@ export default function Simulator({
                 placeholder="Enter a name for this plan"
                 className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-gray-200 mb-4"
               />
+
+              {savedPlans.length > 0 && (
+                <div className="mb-4">
+                  <label className="block text-sm text-gray-400 mb-2">
+                    Or overwrite existing plan:
+                  </label>
+                  <div className="max-h-40 overflow-y-auto border border-gray-700 rounded-lg">
+                    {savedPlans.map((plan, index) => (
+                      <div
+                        key={index}
+                        className={`p-3 border-b border-gray-700 cursor-pointer hover:bg-gray-800/50 ${
+                          selectedPlanToOverwrite === index
+                            ? "bg-blue-900/30"
+                            : ""
+                        }`}
+                        onClick={() => {
+                          setSelectedPlanToOverwrite(index);
+                          setPlanName(plan.name);
+                        }}
+                      >
+                        <div className="flex justify-between">
+                          <span>{plan.name}</span>
+                          <span className="text-xs text-gray-500">
+                            {new Date(plan.createdAt).toLocaleDateString()}
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               <div className="flex justify-end gap-2">
                 <button
-                  onClick={() => setShowSaveModal(false)}
+                  onClick={() => {
+                    setShowSaveModal(false);
+                    setSelectedPlanToOverwrite(null);
+                  }}
                   className="px-4 py-2 rounded-lg bg-gray-800 text-gray-300 hover:bg-gray-700 transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={savePlan}
-                  disabled={!planName.trim()}
+                  disabled={!planName.trim() || !hasChanges}
                   className={`px-4 py-2 rounded-lg ${
-                    planName.trim()
+                    planName.trim() && hasChanges
                       ? "bg-purple-900/50 text-purple-300 hover:bg-purple-800/50"
                       : "bg-gray-800 text-gray-500 cursor-not-allowed"
                   } transition-colors`}
                 >
-                  Save
+                  {selectedPlanToOverwrite !== null ? "Overwrite" : "Save"}
                 </button>
               </div>
             </motion.div>
@@ -607,21 +662,25 @@ export default function Simulator({
               initial={{ scale: 0.9, y: 20 }}
               animate={{ scale: 1, y: 0 }}
               onClick={(e) => e.stopPropagation()}
-              className="w-full max-w-md bg-gray-900/90 backdrop-blur-sm p-6 rounded-xl border border-gray-800 relative max-h-[80vh] overflow-y-auto"
+              className="w-full max-w-md bg-gray-900/90 backdrop-blur-sm p-6 rounded-xl border border-gray-800 relative"
+              style={{ maxHeight: "80vh", height: "500px" }}
             >
               <h4 className="text-lg font-medium mb-4 text-gray-200">
                 Your Saved Plans
               </h4>
               {savedPlans.length === 0 ? (
-                <p className="text-gray-400 text-center py-4">
-                  No saved plans found
-                </p>
+                <div className="h-full flex items-center justify-center">
+                  <p className="text-gray-400 py-4">No saved plans found</p>
+                </div>
               ) : (
-                <div className="space-y-3">
+                <div
+                  className="overflow-y-auto"
+                  style={{ maxHeight: "calc(80vh - 120px)" }}
+                >
                   {savedPlans.map((plan, index) => (
                     <div
                       key={plan.createdAt}
-                      className="p-3 bg-gray-800 rounded-lg border border-gray-700"
+                      className="p-3 bg-gray-800 rounded-lg border border-gray-700 mb-2"
                     >
                       <div className="flex justify-between items-center">
                         <h5 className="font-medium text-gray-300">
@@ -649,6 +708,14 @@ export default function Simulator({
                   ))}
                 </div>
               )}
+              <div className="mt-4 flex justify-end">
+                <button
+                  onClick={() => setShowPlansModal(false)}
+                  className="px-4 py-2 rounded-lg bg-gray-800 text-gray-300 hover:bg-gray-700 transition-colors"
+                >
+                  Close
+                </button>
+              </div>
             </motion.div>
           </motion.div>
         )}

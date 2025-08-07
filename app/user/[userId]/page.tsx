@@ -67,7 +67,8 @@ export default function UserProfilePage() {
           id: doc.id,
           ...doc.data(),
         })) as Course[];
-        setCourses(coursesData);
+        //filter out courses that are skipped
+        setCourses(coursesData.filter((course) => !course.skipped));
       } catch (err) {
         console.error("Error fetching user data:", err);
         setError("Failed to load user profile");

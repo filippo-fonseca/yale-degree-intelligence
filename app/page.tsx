@@ -59,7 +59,7 @@ import CourseModal from "@/components/MajorProgressView/CourseModal";
 import { getGPAColor } from "@/lib/utils/utils";
 import PublicFacingPage from "@/screens/PublicFacingPage";
 import FriendsTab from "@/components/FriendsTab/FriendsTab";
-import { Printer } from "lucide-react";
+import { MonitorCog, Printer } from "lucide-react";
 import Simulator from "@/components/Simulator/Simulator";
 
 interface UserProfile {
@@ -162,7 +162,7 @@ export default function Home() {
     },
     {
       id: "simulator",
-      icon: FiBook,
+      icon: MonitorCog,
       label: "Simulator",
       disabled: !hasData,
     },
@@ -174,7 +174,7 @@ export default function Home() {
     },
     {
       id: "cleoai",
-      icon: LogoIcon, // Using the coffee icon as a placeholder - you might want a different icon
+      icon: LogoIcon,
       label: "CleoAI",
       disabled: !hasData,
     },

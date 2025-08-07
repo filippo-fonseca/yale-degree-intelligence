@@ -174,7 +174,7 @@ export default function Home() {
     },
     {
       id: "cleoai",
-      icon: LogoIcon, // Using the coffee icon as a placeholder - you might want a different icon
+      icon: LogoIcon,
       label: "CleoAI",
       disabled: !hasData,
     },

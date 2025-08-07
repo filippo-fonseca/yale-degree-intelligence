@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { FiChevronDown, FiInfo, FiPlus } from "react-icons/fi";
+import { FiChevronDown, FiInfo, FiPlus, FiTrash2 } from "react-icons/fi";
 import { Course } from "@/lib/types";
 import { getCourseNameFromCode } from "@/lib/courseCatalog";
 import { useAuth } from "@/context/AuthContext";
@@ -495,35 +495,40 @@ export default function Simulator({
                     key={`${semester.id}-${course.code}`}
                     whileHover={{ scale: 1.03 }}
                     whileTap={{ scale: 0.97 }}
-                    onClick={() =>
-                      course.status === "not-taken"
-                        ? removeCourseFromSemester(semester.id, course.code)
-                        : undefined
-                    }
-                    className={`px-3 py-1.5 w-full rounded-full text-sm cursor-pointer select-none transition-all border
-                      ${
-                        course.status === "completed"
-                          ? "bg-emerald-900/20 text-emerald-300 border-emerald-700"
-                          : course.status === "in-progress"
-                          ? "bg-blue-900/20 text-blue-300 border-blue-700"
-                          : "bg-amber-900/20 text-amber-300 border-amber-700 hover:bg-red-900/20 hover:text-red-200"
-                      }`}
+                    className={`w-full flex items-center justify-between px-3 py-1.5 rounded-full text-sm cursor-pointer select-none transition-all border relative group
+        ${
+          course.status === "completed"
+            ? "bg-emerald-900/20 text-emerald-300 border-emerald-700"
+            : course.status === "in-progress"
+            ? "bg-blue-900/20 text-blue-300 border-blue-700"
+            : "bg-amber-900/20 text-pink-300 border-pink-700 hover:bg-pink-800/30"
+        }`}
                   >
-                    {course.code}
-                    <span className="text-xs opacity-70 ml-1">
-                      {truncate(
-                        getCourseNameFromCode(course.code) ?? "",
-                        course.status === "completed" ||
-                          course.status === "in-progress"
-                          ? 30
-                          : 15
+                    <div className="flex items-center justify-between w-full">
+                      <div>
+                        {course.code}
+                        <span className="text-xs opacity-70 ml-1">
+                          {truncate(
+                            getCourseNameFromCode(course.code) ?? "",
+                            course.status === "completed" ||
+                              course.status === "in-progress"
+                              ? 30
+                              : 20
+                          )}
+                        </span>
+                      </div>
+                      {course.status === "not-taken" && (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            removeCourseFromSemester(semester.id, course.code);
+                          }}
+                          className="ml-2 opacity-0 group-hover:opacity-100 transition-opacity text-red-300 hover:text-red-200"
+                        >
+                          <FiTrash2 className="h-3.5 w-3.5" />
+                        </button>
                       )}
-                    </span>
-                    {course.status === "not-taken" && (
-                      <span className="ml-2 text-xs text-gray-500">
-                        (remove)
-                      </span>
-                    )}
+                    </div>
                   </motion.div>
                 ))}
               </div>

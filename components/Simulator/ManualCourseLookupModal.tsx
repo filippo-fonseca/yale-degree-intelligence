@@ -5,6 +5,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import { FiSearch, FiX, FiPlus } from "react-icons/fi";
 import coursesData from "@/lib/courses.json";
 import { Course } from "@/lib/types";
+import { Panda } from "lucide-react";
+import Link from "next/link";
 
 interface ManualCourseLookupModalProps {
   isOpen: boolean;
@@ -109,8 +111,17 @@ export default function ManualCourseLookupModal({
             </div>
             <div className="flex-1 overflow-y-auto space-y-2">
               {searchTerm.length === 0 ? (
-                <div className="text-gray-500 text-center py-8">
-                  Search for any Yale course by code, name, or department.
+                <div className="flex flex-col items-center justify-center text-gray-500 text-center py-8 gap-4">
+                  <Panda size={32} />
+                  <div>
+                    Can't find a course?{" "}
+                    <Link
+                      href="mailto:filippo.fonseca@yale.edu,emir.ahmed@yale.edu"
+                      className="text-gray-400 hover:text-pink-400 transition"
+                    >
+                      Let us know.
+                    </Link>{" "}
+                  </div>
                 </div>
               ) : filteredCourses.length === 0 ? (
                 <div className="text-gray-500 text-center py-8">
@@ -132,9 +143,9 @@ export default function ManualCourseLookupModal({
                       <div className="text-sm text-gray-400">{c.name}</div>
                       <div className="text-xs text-gray-500">
                         {c.credits} credit{c.credits !== 1 ? "s" : ""}{" "}
-                        <span className="text-xs text-gray-600">
+                        <span className="text-xs text-gray-500">
                           {c.allCodes.length > 1 &&
-                            `(aliases: ${c.allCodes.slice(1).join(", ")})`}
+                            `(aka: ${c.allCodes.slice(1).join(", ")})`}
                         </span>
                       </div>
                     </div>

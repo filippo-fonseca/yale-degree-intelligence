@@ -453,7 +453,7 @@ export default function Simulator({
               hoveredSemester === semester.id &&
               draggedCourse &&
               !isPastSemester(semester.name)
-                ? "ring-2 ring-pink-400 ml-1 bg-gray-800/70"
+                ? "ring-2 ring-pink-400 scale-95 bg-gray-800/70"
                 : ""
             }
           `}

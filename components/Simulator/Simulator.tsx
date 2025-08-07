@@ -283,12 +283,13 @@ export default function Simulator({
     <div className="space-y-6 font-louize">
       {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-        <div>
-          <h3 className="text-xl font-medium bg-clip-text text-transparent bg-gradient-to-r from-blue-200 to-purple-200">
-            Degree Plan Simulator
-          </h3>
-          <p className="text-sm text-gray-400">
-            Drag and drop your remaining courses into future semesters below.
+        <div className="mb-6">
+          <h2 className="text-3xl font-medium bg-clip-text text-transparent bg-gradient-to-r from-blue-200 to-purple-200">
+            Need to visualize? No problem.
+          </h2>
+          <p>
+            Your interactive, tailor-made, drag-and-drop Yale degree simulator
+            is here.
           </p>
         </div>
         <div className="flex items-center gap-2 flex-wrap">
@@ -338,21 +339,32 @@ export default function Simulator({
             </h4>
             <ul className="text-sm text-gray-400 space-y-2 list-disc list-inside">
               <li>
-                Drag courses from the <b>Available Courses</b> into any
-                semester.
+                Use this simulator to plan out your remaining semesters and see
+                how your courses fit together.
               </li>
               <li>
-                You can drop <b>multiple</b> courses per semester.
+                We’ve made a pool of the remaining credits in your indicated
+                major for quick drag-and-drop access, but you can always look up
+                any course from any department and add it manually (especially
+                for fun classes/distribs or courses we've not managed to
+                automatically include from your major).
+              </li>
+              <li>Drag/add courses into any semester.</li>
+              <li>
+                NOTE: You can drop <b>multiple</b> courses per semester, of
+                course.
               </li>
               <li>
-                <b>Click</b> a course pill in a semester to remove it.
+                <b>Click</b> a course pill already added to a semester to remove
+                it.
               </li>
               <li>
                 Completed/in-progress courses are <b>pre-assigned</b> to
                 semesters and can’t be dragged from the pool.
               </li>
               <li>
-                <b>Save</b> or <b>load</b> your plans to try out what-ifs!
+                <b>Save</b> or <b>load</b> your plans to try out what-ifs and
+                come back to them later!
               </li>
             </ul>
           </motion.div>
@@ -361,7 +373,9 @@ export default function Simulator({
 
       {/* Available Courses Pool */}
       <div className="bg-gray-900/50 rounded-xl border border-gray-800 p-4">
-        <h4 className="font-medium text-gray-300 mb-3">Available Courses</h4>
+        <h4 className="font-medium text-gray-300 mb-3">
+          Pool of courses from your major
+        </h4>
         {availableCourses.length === 0 ? (
           <p className="text-sm text-gray-500 italic">
             All available courses have been scheduled. Remove one from a

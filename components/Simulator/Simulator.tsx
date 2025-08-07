@@ -2,7 +2,13 @@
 
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { FiChevronDown, FiInfo, FiPlus, FiTrash2 } from "react-icons/fi";
+import {
+  FiChevronDown,
+  FiChevronUp,
+  FiInfo,
+  FiPlus,
+  FiTrash2,
+} from "react-icons/fi";
 import { Course } from "@/lib/types";
 import { getCourseNameFromCode } from "@/lib/courseCatalog";
 import { useAuth } from "@/context/AuthContext";
@@ -56,6 +62,7 @@ export default function Simulator({
   >(null);
   const [hasChanges, setHasChanges] = useState(false);
   const initialSemestersRef = useRef<Semester[]>([]);
+  const [showPool, setShowPool] = useState(true);
 
   useEffect(() => {
     // 1. Build semester list
@@ -334,7 +341,7 @@ export default function Simulator({
             is here.
           </p>
         </div>
-        <div className="flex items-center gap-2 flex-wrap">
+        <div className="flex items-start gap-2 flex-wrap">
           <button
             onClick={() => setShowHelp((v) => !v)}
             className="px-3 py-1.5 text-xs rounded-lg bg-gray-800 text-gray-300 hover:bg-gray-700 flex items-center gap-1 transition-all"
@@ -419,52 +426,70 @@ export default function Simulator({
       </AnimatePresence>
 
       {/* Available Courses Pool */}
-      <div
-        className="
-          sticky top-0 z-30 
-          bg-pink-900/20 backdrop-blur 
-          border border-pink-800/50
-          rounded-xl p-4 mb-2
-          shadow-lg shadow-indigo-900/10
-        "
-        style={{
-          top: "0px",
-        }}
-      >
-        <div className="flex items-center justify-start gap-2 font-medium text-gray-300 mb-3">
-          <h4>Quick-add: Pool of courses from your major </h4>
-          <div className="relative group">
-            <Info className="h-4 w-4 text-gray-400 hover:text-gray-200 transition-colors cursor-pointer" />
-            <div className="absolute z-50 bottom-full mt-2 left-1/2 -translate-x-1/2 bg-gray-800 text-gray-300 text-xs px-3 py-1 rounded-md opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
-              May not include all. Add manually if not.
+      <div className="sticky top-0 z-30 mb-2" style={{ top: "0px" }}>
+        <div className="bg-pink-900/20 backdrop-blur rounded-xl border border-pink-800/50 shadow-lg shadow-indigo-900/10 overflow-hidden">
+          <button
+            onClick={() => setShowPool(!showPool)}
+            className={`flex items-center justify-between w-full p-4 ${
+              showPool ? "border-b border-pink-800/50" : ""
+            } bg-pink-900/20 text-gray-300 hover:bg-pink-900/30 transition-colors`}
+          >
+            <div className="flex items-center gap-2 font-medium">
+              <div>Quick-add: Pool of courses from your major</div>
+              <div className="relative group">
+                <Info className="h-4 w-4 text-gray-400 hover:text-gray-200 transition-colors cursor-pointer" />
+                <div className="absolute z-50 bottom-full mt-2 left-1/2 -translate-x-1/2 bg-gray-800 text-gray-300 text-xs px-3 py-1 rounded-md opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+                  May not include all. Add manually if not.
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
-        {availableCourses.length === 0 ? (
-          <p className="text-sm text-gray-500 italic">
-            All available courses have been scheduled. Remove one from a
-            semester to add it back.
-          </p>
-        ) : (
-          <div className="max-h-32 overflow-y-auto pr-1 flex flex-wrap gap-2">
-            {availableCourses.map((course) => (
+            {showPool ? (
+              <FiChevronUp className="w-4 h-4 text-gray-400" />
+            ) : (
+              <FiChevronDown className="w-4 h-4 text-gray-400" />
+            )}
+          </button>
+
+          <AnimatePresence>
+            {showPool && (
               <motion.div
-                key={course.code}
-                draggable
-                onDragStart={() => handleDragStart(course)}
-                whileHover={{ scale: 1.03 }}
-                whileTap={{ scale: 0.97 }}
-                className="px-3 py-1.5 rounded-full bg-pink-900/20 text-pink-300 border border-pink-700 text-sm cursor-grab active:cursor-grabbing select-none"
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.2 }}
+                className="p-4 pt-4"
               >
-                {course.code}
-                <span className="text-xs text-blue-200/70 ml-1">
-                  {truncate(getCourseNameFromCode(course.code) ?? "", 20)}
-                  {/* {getCourseNameFromCode(course.code) ?? "Unknown Course"} */}
-                </span>
+                {availableCourses.length === 0 ? (
+                  <p className="text-sm text-gray-500 italic">
+                    All available courses have been scheduled. Remove one from a
+                    semester to add it back.
+                  </p>
+                ) : (
+                  <div className="max-h-32 overflow-y-auto pr-1 flex flex-wrap gap-2">
+                    {availableCourses.map((course) => (
+                      <motion.div
+                        key={course.code}
+                        draggable
+                        onDragStart={() => handleDragStart(course)}
+                        whileHover={{ scale: 1.03 }}
+                        whileTap={{ scale: 0.97 }}
+                        className="px-3 py-1.5 rounded-full bg-pink-900/20 text-pink-300 border border-pink-700 text-sm cursor-grab active:cursor-grabbing select-none"
+                      >
+                        {course.code}
+                        <span className="text-xs text-blue-200/70 ml-1">
+                          {truncate(
+                            getCourseNameFromCode(course.code) ?? "",
+                            20
+                          )}
+                        </span>
+                      </motion.div>
+                    ))}
+                  </div>
+                )}
               </motion.div>
-            ))}
-          </div>
-        )}
+            )}
+          </AnimatePresence>
+        </div>
       </div>
 
       {/* Semesters Grid */}
@@ -526,7 +551,7 @@ export default function Simulator({
             `}
               >
                 <p className="text-sm text-gray-500 text-center opacity-70">
-                  Drag courses here
+                  Drag from pool or add others manually
                 </p>
               </div>
             ) : (

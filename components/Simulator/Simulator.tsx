@@ -57,9 +57,9 @@ export default function Simulator({
   const [hasChanges, setHasChanges] = useState(false);
   const initialSemestersRef = useRef<Semester[]>([]);
 
-  // Track initial state and changes
   useEffect(() => {
-    const semestersArr: Semester[] = [];
+    // 1. Build semester list
+    let semestersArr: Semester[] = [];
     let startYear = graduationYear - 4;
     let startSemester: "Fall" | "Spring" = "Fall";
 
@@ -94,7 +94,19 @@ export default function Simulator({
         semester = "Fall";
       }
     }
+
+    // 2. Assign completed/in-progress courses
+    completedCourses.forEach((course) => {
+      const idx = semestersArr.findIndex(
+        (s) => s.name === `${course.semester} ${course.year}`
+      );
+      if (idx !== -1) {
+        (semestersArr[idx].courses as Course[]).push(course);
+      }
+    });
+
     setSemesters(semestersArr);
+    // Set initial snapshot **after** assigning completed/in-progress courses!
     initialSemestersRef.current = JSON.parse(JSON.stringify(semestersArr));
 
     setAvailableCourses(
@@ -126,25 +138,25 @@ export default function Simulator({
   }, [semesters]);
 
   // Assign completed courses to semesters
-  useEffect(() => {
-    if (!semesters.length || !completedCourses.length) return;
+  // useEffect(() => {
+  //   if (!semesters.length || !completedCourses.length) return;
 
-    const updatedSemesters = semesters.map((sem) => ({
-      ...sem,
-      courses: [],
-    }));
+  //   const updatedSemesters = semesters.map((sem) => ({
+  //     ...sem,
+  //     courses: [],
+  //   }));
 
-    completedCourses.forEach((course) => {
-      const idx = updatedSemesters.findIndex(
-        (s) => s.name === `${course.semester} ${course.year}`
-      );
-      if (idx !== -1) {
-        (updatedSemesters[idx].courses as Course[]).push(course);
-      }
-    });
+  //   completedCourses.forEach((course) => {
+  //     const idx = updatedSemesters.findIndex(
+  //       (s) => s.name === `${course.semester} ${course.year}`
+  //     );
+  //     if (idx !== -1) {
+  //       (updatedSemesters[idx].courses as Course[]).push(course);
+  //     }
+  //   });
 
-    setSemesters(updatedSemesters);
-  }, [completedCourses, semesters.length]);
+  //   setSemesters(updatedSemesters);
+  // }, [completedCourses, semesters.length]);
 
   function isPastSemester(semesterName: string) {
     const [sem, yearStr] = semesterName.split(" ");
@@ -340,7 +352,12 @@ export default function Simulator({
               </button>
               <button
                 onClick={() => setShowSaveModal(true)}
-                className="px-3 py-1.5 text-xs rounded-lg bg-purple-900/30 text-purple-300 hover:bg-purple-800/30"
+                className={`px-3 py-1.5 text-xs rounded-lg ${
+                  hasChanges
+                    ? "bg-purple-900/30 text-purple-300 hover:bg-purple-800/30"
+                    : "bg-gray-800/50 text-gray-500 opacity-70 cursor-not-allowed"
+                } transition-all`}
+                disabled={!hasChanges}
               >
                 Save Plan
               </button>

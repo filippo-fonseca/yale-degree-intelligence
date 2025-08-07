@@ -14,7 +14,7 @@ interface ManualCourseLookupModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSelect: (course: Course) => void;
-  alreadyAddedCodes: string[]; // To prevent duplicates
+  // alreadyAddedCodes: string[]; // To prevent duplicates
   userId: string;
 }
 
@@ -22,7 +22,7 @@ export default function ManualCourseLookupModal({
   isOpen,
   onClose,
   onSelect,
-  alreadyAddedCodes,
+  // alreadyAddedCodes,
   userId,
 }: ManualCourseLookupModalProps) {
   const [searchTerm, setSearchTerm] = useState("");
@@ -44,13 +44,15 @@ export default function ManualCourseLookupModal({
     if (!searchTerm.trim()) return [];
     const lower = searchTerm.toLowerCase();
     return allCourseOptions
-      .filter(
-        (c) =>
-          (c.code + c.name + c.department).toLowerCase().includes(lower) &&
-          !alreadyAddedCodes.includes(c.code)
-      )
+      .filter((c) => {
+        const searchString =
+          (c?.code ?? "") + (c?.name ?? "") + (c?.department ?? "");
+        return searchString.toLowerCase().includes(lower);
+      })
+
       .slice(0, 15); // Limit results for perf
-  }, [searchTerm, allCourseOptions, alreadyAddedCodes]);
+    // }, [searchTerm, allCourseOptions, alreadyAddedCodes]);
+  }, [searchTerm, allCourseOptions]);
 
   return (
     <AnimatePresence>

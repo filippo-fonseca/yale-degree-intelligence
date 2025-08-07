@@ -582,16 +582,16 @@ export default function Simulator({
           );
           setLookupSemesterId(null);
         }}
-        alreadyAddedCodes={[
-          ...semesters.flatMap((s) =>
-            (s.courses ?? [])
-              .filter((c): c is Course => !!c && typeof c.code === "string")
-              .map((c) => c.code)
-          ),
-          ...availableCourses
-            .filter((c): c is Course => !!c && typeof c.code === "string")
-            .map((c) => c.code),
-        ]}
+        // alreadyAddedCodes={[
+        //   ...semesters.flatMap((s) =>
+        //     (s.courses ?? [])
+        //       .filter((c): c is Course => !!c && typeof c.code === "string")
+        //       .map((c) => c?.code)
+        //   ),
+        //   ...availableCourses
+        //     .filter((c): c is Course => !!c && typeof c.code === "string")
+        //     .map((c) => c?.code),
+        // ]}
         userId={user?.uid || ""}
       />
     </div>

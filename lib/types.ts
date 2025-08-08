@@ -22,3 +22,19 @@ export type Semester = {
   year: number;
   courses: Course[];
 };
+
+export type MessageRole = "system" | "user" | "assistant";
+export interface Message {
+  id: string;
+  role: MessageRole;
+  content: string;
+  timestamp: string; // ISO string for Firestore compatibility
+}
+
+export interface Conversation {
+  id: string;
+  title: string;
+  messages: Message[];
+  createdAt: string;
+  updatedAt: string;
+}

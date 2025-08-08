@@ -241,3 +241,7 @@ export const getFullMajorNameById = (majorId: string): string => {
   const major = majorRequirements[majorId];
   return major ? major.name : "Unknown Major";
 };
+
+export const getReqsForMajor = (majorId: string): MajorRequirement | null => {
+  return majorRequirements[majorId] || null;
+}

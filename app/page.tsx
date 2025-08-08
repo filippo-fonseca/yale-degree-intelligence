@@ -61,6 +61,7 @@ import PublicFacingPage from "@/screens/PublicFacingPage";
 import FriendsTab from "@/components/FriendsTab/FriendsTab";
 import { MonitorCog, Printer } from "lucide-react";
 import Simulator from "@/components/Simulator/Simulator";
+import CleoAITab from "@/components/CleoAITab/CleoAITab";
 
 interface UserProfile {
   majors: string[];
@@ -1330,7 +1331,6 @@ export default function Home() {
                   )}
                 </motion.div>
               )}
-
               {activeTab === "distributionals" && (
                 <motion.div
                   key="distributionals"
@@ -1413,6 +1413,14 @@ export default function Home() {
                   </div>
                 </motion.div>
               )}
+              {/* {activeTab === "cleoai" && (
+                <CleoAITab
+                  courses={courses}
+                  selectedMajor={selectedMajor}
+                  userProfile={userProfile}
+                  stats={calculateStats()}
+                />
+              )} */}
             </AnimatePresence>
           </motion.div>
         </div>

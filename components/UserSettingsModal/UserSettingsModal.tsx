@@ -37,11 +37,13 @@ export default function UserSettingsModal({
   const [duplicateMajorError, setDuplicateMajorError] = useState<string | null>(
     null
   );
+  const [isSaving, setIsSaving] = useState(false);
 
   // Bio edit flow
   const [isEditingBio, setIsEditingBio] = useState(false);
   const [tempBio, setTempBio] = useState("");
   const [isSavingBio, setIsSavingBio] = useState(false);
+  const [bioJustSaved, setBioJustSaved] = useState(false);
   const [bioCount, setBioCount] = useState(0);
 
   const modalRef = useRef<HTMLDivElement>(null);
@@ -57,18 +59,13 @@ export default function UserSettingsModal({
     }
   }, [userProfile]);
 
+  // Close modal when clicking outside (but ignore portaled dropdowns)
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as HTMLElement;
-
-      // ✅Ignore clicks inside the portaled MajorDropdown menu
       if (target.closest('[data-major-dropdown-portal="true"]')) return;
-
-      if (modalRef.current && !modalRef.current.contains(target)) {
-        onClose();
-      }
+      if (modalRef.current && !modalRef.current.contains(target)) onClose();
     };
-
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [onClose]);
@@ -96,7 +93,6 @@ export default function UserSettingsModal({
       JSON.stringify(userProfile.majors) !==
         JSON.stringify(localProfile.majors) ||
       userProfile.graduationYear !== localProfile.graduationYear
-      // bio intentionally excluded
     );
   };
 
@@ -143,15 +139,20 @@ export default function UserSettingsModal({
     setDuplicateMajorError(null);
   };
 
-  // Save bio immediately (does not affect hasChanges())
+  // Save bio immediately (does not affect hasChanges()); KEEP EDIT MODE
   const handleSaveBio = async () => {
     if (!localProfile) return;
     try {
       setIsSavingBio(true);
+      setBioJustSaved(false);
       const trimmed = tempBio.trim();
-      await onSave({ bio: trimmed }); // immediate persist
-      setLocalProfile({ ...localProfile, bio: trimmed }); // local sync
-      setIsEditingBio(false); // exit edit mode, KEEP MODAL OPEN
+      await onSave({ bio: trimmed });
+      setLocalProfile({ ...localProfile, bio: trimmed }); // sync local
+      // stay in edit mode; show "Saved" on button for a moment
+      setBioJustSaved(true);
+      setTimeout(() => setBioJustSaved(false), 1500);
+      // update counter to trimmed value
+      setBioCount(trimmed.length);
     } finally {
       setIsSavingBio(false);
     }
@@ -162,6 +163,7 @@ export default function UserSettingsModal({
     setTempBio(localProfile.bio || "");
     setBioCount((localProfile.bio || "").length);
     setIsEditingBio(false);
+    setBioJustSaved(false);
   };
 
   const handleSave = async () => {
@@ -170,26 +172,27 @@ export default function UserSettingsModal({
       return;
     }
     if (!localProfile) return;
-    await onSave({
-      majors: localProfile.majors,
-      graduationYear: localProfile.graduationYear,
-      // bio omitted; it saves via handleSaveBio
-    });
+    try {
+      setIsSaving(true);
+      await onSave({
+        majors: localProfile.majors,
+        graduationYear: localProfile.graduationYear,
+      });
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   if (!localProfile) return null;
 
   return (
-    // Make the OVERLAY scroll if needed; keep modal overflow visible so dropdowns aren't clipped
     <div className="fixed inset-0 bg-gray-950/90 backdrop-blur-sm z-50 flex items-center justify-center p-3 overflow-y-auto">
       <motion.div
         ref={modalRef}
         initial={{ opacity: 0, y: 15 }}
         animate={{ opacity: 1, y: 0 }}
-        // IMPORTANT: overflow-visible prevents clipping; internal content will scroll instead
         className="w-full max-w-md bg-gray-900 rounded-xl border border-gray-800 shadow-xl overflow-visible"
       >
-        {/* Scrollable content container */}
         <div className="p-5 max-h-[85vh] overflow-y-auto">
           {/* Header */}
           <div className="flex flex-col items-center mb-4">
@@ -252,6 +255,8 @@ export default function UserSettingsModal({
                     onChange={(e) => {
                       setTempBio(e.target.value);
                       setBioCount(e.target.value.length);
+                      // once user types again, clear the saved indicator
+                      if (bioJustSaved) setBioJustSaved(false);
                     }}
                     placeholder="Tell us about yourself..."
                     maxLength={BIO_MAX}
@@ -273,9 +278,17 @@ export default function UserSettingsModal({
                   <button
                     onClick={handleSaveBio}
                     disabled={isSavingBio}
-                    className="px-2.5 py-1 text-xs rounded bg-pink-600 hover:bg-pink-700 text-white disabled:opacity-70"
+                    className={`px-2.5 py-1 text-xs rounded text-white disabled:opacity-70 ${
+                      bioJustSaved
+                        ? "bg-emerald-600 hover:bg-emerald-700"
+                        : "bg-pink-600 hover:bg-pink-700"
+                    }`}
                   >
-                    {isSavingBio ? "Saving..." : "Set bio"}
+                    {isSavingBio
+                      ? "Saving..."
+                      : bioJustSaved
+                      ? "Saved"
+                      : "Set bio"}
                   </button>
                 </div>
               </div>
@@ -294,7 +307,6 @@ export default function UserSettingsModal({
             )}
             <div className="space-y-2">
               {localProfile.majors.map((major, index) => (
-                // Give each dropdown a high z-index + overflow-visible so menus paint above
                 <div key={index} className="relative z-[60] overflow-visible">
                   <div className="flex items-center gap-2">
                     <div className="flex-1">
@@ -398,14 +410,14 @@ export default function UserSettingsModal({
               </button>
               <button
                 onClick={handleSave}
-                disabled={!hasChanges() || hasDuplicateMajors()}
+                disabled={isSaving || !hasChanges() || hasDuplicateMajors()}
                 className={`px-3 py-1.5 rounded text-sm ${
-                  hasChanges() && !hasDuplicateMajors()
+                  hasChanges() && !hasDuplicateMajors() && !isSaving
                     ? "bg-pink-600 hover:bg-pink-700 text-white"
                     : "bg-gray-800 text-gray-500 cursor-not-allowed"
                 }`}
               >
-                Save
+                {isSaving ? "Saving..." : "Save"}
               </button>
             </div>
           </div>

@@ -59,7 +59,7 @@ import CourseModal from "@/components/MajorProgressView/CourseModal";
 import { getGPAColor } from "@/lib/utils/utils";
 import PublicFacingPage from "@/screens/PublicFacingPage";
 import FriendsTab from "@/components/FriendsTab/FriendsTab";
-import { MonitorCog, Printer } from "lucide-react";
+import { MessageCircleQuestionMark, MonitorCog, Printer } from "lucide-react";
 import Simulator from "@/components/Simulator/Simulator";
 import CleoAITab from "@/components/CleoAITab/CleoAITab";
 
@@ -179,13 +179,13 @@ export default function Home() {
       label: "CleoAI",
       disabled: !hasData,
     },
-    {
-      id: "distributionals",
-      icon: FaBuildingCircleCheck,
-      label: "Distributionals",
-      disabled: true, // Always disabled
-      tooltip: "Coming Soon", // Add tooltip text
-    },
+    // {
+    //   id: "distributionals",
+    //   icon: FaBuildingCircleCheck,
+    //   label: "Distributionals",
+    //   disabled: true, // Always disabled
+    //   tooltip: "Coming Soon", // Add tooltip text
+    // },
   ];
 
   // Fetch user profile on load
@@ -753,12 +753,10 @@ export default function Home() {
                       <FiChevronRight />
                     </motion.div>
                   )}
-
-                  {item.disabled && item.tooltip && (
-                    <div className="absolute left-full ml-2 px-2 py-1 bg-gray-800 text-gray-200 text-xs rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
-                      {item.tooltip}
-                    </div>
-                  )}
+                  {/* 
+                    Removed tooltip rendering because 'tooltip' property does not exist on navItems' type.
+                    If you want to support tooltips, add 'tooltip?: string' to the navItems type and ensure all items are updated accordingly.
+                  */}
                 </motion.button>
               ))}
             </nav>
@@ -782,6 +780,21 @@ export default function Home() {
                         <FaHeart className="text-emerald-400" size={14} />
                       </div>
                       <span className="text-sm font-medium">Our mission</span>
+                    </Link>
+                    <Link
+                      href="/mission"
+                      target="_blank"
+                      className="w-full flex items-center space-x-2.5 p-2 rounded-lg hover:bg-gray-800/40 transition-all duration-200 text-gray-300 hover:text-white"
+                    >
+                      <div className="p-1.5 rounded-lg bg-purple-900/30 border border-purple-800/50 flex items-center justify-center">
+                        <MessageCircleQuestionMark
+                          className="text-purple-400"
+                          size={14}
+                        />
+                      </div>
+                      <span className="text-sm font-medium">
+                        Feedback & errors
+                      </span>
                     </Link>
                     <Link
                       href="/terms"
@@ -1331,7 +1344,7 @@ export default function Home() {
                   )}
                 </motion.div>
               )}
-              {activeTab === "distributionals" && (
+              {/* {activeTab === "distributionals" && (
                 <motion.div
                   key="distributionals"
                   initial={{ opacity: 0 }}
@@ -1341,7 +1354,7 @@ export default function Home() {
                 >
                   <DistributionalsView courses={courses} />
                 </motion.div>
-              )}
+              )} */}
               {activeTab === "friends" && (
                 <motion.div
                   key="friends"

@@ -160,6 +160,26 @@ export default function FriendsTab() {
   const [userProfilesById, setUserProfilesById] = useState<
     Record<string, UserProfile>
   >({});
+  // add friends modal:
+  const modalRef = useRef<HTMLDivElement>(null);
+
+  // 2️Handle clicks outside
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (
+        modalRef.current &&
+        !modalRef.current.contains(event.target as Node)
+      ) {
+        setSearchTerm("");
+        setShowSearchModal(false);
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   // Hydration flags to prevent flashing zeros/empties
   const [hydrated, setHydrated] = useState({
@@ -580,6 +600,7 @@ export default function FriendsTab() {
                   initial={{ scale: 0.95, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
                   exit={{ scale: 0.95, opacity: 0 }}
+                  ref={modalRef}
                 >
                   <div className="flex justify-between items-center mb-4">
                     <h3 className="text-xl font-semibold text-white">
@@ -603,28 +624,13 @@ export default function FriendsTab() {
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
                       className="bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 w-full text-gray-200 focus:outline-none focus:ring-3 focus:ring-pink-500 focus:border-pink-500"
-                      placeholder="Find students by name, email, major..."
+                      placeholder="Your best friend, or perhaps that upperclassman that gives you amazing advice..."
                     />
                   </div>
 
                   <div className="space-y-2 max-h-[50vh] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-600">
                     {searchTerm.length === 0 ? (
-                      <div className="flex flex-col items-center justify-center gap-4 text-gray-400 text-center py-10">
-                        <Panda size={32} />
-                        <div>
-                          Can't find your friends? <CopyButton />
-                          <br />
-                          and{" "}
-                          <span className="text-white">
-                            text it to them!
-                          </span>{" "}
-                          You'll be helping them (and us)
-                          <br />
-                          out with our mission of making academic planning{" "}
-                          <br />
-                          easier and more accessible for all Yale students.
-                        </div>
-                      </div>
+                      <NoFriendsResult />
                     ) : filteredUsers.length > 0 ? (
                       filteredUsers.slice(0, 10).map((u) => (
                         <motion.div
@@ -659,9 +665,7 @@ export default function FriendsTab() {
                         </motion.div>
                       ))
                     ) : (
-                      <div className="text-gray-500 text-sm text-center py-10">
-                        No matching users found!
-                      </div>
+                      <NoFriendsResult />
                     )}
                   </div>
                 </motion.div>
@@ -728,6 +732,23 @@ export default function FriendsTab() {
       )}
     </div>
   );
+
+  function NoFriendsResult() {
+    return (
+      <div className="flex flex-col items-center justify-center gap-4 text-gray-400 text-center py-10">
+        <Panda size={32} />
+        <div>
+          Can't find your friends? <CopyButton />
+          <br />
+          and <span className="text-white">text it to them!</span> You'll be
+          helping them (and us)
+          <br />
+          out with our mission of making academic planning <br />
+          easier and more accessible for all Yale students.
+        </div>
+      </div>
+    );
+  }
 
   function FriendActionsDropdown({
     friend,

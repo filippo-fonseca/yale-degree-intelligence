@@ -226,8 +226,9 @@ export default function MajorSelectionFlow({
               It's time to select your major(s).
             </h2>
             <p className="text-gray-400 text-center text-sm">
-              You can select up to 2 majors (min 1, ofc). This can be changed
-              later in settings.
+              You can select up to 2 majors (min 1, ofc). Don't worry if you
+              don't even have a major rn - this can be changed later in
+              settings. Pick the one(s) you are most interested in right now.
             </p>
             <InfoCard className="text-sm">
               Our goal is to support all majors & concentrations. If yours isn't

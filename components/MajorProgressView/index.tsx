@@ -23,6 +23,170 @@ import { setDoc, doc } from "firebase/firestore";
 import { getCourseInfo } from "@/lib/courseCatalog";
 import { InfoCard } from "../ui/InfoCard";
 
+/* =========================
+   Requirement Modal (inline)
+   ========================= */
+type ReqOption = {
+  code: string;
+  name?: string;
+  credits?: number;
+  completed?: boolean;
+  inProgress?: boolean;
+  skipped?: boolean;
+  manual?: boolean;
+};
+
+type Requirement = {
+  id?: string;
+  name: string;
+  description?: string;
+  required?: number; // credits or count, depending on schema
+  options: ReqOption[];
+};
+
+function RequirementModal({
+  isOpen,
+  requirement,
+  onClose,
+  onOpenCourse,
+  onUnskip,
+  onRemoveManual,
+  onAddManual,
+}: {
+  isOpen: boolean;
+  requirement: Requirement | null;
+  onClose: () => void;
+  onOpenCourse: (opt: ReqOption, reqName: string) => void;
+  onUnskip: (code: string) => void;
+  onRemoveManual: (code: string, reqName: string) => void;
+  onAddManual: (reqName: string) => void;
+}) {
+  return (
+    <AnimatePresence>
+      {isOpen && requirement && (
+        <motion.div
+          className="fixed inset-0 z-[100] flex items-center justify-center"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          onClick={onClose}
+        >
+          <div className="absolute inset-0 bg-black/60" />
+          <motion.div
+            role="dialog"
+            aria-modal="true"
+            className="relative z-[101] w-[min(1000px,92vw)] max-h-[85vh] overflow-y-auto rounded-2xl border border-gray-800 bg-gray-900/95 backdrop-blur-md p-6"
+            initial={{ scale: 0.95, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0.95, opacity: 0 }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <h3 className="text-xl font-semibold text-gray-100">
+                  {requirement.name}
+                </h3>
+                {requirement.description && (
+                  <p className="mt-1 text-sm text-gray-300/80">
+                    {requirement.description}
+                  </p>
+                )}
+              </div>
+              <button
+                onClick={onClose}
+                className="rounded-lg p-2 hover:bg-white/10 text-gray-300"
+                aria-label="Close"
+              >
+                <FiX size={18} />
+              </button>
+            </div>
+
+            <div className="mt-4 space-y-4">
+              {typeof requirement.required !== "undefined" && (
+                <div className="text-sm text-gray-400">
+                  Required:{" "}
+                  <span className="text-gray-200">{requirement.required}</span>
+                </div>
+              )}
+
+              <div className="flex flex-wrap gap-2">
+                {requirement.options.map((opt) => {
+                  const base =
+                    "relative px-3 py-1.5 rounded-full text-sm flex items-center gap-1 border transition-all";
+                  const style = opt.manual
+                    ? "bg-purple-900/20 text-purple-300 border-purple-700"
+                    : opt.completed
+                    ? "bg-emerald-900/20 text-emerald-300 border-emerald-700"
+                    : opt.inProgress
+                    ? "bg-blue-900/20 text-blue-300 border-blue-700"
+                    : opt.skipped
+                    ? "bg-gray-900/20 text-gray-300 border-dashed border-gray-600"
+                    : "bg-amber-900/20 text-amber-300 border-amber-700";
+
+                  return (
+                    <button
+                      key={opt.code}
+                      className={`${base} ${style}`}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (!opt.completed && !opt.skipped) {
+                          onOpenCourse(opt, requirement.name);
+                        }
+                      }}
+                      title={opt.name || opt.code}
+                    >
+                      <span className="font-medium">{opt.code}</span>
+                      <span className="text-[0.7rem] opacity-80">
+                        ({opt.credits ?? 0}cr
+                        {opt.manual
+                          ? ", manual"
+                          : opt.skipped
+                          ? ", skipped"
+                          : opt.inProgress
+                          ? ", in progress"
+                          : opt.completed
+                          ? ", complete"
+                          : ""}
+                        )
+                      </span>
+                      {(opt.skipped || opt.manual) && (
+                        <button
+                          className="ml-1 text-[0.7rem] opacity-80 hover:opacity-100"
+                          onClick={(ev) => {
+                            ev.stopPropagation();
+                            if (opt.skipped) onUnskip(opt.code);
+                            if (opt.manual)
+                              onRemoveManual(opt.code, requirement.name);
+                          }}
+                          title={opt.manual ? "Remove manual course" : "Unskip"}
+                        >
+                          <FiX size={12} />
+                        </button>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+
+              <div className="pt-2">
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onAddManual(requirement.name);
+                  }}
+                  className="text-xs rounded-full bg-gray-800 text-gray-300 px-3 py-1 hover:bg-gray-700"
+                >
+                  Fulfill manually
+                </button>
+              </div>
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+}
+
 // Status color mapping for course pills (kept in case other parts use it)
 function getCourseStatusColor({
   completed,
@@ -83,6 +247,7 @@ const SectionGrid = React.memo(function SectionGrid({
   onUnskip,
   onRemoveManual,
   onAddManual,
+  onOpenRequirement,
 }: {
   title: string;
   subtitleClass: string;
@@ -96,6 +261,7 @@ const SectionGrid = React.memo(function SectionGrid({
   onUnskip: (code: string) => void;
   onRemoveManual: (code: string, reqName: string) => void;
   onAddManual: (reqName: string) => void;
+  onOpenRequirement: (req: any) => void;
 }) {
   return (
     <div className="space-y-3">
@@ -114,13 +280,20 @@ const SectionGrid = React.memo(function SectionGrid({
                 key={reqKey}
                 layout
                 initial={false}
-                className={`p-4 rounded-xl bg-gray-900/50 backdrop-blur-sm border transition-all relative ${
+                className={`p-4 hover:scale-[0.97] rounded-xl bg-gray-900/50 backdrop-blur-sm border transition-all relative cursor-pointer ${
                   reqInProgress > 0
                     ? "border-blue-800/40 hover:border-blue-500/40"
                     : notStarted
                     ? "border-red-800/30 hover:border-red-500/30"
                     : "border-amber-800/30 hover:border-amber-500/30"
                 }`}
+                onClick={() => onOpenRequirement(req)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ")
+                    onOpenRequirement(req);
+                }}
+                role="button"
+                tabIndex={0}
               >
                 <div className="flex justify-between items-start mb-2">
                   <h5
@@ -178,7 +351,8 @@ const SectionGrid = React.memo(function SectionGrid({
                           ? "bg-red-900/20 text-red-300 border border-red-700"
                           : "bg-amber-900/20 text-amber-300 border border-amber-700"
                       }`}
-                      onClick={() => {
+                      onClick={(e) => {
+                        e.stopPropagation(); // don't open the requirement modal
                         if (!opt.completed && !opt.skipped) {
                           onOpenCourse(opt, req.name);
                         }
@@ -221,7 +395,10 @@ const SectionGrid = React.memo(function SectionGrid({
 
                   {/* Add manual course button */}
                   <button
-                    onClick={() => onAddManual(req.name)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onAddManual(req.name);
+                    }}
                     className={`px-2 py-0.5 rounded-full text-xs flex items-center gap-1 ${
                       reqInProgress > 0
                         ? "bg-blue-900/20 text-blue-300 hover:bg-blue-800/30"
@@ -279,6 +456,12 @@ export default function MajorProgressView({
       skipped: boolean;
     } | null;
   }>({ isOpen: false, course: null });
+
+  // requirement modal state
+  const [reqModal, setReqModal] = useState<{
+    isOpen: boolean;
+    req: Requirement | null;
+  }>({ isOpen: false, req: null });
 
   const handleSkip = async (courseCode: string, courseName: string) => {
     if (!user) return;
@@ -698,11 +881,38 @@ export default function MajorProgressView({
                           key={reqKey}
                           layout
                           initial={false}
-                          className={`p-4 rounded-xl border ${
+                          className={`p-4 hover:scale-[0.97] transition-all rounded-xl border cursor-pointer ${
                             isFullyCompleted
                               ? "bg-emerald-900/10 border-emerald-800/30"
                               : "bg-amber-900/10 border-amber-800/30"
                           }`}
+                          onClick={() =>
+                            setReqModal({
+                              isOpen: true,
+                              req: {
+                                id: req.id,
+                                name: req.name,
+                                description: req.description,
+                                required: req.required,
+                                options: req.options,
+                              },
+                            })
+                          }
+                          role="button"
+                          tabIndex={0}
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter" || e.key === " ")
+                              setReqModal({
+                                isOpen: true,
+                                req: {
+                                  id: req.id,
+                                  name: req.name,
+                                  description: req.description,
+                                  required: req.required,
+                                  options: req.options,
+                                },
+                              });
+                          }}
                         >
                           <div className="flex justify-between items-start mb-2">
                             <h5 className="font-medium text-emerald-300">
@@ -732,9 +942,10 @@ export default function MajorProgressView({
                                     opt.manual
                                       ? "bg-purple-900/20 text-purple-300 border border-purple-700"
                                       : opt.completed
-                                      ? "bg-emerald-900/20 text-emerald-300 border border-emerald-700"
+                                      ? "bg-emerald-900/20 text-emerald-300 border-emerald-700"
                                       : "bg-gray-900/20 text-gray-300 border border-dashed border-gray-600"
                                   }`}
+                                  onClick={(e) => e.stopPropagation()} // don't open modal when clicking the pill
                                 >
                                   {opt.code}
                                   <span className="ml-1 text-[0.65rem]">
@@ -818,6 +1029,18 @@ export default function MajorProgressView({
                       onUnskip={handleUnskip}
                       onRemoveManual={handleRemoveManualCourse}
                       onAddManual={(reqName) => handleAddManual(reqName)}
+                      onOpenRequirement={(req) =>
+                        setReqModal({
+                          isOpen: true,
+                          req: {
+                            id: req.id,
+                            name: req.name,
+                            description: req.description,
+                            required: req.required,
+                            options: req.options,
+                          },
+                        })
+                      }
                     />
 
                     {/* Subsection: Not started / No current progress */}
@@ -829,6 +1052,18 @@ export default function MajorProgressView({
                       onUnskip={handleUnskip}
                       onRemoveManual={handleRemoveManualCourse}
                       onAddManual={(reqName) => handleAddManual(reqName)}
+                      onOpenRequirement={(req) =>
+                        setReqModal({
+                          isOpen: true,
+                          req: {
+                            id: req.id,
+                            name: req.name,
+                            description: req.description,
+                            required: req.required,
+                            options: req.options,
+                          },
+                        })
+                      }
                     />
                   </div>
                 </motion.div>
@@ -845,6 +1080,17 @@ export default function MajorProgressView({
         onClose={() => setModalOpen({ isOpen: false, course: null })}
         onSkip={handleSkip}
         onRefresh={onRequirementChange}
+      />
+
+      {/* Requirement Modal */}
+      <RequirementModal
+        isOpen={reqModal.isOpen}
+        requirement={reqModal.req}
+        onClose={() => setReqModal({ isOpen: false, req: null })}
+        onOpenCourse={handleOpenCourse}
+        onUnskip={handleUnskip}
+        onRemoveManual={handleRemoveManualCourse}
+        onAddManual={(reqName) => handleAddManual(reqName)}
       />
 
       <AddManualCourseModal

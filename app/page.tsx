@@ -1099,8 +1099,22 @@ export default function Home() {
                         <p className="mt-3 text-gray-400">
                           You’re brand new here (Class of 2029)—perfect. Start
                           by adding your unofficial transcript{" "}
-                          <em>even if it has no grades yet</em>. We fully
-                          support parsing{" "}
+                          <em>even if it has no grades yet</em> or by testing
+                          the{" "}
+                          <span
+                            className="font-semibold text-pink-300 underline hover:font-bold hover:text-pink-500 transition-all cursor-pointer"
+                            onClick={() => setActiveTab("simulator")}
+                          >
+                            Simulator
+                          </span>{" "}
+                          or{" "}
+                          <span
+                            className="font-semibold text-pink-300 underline hover:font-bold hover:text-pink-500 transition-all cursor-pointer"
+                            onClick={() => setActiveTab("major")}
+                          >
+                            My major
+                          </span>{" "}
+                          features. We fully support parsing{" "}
                           <span className="font-semibold text-gray-300">
                             in-progress
                           </span>{" "}

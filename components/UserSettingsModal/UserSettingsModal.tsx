@@ -287,8 +287,8 @@ export default function UserSettingsModal({
                     {isSavingBio
                       ? "Saving..."
                       : bioJustSaved
-                      ? "Saved"
-                      : "Set bio"}
+                        ? "Saved"
+                        : "Set bio"}
                   </button>
                 </div>
               </div>
@@ -355,7 +355,7 @@ export default function UserSettingsModal({
               type="number"
               inputMode="numeric"
               min={new Date().getFullYear()}
-              max={new Date().getFullYear() + 6}
+              max={new Date().getFullYear() + 4}
               value={localProfile.graduationYear}
               onChange={(e) =>
                 setLocalProfile({
@@ -375,7 +375,7 @@ export default function UserSettingsModal({
               href={`/user/${user.uid}`}
               className="cursor-pointer text-xs px-3 py-1.5 rounded border border-gray-800 hover:border-pink-500 hover:bg-gray-900/50 text-gray-300"
             >
-              View profile
+              View your public profile
             </Link>
             <div className="relative group">
               <Info className="h-3.5 w-3.5 text-gray-400 hover:text-gray-200 transition-colors cursor-pointer" />

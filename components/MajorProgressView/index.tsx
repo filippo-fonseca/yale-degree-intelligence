@@ -593,6 +593,7 @@ export default function MajorProgressView({
 
   const handleAddManual = useCallback(
     (reqName: string) => {
+      setReqModal({ isOpen: false, req: null });
       setManualCourseModal({
         isOpen: true,
         requirement: `${selectedMajor}|${reqName}`,

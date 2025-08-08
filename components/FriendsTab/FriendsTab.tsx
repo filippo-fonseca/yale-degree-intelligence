@@ -6,14 +6,11 @@ import {
   collection,
   query,
   where,
-  getDocs,
   addDoc,
   setDoc,
   doc,
   deleteDoc,
-  orderBy,
   serverTimestamp,
-  getDoc,
   onSnapshot,
 } from "firebase/firestore";
 import { db } from "@/config/firebase";
@@ -31,7 +28,6 @@ import {
 } from "react-icons/fi";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
-import CompoundLogo from "@/components/ui/CompoundLogo";
 import { toast } from "react-hot-toast";
 import { Panda } from "lucide-react";
 import { YearBadge } from "../ui/YearBadge";
@@ -120,6 +116,39 @@ function CopyButton() {
   );
 }
 
+/** ---------- Skeletons ---------- **/
+const Skeleton = ({ className = "" }: { className?: string }) => (
+  <div
+    className={`animate-pulse bg-gray-800/60 border border-gray-700 rounded-lg ${className}`}
+  />
+);
+
+const FriendRowSkeleton = () => (
+  <div className="flex items-center justify-between p-4 rounded-xl bg-gray-900/50 border border-gray-800">
+    <div className="flex gap-4">
+      <Skeleton className="h-10 w-10 rounded-full" />
+      <div className="space-y-2">
+        <Skeleton className="h-4 w-40" />
+        <Skeleton className="h-3 w-28" />
+      </div>
+    </div>
+    <Skeleton className="h-8 w-32" />
+  </div>
+);
+
+const RequestRowSkeleton = () => (
+  <div className="flex items-center justify-between p-3 rounded-xl bg-gray-900/50 border border-gray-800">
+    <div className="flex items-center gap-2">
+      <Skeleton className="h-7 w-7 rounded-full" />
+      <Skeleton className="h-4 w-28" />
+    </div>
+    <div className="flex gap-1">
+      <Skeleton className="h-7 w-7 rounded-md" />
+      <Skeleton className="h-7 w-7 rounded-md" />
+    </div>
+  </div>
+);
+
 export default function FriendsTab() {
   const { user } = useAuth();
   const [searchTerm, setSearchTerm] = useState("");
@@ -131,8 +160,16 @@ export default function FriendsTab() {
   const [userProfilesById, setUserProfilesById] = useState<
     Record<string, UserProfile>
   >({});
-  const [loading, setLoading] = useState(true);
-  const [showSearchModal, setShowSearchModal] = useState(false);
+
+  // Hydration flags to prevent flashing zeros/empties
+  const [hydrated, setHydrated] = useState({
+    users: false,
+    friends: false,
+    sent: false,
+    incoming: false,
+  });
+  const ready =
+    hydrated.users && hydrated.friends && hydrated.sent && hydrated.incoming;
 
   // Set up real-time listeners
   useEffect(() => {
@@ -142,14 +179,15 @@ export default function FriendsTab() {
     const usersUnsub = onSnapshot(collection(db, "users"), (snapshot) => {
       const users: UserProfile[] = [];
       const byId: Record<string, UserProfile> = {};
-      snapshot.forEach((doc) => {
-        const data = doc.data() as UserProfile;
-        const p = { ...data, uid: doc.id };
+      snapshot.forEach((d) => {
+        const data = d.data() as UserProfile;
+        const p = { ...data, uid: d.id };
         users.push(p);
-        byId[doc.id] = p;
+        byId[d.id] = p;
       });
       setAllUsers(users);
       setUserProfilesById(byId);
+      setHydrated((h) => ({ ...h, users: true }));
     });
 
     // 2. Friends listener
@@ -160,10 +198,11 @@ export default function FriendsTab() {
       ),
       (snapshot) => {
         const frs: Friend[] = [];
-        snapshot.forEach((doc) => {
-          frs.push({ ...(doc.data() as Friend), id: doc.id });
+        snapshot.forEach((d) => {
+          frs.push({ ...(d.data() as Friend), id: d.id });
         });
         setFriends(frs);
+        setHydrated((h) => ({ ...h, friends: true }));
       }
     );
 
@@ -176,13 +215,14 @@ export default function FriendsTab() {
       ),
       (snapshot) => {
         const sent: FriendRequest[] = [];
-        snapshot.forEach((doc) => {
+        snapshot.forEach((d) => {
           sent.push({
-            id: doc.id,
-            ...(doc.data() as Omit<FriendRequest, "id">),
+            id: d.id,
+            ...(d.data() as Omit<FriendRequest, "id">),
           });
         });
         setSentRequests(sent);
+        setHydrated((h) => ({ ...h, sent: true }));
       }
     );
 
@@ -195,17 +235,16 @@ export default function FriendsTab() {
       ),
       (snapshot) => {
         const inc: FriendRequest[] = [];
-        snapshot.forEach((doc) => {
+        snapshot.forEach((d) => {
           inc.push({
-            id: doc.id,
-            ...(doc.data() as Omit<FriendRequest, "id">),
+            id: d.id,
+            ...(d.data() as Omit<FriendRequest, "id">),
           });
         });
         setIncomingRequests(inc);
+        setHydrated((h) => ({ ...h, incoming: true }));
       }
     );
-
-    setLoading(false);
 
     return () => {
       usersUnsub();
@@ -220,8 +259,8 @@ export default function FriendsTab() {
     const profiles = friends
       .map((fr) => fr.users.find((id) => id !== user.uid))
       .filter(Boolean)
-      .map((id) => userProfilesById[id!])
-      .filter(Boolean);
+      .map((id) => userProfilesById[id as string])
+      .filter(Boolean) as UserProfile[];
 
     setFriendProfiles(profiles);
   }, [friends, userProfilesById, user]);
@@ -230,7 +269,7 @@ export default function FriendsTab() {
   const sendFriendRequest = async (toId: string) => {
     if (!user) return;
 
-    //close modal
+    // close modal + clear search
     setShowSearchModal(false);
     setSearchTerm("");
 
@@ -256,13 +295,12 @@ export default function FriendsTab() {
     }
 
     try {
-      const docRef = await addDoc(collection(db, "friend-requests"), {
+      await addDoc(collection(db, "friend-requests"), {
         from: user.uid,
         to: toId,
         status: "pending",
         timestamp: serverTimestamp(),
       });
-
       toast.success("Friend request sent!");
     } catch (error) {
       console.error("Error sending friend request:", error);
@@ -273,13 +311,11 @@ export default function FriendsTab() {
   // Accept Friend Request
   const acceptFriendRequest = async (req: FriendRequest) => {
     try {
-      // 1. Mark request as accepted
       await setDoc(doc(db, "friend-requests", req.id), {
         ...req,
         status: "accepted",
       });
 
-      // 2. Create friend record
       const users = [req.from, req.to].sort();
       await addDoc(collection(db, "friends"), {
         users,
@@ -329,6 +365,8 @@ export default function FriendsTab() {
     }
   };
 
+  const [showSearchModal, setShowSearchModal] = useState(false);
+
   // UI Filtering
   const filteredUsers = allUsers.filter(
     (u) =>
@@ -341,10 +379,22 @@ export default function FriendsTab() {
         u.majors.join(" ").toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
+  if (!user) {
+    return (
+      <div className="w-full max-w-3xl mx-auto font-louize">
+        <h2 className="text-3xl font-medium bg-clip-text text-transparent bg-gradient-to-r from-blue-200 to-purple-200">
+          Friends & Connections
+        </h2>
+        <div className="mt-6 text-gray-300">
+          Please sign in to view friends.
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="w-full max-w-3xl mx-auto font-louize">
       <div className="flex items-center justify-between w-full mb-4">
-        {" "}
         <h2 className="text-3xl font-medium bg-clip-text text-transparent bg-gradient-to-r from-blue-200 to-purple-200">
           Friends & Connections
         </h2>
@@ -355,6 +405,7 @@ export default function FriendsTab() {
           <FiUserPlus /> Add a friend
         </button>
       </div>
+
       <InfoCard className="mb-8" autoHide previewText="Why add friends?">
         The friends feature lets you see what classes your friends (or other
         Yale students you know) have taken.
@@ -366,7 +417,7 @@ export default function FriendsTab() {
         </i>{" "}
         when used to connect with people in your <strong>major</strong>,
         especially older students or a student in your year who has perhaps
-        planned better (😅), , for example, who have already walked the path
+        planned better (😅), for example, who have already walked the path
         you're striving to follow.
         <br />
         <br />
@@ -381,20 +432,42 @@ export default function FriendsTab() {
         our database.
       </InfoCard>
 
-      {/* Loading state */}
-      {loading && (
-        <div className="flex justify-center items-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-pink-500"></div>
+      {/* ---------- Loading skeletons (no more "0" flash) ---------- */}
+      {!ready && (
+        <div className="space-y-8">
+          <div className="flex flex-col md:flex-row gap-6">
+            <div className="md:w-1/3">
+              <Skeleton className="h-6 w-48 mb-2" />
+              <div className="space-y-2">
+                <RequestRowSkeleton />
+                <RequestRowSkeleton />
+              </div>
+            </div>
+            <div className="md:w-1/3">
+              <Skeleton className="h-6 w-40 mb-2" />
+              <div className="space-y-2">
+                <RequestRowSkeleton />
+                <RequestRowSkeleton />
+              </div>
+            </div>
+          </div>
+
+          <section>
+            <Skeleton className="h-6 w-56 mb-4" />
+            <div className="space-y-3">
+              <FriendRowSkeleton />
+              <FriendRowSkeleton />
+              <FriendRowSkeleton />
+            </div>
+          </section>
         </div>
       )}
 
-      {/* Main content when not loading */}
-      {!loading && (
+      {/* ---------- Main content once hydrated ---------- */}
+      {ready && (
         <>
-          {/* Top section with requests and add friend button */}
+          {/* Top section with requests */}
           <div className="flex flex-col md:flex-row gap-6 mb-8">
-            {/* Add Friend Button */}
-
             {/* Incoming Requests */}
             <div className="md:w-1/3">
               <h3 className="text-lg font-medium text-pink-200 mb-2 flex items-center gap-2">
@@ -534,7 +607,7 @@ export default function FriendsTab() {
                     />
                   </div>
 
-                  <div className="space-y-2 max-h-[50vh]overflow-y-auto scrollbar-thin scrollbar-thumb-gray-600">
+                  <div className="space-y-2 max-h-[50vh] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-600">
                     {searchTerm.length === 0 ? (
                       <div className="flex flex-col items-center justify-center gap-4 text-gray-400 text-center py-10">
                         <Panda size={32} />

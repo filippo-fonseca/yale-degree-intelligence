@@ -63,7 +63,7 @@ function getCourseStatusColor({
     return "bg-emerald-900/20 text-emerald-300 border border-emerald-700";
   if (inProgress || grade === "In Progress")
     return "bg-blue-900/20 text-blue-300 border border-blue-700";
-  return "bg-amber-900/20 text-amber-300 border border-amber-700";
+  return "bg-red-900/20 text-red-300 border border-red-700";
 }
 
 function MajorStatCard({
@@ -143,7 +143,7 @@ const SectionGrid = React.memo(function SectionGrid({
                     ? "border-blue-800/40 hover:border-blue-500/40"
                     : notStarted
                     ? "border-red-800/30 hover:border-red-500/30"
-                    : "border-amber-800/30 hover:border-amber-500/30"
+                    : "border-red-800/30 hover:border-red-500/30"
                 }`}
                 onClick={() => onOpenRequirement(req)}
                 onKeyDown={(e) => {
@@ -160,7 +160,7 @@ const SectionGrid = React.memo(function SectionGrid({
                         ? "text-blue-300"
                         : notStarted
                         ? "text-red-300"
-                        : "text-amber-300"
+                        : "text-red-300"
                     }`}
                   >
                     {req.name}
@@ -171,7 +171,7 @@ const SectionGrid = React.memo(function SectionGrid({
                         ? "bg-blue-900/20 text-blue-300"
                         : notStarted
                         ? "bg-red-900/20 text-red-300"
-                        : "bg-amber-900/20 text-amber-300"
+                        : "bg-red-900/20 text-red-300"
                     }`}
                   >
                     {reqInProgress + reqCompleted}/{req.required}
@@ -185,7 +185,7 @@ const SectionGrid = React.memo(function SectionGrid({
                         ? "text-blue-300/80"
                         : notStarted
                         ? "text-red-300/80"
-                        : "text-amber-300/80"
+                        : "text-red-300/80"
                     }`}
                   >
                     {req.description}
@@ -207,7 +207,7 @@ const SectionGrid = React.memo(function SectionGrid({
                           ? "bg-gray-900/20 text-gray-300 border border-dashed border-gray-600"
                           : notStarted
                           ? "bg-red-900/20 text-red-300 border border-red-700"
-                          : "bg-amber-900/20 text-amber-300 border border-amber-700"
+                          : "bg-red-900/20 text-red-300 border border-red-700"
                       }`}
                       onClick={(e) => {
                         e.stopPropagation(); // don't open the requirement modal
@@ -257,13 +257,9 @@ const SectionGrid = React.memo(function SectionGrid({
                       e.stopPropagation();
                       onAddManual(req.name);
                     }}
-                    className={`px-2 py-0.5 rounded-full text-xs flex items-center gap-1 ${
-                      reqInProgress > 0
-                        ? "bg-blue-900/20 text-blue-300 hover:bg-blue-800/30"
-                        : notStarted
-                        ? "bg-red-900/20 text-red-300 hover:bg-red-800/30"
-                        : "bg-gray-800 text-gray-400 hover:bg-gray-700 hover:text-gray-300"
-                    } transition-colors`}
+                    className={`px-2 py-0.5 rounded-full text-xs flex items-center gap-1 
+                    bg-pink-900/20 text-pink-300 hover:bg-pink-800/30
+                     transition-colors`}
                     title="Add a course manually for this requirement"
                   >
                     <FiPlus size={12} />
@@ -743,7 +739,7 @@ export default function MajorProgressView({
                           className={`p-4 hover:scale-[0.97] transition-all rounded-xl border cursor-pointer ${
                             isFullyCompleted
                               ? "bg-emerald-900/10 border-emerald-800/30"
-                              : "bg-amber-900/10 border-amber-800/30"
+                              : "bg-red-900/10 border-red-800/30"
                           }`}
                           onClick={() =>
                             setReqModal({
@@ -853,7 +849,7 @@ export default function MajorProgressView({
           <div className="space-y-4">
             <button
               onClick={() => toggleSection("remaining")}
-              className="flex items-center gap-2 text-amber-300 hover:text-amber-200 transition-colors"
+              className="flex items-center gap-2 text-red-300 hover:text-red-200 transition-colors"
             >
               <motion.div
                 animate={{ rotate: expandedSections.remaining ? 0 : -90 }}

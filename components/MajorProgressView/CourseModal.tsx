@@ -181,7 +181,7 @@ export default function CourseModal({
                       ? "bg-blue-900/20 text-blue-300"
                       : course.status === "skipped"
                       ? "bg-gray-800/20 text-gray-300"
-                      : "bg-amber-900/20 text-amber-300"
+                      : "bg-amber-900/20 text-red-300"
                   }`}
                 >
                   {course.status === "completed"
@@ -233,7 +233,7 @@ export default function CourseModal({
                           setCourseGrade(null);
                           onSkip?.(course.code, course.name);
                         }}
-                        className="flex items-center gap-1 text-xs px-2 py-1 rounded-full bg-blue-900/20 text-blue-300 hover:bg-blue-900/30 transition-all transform hover:scale-105"
+                        className="flex items-center border border-pink-300 gap-1 text-xs px-2 py-1 rounded-full bg-pink-900/20 text-pink-300 hover:bg-pink-900/30 transition-all transform hover:scale-105"
                       >
                         <FiCornerDownLeft size={12} />
                         Mark as skipped
@@ -241,7 +241,7 @@ export default function CourseModal({
 
                       <div className="relative group">
                         <Info className="h-4 w-4 text-gray-400 hover:text-gray-200 transition-colors cursor-pointer" />
-                        <div className="absolute border border-pink-500 top-full mt-2 left-1/2 -translate-x-1/2 bg-gray-800 text-gray-300 text-xs p-2 rounded-md opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-50 pointer-events-none">
+                        <div className="absolute border border-pink-500 top-full mt-3 left-1/2 -translate-x-1/2 bg-gray-800 text-gray-300 text-xs p-2 rounded-md opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-50 pointer-events-none">
                           Sometimes you can count a class as "taken" without
                           necessarily taking the exact course
                           <br /> (like via placement or another class). In that

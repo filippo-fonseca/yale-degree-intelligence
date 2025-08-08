@@ -128,7 +128,11 @@ const SectionGrid = React.memo(function SectionGrid({
         <span className="text-gray-400 font-normal">({items.length})</span>
       </div>
       {items.length === 0 ? (
-        <div className="text-xs text-gray-500">Nothing here.</div>
+        <div className="text-xs text-gray-500">
+          Nothing here yet! Whenever you are able to download an Unofficial
+          Transcript from the Acadeics tab on YHub, upload it on the "My
+          courses" page and come back here!
+        </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {items.map(({ req, reqCompleted, reqInProgress, notStarted }) => {
@@ -142,8 +146,8 @@ const SectionGrid = React.memo(function SectionGrid({
                   reqInProgress > 0
                     ? "border-blue-800/40 hover:border-blue-500/40"
                     : notStarted
-                    ? "border-red-800/30 hover:border-red-500/30"
-                    : "border-red-800/30 hover:border-red-500/30"
+                      ? "border-red-800/30 hover:border-red-500/30"
+                      : "border-red-800/30 hover:border-red-500/30"
                 }`}
                 onClick={() => onOpenRequirement(req)}
                 onKeyDown={(e) => {
@@ -159,8 +163,8 @@ const SectionGrid = React.memo(function SectionGrid({
                       reqInProgress > 0
                         ? "text-blue-300"
                         : notStarted
-                        ? "text-red-300"
-                        : "text-red-300"
+                          ? "text-red-300"
+                          : "text-red-300"
                     }`}
                   >
                     {req.name}
@@ -170,8 +174,8 @@ const SectionGrid = React.memo(function SectionGrid({
                       reqInProgress > 0
                         ? "bg-blue-900/20 text-blue-300"
                         : notStarted
-                        ? "bg-red-900/20 text-red-300"
-                        : "bg-red-900/20 text-red-300"
+                          ? "bg-red-900/20 text-red-300"
+                          : "bg-red-900/20 text-red-300"
                     }`}
                   >
                     {reqInProgress + reqCompleted}/{req.required}
@@ -184,8 +188,8 @@ const SectionGrid = React.memo(function SectionGrid({
                       reqInProgress > 0
                         ? "text-blue-300/80"
                         : notStarted
-                        ? "text-red-300/80"
-                        : "text-red-300/80"
+                          ? "text-red-300/80"
+                          : "text-red-300/80"
                     }`}
                   >
                     {req.description}
@@ -200,14 +204,14 @@ const SectionGrid = React.memo(function SectionGrid({
                         opt.manual
                           ? "bg-purple-900/20 text-purple-300 border border-purple-700"
                           : opt.completed
-                          ? "bg-emerald-900/20 text-emerald-300 border border-emerald-700"
-                          : opt.inProgress
-                          ? "bg-blue-900/20 text-blue-300 border border-blue-700"
-                          : opt.skipped
-                          ? "bg-gray-900/20 text-gray-300 border border-dashed border-gray-600"
-                          : notStarted
-                          ? "bg-red-900/20 text-red-300 border border-red-700"
-                          : "bg-red-900/20 text-red-300 border border-red-700"
+                            ? "bg-emerald-900/20 text-emerald-300 border border-emerald-700"
+                            : opt.inProgress
+                              ? "bg-blue-900/20 text-blue-300 border border-blue-700"
+                              : opt.skipped
+                                ? "bg-gray-900/20 text-gray-300 border border-dashed border-gray-600"
+                                : notStarted
+                                  ? "bg-red-900/20 text-red-300 border border-red-700"
+                                  : "bg-red-900/20 text-red-300 border border-red-700"
                       }`}
                       onClick={(e) => {
                         e.stopPropagation(); // don't open the requirement modal
@@ -222,12 +226,12 @@ const SectionGrid = React.memo(function SectionGrid({
                         {opt.manual
                           ? ", manual"
                           : opt.skipped
-                          ? ", skipped"
-                          : opt.inProgress
-                          ? ", in progress"
-                          : opt.completed
-                          ? ", complete"
-                          : ""}
+                            ? ", skipped"
+                            : opt.inProgress
+                              ? ", in progress"
+                              : opt.completed
+                                ? ", complete"
+                                : ""}
                         )
                       </span>
                       {(opt.skipped || opt.manual) && (
@@ -423,8 +427,8 @@ export default function MajorProgressView({
         (c.grade === "In Progress"
           ? "in-progress"
           : c.grade
-          ? "completed"
-          : "not-taken");
+            ? "completed"
+            : "not-taken");
       const codes = info?.codes?.length ? info.codes : [c.code];
       for (const k of codes) m.set(k, status);
     }
@@ -578,10 +582,10 @@ export default function MajorProgressView({
         status: opt.skipped
           ? "skipped"
           : opt.inProgress
-          ? "in-progress"
-          : opt.completed
-          ? "completed"
-          : "not-taken",
+            ? "in-progress"
+            : opt.completed
+              ? "completed"
+              : "not-taken",
         skipped: opt.skipped || false,
       },
     });
@@ -797,8 +801,8 @@ export default function MajorProgressView({
                                     opt.manual
                                       ? "bg-purple-900/20 text-purple-300 border border-purple-700"
                                       : opt.completed
-                                      ? "bg-emerald-900/20 text-emerald-300 border-emerald-700"
-                                      : "bg-gray-900/20 text-gray-300 border border-dashed border-gray-600"
+                                        ? "bg-emerald-900/20 text-emerald-300 border-emerald-700"
+                                        : "bg-gray-900/20 text-gray-300 border border-dashed border-gray-600"
                                   }`}
                                   onClick={(e) => e.stopPropagation()} // don't open modal when clicking the pill
                                 >

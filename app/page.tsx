@@ -210,8 +210,9 @@ export default function Home() {
     fetchUserProfile();
   }, [user]);
 
+  // Replace your current getMajorProgress with this:
   const getMajorProgress = () => {
-    if (!user || courses.length === 0 || !selectedMajor) return null;
+    if (!user || !selectedMajor) return null;
 
     const completedCourseCodes = courses
       .filter(
@@ -230,17 +231,17 @@ export default function Home() {
       .filter((course) => course.skipped)
       .map((course) => course.code);
 
-    // Extract manual requirements
     const manualRequirements = courses.flatMap((course) =>
       (course.manualRequirementsFulfilled || [])
         .filter((m) => m.major_id === selectedMajor)
         .map((m) => ({
           code: course.code,
           requirement: m.requirement_title,
-          credits: course.credits || 1, //putting 1 as the default, as it's the most likely!
+          credits: course.credits || 1,
         }))
     );
 
+    // This works fine even if all arrays are empty.
     return calculateMajorProgress(
       selectedMajor,
       completedCourseCodes,
@@ -1358,7 +1359,7 @@ export default function Home() {
                   <StatsView courses={courses} />
                 </motion.div>
               )}
-              {activeTab === "major" && getMajorProgress() && (
+              {activeTab === "major" && (
                 <motion.div
                   key="major"
                   initial={{ opacity: 0 }}

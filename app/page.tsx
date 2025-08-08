@@ -107,6 +107,8 @@ export default function Home() {
   const [showMajorSelection, setShowMajorSelection] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+  const isBrandNew = userProfile?.graduationYear === 2029;
+
   const [showBetaBanner, setShowBetaBanner] = useLocalStorage(
     "showBetaBanner",
     true
@@ -150,21 +152,21 @@ export default function Home() {
       disabled: false,
     },
     {
-      id: "stats",
-      icon: FiBarChart2,
-      label: "Academic stats",
-      disabled: !hasData,
+      id: "simulator",
+      icon: MonitorCog,
+      label: "Simulator",
+      badge: "2029 can use!",
     },
     {
       id: "major",
       icon: RiProgress3Fill,
       label: "My major",
-      disabled: !hasData,
+      badge: "2029 can use!",
     },
     {
-      id: "simulator",
-      icon: MonitorCog,
-      label: "Simulator",
+      id: "stats",
+      icon: FiBarChart2,
+      label: "Academic stats",
       disabled: !hasData,
     },
     {
@@ -684,6 +686,23 @@ export default function Home() {
           </div>
 
           <div className="flex items-center space-x-3">
+            <span
+              className="hidden md:inline px-2.5 py-1 text-[11px] rounded-full border border-emerald-800 bg-emerald-900/30 text-emerald-300"
+              title="Welcome to Yale!"
+            >
+              {isBrandNew ? (
+                <>
+                  ❤️ New Bulldog (welcome to Yale,{" "}
+                  {user.displayName && user.displayName.split(" ")[0]}!)
+                </>
+              ) : (
+                <>
+                  Welcome back to school,{" "}
+                  {user.displayName && user.displayName.split(" ")[0]}!
+                </>
+              )}
+            </span>
+
             <button
               onClick={() => setShowSettings(true)}
               className="p-2 rounded-lg hover:bg-gray-900/50 transition-all border border-gray-800 hover:border-gray-700 flex items-center gap-1"
@@ -730,8 +749,8 @@ export default function Home() {
                     activeTab === item.id
                       ? "bg-gray-900/50 border border-gray-800 text-white"
                       : item.disabled
-                      ? "text-gray-600 cursor-not-allowed"
-                      : "text-gray-400 hover:text-white hover:bg-gray-900/30"
+                        ? "text-gray-600 cursor-not-allowed"
+                        : "text-gray-400 hover:text-white hover:bg-gray-900/30"
                   }`}
                   disabled={item.disabled}
                 >
@@ -743,7 +762,14 @@ export default function Home() {
                       }
                     />
                     <span>{item.label}</span>
+
+                    {item.badge && isBrandNew && (
+                      <span className="ml-1 px-2 py-0.5 text-[10px] rounded-full bg-emerald-900/30 border border-emerald-800 text-emerald-300">
+                        {item.badge}
+                      </span>
+                    )}
                   </div>
+
                   {activeTab === item.id && (
                     <motion.div
                       initial={{ opacity: 0, x: -10 }}
@@ -974,18 +1000,18 @@ export default function Home() {
                                                         course.grade || ""
                                                       ) + " bg-emerald-900/20"
                                                     : course.status ===
-                                                      "in-progress"
-                                                    ? "text-purple-300 bg-purple-900/20"
-                                                    : "text-gray-300 bg-gray-800/20"
+                                                        "in-progress"
+                                                      ? "text-purple-300 bg-purple-900/20"
+                                                      : "text-gray-300 bg-gray-800/20"
                                                 }`}
                                               >
                                                 {course.status ===
                                                   "completed" && !course.skipped
                                                   ? course.grade || "Completed"
                                                   : course.status ===
-                                                    "in-progress"
-                                                  ? "In Progress"
-                                                  : "Skipped"}
+                                                      "in-progress"
+                                                    ? "In Progress"
+                                                    : "Skipped"}
                                               </span>
                                               <span className="text-xs text-gray-500">
                                                 {course.credits} credit
@@ -1060,6 +1086,149 @@ export default function Home() {
                             </div>
                           </motion.div>
                         )}
+                      </div>
+                    </div>
+                  ) : isBrandNew ? (
+                    <div className="flex flex-col items-center justify-center py-12">
+                      <div className="text-center max-w-2xl">
+                        <h2 className="text-3xl font-semibold bg-clip-text text-transparent bg-gradient-to-r from-emerald-200 to-blue-200">
+                          Welcome to Yale,{" "}
+                          {user?.displayName?.split(" ")[0] || "Bulldog"} 🎉
+                        </h2>
+                        <p className="mt-3 text-gray-400">
+                          You’re brand new here (Class of 2029)—perfect. Start
+                          by adding your unofficial transcript{" "}
+                          <em>even if it has no grades yet</em>. We fully
+                          support parsing{" "}
+                          <span className="font-semibold text-gray-300">
+                            in-progress
+                          </span>{" "}
+                          courses.
+                        </p>
+                      </div>
+
+                      {/* Quick CTAs */}
+                      <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-4 w-full max-w-2xl">
+                        <button
+                          onClick={() => setShowMajorSelection(true)}
+                          className="p-5 rounded-xl bg-gray-900/60 border border-gray-800 hover:border-gray-700 hover:bg-gray-900 transition-all text-left"
+                        >
+                          <div className="text-lg font-medium text-gray-100">
+                            Test the waters.
+                          </div>
+                          <p className="text-sm text-gray-400 mt-1">
+                            Tell us what you’re leaning toward so we can
+                            personalize your roadmap. You can always change this
+                            and it's only to open your mind! You by no means
+                            have to have decided on a major yet.
+                          </p>
+                        </button>
+
+                        <a
+                          href="#upload-transcript"
+                          className="p-5 rounded-xl bg-gray-900/60 border border-gray-800 hover:border-gray-700 hover:bg-gray-900 transition-all block"
+                        >
+                          <div className="text-lg font-medium text-gray-100">
+                            No grades yet? No problem.
+                          </div>
+                          <p className="text-sm text-gray-400 mt-1">
+                            Upload your transcript anyway after registration is
+                            done—we’ll record your in-progress classes.
+                          </p>
+                        </a>
+                      </div>
+
+                      {/* Friendly explainer */}
+                      <div className="text-center mt-6 px-4 py-3 rounded-lg bg-blue-900/20 border border-blue-800 text-blue-200 text-sm">
+                        Even <strong>without</strong> a transcript, you can use
+                        the{" "}
+                        <button
+                          onClick={() => setActiveTab("simulator")}
+                          className="underline hover:opacity-80"
+                        >
+                          Simulator
+                        </button>{" "}
+                        and the{" "}
+                        <button
+                          onClick={() => setActiveTab("major")}
+                          className="underline hover:opacity-80"
+                        >
+                          My major
+                        </button>{" "}
+                        tabs to both sketch
+                        <br /> out your first year (and beyond!) and visualize
+                        requirements for your potential major(s) right away.
+                      </div>
+
+                      {/* The actual step-by-step instructions stay, but with the “no grades is fine” note */}
+                      <div className="mt-10 text-center">
+                        <h3 className="text-xl font-medium mb-3 bg-clip-text text-transparent bg-gradient-to-r from-blue-200 to-purple-200">
+                          How to get your unofficial transcript (no grades is
+                          totally fine)
+                        </h3>
+
+                        <div className="filepond--label-text text-left max-w-2xl">
+                          <p className="text-gray-300">
+                            <span className="font-semibold">1)</span> Go to{" "}
+                            <Link
+                              href="https://yub.yale.edu"
+                              className="text-white font-bold underline hover:text-pink-500 transition-all"
+                              target="_blank"
+                            >
+                              YHub
+                            </Link>{" "}
+                            and download your unofficial transcript.
+                          </p>
+                          <p className="text-gray-500 mt-2">
+                            Navigate to the <em>Academics</em> tab and click{" "}
+                            “Unofficial Transcript — Undergraduate”. Then click
+                            the{" "}
+                            <span className="inline-flex p-0 text-gray-400 align-middle">
+                              <Printer className="w-4 h-4 mr-1" />
+                              Print
+                            </span>{" "}
+                            button at the top right and{" "}
+                            <span className="text-gray-400">save as PDF</span>.
+                          </p>
+
+                          <p className="mt-5 text-gray-300">
+                            <span className="font-semibold">2)</span> Upload it
+                            below. Even without grades yet, we’ll import your{" "}
+                            <span className="font-semibold">in-progress</span>{" "}
+                            courses to kickstart your plan.
+                          </p>
+
+                          <p className="mt-3 text-gray-500">
+                            (If you have placement/AP credits or pre-arrival
+                            courses on there, we’ll capture those too.)
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Upload card anchored for convenience */}
+                      <div
+                        id="upload-transcript"
+                        className="w-full max-w-lg bg-gray-900/50 backdrop-blur-sm p-8 rounded-xl border border-gray-800 mt-8"
+                      >
+                        <h4 className="text-lg font-medium text-gray-200 mb-2">
+                          After registration, upload your unofficial transcript
+                          here.
+                        </h4>
+                        <p className="text-sm text-gray-500 mb-4">
+                          We’ll parse your current classes now and fill in
+                          grades later when they post.
+                        </p>
+                        <FileUpload onSuccess={parseAndStoreCourses} />
+                        <p className="text-center text-gray-500 text-sm mt-4">
+                          We never store your actual transcript file. See our{" "}
+                          <Link
+                            href="/terms"
+                            className="text-gray-300 hover:underline"
+                          >
+                            terms
+                          </Link>
+                          .
+                        </p>
                       </div>
                     </div>
                   ) : (
@@ -1324,7 +1493,7 @@ export default function Home() {
                                         status: "not-taken" as const, // This is the key fix
                                         credits: opt.credits,
                                         skipped: false,
-                                      } as Course)
+                                      }) as Course
                                   )
                               ) || []
                             );

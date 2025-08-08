@@ -249,8 +249,8 @@ export default function CourseModal({
                           <br />
                           took ANOTHER class you want to use for this
                           requirement, use the "Fulfill manually"
-                          <br /> button present on the card for this requirement
-                          (exit out of this modal first).
+                          <br /> button present on the card for this
+                          requirement.
                         </div>
                       </div>
                     </div>

@@ -1,10 +1,11 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { FiX, FiPlus } from "react-icons/fi";
+import { FiX, FiPlus, FiExternalLink, FiCornerDownLeft } from "react-icons/fi";
 import Link from "next/link";
 
-type ReqOption = {
+/* ========= Types ========= */
+export type ReqOption = {
   code: string;
   name?: string;
   credits?: number;
@@ -14,18 +15,37 @@ type ReqOption = {
   manual?: boolean;
 };
 
-type Requirement = {
+export type Requirement = {
   id?: string;
   name: string;
   description?: string;
-  required?: number;
+  required?: number; // credits or count
   options: ReqOption[];
-  // pass these in from the caller if you want the same status badge as the grid
+
+  // Optional UI stats — computed here if not provided
   reqCompleted?: number;
   reqInProgress?: number;
   notStarted?: boolean;
 };
 
+/* ======= Helpers ======= */
+function computeReqStats(req: Requirement) {
+  const options = req.options ?? [];
+
+  const reqCompleted = options
+    .filter((o) => o.completed)
+    .reduce((s, o) => s + (o.credits ?? 0), 0);
+
+  const reqInProgress = options
+    .filter((o) => o.inProgress)
+    .reduce((s, o) => s + (o.credits ?? 0), 0);
+
+  const notStarted = reqCompleted === 0 && reqInProgress === 0;
+
+  return { reqCompleted, reqInProgress, notStarted };
+}
+
+/* ======= Component ======= */
 export default function RequirementModal({
   isOpen,
   requirement,
@@ -34,6 +54,7 @@ export default function RequirementModal({
   onUnskip,
   onRemoveManual,
   onAddManual,
+  onSkip, // OPTIONAL: shows immediate-skip on eligible pills
 }: {
   isOpen: boolean;
   requirement: Requirement | null;
@@ -42,17 +63,18 @@ export default function RequirementModal({
   onUnskip: (code: string) => void;
   onRemoveManual: (code: string, reqName: string) => void;
   onAddManual: (reqName: string) => void;
+  onSkip?: (code: string, name: string) => void | Promise<void>;
 }) {
   if (!requirement) return null;
 
-  // Status styling (mirrors main page)
-  const {
-    reqCompleted = 0,
-    reqInProgress = 0,
-    required = 0,
-    notStarted,
-  } = requirement;
+  // Compute defaults (caller values override)
+  const computed = computeReqStats(requirement);
+  const required = requirement.required ?? 0;
+  const reqCompleted = requirement.reqCompleted ?? computed.reqCompleted;
+  const reqInProgress = requirement.reqInProgress ?? computed.reqInProgress;
+  const notStarted = requirement.notStarted ?? computed.notStarted;
 
+  // Status styling (mirrors main page)
   let statusColor = "";
   let statusBg = "";
   if (reqInProgress > 0) {
@@ -68,6 +90,21 @@ export default function RequirementModal({
     statusColor = "text-amber-300";
     statusBg = "bg-amber-900/20";
   }
+
+  // Tooltip text (same message used in CourseModal)
+  const skipTooltip = (
+    <>
+      Sometimes you can count a class as "taken" without necessarily taking the
+      exact course
+      <br /> (like via placement or another class). In that case, mark it as
+      "skipped!". If you instead
+      <br />
+      took ANOTHER class you want to use for this requirement, use the "Fulfill
+      manually"
+      <br /> button present on the card for this requirement (exit out of this
+      modal first).
+    </>
+  );
 
   return (
     <AnimatePresence>
@@ -129,7 +166,7 @@ export default function RequirementModal({
               <div className="flex flex-wrap gap-2">
                 {requirement.options.map((opt) => {
                   const base =
-                    "relative px-3 py-1.5 rounded-full text-sm flex items-center gap-1 border transition-all";
+                    "relative px-3 py-1.5 rounded-full text-sm flex items-center gap-2 border transition-all";
                   const style = opt.manual
                     ? "bg-purple-900/20 text-purple-300 border-purple-700"
                     : opt.completed
@@ -140,36 +177,87 @@ export default function RequirementModal({
                     ? "bg-gray-900/20 text-gray-300 border-dashed border-gray-600"
                     : "bg-amber-900/20 text-amber-300 border-amber-700";
 
-                  return (
-                    <button
-                      key={opt.code}
-                      className={`${base} ${style}`}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        if (!opt.completed && !opt.skipped) {
-                          onOpenCourse(opt, requirement.name);
-                        }
-                      }}
-                      title={opt.name || opt.code}
-                    >
-                      <span className="font-medium">{opt.code}</span>
-                      <span className="text-[0.7rem] opacity-80">
-                        ({opt.credits ?? 0}cr
-                        {opt.manual
-                          ? ", manual"
-                          : opt.skipped
-                          ? ", skipped"
-                          : opt.inProgress
-                          ? ", in progress"
-                          : opt.completed
-                          ? ", complete"
-                          : ""}
-                        )
-                      </span>
+                  const canExpand = !opt.completed && !opt.skipped;
 
+                  // precise skip handler — closes modal after calling onSkip
+                  const handleSkip = async (e: React.MouseEvent) => {
+                    e.stopPropagation();
+                    if (!onSkip) return;
+                    try {
+                      await Promise.resolve(
+                        onSkip(opt.code, opt.name || opt.code)
+                      );
+                    } finally {
+                      onClose(); // close immediately after action
+                    }
+                  };
+
+                  return (
+                    <div key={opt.code} className={`${base} ${style}`}>
+                      {/* Left: course label */}
+                      <div className="flex items-center gap-1">
+                        <span className="font-medium">{opt.code}</span>
+                        <span className="text-[0.7rem] opacity-80">
+                          ({opt.credits ?? 0}cr
+                          {opt.manual
+                            ? ", manual"
+                            : opt.skipped
+                            ? ", skipped"
+                            : opt.inProgress
+                            ? ", in progress"
+                            : opt.completed
+                            ? ", complete"
+                            : ""}
+                          )
+                        </span>
+                      </div>
+
+                      {/* Middle: explicit Expand button (only when expandable) */}
+                      {canExpand && (
+                        <button
+                          className="flex items-center gap-1 text-[0.7rem] pl-2 ml-1 border-l border-gray-700 opacity-90 hover:opacity-100"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onOpenCourse(opt, requirement.name);
+                          }}
+                          aria-label={`Open actions for ${
+                            opt.name || opt.code
+                          }`}
+                          title="Open actions"
+                        >
+                          <FiExternalLink size={12} />
+                          <span>Expand</span>
+                        </button>
+                      )}
+
+                      {/* Right: mini 'section' for immediate Skip (only if onSkip is provided and eligible) */}
+                      {onSkip &&
+                        !opt.completed &&
+                        !opt.inProgress &&
+                        !opt.skipped && (
+                          <div className="flex items-center pl-2 ml-1 border-l border-gray-700">
+                            {/* Use a NAMED group so only hovering the button shows the tooltip */}
+                            <div className="relative group/skip">
+                              <button
+                                className="flex items-center gap-1 text-[0.7rem] px-2 py-0.5 rounded-full bg-blue-900/20 text-blue-300 hover:bg-blue-900/30 transition-all"
+                                onClick={handleSkip}
+                                aria-label={`Mark ${opt.code} as skipped`}
+                              >
+                                <FiCornerDownLeft size={12} />
+                                Skip
+                              </button>
+                              {/* Tooltip ONLY tied to the skip button via group/skip */}
+                              <div className="absolute top-full mt-2 left-1/2 -translate-x-1/2 bg-gray-800 border border-pink-500 text-gray-300 text-xs p-2 rounded-md opacity-0 group-hover/skip:opacity-100 transition-opacity whitespace-nowrap z-50 pointer-events-none">
+                                {skipTooltip}
+                              </div>
+                            </div>
+                          </div>
+                        )}
+
+                      {/* Remove (unskip/manual) control */}
                       {(opt.skipped || opt.manual) && (
                         <button
-                          className="ml-1 text-[0.7rem] opacity-80 hover:opacity-100"
+                          className="ml-2 text-[0.7rem] opacity-80 hover:opacity-100"
                           onClick={(ev) => {
                             ev.stopPropagation();
                             if (opt.skipped) onUnskip(opt.code);
@@ -177,11 +265,16 @@ export default function RequirementModal({
                               onRemoveManual(opt.code, requirement.name);
                           }}
                           title={opt.manual ? "Remove manual course" : "Unskip"}
+                          aria-label={
+                            opt.manual
+                              ? `Remove manual mapping for ${opt.code}`
+                              : `Unskip ${opt.code}`
+                          }
                         >
                           <FiX size={12} />
                         </button>
                       )}
-                    </button>
+                    </div>
                   );
                 })}
               </div>

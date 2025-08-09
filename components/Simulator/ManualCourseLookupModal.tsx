@@ -1,6 +1,4 @@
-"use client";
-
-import { useState, useMemo } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FiSearch, FiX, FiPlus } from "react-icons/fi";
 import coursesData from "@/lib/courses.json";
@@ -22,6 +20,26 @@ export default function ManualCourseLookupModal({
   userId,
 }: ManualCourseLookupModalProps) {
   const [searchTerm, setSearchTerm] = useState("");
+  const modalRef = useRef<HTMLDivElement>(null); // Ref to the modal div
+
+  // Close modal if click outside of modal
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (modalRef.current && !modalRef.current.contains(e.target as Node)) {
+        onClose();
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    } else {
+      document.removeEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isOpen, onClose]);
 
   // Build a map of every code (canonical and aliases) to their canonical course entry
   const courseLookupMap = useMemo(() => {
@@ -60,7 +78,7 @@ export default function ManualCourseLookupModal({
           .includes(lower);
         return codesMatch || nameMatch || deptMatch;
       })
-      .slice(0, 15); // For perf
+      .slice(0, 15); // For performance
   }, [searchTerm, allCanonicalCourses]);
 
   return (
@@ -73,6 +91,7 @@ export default function ManualCourseLookupModal({
           exit={{ opacity: 0 }}
         >
           <motion.div
+            ref={modalRef} // Assign the ref here
             className="bg-gray-900 p-6 rounded-xl max-w-xl w-full border border-gray-800 flex flex-col"
             style={{
               height: "480px", // <--- Constant modal height

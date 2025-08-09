@@ -104,7 +104,7 @@ export function MajorDropdown({
               <input
                 ref={searchInputRef}
                 type="text"
-                placeholder="Search majors..."
+                placeholder="Search majors & concentrations..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full bg-gray-900 text-gray-200 px-3 py-2 pl-8 rounded-md border border-gray-700 focus:outline-none focus:ring-1 focus:ring-blue-500"

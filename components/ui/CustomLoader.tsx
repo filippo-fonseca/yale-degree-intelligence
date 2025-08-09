@@ -14,12 +14,8 @@ const CustomLoader = ({ fullScreen = true }: CustomLoaderProps) => {
   const [isClient, setIsClient] = useState(false);
 
   const randomPhrases = [
-    "Loading your academic rizz...",
-    "This taking longer than my attention span...",
-    "Your transcript is giving main character energy...",
-    "Processing... like my brain during finals week...",
-    "Boutta make your GPA go 📈...",
-    "This load time is sus...",
+    "Longer than my attention span...",
+    "This load time...",
     "Your academic glow-up loading...",
     "Calculating how many all-nighters you've pulled...",
     "Finding out which dining hall meal gave you food poisoning...",
@@ -27,14 +23,12 @@ const CustomLoader = ({ fullScreen = true }: CustomLoaderProps) => {
     "Counting how many times you said 'I'll start tomorrow'...",
     "Measuring the depth of your imposter syndrome...",
     "Loading more patience than I have for group projects...",
-    "This taking longer than my laundry pile...",
-    "Your academic villain origin story loading...",
-    "Better than waiting for a dining hall line...",
+    "This is taking longer than my laundry pile...",
+    "Better than waiting in a dining hall line...",
     "This wait tho...",
     "Processing your trauma...",
     "Detecting how many blue books you've filled...",
     "Loading more effort than my 9am attendance...",
-    "Your academics are unmatched...",
   ];
 
   useEffect(() => {
@@ -52,13 +46,13 @@ const CustomLoader = ({ fullScreen = true }: CustomLoaderProps) => {
           fullScreen ? "min-h-screen" : "min-h-[200px]"
         } bg-gray-950 overflow-hidden`}
       >
-        <div className="relative w-64 h-64">
+        <div className="relative w-72 h-72">
           <div className="absolute inset-0 flex items-center justify-center">
             <div className="w-28 h-28 rounded-full bg-gradient-to-br from-gray-900 to-gray-800 border-2 border-gray-700 shadow-inner" />
           </div>
-          <div className="absolute bottom-0 left-0 right-0 text-center text-sm text-gray-400 mt-4">
+          {/* <div className="absolute bottom-0 left-0 right-0 text-center text-sm text-gray-400 mt-4">
             cooking here...
-          </div>
+          </div> */}
         </div>
       </div>
     );
@@ -70,7 +64,7 @@ const CustomLoader = ({ fullScreen = true }: CustomLoaderProps) => {
         fullScreen ? "min-h-screen" : "min-h-[200px]"
       } bg-gray-950 overflow-hidden`}
     >
-      <div className="relative w-64 h-64">
+      <div className="relative w-96 h-64">
         {/* The hole */}
         <div className="absolute inset-0 flex items-center justify-center">
           <div className="w-28 h-28 rounded-full bg-gradient-to-br from-gray-900 to-gray-800 border-2 border-gray-700 shadow-inner" />

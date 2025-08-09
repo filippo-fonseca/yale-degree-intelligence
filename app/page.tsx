@@ -30,6 +30,7 @@ import {
   Timestamp,
   writeBatch,
   deleteDoc,
+  onSnapshot,
 } from "firebase/firestore";
 import { Course } from "@/lib/types";
 import { db } from "@/config/firebase";
@@ -59,8 +60,9 @@ import CourseModal from "@/components/MajorProgressView/CourseModal";
 import { getGPAColor } from "@/lib/utils/utils";
 import PublicFacingPage from "@/screens/PublicFacingPage";
 import FriendsTab from "@/components/FriendsTab/FriendsTab";
-import { MonitorCog, Printer } from "lucide-react";
+import { MessageCircleQuestionMark, MonitorCog, Printer } from "lucide-react";
 import Simulator from "@/components/Simulator/Simulator";
+import CleoAITab from "@/components/CleoAITab/CleoAITab";
 
 interface UserProfile {
   majors: string[];
@@ -106,6 +108,8 @@ export default function Home() {
   const [showMajorSelection, setShowMajorSelection] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+  const isBrandNew = userProfile?.graduationYear === 2029;
+
   const [showBetaBanner, setShowBetaBanner] = useLocalStorage(
     "showBetaBanner",
     true
@@ -149,21 +153,21 @@ export default function Home() {
       disabled: false,
     },
     {
-      id: "stats",
-      icon: FiBarChart2,
-      label: "Academic stats",
-      disabled: !hasData,
+      id: "simulator",
+      icon: MonitorCog,
+      label: "Simulator",
+      badge: "2029 can use!",
     },
     {
       id: "major",
       icon: RiProgress3Fill,
       label: "My major",
-      disabled: !hasData,
+      badge: "2029 can use!",
     },
     {
-      id: "simulator",
-      icon: MonitorCog,
-      label: "Simulator",
+      id: "stats",
+      icon: FiBarChart2,
+      label: "Academic stats",
       disabled: !hasData,
     },
     {
@@ -178,37 +182,36 @@ export default function Home() {
       label: "CleoAI",
       disabled: !hasData,
     },
-    {
-      id: "distributionals",
-      icon: FaBuildingCircleCheck,
-      label: "Distributionals",
-      disabled: true, // Always disabled
-      tooltip: "Coming Soon", // Add tooltip text
-    },
+    // {
+    //   id: "distributionals",
+    //   icon: FaBuildingCircleCheck,
+    //   label: "Distributionals",
+    //   disabled: true, // Always disabled
+    //   tooltip: "Coming Soon", // Add tooltip text
+    // },
   ];
 
-  // Fetch user profile on load
+  // Live-subscribe to user profile so UI updates without refresh
   useEffect(() => {
     if (!user) return;
 
-    const fetchUserProfile = async () => {
-      const docRef = doc(db, "users", user.uid);
-      const docSnap = await getDoc(docRef);
-
+    const unsub = onSnapshot(doc(db, "users", user.uid), (docSnap) => {
       if (docSnap.exists()) {
-        const profileData = docSnap.data() as UserProfile;
-        setUserProfile(profileData);
-        setSelectedMajor(profileData.majors[0] || "");
+        const data = docSnap.data() as UserProfile;
+        setUserProfile(data);
+        setSelectedMajor(data.majors?.[0] || "");
+        setShowMajorSelection(false); // auto-close once profile exists
       } else {
+        setUserProfile(null);
         setShowMajorSelection(true);
       }
-    };
-
-    fetchUserProfile();
+    });
+    return () => unsub();
   }, [user]);
 
+  // Replace your current getMajorProgress with this:
   const getMajorProgress = () => {
-    if (!user || courses.length === 0 || !selectedMajor) return null;
+    if (!user || !selectedMajor) return null;
 
     const completedCourseCodes = courses
       .filter(
@@ -227,17 +230,17 @@ export default function Home() {
       .filter((course) => course.skipped)
       .map((course) => course.code);
 
-    // Extract manual requirements
     const manualRequirements = courses.flatMap((course) =>
       (course.manualRequirementsFulfilled || [])
         .filter((m) => m.major_id === selectedMajor)
         .map((m) => ({
           code: course.code,
           requirement: m.requirement_title,
-          credits: course.credits || 1, //putting 1 as the default, as it's the most likely!
+          credits: course.credits || 1,
         }))
     );
 
+    // This works fine even if all arrays are empty.
     return calculateMajorProgress(
       selectedMajor,
       completedCourseCodes,
@@ -683,6 +686,23 @@ export default function Home() {
           </div>
 
           <div className="flex items-center space-x-3">
+            <span
+              className="hidden md:inline px-2.5 py-1 text-[11px] rounded-full border border-emerald-800 bg-emerald-900/30 text-emerald-300"
+              title="Welcome to Yale!"
+            >
+              {isBrandNew ? (
+                <>
+                  ❤️ New Bulldog (welcome to Yale,{" "}
+                  {user.displayName && user.displayName.split(" ")[0]}!)
+                </>
+              ) : (
+                <>
+                  Welcome back to school,{" "}
+                  {user.displayName && user.displayName.split(" ")[0]}!
+                </>
+              )}
+            </span>
+
             <button
               onClick={() => setShowSettings(true)}
               className="p-2 rounded-lg hover:bg-gray-900/50 transition-all border border-gray-800 hover:border-gray-700 flex items-center gap-1"
@@ -729,8 +749,8 @@ export default function Home() {
                     activeTab === item.id
                       ? "bg-gray-900/50 border border-gray-800 text-white"
                       : item.disabled
-                      ? "text-gray-600 cursor-not-allowed"
-                      : "text-gray-400 hover:text-white hover:bg-gray-900/30"
+                        ? "text-gray-600 cursor-not-allowed"
+                        : "text-gray-400 hover:text-white hover:bg-gray-900/30"
                   }`}
                   disabled={item.disabled}
                 >
@@ -742,7 +762,14 @@ export default function Home() {
                       }
                     />
                     <span>{item.label}</span>
+
+                    {item.badge && isBrandNew && (
+                      <span className="ml-1 px-2 py-0.5 text-[10px] rounded-full bg-emerald-900/30 border border-emerald-800 text-emerald-300">
+                        {item.badge}
+                      </span>
+                    )}
                   </div>
+
                   {activeTab === item.id && (
                     <motion.div
                       initial={{ opacity: 0, x: -10 }}
@@ -752,12 +779,10 @@ export default function Home() {
                       <FiChevronRight />
                     </motion.div>
                   )}
-
-                  {item.disabled && item.tooltip && (
-                    <div className="absolute left-full ml-2 px-2 py-1 bg-gray-800 text-gray-200 text-xs rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
-                      {item.tooltip}
-                    </div>
-                  )}
+                  {/* 
+                    Removed tooltip rendering because 'tooltip' property does not exist on navItems' type.
+                    If you want to support tooltips, add 'tooltip?: string' to the navItems type and ensure all items are updated accordingly.
+                  */}
                 </motion.button>
               ))}
             </nav>
@@ -781,6 +806,21 @@ export default function Home() {
                         <FaHeart className="text-emerald-400" size={14} />
                       </div>
                       <span className="text-sm font-medium">Our mission</span>
+                    </Link>
+                    <Link
+                      href="/mission"
+                      target="_blank"
+                      className="w-full flex items-center space-x-2.5 p-2 rounded-lg hover:bg-gray-800/40 transition-all duration-200 text-gray-300 hover:text-white"
+                    >
+                      <div className="p-1.5 rounded-lg bg-purple-900/30 border border-purple-800/50 flex items-center justify-center">
+                        <MessageCircleQuestionMark
+                          className="text-purple-400"
+                          size={14}
+                        />
+                      </div>
+                      <span className="text-sm font-medium">
+                        Feedback & errors
+                      </span>
                     </Link>
                     <Link
                       href="/terms"
@@ -960,18 +1000,18 @@ export default function Home() {
                                                         course.grade || ""
                                                       ) + " bg-emerald-900/20"
                                                     : course.status ===
-                                                      "in-progress"
-                                                    ? "text-purple-300 bg-purple-900/20"
-                                                    : "text-gray-300 bg-gray-800/20"
+                                                        "in-progress"
+                                                      ? "text-purple-300 bg-purple-900/20"
+                                                      : "text-gray-300 bg-gray-800/20"
                                                 }`}
                                               >
                                                 {course.status ===
                                                   "completed" && !course.skipped
                                                   ? course.grade || "Completed"
                                                   : course.status ===
-                                                    "in-progress"
-                                                  ? "In Progress"
-                                                  : "Skipped"}
+                                                      "in-progress"
+                                                    ? "In Progress"
+                                                    : "Skipped"}
                                               </span>
                                               <span className="text-xs text-gray-500">
                                                 {course.credits} credit
@@ -1046,6 +1086,164 @@ export default function Home() {
                             </div>
                           </motion.div>
                         )}
+                      </div>
+                    </div>
+                  ) : isBrandNew ? (
+                    <div className="flex flex-col items-center justify-center py-12">
+                      <div className="text-center max-w-2xl">
+                        <h2 className="text-3xl font-semibold bg-clip-text text-transparent bg-gradient-to-r from-emerald-200 to-blue-200">
+                          Welcome to Yale,{" "}
+                          {user?.displayName?.split(" ")[0] || "Bulldog"} 🎉
+                        </h2>
+                        <p className="mt-3 text-gray-400">
+                          You’re brand new here (Class of 2029)—perfect. Start
+                          by adding your unofficial transcript{" "}
+                          <em>even if it has no grades yet</em> or by testing
+                          the{" "}
+                          <span
+                            className="font-semibold text-pink-300 underline hover:font-bold hover:text-pink-500 transition-all cursor-pointer"
+                            onClick={() => setActiveTab("simulator")}
+                          >
+                            Simulator
+                          </span>{" "}
+                          or{" "}
+                          <span
+                            className="font-semibold text-pink-300 underline hover:font-bold hover:text-pink-500 transition-all cursor-pointer"
+                            onClick={() => setActiveTab("major")}
+                          >
+                            My major
+                          </span>{" "}
+                          features. We fully support parsing{" "}
+                          <span className="font-semibold text-gray-300">
+                            in-progress
+                          </span>{" "}
+                          courses.
+                        </p>
+                      </div>
+
+                      {/* Quick CTAs */}
+                      <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-4 w-full max-w-2xl">
+                        <button
+                          onClick={() => setShowMajorSelection(true)}
+                          className="p-5 rounded-xl bg-gray-900/60 border border-gray-800 hover:border-gray-700 hover:bg-gray-900 transition-all text-left"
+                        >
+                          <div className="text-lg font-medium text-gray-100">
+                            Test the waters.
+                          </div>
+                          <p className="text-sm text-gray-400 mt-1">
+                            Tell us what you’re leaning toward so we can
+                            personalize your roadmap. You can always change this
+                            and it's only to open your mind! You by no means
+                            have to have decided on a major yet.
+                          </p>
+                        </button>
+
+                        <a
+                          href="#upload-transcript"
+                          className="p-5 rounded-xl bg-gray-900/60 border border-gray-800 hover:border-gray-700 hover:bg-gray-900 transition-all block"
+                        >
+                          <div className="text-lg font-medium text-gray-100">
+                            No grades yet? No problem.
+                          </div>
+                          <p className="text-sm text-gray-400 mt-1">
+                            Upload your transcript anyway after registration is
+                            done—we’ll record your in-progress classes.
+                          </p>
+                        </a>
+                      </div>
+
+                      {/* Friendly explainer */}
+                      <div className="text-center mt-6 px-4 py-3 rounded-lg bg-blue-900/20 border border-blue-800 text-blue-200 text-sm">
+                        Even <strong>without</strong> a transcript, you can use
+                        the{" "}
+                        <button
+                          onClick={() => setActiveTab("simulator")}
+                          className="underline hover:opacity-80"
+                        >
+                          Simulator
+                        </button>{" "}
+                        and the{" "}
+                        <button
+                          onClick={() => setActiveTab("major")}
+                          className="underline hover:opacity-80"
+                        >
+                          My major
+                        </button>{" "}
+                        tabs to both sketch
+                        <br /> out your first year (and beyond!) and visualize
+                        requirements for your potential major(s) right away.
+                      </div>
+
+                      {/* The actual step-by-step instructions stay, but with the “no grades is fine” note */}
+                      <div className="mt-10 text-center">
+                        <h3 className="text-xl font-medium mb-3 bg-clip-text text-transparent bg-gradient-to-r from-blue-200 to-purple-200">
+                          How to get your unofficial transcript (no grades is
+                          totally fine)
+                        </h3>
+
+                        <div className="filepond--label-text text-left max-w-2xl">
+                          <p className="text-gray-300">
+                            <span className="font-semibold">1)</span> Go to{" "}
+                            <Link
+                              href="https://yub.yale.edu"
+                              className="text-white font-bold underline hover:text-pink-500 transition-all"
+                              target="_blank"
+                            >
+                              YHub
+                            </Link>{" "}
+                            and download your unofficial transcript.
+                          </p>
+                          <p className="text-gray-500 mt-2">
+                            Navigate to the <em>Academics</em> tab and click{" "}
+                            “Unofficial Transcript — Undergraduate”. Then click
+                            the{" "}
+                            <span className="inline-flex p-0 text-gray-400 align-middle">
+                              <Printer className="w-4 h-4 mr-1" />
+                              Print
+                            </span>{" "}
+                            button at the top right and{" "}
+                            <span className="text-gray-400">save as PDF</span>.
+                          </p>
+
+                          <p className="mt-5 text-gray-300">
+                            <span className="font-semibold">2)</span> Upload it
+                            below. Even without grades yet, we’ll import your{" "}
+                            <span className="font-semibold">in-progress</span>{" "}
+                            courses to kickstart your plan.
+                          </p>
+
+                          <p className="mt-3 text-gray-500">
+                            Note: You have to have registered for courses before
+                            uploading your transcript. Haven't registered? You
+                            can still use the Simulator and the My Major tabs.
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Upload card anchored for convenience */}
+                      <div
+                        id="upload-transcript"
+                        className="w-full max-w-lg bg-gray-900/50 backdrop-blur-sm p-8 rounded-xl border border-gray-800 mt-8"
+                      >
+                        <h4 className="text-lg font-medium text-gray-200 mb-2">
+                          After registration, upload your unofficial transcript
+                          here.
+                        </h4>
+                        <p className="text-sm text-gray-500 mb-4">
+                          We’ll parse your current classes now and fill in
+                          grades later when they post.
+                        </p>
+                        <FileUpload onSuccess={parseAndStoreCourses} />
+                        <p className="text-center text-gray-500 text-sm mt-4">
+                          We never store your actual transcript file. See our{" "}
+                          <Link
+                            href="/terms"
+                            className="text-gray-300 hover:underline"
+                          >
+                            terms
+                          </Link>
+                          .
+                        </p>
                       </div>
                     </div>
                   ) : (
@@ -1175,7 +1373,7 @@ export default function Home() {
                   <StatsView courses={courses} />
                 </motion.div>
               )}
-              {activeTab === "major" && getMajorProgress() && (
+              {activeTab === "major" && (
                 <motion.div
                   key="major"
                   initial={{ opacity: 0 }}
@@ -1310,7 +1508,7 @@ export default function Home() {
                                         status: "not-taken" as const, // This is the key fix
                                         credits: opt.credits,
                                         skipped: false,
-                                      } as Course)
+                                      }) as Course
                                   )
                               ) || []
                             );
@@ -1330,8 +1528,7 @@ export default function Home() {
                   )}
                 </motion.div>
               )}
-
-              {activeTab === "distributionals" && (
+              {/* {activeTab === "distributionals" && (
                 <motion.div
                   key="distributionals"
                   initial={{ opacity: 0 }}
@@ -1341,7 +1538,7 @@ export default function Home() {
                 >
                   <DistributionalsView courses={courses} />
                 </motion.div>
-              )}
+              )} */}
               {activeTab === "friends" && (
                 <motion.div
                   key="friends"
@@ -1413,6 +1610,14 @@ export default function Home() {
                   </div>
                 </motion.div>
               )}
+              {/* {activeTab === "cleoai" && (
+                <CleoAITab
+                  courses={courses}
+                  selectedMajor={selectedMajor}
+                  userProfile={userProfile}
+                  stats={calculateStats()}
+                />
+              )} */}
             </AnimatePresence>
           </motion.div>
         </div>

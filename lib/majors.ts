@@ -241,3 +241,12 @@ export const getFullMajorNameById = (majorId: string): string => {
   const major = majorRequirements[majorId];
   return major ? major.name : "Unknown Major";
 };
+
+export const getMajorDescriptionById = (majorId: string): string => {
+  const major = majorRequirements[majorId];
+  return major.description ? major.description : "Major at Yale University.";
+};
+
+export const getReqsForMajor = (majorId: string): MajorRequirement | null => {
+  return majorRequirements[majorId] || null;
+}

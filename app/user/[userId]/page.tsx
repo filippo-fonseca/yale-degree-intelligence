@@ -251,9 +251,12 @@ export default function UserProfilePage() {
 
               {userProfile?.majors && userProfile.majors.length > 0 && (
                 <p className="text-sm text-gray-400 mt-1">
-                  {userProfile.majors.map((m) => {
-                    return (getFullMajorNameById(m) || m) + " ";
-                  })}
+                  {truncate(
+                    userProfile.majors
+                      .map((m) => getFullMajorNameById(m) || m)
+                      .join(", "),
+                    70
+                  )}
                 </p>
               )}
 
@@ -328,6 +331,7 @@ export default function UserProfilePage() {
           <h2 className="text-xl font-medium mb-6 text-transparent bg-clip-text bg-gradient-to-r from-blue-200 to-purple-200">
             Academic Journey
           </h2>
+          {courses.length == 0 && <p>No courses taken or in progress.</p>}
 
           <div className="space-y-12">
             {Array.from(
@@ -399,8 +403,8 @@ export default function UserProfilePage() {
                                     !course.skipped
                                       ? "bg-emerald-900/10 border-emerald-800/50"
                                       : course.status === "in-progress"
-                                      ? "bg-purple-900/10 border-purple-800/50"
-                                      : "bg-gray-800/10 border-gray-700/50"
+                                        ? "bg-purple-900/10 border-purple-800/50"
+                                        : "bg-gray-800/10 border-gray-700/50"
                                   } border`}
                                 >
                                   <div className="flex justify-between items-start">
@@ -474,8 +478,8 @@ export default function UserProfilePage() {
                             course.status === "completed" && !course.skipped
                               ? "bg-emerald-900/10 border-emerald-800/50"
                               : course.status === "in-progress"
-                              ? "bg-purple-900/10 border-purple-800/50"
-                              : "bg-gray-800/10 border-gray-700/50"
+                                ? "bg-purple-900/10 border-purple-800/50"
+                                : "bg-gray-800/10 border-gray-700/50"
                           } border`}
                         >
                           <div className="flex justify-between items-start">
@@ -529,6 +533,7 @@ export default function UserProfilePage() {
             <h2 className="text-xl font-medium mb-6 text-transparent bg-clip-text bg-gradient-to-r from-blue-200 to-purple-200">
               Major Progress
             </h2>
+            {courses.length == 0 && <p>No progress toward major yet.</p>}
 
             <div className="space-y-8">
               {userProfile.majors.map((major, index) => {

@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { useState } from "react";
 import { doc, setDoc } from "firebase/firestore";
 import { db } from "@/config/firebase";
@@ -25,9 +25,10 @@ export default function MajorSelectionFlow({
     "welcome" | "majors" | "bio" | "year" | "complete"
   >("welcome");
   const [selectedMajors, setSelectedMajors] = useState<string[]>([]);
-  const [graduationYear, setGraduationYear] = useState<string>("2027");
+  const [graduationYear, setGraduationYear] = useState<string>("2029");
   const [bio, setBio] = useState<string>("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showMajorsInfo, setShowMajorsInfo] = useState(false);
 
   const handleMajorToggle = (majorCode: string) => {
     setSelectedMajors((prev) => {
@@ -225,11 +226,59 @@ export default function MajorSelectionFlow({
             <h2 className="text-xl font-medium text-center text-gray-200">
               It's time to select your major(s).
             </h2>
-            <p className="text-gray-400 text-center text-sm">
-              You can select up to 2 majors (min 1, ofc). Don't worry if you
-              don't even have a major rn - this can be changed later in
-              settings. Pick the one(s) you are most interested in right now.
-            </p>
+            <div className="space-y-2">
+              <p className="text-gray-300 text-center text-sm">
+                You can select up to 2 majors (min 1). If you’re a freshman or
+                not sure yet, no problem — just pick one or two you’re
+                considering or want to explore.
+              </p>
+
+              {/* Show more pill */}
+              <div className="flex justify-center">
+                <button
+                  type="button"
+                  onClick={() => setShowMajorsInfo((s) => !s)}
+                  aria-expanded={showMajorsInfo}
+                  className="inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs
+                 bg-gray-800/60 border border-gray-700 hover:border-pink-500/40
+                 text-gray-300 hover:text-white transition-all"
+                >
+                  <span>Why this doesn’t lock you in</span>
+                  <motion.span
+                    animate={{ rotate: showMajorsInfo ? 180 : 0 }}
+                    transition={{ duration: 0.2 }}
+                    className="inline-block"
+                  >
+                    ▼
+                  </motion.span>
+                </button>
+              </div>
+
+              {/* Collapsible details */}
+              <AnimatePresence initial={false}>
+                {showMajorsInfo && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: "auto" }}
+                    exit={{ opacity: 0, height: 0 }}
+                    transition={{ duration: 0.25 }}
+                    className="mx-auto max-w-md rounded-lg border border-gray-800 bg-gray-900/70
+                   text-gray-400 text-xs p-3"
+                  >
+                    <ul className="list-disc list-inside space-y-1">
+                      <li>
+                        Changing majors on DI takes ~5 seconds in Settings.
+                      </li>
+                      <li>All analytics update instantly when you switch.</li>
+                      <li>
+                        It’s just to personalize planning while you explore.
+                      </li>
+                    </ul>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+
             <InfoCard className="text-sm">
               Our goal is to support all majors & concentrations. If yours isn't
               there,{" "}

@@ -30,6 +30,7 @@ import {
   Timestamp,
   writeBatch,
   deleteDoc,
+  onSnapshot,
 } from "firebase/firestore";
 import { Course } from "@/lib/types";
 import { db } from "@/config/firebase";
@@ -190,24 +191,22 @@ export default function Home() {
     // },
   ];
 
-  // Fetch user profile on load
+  // Live-subscribe to user profile so UI updates without refresh
   useEffect(() => {
     if (!user) return;
 
-    const fetchUserProfile = async () => {
-      const docRef = doc(db, "users", user.uid);
-      const docSnap = await getDoc(docRef);
-
+    const unsub = onSnapshot(doc(db, "users", user.uid), (docSnap) => {
       if (docSnap.exists()) {
-        const profileData = docSnap.data() as UserProfile;
-        setUserProfile(profileData);
-        setSelectedMajor(profileData.majors[0] || "");
+        const data = docSnap.data() as UserProfile;
+        setUserProfile(data);
+        setSelectedMajor(data.majors?.[0] || "");
+        setShowMajorSelection(false); // auto-close once profile exists
       } else {
+        setUserProfile(null);
         setShowMajorSelection(true);
       }
-    };
-
-    fetchUserProfile();
+    });
+    return () => unsub();
   }, [user]);
 
   // Replace your current getMajorProgress with this:

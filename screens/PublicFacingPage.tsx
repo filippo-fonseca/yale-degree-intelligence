@@ -7,6 +7,11 @@ import {
   FiMail,
   FiExternalLink,
   FiChevronRight,
+  FiUsers,
+  FiSearch,
+  FiSave,
+  FiShare2,
+  FiPlayCircle,
 } from "react-icons/fi";
 import LogoIcon from "@/icons/LogoIcon";
 import CompoundLogo from "@/components/ui/CompoundLogo";
@@ -39,38 +44,26 @@ export default function AboutPage() {
     },
   ];
 
-  const extensions = [
-    {
-      title: "Degree Tracker",
-      description: "Track your progress towards graduation in real-time",
-      command: "F10.02",
-    },
-    {
-      title: "Course Planner",
-      description: "Plan your semesters with intelligent recommendations",
-      command: "F10.03",
-    },
-    {
-      title: "Requirement Checker",
-      description: "Instantly see which requirements any course fulfills",
-      command: "F10.04",
-    },
-    {
-      title: "Schedule Generator",
-      description: "Generate conflict-free schedules in seconds",
-      command: "F10.05",
-    },
-    {
-      title: "Peer Insights",
-      description: "See what courses others in your major are taking",
-      command: "F10.06",
-    },
-  ];
-
   if (logInFlow) return <LoginPage onBackClick={() => setLogInFlow(false)} />;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-gray-900 font-louize">
+    <div className="min-h-screen pt-2 bg-gradient-to-br from-gray-950 via-gray-900 to-gray-900 font-louize">
+      {/* Welcome Banner */}
+      <div className="relative mb-12 z-50 bg-gradient-to-r from-emerald-900/30 via-blue-900/30 to-purple-900/30 backdrop-blur-sm border-b border-emerald-800/30 shadow-[0_4px_20px_rgba(0,0,0,0.25)]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-center gap-3">
+          <span className="px-3 py-1 text-xs font-semibold rounded-full bg-emerald-900/50 border border-emerald-800/40 text-emerald-300 shadow-sm">
+            🎉 Class of 2029
+          </span>
+          <p className="text-sm text-emerald-100">
+            Welcome to Yale! Start your journey with{" "}
+            <span className="text-blue-300 font-medium">
+              DegreeIntelligence
+            </span>{" "}
+            and have peace of mind from day one.
+          </p>
+        </div>
+      </div>
+
       {/* Access Platform Button - Top Right */}
       <motion.div
         initial={{ opacity: 1, y: -20 }}
@@ -90,17 +83,17 @@ export default function AboutPage() {
       </motion.div>
 
       {/* Hero Section */}
-      <div className="relative mt-8">
+      <div className="relative pt-24 sm:pt-28">
+        {/* increased top padding to fix logo spacing */}
         <div className="max-w-7xl mx-auto px-4 pb-4 sm:px-6 lg:px-8 relative z-10">
-          {" "}
-          {/* pt-32 adds extra margin to the top */}
           <motion.div
             initial={{ opacity: 1, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
             className="text-center"
           >
-            <div className="flex justify-center mb-6">
+            <div className="flex justify-center mb-8">
+              {/* more space under logo */}
               <div className="relative w-24 h-24">
                 <motion.div
                   animate={{ rotate: 360 }}
@@ -120,6 +113,13 @@ export default function AboutPage() {
             <h1 className="flex items-center justify-center text-5xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-blue-200 to-purple-300 mb-4">
               <CompoundLogo hideLogo animated size="lg" />
             </h1>
+            {/* Welcome Badge */}
+            <div className="mb-4 flex justify-center">
+              <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-medium bg-gradient-to-r from-pink-500/20 via-purple-500/20 to-blue-500/20 border border-pink-500/30 text-pink-200 shadow-lg backdrop-blur-sm">
+                <span>💙</span> We’re so glad you’re here. We think you’ll love
+                this.
+              </span>
+            </div>
 
             <h2 className="text-4xl font-bold text-white mb-6">
               Your Yale Degree,{" "}
@@ -127,10 +127,11 @@ export default function AboutPage() {
             </h2>
 
             <p className="text-xl text-gray-300 max-w-3xl mx-auto mb-8">
-              Democratizing academic planning at Yale—one major at a time.
+              Democratizing academic planning at Yale—one major at a time. For
+              Yalies, by Yalies.
             </p>
 
-            <motion.div className="flex justify-center gap-4">
+            <motion.div className="flex flex-wrap justify-center gap-4">
               <Link href="/demo">
                 <motion.button
                   className="px-6 py-3 border border-pink-500 bg-pink-500/30 hover:bg-pink-500/40 backdrop-blur-md rounded-lg text-white font-medium flex items-center gap-2 transition-all shadow-sm hover:shadow-md"
@@ -139,6 +140,16 @@ export default function AboutPage() {
                 >
                   View Demo
                   <FiArrowRight className="opacity-80" />
+                </motion.button>
+              </Link>
+              <Link href="#simulator">
+                <motion.button
+                  className="px-6 py-3 border border-cyan-500 bg-cyan-500/30 hover:bg-cyan-500/40 backdrop-blur-md rounded-lg text-white font-medium flex items-center gap-2 transition-all shadow-sm hover:shadow-md"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  Our features
+                  <FiPlayCircle className="opacity-80" />
                 </motion.button>
               </Link>
               <motion.button
@@ -152,6 +163,11 @@ export default function AboutPage() {
               </motion.button>
             </motion.div>
           </motion.div>
+        </div>
+
+        {/* subtle splash gradient */}
+        <div className="pointer-events-none absolute inset-0 -z-10">
+          <div className="absolute left-1/2 top-10 -translate-x-1/2 h-72 w-[36rem] rounded-full bg-gradient-to-r from-blue-600/20 to-purple-600/20 blur-3xl" />
         </div>
       </div>
 
@@ -170,112 +186,241 @@ export default function AboutPage() {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {/* Problem */}
-            <motion.div
-              initial={{ opacity: 1, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6 }}
-              className="bg-gray-800/50 p-6 rounded-xl border border-gray-700/50 hover:border-blue-500/30 transition-all"
-            >
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 rounded-lg bg-red-500/20 flex items-center justify-center">
-                  <span className="text-red-400 text-xl">❗</span>
-                </div>
-                <h3 className="text-xl font-medium text-white">The Problem</h3>
-              </div>
+            <Card fade>
+              <CardHeader
+                icon={<span className="text-red-400 text-xl">❗</span>}
+                title="The Problem"
+                color="red"
+              />
               <ul className="space-y-3 text-gray-300">
-                <li className="flex items-start gap-2">
-                  <FiChevronRight className="text-red-400 mt-1" />
-                  <span>Scattered requirements across PDFs and websites</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <FiChevronRight className="text-red-400 mt-1" />
-                  <span>Manual tracking in error-prone spreadsheets</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <FiChevronRight className="text-red-400 mt-1" />
-                  <span>No centralized view of progress</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <FiChevronRight className="text-red-400 mt-1" />
-                  <span>Planning nightmares (esp. double majors)</span>
-                </li>
+                {[
+                  "Scattered requirements across PDFs and websites",
+                  "Manual tracking in error-prone spreadsheets",
+                  "No centralized view of progress",
+                  "Planning nightmares (esp. double majors)",
+                ].map((t) => (
+                  <li key={t} className="flex items-start gap-2">
+                    <FiChevronRight className="text-red-400 mt-1" />
+                    <span>{t}</span>
+                  </li>
+                ))}
               </ul>
-            </motion.div>
+            </Card>
 
             {/* Solution */}
-            <motion.div
-              initial={{ opacity: 1, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: 0.1 }}
-              className="bg-gray-800/50 p-6 rounded-xl border border-gray-700/50 hover:border-blue-500/30 transition-all"
-            >
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 rounded-lg bg-blue-500/20 flex items-center justify-center">
-                  <span className="text-blue-400 text-xl">💡</span>
-                </div>
-                <h3 className="text-xl font-medium text-white">Our Solution</h3>
-              </div>
+            <Card fade delay={0.1}>
+              <CardHeader
+                icon={<span className="text-blue-400 text-xl">💡</span>}
+                title="Our Solution"
+                color="blue"
+              />
               <ul className="space-y-3 text-gray-300">
-                <li className="flex items-start gap-2">
-                  <FiChevronRight className="text-blue-400 mt-1" />
-                  <span>Unified requirements database</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <FiChevronRight className="text-blue-400 mt-1" />
-                  <span>Real-time progress stats + visualization</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <FiChevronRight className="text-blue-400 mt-1" />
-                  <span>Intelligent course recommendations</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <FiChevronRight className="text-blue-400 mt-1" />
-                  <span>Clean, intuitive interface</span>
-                </li>
+                {[
+                  "Unified requirements database",
+                  "Real-time progress stats + visualization",
+                  "Intelligent course recommendations",
+                  "Clean, intuitive interface",
+                ].map((t) => (
+                  <li key={t} className="flex items-start gap-2">
+                    <FiChevronRight className="text-blue-400 mt-1" />
+                    <span>{t}</span>
+                  </li>
+                ))}
               </ul>
-            </motion.div>
+            </Card>
 
             {/* Impact */}
-            <motion.div
-              initial={{ opacity: 1, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6 }}
-              className="bg-gray-800/50 p-6 rounded-xl border border-gray-700/50 hover:border-blue-500/30 transition-all"
-            >
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 rounded-lg bg-green-500/20 flex items-center justify-center">
-                  <span className="text-green-400 text-xl">🚀</span>
-                </div>
-                <h3 className="text-xl font-medium text-white">The Impact</h3>
-              </div>
+            <Card fade>
+              <CardHeader
+                icon={<span className="text-green-400 text-xl">🚀</span>}
+                title="The Impact"
+                color="green"
+              />
               <ul className="space-y-3 text-gray-300">
-                <li className="flex items-start gap-2">
-                  <FiChevronRight className="text-green-400 mt-1" />
-                  <span>Hours saved on academic planning</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <FiChevronRight className="text-green-400 mt-1" />
-                  <span>Reduced errors in requirement tracking</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <FiChevronRight className="text-green-400 mt-1" />
-                  <span>
-                    Empowered students can make space for things like fun
-                    classes
-                  </span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <FiChevronRight className="text-green-400 mt-1" />
-                  <span>Democratized access to academic insights</span>
-                </li>
+                {[
+                  "Hours saved on academic planning",
+                  "Reduced errors in requirement tracking",
+                  "Empowered students can make space for fun classes",
+                  "Democratized access to academic insights",
+                ].map((t) => (
+                  <li key={t} className="flex items-start gap-2">
+                    <FiChevronRight className="text-green-400 mt-1" />
+                    <span>{t}</span>
+                  </li>
+                ))}
               </ul>
-            </motion.div>
+            </Card>
           </div>
         </div>
       </div>
+
+      {/* NEW: Simulator Section */}
+      <section
+        id="simulator"
+        className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12"
+      >
+        <div className="bg-gray-900/80 backdrop-blur-lg rounded-2xl p-8 border border-cyan-700/30 shadow-xl overflow-hidden">
+          <div className="absolute -right-24 -top-24 h-72 w-72 rounded-full bg-cyan-600/10 blur-3xl" />
+          <div className="absolute -left-24 -bottom-24 h-72 w-72 rounded-full bg-purple-600/10 blur-3xl" />
+
+          <div className="flex flex-col lg:flex-row gap-10 items-center">
+            {/* Left: copy + bullets */}
+            <div className="flex-1 min-w-0">
+              <h3 className="text-3xl font-bold text-white mb-3">
+                Simulator — drag, drop, done.
+              </h3>
+              <p className="text-gray-300 mb-6 max-w-xl">
+                Build a semester-by-semester plan by dragging courses from your
+                major (or search <em>every</em> course at Yale). Save multiple
+                plans, load them later, and see how fun classes and
+                distributional requirements fit without breaking anything.
+              </p>
+
+              <div className="grid sm:grid-cols-2 gap-3">
+                {[
+                  {
+                    icon: <FiSearch />,
+                    text: "Search the full catalog + your major",
+                  },
+                  {
+                    icon: <FiSave />,
+                    text: "Save and duplicate plans instantly",
+                  },
+                  { icon: <FiShare2 />, text: "Share with friends / mentors" },
+                  {
+                    icon: <FiUsers />,
+                    text: "See where friends slotted courses",
+                  },
+                ].map((b) => (
+                  <div
+                    key={b.text}
+                    className="flex items-center gap-2 text-gray-200 bg-gray-800/60 border border-gray-700/60 rounded-lg px-3 py-2"
+                  >
+                    <span className="shrink-0 text-cyan-300">{b.icon}</span>
+                    <span className="text-sm">{b.text}</span>
+                  </div>
+                ))}
+              </div>
+
+              <div className="mt-6 flex gap-3">
+                <button
+                  className="px-4 py-2 rounded-lg bg-cyan-600/70 hover:bg-cyan-600 text-white border border-cyan-400/40 shadow"
+                  onClick={() => setLogInFlow(true)}
+                >
+                  Try Simulator
+                </button>
+                <Link href="/demo#simulator">
+                  <button className="px-4 py-2 rounded-lg bg-gray-800 hover:bg-gray-700 text-white border border-gray-600/60">
+                    Watch Demo
+                  </button>
+                </Link>
+              </div>
+            </div>
+
+            {/* Right: GIF/video placeholder */}
+            <div className="flex-1 w-full px-6">
+              <div className="relative rounded-xl border-2 border-pink-500 bg-black/40 overflow-hidden shadow-2xl">
+                <img
+                  src="/demo/simulator.gif"
+                  alt="Simulator demo"
+                  className="w-[80%] h-[80%] object-cover aspect-video"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* NEW: Public Profiles & Friends */}
+      <section className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="bg-gray-900/70 backdrop-blur-lg rounded-2xl p-8 border border-gray-800/50 shadow-xl">
+          <div className="text-center mb-10 flex flex-col gap-2">
+            <h2 className="text-3xl font-medium bg-clip-text text-transparent bg-gradient-to-r from-blue-200 to-purple-200">
+              Public Profile & Friends
+            </h2>
+            <p className="text-gray-300 max-w-3xl mx-auto">
+              Add a friend and mutually see each other's profiles and{" "}
+              <em>trajectory</em>. Learn from upperclassmen who've done what
+              you're trying to do and organize yourself smarter.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-6 mt-8">
+            {/* Profile card mock */}
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5 }}
+              className="rounded-xl border border-purple-500/30 bg-gray-800/50 p-6"
+            >
+              <div className="flex items-center gap-4 mb-4">
+                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-purple-600" />
+                <div>
+                  <p className="text-white font-medium">This could be you</p>
+                  <p className="text-sm text-purple-200">CPSC & ECE '27</p>
+                </div>
+              </div>
+              <ul className="text-gray-300 text-sm space-y-2">
+                <li>
+                  • Took <span className="text-white">CPSC 223</span> in Spring
+                  '25 → recommends pairing with{" "}
+                  <span className="text-white">MATH 244</span>.
+                </li>
+                <li>
+                  • Planning <span className="text-white">CPSC 3230</span> +{" "}
+                  <span className="text-white">ECE 310</span> next Fall.
+                </li>
+                <li>• Shares schedule blocks and notes with friends.</li>
+              </ul>
+            </motion.div>
+
+            {/* Trajectory mini-visual */}
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.1 }}
+              className="rounded-xl border border-blue-500/30 bg-gray-800/50 p-6"
+            >
+              <p className="text-gray-200 mb-3 font-medium">
+                Trajectory preview for in-major classes
+              </p>
+              <div className="grid grid-cols-4 gap-3 text-xs">
+                {["Fall '24", "Spring '25", "Fall '25", "Spring '26"].map(
+                  (term, i) => (
+                    <div
+                      key={term}
+                      className="rounded-lg border border-gray-700/60 p-2 bg-gray-900/60"
+                    >
+                      <p className="text-gray-400 mb-1">{term}</p>
+                      <ul className="space-y-1">
+                        {[
+                          "CPSC 201",
+                          i % 2 === 0 ? "CPSC 223" : "MATH 244",
+                          i % 3 === 0 ? "ECE 200" : "ENAS 130",
+                        ].map((c) => (
+                          <li key={c} className="truncate text-gray-200">
+                            {c}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )
+                )}
+              </div>
+              <div className="mt-4 text-right">
+                <button
+                  className="inline-flex items-center gap-2 text-cyan-300 hover:text-cyan-200 text-sm"
+                  onClick={() => setLogInFlow(true)}
+                >
+                  Explore friends <FiUsers />
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        </div>
+      </section>
 
       {/* Mission Section */}
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -292,7 +437,7 @@ export default function AboutPage() {
               Trying to plan our majors, we kept running into the same problem:
               Yale's requirements are complex, scattered across PDFs and
               websites, and nearly impossible to track manually. So we built the
-              tool we wish we had. We sincerely hope it helps {":)"}
+              tool we wish we had. We sincerely hope it helps :)
             </p>
           </div>
 
@@ -453,7 +598,7 @@ export default function AboutPage() {
         </p>
       </div>
 
-      {/* Hide scrollbar styling */}
+      {/* Shared components */}
       <style jsx global>{`
         .hide-scrollbar::-webkit-scrollbar {
           display: none;
@@ -463,6 +608,60 @@ export default function AboutPage() {
           scrollbar-width: none;
         }
       `}</style>
+    </div>
+  );
+}
+
+function Card({
+  children,
+  fade,
+  delay = 0,
+}: {
+  children: React.ReactNode;
+  fade?: boolean;
+  delay?: number;
+}) {
+  if (!fade)
+    return (
+      <div className="bg-gray-800/50 p-6 rounded-xl border border-gray-700/50 hover:border-blue-500/30 transition-all">
+        {children}
+      </div>
+    );
+  return (
+    <motion.div
+      initial={{ opacity: 1, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.6, delay }}
+      className="bg-gray-800/50 p-6 rounded-xl border border-gray-700/50 hover:border-blue-500/30 transition-all"
+    >
+      {children}
+    </motion.div>
+  );
+}
+
+function CardHeader({
+  icon,
+  title,
+  color = "blue",
+}: {
+  icon: React.ReactNode;
+  title: string;
+  color?: "red" | "blue" | "green";
+}) {
+  const colorMap: Record<string, string> = {
+    red: "text-red-400 bg-red-500/20",
+    blue: "text-blue-400 bg-blue-500/20",
+    green: "text-green-400 bg-green-500/20",
+  };
+  return (
+    <div className="flex items-center gap-3 mb-4">
+      <div
+        className={`w-10 h-10 rounded-lg flex items-center justify-center ${colorMap[color]}`}
+      >
+        {icon}
+      </div>
+      <h3 className="text-xl font-medium text-white">{title}</h3>
     </div>
   );
 }

@@ -19,6 +19,20 @@ import Link from "next/link";
 import { useState, useRef } from "react";
 import LoginPage from "@/components/LoginPage";
 
+function MajorProgressBar({ percent }: { percent: number }) {
+  return (
+    <div className="w-full bg-gray-900 rounded-full h-2 overflow-hidden">
+      <motion.div
+        initial={{ width: 0 }}
+        whileInView={{ width: `${Math.min(Math.max(percent, 0), 100)}%` }}
+        viewport={{ once: true, amount: 0.4 }} // triggers when ~40% visible
+        transition={{ duration: 1, ease: "easeOut" }}
+        className="h-2 rounded-full bg-gradient-to-r from-blue-400 to-purple-500"
+      />
+    </div>
+  );
+}
+
 export default function AboutPage() {
   const [logInFlow, setLogInFlow] = useState(false);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -43,6 +57,17 @@ export default function AboutPage() {
       emoji: "🎓",
     },
   ];
+
+  // --- mock for public preview ---
+  const demoMajorName = "Computer Science (CPSC)";
+  const demoTotals = { completed: 5, inProgress: 3, total: 12 };
+
+  const demoStrictPct = Math.round(
+    (demoTotals.completed / demoTotals.total) * 100
+  );
+  const demoWithIPPct = Math.round(
+    ((demoTotals.completed + demoTotals.inProgress) / demoTotals.total) * 100
+  );
 
   if (logInFlow) return <LoginPage onBackClick={() => setLogInFlow(false)} />;
 
@@ -331,6 +356,66 @@ export default function AboutPage() {
         </div>
       </section>
 
+      {/* NEW: Major Progress — compact bar only */}
+      <section
+        id="major-progress"
+        className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12"
+      >
+        <div className="bg-gray-900/80 backdrop-blur-lg rounded-2xl p-8 border border-blue-700/30 shadow-xl">
+          <div className="mb-4">
+            <h3 className="text-2xl font-bold text-white">
+              Your <i>Major</i> progress, visualized.
+            </h3>
+            <p className="text-gray-300 mt-1">
+              Track your journey at a glance, complete with a clean progress bar
+              and a full grid of requirements, each showing the courses you’ve
+              taken and smart recommendations for what to take next from us or
+              your DUS. We have it all.
+            </p>
+          </div>
+
+          <div className="space-y-5">
+            {/* Strict (completed only) */}
+            <div>
+              <div className="flex items-center justify-between text-sm mb-2">
+                <span className="text-gray-400">Completed only</span>
+                <span className="text-blue-300 font-medium">
+                  {demoStrictPct}%
+                </span>
+              </div>
+              <MajorProgressBar percent={demoStrictPct} />
+              <div className="text-xs text-gray-400 mt-2">
+                {demoTotals.completed}/{demoTotals.total} credits
+              </div>
+            </div>
+
+            {/* Including in-progress */}
+            <div>
+              <div className="flex items-center justify-between text-sm mb-2">
+                <span className="text-gray-400">Including in-progress</span>
+                <span className="text-purple-300 font-medium">
+                  {demoWithIPPct}%
+                </span>
+              </div>
+              <MajorProgressBar percent={demoWithIPPct} />
+              <div className="text-xs text-gray-400 mt-2">
+                {demoTotals.completed + demoTotals.inProgress}/
+                {demoTotals.total} credits
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-6">
+            <button
+              className="px-4 py-2 rounded-lg bg-pink-600/70 hover:bg-blue-600 text-white border border-pink-400/40 shadow"
+              onClick={() => setLogInFlow(true)}
+            >
+              Let's do this
+            </button>
+          </div>
+        </div>
+      </section>
+
       {/* NEW: Public Profiles & Friends */}
       <section className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="bg-gray-900/70 backdrop-blur-lg rounded-2xl p-8 border border-gray-800/50 shadow-xl">
@@ -478,8 +563,8 @@ export default function AboutPage() {
           {[
             {
               name: "Filippo Fonseca",
-              role: "Mechanical Engineering (ABET) & EECS '28",
-              bio: "Built the first version as a shell script after one too many long sessions trying to plan courses.",
+              role: "Founder | Mechanical Engineering (ABET) & EECS '28",
+              bio: "Built the first version as a shell script after one too many long sessions trying to plan courses. Talks too much.",
               contact: "filippo.fonseca@yale.edu",
               photoRoute: "/team/filippo.jpeg",
               github: "https://github.com/filippo-fonseca",
@@ -487,7 +572,7 @@ export default function AboutPage() {
             },
             {
               name: "Emir Ahmed",
-              role: "Computer Science & Applied Math '28",
+              role: "Development | Computer Science & Applied Math '28",
               bio: "Joined forces to continue scaling the platform and make it more robust.",
               contact: "emir.ahmed@yale.edu",
               photoRoute: "/team/emir.JPG",

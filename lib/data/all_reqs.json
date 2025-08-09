@@ -15326,8 +15326,8 @@
     "name": "Mechanical Engineering (ABET), B.S.",
     "description": "Bachelor of Science in Mechanical Engineering (ABET)",
     "creditRequirements": {
-      "total": 27.5,
-      "core": 24.5,
+      "total": 26.5,
+      "core": 23.5,
       "electives": 3
     },
     "requirements": [
@@ -15369,7 +15369,7 @@
       {
         "name": "Physics Sequence",
         "description": "PHYS 1800 + 1810 or PHYS 2000 + 2010",
-        "required": 1,
+        "required": 2,
         "options": [
           {
             "type": "course",
@@ -15675,7 +15675,7 @@
       },
       {
         "name": "Senior Design II",
-        "required": 1,
+        "required": 0.5,
         "options": [
           {
             "type": "course",

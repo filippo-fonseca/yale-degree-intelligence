@@ -10,7 +10,11 @@ import React, {
 import { motion, AnimatePresence } from "framer-motion";
 import { FiX, FiChevronDown, FiInfo, FiPlus } from "react-icons/fi";
 
-import { MajorProgress } from "@/lib/majors";
+import {
+  getFullMajorNameById,
+  getMajorDescriptionById,
+  MajorProgress,
+} from "@/lib/majors";
 import { MAJORS } from "@/lib/majors";
 import { useAuth } from "@/context/AuthContext";
 import { skipCourse, unskipCourse } from "@/lib/utils/courseOperations";
@@ -610,6 +614,9 @@ export default function MajorProgressView({
           <h3 className="text-xl font-medium bg-clip-text text-transparent bg-gradient-to-r from-blue-200 to-purple-200">
             {MAJORS[selectedMajor]}
           </h3>
+          <p className="text-sm text-gray-500">
+            {getMajorDescriptionById(selectedMajor)}
+          </p>
         </div>
         <div className="flex items-center gap-4">
           <div className="text-3xl font-medium bg-clip-text text-transparent bg-gradient-to-r from-blue-200 to-purple-200">

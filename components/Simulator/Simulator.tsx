@@ -435,7 +435,7 @@ export default function Simulator({
             } bg-pink-900/20 text-gray-300 hover:bg-pink-900/30 transition-colors`}
           >
             <div className="flex items-center gap-2 font-medium">
-              <div>Quick-add: Pool of courses from your major</div>
+              <div>Quick-add: Pool of remaining courses from your major</div>
               <div className="relative group">
                 <Info className="h-4 w-4 text-gray-400 hover:text-gray-200 transition-colors cursor-pointer" />
                 <div className="absolute z-50 bottom-full mt-2 left-1/2 -translate-x-1/2 bg-gray-800 text-gray-300 text-xs px-3 py-1 rounded-md opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">

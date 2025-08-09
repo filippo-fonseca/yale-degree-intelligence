@@ -66,16 +66,19 @@ export default function StatsView({ courses }: { courses: Course[] }) {
   });
 
   // Semester data
-  const semesterGroups = activeCourses.reduce((acc, c) => {
-    const key = `${c.semester} ${c.year}`;
-    if (!acc[key]) {
-      acc[key] = { credits: 0, points: 0, courses: [] };
-    }
-    acc[key].credits += c.credits || 0;
-    acc[key].points += gradePoints[c.grade!] * (c.credits || 1);
-    acc[key].courses.push(c);
-    return acc;
-  }, {} as Record<string, { credits: number; points: number; courses: Course[] }>);
+  const semesterGroups = activeCourses.reduce(
+    (acc, c) => {
+      const key = `${c.semester} ${c.year}`;
+      if (!acc[key]) {
+        acc[key] = { credits: 0, points: 0, courses: [] };
+      }
+      acc[key].credits += c.credits || 0;
+      acc[key].points += gradePoints[c.grade!] * (c.credits || 1);
+      acc[key].courses.push(c);
+      return acc;
+    },
+    {} as Record<string, { credits: number; points: number; courses: Course[] }>
+  );
 
   const semesterData = Object.entries(semesterGroups)
     .map(([semester, { credits, points, courses }]) => ({
@@ -118,14 +121,17 @@ export default function StatsView({ courses }: { courses: Course[] }) {
 
   // Department data
   const departmentData = Object.entries(
-    activeCourses.reduce((acc, c) => {
-      const dept = c.code.split(" ")[0];
-      if (!acc[dept]) acc[dept] = { creds: 0, pts: 0, count: 0 };
-      acc[dept].creds += c.credits || 0;
-      acc[dept].pts += gradePoints[c.grade!] * (c.credits || 1);
-      acc[dept].count += 1;
-      return acc;
-    }, {} as Record<string, { creds: number; pts: number; count: number }>)
+    activeCourses.reduce(
+      (acc, c) => {
+        const dept = c.code.split(" ")[0];
+        if (!acc[dept]) acc[dept] = { creds: 0, pts: 0, count: 0 };
+        acc[dept].creds += c.credits || 0;
+        acc[dept].pts += gradePoints[c.grade!] * (c.credits || 1);
+        acc[dept].count += 1;
+        return acc;
+      },
+      {} as Record<string, { creds: number; pts: number; count: number }>
+    )
   )
     .map(([dept, d]) => ({
       department: dept,
@@ -479,8 +485,8 @@ function StatCard({
             change > 0
               ? "text-emerald-400"
               : change > -0.05
-              ? "text-gray-400"
-              : "text-red-400"
+                ? "text-gray-400"
+                : "text-red-400"
           }`}
         >
           {change > 0 ? "+" : ""}

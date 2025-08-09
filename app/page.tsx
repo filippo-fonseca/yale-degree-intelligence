@@ -1214,8 +1214,9 @@ export default function Home() {
                           </p>
 
                           <p className="mt-3 text-gray-500">
-                            (If you have placement/AP credits or pre-arrival
-                            courses on there, we’ll capture those too.)
+                            Note: You have to have registered for courses before
+                            uploading your transcript. Haven't registered? You
+                            can still use the Simulator and the My Major tabs.
                           </p>
                         </div>
                       </div>

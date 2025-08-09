@@ -566,8 +566,8 @@ export default function Simulator({
           course.status === "completed"
             ? "bg-emerald-900/20 text-emerald-300 border-emerald-700"
             : course.status === "in-progress"
-            ? "bg-blue-900/20 text-blue-300 border-blue-700"
-            : "bg-amber-900/20 text-pink-300 border-pink-700 hover:bg-pink-800/30"
+              ? "bg-blue-900/20 text-blue-300 border-blue-700"
+              : "bg-amber-900/20 text-pink-300 border-pink-700 hover:bg-pink-800/30"
         }`}
                   >
                     <div className="flex items-center justify-between w-full">

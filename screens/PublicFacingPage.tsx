@@ -1,6 +1,12 @@
 "use client";
 
-import { motion } from "framer-motion";
+import {
+  motion,
+  useInView,
+  useMotionValue,
+  useSpring,
+  useTransform,
+} from "framer-motion";
 import {
   FiArrowRight,
   FiGithub,
@@ -18,6 +24,68 @@ import CompoundLogo from "@/components/ui/CompoundLogo";
 import Link from "next/link";
 import { useState, useRef } from "react";
 import LoginPage from "@/components/LoginPage";
+import dynamic from "next/dynamic";
+import { GraduationCap, BookOpen, Award, Clock } from "lucide-react";
+
+function CountUp({
+  to,
+  inView,
+  decimals = 0,
+  duration = 0.8,
+}: {
+  to: number;
+  inView: boolean;
+  decimals?: number;
+  duration?: number;
+}) {
+  const mv = useMotionValue(0);
+  const sp = useSpring(mv, { stiffness: 120, damping: 20, duration });
+  const rounded = useTransform(sp, (v) => v.toFixed(decimals));
+  // start when visible
+  if (inView) mv.set(to);
+  return <motion.span>{rounded as any}</motion.span>;
+}
+
+const statsMock = {
+  gpa: 3.78,
+  totalCredits: 18.5,
+  coursesCompleted: 16,
+  avgCreditsPerSem: 4.7,
+  progressToGradPct: 78, // optional subtitle for Total Credits
+};
+
+// avoid SSR issues with charts
+const LineChart = dynamic(
+  () => import("@mui/x-charts/LineChart").then((m) => m.LineChart),
+  { ssr: false }
+);
+const PieChartWrapper = dynamic(
+  () => import("@/components/ui/PieChartWrapper"),
+  { ssr: false }
+);
+
+// --- Stats demo data (public page) ---
+const statsDemo = {
+  semesters: ["Fall 23", "Spring 24", "Fall 24", "Spring 25"],
+  cumulativeGpa: [3.79, 3.71, 3.8, 3.88], // smooth upward trend
+  gradeDistribution: [
+    { label: "A", count: 12.5 },
+    { label: "B+", count: 4 },
+    { label: "B", count: 1 },
+    { label: "B-", count: 1 },
+  ],
+};
+
+const CHART_COLORS = [
+  "#8B5CF6", // purple
+  "#3B82F6", // blue
+  "#10B981", // emerald
+  "#F59E0B", // amber
+  "#EC4899", // pink
+  "#6366F1", // indigo
+  "#F97316", // orange
+  "#14B8A6", // teal
+];
 
 function MajorProgressBar({ percent }: { percent: number }) {
   return (
@@ -36,6 +104,12 @@ function MajorProgressBar({ percent }: { percent: number }) {
 export default function AboutPage() {
   const [logInFlow, setLogInFlow] = useState(false);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const lineRef = useRef<HTMLDivElement | null>(null);
+  const lineInView = useInView(lineRef, { once: true, amount: 0.35 });
+  const pieRef = useRef<HTMLDivElement | null>(null);
+  const pieInView = useInView(pieRef, { once: true, amount: 0.35 });
+  const cardsRef = useRef<HTMLDivElement | null>(null);
+  const cardsInView = useInView(cardsRef, { once: true, amount: 0.35 });
 
   const features = [
     {
@@ -84,7 +158,8 @@ export default function AboutPage() {
             <span className="text-blue-300 font-medium">
               DegreeIntelligence
             </span>{" "}
-            and have peace of mind from day one.
+            and have peace of mind from day one. You do not need grades to use
+            it.
           </p>
         </div>
       </div>
@@ -352,6 +427,329 @@ export default function AboutPage() {
                 />
               </div>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* NEW: Stats Preview (public) */}
+      <section
+        id="stats"
+        className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12"
+      >
+        <div className="bg-gray-900/80 backdrop-blur-lg rounded-2xl p-8 border border-purple-700/30 shadow-xl overflow-hidden">
+          <div className="absolute -right-24 -top-24 h-72 w-72 rounded-full bg-purple-600/10 blur-3xl" />
+          <div className="absolute -left-24 -bottom-24 h-72 w-72 rounded-full bg-blue-600/10 blur-3xl" />
+
+          <div className="mb-6">
+            <h3 className="text-3xl font-bold text-white">
+              Contextual stats that actually help.
+            </h3>
+            <p className="text-gray-300 mt-1">
+              See your progress and trajectory in context so you know where to
+              improve, not just your grades in isolation. This is just a preview
+              of all that we have; log in to see it!
+            </p>
+          </div>
+          <div ref={cardsRef} className="mb-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              {/* Cumulative GPA */}
+              <motion.div
+                initial={{ opacity: 0, y: 16 }}
+                animate={cardsInView ? { opacity: 1, y: 0 } : {}}
+                transition={{ duration: 0.5 }}
+                className="p-6 rounded-xl bg-gray-900/50 backdrop-blur-sm border border-gray-800"
+              >
+                <div className="flex items-center justify-between">
+                  <p className="text-sm text-gray-400">Cumulative GPA</p>
+                  <div className="text-emerald-400 opacity-80">
+                    <GraduationCap className="h-5 w-5" />
+                  </div>
+                </div>
+                <p className="text-3xl font-medium text-emerald-400 mt-2">
+                  <CountUp
+                    to={statsMock.gpa}
+                    inView={cardsInView}
+                    decimals={2}
+                  />
+                </p>
+              </motion.div>
+
+              {/* Total Credits */}
+              <motion.div
+                initial={{ opacity: 0, y: 16 }}
+                animate={cardsInView ? { opacity: 1, y: 0 } : {}}
+                transition={{ duration: 0.5, delay: 0.05 }}
+                className="p-6 rounded-xl bg-gray-900/50 backdrop-blur-sm border border-gray-800"
+              >
+                <div className="flex items-center justify-between">
+                  <p className="text-sm text-gray-400">Total Credits</p>
+                  <div className="text-blue-400 opacity-80">
+                    <BookOpen className="h-5 w-5" />
+                  </div>
+                </div>
+                <p className="text-3xl font-medium text-blue-400 mt-2">
+                  <CountUp to={statsMock.totalCredits} inView={cardsInView} />
+                </p>
+                <p className="text-xs text-gray-400 mt-1">
+                  {statsMock.progressToGradPct}% to graduation
+                </p>
+              </motion.div>
+
+              {/* Courses Completed */}
+              <motion.div
+                initial={{ opacity: 0, y: 16 }}
+                animate={cardsInView ? { opacity: 1, y: 0 } : {}}
+                transition={{ duration: 0.5, delay: 0.1 }}
+                className="p-6 rounded-xl bg-gray-900/50 backdrop-blur-sm border border-gray-800"
+              >
+                <div className="flex items-center justify-between">
+                  <p className="text-sm text-gray-400">Courses Completed</p>
+                  <div className="text-purple-300 opacity-80">
+                    <Award className="h-5 w-5" />
+                  </div>
+                </div>
+                <p className="text-3xl font-medium text-purple-300 mt-2">
+                  <CountUp
+                    to={statsMock.coursesCompleted}
+                    inView={cardsInView}
+                  />
+                </p>
+                <p className="text-xs text-gray-400 mt-1">
+                  & 5 courses in progress right now
+                </p>
+              </motion.div>
+
+              {/* Average Credits / Semester */}
+              <motion.div
+                initial={{ opacity: 0, y: 16 }}
+                animate={cardsInView ? { opacity: 1, y: 0 } : {}}
+                transition={{ duration: 0.5, delay: 0.15 }}
+                className="p-6 rounded-xl bg-gray-900/50 backdrop-blur-sm border border-gray-800"
+              >
+                <div className="flex items-center justify-between">
+                  <p className="text-sm text-gray-400">
+                    Average Credits/Semester
+                  </p>
+                  <div className="text-blue-300 opacity-80">
+                    <Clock className="h-5 w-5" />
+                  </div>
+                </div>
+                <p className="text-3xl font-medium text-blue-300 mt-2">
+                  <CountUp
+                    to={statsMock.avgCreditsPerSem}
+                    inView={cardsInView}
+                    decimals={1}
+                  />
+                </p>
+                <p className="text-xs text-gray-400 mt-1">across 6 semesters</p>
+              </motion.div>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Cumulative GPA */}
+            <motion.div
+              initial={{ opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.35 }}
+              transition={{ duration: 0.6 }}
+              className="p-6 rounded-xl bg-gray-900/50 backdrop-blur-sm border border-gray-800"
+            >
+              <div className="flex items-start justify-between mb-4">
+                <div>
+                  <h4 className="font-medium text-lg text-transparent bg-clip-text bg-gradient-to-r from-blue-200 to-purple-200">
+                    Cumulative GPA
+                  </h4>
+                  <p className="text-xs text-gray-400 mt-1">
+                    Watch your GPA evolve semester by semester.
+                  </p>
+                </div>
+                <div className="p-2 rounded-full bg-gray-800/50 text-purple-300">
+                  {/* icon-ish sparkline */}
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                    <path
+                      d="M3 20L9 12l4 3 8-9"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                    />
+                  </svg>
+                </div>
+              </div>
+              <div className="h-[360px] w-full">
+                <div ref={lineRef} className="relative">
+                  {/* Wipe reveal overlay */}
+                  <motion.div
+                    initial={{ x: 0 }}
+                    animate={lineInView ? { x: "100%" } : {}}
+                    transition={{ duration: 0.9, ease: "easeOut", delay: 0.15 }}
+                    className="pointer-events-none absolute inset-0 bg-gray-900/50"
+                    style={{ mixBlendMode: "multiply" }}
+                  />
+                  {lineInView && (
+                    <LineChart
+                      key="cum-line-mounted"
+                      height={360}
+                      xAxis={[
+                        {
+                          scaleType: "point",
+                          data: statsDemo.semesters,
+                          tickLabelStyle: {
+                            angle: 45,
+                            textAnchor: "start",
+                            fontSize: 12,
+                            fill: "#9CA3AF",
+                          },
+                        },
+                      ]}
+                      yAxis={[
+                        {
+                          label: "GPA",
+                          min: Math.max(
+                            0,
+                            Math.floor(
+                              Math.min(...statsDemo.cumulativeGpa) * 2
+                            ) / 2
+                          ),
+                          max: 4,
+                        },
+                      ]}
+                      series={[
+                        {
+                          data: statsDemo.cumulativeGpa,
+                          showMark: true,
+                          color: "#ed64a6",
+                          area: true,
+                          curve: "natural",
+                        },
+                      ]}
+                      grid={{ vertical: true, horizontal: true }}
+                      margin={{ left: 60, right: 20, top: 20, bottom: 80 }}
+                      slotProps={{
+                        tooltip: {
+                          sx: {
+                            backgroundColor: "#1F2937",
+                            borderColor: "#374151",
+                            color: "#F3F4F6",
+                            borderRadius: "0.5rem",
+                          },
+                        },
+                      }}
+                      sx={{
+                        "& .MuiChartsAxis-left .MuiChartsAxis-tickLabel": {
+                          fill: "#9CA3AF",
+                        },
+                        "& .MuiChartsAxis-bottom .MuiChartsAxis-tickLabel": {
+                          fill: "#9CA3AF",
+                        },
+                        "& .MuiChartsAxis-left .MuiChartsAxis-line, & .MuiChartsAxis-bottom .MuiChartsAxis-line":
+                          {
+                            stroke: "#374151",
+                            opacity: 0.4,
+                          },
+                      }}
+                    />
+                  )}
+                </div>
+              </div>
+            </motion.div>
+
+            {/* Grade Distribution (Pie) */}
+            <motion.div
+              initial={{ opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.35 }}
+              transition={{ duration: 0.6, delay: 0.05 }}
+              className="p-6 rounded-xl bg-gray-900/50 backdrop-blur-sm border border-gray-800"
+            >
+              <div className="flex items-start justify-between mb-4">
+                <div>
+                  <h4 className="font-medium text-lg text-transparent bg-clip-text bg-gradient-to-r from-blue-200 to-purple-200">
+                    Grade distribution
+                  </h4>
+                  <p className="text-xs text-gray-400 mt-1">
+                    Your percentage mix of A’s, A-’s, B+’s, and beyond.
+                  </p>
+                </div>
+                <div className="p-2 rounded-full bg-gray-800/50 text-blue-300">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                    <path
+                      d="M11 2a10 10 0 1 0 10 10h-10V2Z"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                    />
+                  </svg>
+                </div>
+              </div>
+
+              <div className="h-[360px] w-full">
+                <div
+                  ref={pieRef}
+                  className="h-[360px] w-full flex items-center justify-center"
+                >
+                  <motion.div
+                    initial={{ scale: 0.9, opacity: 0 }}
+                    animate={pieInView ? { scale: 1, opacity: 1 } : {}}
+                    transition={{ duration: 0.5, ease: "easeOut" }}
+                    className="w-full h-full"
+                  >
+                    {pieInView && (
+                      <PieChartWrapper
+                        key="pie-mounted"
+                        data={{
+                          labels: statsDemo.gradeDistribution.map(
+                            (g) => g.label
+                          ),
+                          datasets: [
+                            {
+                              data: statsDemo.gradeDistribution.map(
+                                (g) => g.count
+                              ),
+                              backgroundColor: CHART_COLORS.slice(
+                                0,
+                                statsDemo.gradeDistribution.length
+                              ),
+                              borderColor: Array(
+                                statsDemo.gradeDistribution.length
+                              ).fill("#1F2937"),
+                              borderWidth: 1,
+                            },
+                          ],
+                        }}
+                        showLegend={true}
+                      />
+                    )}
+                  </motion.div>
+                </div>
+              </div>
+
+              {/* Percent breakdown text row */}
+              <div className="mt-4 flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-400">
+                {(() => {
+                  const total = statsDemo.gradeDistribution.reduce(
+                    (s, g) => s + g.count,
+                    0
+                  );
+                  return statsDemo.gradeDistribution.map((g) => {
+                    const pct = total ? Math.round((g.count / total) * 100) : 0;
+                    return (
+                      <span key={g.label} className="whitespace-nowrap">
+                        <span className="text-gray-300">{g.label}</span>: {pct}%
+                      </span>
+                    );
+                  });
+                })()}
+              </div>
+            </motion.div>
+          </div>
+
+          <div className="mt-6">
+            <button
+              className="px-4 py-2 rounded-lg bg-purple-600/70 hover:bg-purple-600 text-white border border-purple-400/40 shadow"
+              onClick={() => setLogInFlow(true)}
+            >
+              See my full stats
+            </button>
           </div>
         </div>
       </section>

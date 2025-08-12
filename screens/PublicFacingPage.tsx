@@ -148,7 +148,7 @@ export default function AboutPage() {
 
   return (
     <div className="min-h-screen pt-2 bg-gradient-to-br from-gray-950 via-gray-900 to-gray-900 font-louize">
-       <CosmicBackground mode="stars" opacity={0.9} />
+      <CosmicBackground mode="stars" opacity={0.9} />
       {/* Welcome Banner */}
       <div className="relative mb-12 z-50 bg-gradient-to-r from-emerald-900/30 via-blue-900/30 to-purple-900/30 backdrop-blur-sm border-b border-emerald-800/30 shadow-[0_4px_20px_rgba(0,0,0,0.25)]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-center gap-3">
@@ -229,8 +229,8 @@ export default function AboutPage() {
             </h2>
 
             <p className="text-xl text-gray-300 max-w-3xl mx-auto mb-8">
-              Let's democratize academic planning at Yale, together. For
-              Yalies, by Yalies.
+              Let's democratize academic planning, stats, & insights at Yale,
+              together. For Yalies, by Yalies.
             </p>
 
             <motion.div className="flex flex-wrap justify-center gap-4">

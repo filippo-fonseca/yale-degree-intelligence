@@ -30,7 +30,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Yale DegreeIntelligence",
     description:
-      "Organize your Yale academic life. Stress-free. Always. Built by yalies, for yalies.",
+      "Your Yale degree, made easy. Stress-free. Always. Built by yalies, for yalies.",
     images: ["/thumbnail.png"],
   },
 };

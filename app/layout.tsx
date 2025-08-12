@@ -7,7 +7,7 @@ import { Toaster } from "react-hot-toast";
 export const metadata: Metadata = {
   title: "Yale DegreeIntelligence",
   description:
-    "Your Yale degree, made easy. Stress-free. Always free. Built by yalies, for yalies.",
+    "Your Yale degree, made easy. Stress-free. Always. Built by yalies, for yalies.",
   icons: [{ rel: "icon", url: "/favicon.ico" }],
   openGraph: {
     title: "Yale DegreeIntelligence",

@@ -234,17 +234,18 @@ export default function AboutPage() {
             </p>
 
             <motion.div className="flex flex-wrap justify-center gap-4">
-              <Link href="/demo">
+              <Link href="#simulator">
                 <motion.button
                   className="px-6 py-3 border border-pink-500 bg-pink-500/30 hover:bg-pink-500/40 backdrop-blur-md rounded-lg text-white font-medium flex items-center gap-2 transition-all shadow-sm hover:shadow-md"
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.98 }}
                 >
-                  View Demo
-                  <FiArrowRight className="opacity-80" />
+                  Our features
+                  {/* <FiArrowRight className="opacity-80" /> */}
+                  <FiPlayCircle className="opacity-80" />
                 </motion.button>
               </Link>
-              <Link href="#simulator">
+              {/* <Link href="#simulator">
                 <motion.button
                   className="px-6 py-3 border border-cyan-500 bg-cyan-500/30 hover:bg-cyan-500/40 backdrop-blur-md rounded-lg text-white font-medium flex items-center gap-2 transition-all shadow-sm hover:shadow-md"
                   whileHover={{ scale: 1.05 }}
@@ -253,7 +254,7 @@ export default function AboutPage() {
                   Our features
                   <FiPlayCircle className="opacity-80" />
                 </motion.button>
-              </Link>
+              </Link> */}
               <motion.button
                 className="px-6 py-3 border border-blue-500 bg-blue-500/30 hover:bg-blue-500/40 backdrop-blur-md rounded-lg text-white font-medium flex items-center gap-2 transition-all shadow-sm hover:shadow-md"
                 whileHover={{ scale: 1.05 }}

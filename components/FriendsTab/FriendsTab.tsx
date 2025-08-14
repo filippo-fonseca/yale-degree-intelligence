@@ -636,7 +636,7 @@ export default function FriendsTab() {
                         <motion.div
                           key={u.uid}
                           className="flex items-center justify-between p-3 rounded-xl bg-gray-800 border border-gray-700 hover:border-pink-400 transition-all"
-                          whileHover={{ scale: 1.01 }}
+                          whileHover={{ scale: 0.99 }}
                         >
                           <div className="flex items-center gap-4">
                             <ProfilePic profile={u} size={36} />

@@ -812,7 +812,7 @@ export default function Home() {
                       <span className="text-sm font-medium">Our mission</span>
                     </Link>
                     <Link
-                      href="/mission"
+                      href="mailto:filippo.fonseca@yale.edu,emir.ahmed@yale.edu"
                       target="_blank"
                       className="w-full flex items-center space-x-2.5 p-2 rounded-lg hover:bg-gray-800/40 transition-all duration-200 text-gray-300 hover:text-white"
                     >

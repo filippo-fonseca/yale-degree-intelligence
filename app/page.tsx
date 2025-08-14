@@ -63,6 +63,10 @@ import FriendsTab from "@/components/FriendsTab/FriendsTab";
 import { MessageCircleQuestionMark, MonitorCog, Printer } from "lucide-react";
 import Simulator from "@/components/Simulator/Simulator";
 import CleoAITab from "@/components/CleoAITab/CleoAITab";
+import MajorTipModal, {
+  MajorTipHelpButton,
+  resetMajorTipSeen,
+} from "@/components/MajorProgressView/MajorTipModal";
 
 interface UserProfile {
   majors: string[];
@@ -749,8 +753,8 @@ export default function Home() {
                     activeTab === item.id
                       ? "bg-gray-900/50 border border-gray-800 text-white"
                       : item.disabled
-                        ? "text-gray-600 cursor-not-allowed"
-                        : "text-gray-400 hover:text-white hover:bg-gray-900/30"
+                      ? "text-gray-600 cursor-not-allowed"
+                      : "text-gray-400 hover:text-white hover:bg-gray-900/30"
                   }`}
                   disabled={item.disabled}
                 >
@@ -1000,18 +1004,18 @@ export default function Home() {
                                                         course.grade || ""
                                                       ) + " bg-emerald-900/20"
                                                     : course.status ===
-                                                        "in-progress"
-                                                      ? "text-purple-300 bg-purple-900/20"
-                                                      : "text-gray-300 bg-gray-800/20"
+                                                      "in-progress"
+                                                    ? "text-purple-300 bg-purple-900/20"
+                                                    : "text-gray-300 bg-gray-800/20"
                                                 }`}
                                               >
                                                 {course.status ===
                                                   "completed" && !course.skipped
                                                   ? course.grade || "Completed"
                                                   : course.status ===
-                                                      "in-progress"
-                                                    ? "In Progress"
-                                                    : "Skipped"}
+                                                    "in-progress"
+                                                  ? "In Progress"
+                                                  : "Skipped"}
                                               </span>
                                               <span className="text-xs text-gray-500">
                                                 {course.credits} credit
@@ -1508,7 +1512,7 @@ export default function Home() {
                                         status: "not-taken" as const, // This is the key fix
                                         credits: opt.credits,
                                         skipped: false,
-                                      }) as Course
+                                      } as Course)
                                   )
                               ) || []
                             );

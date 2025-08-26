@@ -56,7 +56,7 @@ Use this information to provide personalized, specific advice. Be friendly but p
 `,
   };
 
-  console.log("The system message being sent to OpenAI:", systemMessage, "end of system message");
+  // console.log("The system message being sent to OpenAI:", systemMessage, "end of system message");
 
 
     const conversationHistory = userContext.conversationHistory.map(

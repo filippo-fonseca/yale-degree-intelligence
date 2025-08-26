@@ -320,18 +320,18 @@ export default function Home() {
           // Add to batch delete (we'll keep one copy)
           batch.delete(doc(db, "courses", value.id));
           duplicatesFound++;
-          console.log(`Found duplicate course: ${key}`);
+          // console.log(`Found duplicate course: ${key}`);
         }
       });
 
       if (duplicatesFound > 0) {
-        console.log(`Found ${duplicatesFound} duplicates, removing...`);
+        // console.log(`Found ${duplicatesFound} duplicates, removing...`);
         await batch.commit();
-        console.log(
-          `Successfully removed ${duplicatesFound} duplicate courses`
-        );
+        // console.log(
+        //   `Successfully removed ${duplicatesFound} duplicate courses`
+        // );
       } else {
-        console.log("No duplicate courses found");
+        // console.log("No duplicate courses found");
       }
 
       return duplicatesFound;
@@ -389,15 +389,15 @@ export default function Home() {
           if (existingCourse) {
             if (existingCourse.grade !== grade.trim()) {
               // Grade changed → delete old course
-              console.log(
-                `Deleting outdated course: ${key} (old grade: ${
-                  existingCourse.grade
-                }, new grade: ${grade.trim()})`
-              );
+              // console.log(
+              //   `Deleting outdated course: ${key} (old grade: ${
+              //     existingCourse.grade
+              //   }, new grade: ${grade.trim()})`
+              // );
               await deleteDoc(doc(db, "courses", existingCourse.docId));
             } else {
               // Already exists with same grade → skip
-              console.log(`Skipping duplicate: ${courseKey}`);
+              // console.log(`Skipping duplicate: ${courseKey}`);
               continue;
             }
           }
@@ -430,13 +430,13 @@ export default function Home() {
           if (existingCourse) {
             if (existingCourse.grade !== null) {
               // Grade changed from completed to in-progress → delete old
-              console.log(
-                `Deleting outdated course: ${key} (old grade: ${existingCourse.grade}, new: null)`
-              );
+              // console.log(
+              //   `Deleting outdated course: ${key} (old grade: ${existingCourse.grade}, new: null)`
+              // );
               await deleteDoc(doc(db, "courses", existingCourse.docId));
             } else {
               // Already exists with same null grade → skip
-              console.log(`Skipping duplicate in-progress: ${courseKey}`);
+              // console.log(`Skipping duplicate in-progress: ${courseKey}`);
               continue;
             }
           }
@@ -455,14 +455,14 @@ export default function Home() {
     }
 
     if (coursesToAdd.length > 0) {
-      console.log(`Adding ${coursesToAdd.length} new/updated courses`);
+      // console.log(`Adding ${coursesToAdd.length} new/updated courses`);
       const batchWrites = coursesToAdd.map((course) => {
         const docRef = doc(collection(db, "courses"));
         return setDoc(docRef, course);
       });
       await Promise.all(batchWrites);
     } else {
-      console.log("No new or updated courses to add");
+      // console.log("No new or updated courses to add");
     }
 
     // Refresh

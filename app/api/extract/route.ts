@@ -54,7 +54,7 @@ ${text}
     })
 
     const result = chat.choices[0].message?.content ?? ''
-    console.log("the openai result is:", result);
+    // console.log("the openai result is:", result);
     return NextResponse.json({ result })
   } catch (error) {
     console.error('OpenAI error:', error)

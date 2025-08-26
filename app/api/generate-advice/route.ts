@@ -9,7 +9,7 @@ type MajorRequirements = Record<string, any>;
 export async function POST(req: NextRequest) {
   
   try {
-    console.log("Received request to generate advice");
+    // console.log("Received request to generate advice");
     const body = await req.json();
     const {
       coursesToAdd: courses,
@@ -238,8 +238,8 @@ const semestersLeft = semestersLeftArr.length;
       semestersLeft > 0
         ? Math.round((remainingCredits / semestersLeft) * 10) / 10
         : remainingCredits;
-    console.log("Remaining credits:", remainingCredits);
-    console.log("Average per semester:", avgPerSemester);
+    // console.log("Remaining credits:", remainingCredits);
+    // console.log("Average per semester:", avgPerSemester);
 
     const prompt = `
 You are an experienced academic advisor for undergraduates at a top U.S. university (Yale). Given a student's course history, their major, the official requirements (in JSON), the current semester and year, today's date, and expected graduation, write a concise, supportive, actionable blurb of advice.
@@ -270,7 +270,7 @@ Average major credits per remaining semester needed to finish on time: ${avgPerS
 Remember to be nice, but also be critical and don't be afraid to tell them to lock in if they have to - these are Yale students, so be supportvive and realistic but if they're slacking let em know. Also, remember to give advice that is pertinent to now, and to give advice to courses in the lower levels that haven't been completed yet - i.e. if a student hasn't cimpleted some courses in the 1000s, 2000s, or even 3000s, why would we even suggest a 4000 level class? etc. stuff relevant to right now and a snapshot of where they're at and what they should focus on moving forward for their major.
     `.trim();
 
-    console.log("Generated prompt:", prompt);
+    // console.log("Generated prompt:", prompt);
 
     const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY! });
     const completion = await openai.chat.completions.create({

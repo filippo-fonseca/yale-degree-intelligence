@@ -18,4 +18,4 @@ for (const file of fs.readdirSync(reqsDir).filter(f => f.endsWith("_reqs.json"))
 }
 
 fs.writeFileSync(outputFile, JSON.stringify(majors, null, 2));
-console.log("subjects.json generated successfully!");
+// console.log("subjects.json generated successfully!");

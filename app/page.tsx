@@ -855,9 +855,9 @@ export default function Home() {
                 {/* Disclaimer Text */}
                 <div className="px-1 pb-2">
                   <p className="text-[11px] text-gray-500 leading-tight text-justify">
-                    Yale DegreeIntelligence is purely a student-built toolData
-                    may be inaccurate - please verify everything with your DUS.
-                    We take no responsibility for any errors or omissions. This
+                    Yale DegreeIntelligence is purely a student-built tool. Data
+                    may be inaccurate. PLEASE verify everything with your DUS.
+                    We take NO responsibility for any errors or omissions. This
                     is purely a tool developed for ourselves that we wished to
                     share, as it's helped us a ton! Enjoy.
                   </p>

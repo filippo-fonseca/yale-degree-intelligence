@@ -15685,6 +15685,81 @@
       }
     ]
   },
+  "MENG_ENGS": {
+  "id": "MENG_ENGS",
+  "name": "Engineering Sciences (Mechanical), B.S.",
+  "description": "Bachelor of Science in Engineering Sciences (Mechanical)",
+  "creditRequirements": {
+    "total": 18
+  },
+  "requirements": [
+    {
+      "name": "Calc I",
+      "required": 1,
+      "options": [
+        { "type": "course", "code": "MATH 1120" }
+      ]
+    },
+    {
+      "name": "Calc II",
+      "required": 1,
+      "options": [
+        { "type": "course", "code": "MATH 1150" }
+      ]
+    },
+    {
+      "name": "Calc III (Multivar)",
+      "description": "ENAS 1510 or equivalent",
+      "required": 1,
+      "options": [
+        { "type": "course", "code": "ENAS 1510" },
+        { "type": "course", "code": "MATh 1200" }
+      ]
+    },
+    {
+      "name": "Physics Sequence",
+      "description": "PHYS 1800 + 1810, PHYS 2000 + 2010, or PHYS 1600 + 2610",
+      "required": 2,
+      "options": [
+        { "type": "course", "code": "PHYS 1800" },
+        { "type": "course", "code": "PHYS 1810" },
+        { "type": "course", "code": "PHYS 2000" },
+        { "type": "course", "code": "PHYS 2010" },
+        { "type": "course", "code": "PHYS 2600" },
+        { "type": "course", "code": "PHYS 2610" }
+      ]
+    },
+    {
+      "name": "Physics Labs",
+      "description": "Two labs required as prereqs (½ credit each) OR MENG 2616L (1 credit)",
+      "required": 1,
+      "options": [
+        { "type": "course", "code": "PHYS 1650L" },
+        { "type": "course", "code": "PHYS 1660L" },
+        { "type": "course", "code": "PHYS 2050L" },
+        { "type": "course", "code": "PHYS 2060L" },
+        { "type": "course", "code": "MENG 2616L" }
+      ]
+    },
+    {
+      "name": "MENG Electives",
+      "description": "11 electives chosen with DUS approval",
+      "required": 11,
+      "options": [
+      ]
+    },
+    {
+      "name": "Senior Requirement",
+      "description": "MENG 4154; MENG 4991; MENG 4992; OR another upper-level design course (with DUS approval). Some options shown here (not all).",
+      "required": 1,
+      "options": [
+        { "type": "course", "code": "MENG 4154" },
+        { "type": "course", "code": "MENG 4991" },
+        { "type": "course", "code": "MENG 4992" }
+      ]
+    }
+  ]
+},
   "HIST_CONCEN_GLOBAL": {
     "id": "HIST_CONCEN_GLOBAL",
     "name": "History, B.A. - Global Concentration",

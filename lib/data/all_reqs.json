@@ -9020,7 +9020,7 @@
     ]
   },
   "S&DS_BA": {
-    "id": "SDS_BA",
+    "id": "S&DS_BA",
     "name": "Statistics & Data Science, B.A.",
     "description": "B.A. in Statistics & Data Science: mathematical and practical foundations in probability, statistics, computation, and data science methods.",
     "creditRequirements": {
@@ -9136,7 +9136,7 @@
     ]
   },
   "S&DS_BS": {
-    "id": "SDS_BS",
+    "id": "S&DS_BS",
     "name": "Statistics & Data Science, B.S.",
     "description": "B.S. in Statistics & Data Science: advanced theory and practice for research or graduate study, includes core and elective requirements, plus S&DS 2420 and S&DS 3650.",
     "creditRequirements": {

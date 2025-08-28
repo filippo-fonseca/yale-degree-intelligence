@@ -80,19 +80,6 @@ export default function RootLayout({
     <html lang="en" className={`${louize.variable} ${sf.variable}`}>
       <AuthProvider>
         <body className="bg-black text-white">
-          <Script
-            src="https://cdn.amplitude.com/script/3294f81bbb47cf20adaf628c010b1866.js"
-            strategy="afterInteractive"
-          />
-          <Script id="amplitude-init" strategy="afterInteractive">
-            {`
-            window.amplitude.add(window.sessionReplay.plugin({ sampleRate: 1 }));
-            window.amplitude.init('3294f81bbb47cf20adaf628c010b1866', {
-              fetchRemoteConfig: true,
-              autocapture: true
-            });
-          `}
-          </Script>
           <Toaster
             position="top-center"
             toastOptions={{
@@ -119,6 +106,19 @@ export default function RootLayout({
             }}
           />
           {children}
+          <Script
+            src="https://cdn.amplitude.com/script/3294f81bbb47cf20adaf628c010b1866.js"
+            strategy="afterInteractive"
+          />
+          <Script id="amplitude-init" strategy="afterInteractive">
+            {`
+            window.amplitude.add(window.sessionReplay.plugin({ sampleRate: 1 }));
+            window.amplitude.init('3294f81bbb47cf20adaf628c010b1866', {
+              fetchRemoteConfig: true,
+              autocapture: true
+            });
+          `}
+          </Script>
         </body>
       </AuthProvider>
     </html>

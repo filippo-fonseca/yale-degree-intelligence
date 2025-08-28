@@ -3,6 +3,7 @@ import localFont from "next/font/local";
 import { type Metadata } from "next";
 import { AuthProvider } from "@/context/AuthContext";
 import { Toaster } from "react-hot-toast";
+import Script from "next/script";
 
 export const metadata: Metadata = {
   title: "Yale DegreeIntelligence",
@@ -79,6 +80,19 @@ export default function RootLayout({
     <html lang="en" className={`${louize.variable} ${sf.variable}`}>
       <AuthProvider>
         <body className="bg-black text-white">
+          <Script
+            src="https://cdn.amplitude.com/script/3294f81bbb47cf20adaf628c010b1866.js"
+            strategy="afterInteractive"
+          />
+          <Script id="amplitude-init" strategy="afterInteractive">
+            {`
+            window.amplitude.add(window.sessionReplay.plugin({ sampleRate: 1 }));
+            window.amplitude.init('3294f81bbb47cf20adaf628c010b1866', {
+              fetchRemoteConfig: true,
+              autocapture: true
+            });
+          `}
+          </Script>
           <Toaster
             position="top-center"
             toastOptions={{

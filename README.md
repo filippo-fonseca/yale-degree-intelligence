@@ -4,4 +4,6 @@ watch me.
 
 let's go.
 
+what did I tell u? - aug 27th, 2025
+
 Started: July 2025.

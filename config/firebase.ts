@@ -1,19 +1,21 @@
+"use client";
+
 import { initializeApp, getApps } from "firebase/app";
 import { getAuth, GoogleAuthProvider } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyCzGSr5WcXM2hgwMwC5qtnIYo_p6Zekpi8",
-  authDomain: "yale-degree-intelligence.firebaseapp.com",
-  projectId: "yale-degree-intelligence",
-  storageBucket: "yale-degree-intelligence.firebasestorage.app",
-  messagingSenderId: "105610316211",
-  appId: "1:105610316211:web:93985e9eea666b0fa8a3c6",
-  measurementId: "G-3SZLG7BBL4"
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY!,
+  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN!,
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID!,
+  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET!,
+  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID!,
+  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID!,
+  measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID!,
 };
 
-// Initialize Firebase
-let firebaseApp = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
+let firebaseApp =
+  getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
 
 export const auth = getAuth(firebaseApp);
 export const db = getFirestore(firebaseApp);

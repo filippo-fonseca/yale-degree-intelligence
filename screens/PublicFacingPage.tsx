@@ -1036,7 +1036,7 @@ export default function AboutPage() {
         </div>
       </div>
       {/* Wait... Are You Trying to Replace CourseTable? */}
-      <section className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      {/* <section className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="bg-gray-900/80 backdrop-blur-lg rounded-2xl p-8 border border-gray-800/50 shadow-xl">
           <div className="text-center mb-8">
             <h2 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-200 to-purple-200">
@@ -1088,7 +1088,7 @@ export default function AboutPage() {
             </p>
           </div>
         </div>
-      </section>
+      </section> */}
 
       {/* CTA Section */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">

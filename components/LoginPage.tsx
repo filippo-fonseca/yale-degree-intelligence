@@ -191,7 +191,7 @@ export default function LoginPage({
               className="pt-4"
             >
               <Button
-                onClick={signInWithGoogle}
+                // onClick={signInWithGoogle}
                 disabled={loading}
                 className={`w-full h-14 text-lg font-medium rounded-xl transition-all duration-500 ${
                   isHovering

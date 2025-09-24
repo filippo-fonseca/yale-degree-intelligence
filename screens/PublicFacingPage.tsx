@@ -153,15 +153,17 @@ export default function AboutPage() {
       <div className="relative mb-12 z-50 bg-gradient-to-r from-emerald-900/30 via-blue-900/30 to-purple-900/30 backdrop-blur-sm border-b border-emerald-800/30 shadow-[0_4px_20px_rgba(0,0,0,0.25)]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-center gap-3">
           <span className="px-3 py-1 text-xs font-semibold rounded-full bg-emerald-900/50 border border-emerald-800/40 text-emerald-300 shadow-sm">
-            🎉 Class of 2029
+            🎉 News Feature
           </span>
           <p className="text-sm text-emerald-100">
-            Welcome to Yale! Start your journey with{" "}
-            <span className="text-blue-300 font-medium">
-              DegreeIntelligence
-            </span>{" "}
-            and have peace of mind from day one. You do not need grades to use
-            it.
+            The Yale Daily News just ran a feature on us.{" "}
+            <a
+              href="https://yaledailynews.com/blog/2025/09/23/new-student-run-platform-aims-to-simplify-degree-planning/"
+              target="_blank"
+              className="text-blue-300 font-medium hover:text-white hover:underline"
+            >
+              Read it!
+            </a>{" "}
           </p>
         </div>
       </div>

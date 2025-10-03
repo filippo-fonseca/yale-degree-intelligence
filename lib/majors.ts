@@ -250,3 +250,61 @@ export const getMajorDescriptionById = (majorId: string): string => {
 export const getReqsForMajor = (majorId: string): MajorRequirement | null => {
   return majorRequirements[majorId] || null;
 }
+
+// --- Live preview helper (treat planned as in-progress) ---
+
+export type ManualRequirementEntry = {
+  code: string;
+  requirement: string;
+  credits: number;
+};
+
+/**
+ * Builds a MajorProgress map for the given majors, where plannedCourseCodes
+ * are treated as "in-progress" on top of the user's real in-progress set.
+ *
+ * This mirrors the "Including In Progress Credits" logic but also includes
+ * anything the user has currently placed on the Simulator grid.
+ */
+export function calculatePreviewMajorProgressByMajors(
+  majorIds: string[],
+  completedCourseCodes: string[],
+  inProgressCourseCodes: string[] = [],
+  skippedCourseCodes: string[] = [],
+  manualRequirements: ManualRequirementEntry[] = [],
+  plannedCourseCodes: string[] = []
+): Record<string, MajorProgress> {
+  // Canonicalize + dedupe planned into inProgress (without overriding completed/skipped)
+  const canon = (arr: string[]) =>
+    Array.from(
+      new Set(
+        arr
+          .map((c) => getCanonicalCode(c) || c)
+          .filter((c) => typeof c === "string" && c.length > 0)
+      )
+    );
+
+  const completedCanon = canon(completedCourseCodes);
+  const skippedCanon = canon(skippedCourseCodes);
+
+  // planned that are not already completed/skipped
+  const plannedCanon = canon(plannedCourseCodes).filter(
+    (c) => !completedCanon.includes(c) && !skippedCanon.includes(c)
+  );
+
+  const inProgressCanon = Array.from(
+    new Set([...canon(inProgressCourseCodes), ...plannedCanon])
+  );
+
+  const out: Record<string, MajorProgress> = {};
+  for (const majorId of majorIds) {
+    out[majorId] = calculateMajorProgress(
+      majorId,
+      completedCanon,
+      inProgressCanon,
+      skippedCanon,
+      manualRequirements
+    );
+  }
+  return out;
+}

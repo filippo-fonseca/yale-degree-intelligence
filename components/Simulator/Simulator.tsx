@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   FiChevronDown,
@@ -9,18 +9,23 @@ import {
   FiPlus,
   FiTrash2,
 } from "react-icons/fi";
+import { Info } from "lucide-react";
 import { Course } from "@/lib/types";
 import { getCourseNameFromCode } from "@/lib/courseCatalog";
 import { useAuth } from "@/context/AuthContext";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import { db } from "@/config/firebase";
 import ManualCourseLookupModal from "./ManualCourseLookupModal";
-import { truncate } from "@/lib/utils/utils";
-import { Info } from "lucide-react";
+import {
+  calculatePreviewMajorProgressByMajors,
+  MAJORS,
+  MajorProgress,
+} from "@/lib/majors";
 
+// ----------------- Types -----------------
 interface Semester {
   id: string;
-  name: string;
+  name: string; // e.g. "Fall 2026"
   courses: Course[];
 }
 
@@ -30,45 +35,86 @@ interface SimulatorProps {
   graduationYear: number;
 }
 
-// --- Credit helpers ---
-const getCourseCredits = (c: Course): number => {
-  // Adjust keys to match your schema if needed
-  const raw =
-    (c as any).credits ??
-    (c as any).credit ??
-    (c as any).units ??
-    (c as any).yaleCredits ??
-    (c as any).ECTS;
+type Plan = {
+  name: string;
+  semesters: Semester[];
+  createdAt: string; // ISO
+};
 
-  const n = typeof raw === "string" ? parseFloat(raw) : Number(raw);
-  return Number.isFinite(n) ? n : 1; // default to 1 if missing
+type PreviewProgressMap = Record<string, MajorProgress>;
+
+type PlannedCoursePick = Pick<Course, "code" | "status"> & {
+  status: "in-progress"; // coerced for preview semantics
+};
+
+type MaybeCreditFields = Partial<{
+  credits: number | string;
+  credit: number | string;
+  units: number | string;
+  yaleCredits: number | string;
+  ECTS: number | string;
+}>;
+
+// ----------------- Helpers -----------------
+const getCourseCredits = (c: Course & MaybeCreditFields): number => {
+  const raw = c.credits ?? c.credit ?? c.units ?? c.yaleCredits ?? c.ECTS;
+
+  const n =
+    typeof raw === "string"
+      ? parseFloat(raw)
+      : typeof raw === "number"
+      ? raw
+      : NaN;
+
+  return Number.isFinite(n) ? (n as number) : 1; // default to 1 if missing
 };
 
 const getSemesterCredits = (sem: Semester): number =>
-  sem.courses.reduce((sum, c) => sum + getCourseCredits(c), 0);
+  sem.courses.reduce(
+    (sum, c) => sum + getCourseCredits(c as Course & MaybeCreditFields),
+    0
+  );
 
 function compareSemesters(a: string, b: string) {
   const [semA, yearA] = a.split(" ");
   const [semB, yearB] = b.split(" ");
   const yA = parseInt(yearA, 10);
   const yB = parseInt(yearB, 10);
-
   if (yA !== yB) return yA - yB;
-  const order = { Spring: 0, Fall: 1 };
-  return order[semA as keyof typeof order] - order[semB as keyof typeof order];
+  const order: Record<"Spring" | "Fall", number> = { Spring: 0, Fall: 1 };
+  return order[semA as "Spring" | "Fall"] - order[semB as "Spring" | "Fall"];
 }
 
+function isPastSemester(semesterName: string) {
+  const [sem, yearStr] = semesterName.split(" ");
+  const year = parseInt(yearStr, 10);
+  const now = new Date();
+  const currentYear = now.getFullYear();
+  const currentMonth = now.getMonth(); // 0 = Jan
+
+  if (year < currentYear) return true;
+  if (year > currentYear) return false;
+
+  // Coarse cutoffs so you can't alter clearly past terms:
+  // treat Feb+ as "Fall is in the past"; treat Jun+ as "Spring is in the past"
+  if (sem === "Fall" && currentMonth > 1) return true; // > Feb
+  if (sem === "Spring" && currentMonth > 5) return true; // > Jun
+  return false;
+}
+
+// ----------------- Component -----------------
 export default function Simulator({
   remainingCourses,
   completedCourses,
   graduationYear,
 }: SimulatorProps) {
   const { user } = useAuth();
+
   const [semesters, setSemesters] = useState<Semester[]>([]);
   const [availableCourses, setAvailableCourses] = useState<Course[]>([]);
   const [draggedCourse, setDraggedCourse] = useState<Course | null>(null);
   const [showHelp, setShowHelp] = useState(false);
-  const [savedPlans, setSavedPlans] = useState<any[]>([]);
+  const [savedPlans, setSavedPlans] = useState<Plan[]>([]);
   const [planName, setPlanName] = useState("");
   const [showSaveModal, setShowSaveModal] = useState(false);
   const [showPlansModal, setShowPlansModal] = useState(false);
@@ -78,26 +124,40 @@ export default function Simulator({
     number | null
   >(null);
   const [hasChanges, setHasChanges] = useState(false);
-  const initialSemestersRef = useRef<Semester[]>([]);
   const [showPool, setShowPool] = useState(false);
 
+  // Preview state
+  const [previewProgress, setPreviewProgress] = useState<PreviewProgressMap>(
+    {}
+  );
+  const [isPreviewLoading, setIsPreviewLoading] = useState<boolean>(false);
+  const [previewError, setPreviewError] = useState<string | null>(null);
+
+  // keep initial snapshot to detect changes
+  const initialSemestersRef = useRef<Semester[]>([]);
+
+  // majors to compute (replace with user's declared majors if you have them)
+  const majorIds = useMemo<string[]>(() => Object.keys(MAJORS), []);
+
+  // ------------ Build initial semesters & pools ------------
   useEffect(() => {
-    // 1. Build semester list
+    // 1) Build semester list starting from earliest known term or grad - 4y
     let semestersArr: Semester[] = [];
     let startYear = graduationYear - 4;
     let startSemester: "Fall" | "Spring" = "Fall";
 
     if (completedCourses.length > 0) {
-      let minYear = Math.min(...completedCourses.map((c) => c.year));
-      let minSem = "Fall";
+      const minYear = Math.min(...completedCourses.map((c) => c.year));
       const coursesInMinYear = completedCourses.filter(
         (c) => c.year === minYear
       );
-      if (coursesInMinYear.some((c) => c.semester === "Spring")) {
-        minSem = "Spring";
-      }
+      const minSem: "Fall" | "Spring" = coursesInMinYear.some(
+        (c) => c.semester === "Spring"
+      )
+        ? "Spring"
+        : "Fall";
       startYear = minYear;
-      startSemester = minSem as "Fall" | "Spring";
+      startSemester = minSem;
     }
 
     let year = startYear;
@@ -119,20 +179,22 @@ export default function Simulator({
       }
     }
 
-    // 2. Assign completed/in-progress courses
+    // 2) Assign completed/in-progress courses to their terms
     completedCourses.forEach((course) => {
       const idx = semestersArr.findIndex(
         (s) => s.name === `${course.semester} ${course.year}`
       );
       if (idx !== -1) {
-        (semestersArr[idx].courses as Course[]).push(course);
+        semestersArr[idx].courses.push(course);
       }
     });
 
     setSemesters(semestersArr);
-    // Set initial snapshot **after** assigning completed/in-progress courses!
-    initialSemestersRef.current = JSON.parse(JSON.stringify(semestersArr));
+    initialSemestersRef.current = JSON.parse(
+      JSON.stringify(semestersArr)
+    ) as Semester[];
 
+    // 3) Build pool of available (not-taken & not already taken)
     setAvailableCourses(
       remainingCourses.filter(
         (rc) =>
@@ -142,61 +204,42 @@ export default function Simulator({
     );
   }, [graduationYear, remainingCourses, completedCourses]);
 
-  // Check for changes
+  // ------------ Change detection ------------
   useEffect(() => {
     if (initialSemestersRef.current.length === 0) return;
 
-    const currentCourses = semesters.flatMap((s) =>
-      s.courses.map((c) => c.code)
-    );
-    const initialCourses = initialSemestersRef.current.flatMap((s) =>
+    const currentCodes = semesters.flatMap((s) => s.courses.map((c) => c.code));
+    const initialCodes = initialSemestersRef.current.flatMap((s) =>
       s.courses.map((c) => c.code)
     );
 
-    const coursesChanged =
-      currentCourses.length !== initialCourses.length ||
-      !currentCourses.every((code) => initialCourses.includes(code)) ||
-      !initialCourses.every((code) => currentCourses.includes(code));
+    const changed =
+      currentCodes.length !== initialCodes.length ||
+      currentCodes.some((code) => !initialCodes.includes(code)) ||
+      initialCodes.some((code) => !currentCodes.includes(code));
 
-    setHasChanges(coursesChanged);
+    setHasChanges(changed);
   }, [semesters]);
 
-  // Assign completed courses to semesters
-  // useEffect(() => {
-  //   if (!semesters.length || !completedCourses.length) return;
+  // ------------ Saved plans load ------------
+  useEffect(() => {
+    if (!user) return;
+    const loadSavedPlans = async () => {
+      try {
+        const docRef = doc(db, "users", user.uid);
+        const docSnap = await getDoc(docRef);
+        const data = docSnap.exists()
+          ? (docSnap.data() as { savedPlans?: Plan[] })
+          : null;
+        if (data?.savedPlans) setSavedPlans(data.savedPlans);
+      } catch (e) {
+        console.error("Error loading saved plans:", e);
+      }
+    };
+    loadSavedPlans();
+  }, [user]);
 
-  //   const updatedSemesters = semesters.map((sem) => ({
-  //     ...sem,
-  //     courses: [],
-  //   }));
-
-  //   completedCourses.forEach((course) => {
-  //     const idx = updatedSemesters.findIndex(
-  //       (s) => s.name === `${course.semester} ${course.year}`
-  //     );
-  //     if (idx !== -1) {
-  //       (updatedSemesters[idx].courses as Course[]).push(course);
-  //     }
-  //   });
-
-  //   setSemesters(updatedSemesters);
-  // }, [completedCourses, semesters.length]);
-
-  function isPastSemester(semesterName: string) {
-    const [sem, yearStr] = semesterName.split(" ");
-    const year = parseInt(yearStr, 10);
-    const now = new Date();
-    const currentYear = now.getFullYear();
-    const currentMonth = now.getMonth();
-
-    if (year < currentYear) return true;
-    if (year > currentYear) return false;
-    if (sem === "Fall" && currentMonth > 1) return true;
-    if (sem === "Spring" && currentMonth > 5) return true;
-    return false;
-  }
-
-  // DRAG-AND-DROP LOGIC
+  // ------------ Drag & Drop ------------
   const handleDragStart = (course: Course) => setDraggedCourse(course);
 
   const handleDrop = (semesterId: string) => {
@@ -223,13 +266,12 @@ export default function Simulator({
         sem.id === semesterId
           ? {
               ...sem,
-              courses: sem.courses.filter(
-                (c): c is Course => !!c && c.code !== courseCode
-              ),
+              courses: sem.courses.filter((c) => c && c.code !== courseCode),
             }
           : sem
       )
     );
+
     const rc = remainingCourses.find((c) => c.code === courseCode);
     if (rc && rc.status === "not-taken") {
       setAvailableCourses((prev) =>
@@ -238,39 +280,126 @@ export default function Simulator({
     }
   };
 
-  // SAVING & LOADING PLANS
-  useEffect(() => {
-    if (!user) return;
-    const loadSavedPlans = async () => {
-      try {
-        const docRef = doc(db, "users", user.uid);
-        const docSnap = await getDoc(docRef);
-        if (docSnap.exists() && docSnap.data().savedPlans) {
-          setSavedPlans(docSnap.data().savedPlans);
+  // ------------ Planned set (for preview) ------------
+  const plannedNow = useMemo<PlannedCoursePick[]>(() => {
+    const codes = new Set<string>();
+    const list: PlannedCoursePick[] = [];
+    semesters.forEach((s) => {
+      s.courses.forEach((c) => {
+        if (c?.code && c.status === "not-taken" && !codes.has(c.code)) {
+          codes.add(c.code);
+          list.push({ code: c.code, status: "in-progress" });
         }
-      } catch (e) {
-        console.error("Error loading saved plans:", e);
-      }
-    };
-    loadSavedPlans();
-  }, [user]);
+      });
+    });
+    return list;
+  }, [semesters]);
 
+  const plannedCodes = useMemo<string[]>(
+    () => plannedNow.map((c) => c.code),
+    [plannedNow]
+  );
+
+  // ------------ Live preview progress (local compute) ------------
+  useEffect(() => {
+    if (!user) {
+      setPreviewProgress({});
+      return;
+    }
+
+    setIsPreviewLoading(true);
+    setPreviewError(null);
+
+    // Inputs for progress calc
+    const completedCodes = completedCourses.map((c) => c.code);
+    const inProgCodes = semesters.flatMap((s) =>
+      s.courses.filter((c) => c.status === "in-progress").map((c) => c.code)
+    );
+    const plannedCodesLocal = plannedCodes; // from memo
+    const skippedCodes: string[] = []; // wire up if you track skips
+    const manualReqs: { code: string; requirement: string; credits: number }[] =
+      []; // wire up if you track manual reqs
+
+    try {
+      // 1) Batch compute for all majors
+      const all = calculatePreviewMajorProgressByMajors(
+        majorIds,
+        completedCodes,
+        inProgCodes,
+        skippedCodes,
+        manualReqs,
+        plannedCodesLocal
+      );
+
+      const filtered = Object.fromEntries(
+        Object.entries(all).filter(
+          ([, prog]) =>
+            (prog.completedCredits ?? 0) > 0 ||
+            (prog.inProgressCredits ?? 0) > 0
+        )
+      );
+
+      setPreviewProgress(filtered);
+    } catch (batchErr) {
+      // 2) Fallback: compute per-major so one bad major doesn't break others
+      console.error("[PreviewProgress] batch compute failed:", batchErr);
+      const result: PreviewProgressMap = {};
+      let successes = 0;
+      let failures = 0;
+
+      for (const mid of majorIds) {
+        try {
+          const one = calculatePreviewMajorProgressByMajors(
+            [mid],
+            completedCodes,
+            inProgCodes,
+            skippedCodes,
+            manualReqs,
+            plannedCodesLocal
+          )[mid];
+
+          if (one) {
+            // keep only majors with any signal
+            if (
+              (one.completedCredits ?? 0) > 0 ||
+              (one.inProgressCredits ?? 0) > 0
+            ) {
+              result[mid] = one;
+              successes++;
+            }
+          }
+        } catch (perErr) {
+          failures++;
+          console.error(`[PreviewProgress] failed for major "${mid}":`, perErr);
+        }
+      }
+
+      setPreviewProgress(result);
+
+      if (successes === 0) {
+        setPreviewError("Could not load simulated major progress.");
+      }
+    } finally {
+      setIsPreviewLoading(false);
+    }
+  }, [user, majorIds, semesters, completedCourses, plannedCodes]);
+
+  // ------------ Save / Load / Delete Plans ------------
   const savePlan = async () => {
     if (!user || !planName.trim()) return;
     try {
-      const newPlan = {
-        name: planName,
+      const newPlan: Plan = {
+        name: planName.trim(),
         semesters,
         createdAt: new Date().toISOString(),
       };
 
-      let updatedPlans;
-      if (selectedPlanToOverwrite !== null) {
-        updatedPlans = [...savedPlans];
-        updatedPlans[selectedPlanToOverwrite] = newPlan;
-      } else {
-        updatedPlans = [...savedPlans, newPlan];
-      }
+      const updatedPlans: Plan[] =
+        selectedPlanToOverwrite !== null
+          ? savedPlans.map((p, i) =>
+              i === selectedPlanToOverwrite ? newPlan : p
+            )
+          : [...savedPlans, newPlan];
 
       await setDoc(
         doc(db, "users", user.uid),
@@ -290,12 +419,15 @@ export default function Simulator({
     if (planIndex < 0 || planIndex >= savedPlans.length) return;
     const plan = savedPlans[planIndex];
     setSemesters(plan.semesters);
-    initialSemestersRef.current = JSON.parse(JSON.stringify(plan.semesters));
+    initialSemestersRef.current = JSON.parse(
+      JSON.stringify(plan.semesters)
+    ) as Semester[];
 
     const usedCodes = new Set<string>();
-    plan.semesters.forEach((sem: Semester) =>
-      sem.courses.forEach((course: Course) => usedCodes.add(course.code))
+    plan.semesters.forEach((sem) =>
+      sem.courses.forEach((course) => usedCodes.add(course.code))
     );
+
     setAvailableCourses(
       remainingCourses.filter(
         (c) =>
@@ -303,14 +435,14 @@ export default function Simulator({
           !completedCourses.some((cc) => cc.code === c.code)
       )
     );
+
     setShowPlansModal(false);
   };
 
   const deletePlan = async (planIndex: number) => {
     if (!user || planIndex < 0 || planIndex >= savedPlans.length) return;
     try {
-      const updatedPlans = [...savedPlans];
-      updatedPlans.splice(planIndex, 1);
+      const updatedPlans = savedPlans.filter((_, i) => i !== planIndex);
       await setDoc(
         doc(db, "users", user.uid),
         { savedPlans: updatedPlans },
@@ -340,11 +472,57 @@ export default function Simulator({
     );
   };
 
-  function hasInProgress(semester: Semester) {
-    return semester.courses.some((c) => c.status === "in-progress");
+  const hasInProgress = (semester: Semester) =>
+    semester.courses.some((c) => c.status === "in-progress");
+
+  // ------------ Compact progress row ------------
+  function ProgressRow({
+    label,
+    progress,
+  }: {
+    label: string;
+    progress: MajorProgress;
+  }) {
+    const pctStrict = Math.max(0, Math.min(100, progress.percentage));
+    const pctWithIP = progress.inProgressPercentage ?? progress.percentage;
+
+    return (
+      <div className="p-3 rounded-xl bg-gray-900/50 border border-gray-800">
+        <div className="flex items-center justify-between mb-2">
+          <div className="text-sm text-gray-300">{label}</div>
+          <div className="text-sm text-gray-400">
+            <span className="mr-2">
+              Completed:{" "}
+              <span className="text-blue-300">
+                {progress.completedCredits}/{progress.totalCredits}
+              </span>
+            </span>
+            <span>
+              With planned:{" "}
+              <span className="text-purple-300">{pctWithIP.toFixed(0)}%</span>
+            </span>
+          </div>
+        </div>
+        <div className="w-full bg-gray-800/60 h-2 rounded-full overflow-hidden relative">
+          <div
+            className="h-2 bg-gradient-to-r from-blue-400 to-blue-500"
+            style={{ width: `${pctStrict}%` }}
+          />
+          <div
+            className="h-2 bg-gradient-to-r from-purple-400 to-purple-500 opacity-35 absolute top-0 left-0"
+            style={{ width: `${pctWithIP}%` }}
+            aria-hidden
+          />
+        </div>
+        <div className="mt-1 text-[11px] text-gray-500">
+          Blue = completed only • Purple overlay = includes current in-progress
+          + courses placed on the grid
+        </div>
+      </div>
+    );
   }
 
-  // ----------- RENDER ----------- //
+  // ----------------- Render -----------------
   return (
     <div className="space-y-4 font-louize">
       {/* Header */}
@@ -411,36 +589,66 @@ export default function Simulator({
             <ul className="text-sm text-gray-400 space-y-2 list-disc list-inside">
               <li>
                 Use this simulator to plan out your remaining semesters and see
-                how your courses fit together.
+                fit.
               </li>
               <li>
-                We’ve made a pool of the remaining credits in your indicated
-                major for quick drag-and-drop access, but you can always look up
-                any course from any department and add it manually (especially
-                for fun classes/distribs or courses we've not managed to
-                automatically include from your major).
-              </li>
-              <li>Drag/add courses into any semester.</li>
-              <li>
-                NOTE: You can drop <b>multiple</b> courses per semester, of
-                course.
+                The pool shows remaining courses in your major; you can also add
+                any course manually.
               </li>
               <li>
-                <b>Click</b> a course pill already added to a semester to remove
-                it.
+                Drag/add courses into any semester (multiple courses per term
+                work fine).
               </li>
               <li>
-                Completed/in-progress courses are <b>pre-assigned</b> to
-                semesters and can’t be dragged from the pool.
+                Click a course pill already added to a semester to remove it (if
+                it’s not completed/in-progress).
               </li>
               <li>
-                <b>Save</b> or <b>load</b> your plans to try out what-ifs and
-                come back to them later!
+                Completed/in-progress are pre-assigned and cannot be dragged
+                from the pool.
               </li>
+              <li>Save or load plans to explore what-ifs and revisit later.</li>
             </ul>
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Live Major Progress Preview */}
+      <div className="space-y-2">
+        <div className="flex items-center gap-2">
+          <h3 className="text-lg font-medium bg-clip-text text-transparent bg-gradient-to-r from-blue-200 to-purple-200">
+            Major progress (live preview)
+          </h3>
+          <span className="text-xs text-gray-500">
+            Includes in-progress + everything you’ve placed on the grid.
+          </span>
+        </div>
+
+        {isPreviewLoading && (
+          <div className="text-sm text-gray-400">Updating preview…</div>
+        )}
+        {previewError && (
+          <div className="text-sm text-red-300">{previewError}</div>
+        )}
+
+        {!isPreviewLoading &&
+          !previewError &&
+          Object.keys(previewProgress).length === 0 && (
+            <div className="text-sm text-gray-500">
+              No declared majors found for preview.
+            </div>
+          )}
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+          {Object.entries(previewProgress).map(([majorId, prog]) => (
+            <ProgressRow
+              key={majorId}
+              label={MAJORS[majorId] ?? majorId}
+              progress={prog}
+            />
+          ))}
+        </div>
+      </div>
 
       {/* Available Courses Pool */}
       <div className="sticky top-0 z-30 mb-2" style={{ top: "0px" }}>
@@ -494,10 +702,9 @@ export default function Simulator({
                       >
                         {course.code}
                         <span className="text-xs text-blue-200/70 ml-1">
-                          {truncate(
-                            getCourseNameFromCode(course.code) ?? "",
-                            20
-                          )}
+                          {(getCourseNameFromCode(course.code) ?? "").length > 0
+                            ? ` ${getCourseNameFromCode(course.code)}`
+                            : ""}
                         </span>
                       </motion.div>
                     ))}
@@ -516,14 +723,14 @@ export default function Simulator({
           const semCreditsLabel = Number.isInteger(semCredits)
             ? String(semCredits)
             : semCredits.toFixed(1);
+
           return (
             <motion.div
               key={semester.id}
               onDragOver={(e) => {
                 e.preventDefault();
-                if (!isPastSemester(semester.name)) {
+                if (!isPastSemester(semester.name))
                   setHoveredSemester(semester.id);
-                }
               }}
               onDragLeave={() => setHoveredSemester(null)}
               onDrop={() => {
@@ -532,33 +739,28 @@ export default function Simulator({
                 setHoveredSemester(null);
               }}
               className={`bg-gray-900/50 rounded-xl border p-4 min-h-[180px] flex flex-col transition-all
-            ${
-              hasInProgress(semester)
-                ? "border-blue-600/70 ring-2 ring-blue-400/40"
-                : "border-gray-800"
-            }
-            ${
-              hoveredSemester === semester.id &&
-              draggedCourse &&
-              !isPastSemester(semester.name)
-                ? "ring-2 ring-pink-400 scale-95 bg-gray-800/70"
-                : ""
-            }
-          `}
+                ${
+                  hasInProgress(semester)
+                    ? "border-blue-600/70 ring-2 ring-blue-400/40"
+                    : "border-gray-800"
+                }
+                ${
+                  hoveredSemester === semester.id &&
+                  draggedCourse &&
+                  !isPastSemester(semester.name)
+                    ? "ring-2 ring-pink-400 scale-95 bg-gray-800/70"
+                    : ""
+                }`}
             >
               <div className="flex justify-between items-center mb-3">
                 <h4 className="font-medium text-gray-300">{semester.name}</h4>
-
                 <div className="flex items-center gap-2">
-                  {/* Credits pill */}
                   <span
-                    className="px-2 py-0.5 rounded-full text-xs bg-gray-800/70 text-gray-200 border border-gray-700
-                 shadow-sm shadow-black/20"
+                    className="px-2 py-0.5 rounded-full text-xs bg-gray-800/70 text-gray-200 border border-gray-700 shadow-sm shadow-black/20"
                     title="Sum of credits in this semester"
                   >
                     {semCreditsLabel} cr
                   </span>
-
                   {!isPastSemester(semester.name) && (
                     <button
                       onClick={() => setLookupSemesterId(semester.id)}
@@ -575,14 +777,13 @@ export default function Simulator({
               {semester.courses.length === 0 ? (
                 <div
                   className={`flex-1 flex items-center justify-center border-2 border-dashed rounded-lg p-4 min-h-[52px] transition-all
-              ${
-                hoveredSemester === semester.id &&
-                draggedCourse &&
-                !isPastSemester(semester.name)
-                  ? "border-pink-400 bg-purple-900/20"
-                  : "border-gray-700"
-              }
-            `}
+                    ${
+                      hoveredSemester === semester.id &&
+                      draggedCourse &&
+                      !isPastSemester(semester.name)
+                        ? "border-pink-400 bg-purple-900/20"
+                        : "border-gray-700"
+                    }`}
                 >
                   <p className="text-sm text-gray-500 text-center opacity-70">
                     Drag from pool or add others manually
@@ -596,25 +797,19 @@ export default function Simulator({
                       whileHover={{ scale: 1.03 }}
                       whileTap={{ scale: 0.97 }}
                       className={`w-full flex items-center justify-between px-3 py-1.5 rounded-full text-sm cursor-pointer select-none transition-all border relative group
-        ${
-          course.status === "completed"
-            ? "bg-emerald-900/20 text-emerald-300 border-emerald-700"
-            : course.status === "in-progress"
-            ? "bg-blue-900/20 text-blue-300 border-blue-700"
-            : "bg-amber-900/20 text-pink-300 border-pink-700 hover:bg-pink-800/30"
-        }`}
+                        ${
+                          course.status === "completed"
+                            ? "bg-emerald-900/20 text-emerald-300 border-emerald-700"
+                            : course.status === "in-progress"
+                            ? "bg-blue-900/20 text-blue-300 border-blue-700"
+                            : "bg-amber-900/20 text-pink-300 border-pink-700 hover:bg-pink-800/30"
+                        }`}
                     >
                       <div className="flex items-center justify-between w-full">
                         <div>
                           {course.code}
                           <span className="text-xs opacity-70 ml-1">
-                            {truncate(
-                              getCourseNameFromCode(course.code) ?? "",
-                              course.status === "completed" ||
-                                course.status === "in-progress"
-                                ? 30
-                                : 20
-                            )}
+                            {getCourseNameFromCode(course.code) ?? ""}
                           </span>
                         </div>
                         {course.status === "not-taken" && (
@@ -678,7 +873,7 @@ export default function Simulator({
                   <div className="max-h-40 overflow-y-auto border border-gray-700 rounded-lg">
                     {savedPlans.map((plan, index) => (
                       <div
-                        key={index}
+                        key={`${plan.createdAt}-${index}`}
                         className={`p-3 border-b border-gray-700 cursor-pointer hover:bg-gray-800/50 ${
                           selectedPlanToOverwrite === index
                             ? "bg-blue-900/30"
@@ -759,7 +954,7 @@ export default function Simulator({
                 >
                   {savedPlans.map((plan, index) => (
                     <div
-                      key={plan.createdAt}
+                      key={`${plan.createdAt}-${index}`}
                       className="p-3 bg-gray-800 rounded-lg border border-gray-700 mb-2"
                     >
                       <div className="flex justify-between items-center">
@@ -800,6 +995,8 @@ export default function Simulator({
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Manual Course Lookup Modal */}
       <ManualCourseLookupModal
         isOpen={lookupSemesterId !== null}
         onClose={() => setLookupSemesterId(null)}
@@ -808,25 +1005,12 @@ export default function Simulator({
           setSemesters((prev) =>
             prev.map((sem) =>
               sem.id === lookupSemesterId
-                ? {
-                    ...sem,
-                    courses: [...sem.courses, manualCourse],
-                  }
+                ? { ...sem, courses: [...sem.courses, manualCourse] }
                 : sem
             )
           );
           setLookupSemesterId(null);
         }}
-        // alreadyAddedCodes={[
-        //   ...semesters.flatMap((s) =>
-        //     (s.courses ?? [])
-        //       .filter((c): c is Course => !!c && typeof c.code === "string")
-        //       .map((c) => c?.code)
-        //   ),
-        //   ...availableCourses
-        //     .filter((c): c is Course => !!c && typeof c.code === "string")
-        //     .map((c) => c?.code),
-        // ]}
         userId={user?.uid || ""}
       />
     </div>

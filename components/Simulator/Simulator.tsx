@@ -30,6 +30,23 @@ interface SimulatorProps {
   graduationYear: number;
 }
 
+// --- Credit helpers ---
+const getCourseCredits = (c: Course): number => {
+  // Adjust keys to match your schema if needed
+  const raw =
+    (c as any).credits ??
+    (c as any).credit ??
+    (c as any).units ??
+    (c as any).yaleCredits ??
+    (c as any).ECTS;
+
+  const n = typeof raw === "string" ? parseFloat(raw) : Number(raw);
+  return Number.isFinite(n) ? n : 1; // default to 1 if missing
+};
+
+const getSemesterCredits = (sem: Semester): number =>
+  sem.courses.reduce((sum, c) => sum + getCourseCredits(c), 0);
+
 function compareSemesters(a: string, b: string) {
   const [semA, yearA] = a.split(" ");
   const [semB, yearB] = b.split(" ");
@@ -494,22 +511,27 @@ export default function Simulator({
 
       {/* Semesters Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {semesters.map((semester) => (
-          <motion.div
-            key={semester.id}
-            onDragOver={(e) => {
-              e.preventDefault();
-              if (!isPastSemester(semester.name)) {
-                setHoveredSemester(semester.id);
-              }
-            }}
-            onDragLeave={() => setHoveredSemester(null)}
-            onDrop={() => {
-              if (isPastSemester(semester.name)) return;
-              handleDrop(semester.id);
-              setHoveredSemester(null);
-            }}
-            className={`bg-gray-900/50 rounded-xl border p-4 min-h-[180px] flex flex-col transition-all
+        {semesters.map((semester) => {
+          const semCredits = getSemesterCredits(semester);
+          const semCreditsLabel = Number.isInteger(semCredits)
+            ? String(semCredits)
+            : semCredits.toFixed(1);
+          return (
+            <motion.div
+              key={semester.id}
+              onDragOver={(e) => {
+                e.preventDefault();
+                if (!isPastSemester(semester.name)) {
+                  setHoveredSemester(semester.id);
+                }
+              }}
+              onDragLeave={() => setHoveredSemester(null)}
+              onDrop={() => {
+                if (isPastSemester(semester.name)) return;
+                handleDrop(semester.id);
+                setHoveredSemester(null);
+              }}
+              className={`bg-gray-900/50 rounded-xl border p-4 min-h-[180px] flex flex-col transition-all
             ${
               hasInProgress(semester)
                 ? "border-blue-600/70 ring-2 ring-blue-400/40"
@@ -523,24 +545,36 @@ export default function Simulator({
                 : ""
             }
           `}
-          >
-            <div className="flex justify-between items-center mb-3">
-              <h4 className="font-medium text-gray-300">{semester.name}</h4>
-              {!isPastSemester(semester.name) && (
-                <button
-                  onClick={() => setLookupSemesterId(semester.id)}
-                  className="ml-2 px-2 py-1 text-xs rounded-lg bg-blue-800/30 text-blue-200 hover:bg-blue-700/60 border border-blue-900"
-                  type="button"
-                >
-                  <FiPlus className="inline-block mr-1" />
-                  Manual course lookup
-                </button>
-              )}
-            </div>
+            >
+              <div className="flex justify-between items-center mb-3">
+                <h4 className="font-medium text-gray-300">{semester.name}</h4>
 
-            {semester.courses.length === 0 ? (
-              <div
-                className={`flex-1 flex items-center justify-center border-2 border-dashed rounded-lg p-4 min-h-[52px] transition-all
+                <div className="flex items-center gap-2">
+                  {/* Credits pill */}
+                  <span
+                    className="px-2 py-0.5 rounded-full text-xs bg-gray-800/70 text-gray-200 border border-gray-700
+                 shadow-sm shadow-black/20"
+                    title="Sum of credits in this semester"
+                  >
+                    {semCreditsLabel} cr
+                  </span>
+
+                  {!isPastSemester(semester.name) && (
+                    <button
+                      onClick={() => setLookupSemesterId(semester.id)}
+                      className="ml-1 px-2 py-1 text-xs rounded-lg bg-blue-800/30 text-blue-200 hover:bg-blue-700/60 border border-blue-900"
+                      type="button"
+                    >
+                      <FiPlus className="inline-block mr-1" />
+                      Manual add
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              {semester.courses.length === 0 ? (
+                <div
+                  className={`flex-1 flex items-center justify-center border-2 border-dashed rounded-lg p-4 min-h-[52px] transition-all
               ${
                 hoveredSemester === semester.id &&
                 draggedCourse &&
@@ -549,58 +583,62 @@ export default function Simulator({
                   : "border-gray-700"
               }
             `}
-              >
-                <p className="text-sm text-gray-500 text-center opacity-70">
-                  Drag from pool or add others manually
-                </p>
-              </div>
-            ) : (
-              <div className="flex flex-wrap gap-2">
-                {semester.courses.map((course) => (
-                  <motion.div
-                    key={`${semester.id}-${course.code}`}
-                    whileHover={{ scale: 1.03 }}
-                    whileTap={{ scale: 0.97 }}
-                    className={`w-full flex items-center justify-between px-3 py-1.5 rounded-full text-sm cursor-pointer select-none transition-all border relative group
+                >
+                  <p className="text-sm text-gray-500 text-center opacity-70">
+                    Drag from pool or add others manually
+                  </p>
+                </div>
+              ) : (
+                <div className="flex flex-wrap gap-2">
+                  {semester.courses.map((course) => (
+                    <motion.div
+                      key={`${semester.id}-${course.code}`}
+                      whileHover={{ scale: 1.03 }}
+                      whileTap={{ scale: 0.97 }}
+                      className={`w-full flex items-center justify-between px-3 py-1.5 rounded-full text-sm cursor-pointer select-none transition-all border relative group
         ${
           course.status === "completed"
             ? "bg-emerald-900/20 text-emerald-300 border-emerald-700"
             : course.status === "in-progress"
-              ? "bg-blue-900/20 text-blue-300 border-blue-700"
-              : "bg-amber-900/20 text-pink-300 border-pink-700 hover:bg-pink-800/30"
+            ? "bg-blue-900/20 text-blue-300 border-blue-700"
+            : "bg-amber-900/20 text-pink-300 border-pink-700 hover:bg-pink-800/30"
         }`}
-                  >
-                    <div className="flex items-center justify-between w-full">
-                      <div>
-                        {course.code}
-                        <span className="text-xs opacity-70 ml-1">
-                          {truncate(
-                            getCourseNameFromCode(course.code) ?? "",
-                            course.status === "completed" ||
-                              course.status === "in-progress"
-                              ? 30
-                              : 20
-                          )}
-                        </span>
+                    >
+                      <div className="flex items-center justify-between w-full">
+                        <div>
+                          {course.code}
+                          <span className="text-xs opacity-70 ml-1">
+                            {truncate(
+                              getCourseNameFromCode(course.code) ?? "",
+                              course.status === "completed" ||
+                                course.status === "in-progress"
+                                ? 30
+                                : 20
+                            )}
+                          </span>
+                        </div>
+                        {course.status === "not-taken" && (
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              removeCourseFromSemester(
+                                semester.id,
+                                course.code
+                              );
+                            }}
+                            className="ml-2 opacity-0 group-hover:opacity-100 transition-opacity text-red-300 hover:text-red-200"
+                          >
+                            <FiTrash2 className="h-3.5 w-3.5" />
+                          </button>
+                        )}
                       </div>
-                      {course.status === "not-taken" && (
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            removeCourseFromSemester(semester.id, course.code);
-                          }}
-                          className="ml-2 opacity-0 group-hover:opacity-100 transition-opacity text-red-300 hover:text-red-200"
-                        >
-                          <FiTrash2 className="h-3.5 w-3.5" />
-                        </button>
-                      )}
-                    </div>
-                  </motion.div>
-                ))}
-              </div>
-            )}
-          </motion.div>
-        ))}
+                    </motion.div>
+                  ))}
+                </div>
+              )}
+            </motion.div>
+          );
+        })}
       </div>
 
       {/* Save Plan Modal */}

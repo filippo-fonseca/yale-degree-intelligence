@@ -721,17 +721,7 @@ export default function Home() {
               className="hidden md:inline px-2.5 py-1 text-[11px] rounded-full border border-emerald-800 bg-emerald-900/30 text-emerald-300"
               title="Welcome to Yale!"
             >
-              {isBrandNew ? (
-                <>
-                  ❤️ New Bulldog (welcome to Yale,{" "}
-                  {user.displayName && user.displayName.split(" ")[0]}!)
-                </>
-              ) : (
-                <>
-                  Welcome back to school,{" "}
-                  {user.displayName && user.displayName.split(" ")[0]}!
-                </>
-              )}
+              Good luck on midterms!
             </span>
 
             <button

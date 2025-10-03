@@ -79,7 +79,7 @@ export default function Simulator({
   >(null);
   const [hasChanges, setHasChanges] = useState(false);
   const initialSemestersRef = useRef<Semester[]>([]);
-  const [showPool, setShowPool] = useState(true);
+  const [showPool, setShowPool] = useState(false);
 
   useEffect(() => {
     // 1. Build semester list

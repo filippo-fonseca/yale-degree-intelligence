@@ -11,15 +11,18 @@ import {
 } from "react-icons/fi";
 import { Info } from "lucide-react";
 import { Course } from "@/lib/types";
-import { getCourseNameFromCode } from "@/lib/courseCatalog";
+import { getCourseNameFromCode, getCanonicalCode } from "@/lib/courseCatalog";
 import { useAuth } from "@/context/AuthContext";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import { db } from "@/config/firebase";
 import ManualCourseLookupModal from "./ManualCourseLookupModal";
+import SimulatorManualAssignModal from "./SimulatorManualAssignModal";
+import SimulatorRequirementsBreakdown from "./SimulatorRequirementsBreakdown";
 import {
   calculatePreviewMajorProgressByMajors,
-  MAJORS,
   MajorProgress,
+  ManualRequirementEntry,
+  majorRequirements,
 } from "@/lib/majors";
 
 // ----------------- Types -----------------
@@ -33,11 +36,13 @@ interface SimulatorProps {
   remainingCourses: Course[];
   completedCourses: Course[];
   graduationYear: number;
+  userMajors: string[];
 }
 
 type Plan = {
   name: string;
   semesters: Semester[];
+  manualRequirements?: ManualRequirementEntry[];
   createdAt: string; // ISO
 };
 
@@ -107,12 +112,14 @@ export default function Simulator({
   remainingCourses,
   completedCourses,
   graduationYear,
+  userMajors,
 }: SimulatorProps) {
   const { user } = useAuth();
 
   const [semesters, setSemesters] = useState<Semester[]>([]);
   const [availableCourses, setAvailableCourses] = useState<Course[]>([]);
   const [draggedCourse, setDraggedCourse] = useState<Course | null>(null);
+  const [dragSourceSemester, setDragSourceSemester] = useState<string | null>(null);
   const [showHelp, setShowHelp] = useState(false);
   const [savedPlans, setSavedPlans] = useState<Plan[]>([]);
   const [planName, setPlanName] = useState("");
@@ -126,6 +133,16 @@ export default function Simulator({
   const [hasChanges, setHasChanges] = useState(false);
   const [showPool, setShowPool] = useState(false);
 
+  // Simulator-local manual requirements (plan-scoped, NOT in Firebase courses)
+  const [simulatorManualReqs, setSimulatorManualReqs] = useState<
+    ManualRequirementEntry[]
+  >([]);
+  // Manual assignment modal state
+  const [manualAssignPending, setManualAssignPending] = useState<{
+    course: Course;
+    semesterId: string;
+  } | null>(null);
+
   // Preview state
   const [previewProgress, setPreviewProgress] = useState<PreviewProgressMap>(
     {}
@@ -136,8 +153,36 @@ export default function Simulator({
   // keep initial snapshot to detect changes
   const initialSemestersRef = useRef<Semester[]>([]);
 
-  // majors to compute (replace with user's declared majors if you have them)
-  const majorIds = useMemo<string[]>(() => Object.keys(MAJORS), []);
+  // majors to compute – only the user's declared majors
+  const majorIds = useMemo<string[]>(() => userMajors, [userMajors]);
+
+  // Auto-detect: does a course code appear in any requirement option across all user majors?
+  const isCourseInAnyRequirement = useMemo(() => {
+    const allOptionCodes = new Set<string>();
+    for (const majorId of majorIds) {
+      const major = majorRequirements[majorId];
+      if (!major) continue;
+      for (const req of major.requirements) {
+        for (const opt of req.options) {
+          if (opt.type === "course") {
+            allOptionCodes.add(opt.code);
+            const canon = getCanonicalCode(opt.code);
+            if (canon) allOptionCodes.add(canon);
+          } else if (opt.type === "group") {
+            for (const code of (opt as { type: "group"; options: string[] }).options) {
+              allOptionCodes.add(code);
+              const canon = getCanonicalCode(code);
+              if (canon) allOptionCodes.add(canon);
+            }
+          }
+        }
+      }
+    }
+    return (courseCode: string): boolean => {
+      const canon = getCanonicalCode(courseCode) || courseCode;
+      return allOptionCodes.has(courseCode) || allOptionCodes.has(canon);
+    };
+  }, [majorIds]);
 
   // ------------ Build initial semesters & pools ------------
   useEffect(() => {
@@ -216,10 +261,11 @@ export default function Simulator({
     const changed =
       currentCodes.length !== initialCodes.length ||
       currentCodes.some((code) => !initialCodes.includes(code)) ||
-      initialCodes.some((code) => !currentCodes.includes(code));
+      initialCodes.some((code) => !currentCodes.includes(code)) ||
+      simulatorManualReqs.length > 0;
 
     setHasChanges(changed);
-  }, [semesters]);
+  }, [semesters, simulatorManualReqs]);
 
   // ------------ Saved plans load ------------
   useEffect(() => {
@@ -240,24 +286,54 @@ export default function Simulator({
   }, [user]);
 
   // ------------ Drag & Drop ------------
-  const handleDragStart = (course: Course) => setDraggedCourse(course);
+  const handleDragStart = (course: Course, sourceSemesterId?: string) => {
+    setDraggedCourse(course);
+    setDragSourceSemester(sourceSemesterId ?? null);
+  };
 
   const handleDrop = (semesterId: string) => {
     if (!draggedCourse) return;
 
+    // Dropping back on the same semester — no-op
+    if (dragSourceSemester === semesterId) {
+      setDraggedCourse(null);
+      setDragSourceSemester(null);
+      return;
+    }
+
     setSemesters((prev) =>
-      prev.map((sem) =>
-        sem.id === semesterId
-          ? sem.courses.some((c) => c.code === draggedCourse.code)
+      prev.map((sem) => {
+        // Remove from source semester (inter-semester move)
+        if (dragSourceSemester && sem.id === dragSourceSemester) {
+          return {
+            ...sem,
+            courses: sem.courses.filter((c) => c.code !== draggedCourse.code),
+          };
+        }
+        // Add to target semester (if not already there)
+        if (sem.id === semesterId) {
+          return sem.courses.some((c) => c.code === draggedCourse.code)
             ? sem
-            : { ...sem, courses: [...sem.courses, draggedCourse] }
-          : sem
-      )
+            : { ...sem, courses: [...sem.courses, draggedCourse] };
+        }
+        return sem;
+      })
     );
-    setAvailableCourses((prev) =>
-      prev.filter((c) => c.code !== draggedCourse.code)
-    );
+
+    // Only remove from pool if dragged from pool (not from another semester)
+    if (!dragSourceSemester) {
+      setAvailableCourses((prev) =>
+        prev.filter((c) => c.code !== draggedCourse.code)
+      );
+
+      // Auto-detect: prompt manual assignment if not in any requirement
+      if (!isCourseInAnyRequirement(draggedCourse.code)) {
+        setManualAssignPending({ course: draggedCourse, semesterId });
+      }
+    }
+
     setDraggedCourse(null);
+    setDragSourceSemester(null);
   };
 
   const removeCourseFromSemester = (semesterId: string, courseCode: string) => {
@@ -271,6 +347,9 @@ export default function Simulator({
           : sem
       )
     );
+
+    // Clean up any simulator manual reqs for this course
+    setSimulatorManualReqs((prev) => prev.filter((m) => m.code !== courseCode));
 
     const rc = remainingCourses.find((c) => c.code === courseCode);
     if (rc && rc.status === "not-taken") {
@@ -317,8 +396,24 @@ export default function Simulator({
     );
     const plannedCodesLocal = plannedCodes; // from memo
     const skippedCodes: string[] = []; // wire up if you track skips
-    const manualReqs: { code: string; requirement: string; credits: number }[] =
-      []; // wire up if you track manual reqs
+
+    // Extract permanent manual fulfillments from Firebase courses
+    const permanentManualReqs: ManualRequirementEntry[] = completedCourses.flatMap((course) =>
+      (course.manualRequirementsFulfilled || [])
+        .filter((m) => majorIds.includes(m.major_id))
+        .map((m) => ({
+          code: course.code,
+          requirement: m.requirement_title,
+          credits: course.credits || 1,
+        }))
+    );
+
+    // Merge permanent manual reqs with simulator-local manual reqs
+    // Simulator manuals are ALWAYS planned (for future courses)
+    const manualReqs = [
+      ...permanentManualReqs,
+      ...simulatorManualReqs.map(m => ({ ...m, isPlanned: true }))
+    ];
 
     try {
       // 1) Batch compute for all majors
@@ -331,15 +426,7 @@ export default function Simulator({
         plannedCodesLocal
       );
 
-      const filtered = Object.fromEntries(
-        Object.entries(all).filter(
-          ([, prog]) =>
-            (prog.completedCredits ?? 0) > 0 ||
-            (prog.inProgressCredits ?? 0) > 0
-        )
-      );
-
-      setPreviewProgress(filtered);
+      setPreviewProgress(all);
     } catch (batchErr) {
       // 2) Fallback: compute per-major so one bad major doesn't break others
       console.error("[PreviewProgress] batch compute failed:", batchErr);
@@ -382,7 +469,7 @@ export default function Simulator({
     } finally {
       setIsPreviewLoading(false);
     }
-  }, [user, majorIds, semesters, completedCourses, plannedCodes]);
+  }, [user, majorIds, semesters, completedCourses, plannedCodes, simulatorManualReqs]);
 
   // ------------ Save / Load / Delete Plans ------------
   const savePlan = async () => {
@@ -391,6 +478,7 @@ export default function Simulator({
       const newPlan: Plan = {
         name: planName.trim(),
         semesters,
+        manualRequirements: simulatorManualReqs,
         createdAt: new Date().toISOString(),
       };
 
@@ -419,6 +507,7 @@ export default function Simulator({
     if (planIndex < 0 || planIndex >= savedPlans.length) return;
     const plan = savedPlans[planIndex];
     setSemesters(plan.semesters);
+    setSimulatorManualReqs(plan.manualRequirements ?? []);
     initialSemestersRef.current = JSON.parse(
       JSON.stringify(plan.semesters)
     ) as Semester[];
@@ -470,61 +559,23 @@ export default function Simulator({
           rc.status === "not-taken"
       )
     );
+    setSimulatorManualReqs([]);
   };
 
   const hasInProgress = (semester: Semester) =>
     semester.courses.some((c) => c.status === "in-progress");
 
-  // ------------ Compact progress row ------------
-  function ProgressRow({
-    label,
-    progress,
-  }: {
-    label: string;
-    progress: MajorProgress;
-  }) {
-    const pctStrict = Math.max(0, Math.min(100, progress.percentage));
-    const pctWithIP = progress.inProgressPercentage ?? progress.percentage;
-
-    return (
-      <div className="p-3 rounded-xl bg-gray-900/50 border border-gray-800">
-        <div className="flex items-center justify-between mb-2">
-          <div className="text-sm text-gray-300">{label}</div>
-          <div className="text-sm text-gray-400">
-            <span className="mr-2">
-              Completed:{" "}
-              <span className="text-blue-300">
-                {progress.completedCredits}/{progress.totalCredits}
-              </span>
-            </span>
-            <span>
-              With planned:{" "}
-              <span className="text-purple-300">{pctWithIP.toFixed(0)}%</span>
-            </span>
-          </div>
-        </div>
-        <div className="w-full bg-gray-800/60 h-2 rounded-full overflow-hidden relative">
-          <div
-            className="h-2 bg-gradient-to-r from-blue-400 to-blue-500"
-            style={{ width: `${pctStrict}%` }}
-          />
-          <div
-            className="h-2 bg-gradient-to-r from-purple-400 to-purple-500 opacity-35 absolute top-0 left-0"
-            style={{ width: `${pctWithIP}%` }}
-            aria-hidden
-          />
-        </div>
-        <div className="mt-1 text-[11px] text-gray-500">
-          Blue = completed only • Purple overlay = includes current in-progress
-          + courses placed on the grid
-        </div>
-      </div>
-    );
-  }
 
   // ----------------- Render -----------------
   return (
-    <div className="space-y-4 font-louize">
+    <div
+      className="space-y-4 font-louize"
+      onDragEnd={() => {
+        setDraggedCourse(null);
+        setDragSourceSemester(null);
+        setHoveredSemester(null);
+      }}
+    >
       {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div className="mb-6">
@@ -614,14 +665,14 @@ export default function Simulator({
       </AnimatePresence>
 
       {/* Live Major Progress Preview */}
-      <div className="space-y-2">
-        <div className="flex items-center gap-2">
+      <div className="space-y-3">
+        <div>
           <h3 className="text-lg font-medium bg-clip-text text-transparent bg-gradient-to-r from-blue-200 to-purple-200">
-            Major progress (live preview)
+            Major progress
           </h3>
-          <span className="text-xs text-gray-500">
-            Includes in-progress + everything you’ve placed on the grid.
-          </span>
+          <p className="text-xs text-gray-500 mt-0.5">
+            Live preview — reflects completed, in-progress, and courses placed on the grid.
+          </p>
         </div>
 
         {isPreviewLoading && (
@@ -631,23 +682,19 @@ export default function Simulator({
           <div className="text-sm text-red-300">{previewError}</div>
         )}
 
-        {!isPreviewLoading &&
-          !previewError &&
-          Object.keys(previewProgress).length === 0 && (
-            <div className="text-sm text-gray-500">
-              No declared majors found for preview.
-            </div>
-          )}
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-          {Object.entries(previewProgress).map(([majorId, prog]) => (
-            <ProgressRow
-              key={majorId}
-              label={MAJORS[majorId] ?? majorId}
-              progress={prog}
-            />
-          ))}
-        </div>
+        <SimulatorRequirementsBreakdown
+          majorIds={majorIds}
+          previewProgress={previewProgress}
+          plannedCodes={plannedCodes}
+          simulatorManualReqs={simulatorManualReqs}
+          onRemoveManualReq={(code, requirement) => {
+            setSimulatorManualReqs((prev) =>
+              prev.filter(
+                (m) => !(m.code === code && m.requirement === requirement)
+              )
+            );
+          }}
+        />
       </div>
 
       {/* Available Courses Pool */}
@@ -794,15 +841,21 @@ export default function Simulator({
                   {semester.courses.map((course) => (
                     <motion.div
                       key={`${semester.id}-${course.code}`}
+                      draggable={course.status === "not-taken"}
+                      onDragStart={
+                        course.status === "not-taken"
+                          ? () => handleDragStart(course, semester.id)
+                          : undefined
+                      }
                       whileHover={{ scale: 1.03 }}
                       whileTap={{ scale: 0.97 }}
-                      className={`w-full flex items-center justify-between px-3 py-1.5 rounded-full text-sm cursor-pointer select-none transition-all border relative group
+                      className={`w-full flex items-center justify-between px-3 py-1.5 rounded-full text-sm select-none transition-all border relative group
                         ${
                           course.status === "completed"
                             ? "bg-emerald-900/20 text-emerald-300 border-emerald-700"
                             : course.status === "in-progress"
                             ? "bg-blue-900/20 text-blue-300 border-blue-700"
-                            : "bg-amber-900/20 text-pink-300 border-pink-700 hover:bg-pink-800/30"
+                            : "bg-amber-900/20 text-pink-300 border-pink-700 hover:bg-pink-800/30 cursor-grab active:cursor-grabbing"
                         }`}
                     >
                       <div className="flex items-center justify-between w-full">
@@ -1009,9 +1062,32 @@ export default function Simulator({
                 : sem
             )
           );
+
+          // Auto-detect: prompt manual assignment if not in any requirement
+          if (!isCourseInAnyRequirement(manualCourse.code)) {
+            setManualAssignPending({
+              course: manualCourse,
+              semesterId: lookupSemesterId,
+            });
+          }
+
           setLookupSemesterId(null);
         }}
         userId={user?.uid || ""}
+      />
+
+      {/* Manual requirement assignment modal */}
+      <SimulatorManualAssignModal
+        isOpen={manualAssignPending !== null}
+        course={manualAssignPending?.course ?? null}
+        majorIds={majorIds}
+        previewProgress={previewProgress}
+        onAssign={(entry) => {
+          setSimulatorManualReqs((prev) => [...prev, entry]);
+          setManualAssignPending(null);
+        }}
+        onSkip={() => setManualAssignPending(null)}
+        onClose={() => setManualAssignPending(null)}
       />
     </div>
   );

@@ -70,7 +70,7 @@ export const calculateMajorProgress = (
   completedCourseCodes: string[],
   inProgressCourseCodes: string[] = [],
   skippedCourseCodes: string[] = [],
-  manualRequirements: {code: string, requirement: string, credits: number}[] = []
+  manualRequirements: ManualRequirementEntry[] = []
 ): MajorProgress => {
   const major = majorRequirements[majorId];
   if (!major) throw new Error(`Major ${majorId} not found`);
@@ -81,9 +81,9 @@ export const calculateMajorProgress = (
   const canonicalSkipped = skippedCourseCodes.map(code => getCanonicalCode(code) || code);
   
   // Group manual requirements by requirement name
-  const manualByRequirement: Record<string, {code: string, credits: number}[]> = {};
+  const manualByRequirement: Record<string, {code: string, credits: number, isPlanned?: boolean}[]> = {};
   manualRequirements.forEach(m => {
-    
+
     if (!manualByRequirement[m.requirement]) {
       manualByRequirement[m.requirement] = [];
     }
@@ -91,6 +91,7 @@ export const calculateMajorProgress = (
     manualByRequirement[m.requirement].push({
       code: m.code,
       credits: m.credits,
+      isPlanned: m.isPlanned,
     });
   });
 
@@ -107,18 +108,23 @@ export const calculateMajorProgress = (
     const manualFulfillments = manualByRequirement[req.name] || [];
 
     // Process manual fulfillments
-    manualFulfillments.forEach(({code, credits}) => {
+    manualFulfillments.forEach(({code, credits, isPlanned}) => {
       reqOptions.push({
         code,
         name: getCourseInfo(code)?.name || code,
-        completed: true,
-        inProgress: false,
+        completed: !isPlanned, // Planned manuals are not yet completed
+        inProgress: !!isPlanned, // Planned manuals show as in-progress
         required: true,
         credits: credits,
         manual: true
       });
-      reqCompleted += 1;
-      totalCompletedCredits += credits;
+      if (isPlanned) {
+        reqInProgress += 1;
+        totalInProgressCredits += credits;
+      } else {
+        reqCompleted += 1;
+        totalCompletedCredits += credits;
+      }
     });
 
     // Process regular requirements
@@ -192,30 +198,33 @@ export const calculateMajorProgress = (
       }
     }
 
+    // Only count permanent (non-planned) manuals toward satisfaction
+    const permanentManualCount = manualFulfillments.filter(m => !m.isPlanned).length;
+
     requirementProgress.push({
       name: req.name,
       description: req.description,
       completed: reqCompleted,
       required: req.required,
-      satisfied: reqCompleted >= req.required || manualFulfillments.length >= (req.required - reqCompleted), // Mark as satisfied if manually fulfilled
+      satisfied: reqCompleted >= req.required || permanentManualCount >= (req.required - reqCompleted),
       options: reqOptions
     });
   }
 
-  // Categorize requirements
-  // Replace the current categorization code with this:
-  const completedReqs = requirementProgress.filter(r => 
-    r.satisfied || 
-    r.options.some(o => o.manual || o.completed) // Include requirements with any completed or manual courses
+  // Categorize requirements - each requirement appears in exactly ONE section
+  // Priority: Satisfied > In Progress > Remaining
+
+  // Satisfied: fully satisfied requirements only
+  const completedReqs = requirementProgress.filter(r => r.satisfied);
+
+  // In Progress: NOT satisfied, but has in-progress courses (real or planned)
+  const inProgressReqs = requirementProgress.filter(r =>
+    !r.satisfied && r.options.some(o => o.inProgress)
   );
-  
-  const inProgressReqs = requirementProgress.filter(r => 
-    !completedReqs.includes(r) && // Don't include requirements already marked as completed
-    (r.completed > 0 || r.options.some(o => o.inProgress))
-  );
-  
-  const remainingReqs = requirementProgress.filter(r => 
-    r.completed < r.required
+
+  // Remaining: NOT satisfied AND no in-progress courses
+  const remainingReqs = requirementProgress.filter(r =>
+    !r.satisfied && !r.options.some(o => o.inProgress)
   );
 
   // Calculate percentages
@@ -257,6 +266,7 @@ export type ManualRequirementEntry = {
   code: string;
   requirement: string;
   credits: number;
+  isPlanned?: boolean; // true = simulator planning (future), false/undefined = permanent (My Major)
 };
 
 /**

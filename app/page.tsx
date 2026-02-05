@@ -1391,6 +1391,7 @@ export default function Home() {
                           c.status === "completed" || c.status === "in-progress"
                       )}
                       graduationYear={userProfile.graduationYear}
+                      userMajors={userProfile.majors}
                     />
                   )}
                 </motion.div>

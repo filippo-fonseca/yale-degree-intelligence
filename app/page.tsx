@@ -37,6 +37,11 @@ import {
 } from "firebase/firestore";
 import { Course } from "@/lib/types";
 import { db } from "@/config/firebase";
+import {
+  syncFriendsPublicData,
+  enableFriendsFeature,
+  disableFriendsFeature,
+} from "@/lib/syncFriendsPublicData";
 import { gradePoints } from "@/lib/constants";
 import {
   calculateMajorProgress,
@@ -147,11 +152,15 @@ export default function Home() {
 
   const [coursesLoading, setCoursesLoading] = useState(true);
 
+  // Friends feature state
+  const [friendsEnabled, setFriendsEnabled] = useState(false);
+
   useEffect(() => {
     if (!user) {
       setCoursesLoading(false);
       setCourses([]);
       setHasData(false);
+      setFriendsEnabled(false);
     }
   }, [user]);
 
@@ -237,6 +246,23 @@ export default function Home() {
         setShowMajorSelection(true);
       }
     });
+    return () => unsub();
+  }, [user]);
+
+  // Listen to friends_public_data to track friends feature status
+  useEffect(() => {
+    if (!user) return;
+
+    const unsub = onSnapshot(
+      doc(db, "friends_public_data", user.uid),
+      (docSnap) => {
+        if (docSnap.exists()) {
+          setFriendsEnabled(docSnap.data().enabled || false);
+        } else {
+          setFriendsEnabled(false);
+        }
+      },
+    );
     return () => unsub();
   }, [user]);
 
@@ -502,6 +528,24 @@ export default function Home() {
       console.error("Error during duplicate check:", error);
     }
 
+    // Sync to friends_public_data if enabled
+    if (friendsEnabled) {
+      const q = query(
+        collection(db, "courses"),
+        where("userId", "==", user.uid),
+      );
+      const snap = await getDocs(q);
+      const freshCourses = snap.docs.map((d) => ({
+        id: d.id,
+        ...d.data(),
+      })) as Course[];
+      await syncFriendsPublicData(user.uid, freshCourses, userProfile, {
+        displayName: user.displayName,
+        email: user.email,
+        photoURL: user.photoURL,
+      });
+    }
+
     if (showUpdateModal) setShowUpdateModal(false);
   };
 
@@ -541,22 +585,12 @@ export default function Home() {
   const stats = calculateStats();
 
   const getYearStatus = (graduationYear: number): string => {
-    const now = new Date();
-    const currentYear = now.getFullYear();
-    const currentMonth = now.getMonth(); // 0 = Jan, 8 = Sep
-
-    // Academic year starts in September
-    const academicYear = currentMonth >= 8 ? currentYear + 1 : currentYear;
-
-    const yearsRemaining = graduationYear - academicYear;
-
-    if (yearsRemaining > 4) return "High School";
-    if (yearsRemaining === 4) return "Freshman";
-    if (yearsRemaining === 3) return "Sophomore";
-    if (yearsRemaining === 2) return "Junior";
-    if (yearsRemaining === 1) return "Senior";
-    if (yearsRemaining <= 0) return "Graduated";
-
+    // Direct mapping based on graduation year
+    if (graduationYear >= 2030) return "High School";
+    if (graduationYear === 2029) return "Freshman";
+    if (graduationYear === 2028) return "Sophomore";
+    if (graduationYear === 2027) return "Junior";
+    if (graduationYear <= 2026) return "Senior";
     return "Unknown";
   };
 
@@ -585,6 +619,27 @@ export default function Home() {
       setShowSettings(false);
     } catch (error) {
       console.error("Error updating profile:", error);
+    }
+  };
+
+  // Handle toggling the friends feature
+  const handleToggleFriends = async (enabled: boolean) => {
+    if (!user) return;
+
+    try {
+      if (enabled) {
+        // Enable and sync current courses (without grades)
+        await enableFriendsFeature(user.uid, courses, userProfile, {
+          displayName: user.displayName,
+          email: user.email,
+          photoURL: user.photoURL,
+        });
+      } else {
+        // Disable (keep document but set enabled = false)
+        await disableFriendsFeature(user.uid);
+      }
+    } catch (error) {
+      console.error("Error toggling friends feature:", error);
     }
   };
 
@@ -704,8 +759,10 @@ export default function Home() {
         <UserSettingsModal
           user={user}
           userProfile={userProfile}
+          friendsEnabled={friendsEnabled}
           onClose={() => setShowSettings(false)}
           onSave={handleProfileUpdate}
+          onToggleFriends={handleToggleFriends}
           onLogout={() => {
             setShowSettings(false);
             setActiveTab("upload");
@@ -1631,7 +1688,10 @@ export default function Home() {
                   exit={{ opacity: 0 }}
                   transition={{ duration: 0.3 }}
                 >
-                  <FriendsTab />
+                  <FriendsTab
+                    friendsEnabled={friendsEnabled}
+                    onToggleFriends={handleToggleFriends}
+                  />
                 </motion.div>
               )}
               {activeTab === "cleoai" && (

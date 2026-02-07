@@ -20,8 +20,10 @@ interface UserProfile {
 interface UserSettingsModalProps {
   user: User;
   userProfile: UserProfile | null;
+  friendsEnabled: boolean;
   onClose: () => void;
   onSave: (updatedProfile: Partial<UserProfile>) => Promise<void>;
+  onToggleFriends: (enabled: boolean) => Promise<void>;
   onLogout: () => void;
   onDeleteAccount: () => Promise<void>;
 }
@@ -29,8 +31,10 @@ interface UserSettingsModalProps {
 export default function UserSettingsModal({
   user,
   userProfile,
+  friendsEnabled,
   onClose,
   onSave,
+  onToggleFriends,
   onLogout,
   onDeleteAccount,
 }: UserSettingsModalProps) {
@@ -53,6 +57,11 @@ export default function UserSettingsModal({
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const moreMenuRef = useRef<HTMLDivElement>(null);
+
+  // Friends feature toggle
+  const [isTogglingFriends, setIsTogglingFriends] = useState(false);
+  const [showDisableFriendsConfirm, setShowDisableFriendsConfirm] =
+    useState(false);
 
   const modalRef = useRef<HTMLDivElement>(null);
 
@@ -107,18 +116,12 @@ export default function UserSettingsModal({
   };
 
   const getYearStatus = (graduationYear: number): string => {
-    const now = new Date();
-    const currentYear = now.getFullYear();
-    const currentMonth = now.getMonth();
-    const academicYear = currentMonth >= 8 ? currentYear + 1 : currentYear;
-    const yearsRemaining = graduationYear - academicYear;
-
-    if (yearsRemaining > 4) return "High School";
-    if (yearsRemaining === 4) return "Freshman";
-    if (yearsRemaining === 3) return "Sophomore";
-    if (yearsRemaining === 2) return "Junior";
-    if (yearsRemaining === 1) return "Senior";
-    if (yearsRemaining <= 0) return "Graduated";
+    // Direct mapping based on graduation year
+    if (graduationYear >= 2030) return "High School";
+    if (graduationYear === 2029) return "Freshman";
+    if (graduationYear === 2028) return "Sophomore";
+    if (graduationYear === 2027) return "Junior";
+    if (graduationYear <= 2026) return "Senior";
     return "Unknown";
   };
 
@@ -330,6 +333,121 @@ export default function UserSettingsModal({
               </div>
             )}
           </div>
+
+          {/* Friends Feature Toggle */}
+          <div className="mb-4 rounded-lg border border-gray-800 bg-gray-900/60">
+            <div className="flex items-center justify-between px-3 py-3">
+              <div className="flex-1 mr-3">
+                <span className="text-sm font-medium text-gray-300">
+                  Friends Feature
+                </span>
+                <p className="text-xs text-gray-500 mt-0.5">
+                  Allow friends to see your courses (grades are never shared)
+                </p>
+              </div>
+              <label className="relative inline-flex items-center cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={friendsEnabled}
+                  disabled={isTogglingFriends}
+                  onChange={async (e) => {
+                    if (!e.target.checked && friendsEnabled) {
+                      // Disabling - show confirmation
+                      setShowDisableFriendsConfirm(true);
+                    } else {
+                      // Enabling
+                      setIsTogglingFriends(true);
+                      try {
+                        await onToggleFriends(true);
+                      } finally {
+                        setIsTogglingFriends(false);
+                      }
+                    }
+                  }}
+                  className="sr-only peer"
+                />
+                <div className="w-11 h-6 bg-gray-700 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-pink-500 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-pink-600 peer-disabled:opacity-50"></div>
+              </label>
+            </div>
+            {friendsEnabled && (
+              <div className="px-3 pb-3 -mt-1">
+                <p className="text-xs text-emerald-400">
+                  Your course list is visible to friends (without grades)
+                </p>
+              </div>
+            )}
+          </div>
+
+          {/* Disable Friends Confirmation Modal */}
+          <AnimatePresence>
+            {showDisableFriendsConfirm && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="fixed inset-0 bg-black/70 backdrop-blur-sm z-[9999] flex items-center justify-center p-4"
+                onClick={(e) => {
+                  if (e.target === e.currentTarget && !isTogglingFriends) {
+                    setShowDisableFriendsConfirm(false);
+                  }
+                }}
+              >
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.95 }}
+                  className="bg-gray-900 border border-gray-800 rounded-xl p-5 max-w-xs w-full shadow-xl"
+                >
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="p-2 bg-red-500/10 rounded-full">
+                      <FiTrash2 className="text-red-500" size={20} />
+                    </div>
+                    <h3 className="text-lg font-semibold text-gray-100">
+                      Disable Friends?
+                    </h3>
+                  </div>
+                  <p className="text-gray-400 text-sm mb-4">
+                    This will{" "}
+                    <strong className="text-red-400">
+                      remove all your friends
+                    </strong>
+                    , pending requests, and hide your courses from others.
+                  </p>
+                  <div className="flex justify-end gap-2">
+                    <button
+                      onClick={() => setShowDisableFriendsConfirm(false)}
+                      disabled={isTogglingFriends}
+                      className="px-3 py-1.5 rounded border border-gray-700 hover:bg-gray-800/50 text-gray-200 text-sm disabled:opacity-50"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      onClick={async () => {
+                        setIsTogglingFriends(true);
+                        try {
+                          await onToggleFriends(false);
+                          setShowDisableFriendsConfirm(false);
+                        } finally {
+                          setIsTogglingFriends(false);
+                        }
+                      }}
+                      disabled={isTogglingFriends}
+                      className="px-3 py-1.5 rounded bg-red-600 hover:bg-red-700 text-white text-sm disabled:opacity-50 flex items-center gap-1.5"
+                    >
+                      {isTogglingFriends ? (
+                        <>
+                          <span className="animate-spin h-3 w-3 border-2 border-white/30 border-t-white rounded-full" />
+                          Disabling...
+                        </>
+                      ) : (
+                        "Disable & Remove"
+                      )}
+                    </button>
+                  </div>
+                </motion.div>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
           {/* Majors */}
           <div className="mb-4">

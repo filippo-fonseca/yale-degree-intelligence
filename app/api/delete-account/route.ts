@@ -34,11 +34,21 @@ export async function POST(req: NextRequest) {
     const courseDeletes = coursesSnapshot.docs.map((doc) => doc.ref.delete());
     await Promise.all(courseDeletes);
 
-    // 3. Delete all friendships involving this user
+    // 3. Delete all friendships involving this user (and their lookup entries)
     const friendsSnapshot = await adminDb
       .collection("friends")
       .where("users", "array-contains", userId)
       .get();
+
+    // Delete friends_lookup entries for each friendship
+    const lookupDeletes = friendsSnapshot.docs.map((doc) => {
+      const users = [...doc.data().users].sort();
+      const lookupId = `${users[0]}_${users[1]}`;
+      return adminDb!.collection("friends_lookup").doc(lookupId).delete();
+    });
+    await Promise.all(lookupDeletes);
+
+    // Delete the friends documents
     const friendDeletes = friendsSnapshot.docs.map((doc) => doc.ref.delete());
     await Promise.all(friendDeletes);
 
@@ -67,7 +77,10 @@ export async function POST(req: NextRequest) {
     );
     await Promise.all(conversationDeletes);
 
-    // 6. Delete user from Firebase Authentication
+    // 6. Delete friends_public_data for this user
+    await adminDb.collection("friends_public_data").doc(userId).delete();
+
+    // 7. Delete user from Firebase Authentication
     await adminAuth.deleteUser(userId);
 
     return NextResponse.json({ success: true });

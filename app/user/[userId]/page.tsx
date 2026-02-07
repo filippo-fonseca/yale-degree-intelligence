@@ -14,8 +14,8 @@ import {
   where,
   getDocs,
 } from "firebase/firestore";
-import { Course } from "@/lib/types";
-import { FiBook, FiCreditCard } from "react-icons/fi";
+import { Course, FriendsPublicData, PublicCourse } from "@/lib/types";
+import { FiBook, FiCreditCard, FiLock } from "react-icons/fi";
 import CompoundLogo from "@/components/ui/CompoundLogo";
 import { gradePoints } from "@/lib/constants";
 import { useAuth } from "@/context/AuthContext";
@@ -44,14 +44,22 @@ export default function UserProfilePage() {
   const [authLoading, setAuthLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [hasPermission, setHasPermission] = useState(false);
+  const [friendsFeatureDisabled, setFriendsFeatureDisabled] = useState(false);
+  const [isOwnProfile, setIsOwnProfile] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
     const fetchUserData = async () => {
+      if (!user) return;
+
       try {
         setLoading(true);
+        setFriendsFeatureDisabled(false);
 
-        // Fetch user profile from Firestore (assuming you store email and photoURL here)
+        const isOwn = user.uid === userId;
+        setIsOwnProfile(isOwn);
+
+        // Fetch user profile from Firestore
         const userDoc = await getDoc(doc(db, "users", userId as string));
         if (!userDoc.exists()) {
           throw new Error("User not found");
@@ -59,16 +67,47 @@ export default function UserProfilePage() {
         const profileData = userDoc.data() as UserProfile;
         setUserProfile(profileData);
 
-        // Fetch user courses
-        const coursesSnapshot = await getDocs(
-          query(collection(db, "courses"), where("userId", "==", userId))
-        );
-        const coursesData = coursesSnapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        })) as Course[];
-        //filter out courses that are skipped
-        setCourses(coursesData.filter((course) => !course.skipped));
+        if (isOwn) {
+          // Own profile: fetch from courses collection (with grades)
+          const coursesSnapshot = await getDocs(
+            query(collection(db, "courses"), where("userId", "==", userId))
+          );
+          const coursesData = coursesSnapshot.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+          })) as Course[];
+          setCourses(coursesData.filter((course) => !course.skipped));
+        } else {
+          // Friend's profile: fetch from friends_public_data (NO grades)
+          const publicDataDoc = await getDoc(
+            doc(db, "friends_public_data", userId as string)
+          );
+
+          if (!publicDataDoc.exists() || !publicDataDoc.data().enabled) {
+            // Friend hasn't enabled the feature
+            setFriendsFeatureDisabled(true);
+            setCourses([]);
+          } else {
+            const publicData = publicDataDoc.data() as FriendsPublicData;
+
+            // Convert PublicCourse[] to Course[] (grade will be null)
+            const publicCourses: Course[] = (publicData.courses || []).map(
+              (c: PublicCourse, idx: number) => ({
+                id: `public-${idx}`,
+                code: c.code,
+                semester: c.semester,
+                year: c.year,
+                credits: c.credits,
+                status: c.status,
+                grade: null, // NEVER expose grades
+                userId: userId as string,
+                manualRequirementsFulfilled: c.manualRequirementsFulfilled,
+              })
+            );
+
+            setCourses(publicCourses.filter((course) => !course.skipped));
+          }
+        }
       } catch (err) {
         console.error("Error fetching user data:", err);
         setError("Failed to load user profile");
@@ -77,35 +116,55 @@ export default function UserProfilePage() {
       }
     };
 
-    fetchUserData();
-  }, [userId]);
+    if (hasPermission) {
+      fetchUserData();
+    }
+  }, [userId, user, hasPermission]);
 
   const getMajorProgress = (major: string) => {
     if (!courses.length) return null;
 
+    // For friend profiles (grade is null), we rely solely on the status field
+    // For own profile, we also check that grade is a final grade (not "In Progress")
     const completedCourseCodes = courses
       .filter(
         (course) =>
-          (course.status === "completed" &&
-            course.grade !== null &&
-            course.grade !== "In Progress") ||
-          course.skipped
+          course.status === "completed" &&
+          (course.grade === null || // Friend profile - trust status
+            (course.grade !== "In Progress")) // Own profile - check it's a final grade
       )
       .map((course) => course.code);
 
     const inProgressCourseCodes = courses
-      .filter((course) => course.grade === "In Progress" && !course.skipped)
+      .filter(
+        (course) =>
+          !course.skipped &&
+          (course.status === "in-progress" || // Use status for friend profiles
+            course.grade === "In Progress") // Own profile check
+      )
       .map((course) => course.code);
 
     const skippedCourseCodes = courses
-      .filter((course) => course.skipped)
+      .filter((course) => course.skipped || course.status === "skipped")
       .map((course) => course.code);
+
+    // Extract manual requirements from courses (for own profile)
+    const manualRequirements = courses.flatMap((course) =>
+      (course.manualRequirementsFulfilled || [])
+        .filter((m) => m.major_id === major)
+        .map((m) => ({
+          code: course.code,
+          requirement: m.requirement_title,
+          credits: course.credits || 1,
+        }))
+    );
 
     return calculateMajorProgress(
       major,
       completedCourseCodes,
       inProgressCourseCodes,
-      skippedCourseCodes
+      skippedCourseCodes,
+      manualRequirements
     );
   };
 
@@ -278,6 +337,28 @@ export default function UserProfilePage() {
             </div>
           </motion.div>
         </header>
+
+        {/* Friends Feature Disabled Notice */}
+        {friendsFeatureDisabled && !isOwnProfile && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mb-12 p-8 rounded-xl bg-gray-900/50 backdrop-blur-sm border border-gray-800 text-center"
+          >
+            <div className="flex justify-center mb-4">
+              <div className="p-3 rounded-full bg-gray-800/50 border border-gray-700">
+                <FiLock className="text-gray-400 w-8 h-8" />
+              </div>
+            </div>
+            <h3 className="text-lg font-medium text-gray-300 mb-2">
+              Course Data Hidden
+            </h3>
+            <p className="text-gray-500 max-w-md mx-auto">
+              This user hasn't enabled course sharing yet. They can turn it on
+              in their settings to share their courses with friends.
+            </p>
+          </motion.div>
+        )}
 
         {/* Stats Section */}
         <motion.section

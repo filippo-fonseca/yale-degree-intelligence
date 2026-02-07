@@ -8,19 +8,12 @@ interface YearBadgeProps {
 }
 
 const getYearStatus = (graduationYear: number): string => {
-  const now = new Date();
-  const currentYear = now.getFullYear();
-  const currentMonth = now.getMonth();
-
-  const academicYear = currentMonth >= 8 ? currentYear + 1 : currentYear;
-  const yearsRemaining = graduationYear - academicYear;
-
-  if (yearsRemaining > 4) return "High School";
-  if (yearsRemaining === 4) return "Freshman";
-  if (yearsRemaining === 3) return "Sophomore";
-  if (yearsRemaining === 2) return "Junior";
-  if (yearsRemaining === 1) return "Senior";
-  if (yearsRemaining <= 0) return "Graduated";
+  // Direct mapping based on graduation year
+  if (graduationYear >= 2030) return "High School";
+  if (graduationYear === 2029) return "Freshman";
+  if (graduationYear === 2028) return "Sophomore";
+  if (graduationYear === 2027) return "Junior";
+  if (graduationYear <= 2026) return "Senior";
 
   return "Unknown";
 };

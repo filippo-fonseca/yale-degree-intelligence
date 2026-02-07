@@ -25,6 +25,9 @@ import {
   FiMail,
   FiCopy,
   FiMoreVertical,
+  FiToggleLeft,
+  FiToggleRight,
+  FiAlertTriangle,
 } from "react-icons/fi";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
@@ -149,7 +152,15 @@ const RequestRowSkeleton = () => (
   </div>
 );
 
-export default function FriendsTab() {
+interface FriendsTabProps {
+  friendsEnabled: boolean;
+  onToggleFriends: (enabled: boolean) => Promise<void>;
+}
+
+export default function FriendsTab({
+  friendsEnabled,
+  onToggleFriends,
+}: FriendsTabProps) {
   const { user } = useAuth();
   const [searchTerm, setSearchTerm] = useState("");
   const [allUsers, setAllUsers] = useState<UserProfile[]>([]);
@@ -157,6 +168,9 @@ export default function FriendsTab() {
   const [friendProfiles, setFriendProfiles] = useState<UserProfile[]>([]);
   const [sentRequests, setSentRequests] = useState<FriendRequest[]>([]);
   const [incomingRequests, setIncomingRequests] = useState<FriendRequest[]>([]);
+  const [isEnabling, setIsEnabling] = useState(false);
+  const [showDisableConfirm, setShowDisableConfirm] = useState(false);
+  const [isDisabling, setIsDisabling] = useState(false);
   const [userProfilesById, setUserProfilesById] = useState<
     Record<string, UserProfile>
   >({});
@@ -337,7 +351,16 @@ export default function FriendsTab() {
       });
 
       const users = [req.from, req.to].sort();
+
+      // Create the friends document
       await addDoc(collection(db, "friends"), {
+        users,
+        createdAt: serverTimestamp(),
+      });
+
+      // Also create friends_lookup for security rules
+      const lookupId = `${users[0]}_${users[1]}`;
+      await setDoc(doc(db, "friends_lookup", lookupId), {
         users,
         createdAt: serverTimestamp(),
       });
@@ -366,7 +389,19 @@ export default function FriendsTab() {
   // Remove Friend
   const removeFriend = async (friendId: string) => {
     try {
-      await deleteDoc(doc(db, "friends", friendId));
+      // Get the friend document to find the user IDs
+      const friendDoc = friends.find((f) => f.id === friendId);
+      if (friendDoc) {
+        const users = [...friendDoc.users].sort();
+        const lookupId = `${users[0]}_${users[1]}`;
+
+        // Delete both friends and friends_lookup documents
+        await deleteDoc(doc(db, "friends", friendId));
+        await deleteDoc(doc(db, "friends_lookup", lookupId));
+      } else {
+        await deleteDoc(doc(db, "friends", friendId));
+      }
+
       toast.success("Friend removed");
     } catch (error) {
       console.error("Error removing friend:", error);
@@ -412,21 +447,99 @@ export default function FriendsTab() {
     );
   }
 
-  return (
-    <div className="w-full max-w-3xl mx-auto font-louize">
-      <div className="flex items-center justify-between w-full mb-4">
-        <h2 className="text-3xl font-medium bg-clip-text text-transparent bg-gradient-to-r from-blue-200 to-purple-200">
+  // Show enable prompt when friends feature is disabled
+  if (!friendsEnabled) {
+    return (
+      <div className="w-full max-w-3xl mx-auto font-louize">
+        <h2 className="text-3xl font-medium bg-clip-text text-transparent bg-gradient-to-r from-blue-200 to-purple-200 mb-6">
           Friends & Connections
         </h2>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="flex flex-col items-center justify-center py-16 px-8 rounded-xl bg-gray-900/50 border border-gray-800"
+        >
+          <div className="p-4 rounded-full bg-pink-500/10 border border-pink-500/30 mb-6">
+            <FiUsers className="w-12 h-12 text-pink-400" />
+          </div>
+
+          <h3 className="text-2xl font-medium text-gray-100 mb-3 text-center">
+            Enable Friends Feature
+          </h3>
+
+          <p className="text-gray-400 text-center max-w-md mb-6">
+            Connect with other Yale students to see what courses they've taken
+            and get inspiration for your own academic journey. Your grades are{" "}
+            <strong className="text-gray-300">never shared</strong> - only
+            course codes, semesters, and credits.
+          </p>
+
+          <div className="bg-gray-800/50 rounded-lg p-4 mb-6 max-w-md border border-gray-700">
+            <h4 className="text-sm font-medium text-gray-300 mb-2">
+              What gets shared with friends:
+            </h4>
+            <ul className="text-sm text-gray-400 space-y-1">
+              <li>• Course codes (e.g., CPSC 201)</li>
+              <li>• Semesters and years taken</li>
+              <li>• Credit counts</li>
+              <li>• Your major and graduation year</li>
+            </ul>
+            <p className="text-xs text-emerald-400 mt-3">
+              Your grades and GPA are NEVER shared.
+            </p>
+          </div>
+
+          <button
+            onClick={async () => {
+              setIsEnabling(true);
+              try {
+                await onToggleFriends(true);
+                toast.success("Friends feature enabled!");
+              } catch (error) {
+                toast.error("Failed to enable friends feature");
+              } finally {
+                setIsEnabling(false);
+              }
+            }}
+            disabled={isEnabling}
+            className="px-6 py-3 bg-pink-600 hover:bg-pink-700 text-white rounded-lg font-medium transition-colors disabled:opacity-50 flex items-center gap-2"
+          >
+            {isEnabling ? (
+              <>
+                <span className="animate-spin h-4 w-4 border-2 border-white/30 border-t-white rounded-full" />
+                Enabling...
+              </>
+            ) : (
+              <>
+                <FiToggleRight size={20} />
+                Enable Friends Feature
+              </>
+            )}
+          </button>
+        </motion.div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="w-full max-w-3xl mx-auto font-louize">
+      <div className="flex items-center justify-between w-full mb-6">
+        <div className="flex items-center gap-3">
+          <h2 className="text-3xl font-medium bg-clip-text text-transparent bg-gradient-to-r from-blue-200 to-purple-200">
+            Friends & Connections
+          </h2>
+          <MoreOptionsDropdown onDisable={() => setShowDisableConfirm(true)} />
+        </div>
         <button
-          className="w-max px-4 py-2 bg-pink-700 text-white rounded-md hover:bg-pink-800 transition flex items-center justify-end gap-2"
+          className="px-4 py-2 bg-pink-600 hover:bg-pink-700 text-white rounded-lg transition flex items-center gap-2 text-sm font-medium"
           onClick={() => setShowSearchModal(true)}
         >
-          <FiUserPlus /> Add a friend
+          <FiUserPlus size={16} /> Add Friend
         </button>
       </div>
 
-      <InfoCard className="mb-8" autoHide previewText="Why add friends?">
+      <InfoCard className="mb-6" autoHide previewText="Why add friends?">
         The friends feature lets you see what classes your friends (or other
         Yale students you know) have taken.
         <br />
@@ -486,105 +599,99 @@ export default function FriendsTab() {
       {/* ---------- Main content once hydrated ---------- */}
       {ready && (
         <>
-          {/* Top section with requests */}
-          <div className="flex flex-col md:flex-row gap-6 mb-8">
-            {/* Incoming Requests */}
-            <div className="md:w-1/3">
-              <h3 className="text-lg font-medium text-pink-200 mb-2 flex items-center gap-2">
-                <FiMail /> Incoming ({incomingRequests.length})
-              </h3>
-              <div className="space-y-2">
-                {incomingRequests.length === 0 && (
-                  <div className="text-gray-400 text-sm">
-                    No incoming requests.
-                  </div>
-                )}
-                {incomingRequests.slice(0, 2).map((req) => {
-                  const sender = userProfilesById[req.from];
-                  if (!sender) return null;
-                  return (
-                    <motion.div
-                      key={req.id}
-                      className="flex items-center justify-between p-3 rounded-xl bg-gray-900/50 border border-gray-800"
-                      whileHover={{ scale: 1.01 }}
-                    >
-                      <div className="flex items-center gap-2">
-                        <ProfilePic profile={sender} size={28} />
-                        <div className="text-sm font-medium text-gray-200 truncate">
-                          {getDisplayName(sender)}
+          {/* Requests Section - only show if there are any */}
+          {(incomingRequests.length > 0 || sentRequests.length > 0) && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+              {/* Incoming Requests */}
+              {incomingRequests.length > 0 && (
+                <div className="p-4 rounded-xl bg-gray-900/30 border border-gray-800">
+                  <h3 className="text-sm font-medium text-gray-300 mb-3 flex items-center gap-2">
+                    <FiMail size={14} /> Incoming Requests ({incomingRequests.length})
+                  </h3>
+                  <div className="space-y-2">
+                    {incomingRequests.slice(0, 3).map((req) => {
+                      const sender = userProfilesById[req.from];
+                      if (!sender) return null;
+                      return (
+                        <div
+                          key={req.id}
+                          className="flex items-center justify-between p-2 rounded-lg bg-gray-800/50"
+                        >
+                          <div className="flex items-center gap-2">
+                            <ProfilePic profile={sender} size={24} />
+                            <span className="text-sm text-gray-200 truncate">
+                              {getDisplayName(sender)}
+                            </span>
+                          </div>
+                          <div className="flex gap-1">
+                            <button
+                              className="p-1.5 rounded bg-emerald-600/20 text-emerald-400 hover:bg-emerald-600/40 transition"
+                              onClick={() => acceptFriendRequest(req)}
+                              title="Accept"
+                            >
+                              <FiCheck size={12} />
+                            </button>
+                            <button
+                              className="p-1.5 rounded bg-red-600/20 text-red-400 hover:bg-red-600/40 transition"
+                              onClick={() => rejectFriendRequest(req)}
+                              title="Reject"
+                            >
+                              <FiX size={12} />
+                            </button>
+                          </div>
                         </div>
-                      </div>
-                      <div className="flex gap-1">
-                        <button
-                          className="bg-emerald-900/40 text-emerald-200 rounded-lg p-1 border border-emerald-800 hover:bg-emerald-700/60"
-                          onClick={() => acceptFriendRequest(req)}
-                          title="Accept"
-                        >
-                          <FiCheck size={14} />
-                        </button>
-                        <button
-                          className="bg-red-900/40 text-red-200 rounded-lg p-1 border border-red-800 hover:bg-red-700/60"
-                          onClick={() => rejectFriendRequest(req)}
-                          title="Reject"
-                        >
-                          <FiX size={14} />
-                        </button>
-                      </div>
-                    </motion.div>
-                  );
-                })}
-                {incomingRequests.length > 2 && (
-                  <div className="text-gray-400 text-sm">
-                    +{incomingRequests.length - 2} more requests
+                      );
+                    })}
+                    {incomingRequests.length > 3 && (
+                      <p className="text-xs text-gray-500 pt-1">
+                        +{incomingRequests.length - 3} more
+                      </p>
+                    )}
                   </div>
-                )}
-              </div>
-            </div>
+                </div>
+              )}
 
-            {/* Outgoing Requests */}
-            <div className="md:w-1/3">
-              <h3 className="text-lg font-medium text-pink-200 mb-2 flex items-center gap-2">
-                <FiUserCheck /> Sent ({sentRequests.length})
-              </h3>
-              <div className="space-y-2">
-                {sentRequests.length === 0 && (
-                  <div className="text-gray-400 text-sm">No sent requests.</div>
-                )}
-                {sentRequests.slice(0, 2).map((req) => {
-                  const recipient = userProfilesById[req.to];
-                  if (!recipient) return null;
-                  return (
-                    <motion.div
-                      key={req.id}
-                      className="flex items-center justify-between p-3 rounded-xl bg-gray-900/50 border border-gray-800"
-                      whileHover={{ scale: 1.01 }}
-                    >
-                      <div className="flex items-center gap-2">
-                        <ProfilePic profile={recipient} size={28} />
-                        <div className="text-sm font-medium text-gray-200 truncate">
-                          {getDisplayName(recipient)}
-                        </div>
-                      </div>
-                      <div className="flex gap-1">
-                        <button
-                          className="bg-red-900/40 text-red-200 rounded-lg p-1 border border-red-800 hover:bg-red-700/60"
-                          onClick={() => cancelSentRequest(req.id)}
-                          title="Cancel request"
+              {/* Sent Requests */}
+              {sentRequests.length > 0 && (
+                <div className="p-4 rounded-xl bg-gray-900/30 border border-gray-800">
+                  <h3 className="text-sm font-medium text-gray-300 mb-3 flex items-center gap-2">
+                    <FiUserCheck size={14} /> Sent Requests ({sentRequests.length})
+                  </h3>
+                  <div className="space-y-2">
+                    {sentRequests.slice(0, 3).map((req) => {
+                      const recipient = userProfilesById[req.to];
+                      if (!recipient) return null;
+                      return (
+                        <div
+                          key={req.id}
+                          className="flex items-center justify-between p-2 rounded-lg bg-gray-800/50"
                         >
-                          <FiX size={14} />
-                        </button>
-                      </div>
-                    </motion.div>
-                  );
-                })}
-                {sentRequests.length > 2 && (
-                  <div className="text-gray-400 text-sm">
-                    +{sentRequests.length - 2} more requests
+                          <div className="flex items-center gap-2">
+                            <ProfilePic profile={recipient} size={24} />
+                            <span className="text-sm text-gray-200 truncate">
+                              {getDisplayName(recipient)}
+                            </span>
+                          </div>
+                          <button
+                            className="p-1.5 rounded bg-gray-700/50 text-gray-400 hover:bg-red-600/30 hover:text-red-400 transition"
+                            onClick={() => cancelSentRequest(req.id)}
+                            title="Cancel"
+                          >
+                            <FiX size={12} />
+                          </button>
+                        </div>
+                      );
+                    })}
+                    {sentRequests.length > 3 && (
+                      <p className="text-xs text-gray-500 pt-1">
+                        +{sentRequests.length - 3} more
+                      </p>
+                    )}
                   </div>
-                )}
-              </div>
+                </div>
+              )}
             </div>
-          </div>
+          )}
 
           {/* Friend Search Modal */}
           <AnimatePresence>
@@ -728,8 +835,81 @@ export default function FriendsTab() {
               })}
             </div>
           </section>
-        </>
+
+                  </>
       )}
+
+      {/* Disable Confirmation Modal */}
+      <AnimatePresence>
+        {showDisableConfirm && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/70 backdrop-blur-sm z-[9999] flex items-center justify-center p-4"
+            onClick={(e) => {
+              if (e.target === e.currentTarget && !isDisabling) {
+                setShowDisableConfirm(false);
+              }
+            }}
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="bg-gray-900 border border-gray-800 rounded-xl p-5 max-w-sm w-full shadow-xl"
+            >
+              <div className="flex items-center gap-3 mb-3">
+                <div className="p-2 bg-red-500/10 rounded-full">
+                  <FiAlertTriangle className="text-red-500" size={20} />
+                </div>
+                <h3 className="text-lg font-semibold text-gray-100">
+                  Disable Friends Feature?
+                </h3>
+              </div>
+              <p className="text-gray-400 text-sm mb-4">
+                This will <strong className="text-red-400">remove all your friends</strong>,
+                pending requests, and hide your courses from others. You can re-enable
+                the feature later, but you'll need to add friends again.
+              </p>
+              <div className="flex justify-end gap-2">
+                <button
+                  onClick={() => setShowDisableConfirm(false)}
+                  disabled={isDisabling}
+                  className="px-3 py-1.5 rounded border border-gray-700 hover:bg-gray-800/50 text-gray-200 text-sm disabled:opacity-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={async () => {
+                    setIsDisabling(true);
+                    try {
+                      await onToggleFriends(false);
+                      toast.success("Friends feature disabled");
+                      setShowDisableConfirm(false);
+                    } catch (error) {
+                      toast.error("Failed to disable friends feature");
+                    } finally {
+                      setIsDisabling(false);
+                    }
+                  }}
+                  disabled={isDisabling}
+                  className="px-3 py-1.5 rounded bg-red-600 hover:bg-red-700 text-white text-sm disabled:opacity-50 flex items-center gap-1.5"
+                >
+                  {isDisabling ? (
+                    <>
+                      <span className="animate-spin h-3 w-3 border-2 border-white/30 border-t-white rounded-full" />
+                      Disabling...
+                    </>
+                  ) : (
+                    "Disable & Remove Friends"
+                  )}
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 
@@ -746,6 +926,60 @@ export default function FriendsTab() {
           out with our mission of making academic planning <br />
           easier and more accessible for all Yale students.
         </div>
+      </div>
+    );
+  }
+
+  function MoreOptionsDropdown({ onDisable }: { onDisable: () => void }) {
+    const [isOpen, setIsOpen] = useState(false);
+    const dropdownRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+      function handleClickOutside(event: MouseEvent) {
+        if (
+          dropdownRef.current &&
+          !dropdownRef.current.contains(event.target as Node)
+        ) {
+          setIsOpen(false);
+        }
+      }
+      document.addEventListener("mousedown", handleClickOutside);
+      return () => {
+        document.removeEventListener("mousedown", handleClickOutside);
+      };
+    }, []);
+
+    return (
+      <div className="relative" ref={dropdownRef}>
+        <button
+          onClick={() => setIsOpen(!isOpen)}
+          className="p-2 rounded-lg hover:bg-gray-800 text-gray-400 hover:text-gray-200 transition"
+          aria-label="More options"
+        >
+          <FiMoreVertical size={18} />
+        </button>
+
+        <AnimatePresence>
+          {isOpen && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              className="absolute right-0 bottom-full mb-2 w-48 bg-gray-800 rounded-lg shadow-lg z-10 border border-gray-700 overflow-hidden"
+            >
+              <button
+                onClick={() => {
+                  onDisable();
+                  setIsOpen(false);
+                }}
+                className="flex items-center gap-2 w-full text-left px-4 py-2.5 text-sm text-red-400 hover:bg-red-900/30 transition-colors"
+              >
+                <FiToggleLeft size={16} />
+                Disable Friends Feature
+              </button>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     );
   }

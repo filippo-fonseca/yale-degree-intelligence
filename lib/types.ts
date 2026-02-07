@@ -56,3 +56,32 @@ export interface ConversationContext {
   };
   createdAt: string;
 }
+
+// Friends feature - public course data (NO grades)
+export interface PublicCourse {
+  code: string;
+  semester: string;
+  year: number;
+  credits: number;
+  status: "completed" | "in-progress" | "skipped";
+  manualRequirementsFulfilled?: ManualRequirement[]; // For tracking manually assigned requirements
+}
+
+export interface FriendsPublicData {
+  userId: string;
+  enabled: boolean;
+  enabledAt: Date | null;
+  updatedAt: Date;
+  displayName?: string;
+  email?: string;
+  photoURL?: string;
+  majors: string[];
+  graduationYear?: number;
+  bio?: string;
+  courses: PublicCourse[];
+}
+
+export interface FriendsLookup {
+  users: [string, string];
+  createdAt: Date;
+}

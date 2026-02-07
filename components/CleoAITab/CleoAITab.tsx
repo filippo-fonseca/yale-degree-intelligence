@@ -1,21 +1,16 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { FiSend, FiRefreshCw, FiUser, FiChevronDown } from "react-icons/fi";
+import { useState, useRef, useEffect, useCallback } from "react";
+import { motion } from "framer-motion";
+import { FiSend, FiRefreshCw } from "react-icons/fi";
 import { useAuth } from "@/context/AuthContext";
-import { Course } from "@/lib/types";
-import { calculateMajorProgress, MAJORS } from "@/lib/majors";
+import { Course, Message } from "@/lib/types";
+import { calculateMajorProgress } from "@/lib/majors";
 import { getCourseNameFromCode } from "@/lib/courseCatalog";
-import { getGPAColor } from "@/lib/utils/utils";
-import LogoIcon from "@/icons/LogoIcon";
-
-interface Message {
-  id: string;
-  content: string;
-  role: "user" | "assistant";
-  timestamp: Date;
-}
+import BulldogIcon from "@/icons/BulldogIcon";
+import { db } from "@/config/firebase";
+import { doc, getDoc, setDoc } from "firebase/firestore";
+import ReactMarkdown from "react-markdown";
 
 interface CleoAITabProps {
   courses: Course[];
@@ -34,91 +29,136 @@ export default function CleoAITab({
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isInitialized, setIsInitialized] = useState(false);
+  const [contextHash, setContextHash] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const [showContextMenu, setShowContextMenu] = useState(false);
 
-  // Calculate major progress for context
-  const majorProgress = calculateMajorProgress(
-    selectedMajor,
-    courses
-      .filter(
-        (course) =>
-          course.status === "completed" &&
-          ((course.grade !== null && course.grade !== "In Progress") ||
-            course.skipped)
-      )
-      .map((course) => course.code),
-    courses
-      .filter((course) => course.grade === "In Progress" && !course.skipped)
-      .map((course) => course.code),
-    courses.filter((course) => course.skipped).map((course) => course.code),
-    courses.flatMap((course) =>
-      (course.manualRequirementsFulfilled || [])
-        .filter((m) => m.major_id === selectedMajor)
-        .map((m) => ({
-          code: course.code,
-          requirement: m.requirement_title,
-          credits: course.credits || 1,
-        }))
-    )
-  );
+  // Calculate progress for ALL majors (for double majors)
+  const completedCodes = courses.filter((c) => c.status === "completed" && c.grade !== "In Progress").map((c) => c.code);
+  const inProgressCodes = courses.filter((c) => c.status === "in-progress" || c.grade === "In Progress").map((c) => c.code);
+  const skippedCodes = courses.filter((c) => c.skipped).map((c) => c.code);
 
-  // Initial system message with user context
+  const allMajorProgress: Record<string, any> = {};
+  const userMajors = userProfile?.majors || [selectedMajor];
+
+  for (const majorId of userMajors) {
+    const manualReqs = courses.flatMap((c) =>
+      (c.manualRequirementsFulfilled || [])
+        .filter((m) => m.major_id === majorId)
+        .map((m) => ({ code: c.code, requirement: m.requirement_title, credits: c.credits || 1 }))
+    );
+    allMajorProgress[majorId] = calculateMajorProgress(majorId, completedCodes, inProgressCodes, skippedCodes, manualReqs);
+  }
+
+  // Primary major progress for welcome message
+  const majorProgress = allMajorProgress[selectedMajor];
+
+  // Generate context hash to detect data changes
+  const currentHash = `${stats?.totalCredits}-${stats?.completedCourses}`;
+
+  // Load conversation from Firestore (single conversation per user)
   useEffect(() => {
-    if (user && courses.length > 0 && !messages.length) {
-      const initialMessage = createSystemMessage();
-      setMessages([initialMessage]);
-    }
-  }, [user, courses]);
+    if (!user) return;
 
-  const createSystemMessage = (): Message => {
-    const completedCredits = majorProgress?.completedCredits || 0;
-    const totalCredits = majorProgress?.totalCredits || 0;
-    const completionPercentage = majorProgress?.percentage || 0;
-    const gpa = stats?.gpa || "N/A";
+    const loadConversation = async () => {
+      try {
+        const docRef = doc(db, "cleoai_conversations", user.uid);
+        const docSnap = await getDoc(docRef);
 
-    return {
-      id: "system-init",
-      content: `Hello ${
-        user?.displayName?.split(" ")[0] || "there"
-      }! I'm CleoAI, your personalized academic assistant. Here's what I know about your Yale journey:
-
-- **Major**: ${selectedMajor} (${MAJORS[selectedMajor] || ""})
-- **Progress**: ${completedCredits}/${totalCredits} credits (${completionPercentage.toFixed(
-        0
-      )}% complete)
-- **Cumulative GPA**: ${gpa}
-- **Completed Courses**: ${
-        courses.filter((c) => c.status === "completed").length
+        if (docSnap.exists()) {
+          const data = docSnap.data();
+          const loadedMessages = data.messages || [];
+          if (loadedMessages.length > 0) {
+            setMessages(loadedMessages);
+            setContextHash(data.contextHash || "");
+          }
+        }
+      } catch (error) {
+        console.error("Error loading conversation:", error);
+      } finally {
+        setIsInitialized(true);
       }
-- **In Progress**: ${courses.filter((c) => c.status === "in-progress").length}
-
-How can I help you with your academic planning today?`,
-      role: "assistant",
-      timestamp: new Date(),
     };
+
+    loadConversation();
+  }, [user]);
+
+  // Save conversation to Firestore
+  const saveConversation = async (newMessages: Message[], hash: string) => {
+    if (!user) return;
+
+    try {
+      await setDoc(doc(db, "cleoai_conversations", user.uid), {
+        messages: newMessages,
+        contextHash: hash,
+        updatedAt: new Date().toISOString(),
+      });
+    } catch (error) {
+      console.error("Error saving conversation:", error);
+    }
   };
 
+  // Create welcome message
+  const createWelcomeMessage = useCallback((): Message => {
+    const majors = userProfile?.majors || [selectedMajor];
+    const isDoubleMajor = majors.length > 1;
+
+    let progressText = "";
+    if (isDoubleMajor) {
+      progressText = majors.map((m: string) => `${m}: ${allMajorProgress[m]?.percentage?.toFixed(0) || 0}%`).join(", ");
+    } else {
+      progressText = `${majorProgress?.percentage?.toFixed(0) || 0}% done`;
+    }
+
+    return {
+      id: "welcome",
+      content: `Woof! Hey ${user?.displayName?.split(" ")[0] || "there"}! I'm Dan, your Yale bulldog advisor. 🐾
+
+I can see you're ${isDoubleMajor ? `double majoring in **${majors.join(" + ")}**` : `majoring in **${selectedMajor}**`} with a **${stats?.gpa || "N/A"} GPA**.
+
+${isDoubleMajor ? `Progress: ${progressText}` : `Major progress: ${progressText}`}
+
+What can I help you with? I can help plan your schedule, find courses that count for both majors, or figure out what you still need to graduate.`,
+      role: "assistant",
+      timestamp: new Date().toISOString(),
+    };
+  }, [user, selectedMajor, majorProgress, allMajorProgress, stats, userProfile]);
+
+  // Start fresh conversation
+  const resetConversation = async () => {
+    const welcome = createWelcomeMessage();
+    setMessages([welcome]);
+    setContextHash(currentHash);
+    await saveConversation([welcome], currentHash);
+  };
+
+  // Initialize if no messages (after load completes)
+  useEffect(() => {
+    if (user && isInitialized && messages.length === 0) {
+      resetConversation();
+    }
+  }, [user, isInitialized]);
+
   const handleSendMessage = async () => {
-    if (!input.trim() || isLoading) return;
+    if (!input.trim() || isLoading || !user) return;
 
     const userMessage: Message = {
       id: Date.now().toString(),
       content: input,
       role: "user",
-      timestamp: new Date(),
+      timestamp: new Date().toISOString(),
     };
 
-    setMessages((prev) => [...prev, userMessage]);
+    const updatedMessages = [...messages, userMessage];
+    setMessages(updatedMessages);
     setInput("");
     setIsLoading(true);
 
     try {
-      // Prepare context for the AI
       const context = {
         user: {
-          name: user?.displayName,
-          email: user?.email,
+          name: user.displayName,
+          email: user.email,
           graduationYear: userProfile?.graduationYear,
           majors: userProfile?.majors,
         },
@@ -131,19 +171,28 @@ How can I help you with your academic planning today?`,
             grade: c.grade,
             credits: c.credits,
             status: c.status,
+            skipped: c.skipped,
           })),
-          stats,
+          stats: {
+            gpa: stats?.gpa,
+            totalCredits: stats?.totalCredits,
+            completedCourses: stats?.completedCourses,
+            inProgressCourses: stats?.inProgressCourses,
+          },
           majorProgress,
+          allMajorProgress, // Progress for ALL majors (double major support)
         },
-        conversationHistory: messages.slice(-4), // Send last 4 messages for context
+        lastContextHash: contextHash,
+        // Send last 20 messages for good conversation memory
+        conversationHistory: messages.slice(-20).map((m) => ({
+          role: m.role,
+          content: m.content,
+        })),
       };
 
-      // Call your AI API here
       const response = await fetch("/api/cleoai", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           prompt: input,
           context: JSON.stringify(context),
@@ -152,23 +201,28 @@ How can I help you with your academic planning today?`,
 
       const data = await response.json();
 
+      if (data.error) throw new Error(data.error);
+
       const aiMessage: Message = {
-        id: Date.now().toString(),
+        id: (Date.now() + 1).toString(),
         content: data.response,
         role: "assistant",
-        timestamp: new Date(),
+        timestamp: new Date().toISOString(),
       };
 
-      setMessages((prev) => [...prev, aiMessage]);
+      const finalMessages = [...updatedMessages, aiMessage];
+      setMessages(finalMessages);
+      setContextHash(currentHash);
+      await saveConversation(finalMessages, currentHash);
     } catch (error) {
-      console.error("Error calling CleoAI:", error);
-      const errorMessage: Message = {
-        id: Date.now().toString(),
-        content: "Sorry, I encountered an error. Please try again.",
+      console.error("Error:", error);
+      const errorMsg: Message = {
+        id: (Date.now() + 1).toString(),
+        content: "Sorry, something went wrong. Please try again.",
         role: "assistant",
-        timestamp: new Date(),
+        timestamp: new Date().toISOString(),
       };
-      setMessages((prev) => [...prev, errorMessage]);
+      setMessages([...updatedMessages, errorMsg]);
     } finally {
       setIsLoading(false);
     }
@@ -185,72 +239,39 @@ How can I help you with your academic planning today?`,
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  const resetConversation = () => {
-    setMessages([createSystemMessage()]);
-  };
-
   return (
     <div className="flex flex-col h-full">
       {/* Header */}
-      <div className="mb-6 flex items-start justify-between">
-        <div className="m-0">
-          <h2 className="text-3xl m-0 font-medium bg-clip-text text-transparent bg-gradient-to-r from-blue-200 to-purple-200">
-            CleoAI – Context-Powered Academic Insight
-          </h2>
-          <p className="text-gray-400 mt-2">
-            More than just a chatbot – CleoAI is your tailored academic advisor,
-            powered by your actual transcript data.
-          </p>
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-3">
+          <BulldogIcon className="w-10 h-10 text-blue-400" />
+          <div>
+            <h2 className="text-2xl font-medium bg-clip-text text-transparent bg-gradient-to-r from-blue-300 to-blue-100">
+              Handsome Dan
+            </h2>
+            <p className="text-gray-400 text-sm">Your Yale bulldog advisor</p>
+          </div>
         </div>
-
-        <div className="relative">
-          <button
-            onClick={() => setShowContextMenu(!showContextMenu)}
-            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-900/50 border border-gray-800 hover:border-gray-700 text-gray-300 hover:text-white transition-all"
-          >
-            <LogoIcon className="w-4 h-4" />
-            <span>Options</span>
-            <FiChevronDown
-              className={`transition-transform ${
-                showContextMenu ? "rotate-180" : ""
-              }`}
-            />
-          </button>
-
-          <AnimatePresence>
-            {showContextMenu && (
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: 10 }}
-                className="absolute right-0 mt-2 w-48 bg-gray-900 rounded-lg shadow-lg border border-gray-800 z-10"
-              >
-                <button
-                  onClick={resetConversation}
-                  className="w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-gray-800 transition-colors flex items-center gap-2"
-                >
-                  <FiRefreshCw size={14} />
-                  Reset Conversation
-                </button>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
+        <button
+          onClick={resetConversation}
+          className="p-2 rounded-lg hover:bg-gray-800 text-gray-400 hover:text-white transition-colors"
+          title="Reset conversation"
+        >
+          <FiRefreshCw size={18} />
+        </button>
       </div>
 
-      {/* Chat Container */}
-      <div className="flex-1 overflow-y-auto mb-4 space-y-6">
+      {/* Messages */}
+      <div className="flex-1 overflow-y-auto space-y-4 mb-4">
         {messages.map((message) => (
           <motion.div
             key={message.id}
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            className={`flex ${
-              message.role === "user" ? "justify-end" : "justify-start"
-            }`}
+            className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}
           >
             <div
-              className={`max-w-[80%] rounded-xl p-4 ${
+              className={`max-w-[85%] rounded-xl p-4 ${
                 message.role === "user"
                   ? "bg-blue-900/30 text-blue-100 border border-blue-800"
                   : "bg-gray-800/50 text-gray-200 border border-gray-700"
@@ -258,35 +279,27 @@ How can I help you with your academic planning today?`,
             >
               {message.role === "assistant" && (
                 <div className="flex items-center gap-2 mb-2">
-                  <LogoIcon className="w-4 h-4" />
-                  <span className="text-xs font-medium text-gray-400">
-                    CleoAI
-                  </span>
+                  <BulldogIcon className="w-4 h-4 text-blue-400" />
+                  <span className="text-xs font-medium text-gray-400">Dan</span>
                 </div>
               )}
-              <div className="whitespace-pre-wrap">{message.content}</div>
-              <div className="text-xs text-gray-500 mt-2 text-right">
-                {message.timestamp.toLocaleTimeString([], {
-                  hour: "2-digit",
-                  minute: "2-digit",
-                })}
+              <div className="prose prose-invert prose-sm max-w-none prose-p:my-1 prose-ul:my-1 prose-li:my-0">
+                <ReactMarkdown>{message.content}</ReactMarkdown>
               </div>
             </div>
           </motion.div>
         ))}
         {isLoading && (
           <div className="flex justify-start">
-            <div className="max-w-[80%] rounded-xl p-4 bg-gray-800/50 text-gray-200 border border-gray-700">
+            <div className="rounded-xl p-4 bg-gray-800/50 border border-gray-700">
               <div className="flex items-center gap-2">
-                <LogoIcon className="w-4 h-4" />
-                <span className="text-xs font-medium text-gray-400">
-                  CleoAI is thinking...
-                </span>
+                <BulldogIcon className="w-4 h-4 text-blue-400" />
+                <span className="text-xs text-gray-400">Dan is sniffing around...</span>
               </div>
-              <div className="flex space-x-2 mt-2">
-                <div className="w-2 h-2 rounded-full bg-gray-500 animate-bounce"></div>
-                <div className="w-2 h-2 rounded-full bg-gray-500 animate-bounce delay-100"></div>
-                <div className="w-2 h-2 rounded-full bg-gray-500 animate-bounce delay-200"></div>
+              <div className="flex space-x-1 mt-2">
+                <div className="w-2 h-2 rounded-full bg-blue-400 animate-bounce" />
+                <div className="w-2 h-2 rounded-full bg-blue-400 animate-bounce" style={{ animationDelay: "0.1s" }} />
+                <div className="w-2 h-2 rounded-full bg-blue-400 animate-bounce" style={{ animationDelay: "0.2s" }} />
               </div>
             </div>
           </div>
@@ -294,14 +307,14 @@ How can I help you with your academic planning today?`,
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Input Area */}
-      <div className="sticky bottom-0 bg-gray-950/80 backdrop-blur-sm pt-4 border-t border-gray-800">
+      {/* Input */}
+      <div className="border-t border-gray-800 pt-4">
         <div className="relative">
           <textarea
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="Ask CleoAI about your academic progress, requirements, or planning..."
+            placeholder="Ask Dan about requirements, courses, planning..."
             className="w-full px-4 py-3 pr-12 bg-gray-900/50 border border-gray-800 rounded-xl text-gray-200 focus:outline-none focus:ring-2 focus:ring-purple-500/30 focus:border-purple-500 resize-none"
             rows={2}
             disabled={isLoading}
@@ -318,10 +331,6 @@ How can I help you with your academic planning today?`,
             <FiSend />
           </button>
         </div>
-        <p className="text-xs text-gray-500 mt-2 text-center">
-          CleoAI has access to your academic data to provide personalized
-          advice.
-        </p>
       </div>
     </div>
   );

@@ -27,6 +27,7 @@ import {
   getDocs,
   doc,
   setDoc,
+  updateDoc,
   getDoc,
   addDoc,
   Timestamp,
@@ -78,7 +79,7 @@ interface UserProfile {
 
 const useLocalStorage = <T,>(
   key: string,
-  initialValue: T
+  initialValue: T,
 ): [T, (value: T) => void] => {
   const [storedValue, setStoredValue] = useState<T>(() => {
     if (typeof window === "undefined") return initialValue;
@@ -105,6 +106,22 @@ const useLocalStorage = <T,>(
   return [storedValue, setValue];
 };
 
+const DIST_PILL_STYLES: Record<string, string> = {
+  Hu: "bg-purple-500/20 text-purple-300 border-purple-500/30",
+  So: "bg-sky-500/20 text-sky-300 border-sky-500/30",
+  Sc: "bg-emerald-500/20 text-emerald-300 border-emerald-500/30",
+  QR: "bg-red-500/20 text-red-300 border-red-500/30",
+  WR: "bg-orange-500/20 text-orange-300 border-orange-500/30",
+  L1: "bg-teal-500/20 text-teal-300 border-teal-500/30",
+  L2: "bg-teal-500/20 text-teal-300 border-teal-500/30",
+  L3: "bg-teal-500/20 text-teal-300 border-teal-500/30",
+  L4: "bg-teal-500/20 text-teal-300 border-teal-500/30",
+  L5: "bg-teal-500/20 text-teal-300 border-teal-500/30",
+};
+
+const getDistPillStyle = (code: string) =>
+  DIST_PILL_STYLES[code] || "bg-gray-800/50 text-gray-400 border-gray-700";
+
 export default function Home() {
   const { user, loading, logout } = useAuth();
   const [courses, setCourses] = useState<Course[]>([]);
@@ -118,7 +135,7 @@ export default function Home() {
 
   const [showBetaBanner, setShowBetaBanner] = useLocalStorage(
     "showBetaBanner",
-    true
+    true,
   );
   const [latestAdvice, setLatestAdvice] = useState<string | null>(null);
 
@@ -152,10 +169,13 @@ export default function Home() {
   //tabs:
   const [activeTab, setActiveTab] = useLocalStorage(
     "dashboardActiveTab",
-    "upload"
+    "upload",
   );
 
   const [showUpdateModal, setShowUpdateModal] = useState(false);
+  const [distSelectorCourseId, setDistSelectorCourseId] = useState<
+    string | null
+  >(null);
 
   const navItems = [
     {
@@ -191,16 +211,15 @@ export default function Home() {
     {
       id: "cleoai",
       icon: LogoIcon,
-      label: "CleoAI",
+      label: "Dan",
       disabled: !hasData,
     },
-    // {
-    //   id: "distributionals",
-    //   icon: FaBuildingCircleCheck,
-    //   label: "Distributionals",
-    //   disabled: true, // Always disabled
-    //   tooltip: "Coming Soon", // Add tooltip text
-    // },
+    {
+      id: "distributionals",
+      icon: FaBuildingCircleCheck,
+      label: "Distributionals",
+      disabled: !hasData,
+    },
   ];
 
   // Live-subscribe to user profile so UI updates without refresh
@@ -230,7 +249,7 @@ export default function Home() {
         (course) =>
           course.status === "completed" &&
           ((course.grade !== null && course.grade !== "In Progress") ||
-            course.skipped)
+            course.skipped),
       )
       .map((course) => course.code);
 
@@ -249,7 +268,7 @@ export default function Home() {
           code: course.code,
           requirement: m.requirement_title,
           credits: course.credits || 1,
-        }))
+        })),
     );
 
     // This works fine even if all arrays are empty.
@@ -258,7 +277,7 @@ export default function Home() {
       completedCourseCodes,
       inProgressCourseCodes,
       skippedCourseCodes,
-      manualRequirements
+      manualRequirements,
     );
   };
 
@@ -354,7 +373,7 @@ export default function Home() {
 
     const existingCoursesQuery = query(
       collection(db, "courses"),
-      where("userId", "==", user.uid)
+      where("userId", "==", user.uid),
     );
     const existingSnapshot = await getDocs(existingCoursesQuery);
 
@@ -383,7 +402,7 @@ export default function Home() {
         if (line.trim() === "") continue;
 
         const completedMatch = line.match(
-          /^- (.+?): (.+?) — (.+?) \((\d+\.\d+)\)$/
+          /^- (.+?): (.+?) — (.+?) \((\d+\.\d+)\)$/,
         );
         if (completedMatch) {
           const [, code, name, grade, credits] = completedMatch;
@@ -424,7 +443,7 @@ export default function Home() {
         }
 
         const inProgressMatch = line.match(
-          /^- (.+?): (.+?) — (?:In Progress|IP) \((\d+\.\d+)\)$/
+          /^- (.+?): (.+?) — (?:In Progress|IP) \((\d+\.\d+)\)$/,
         );
         if (inProgressMatch) {
           const [, code, name, credits] = inProgressMatch;
@@ -552,7 +571,7 @@ export default function Home() {
           ...updatedProfile,
           updatedAt: new Date(),
         },
-        { merge: true }
+        { merge: true },
       );
 
       const docRef = doc(db, "users", user.uid);
@@ -585,6 +604,32 @@ export default function Home() {
       console.error("Error deleting course:", err);
     } finally {
       closeDeleteConfirm();
+    }
+  };
+
+  const toggleDistributional = async (courseId: string, dist: string) => {
+    const course = courses.find((c) => c.id === courseId);
+    if (!course) return;
+    const current = course.distributionals || [];
+    const updated = current.includes(dist)
+      ? current.filter((d) => d !== dist)
+      : [...current, dist];
+    setCourses((prev) =>
+      prev.map((c) =>
+        c.id === courseId ? { ...c, distributionals: updated } : c,
+      ),
+    );
+    try {
+      await updateDoc(doc(db, "courses", courseId), {
+        distributionals: updated,
+      });
+    } catch (error) {
+      console.error("Error updating distributionals:", error);
+      setCourses((prev) =>
+        prev.map((c) =>
+          c.id === courseId ? { ...c, distributionals: current } : c,
+        ),
+      );
     }
   };
 
@@ -666,6 +711,21 @@ export default function Home() {
             setActiveTab("upload");
             logout();
           }}
+          onDeleteAccount={async () => {
+            const idToken = await user.getIdToken();
+            const response = await fetch("/api/delete-account", {
+              method: "POST",
+              headers: {
+                Authorization: `Bearer ${idToken}`,
+              },
+            });
+            if (!response.ok) {
+              throw new Error("Failed to delete account");
+            }
+            setShowSettings(false);
+            setActiveTab("upload");
+            logout();
+          }}
         />
       )}
 
@@ -721,7 +781,7 @@ export default function Home() {
               className="hidden md:inline px-2.5 py-1 text-[11px] rounded-full border border-emerald-800 bg-emerald-900/30 text-emerald-300"
               title="Welcome to Yale!"
             >
-              Good luck on midterms!
+              🎉 v2: We've made massive updates!
             </span>
 
             <button
@@ -770,8 +830,8 @@ export default function Home() {
                     activeTab === item.id
                       ? "bg-gray-900/50 border border-gray-800 text-white"
                       : item.disabled
-                      ? "text-gray-600 cursor-not-allowed"
-                      : "text-gray-400 hover:text-white hover:bg-gray-900/30"
+                        ? "text-gray-600 cursor-not-allowed"
+                        : "text-gray-400 hover:text-white hover:bg-gray-900/30"
                   }`}
                   disabled={item.disabled}
                 >
@@ -929,8 +989,8 @@ export default function Home() {
                           new Set(
                             courses
                               .filter((course) => !course.skipped)
-                              .map((c) => `${c.semester} ${c.year}`)
-                          )
+                              .map((c) => `${c.semester} ${c.year}`),
+                          ),
                         )
                           .sort((a, b) => {
                             const semesterOrder = {
@@ -967,7 +1027,7 @@ export default function Home() {
                                 {courses
                                   .filter(
                                     (c) =>
-                                      `${c.semester} ${c.year}` === semester
+                                      `${c.semester} ${c.year}` === semester,
                                   )
                                   .map((course) => (
                                     <motion.div
@@ -981,7 +1041,7 @@ export default function Home() {
                                             code: course.code,
                                             name:
                                               getCourseNameFromCode(
-                                                course.code
+                                                course.code,
                                               ) ?? "Course",
                                             status: course.status,
                                             skipped: course.skipped || false,
@@ -1009,21 +1069,21 @@ export default function Home() {
                                                 course.status === "completed" &&
                                                 !course.skipped
                                                   ? getGPAColor(
-                                                      course.grade || ""
+                                                      course.grade || "",
                                                     ) + " bg-emerald-900/20"
                                                   : course.status ===
-                                                    "in-progress"
-                                                  ? "text-purple-300 bg-purple-900/20"
-                                                  : "text-gray-300 bg-gray-800/20"
+                                                      "in-progress"
+                                                    ? "text-purple-300 bg-purple-900/20"
+                                                    : "text-gray-300 bg-gray-800/20"
                                               }`}
                                             >
                                               {course.status === "completed" &&
                                               !course.skipped
                                                 ? course.grade || "Completed"
                                                 : course.status ===
-                                                  "in-progress"
-                                                ? "In Progress"
-                                                : "Skipped"}
+                                                    "in-progress"
+                                                  ? "In Progress"
+                                                  : "Skipped"}
                                             </span>
                                             <span className="text-xs text-gray-500">
                                               {course.credits} credit
@@ -1047,6 +1107,161 @@ export default function Home() {
                                               <FiTrash2 className="w-4 h-4" />
                                             </button>
                                           )}
+                                      </div>
+                                      {/* Distributional tags */}
+                                      <div
+                                        className="mt-2"
+                                        onClick={(e) => e.stopPropagation()}
+                                      >
+                                        <div className="flex flex-wrap items-center gap-1.5">
+                                          {(course.distributionals || []).map(
+                                            (d) => (
+                                              <span
+                                                key={d}
+                                                className={`text-[10px] px-2 py-0.5 rounded-full border font-medium ${getDistPillStyle(d)}`}
+                                              >
+                                                {d}
+                                              </span>
+                                            ),
+                                          )}
+                                          <button
+                                            onClick={() =>
+                                              setDistSelectorCourseId(
+                                                distSelectorCourseId ===
+                                                  course.id
+                                                  ? null
+                                                  : course.id,
+                                              )
+                                            }
+                                            className="text-[10px] px-2 py-0.5 rounded-full bg-gray-800/50 text-gray-500 hover:text-gray-300 hover:bg-gray-700/50 border border-dashed border-gray-700/50 transition-all"
+                                          >
+                                            {(course.distributionals || [])
+                                              .length > 0
+                                              ? "edit"
+                                              : "+ dist"}
+                                          </button>
+                                        </div>
+                                        <AnimatePresence>
+                                          {distSelectorCourseId ===
+                                            course.id && (
+                                            <motion.div
+                                              initial={{
+                                                opacity: 0,
+                                                height: 0,
+                                              }}
+                                              animate={{
+                                                opacity: 1,
+                                                height: "auto",
+                                              }}
+                                              exit={{
+                                                opacity: 0,
+                                                height: 0,
+                                              }}
+                                              className="overflow-hidden"
+                                            >
+                                              <div className="mt-2 p-3 rounded-lg bg-gray-800/50 border border-gray-700/50 space-y-2.5">
+                                                <div>
+                                                  <p className="text-[10px] text-gray-500 uppercase tracking-wider mb-1.5">
+                                                    Areas
+                                                  </p>
+                                                  <div className="flex flex-wrap gap-1.5">
+                                                    {["Hu", "So", "Sc"].map(
+                                                      (d) => (
+                                                        <button
+                                                          key={d}
+                                                          onClick={() =>
+                                                            toggleDistributional(
+                                                              course.id,
+                                                              d,
+                                                            )
+                                                          }
+                                                          className={`text-xs px-2.5 py-1 rounded-full border font-medium transition-all ${
+                                                            (
+                                                              course.distributionals ||
+                                                              []
+                                                            ).includes(d)
+                                                              ? getDistPillStyle(
+                                                                  d,
+                                                                )
+                                                              : "bg-gray-800/50 text-gray-500 border-gray-700 hover:border-gray-600"
+                                                          }`}
+                                                        >
+                                                          {d}
+                                                        </button>
+                                                      ),
+                                                    )}
+                                                  </div>
+                                                </div>
+                                                <div>
+                                                  <p className="text-[10px] text-gray-500 uppercase tracking-wider mb-1.5">
+                                                    Skills
+                                                  </p>
+                                                  <div className="flex flex-wrap gap-1.5">
+                                                    {["QR", "WR"].map((d) => (
+                                                      <button
+                                                        key={d}
+                                                        onClick={() =>
+                                                          toggleDistributional(
+                                                            course.id,
+                                                            d,
+                                                          )
+                                                        }
+                                                        className={`text-xs px-2.5 py-1 rounded-full border font-medium transition-all ${
+                                                          (
+                                                            course.distributionals ||
+                                                            []
+                                                          ).includes(d)
+                                                            ? getDistPillStyle(
+                                                                d,
+                                                              )
+                                                            : "bg-gray-800/50 text-gray-500 border-gray-700 hover:border-gray-600"
+                                                        }`}
+                                                      >
+                                                        {d}
+                                                      </button>
+                                                    ))}
+                                                  </div>
+                                                </div>
+                                                <div>
+                                                  <p className="text-[10px] text-gray-500 uppercase tracking-wider mb-1.5">
+                                                    Language
+                                                  </p>
+                                                  <div className="flex flex-wrap gap-1.5">
+                                                    {[
+                                                      "L1",
+                                                      "L2",
+                                                      "L3",
+                                                      "L4",
+                                                      "L5",
+                                                    ].map((d) => (
+                                                      <button
+                                                        key={d}
+                                                        onClick={() =>
+                                                          toggleDistributional(
+                                                            course.id,
+                                                            d,
+                                                          )
+                                                        }
+                                                        className={`text-xs px-2.5 py-1 rounded-full border font-medium transition-all ${
+                                                          (
+                                                            course.distributionals ||
+                                                            []
+                                                          ).includes(d)
+                                                            ? getDistPillStyle(
+                                                                d,
+                                                              )
+                                                            : "bg-gray-800/50 text-gray-500 border-gray-700 hover:border-gray-600"
+                                                        }`}
+                                                      >
+                                                        {d}
+                                                      </button>
+                                                    ))}
+                                                  </div>
+                                                </div>
+                                              </div>
+                                            </motion.div>
+                                          )}
+                                        </AnimatePresence>
                                       </div>
                                     </motion.div>
                                   ))}
@@ -1100,7 +1315,7 @@ export default function Home() {
                                       {course.grade && (
                                         <span
                                           className={`text-lg font-medium ${getGPAColor(
-                                            course.grade
+                                            course.grade,
                                           )}`}
                                         >
                                           {course.grade}
@@ -1316,7 +1531,7 @@ export default function Home() {
                                   course.status === "completed" &&
                                   ((course.grade !== null &&
                                     course.grade !== "In Progress") ||
-                                    course.skipped)
+                                    course.skipped),
                               )
                               .map((course) => course.code);
 
@@ -1324,7 +1539,7 @@ export default function Home() {
                               .filter(
                                 (course) =>
                                   course.grade === "In Progress" &&
-                                  !course.skipped
+                                  !course.skipped,
                               )
                               .map((course) => course.code);
 
@@ -1340,7 +1555,7 @@ export default function Home() {
                                     code: course.code,
                                     requirement: m.requirement_title,
                                     credits: course.credits || 1,
-                                  }))
+                                  })),
                             );
 
                             // Get progress for this major
@@ -1349,7 +1564,7 @@ export default function Home() {
                               completedCourseCodes,
                               inProgressCourseCodes,
                               skippedCourseCodes,
-                              manualRequirements
+                              manualRequirements,
                             );
 
                             // Extract all "not taken" requirements
@@ -1360,7 +1575,7 @@ export default function Home() {
                                     (opt) =>
                                       !opt.completed &&
                                       !opt.inProgress &&
-                                      !opt.skipped
+                                      !opt.skipped,
                                   )
                                   .map(
                                     (opt) =>
@@ -1375,20 +1590,21 @@ export default function Home() {
                                         status: "not-taken" as const, // This is the key fix
                                         credits: opt.credits,
                                         skipped: false,
-                                      } as Course)
-                                  )
+                                      }) as Course,
+                                  ),
                               ) || []
                             );
                           })
                           .filter(
                             (course, idx, arr) =>
                               arr.findIndex((c) => c.code === course.code) ===
-                              idx
+                              idx,
                           )
                       }
                       completedCourses={courses.filter(
                         (c) =>
-                          c.status === "completed" || c.status === "in-progress"
+                          c.status === "completed" ||
+                          c.status === "in-progress",
                       )}
                       graduationYear={userProfile.graduationYear}
                       userMajors={userProfile.majors}
@@ -1396,7 +1612,7 @@ export default function Home() {
                   )}
                 </motion.div>
               )}
-              {/* {activeTab === "distributionals" && (
+              {activeTab === "distributionals" && (
                 <motion.div
                   key="distributionals"
                   initial={{ opacity: 0 }}
@@ -1406,7 +1622,7 @@ export default function Home() {
                 >
                   <DistributionalsView courses={courses} />
                 </motion.div>
-              )} */}
+              )}
               {activeTab === "friends" && (
                 <motion.div
                   key="friends"
@@ -1425,67 +1641,16 @@ export default function Home() {
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
                   transition={{ duration: 0.3 }}
+                  className="h-[calc(100vh-200px)]"
                 >
-                  <div className="mb-6 flex items-start justify-between">
-                    <div className="m-0">
-                      <h2 className="text-3xl m-0 font-medium bg-clip-text text-transparent bg-gradient-to-r from-blue-200 to-purple-200">
-                        CleoAI – Context-Powered Academic Insight
-                      </h2>
-                      <p className="text-gray-400 mt-2">
-                        More than just a chatbot – CleoAI is your tailored
-                        academic advisor, powered by your actual transcript
-                        data.
-                      </p>
-                    </div>
-
-                    <span className="inline-block px-3 py-1 text-sm bg-yellow-900/30 border border-yellow-800 text-yellow-400 rounded-full">
-                      Coming Soon
-                    </span>
-                  </div>
-
-                  <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-6 space-y-4">
-                    <p className="text-lg text-gray-200 font-medium">
-                      Sure, you could copy-paste your transcript into ChatGPT…
-                    </p>
-                    <p className="text-gray-400">But good luck supplying:</p>
-                    <ul className="list-disc list-inside text-gray-400 space-y-1 pl-2">
-                      <li>Thousands of lines of course history and grades</li>
-                      <li>Raw and computed academic stats</li>
-                      <li>Dynamic progress toward major and graduation</li>
-                      <li>
-                        Distributional fulfillment, GPA, and degree requirements
-                      </li>
-                    </ul>
-
-                    <p className="text-gray-400">
-                      CleoAI already knows all of that — because it lives inside
-                      your DegreeIntelligence dashboard. No need to re-explain
-                      yourself.
-                    </p>
-
-                    <div className="p-4 rounded-lg bg-blue-900/20 border border-blue-800 text-blue-300 text-sm italic">
-                      This isn’t just AI with words. This is AI with{" "}
-                      <span className="font-semibold text-blue-200">
-                        context
-                      </span>
-                      .
-                    </div>
-
-                    <p className="text-gray-500 text-sm pt-2">
-                      We are actively working on making CleoAI better. Stay
-                      tuned. {":)"}
-                    </p>
-                  </div>
+                  <CleoAITab
+                    courses={courses}
+                    selectedMajor={selectedMajor}
+                    userProfile={userProfile}
+                    stats={calculateStats()}
+                  />
                 </motion.div>
               )}
-              {/* {activeTab === "cleoai" && (
-                <CleoAITab
-                  courses={courses}
-                  selectedMajor={selectedMajor}
-                  userProfile={userProfile}
-                  stats={calculateStats()}
-                />
-              )} */}
             </AnimatePresence>
           </motion.div>
         </div>

@@ -15,6 +15,7 @@ export type Course = {
   credits: number;
   skipped?: boolean; // Add this new property
   manualRequirementsFulfilled?: ManualRequirement[];
+  distributionals?: string[]; // manually assigned: "Hu", "So", "Sc", "QR", "WR", "L1"-"L5"
 };
   
 export type Semester = {
@@ -33,8 +34,25 @@ export interface Message {
 
 export interface Conversation {
   id: string;
+  userId: string;
   title: string;
   messages: Message[];
   createdAt: string;
   updatedAt: string;
+}
+
+// For CleoAI conversation context summary (stored to avoid re-sending full context)
+export interface ConversationContext {
+  userSnapshot: {
+    name: string;
+    email: string;
+    graduationYear: number;
+    majors: string[];
+  };
+  statsSnapshot: {
+    gpa: string;
+    totalCredits: number;
+    completedCourses: number;
+  };
+  createdAt: string;
 }

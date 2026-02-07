@@ -110,14 +110,20 @@ export default function RootLayout({
             src="https://cdn.amplitude.com/script/3294f81bbb47cf20adaf628c010b1866.js"
             strategy="afterInteractive"
           />
-          <Script id="amplitude-init" strategy="afterInteractive">
+          <Script id="amplitude-init" strategy="lazyOnload">
             {`
-            window.amplitude.add(window.sessionReplay.plugin({ sampleRate: 1 }));
-            window.amplitude.init('3294f81bbb47cf20adaf628c010b1866', {
-              fetchRemoteConfig: true,
-              autocapture: true
-            });
-          `}
+              (function initAmplitude() {
+                if (window.amplitude && window.sessionReplay) {
+                  window.amplitude.add(window.sessionReplay.plugin({ sampleRate: 1 }));
+                  window.amplitude.init('3294f81bbb47cf20adaf628c010b1866', {
+                    fetchRemoteConfig: true,
+                    autocapture: true
+                  });
+                } else {
+                  setTimeout(initAmplitude, 100);
+                }
+              })();
+            `}
           </Script>
         </body>
       </AuthProvider>

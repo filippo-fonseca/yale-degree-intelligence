@@ -1,8 +1,8 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
-import { FiLogOut, FiEdit2 } from "react-icons/fi";
+import { FiLogOut, FiEdit2, FiMoreVertical, FiTrash2 } from "react-icons/fi";
 import { User } from "firebase/auth";
 import { MAJORS } from "@/lib/majors";
 import { MajorDropdown } from "../ui/MajorDropdown";
@@ -23,6 +23,7 @@ interface UserSettingsModalProps {
   onClose: () => void;
   onSave: (updatedProfile: Partial<UserProfile>) => Promise<void>;
   onLogout: () => void;
+  onDeleteAccount: () => Promise<void>;
 }
 
 export default function UserSettingsModal({
@@ -31,6 +32,7 @@ export default function UserSettingsModal({
   onClose,
   onSave,
   onLogout,
+  onDeleteAccount,
 }: UserSettingsModalProps) {
   const [isHoveringLogout, setIsHoveringLogout] = useState(false);
   const [localProfile, setLocalProfile] = useState<UserProfile | null>(null);
@@ -45,6 +47,12 @@ export default function UserSettingsModal({
   const [isSavingBio, setIsSavingBio] = useState(false);
   const [bioJustSaved, setBioJustSaved] = useState(false);
   const [bioCount, setBioCount] = useState(0);
+
+  // More menu and delete account
+  const [showMoreMenu, setShowMoreMenu] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const moreMenuRef = useRef<HTMLDivElement>(null);
 
   const modalRef = useRef<HTMLDivElement>(null);
 
@@ -69,6 +77,34 @@ export default function UserSettingsModal({
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [onClose]);
+
+  // Close more menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        moreMenuRef.current &&
+        !moreMenuRef.current.contains(event.target as Node)
+      ) {
+        setShowMoreMenu(false);
+      }
+    };
+    if (showMoreMenu) {
+      document.addEventListener("mousedown", handleClickOutside);
+      return () =>
+        document.removeEventListener("mousedown", handleClickOutside);
+    }
+  }, [showMoreMenu]);
+
+  const handleDeleteAccount = async () => {
+    setIsDeleting(true);
+    try {
+      await onDeleteAccount();
+    } catch (error) {
+      console.error("Failed to delete account:", error);
+      setIsDeleting(false);
+      setShowDeleteConfirm(false);
+    }
+  };
 
   const getYearStatus = (graduationYear: number): string => {
     const now = new Date();
@@ -387,20 +423,55 @@ export default function UserSettingsModal({
 
           {/* Actions */}
           <div className="flex justify-between mt-4">
-            <motion.button
-              onHoverStart={() => setIsHoveringLogout(true)}
-              onHoverEnd={() => setIsHoveringLogout(false)}
-              onClick={onLogout}
-              className="flex items-center justify-center gap-1.5 px-3 py-1.5 rounded border border-gray-800 hover:border-gray-700 text-gray-200 text-sm"
-            >
-              <span>Sign out</span>
-              <motion.div
-                animate={isHoveringLogout ? { x: 1 } : { x: 0 }}
-                transition={{ type: "spring", stiffness: 500 }}
+            <div className="flex items-center gap-2">
+              <motion.button
+                onHoverStart={() => setIsHoveringLogout(true)}
+                onHoverEnd={() => setIsHoveringLogout(false)}
+                onClick={onLogout}
+                className="flex items-center justify-center gap-1.5 px-3 py-1.5 rounded border border-gray-800 hover:border-gray-700 text-gray-200 text-sm"
               >
-                <FiLogOut size={14} />
-              </motion.div>
-            </motion.button>
+                <span>Sign out</span>
+                <motion.div
+                  animate={isHoveringLogout ? { x: 1 } : { x: 0 }}
+                  transition={{ type: "spring", stiffness: 500 }}
+                >
+                  <FiLogOut size={14} />
+                </motion.div>
+              </motion.button>
+
+              {/* More menu */}
+              <div className="relative" ref={moreMenuRef}>
+                <button
+                  onClick={() => setShowMoreMenu(!showMoreMenu)}
+                  className="p-1.5 rounded border border-gray-800 hover:border-gray-700 text-gray-400 hover:text-gray-200 transition-colors"
+                  title="More options"
+                >
+                  <FiMoreVertical size={16} />
+                </button>
+
+                <AnimatePresence>
+                  {showMoreMenu && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -5 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -5 }}
+                      className="absolute bottom-full left-0 mb-1 w-40 bg-gray-800 border border-gray-700 rounded-lg shadow-lg overflow-hidden z-[80]"
+                    >
+                      <button
+                        onClick={() => {
+                          setShowMoreMenu(false);
+                          setShowDeleteConfirm(true);
+                        }}
+                        className="w-full flex items-center gap-2 px-3 py-2 text-red-400 hover:bg-gray-700/50 text-sm transition-colors"
+                      >
+                        <FiTrash2 size={14} />
+                        Delete Account
+                      </button>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            </div>
             <div className="flex gap-2">
               <button
                 onClick={onClose}
@@ -421,6 +492,67 @@ export default function UserSettingsModal({
               </button>
             </div>
           </div>
+
+          {/* Delete Account Confirmation Modal */}
+          <AnimatePresence>
+            {showDeleteConfirm && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="fixed inset-0 bg-black/70 backdrop-blur-sm z-[9999] flex items-center justify-center p-4"
+                onClick={(e) => {
+                  if (e.target === e.currentTarget && !isDeleting) {
+                    setShowDeleteConfirm(false);
+                  }
+                }}
+              >
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.95 }}
+                  className="bg-gray-900 border border-gray-800 rounded-xl p-5 max-w-xs w-full shadow-xl"
+                >
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="p-2 bg-red-500/10 rounded-full">
+                      <FiTrash2 className="text-red-500" size={20} />
+                    </div>
+                    <h3 className="text-lg font-semibold text-gray-100">
+                      Delete Account
+                    </h3>
+                  </div>
+                  <p className="text-gray-400 text-sm mb-4">
+                    Are you sure you want to delete your account? This will
+                    permanently remove all your data including courses, friends,
+                    and conversations. This action cannot be undone.
+                  </p>
+                  <div className="flex justify-end gap-2">
+                    <button
+                      onClick={() => setShowDeleteConfirm(false)}
+                      disabled={isDeleting}
+                      className="px-3 py-1.5 rounded border border-gray-700 hover:bg-gray-800/50 text-gray-200 text-sm disabled:opacity-50"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      onClick={handleDeleteAccount}
+                      disabled={isDeleting}
+                      className="px-3 py-1.5 rounded bg-red-600 hover:bg-red-700 text-white text-sm disabled:opacity-50 flex items-center gap-1.5"
+                    >
+                      {isDeleting ? (
+                        <>
+                          <span className="animate-spin h-3 w-3 border-2 border-white/30 border-t-white rounded-full" />
+                          Deleting...
+                        </>
+                      ) : (
+                        "Delete Account"
+                      )}
+                    </button>
+                  </div>
+                </motion.div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       </motion.div>
     </div>

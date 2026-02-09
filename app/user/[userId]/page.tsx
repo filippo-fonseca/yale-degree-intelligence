@@ -3,9 +3,8 @@
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { getFullMajorNameById, MAJORS } from "@/lib/majors";
-import { calculateMajorProgress } from "@/lib/majors";
-import { db } from "@/config/firebase";
+import { getFullMajorNameById } from "@/lib/majors";
+import { db, auth } from "@/config/firebase";
 import {
   doc,
   getDoc,
@@ -25,6 +24,30 @@ import Link from "next/link";
 import { getCourseNameFromCode } from "@/lib/courseCatalog";
 import { truncate } from "@/lib/utils/utils";
 import { YearBadge } from "@/components/ui/YearBadge";
+
+/**
+ * Triggers a sync of the target user's friends_public_data with their actual courses.
+ * This ensures friends always see up-to-date data including manual adds and skips.
+ */
+async function syncFriendData(targetUserId: string): Promise<void> {
+  try {
+    const currentUser = auth.currentUser;
+    if (!currentUser) return;
+
+    const token = await currentUser.getIdToken();
+    await fetch("/api/sync-friend-data", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ targetUserId }),
+    });
+  } catch (error) {
+    // Silently fail - this is a background optimization
+    console.error("Failed to sync friend data:", error);
+  }
+}
 
 interface UserProfile {
   displayName?: string;
@@ -69,6 +92,7 @@ export default function UserProfilePage() {
 
         if (isOwn) {
           // Own profile: fetch from courses collection (with grades)
+          // Keep ALL courses including skipped ones for progress calculation
           const coursesSnapshot = await getDocs(
             query(collection(db, "courses"), where("userId", "==", userId))
           );
@@ -76,9 +100,12 @@ export default function UserProfilePage() {
             id: doc.id,
             ...doc.data(),
           })) as Course[];
-          setCourses(coursesData.filter((course) => !course.skipped));
+          setCourses(coursesData);
         } else {
-          // Friend's profile: fetch from friends_public_data (NO grades)
+          // Friend's profile: first sync their data, then fetch
+          // This ensures we see the latest data including manual adds and skips
+          await syncFriendData(userId as string);
+
           const publicDataDoc = await getDoc(
             doc(db, "friends_public_data", userId as string)
           );
@@ -91,6 +118,7 @@ export default function UserProfilePage() {
             const publicData = publicDataDoc.data() as FriendsPublicData;
 
             // Convert PublicCourse[] to Course[] (grade will be null)
+            // Keep ALL courses including skipped ones for progress calculation
             const publicCourses: Course[] = (publicData.courses || []).map(
               (c: PublicCourse, idx: number) => ({
                 id: `public-${idx}`,
@@ -101,11 +129,12 @@ export default function UserProfilePage() {
                 status: c.status,
                 grade: null, // NEVER expose grades
                 userId: userId as string,
+                skipped: c.skipped || c.status === "skipped", // Include skipped flag
                 manualRequirementsFulfilled: c.manualRequirementsFulfilled,
               })
             );
 
-            setCourses(publicCourses.filter((course) => !course.skipped));
+            setCourses(publicCourses);
           }
         }
       } catch (err) {
@@ -121,53 +150,6 @@ export default function UserProfilePage() {
     }
   }, [userId, user, hasPermission]);
 
-  const getMajorProgress = (major: string) => {
-    if (!courses.length) return null;
-
-    // For friend profiles (grade is null), we rely solely on the status field
-    // For own profile, we also check that grade is a final grade (not "In Progress")
-    const completedCourseCodes = courses
-      .filter(
-        (course) =>
-          course.status === "completed" &&
-          (course.grade === null || // Friend profile - trust status
-            (course.grade !== "In Progress")) // Own profile - check it's a final grade
-      )
-      .map((course) => course.code);
-
-    const inProgressCourseCodes = courses
-      .filter(
-        (course) =>
-          !course.skipped &&
-          (course.status === "in-progress" || // Use status for friend profiles
-            course.grade === "In Progress") // Own profile check
-      )
-      .map((course) => course.code);
-
-    const skippedCourseCodes = courses
-      .filter((course) => course.skipped || course.status === "skipped")
-      .map((course) => course.code);
-
-    // Extract manual requirements from courses (for own profile)
-    const manualRequirements = courses.flatMap((course) =>
-      (course.manualRequirementsFulfilled || [])
-        .filter((m) => m.major_id === major)
-        .map((m) => ({
-          code: course.code,
-          requirement: m.requirement_title,
-          credits: course.credits || 1,
-        }))
-    );
-
-    return calculateMajorProgress(
-      major,
-      completedCourseCodes,
-      inProgressCourseCodes,
-      skippedCourseCodes,
-      manualRequirements
-    );
-  };
-
   const getDisplayNameFromEmail = (email?: string) => {
     if (!email) return "Yale Student";
     if (email.endsWith("@yale.edu")) {
@@ -181,9 +163,15 @@ export default function UserProfilePage() {
   };
 
   const calculateTotalCredits = () => {
+    // Include both completed and skipped courses (skipped = got credit elsewhere like AP)
     return courses
-      .filter((c) => c.status === "completed")
+      .filter((c) => c.status === "completed" || c.skipped)
       .reduce((sum, course) => sum + (course.credits || 0), 0);
+  };
+
+  const getCompletedCoursesCount = () => {
+    // Include both completed and skipped courses for the count
+    return courses.filter((c) => c.status === "completed" || c.skipped).length;
   };
 
   const getGPAColor = (grade: string) => {
@@ -380,7 +368,7 @@ export default function UserProfilePage() {
                 <div>
                   <p className="text-sm text-gray-400">Courses Taken</p>
                   <p className="text-xl font-medium">
-                    {courses.filter((c) => c.status === "completed").length}
+                    {getCompletedCoursesCount()}
                   </p>
                 </div>
               </div>
@@ -602,86 +590,6 @@ export default function UserProfilePage() {
             )}
           </div>
         </motion.section>
-
-        {/* Majors Section */}
-        {userProfile?.majors && userProfile.majors.length > 0 && (
-          <motion.section
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.8 }}
-            className="mb-12"
-          >
-            <h2 className="text-xl font-medium mb-6 text-transparent bg-clip-text bg-gradient-to-r from-blue-200 to-purple-200">
-              Major Progress
-            </h2>
-            {courses.length == 0 && <p>No progress toward major yet.</p>}
-
-            <div className="space-y-8">
-              {userProfile.majors.map((major, index) => {
-                const progress = getMajorProgress(major);
-                if (!progress) return null;
-
-                const completionPercentage = progress.percentage;
-                const completedCredits = progress.completedCredits;
-                const totalCredits = progress.totalCredits;
-
-                return (
-                  <div
-                    key={major}
-                    className="p-6 rounded-xl bg-gray-900/50 backdrop-blur-sm border border-gray-800"
-                  >
-                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
-                      <div>
-                        <h3 className="text-lg font-medium">
-                          {MAJORS[major] || major}
-                        </h3>
-                        <p className="text-sm text-gray-400">
-                          {completedCredits}/{totalCredits} credits completed
-                        </p>
-                      </div>
-                      <div className="text-3xl font-medium text-transparent bg-clip-text bg-gradient-to-r from-blue-200 to-purple-200">
-                        {completionPercentage.toFixed(0)}%
-                      </div>
-                    </div>
-
-                    {/* Progress bar */}
-                    <div className="w-full bg-gray-900 rounded-full h-2 mb-4">
-                      <motion.div
-                        initial={{ width: 0 }}
-                        animate={{ width: `${completionPercentage}%` }}
-                        transition={{ duration: 1, ease: "easeOut" }}
-                        className="h-2 rounded-full bg-gradient-to-r from-blue-400 to-purple-500"
-                      />
-                    </div>
-
-                    {/* Requirements summary */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
-                      <div className="p-4 rounded-lg bg-gray-800/30 border border-emerald-700/30">
-                        <p className="text-sm text-emerald-300 mb-1">
-                          Completed Requirements
-                        </p>
-                        <p className="text-lg">
-                          {progress.completedRequirements.length} /{" "}
-                          {progress.completedRequirements.length +
-                            progress.remainingRequirements.length}
-                        </p>
-                      </div>
-
-                      <div className="p-4 rounded-lg bg-gray-800/30 border border-amber-700/30">
-                        <p className="text-sm text-amber-300 mb-1">
-                          Remaining Requirements
-                        </p>
-                        <p className="text-lg">
-                          {progress.remainingRequirements.length}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </motion.section>
-        )}
 
         {/* Footer */}
         <motion.footer

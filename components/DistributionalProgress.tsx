@@ -90,7 +90,7 @@ const DistributionalsView = ({ courses }: { courses: Course[] }) => {
         key={req.code}
         whileHover={{ y: -2 }}
         className={`p-5 rounded-xl border transition-all ${
-          count > 0 ? colors.card : "bg-gray-900/50 border-gray-800"
+          count > 0 ? colors.card : "bg-gray-100/50 dark:bg-gray-900/50 border-gray-200 dark:border-gray-800"
         }`}
       >
         <div className="flex items-center justify-between mb-3">
@@ -104,7 +104,7 @@ const DistributionalsView = ({ courses }: { courses: Course[] }) => {
             >
               {req.code}
             </span>
-            <span className="text-sm text-gray-300 font-medium">{req.name}</span>
+            <span className="text-sm text-gray-700 dark:text-gray-300 font-medium">{req.name}</span>
           </div>
           {fulfilled && (
             <span className="text-emerald-400">
@@ -114,7 +114,7 @@ const DistributionalsView = ({ courses }: { courses: Course[] }) => {
         </div>
 
         {/* Progress bar */}
-        <div className="w-full h-2 bg-gray-800 rounded-full overflow-hidden mb-2">
+        <div className="w-full h-2 bg-gray-200 dark:bg-gray-800 rounded-full overflow-hidden mb-2">
           <motion.div
             initial={{ width: 0 }}
             animate={{ width: `${progress * 100}%` }}
@@ -127,7 +127,7 @@ const DistributionalsView = ({ courses }: { courses: Course[] }) => {
         </div>
 
         <div className="flex justify-between items-center">
-          <span className="text-xs text-gray-400">
+          <span className="text-xs text-gray-600 dark:text-gray-400">
             {Math.min(count, 2)} of 2 credits
           </span>
           {count > 2 && (
@@ -137,14 +137,14 @@ const DistributionalsView = ({ courses }: { courses: Course[] }) => {
 
         {/* Course list */}
         {coursesForReq.length > 0 && (
-          <div className="mt-3 pt-3 border-t border-gray-800/50">
+          <div className="mt-3 pt-3 border-t border-gray-200/50 dark:border-gray-800/50">
             <div className="space-y-1.5">
               {coursesForReq.map((course) => (
                 <div
                   key={course.id}
                   className="flex items-center justify-between"
                 >
-                  <span className="text-xs text-gray-300 font-medium">
+                  <span className="text-xs text-gray-700 dark:text-gray-300 font-medium">
                     {course.code}
                   </span>
                   <span className="text-xs text-gray-500 truncate ml-2 max-w-[140px]">
@@ -170,10 +170,10 @@ const DistributionalsView = ({ courses }: { courses: Course[] }) => {
         <h2 className="text-3xl font-medium bg-clip-text text-transparent bg-gradient-to-r from-blue-200 to-purple-200">
           Your distributional progress.
         </h2>
-        <p className="text-gray-400 mt-1">
+        <p className="text-gray-600 dark:text-gray-400 mt-1">
           Track your progress toward Yale College's distributional requirements.
           Assign distributionals to your courses in the{" "}
-          <span className="text-gray-300">My Courses</span> tab.
+          <span className="text-gray-700 dark:text-gray-300">My Courses</span> tab.
         </p>
       </div>
 
@@ -190,16 +190,16 @@ const DistributionalsView = ({ courses }: { courses: Course[] }) => {
       )}
 
       {/* Overall progress */}
-      <div className="p-4 rounded-xl bg-gray-900/50 border border-gray-800">
+      <div className="p-4 rounded-xl bg-gray-100/50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-800">
         <div className="flex items-center justify-between mb-2">
-          <span className="text-sm text-gray-400">
+          <span className="text-sm text-gray-600 dark:text-gray-400">
             Overall Areas & Skills Progress
           </span>
-          <span className="text-sm font-medium text-gray-200">
+          <span className="text-sm font-medium text-gray-800 dark:text-gray-200">
             {totalCompleted}/10
           </span>
         </div>
-        <div className="w-full h-3 bg-gray-800 rounded-full overflow-hidden">
+        <div className="w-full h-3 bg-gray-200 dark:bg-gray-800 rounded-full overflow-hidden">
           <motion.div
             initial={{ width: 0 }}
             animate={{ width: `${(totalCompleted / 10) * 100}%` }}

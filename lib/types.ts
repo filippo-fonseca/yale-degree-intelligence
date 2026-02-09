@@ -64,6 +64,7 @@ export interface PublicCourse {
   year: number;
   credits: number;
   status: "completed" | "in-progress" | "skipped";
+  skipped?: boolean; // Explicit flag for skipped courses (counts toward requirements)
   manualRequirementsFulfilled?: ManualRequirement[]; // For tracking manually assigned requirements
 }
 

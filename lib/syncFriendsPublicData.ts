@@ -25,8 +25,39 @@ interface UserInfo {
 }
 
 /**
+ * Compares two PublicCourse arrays to check if they're equivalent.
+ */
+function coursesAreEqual(
+  existingCourses: PublicCourse[],
+  newCourses: PublicCourse[]
+): boolean {
+  if (existingCourses.length !== newCourses.length) return false;
+
+  const existingMap = new Map<string, PublicCourse>();
+  existingCourses.forEach((c) => {
+    const key = `${c.code}-${c.semester}-${c.year}`;
+    existingMap.set(key, c);
+  });
+
+  for (const newCourse of newCourses) {
+    const key = `${newCourse.code}-${newCourse.semester}-${newCourse.year}`;
+    const existing = existingMap.get(key);
+    if (!existing) return false;
+    if (existing.credits !== newCourse.credits) return false;
+    if (existing.status !== newCourse.status) return false;
+    if ((existing.skipped || false) !== (newCourse.skipped || false)) return false;
+    const existingManual = JSON.stringify(existing.manualRequirementsFulfilled || []);
+    const newManual = JSON.stringify(newCourse.manualRequirementsFulfilled || []);
+    if (existingManual !== newManual) return false;
+  }
+
+  return true;
+}
+
+/**
  * Syncs course data (without grades) to friends_public_data collection.
  * Only runs if the user has enabled the friends feature.
+ * Compares data first and skips update if unchanged.
  */
 export async function syncFriendsPublicData(
   userId: string,
@@ -43,23 +74,36 @@ export async function syncFriendsPublicData(
       return;
     }
 
+    const existingData = publicDataDoc.data();
+
     // Build public courses array (NO GRADES - this is critical for privacy)
-    const publicCourses: PublicCourse[] = courses
-      .filter((c) => !c.skipped)
-      .map((c) => ({
-        code: c.code,
-        semester: c.semester,
-        year: c.year,
-        credits: c.credits,
-        status: c.status === "not-taken" ? "completed" : c.status,
-        manualRequirementsFulfilled: c.manualRequirementsFulfilled,
-      }));
+    // Include ALL courses including skipped ones (they count toward requirements)
+    const publicCourses: PublicCourse[] = courses.map((c) => ({
+      code: c.code,
+      semester: c.semester,
+      year: c.year,
+      credits: c.credits,
+      status: c.skipped ? "skipped" : (c.status === "not-taken" ? "completed" : c.status),
+      skipped: c.skipped || false,
+      manualRequirementsFulfilled: c.manualRequirementsFulfilled,
+    }));
+
+    // Check if data has changed - skip update if unchanged
+    const existingCourses = (existingData.courses || []) as PublicCourse[];
+    if (
+      coursesAreEqual(existingCourses, publicCourses) &&
+      existingData.displayName === (user.displayName || null) &&
+      JSON.stringify(existingData.majors || []) === JSON.stringify(userProfile?.majors || []) &&
+      existingData.graduationYear === (userProfile?.graduationYear || null)
+    ) {
+      return; // Data unchanged, skip update
+    }
 
     // Update the public data document
     await setDoc(doc(db, "friends_public_data", userId), {
       userId,
       enabled: true,
-      enabledAt: publicDataDoc.data().enabledAt,
+      enabledAt: existingData.enabledAt,
       updatedAt: serverTimestamp(),
       displayName: user.displayName || null,
       email: user.email || null,
@@ -83,16 +127,16 @@ export async function enableFriendsFeature(
   userProfile: UserProfile | null,
   user: UserInfo
 ): Promise<void> {
-  const publicCourses: PublicCourse[] = courses
-    .filter((c) => !c.skipped)
-    .map((c) => ({
-      code: c.code,
-      semester: c.semester,
-      year: c.year,
-      credits: c.credits,
-      status: c.status === "not-taken" ? "completed" : c.status,
-      manualRequirementsFulfilled: c.manualRequirementsFulfilled,
-    }));
+  // Include ALL courses including skipped ones (they count toward requirements)
+  const publicCourses: PublicCourse[] = courses.map((c) => ({
+    code: c.code,
+    semester: c.semester,
+    year: c.year,
+    credits: c.credits,
+    status: c.skipped ? "skipped" : (c.status === "not-taken" ? "completed" : c.status),
+    skipped: c.skipped || false,
+    manualRequirementsFulfilled: c.manualRequirementsFulfilled,
+  }));
 
   await setDoc(doc(db, "friends_public_data", userId), {
     userId,

@@ -174,7 +174,7 @@ export default function StatsView({ courses }: { courses: Course[] }) {
   };
 
   return (
-    <div className={`space-y-8 font-louize text-gray-200`}>
+    <div className={`space-y-8 font-louize text-gray-800 dark:text-gray-200`}>
       {/* Summary Cards */}
       <InfoCard>
         We're actively working on new stats. Have any suggestions?{" "}
@@ -467,17 +467,17 @@ function StatCard({
   return (
     <motion.div
       whileHover={{ y: -2 }}
-      className="p-6 rounded-xl bg-gray-900/50 backdrop-blur-sm border border-gray-800 hover:border-gray-700 transition-all"
+      className="p-6 rounded-xl bg-gray-100/50 dark:bg-gray-900/50 backdrop-blur-sm border border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700 transition-all shadow-sm dark:shadow-none"
     >
       <div className="flex items-center justify-between">
-        <p className="text-sm text-gray-400">{label}</p>
+        <p className="text-sm text-gray-600 dark:text-gray-400">{label}</p>
         {icon && <div className={`${color} opacity-80`}>{icon}</div>}
       </div>
       <div className="flex items-end justify-between mt-2">
         <p className={`text-3xl font-medium ${color}`}>{value}</p>
       </div>
       {secondaryLabel && (
-        <p className="text-xs text-gray-400 mt-1">{secondaryLabel}</p>
+        <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">{secondaryLabel}</p>
       )}
       {change !== 0 && (
         <p
@@ -485,13 +485,13 @@ function StatCard({
             change > 0
               ? "text-emerald-400"
               : change > -0.05
-                ? "text-gray-400"
+                ? "text-gray-600 dark:text-gray-400"
                 : "text-red-400"
           }`}
         >
           {change > 0 ? "+" : ""}
           {change.toFixed(2)}{" "}
-          <span className="text-gray-400">{changeText}</span>
+          <span className="text-gray-600 dark:text-gray-400">{changeText}</span>
         </p>
       )}
     </motion.div>
@@ -513,7 +513,7 @@ function ChartBox({
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="p-6 rounded-xl bg-gray-900/50 backdrop-blur-sm border border-gray-800"
+      className="p-6 rounded-xl bg-gray-100/50 dark:bg-gray-900/50 backdrop-blur-sm border border-gray-200 dark:border-gray-800 shadow-sm dark:shadow-none"
     >
       <div className="flex items-start justify-between mb-4">
         <div>
@@ -521,11 +521,11 @@ function ChartBox({
             {title}
           </h3>
           {description && (
-            <p className="text-xs text-gray-400 mt-1">{description}</p>
+            <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">{description}</p>
           )}
         </div>
         {icon && (
-          <div className="p-2 rounded-full bg-gray-800/50 text-blue-300">
+          <div className="p-2 rounded-full bg-gray-200/50 dark:bg-gray-800/50 text-blue-500 dark:text-blue-300">
             {icon}
           </div>
         )}

@@ -590,7 +590,7 @@ export default function Simulator({
         <div className="flex items-start gap-2 flex-wrap">
           <button
             onClick={() => setShowHelp((v) => !v)}
-            className="px-3 py-1.5 text-xs rounded-lg bg-gray-800 text-gray-300 hover:bg-gray-700 flex items-center gap-1 transition-all"
+            className="px-3 py-1.5 text-xs rounded-lg bg-gray-200 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-700 flex items-center gap-1 transition-all"
           >
             <FiInfo size={14} />
             Help
@@ -608,7 +608,7 @@ export default function Simulator({
                 className={`px-3 py-1.5 text-xs rounded-lg ${
                   hasChanges
                     ? "bg-purple-900/30 text-purple-300 hover:bg-purple-800/30"
-                    : "bg-gray-800/50 text-gray-500 opacity-70 cursor-not-allowed"
+                    : "bg-gray-200/50 dark:bg-gray-800/50 text-gray-500 opacity-70 cursor-not-allowed"
                 } transition-all`}
                 disabled={!hasChanges}
               >
@@ -632,7 +632,7 @@ export default function Simulator({
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
-            className="overflow-hidden bg-gray-900/50 rounded-xl border border-gray-800 p-4"
+            className="overflow-hidden bg-gray-100/50 dark:bg-gray-900/50 rounded-xl border border-gray-200 dark:border-gray-800 p-4"
           >
             <h4 className="font-medium text-gray-300 mb-2">
               How to use the simulator

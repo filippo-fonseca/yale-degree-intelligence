@@ -168,10 +168,12 @@ export default function Home() {
   const [modalOpen, setModalOpen] = useState<{
     isOpen: boolean;
     course: {
+      id: string;
       code: string;
       name: string;
       status: "completed" | "in-progress" | "not-taken" | "skipped";
       skipped: boolean;
+      distributionals: string[];
     } | null;
   }>({ isOpen: false, course: null });
 
@@ -194,16 +196,16 @@ export default function Home() {
       disabled: false,
     },
     {
-      id: "simulator",
-      icon: MonitorCog,
-      label: "Simulator",
-      badge: "2029 can use!",
-    },
-    {
       id: "major",
       icon: RiProgress3Fill,
       label: "My major",
-      badge: "2029 can use!",
+      // badge: "2029 can use!",
+    },
+    {
+      id: "simulator",
+      icon: MonitorCog,
+      label: "Simulator",
+      // badge: "2029 can use!",
     },
     {
       id: "stats",
@@ -863,32 +865,33 @@ export default function Home() {
           </div>
         </motion.header>
 
-        <div className="flex flex-col lg:flex-row gap-8 pb-16">
+        <div className="flex flex-col lg:flex-row gap-8 pb-8 h-[calc(100vh-120px)]">
           {/* Sidebar Navigation */}
           <motion.aside
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.2, duration: 0.5 }}
-            className="w-full lg:w-56 flex flex-col justify-between"
+            className="w-full lg:w-56 h-full flex flex-col justify-between p-4 rounded-3xl bg-gradient-to-br from-gray-900/70 via-gray-900/50 to-gray-950/70 backdrop-blur-xl border border-white/[0.08] shadow-[0_8px_32px_rgba(0,0,0,0.4),0_0_80px_rgba(59,130,246,0.06),inset_0_1px_0_rgba(255,255,255,0.1),inset_0_-1px_0_rgba(0,0,0,0.3)] ring-1 ring-white/[0.05] overflow-hidden"
           >
             {/* Navigation Items */}
-            <nav className="space-y-1 flex-1">
+            <nav className="space-y-1.5 flex-1 overflow-y-auto">
               {navItems.map((item) => (
                 <motion.button
                   key={item.id}
-                  whileHover={!item.disabled ? { x: 4 } : {}}
+                  whileHover={!item.disabled ? { scale: 1.02, x: 2 } : {}}
+                  whileTap={!item.disabled ? { scale: 0.98 } : {}}
                   onClick={() => {
                     if (!item.disabled) {
                       setActiveTab(item.id);
                       void new Audio("/audio/pop.mp3").play().catch(() => null);
                     }
                   }}
-                  className={`w-full flex items-center justify-between px-4 py-3 text-left rounded-xl transition-all relative ${
+                  className={`w-full flex items-center justify-between px-4 py-3 text-left rounded-2xl transition-all duration-300 relative ${
                     activeTab === item.id
-                      ? "bg-gray-900/50 border border-gray-800 text-white"
+                      ? "bg-gradient-to-br from-white/[0.12] via-white/[0.06] to-transparent text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.15),inset_0_-1px_0_rgba(0,0,0,0.2),0_4px_16px_rgba(0,0,0,0.3),0_0_0_1px_rgba(255,255,255,0.08)] backdrop-blur-sm border border-transparent"
                       : item.disabled
                         ? "text-gray-600 cursor-not-allowed"
-                        : "text-gray-400 hover:text-white hover:bg-gray-900/30"
+                        : "text-gray-400 hover:text-white hover:bg-white/[0.04] hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_4px_12px_rgba(0,0,0,0.15)]"
                   }`}
                   disabled={item.disabled}
                 >
@@ -926,74 +929,75 @@ export default function Home() {
             </nav>
 
             {/* Fixed Bottom Section */}
-            <div className="sticky bottom-0 left-0 right-0 pt-4 bg-gradient-to-t from-gray-950/90 via-gray-950/90 to-transparent">
-              <div className="space-y-3">
+            <div className="sticky bottom-0 left-0 right-0 pt-2">
+              <div className="space-y-2">
                 {/* Neumorphic Action Card */}
                 <motion.div
-                  whileHover={{ y: -2 }}
-                  whileTap={{ scale: 0.98 }}
-                  className="p-3 rounded-xl bg-gray-900 border border-gray-800 shadow-[0_4px_20px_rgba(0,0,0,0.25)]"
+                  whileHover={{ y: -1, scale: 1.005 }}
+                  whileTap={{ scale: 0.99 }}
+                  className="p-2 rounded-xl bg-gradient-to-br from-white/[0.08] via-transparent to-black/20 border border-white/[0.08] shadow-[0_8px_32px_rgba(0,0,0,0.4),0_0_60px_rgba(139,92,246,0.04),inset_0_1px_0_rgba(255,255,255,0.12),inset_0_-1px_0_rgba(0,0,0,0.3)] backdrop-blur-md"
                 >
-                  <div className="flex flex-col space-y-2.5">
+                  <div className="flex flex-col space-y-1">
                     <Link
                       href="/mission"
                       target="_blank"
-                      className="w-full flex items-center space-x-2.5 p-2 rounded-lg hover:bg-gray-800/40 transition-all duration-200 text-gray-300 hover:text-white"
+                      className="w-full flex items-center space-x-2 p-1.5 rounded-lg hover:bg-white/[0.06] hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] transition-all duration-200 text-gray-400 hover:text-white"
                     >
-                      <div className="p-1.5 rounded-lg bg-emerald-900/30 border border-emerald-800/50 flex items-center justify-center">
-                        <FaHeart className="text-emerald-400" size={14} />
+                      <div className="p-1 rounded-md bg-gradient-to-br from-emerald-500/20 to-emerald-900/30 border border-emerald-500/30 shadow-[inset_0_1px_0_rgba(255,255,255,0.1)] flex items-center justify-center">
+                        <FaHeart
+                          className="text-emerald-400 drop-shadow-[0_0_4px_rgba(52,211,153,0.4)]"
+                          size={10}
+                        />
                       </div>
-                      <span className="text-sm font-medium">Our mission</span>
+                      <span className="text-xs">Our mission</span>
                     </Link>
                     <Link
                       href="mailto:filippo.fonseca@yale.edu,emir.ahmed@yale.edu"
                       target="_blank"
-                      className="w-full flex items-center space-x-2.5 p-2 rounded-lg hover:bg-gray-800/40 transition-all duration-200 text-gray-300 hover:text-white"
+                      className="w-full flex items-center space-x-2 p-1.5 rounded-lg hover:bg-white/[0.06] hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] transition-all duration-200 text-gray-400 hover:text-white"
                     >
-                      <div className="p-1.5 rounded-lg bg-purple-900/30 border border-purple-800/50 flex items-center justify-center">
+                      <div className="p-1 rounded-md bg-gradient-to-br from-purple-500/20 to-purple-900/30 border border-purple-500/30 shadow-[inset_0_1px_0_rgba(255,255,255,0.1)] flex items-center justify-center">
                         <MessageCircleQuestionMark
-                          className="text-purple-400"
-                          size={14}
+                          className="text-purple-400 drop-shadow-[0_0_4px_rgba(167,139,250,0.4)]"
+                          size={10}
                         />
                       </div>
-                      <span className="text-sm font-medium">
-                        Feedback & errors
-                      </span>
+                      <span className="text-xs">Feedback & errors</span>
                     </Link>
                     <Link
                       href="/terms"
                       target="_blank"
-                      className="w-full flex items-center space-x-2.5 p-2 rounded-lg hover:bg-gray-800/40 transition-all duration-200 text-gray-300 hover:text-white"
+                      className="w-full flex items-center space-x-2 p-1.5 rounded-lg hover:bg-white/[0.06] hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] transition-all duration-200 text-gray-400 hover:text-white"
                     >
-                      <div className="p-1.5 rounded-lg bg-blue-900/30 border border-blue-800/50 flex items-center justify-center">
-                        <FiBook className="text-blue-400" size={14} />
+                      <div className="p-1 rounded-md bg-gradient-to-br from-blue-500/20 to-blue-900/30 border border-blue-500/30 shadow-[inset_0_1px_0_rgba(255,255,255,0.1)] flex items-center justify-center">
+                        <FiBook
+                          className="text-blue-400 drop-shadow-[0_0_4px_rgba(96,165,250,0.4)]"
+                          size={10}
+                        />
                       </div>
-                      <span className="text-sm font-medium">Terms</span>
+                      <span className="text-xs">Terms</span>
                     </Link>
-
                     <Link
                       href="https://coff.ee/filippofonseca"
                       target="_blank"
-                      className="w-full flex items-center space-x-2.5 p-2 rounded-lg hover:bg-gray-800/40 transition-all duration-200 text-gray-300 hover:text-white"
+                      className="w-full flex items-center space-x-2 p-1.5 rounded-lg hover:bg-white/[0.06] hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] transition-all duration-200 text-gray-400 hover:text-white"
                     >
-                      <div className="p-1.5 rounded-lg bg-amber-900/30 border border-amber-800/50 flex items-center justify-center">
-                        <FiCoffee className="text-amber-400" size={14} />
+                      <div className="p-1 rounded-md bg-gradient-to-br from-amber-500/20 to-amber-900/30 border border-amber-500/30 shadow-[inset_0_1px_0_rgba(255,255,255,0.1)] flex items-center justify-center">
+                        <FiCoffee
+                          className="text-amber-400 drop-shadow-[0_0_4px_rgba(251,191,36,0.4)]"
+                          size={10}
+                        />
                       </div>
-                      <span className="text-sm font-medium">
-                        Buy us a coffee
-                      </span>
+                      <span className="text-xs">Buy us a coffee</span>
                     </Link>
                   </div>
                 </motion.div>
 
                 {/* Disclaimer Text */}
-                <div className="px-1 pb-2">
-                  <p className="text-[11px] text-gray-500 leading-tight text-justify">
-                    Yale DegreeIntelligence is purely a student-built tool. Data
-                    may be inaccurate. PLEASE verify everything with your DUS.
-                    We take NO responsibility for any errors or omissions. This
-                    is purely a tool developed for ourselves that we wished to
-                    share, as it's helped us a ton! Enjoy.
+                <div className="px-1 pb-1">
+                  <p className="text-[10px] text-gray-600 leading-tight text-justify">
+                    DegreeIntelligence is a student-built tool. Data may be
+                    inaccurate. Verify with your DUS.
                   </p>
                 </div>
               </div>
@@ -1005,8 +1009,7 @@ export default function Home() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3, duration: 0.5 }}
-            className="flex-1 overflow-y-auto" // Add overflow-y-auto here
-            style={{ maxHeight: "calc(80vh)" }} // Adjust this value based on your header/footer heights
+            className="flex-1 h-full overflow-y-auto"
           >
             <AnimatePresence mode="wait">
               {activeTab === "upload" && (
@@ -1021,11 +1024,11 @@ export default function Home() {
                     <div>
                       <div className="mb-6 flex justify-between items-start">
                         <div>
-                          <h2 className="text-3xl font-medium bg-clip-text text-transparent bg-gradient-to-r from-blue-200 to-purple-200">
+                          <h2 className="text-3xl font-medium bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-200 dark:to-purple-200">
                             Your academic journey at Yale,{" "}
                             {user?.displayName?.split(" ")[0]}.
                           </h2>
-                          <p>
+                          <p className="text-gray-600 dark:text-gray-300">
                             These are all the classes you've taken, including
                             their grades and in-progress ones. Upload a more
                             recent transcript on the top right.
@@ -1035,9 +1038,9 @@ export default function Home() {
                           whileHover={{ scale: 1.03 }}
                           whileTap={{ scale: 0.98 }}
                           onClick={() => setShowUpdateModal(true)}
-                          className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gray-900 border border-gray-800 hover:border-gray-700 text-gray-300 hover:text-white transition-all shadow-[0_4px_20px_rgba(0,0,0,0.25)]"
+                          className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-all shadow-[0_4px_20px_rgba(0,0,0,0.08)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.25)]"
                         >
-                          <FiRefreshCw className="text-blue-400" />
+                          <FiRefreshCw className="text-blue-500 dark:text-blue-400" />
                         </motion.button>
                       </div>
 
@@ -1076,7 +1079,7 @@ export default function Home() {
                               animate={{ opacity: 1 }}
                               className="mb-8"
                             >
-                              <h3 className="text-lg font-medium mb-4 text-gray-300">
+                              <h3 className="text-lg font-medium mb-4 text-gray-700 dark:text-gray-300">
                                 {semester}
                               </h3>
 
@@ -1090,11 +1093,12 @@ export default function Home() {
                                     <motion.div
                                       key={course.id}
                                       whileHover={{ y: -2 }}
-                                      className={`relative p-4 cursor-pointer rounded-xl bg-gray-900/50 backdrop-blur-sm border border-gray-800 hover:border-gray-700 transition-all`}
+                                      className={`relative p-4 cursor-pointer rounded-xl bg-white dark:bg-gray-900/50 backdrop-blur-sm border border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700 transition-all shadow-sm dark:shadow-none`}
                                       onClick={() => {
                                         setModalOpen({
                                           isOpen: true,
                                           course: {
+                                            id: course.id,
                                             code: course.code,
                                             name:
                                               getCourseNameFromCode(
@@ -1102,6 +1106,8 @@ export default function Home() {
                                               ) ?? "Course",
                                             status: course.status,
                                             skipped: course.skipped || false,
+                                            distributionals:
+                                              course.distributionals || [],
                                           },
                                         });
                                       }}
@@ -1109,7 +1115,7 @@ export default function Home() {
                                       {/* TOP ROW */}
                                       <div className="flex justify-between items-start">
                                         <div className="pr-8">
-                                          <h4 className="font-medium">
+                                          <h4 className="font-medium text-gray-900 dark:text-white">
                                             {course.code}
                                             {course.skipped && (
                                               <span className="ml-2 text-xs text-gray-500">
@@ -1117,7 +1123,7 @@ export default function Home() {
                                               </span>
                                             )}
                                           </h4>
-                                          <p className="text-sm text-gray-400">
+                                          <p className="text-sm text-gray-500 dark:text-gray-400">
                                             {getCourseNameFromCode(course.code)}
                                           </p>
                                           <div className="flex items-center mt-1 space-x-2">
@@ -1127,11 +1133,12 @@ export default function Home() {
                                                 !course.skipped
                                                   ? getGPAColor(
                                                       course.grade || "",
-                                                    ) + " bg-emerald-900/20"
+                                                    ) +
+                                                    " bg-emerald-100 dark:bg-emerald-900/20"
                                                   : course.status ===
                                                       "in-progress"
-                                                    ? "text-purple-300 bg-purple-900/20"
-                                                    : "text-gray-300 bg-gray-800/20"
+                                                    ? "text-purple-600 dark:text-purple-300 bg-purple-100 dark:bg-purple-900/20"
+                                                    : "text-gray-600 dark:text-gray-300 bg-gray-100 dark:bg-gray-800/20"
                                               }`}
                                             >
                                               {course.status === "completed" &&
@@ -1154,7 +1161,7 @@ export default function Home() {
                                           !course.skipped && (
                                             <button
                                               aria-label="Delete in-progress course"
-                                              className="absolute top-3 right-3 p-2 rounded-lg border border-red-800/40 bg-red-900/20 text-red-300 hover:bg-red-900/30 hover:border-red-700 transition-all"
+                                              className="absolute top-3 right-3 p-2 rounded-lg border border-red-300 dark:border-red-800/40 bg-red-50 dark:bg-red-900/20 text-red-500 dark:text-red-300 hover:bg-red-100 dark:hover:bg-red-900/30 hover:border-red-400 dark:hover:border-red-700 transition-all"
                                               onClick={(e) => {
                                                 e.stopPropagation(); // don't open the CourseModal
                                                 openDeleteConfirm(course);
@@ -1181,22 +1188,37 @@ export default function Home() {
                                               </span>
                                             ),
                                           )}
-                                          <button
-                                            onClick={() =>
-                                              setDistSelectorCourseId(
-                                                distSelectorCourseId ===
-                                                  course.id
-                                                  ? null
-                                                  : course.id,
-                                              )
-                                            }
-                                            className="text-[10px] px-2 py-0.5 rounded-full bg-gray-800/50 text-gray-500 hover:text-gray-300 hover:bg-gray-700/50 border border-dashed border-gray-700/50 transition-all"
-                                          >
-                                            {(course.distributionals || [])
-                                              .length > 0
-                                              ? "edit"
-                                              : "+ dist"}
-                                          </button>
+                                          {(course.distributionals || [])
+                                            .length === 0 ? (
+                                            // Gradient border when no distributionals assigned
+                                            <button
+                                              onClick={() =>
+                                                setDistSelectorCourseId(
+                                                  distSelectorCourseId ===
+                                                    course.id
+                                                    ? null
+                                                    : course.id,
+                                                )
+                                              }
+                                              className="text-[10px] px-2 py-0.5 rounded-full bg-gradient-to-r from-purple-500/20 via-pink-500/20 to-blue-500/20 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white border border-purple-500/50 hover:border-purple-400/70 transition-all"
+                                            >
+                                              + assign distributional req.
+                                            </button>
+                                          ) : (
+                                            <button
+                                              onClick={() =>
+                                                setDistSelectorCourseId(
+                                                  distSelectorCourseId ===
+                                                    course.id
+                                                    ? null
+                                                    : course.id,
+                                                )
+                                              }
+                                              className="text-[10px] px-2 py-0.5 rounded-full bg-gray-100 dark:bg-gray-800/50 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700/50 border border-dashed border-gray-300 dark:border-gray-700/50 transition-all"
+                                            >
+                                              edit distribs.
+                                            </button>
+                                          )}
                                         </div>
                                         <AnimatePresence>
                                           {distSelectorCourseId ===
@@ -1216,7 +1238,7 @@ export default function Home() {
                                               }}
                                               className="overflow-hidden"
                                             >
-                                              <div className="mt-2 p-3 rounded-lg bg-gray-800/50 border border-gray-700/50 space-y-2.5">
+                                              <div className="mt-2 p-3 rounded-lg bg-gray-100 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700/50 space-y-2.5">
                                                 <div>
                                                   <p className="text-[10px] text-gray-500 uppercase tracking-wider mb-1.5">
                                                     Areas
@@ -1240,7 +1262,7 @@ export default function Home() {
                                                               ? getDistPillStyle(
                                                                   d,
                                                                 )
-                                                              : "bg-gray-800/50 text-gray-500 border-gray-700 hover:border-gray-600"
+                                                              : "bg-white dark:bg-gray-800/50 text-gray-500 border-gray-300 dark:border-gray-700 hover:border-gray-400 dark:hover:border-gray-600"
                                                           }`}
                                                         >
                                                           {d}
@@ -1271,7 +1293,7 @@ export default function Home() {
                                                             ? getDistPillStyle(
                                                                 d,
                                                               )
-                                                            : "bg-gray-800/50 text-gray-500 border-gray-700 hover:border-gray-600"
+                                                            : "bg-white dark:bg-gray-800/50 text-gray-500 border-gray-300 dark:border-gray-700 hover:border-gray-400 dark:hover:border-gray-600"
                                                         }`}
                                                       >
                                                         {d}
@@ -1307,7 +1329,7 @@ export default function Home() {
                                                             ? getDistPillStyle(
                                                                 d,
                                                               )
-                                                            : "bg-gray-800/50 text-gray-500 border-gray-700 hover:border-gray-600"
+                                                            : "bg-white dark:bg-gray-800/50 text-gray-500 border-gray-300 dark:border-gray-700 hover:border-gray-400 dark:hover:border-gray-600"
                                                         }`}
                                                       >
                                                         {d}
@@ -1333,7 +1355,7 @@ export default function Home() {
                             className="mb-8"
                           >
                             <div className="mb-4">
-                              <h3 className="text-lg font-medium text-gray-300">
+                              <h3 className="text-lg font-medium text-gray-700 dark:text-gray-300">
                                 "Skipped" Courses for your major
                                 {userProfile && userProfile?.majors.length > 0
                                   ? "s"
@@ -1352,14 +1374,14 @@ export default function Home() {
                                   <motion.div
                                     key={course.id}
                                     whileHover={{ y: -2 }}
-                                    className="p-4 rounded-xl bg-gray-900/50 backdrop-blur-sm border border-gray-800 hover:border-gray-700 transition-all border-l-2"
+                                    className="p-4 rounded-xl bg-white dark:bg-gray-900/50 backdrop-blur-sm border border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700 transition-all border-l-2 shadow-sm dark:shadow-none"
                                   >
                                     <div className="flex justify-between items-start">
                                       <div>
-                                        <h4 className="font-medium">
+                                        <h4 className="font-medium text-gray-900 dark:text-white">
                                           {course.code}
                                         </h4>
-                                        <p className="text-sm text-gray-400">
+                                        <p className="text-sm text-gray-500 dark:text-gray-400">
                                           {getCourseNameFromCode(course.code)}
                                         </p>
                                         <div className="flex items-center mt-1 space-x-2">
@@ -1392,14 +1414,14 @@ export default function Home() {
                       {/* ... keep your existing new-user content ... */}
                       <div
                         id="upload-transcript"
-                        className="w-full max-w-lg bg-gray-900/50 backdrop-blur-sm p-8 rounded-xl border border-gray-800 mt-8"
+                        className="w-full max-w-lg bg-white dark:bg-gray-900/50 backdrop-blur-sm p-8 rounded-xl border border-gray-200 dark:border-gray-800 mt-8 shadow-sm dark:shadow-none"
                       >
-                        <h4 className="text-lg font-medium text-gray-200 mb-2">
+                        <h4 className="text-lg font-medium text-gray-800 dark:text-gray-200 mb-2">
                           After registration, upload your unofficial transcript
                           here.
                         </h4>
                         <p className="text-sm text-gray-500 mb-4">
-                          We’ll parse your current classes now and fill in
+                          We'll parse your current classes now and fill in
                           grades later when they post.
                         </p>
                         <FileUpload onSuccess={parseAndStoreCourses} />
@@ -1407,7 +1429,7 @@ export default function Home() {
                           We never store your actual transcript file. See our{" "}
                           <Link
                             href="/terms"
-                            className="text-gray-300 hover:underline"
+                            className="text-gray-700 dark:text-gray-300 hover:underline"
                           >
                             terms
                           </Link>
@@ -1419,13 +1441,13 @@ export default function Home() {
                     /* (unchanged pre-upload content) */
                     <div className="flex flex-col items-center justify-center py-12">
                       {/* ... keep your existing pre-upload content ... */}
-                      <div className="w-full max-w-lg bg-gray-900/50 backdrop-blur-sm p-8 rounded-xl border border-gray-800">
+                      <div className="w-full max-w-lg bg-white dark:bg-gray-900/50 backdrop-blur-sm p-8 rounded-xl border border-gray-200 dark:border-gray-800 shadow-sm dark:shadow-none">
                         <FileUpload onSuccess={parseAndStoreCourses} />
                         <p className="text-center text-gray-500 text-sm mt-4">
                           By uploading your transcript, you agree to our{" "}
                           <Link
                             href="/terms"
-                            className="text-gray-300 hover:text-gray-300 hover:underline transition-all hover:scale-[1.3]"
+                            className="text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-300 hover:underline transition-all hover:scale-[1.3]"
                             target="_blank"
                           >
                             terms.
@@ -1452,22 +1474,22 @@ export default function Home() {
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
-                  className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+                  className="fixed inset-0 bg-gray-100/70 dark:bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4"
                   onClick={() => setShowUpdateModal(false)}
                 >
                   <motion.div
                     initial={{ scale: 0.9, y: 20 }}
                     animate={{ scale: 1, y: 0 }}
                     onClick={(e) => e.stopPropagation()}
-                    className="w-full max-w-lg bg-gray-900/90 backdrop-blur-sm p-8 rounded-xl border border-gray-800 relative"
+                    className="w-full max-w-lg bg-white dark:bg-gray-900/90 backdrop-blur-sm p-8 rounded-xl border border-gray-200 dark:border-gray-800 relative shadow-xl dark:shadow-none"
                   >
                     <button
                       onClick={() => setShowUpdateModal(false)}
-                      className="absolute top-4 right-4 p-1 rounded-full hover:bg-gray-800 transition-colors"
+                      className="absolute top-4 right-4 p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
                     >
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
-                        className="h-5 w-5 text-gray-400"
+                        className="h-5 w-5 text-gray-500 dark:text-gray-400"
                         fill="none"
                         viewBox="0 0 24 24"
                         stroke="currentColor"
@@ -1480,10 +1502,10 @@ export default function Home() {
                         />
                       </svg>
                     </button>
-                    <h3 className="text-xl font-medium mb-4 text-gray-200">
+                    <h3 className="text-xl font-medium mb-4 text-gray-800 dark:text-gray-200">
                       Update your transcript
                     </h3>
-                    <p className="text-gray-400 mb-6">
+                    <p className="text-gray-600 dark:text-gray-400 mb-6">
                       Upload a new transcript to update your course history.
                       We'll only add new courses that aren't already in your
                       record.
@@ -1501,10 +1523,10 @@ export default function Home() {
                   transition={{ duration: 0.3 }}
                 >
                   <div className="mb-6">
-                    <h2 className="text-3xl font-medium bg-clip-text text-transparent bg-gradient-to-r from-blue-200 to-purple-200">
+                    <h2 className="text-3xl font-medium bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-200 dark:to-purple-200">
                       Numbers aren't everything, but they're important.
                     </h2>
-                    <p>
+                    <p className="text-gray-600 dark:text-gray-300">
                       Here's a comprehesive visual overview of your academic
                       trajectory over your time at Yale.
                     </p>
@@ -1522,12 +1544,12 @@ export default function Home() {
                 >
                   {user && userProfile && (
                     <div className="mb-6">
-                      <h2 className="text-3xl font-medium bg-clip-text text-transparent bg-gradient-to-r from-blue-200 to-purple-200">
+                      <h2 className="text-3xl font-medium bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-200 dark:to-purple-200">
                         This is how you're doing for your{" "}
                         {userProfile?.majors?.length > 1 ? "majors" : "major"},{" "}
                         {user?.displayName?.split(" ")[0]}.
                       </h2>
-                      <p>
+                      <p className="text-gray-600 dark:text-gray-300">
                         This is based on data from your transcript and the{" "}
                         {userProfile?.majors?.length > 1 ? "majors" : "major"}{" "}
                         you indicated to us.
@@ -1539,7 +1561,7 @@ export default function Home() {
                     activeTab === "major" &&
                     userProfile?.majors?.length > 1 && (
                       <div className="mb-6">
-                        <label className="block text-sm font-medium text-gray-400 mb-2">
+                        <label className="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">
                           Viewing Progress For:
                         </label>
                         <div className="flex flex-wrap gap-2">
@@ -1549,8 +1571,8 @@ export default function Home() {
                               onClick={() => setSelectedMajor(major)}
                               className={`px-4 py-2 rounded-lg border transition-colors ${
                                 selectedMajor === major
-                                  ? "border-blue-500 bg-blue-900/20 text-blue-100"
-                                  : "border-gray-800 hover:border-gray-700 hover:bg-gray-800/50"
+                                  ? "border-blue-500 bg-blue-100 dark:bg-blue-900/20 text-blue-700 dark:text-blue-100"
+                                  : "border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800/50"
                               }`}
                             >
                               {major} - {MAJORS[major] || major}
@@ -1719,7 +1741,22 @@ export default function Home() {
         isOpen={modalOpen.isOpen}
         course={modalOpen.course}
         onClose={() => setModalOpen({ isOpen: false, course: null })}
-        allowSkip={false} // Disables skip functionality
+        allowSkip={false}
+        onToggleDistributional={(courseId, dist) => {
+          toggleDistributional(courseId, dist);
+          // Update modal state to reflect change
+          setModalOpen((prev) => {
+            if (!prev.course || prev.course.id !== courseId) return prev;
+            const currentDists = prev.course.distributionals || [];
+            const newDists = currentDists.includes(dist)
+              ? currentDists.filter((d) => d !== dist)
+              : [...currentDists, dist];
+            return {
+              ...prev,
+              course: { ...prev.course, distributionals: newDists },
+            };
+          });
+        }}
       />
     </main>
   );
@@ -1743,36 +1780,41 @@ function ConfirmDeleteModal({
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 bg-black/70 backdrop-blur-sm z-[999] flex items-center justify-center p-4"
+          className="fixed inset-0 bg-gray-100/70 dark:bg-black/70 backdrop-blur-sm z-[999] flex items-center justify-center p-4"
           onClick={onCancel}
         >
           <motion.div
             initial={{ scale: 0.9, y: 20 }}
             animate={{ scale: 1, y: 0 }}
             exit={{ scale: 0.9, y: 20 }}
-            className="w-full max-w-md bg-gray-900/90 backdrop-blur-sm p-6 rounded-xl border border-gray-800 relative"
+            className="w-full max-w-md bg-white dark:bg-gray-900/90 backdrop-blur-sm p-6 rounded-xl border border-gray-200 dark:border-gray-800 relative shadow-xl dark:shadow-none"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-start justify-between mb-4">
-              <h3 className="text-xl font-medium text-gray-200">
+              <h3 className="text-xl font-medium text-gray-800 dark:text-gray-200">
                 Delete course?
               </h3>
               <button
                 onClick={onCancel}
-                className="p-1 rounded-md hover:bg-gray-800 transition-colors text-gray-400 hover:text-gray-200"
+                className="p-1 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
                 aria-label="Close"
               >
                 <FiX className="h-5 w-5" />
               </button>
             </div>
 
-            <p className="text-gray-300">
-              You’re about to permanently delete{" "}
-              <span className="font-semibold text-gray-100">{course.code}</span>{" "}
+            <p className="text-gray-700 dark:text-gray-300">
+              You're about to permanently delete{" "}
+              <span className="font-semibold text-gray-900 dark:text-gray-100">
+                {course.code}
+              </span>{" "}
               ({getCourseNameFromCode(course.code) || "Course"}) from your{" "}
-              <span className="text-purple-300">in-progress</span> list.
+              <span className="text-purple-600 dark:text-purple-300">
+                in-progress
+              </span>{" "}
+              list.
             </p>
-            <p className="text-gray-400 text-sm mt-2">
+            <p className="text-gray-500 dark:text-gray-400 text-sm mt-2">
               This only removes the entry from DegreeIntelligence. You can
               re-import it later by uploading a fresh transcript.
             </p>
@@ -1780,13 +1822,13 @@ function ConfirmDeleteModal({
             <div className="mt-6 flex items-center justify-end gap-2">
               <button
                 onClick={onCancel}
-                className="px-4 py-2 rounded-lg border border-gray-800 hover:border-gray-700 bg-gray-900/50 text-gray-300 hover:text-white transition-all"
+                className="px-4 py-2 rounded-lg border border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700 bg-white dark:bg-gray-900/50 text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-all"
               >
                 Cancel
               </button>
               <button
                 onClick={onConfirm}
-                className="px-4 py-2 rounded-lg border border-red-800/60 bg-red-900/30 text-red-200 hover:bg-red-900/40 hover:border-red-700 transition-all flex items-center gap-2"
+                className="px-4 py-2 rounded-lg border border-red-300 dark:border-red-800/60 bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-200 hover:bg-red-100 dark:hover:bg-red-900/40 hover:border-red-400 dark:hover:border-red-700 transition-all flex items-center gap-2"
               >
                 <FiTrash2 className="w-4 h-4" />
                 Delete

@@ -35,12 +35,13 @@ export default function TermsOfService() {
             1. About the App
           </h2>
           <p>
-            Yale DegreeIntelligence is a student-built tool designed to help
+            DegreeIntelligence is a student-built, free tool designed to help
             Yale students visualize and plan their academic trajectories. It
             allows users to upload transcript data, which we parse into course
             and grade records to track academic progress. This app is
             student-run, free to use, and{" "}
-            <strong>not officially affiliated with Yale University</strong>.
+            <strong>not officially affiliated with Yale University</strong> in
+            any way, shape, or form.
           </p>
         </section>
 

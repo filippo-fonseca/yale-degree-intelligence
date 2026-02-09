@@ -42,15 +42,15 @@ export const YearBadge: React.FC<YearBadgeProps> = ({
   return (
     <div className="flex items-center">
       <span
-        className={`text-xs font-medium rounded-full flex items-center ${
-          noPadding ? "" : "px-2.5 py-0.5"
+        className={`text-[10px] font-medium rounded-full flex items-center ${
+          noPadding ? "" : "px-2 py-0.5"
         }`}
       >
         <span
-          className={`w-2 h-2 rounded-full mr-1.5 ${getDotColor(yearStatus)}`}
+          className={`w-1.5 h-1.5 rounded-full mr-1 ${getDotColor(yearStatus)}`}
         ></span>
-        <span className="text-gray-300">
-          {yearStatus} • Class of {graduationYear}
+        <span className="text-gray-400">
+          {yearStatus} • '{graduationYear.toString().slice(-2)}
         </span>
       </span>
     </div>

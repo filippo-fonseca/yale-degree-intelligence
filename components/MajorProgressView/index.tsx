@@ -66,7 +66,7 @@ function getCourseStatusColor({
   grade?: string | null;
 }) {
   if (skipped)
-    return "bg-gray-800 text-gray-300 border border-dashed border-gray-600";
+    return "bg-gray-200 dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-dashed border-gray-600";
   if (completed && grade && grade !== "In Progress")
     return "bg-emerald-900/20 text-emerald-300 border border-emerald-700";
   if (inProgress || grade === "In Progress")
@@ -88,17 +88,17 @@ function MajorStatCard({
   return (
     <motion.div
       whileHover={{ y: -2 }}
-      className="p-4 rounded-xl bg-gray-900/50 backdrop-blur-sm border border-gray-800 hover:border-gray-700 transition-all relative"
+      className="p-4 rounded-xl bg-gray-100 dark:bg-gray-900/50 backdrop-blur-sm border border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700 transition-all relative shadow-sm dark:shadow-none"
     >
       {infoTooltip && (
         <div className="absolute top-2 right-2 group">
-          <FiInfo className="w-4 h-4 text-gray-400 hover:text-gray-300" />
-          <div className="absolute z-10 right-0 w-48 p-2 text-xs text-gray-300 bg-gray-800 rounded-md shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
+          <FiInfo className="w-4 h-4 text-gray-600 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300" />
+          <div className="absolute z-10 right-0 w-48 p-2 text-xs text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-gray-800 rounded-md shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
             {infoTooltip}
           </div>
         </div>
       )}
-      <p className="text-sm text-gray-400">{label}</p>
+      <p className="text-sm text-gray-600 dark:text-gray-400">{label}</p>
       <p className={`text-xl font-medium mt-1 ${color}`}>{value}</p>
     </motion.div>
   );
@@ -133,10 +133,10 @@ const SectionGrid = React.memo(function SectionGrid({
     <div className="space-y-3">
       <div className={`text-sm font-medium ${subtitleClass}`}>
         {title}{" "}
-        <span className="text-gray-400 font-normal">({items.length})</span>
+        <span className="text-gray-600 dark:text-gray-400 font-normal">({items.length})</span>
       </div>
       {items.length === 0 ? (
-        <div className="text-xs text-gray-500">
+        <div className="text-xs text-gray-500 dark:text-gray-500">
           Nothing here yet! Whenever you are able to download an Unofficial
           Transcript from the Acadeics tab on YHub, upload it on the "My
           courses" page and come back here!

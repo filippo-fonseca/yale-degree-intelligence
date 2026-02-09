@@ -249,12 +249,12 @@ What can I help you with? I can help plan your schedule, find courses that count
             <h2 className="text-2xl font-medium bg-clip-text text-transparent bg-gradient-to-r from-blue-300 to-blue-100">
               Handsome Dan
             </h2>
-            <p className="text-gray-400 text-sm">Your Yale bulldog advisor</p>
+            <p className="text-gray-600 dark:text-gray-400 text-sm">Your Yale bulldog advisor</p>
           </div>
         </div>
         <button
           onClick={resetConversation}
-          className="p-2 rounded-lg hover:bg-gray-800 text-gray-400 hover:text-white transition-colors"
+          className="p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white transition-colors"
           title="Reset conversation"
         >
           <FiRefreshCw size={18} />
@@ -274,13 +274,13 @@ What can I help you with? I can help plan your schedule, find courses that count
               className={`max-w-[85%] rounded-xl p-4 ${
                 message.role === "user"
                   ? "bg-blue-900/30 text-blue-100 border border-blue-800"
-                  : "bg-gray-800/50 text-gray-200 border border-gray-700"
+                  : "bg-gray-200/50 dark:bg-gray-800/50 text-gray-800 dark:text-gray-200 border border-gray-300 dark:border-gray-700"
               }`}
             >
               {message.role === "assistant" && (
                 <div className="flex items-center gap-2 mb-2">
                   <BulldogIcon className="w-4 h-4 text-blue-400" />
-                  <span className="text-xs font-medium text-gray-400">Dan</span>
+                  <span className="text-xs font-medium text-gray-600 dark:text-gray-400">Dan</span>
                 </div>
               )}
               <div className="prose prose-invert prose-sm max-w-none prose-p:my-1 prose-ul:my-1 prose-li:my-0">
@@ -291,10 +291,10 @@ What can I help you with? I can help plan your schedule, find courses that count
         ))}
         {isLoading && (
           <div className="flex justify-start">
-            <div className="rounded-xl p-4 bg-gray-800/50 border border-gray-700">
+            <div className="rounded-xl p-4 bg-gray-200/50 dark:bg-gray-800/50 border border-gray-300 dark:border-gray-700">
               <div className="flex items-center gap-2">
                 <BulldogIcon className="w-4 h-4 text-blue-400" />
-                <span className="text-xs text-gray-400">Dan is sniffing around...</span>
+                <span className="text-xs text-gray-600 dark:text-gray-400">Dan is sniffing around...</span>
               </div>
               <div className="flex space-x-1 mt-2">
                 <div className="w-2 h-2 rounded-full bg-blue-400 animate-bounce" />
@@ -308,14 +308,14 @@ What can I help you with? I can help plan your schedule, find courses that count
       </div>
 
       {/* Input */}
-      <div className="border-t border-gray-800 pt-4">
+      <div className="border-t border-gray-200 dark:border-gray-800 pt-4">
         <div className="relative">
           <textarea
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder="Ask Dan about requirements, courses, planning..."
-            className="w-full px-4 py-3 pr-12 bg-gray-900/50 border border-gray-800 rounded-xl text-gray-200 focus:outline-none focus:ring-2 focus:ring-purple-500/30 focus:border-purple-500 resize-none"
+            className="w-full px-4 py-3 pr-12 bg-gray-100/50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-800 rounded-xl text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-purple-500/30 focus:border-purple-500 resize-none"
             rows={2}
             disabled={isLoading}
           />
@@ -325,7 +325,7 @@ What can I help you with? I can help plan your schedule, find courses that count
             className={`absolute right-3 bottom-3 p-2 rounded-lg ${
               input.trim()
                 ? "bg-purple-600 text-white hover:bg-purple-700"
-                : "bg-gray-800 text-gray-500 cursor-not-allowed"
+                : "bg-gray-200 dark:bg-gray-800 text-gray-500 cursor-not-allowed"
             } transition-colors`}
           >
             <FiSend />

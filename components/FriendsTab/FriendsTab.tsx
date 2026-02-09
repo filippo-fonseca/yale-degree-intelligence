@@ -76,12 +76,12 @@ function ProfilePic({
     <img
       src={profile.photoURL}
       alt={getDisplayName(profile)}
-      className={`rounded-full object-cover border-2 border-gray-700`}
+      className={`rounded-full object-cover border-2 border-gray-300 dark:border-gray-700`}
       style={{ width: size, height: size }}
     />
   ) : (
     <div
-      className="rounded-full bg-gradient-to-br from-pink-500 to-purple-600 flex items-center justify-center text-white font-medium border-2 border-gray-700"
+      className="rounded-full bg-gradient-to-br from-pink-500 to-purple-600 flex items-center justify-center text-white font-medium border-2 border-gray-300 dark:border-gray-700"
       style={{ width: size, height: size, fontSize: size / 2 }}
     >
       {getDisplayName(profile).charAt(0).toUpperCase()}
@@ -122,12 +122,12 @@ function CopyButton() {
 /** ---------- Skeletons ---------- **/
 const Skeleton = ({ className = "" }: { className?: string }) => (
   <div
-    className={`animate-pulse bg-gray-800/60 border border-gray-700 rounded-lg ${className}`}
+    className={`animate-pulse bg-gray-200/60 dark:bg-gray-800/60 border border-gray-300 dark:border-gray-700 rounded-lg ${className}`}
   />
 );
 
 const FriendRowSkeleton = () => (
-  <div className="flex items-center justify-between p-4 rounded-xl bg-gray-900/50 border border-gray-800">
+  <div className="flex items-center justify-between p-4 rounded-xl bg-gray-100/50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-800">
     <div className="flex gap-4">
       <Skeleton className="h-10 w-10 rounded-full" />
       <div className="space-y-2">
@@ -140,7 +140,7 @@ const FriendRowSkeleton = () => (
 );
 
 const RequestRowSkeleton = () => (
-  <div className="flex items-center justify-between p-3 rounded-xl bg-gray-900/50 border border-gray-800">
+  <div className="flex items-center justify-between p-3 rounded-xl bg-gray-100/50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-800">
     <div className="flex items-center gap-2">
       <Skeleton className="h-7 w-7 rounded-full" />
       <Skeleton className="h-4 w-28" />
@@ -228,7 +228,7 @@ export default function FriendsTab({
     const friendsUnsub = onSnapshot(
       query(
         collection(db, "friends"),
-        where("users", "array-contains", user.uid)
+        where("users", "array-contains", user.uid),
       ),
       (snapshot) => {
         const frs: Friend[] = [];
@@ -237,7 +237,7 @@ export default function FriendsTab({
         });
         setFriends(frs);
         setHydrated((h) => ({ ...h, friends: true }));
-      }
+      },
     );
 
     // 3. Sent requests listener
@@ -245,7 +245,7 @@ export default function FriendsTab({
       query(
         collection(db, "friend-requests"),
         where("from", "==", user.uid),
-        where("status", "==", "pending")
+        where("status", "==", "pending"),
       ),
       (snapshot) => {
         const sent: FriendRequest[] = [];
@@ -257,7 +257,7 @@ export default function FriendsTab({
         });
         setSentRequests(sent);
         setHydrated((h) => ({ ...h, sent: true }));
-      }
+      },
     );
 
     // 4. Incoming requests listener
@@ -265,7 +265,7 @@ export default function FriendsTab({
       query(
         collection(db, "friend-requests"),
         where("to", "==", user.uid),
-        where("status", "==", "pending")
+        where("status", "==", "pending"),
       ),
       (snapshot) => {
         const inc: FriendRequest[] = [];
@@ -277,7 +277,7 @@ export default function FriendsTab({
         });
         setIncomingRequests(inc);
         setHydrated((h) => ({ ...h, incoming: true }));
-      }
+      },
     );
 
     return () => {
@@ -431,7 +431,7 @@ export default function FriendsTab({
       !incomingRequests.some((req) => req.from === u.uid) &&
       (u.displayName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         u.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        u.majors.join(" ").toLowerCase().includes(searchTerm.toLowerCase()))
+        u.majors.join(" ").toLowerCase().includes(searchTerm.toLowerCase())),
   );
 
   if (!user) {
@@ -440,7 +440,7 @@ export default function FriendsTab({
         <h2 className="text-3xl font-medium bg-clip-text text-transparent bg-gradient-to-r from-blue-200 to-purple-200">
           Friends & Connections
         </h2>
-        <div className="mt-6 text-gray-300">
+        <div className="mt-6 text-gray-700 dark:text-gray-300">
           Please sign in to view friends.
         </div>
       </div>
@@ -458,28 +458,28 @@ export default function FriendsTab({
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="flex flex-col items-center justify-center py-16 px-8 rounded-xl bg-gray-900/50 border border-gray-800"
+          className="flex flex-col items-center justify-center py-16 px-8 rounded-xl bg-gray-100/50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-800"
         >
           <div className="p-4 rounded-full bg-pink-500/10 border border-pink-500/30 mb-6">
             <FiUsers className="w-12 h-12 text-pink-400" />
           </div>
 
-          <h3 className="text-2xl font-medium text-gray-100 mb-3 text-center">
+          <h3 className="text-2xl font-medium text-gray-900 dark:text-gray-100 mb-3 text-center">
             Enable Friends Feature
           </h3>
 
-          <p className="text-gray-400 text-center max-w-md mb-6">
+          <p className="text-gray-600 dark:text-gray-400 text-center max-w-md mb-6">
             Connect with other Yale students to see what courses they've taken
             and get inspiration for your own academic journey. Your grades are{" "}
-            <strong className="text-gray-300">never shared</strong> - only
+            <strong className="text-gray-700 dark:text-gray-300">never shared</strong> - only
             course codes, semesters, and credits.
           </p>
 
-          <div className="bg-gray-800/50 rounded-lg p-4 mb-6 max-w-md border border-gray-700">
-            <h4 className="text-sm font-medium text-gray-300 mb-2">
+          <div className="bg-gray-200/50 dark:bg-gray-800/50 rounded-lg p-4 mb-6 max-w-md border border-gray-300 dark:border-gray-700">
+            <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               What gets shared with friends:
             </h4>
-            <ul className="text-sm text-gray-400 space-y-1">
+            <ul className="text-sm text-gray-600 dark:text-gray-400 space-y-1">
               <li>• Course codes (e.g., CPSC 201)</li>
               <li>• Semesters and years taken</li>
               <li>• Credit counts</li>
@@ -604,9 +604,10 @@ export default function FriendsTab({
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
               {/* Incoming Requests */}
               {incomingRequests.length > 0 && (
-                <div className="p-4 rounded-xl bg-gray-900/30 border border-gray-800">
-                  <h3 className="text-sm font-medium text-gray-300 mb-3 flex items-center gap-2">
-                    <FiMail size={14} /> Incoming Requests ({incomingRequests.length})
+                <div className="p-4 rounded-xl bg-gray-100/30 dark:bg-gray-900/30 border border-gray-200 dark:border-gray-800">
+                  <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3 flex items-center gap-2">
+                    <FiMail size={14} /> Incoming Requests (
+                    {incomingRequests.length})
                   </h3>
                   <div className="space-y-2">
                     {incomingRequests.slice(0, 3).map((req) => {
@@ -615,11 +616,11 @@ export default function FriendsTab({
                       return (
                         <div
                           key={req.id}
-                          className="flex items-center justify-between p-2 rounded-lg bg-gray-800/50"
+                          className="flex items-center justify-between p-2 rounded-lg bg-gray-200/50 dark:bg-gray-800/50"
                         >
                           <div className="flex items-center gap-2">
                             <ProfilePic profile={sender} size={24} />
-                            <span className="text-sm text-gray-200 truncate">
+                            <span className="text-sm text-gray-800 dark:text-gray-200 truncate">
                               {getDisplayName(sender)}
                             </span>
                           </div>
@@ -653,9 +654,10 @@ export default function FriendsTab({
 
               {/* Sent Requests */}
               {sentRequests.length > 0 && (
-                <div className="p-4 rounded-xl bg-gray-900/30 border border-gray-800">
-                  <h3 className="text-sm font-medium text-gray-300 mb-3 flex items-center gap-2">
-                    <FiUserCheck size={14} /> Sent Requests ({sentRequests.length})
+                <div className="p-4 rounded-xl bg-gray-100/30 dark:bg-gray-900/30 border border-gray-200 dark:border-gray-800">
+                  <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3 flex items-center gap-2">
+                    <FiUserCheck size={14} /> Sent Requests (
+                    {sentRequests.length})
                   </h3>
                   <div className="space-y-2">
                     {sentRequests.slice(0, 3).map((req) => {
@@ -664,16 +666,16 @@ export default function FriendsTab({
                       return (
                         <div
                           key={req.id}
-                          className="flex items-center justify-between p-2 rounded-lg bg-gray-800/50"
+                          className="flex items-center justify-between p-2 rounded-lg bg-gray-200/50 dark:bg-gray-800/50"
                         >
                           <div className="flex items-center gap-2">
                             <ProfilePic profile={recipient} size={24} />
-                            <span className="text-sm text-gray-200 truncate">
+                            <span className="text-sm text-gray-800 dark:text-gray-200 truncate">
                               {getDisplayName(recipient)}
                             </span>
                           </div>
                           <button
-                            className="p-1.5 rounded bg-gray-700/50 text-gray-400 hover:bg-red-600/30 hover:text-red-400 transition"
+                            className="p-1.5 rounded bg-gray-300/50 dark:bg-gray-700/50 text-gray-600 dark:text-gray-400 hover:bg-red-600/30 hover:text-red-400 transition"
                             onClick={() => cancelSentRequest(req.id)}
                             title="Cancel"
                           >
@@ -703,14 +705,14 @@ export default function FriendsTab({
                 exit={{ opacity: 0 }}
               >
                 <motion.div
-                  className="bg-gray-900 p-6 rounded-lg shadow-xl max-w-2xl w-full h-[400px] flex flex-col"
+                  className="bg-gray-100 dark:bg-gray-900 p-6 rounded-lg shadow-xl max-w-2xl w-full h-[400px] flex flex-col"
                   initial={{ scale: 0.95, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
                   exit={{ scale: 0.95, opacity: 0 }}
                   ref={modalRef}
                 >
                   <div className="flex justify-between items-center mb-4">
-                    <h3 className="text-xl font-semibold text-white">
+                    <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
                       Add a friend on DegreeIntelligence
                     </h3>
                     <button
@@ -718,7 +720,7 @@ export default function FriendsTab({
                         setSearchTerm("");
                         setShowSearchModal(false);
                       }}
-                      className="text-gray-400 hover:text-red-400 transition"
+                      className="text-gray-600 dark:text-gray-400 hover:text-red-400 transition"
                     >
                       <FiX size={20} />
                     </button>
@@ -730,28 +732,28 @@ export default function FriendsTab({
                       type="text"
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
-                      className="bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 w-full text-gray-200 focus:outline-none focus:ring-3 focus:ring-pink-500 focus:border-pink-500"
+                      className="bg-gray-200 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg px-4 py-2 w-full text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-3 focus:ring-pink-500 focus:border-pink-500"
                       placeholder="Your best friend, or perhaps that upperclassman that gives you amazing advice..."
                     />
                   </div>
 
-                  <div className="space-y-2 max-h-[50vh] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-600">
+                  <div className="space-y-2 max-h-[50vh] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 dark:scrollbar-thumb-gray-600">
                     {searchTerm.length === 0 ? (
                       <NoFriendsResult />
                     ) : filteredUsers.length > 0 ? (
                       filteredUsers.slice(0, 10).map((u) => (
                         <motion.div
                           key={u.uid}
-                          className="flex items-center justify-between p-3 rounded-xl bg-gray-800 border border-gray-700 hover:border-pink-400 transition-all"
+                          className="flex items-center justify-between p-3 rounded-xl bg-gray-200 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 hover:border-pink-400 transition-all"
                           whileHover={{ scale: 0.99 }}
                         >
                           <div className="flex items-center gap-4">
                             <ProfilePic profile={u} size={36} />
                             <div>
-                              <div className="font-medium text-gray-200">
+                              <div className="font-medium text-gray-800 dark:text-gray-200">
                                 {getDisplayName(u)}
                               </div>
-                              <div className="text-sm text-gray-400">
+                              <div className="text-sm text-gray-600 dark:text-gray-400">
                                 {u.majors?.join(", ")} &middot;{" "}
                                 {u.graduationYear && (
                                   <YearBadge
@@ -787,7 +789,7 @@ export default function FriendsTab({
             </h3>
             <div className="space-y-3">
               {friendProfiles.length === 0 && (
-                <div className="text-gray-400 text-sm">
+                <div className="text-gray-600 dark:text-gray-400 text-sm">
                   No friends yet. Go add some above!
                 </div>
               )}
@@ -798,7 +800,7 @@ export default function FriendsTab({
                 return (
                   <motion.div
                     key={f.uid}
-                    className="flex items-center justify-between p-4 rounded-xl bg-gray-900/50 border border-gray-800 hover:border-purple-400 transition-all"
+                    className="flex items-center justify-between p-4 rounded-xl bg-gray-100/50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-800 hover:border-purple-400 transition-all"
                     whileHover={{ scale: 1.015 }}
                   >
                     <div className="flex gap-4">
@@ -807,7 +809,7 @@ export default function FriendsTab({
                         <div className="font-medium text-pink-200">
                           {getDisplayName(f)}
                         </div>
-                        <div className="text-xs text-gray-400">
+                        <div className="text-xs text-gray-600 dark:text-gray-400">
                           {f.majors?.join(", ")} &middot;{" "}
                           {f.graduationYear && (
                             <div className="mt-1">
@@ -823,7 +825,7 @@ export default function FriendsTab({
                     <div className="flex gap-2">
                       <Link
                         href={`/user/${f.uid}`}
-                        className="flex items-center gap-1 px-3 py-1.5 bg-gray-800/60 text-gray-300 rounded-lg border border-gray-700 hover:bg-pink-500 hover:text-white transition"
+                        className="flex items-center gap-1 px-3 py-1.5 bg-gray-200/60 dark:bg-gray-800/60 text-gray-700 dark:text-gray-300 rounded-lg border border-gray-300 dark:border-gray-700 hover:bg-pink-500 hover:text-white transition"
                       >
                         <FiUser className="inline-block" />
                         Open Profile
@@ -835,8 +837,7 @@ export default function FriendsTab({
               })}
             </div>
           </section>
-
-                  </>
+        </>
       )}
 
       {/* Disable Confirmation Modal */}
@@ -857,26 +858,30 @@ export default function FriendsTab({
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="bg-gray-900 border border-gray-800 rounded-xl p-5 max-w-sm w-full shadow-xl"
+              className="bg-gray-100 dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl p-5 max-w-sm w-full shadow-xl"
             >
               <div className="flex items-center gap-3 mb-3">
                 <div className="p-2 bg-red-500/10 rounded-full">
                   <FiAlertTriangle className="text-red-500" size={20} />
                 </div>
-                <h3 className="text-lg font-semibold text-gray-100">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
                   Disable Friends Feature?
                 </h3>
               </div>
-              <p className="text-gray-400 text-sm mb-4">
-                This will <strong className="text-red-400">remove all your friends</strong>,
-                pending requests, and hide your courses from others. You can re-enable
-                the feature later, but you'll need to add friends again.
+              <p className="text-gray-600 dark:text-gray-400 text-sm mb-4">
+                This will{" "}
+                <strong className="text-red-400">
+                  remove all your friends
+                </strong>
+                , pending requests, and hide your courses from others. You can
+                re-enable the feature later, but you'll need to add friends
+                again.
               </p>
               <div className="flex justify-end gap-2">
                 <button
                   onClick={() => setShowDisableConfirm(false)}
                   disabled={isDisabling}
-                  className="px-3 py-1.5 rounded border border-gray-700 hover:bg-gray-800/50 text-gray-200 text-sm disabled:opacity-50"
+                  className="px-3 py-1.5 rounded border border-gray-300 dark:border-gray-700 hover:bg-gray-200/50 dark:hover:bg-gray-800/50 text-gray-800 dark:text-gray-200 text-sm disabled:opacity-50"
                 >
                   Cancel
                 </button>
@@ -915,12 +920,12 @@ export default function FriendsTab({
 
   function NoFriendsResult() {
     return (
-      <div className="flex flex-col items-center justify-center gap-4 text-gray-400 text-center py-10">
+      <div className="flex flex-col items-center justify-center gap-4 text-gray-600 dark:text-gray-400 text-center py-10">
         <Panda size={32} />
         <div>
           Can't find your friends? <CopyButton />
           <br />
-          and <span className="text-white">text it to them!</span> You'll be
+          and <span className="text-gray-900 dark:text-white">text it to them!</span> You'll be
           helping them (and us)
           <br />
           out with our mission of making academic planning <br />
@@ -953,7 +958,7 @@ export default function FriendsTab({
       <div className="relative" ref={dropdownRef}>
         <button
           onClick={() => setIsOpen(!isOpen)}
-          className="p-2 rounded-lg hover:bg-gray-800 text-gray-400 hover:text-gray-200 transition"
+          className="p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 transition"
           aria-label="More options"
         >
           <FiMoreVertical size={18} />
@@ -965,7 +970,7 @@ export default function FriendsTab({
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
-              className="absolute right-0 bottom-full mb-2 w-48 bg-gray-800 rounded-lg shadow-lg z-10 border border-gray-700 overflow-hidden"
+              className="absolute right-0 bottom-full mb-2 w-48 bg-gray-200 dark:bg-gray-800 rounded-lg shadow-lg z-10 border border-gray-300 dark:border-gray-700 overflow-hidden"
             >
               <button
                 onClick={() => {
@@ -1014,7 +1019,7 @@ export default function FriendsTab({
       <div className="relative" ref={dropdownRef}>
         <button
           onClick={() => setIsOpen(!isOpen)}
-          className="p-2 rounded-full hover:bg-gray-700 transition"
+          className="p-2 rounded-full hover:bg-gray-300 dark:hover:bg-gray-700 transition"
           aria-label="Friend actions"
         >
           <FiMoreVertical />
@@ -1026,12 +1031,12 @@ export default function FriendsTab({
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
-              className="absolute right-0 mt-2 w-48 bg-gray-800 rounded-md shadow-lg z-10 border border-gray-700"
+              className="absolute right-0 mt-2 w-48 bg-gray-200 dark:bg-gray-800 rounded-md shadow-lg z-10 border border-gray-300 dark:border-gray-700"
             >
               <div className="py-1">
                 <Link
                   href={`/user/${profile.uid}`}
-                  className="flex items-center gap-2 px-4 py-2 text-sm text-gray-200 hover:bg-gray-700"
+                  className="flex items-center gap-2 px-4 py-2 text-sm text-gray-800 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-700"
                   onClick={() => setIsOpen(false)}
                 >
                   <FiUser className="inline-block" />

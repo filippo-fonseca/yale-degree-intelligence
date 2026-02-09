@@ -2,6 +2,7 @@ import "./globals.css";
 import localFont from "next/font/local";
 import { type Metadata } from "next";
 import { AuthProvider } from "@/context/AuthContext";
+import { ThemeProvider } from "@/context/ThemeContext";
 import { Toaster } from "react-hot-toast";
 import Script from "next/script";
 
@@ -77,55 +78,56 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={`${louize.variable} ${sf.variable}`}>
+    <html lang="en" className={`${louize.variable} ${sf.variable} dark`}>
+      <head />
       <AuthProvider>
-        <body className="bg-black text-white">
-          <Toaster
-            position="top-center"
-            toastOptions={{
-              // Global styles
-              style: {
-                background: "#1f1f1f", // dark gray
-                color: "#fff", // white text
-                fontSize: "0.875rem", // smaller text (Tailwind `text-sm`)
-                borderRadius: "8px",
-                padding: "12px 16px",
-              },
-              success: {
-                iconTheme: {
-                  primary: "#ec4899", // Tailwind pink-500
-                  secondary: "#1f1f1f", // match background
+        <ThemeProvider>
+          <body className="bg-black text-white">
+            <Toaster
+              position="top-center"
+              toastOptions={{
+                className: "!bg-[#1f1f1f] !text-white",
+                style: {
+                  fontSize: "0.875rem",
+                  borderRadius: "8px",
+                  padding: "12px 16px",
                 },
-              },
-              error: {
-                iconTheme: {
-                  primary: "#ef4444", // Tailwind red-500
-                  secondary: "#1f1f1f",
+                success: {
+                  iconTheme: {
+                    primary: "#ec4899",
+                    secondary: "#ffffff",
+                  },
                 },
-              },
-            }}
-          />
-          {children}
-          <Script
-            src="https://cdn.amplitude.com/script/3294f81bbb47cf20adaf628c010b1866.js"
-            strategy="afterInteractive"
-          />
-          <Script id="amplitude-init" strategy="lazyOnload">
-            {`
-              (function initAmplitude() {
-                if (window.amplitude && window.sessionReplay) {
-                  window.amplitude.add(window.sessionReplay.plugin({ sampleRate: 1 }));
-                  window.amplitude.init('3294f81bbb47cf20adaf628c010b1866', {
-                    fetchRemoteConfig: true,
-                    autocapture: true
-                  });
-                } else {
-                  setTimeout(initAmplitude, 100);
-                }
-              })();
-            `}
-          </Script>
-        </body>
+                error: {
+                  iconTheme: {
+                    primary: "#ef4444",
+                    secondary: "#ffffff",
+                  },
+                },
+              }}
+            />
+            {children}
+            <Script
+              src="https://cdn.amplitude.com/script/3294f81bbb47cf20adaf628c010b1866.js"
+              strategy="afterInteractive"
+            />
+            <Script id="amplitude-init" strategy="lazyOnload">
+              {`
+                (function initAmplitude() {
+                  if (window.amplitude && window.sessionReplay) {
+                    window.amplitude.add(window.sessionReplay.plugin({ sampleRate: 1 }));
+                    window.amplitude.init('3294f81bbb47cf20adaf628c010b1866', {
+                      fetchRemoteConfig: true,
+                      autocapture: true
+                    });
+                  } else {
+                    setTimeout(initAmplitude, 100);
+                  }
+                })();
+              `}
+            </Script>
+          </body>
+        </ThemeProvider>
       </AuthProvider>
     </html>
   );

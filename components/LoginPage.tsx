@@ -118,7 +118,7 @@ export default function LoginPage({
         className="relative z-10 w-full max-w-xl"
       >
         <div className="p-1 rounded-2xl bg-gradient-to-r from-purple-500/20 via-blue-500/20 to-pink-500/20">
-          <div className="p-8 space-y-8 backdrop-blur-lg bg-gray-900/70 rounded-xl border border-gray-800/50 shadow-2xl">
+          <div className="p-8 space-y-8 backdrop-blur-lg bg-gray-100/70 dark:bg-gray-900/70 rounded-xl border border-gray-200/50 dark:border-gray-800/50 shadow-2xl">
             {/* Yale crest animation */}
             <motion.div
               whileHover={{ scale: 1.05 }}
@@ -156,7 +156,7 @@ export default function LoginPage({
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.5 }}
-                className="text-lg text-gray-300"
+                className="text-lg text-gray-700 dark:text-gray-300"
               >
                 Here you'll navigate Yale journey with clarity, not
                 spreadsheets.
@@ -177,7 +177,7 @@ export default function LoginPage({
                   <h3 className="text-xl font-medium text-blue-200">
                     {features[activeFeature].title}
                   </h3>
-                  <p className="text-gray-300">
+                  <p className="text-gray-700 dark:text-gray-300">
                     {features[activeFeature].description}
                   </p>
                 </motion.div>
@@ -243,7 +243,7 @@ export default function LoginPage({
             >
               <a
                 href="/"
-                className="text-sm text-gray-400 hover:text-white transition-colors inline-flex items-center"
+                className="text-sm text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white transition-colors inline-flex items-center"
               >
                 <span>←</span> Return to homepage
               </a>
@@ -259,16 +259,16 @@ export default function LoginPage({
         transition={{ delay: 1.2 }}
         className="absolute bottom-6 text-center text-sm"
       >
-        <p className="text-gray-400">
+        <p className="text-gray-600 dark:text-gray-400">
           Hey there! Thanks for stopping by. We're Filippo Fonseca & Emir Ahmed.{" "}
           <a
             href="mailto:filippo.fonseca@yale.edu,emir.ahmed@yale.edu"
-            className="text-white font-normal hover:underline"
+            className="text-black dark:text-white font-normal hover:underline"
           >
             Have feedback?
           </a>
         </p>
-        <p className="text-xs mt-1 text-gray-400">
+        <p className="text-xs mt-1 text-gray-600 dark:text-gray-400">
           v0.0.1. Not officially affiliated or partnered with Yale University.
         </p>
       </motion.div>

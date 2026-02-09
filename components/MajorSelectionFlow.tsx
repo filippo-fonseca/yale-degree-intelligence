@@ -11,7 +11,10 @@ import { InfoCard } from "./ui/InfoCard";
 import Link from "next/link";
 import CompoundLogo from "./ui/CompoundLogo";
 import LogoIcon from "@/icons/LogoIcon";
-import { FiArrowRight, FiX } from "react-icons/fi";
+import { FiArrowRight, FiX, FiCheck, FiChevronDown } from "react-icons/fi";
+import { RiProgress3Fill } from "react-icons/ri";
+import { HiSparkles } from "react-icons/hi2";
+import { FaUsers, FaGraduationCap } from "react-icons/fa6";
 
 interface MajorSelectionFlowProps {
   onComplete: () => void;
@@ -68,16 +71,102 @@ export default function MajorSelectionFlow({
     }
   };
 
+  const features = [
+    {
+      icon: <RiProgress3Fill className="w-5 h-5" />,
+      title: "Track Requirements",
+      desc: "Visualize your progress through major requirements",
+      gradient: "from-pink-500/20 to-pink-600/10",
+      border: "border-pink-500/20",
+      iconColor: "text-pink-400",
+    },
+    {
+      icon: <HiSparkles className="w-5 h-5" />,
+      title: "Smart AI Planning",
+      desc: "Get recommendations for optimal course selection",
+      gradient: "from-purple-500/20 to-purple-600/10",
+      border: "border-purple-500/20",
+      iconColor: "text-purple-400",
+    },
+    {
+      icon: <FaGraduationCap className="w-5 h-5" />,
+      title: "Graduation Timeline",
+      desc: "See your projected path to graduation. Simply.",
+      gradient: "from-blue-500/20 to-blue-600/10",
+      border: "border-blue-500/20",
+      iconColor: "text-blue-400",
+    },
+    {
+      icon: <FaUsers className="w-5 h-5" />,
+      title: "Peer Insights",
+      desc: "See what courses your friends are taking",
+      gradient: "from-emerald-500/20 to-emerald-600/10",
+      border: "border-emerald-500/20",
+      iconColor: "text-emerald-400",
+    },
+  ];
+
+  // Step indicator
+  const steps = ["majors", "bio", "year"];
+  const currentStepIndex = steps.indexOf(step);
+
   return (
-    <div className="fixed inset-0 bg-gray-950/90 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div className="fixed inset-0 bg-gray-950/95 backdrop-blur-md z-50 flex items-center justify-center p-4 overflow-y-auto">
+      {/* Background decorative elements */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute inset-0 bg-gradient-to-br from-gray-950 via-blue-950/20 to-purple-950/20" />
+        <div className="absolute top-1/4 -left-32 w-64 h-64 bg-pink-500/10 rounded-full blur-3xl" />
+        <div className="absolute bottom-1/4 -right-32 w-64 h-64 bg-purple-500/10 rounded-full blur-3xl" />
+      </div>
+
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="w-full max-w-xl bg-gray-900 rounded-xl border border-gray-800 p-6"
+        initial={{ opacity: 0, y: 20, scale: 0.98 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        transition={{ type: "spring", damping: 25, stiffness: 300 }}
+        className="relative w-full max-w-xl bg-gradient-to-br from-gray-900/80 via-gray-900/70 to-gray-950/80 rounded-2xl border border-white/[0.08] p-6 shadow-[0_8px_32px_rgba(0,0,0,0.5),0_0_80px_rgba(139,92,246,0.08),inset_0_1px_0_rgba(255,255,255,0.1),inset_0_-1px_0_rgba(0,0,0,0.3)] backdrop-blur-2xl ring-1 ring-white/[0.05]"
       >
+        {/* Step Progress Indicator (only show after welcome) */}
+        {step !== "welcome" && (
+          <div className="mb-6">
+            <div className="flex items-center justify-center gap-2">
+              {steps.map((s, i) => (
+                <div key={s} className="flex items-center">
+                  <motion.div
+                    initial={{ scale: 0.8 }}
+                    animate={{ scale: 1 }}
+                    className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-medium transition-all duration-300 ${
+                      i < currentStepIndex
+                        ? "bg-gradient-to-br from-emerald-500 to-emerald-600 text-white shadow-[0_2px_8px_rgba(16,185,129,0.3)]"
+                        : i === currentStepIndex
+                          ? "bg-gradient-to-br from-pink-500 to-purple-600 text-white shadow-[0_2px_8px_rgba(236,72,153,0.3)]"
+                          : "bg-gray-800/60 text-gray-500 border border-gray-700/50"
+                    }`}
+                  >
+                    {i < currentStepIndex ? <FiCheck size={14} /> : i + 1}
+                  </motion.div>
+                  {i < steps.length - 1 && (
+                    <div
+                      className={`w-12 h-0.5 mx-1 rounded-full transition-all duration-300 ${
+                        i < currentStepIndex
+                          ? "bg-gradient-to-r from-emerald-500 to-emerald-400"
+                          : "bg-gray-800/60"
+                      }`}
+                    />
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
         {step === "welcome" && (
-          <div className="space-y-8">
-            <div className="flex justify-center mb-6">
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="space-y-6"
+          >
+            {/* Logo Section */}
+            <div className="flex justify-center mb-4">
               <div className="relative w-24 h-24">
                 <motion.div
                   animate={{ rotate: 360 }}
@@ -86,251 +175,210 @@ export default function MajorSelectionFlow({
                     repeat: Infinity,
                     ease: "linear",
                   }}
-                  className="absolute inset-0 rounded-full border-2 border-transparent border-t-pink-400/30 border-r-purple-400/30"
+                  className="absolute inset-0 rounded-full border-2 border-transparent border-t-pink-400/40 border-r-purple-400/40"
                 />
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <LogoIcon width={48} height={48} />
+                  <div className="p-3 rounded-2xl bg-gradient-to-br from-white/[0.08] via-transparent to-black/10 border border-white/[0.08] shadow-[0_4px_16px_rgba(0,0,0,0.3),inset_0_1px_0_rgba(255,255,255,0.1)]">
+                    <LogoIcon width={36} height={36} />
+                  </div>
                 </div>
               </div>
             </div>
-            <div className="flex items-center justify-center font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-pink-200 to-purple-300 mb-4">
+
+            {/* Title */}
+            <div className="text-center flex flex-col items-center justify-center">
               <CompoundLogo hideLogo animated size="lg" />
+              <p className="text-gray-400 text-sm mt-2">
+                Your intelligent academic companion at Yale
+              </p>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              {[
-                {
-                  icon: (
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                      className="w-6 h-6"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
-                      />
-                    </svg>
-                  ),
-                  title: "Track Requirements",
-                  desc: "Visualize your progress through major requirements",
-                },
-                {
-                  icon: (
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                      className="w-6 h-6"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"
-                      />
-                    </svg>
-                  ),
-                  title: "Smart AI Planning",
-                  desc: "Get recommendations for optimal course selection",
-                },
-                {
-                  icon: (
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                      className="w-6 h-6"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                      />
-                    </svg>
-                  ),
-                  title: "Graduation Timeline",
-                  desc: "See your projected path to graduation. Simply.",
-                },
-                {
-                  icon: (
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                      className="w-6 h-6"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
-                      />
-                    </svg>
-                  ),
-                  title: "Peer Insights",
-                  desc: "See how others in your major are planning (coming soon!)",
-                },
-              ].map((feature, index) => (
+            {/* Features Grid */}
+            <div className="grid grid-cols-2 gap-3">
+              {features.map((feature, index) => (
                 <motion.div
                   key={index}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  whileHover={{ y: -5 }}
-                  className="neumorphic-card p-4 rounded-xl bg-gray-900 border border-gray-800 hover:border-pink-500/30 transition-all duration-300 cursor-default"
+                  transition={{ delay: index * 0.1 }}
+                  whileHover={{ y: -2, scale: 1.01 }}
+                  className={`p-3.5 rounded-xl bg-gradient-to-br ${feature.gradient} border ${feature.border} backdrop-blur-sm shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_4px_12px_rgba(0,0,0,0.2)] transition-all duration-300 cursor-default`}
                 >
-                  <div className="flex items-center space-x-3">
-                    <div className="neumorphic-icon p-2 rounded-lg bg-gray-900 border border-gray-800 text-pink-400">
+                  <div className="flex items-start gap-3">
+                    <div
+                      className={`p-2 rounded-lg bg-gray-900/60 border border-white/[0.06] ${feature.iconColor} shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]`}
+                    >
                       {feature.icon}
                     </div>
-                    <div>
-                      <h3 className="font-medium text-gray-200">
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-medium text-sm text-gray-200">
                         {feature.title}
                       </h3>
-                      <p className="text-sm text-gray-400">{feature.desc}</p>
+                      <p className="text-xs text-gray-400 mt-0.5 leading-relaxed">
+                        {feature.desc}
+                      </p>
                     </div>
                   </div>
                 </motion.div>
               ))}
             </div>
 
+            {/* CTA Button */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ delay: 0.6 }}
-              className="flex items-center justify-center w-full pt-6"
-              onClick={() => setStep("majors")}
+              transition={{ delay: 0.5 }}
+              className="flex items-center justify-center pt-4"
             >
               <motion.button
-                className="px-6 py-3 border border-pink-500 bg-pink-500/30 hover:bg-pink-500/40 backdrop-blur-md rounded-lg text-white font-medium flex items-center gap-2 transition-all shadow-sm hover:shadow-md"
-                whileHover={{ scale: 1.05 }}
+                onClick={() => setStep("majors")}
+                className="px-6 py-3 bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 rounded-xl text-white font-medium flex items-center gap-2 transition-all shadow-[0_4px_16px_rgba(236,72,153,0.3),inset_0_1px_0_rgba(255,255,255,0.15)] hover:shadow-[0_6px_20px_rgba(236,72,153,0.4)]"
+                whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
               >
-                I'm excited
+                Get Started
                 <FiArrowRight className="opacity-80" />
               </motion.button>
             </motion.div>
-          </div>
+          </motion.div>
         )}
 
         {step === "majors" && (
-          <div className="space-y-4">
-            <h2 className="text-xl font-medium text-center text-gray-200">
-              It's time to select your major(s).
-            </h2>
-            <div className="space-y-2">
-              <p className="text-gray-300 text-center text-sm">
-                You can select up to 2 majors (min 1). If you’re a freshman or
-                not sure yet, no problem — just pick one or two you’re
-                considering or want to explore.
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -20 }}
+            className="space-y-5"
+          >
+            <div className="text-center">
+              <h2 className="text-xl font-medium bg-clip-text text-transparent bg-gradient-to-r from-pink-200 to-purple-200">
+                Select your major(s)
+              </h2>
+              <p className="text-gray-400 text-sm mt-1.5">
+                Pick up to 2. Not sure yet? Just choose what you're exploring.
               </p>
-
-              {/* Show more pill */}
-              <div className="flex justify-center">
-                <button
-                  type="button"
-                  onClick={() => setShowMajorsInfo((s) => !s)}
-                  aria-expanded={showMajorsInfo}
-                  className="inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs
-                 bg-gray-800/60 border border-gray-700 hover:border-pink-500/40
-                 text-gray-300 hover:text-white transition-all"
-                >
-                  <span>Why this doesn’t lock you in</span>
-                  <motion.span
-                    animate={{ rotate: showMajorsInfo ? 180 : 0 }}
-                    transition={{ duration: 0.2 }}
-                    className="inline-block"
-                  >
-                    ▼
-                  </motion.span>
-                </button>
-              </div>
-
-              {/* Collapsible details */}
-              <AnimatePresence initial={false}>
-                {showMajorsInfo && (
-                  <motion.div
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: "auto" }}
-                    exit={{ opacity: 0, height: 0 }}
-                    transition={{ duration: 0.25 }}
-                    className="mx-auto max-w-md rounded-lg border border-gray-800 bg-gray-900/70
-                   text-gray-400 text-xs p-3"
-                  >
-                    <ul className="list-disc list-inside space-y-1">
-                      <li>
-                        Changing majors on DI takes ~5 seconds in Settings.
-                      </li>
-                      <li>All analytics update instantly when you switch.</li>
-                      <li>
-                        It’s just to personalize planning while you explore.
-                      </li>
-                    </ul>
-                  </motion.div>
-                )}
-              </AnimatePresence>
             </div>
 
-            <InfoCard className="text-sm">
+            {/* Collapsible Info */}
+            <div className="flex justify-center">
+              <button
+                type="button"
+                onClick={() => setShowMajorsInfo((s) => !s)}
+                className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs bg-gradient-to-br from-white/[0.06] to-transparent border border-white/[0.08] hover:border-pink-500/30 text-gray-400 hover:text-gray-200 transition-all shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]"
+              >
+                <span>Why this doesn't lock you in</span>
+                <motion.span
+                  animate={{ rotate: showMajorsInfo ? 180 : 0 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <FiChevronDown size={12} />
+                </motion.span>
+              </button>
+            </div>
+
+            <AnimatePresence initial={false}>
+              {showMajorsInfo && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: "auto" }}
+                  exit={{ opacity: 0, height: 0 }}
+                  transition={{ duration: 0.25 }}
+                  className="mx-auto max-w-md rounded-xl border border-white/[0.06] bg-gradient-to-br from-gray-800/40 to-gray-900/40 backdrop-blur-sm text-gray-400 text-xs p-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]"
+                >
+                  <ul className="space-y-1.5">
+                    <li className="flex items-start gap-2">
+                      <FiCheck
+                        className="text-emerald-400 mt-0.5 flex-shrink-0"
+                        size={12}
+                      />
+                      <span>Changing majors takes ~5 seconds in Settings</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <FiCheck
+                        className="text-emerald-400 mt-0.5 flex-shrink-0"
+                        size={12}
+                      />
+                      <span>
+                        All analytics update instantly when you switch
+                      </span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <FiCheck
+                        className="text-emerald-400 mt-0.5 flex-shrink-0"
+                        size={12}
+                      />
+                      <span>
+                        It's just to personalize planning while you explore
+                      </span>
+                    </li>
+                  </ul>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            <InfoCard className="text-xs">
               Our goal is to support all majors & concentrations. If yours isn't
               there,{" "}
               <Link
                 href="mailto:filippo.fonseca@yale.edu,emir.ahmed@yale.edu"
-                className="text-white font-normal hover:underline"
+                className="text-pink-300 font-medium hover:underline"
               >
                 tell us.
               </Link>
             </InfoCard>
 
+            {/* Major Selection */}
             <div className="space-y-3">
               {selectedMajors.map((major, index) => (
-                <div key={index} className="flex items-center gap-2">
-                  <MajorDropdown
-                    value={major}
-                    onChange={(newMajor) => {
-                      const newMajors = [...selectedMajors];
-                      newMajors[index] = newMajor;
-                      setSelectedMajors(newMajors);
-                    }}
-                    disabledOptions={selectedMajors.filter((m) => m !== major)}
-                  />
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="flex items-center gap-2"
+                >
+                  <div className="flex-1">
+                    <MajorDropdown
+                      value={major}
+                      onChange={(newMajor) => {
+                        const newMajors = [...selectedMajors];
+                        newMajors[index] = newMajor;
+                        setSelectedMajors(newMajors);
+                      }}
+                      disabledOptions={selectedMajors.filter(
+                        (m) => m !== major,
+                      )}
+                    />
+                  </div>
                   {index > 0 && (
                     <button
                       onClick={() => handleRemoveMajor(index)}
-                      className="text-gray-400 hover:text-gray-200 p-1 rounded-full hover:bg-gray-800 transition-colors"
+                      className="p-2 rounded-lg text-gray-500 hover:text-red-400 hover:bg-red-500/10 border border-transparent hover:border-red-500/20 transition-all"
                       title="Remove major"
                     >
-                      <FiX size={18} />
+                      <FiX size={16} />
                     </button>
                   )}
-                </div>
+                </motion.div>
               ))}
 
               {selectedMajors.length < 2 && (
-                <button
+                <motion.button
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
                   onClick={() => {
-                    // Find first major not already selected
                     const availableMajor = Object.keys(MAJORS).find(
-                      (major) => !selectedMajors.includes(major)
+                      (major) => !selectedMajors.includes(major),
                     );
                     if (availableMajor) {
                       setSelectedMajors([...selectedMajors, availableMajor]);
                     }
                   }}
                   disabled={selectedMajors.length >= 2}
-                  className="w-full py-2 px-4 rounded-lg border border-gray-700 hover:bg-gray-800/50 text-gray-400 hover:text-gray-200 flex items-center justify-center"
+                  className="w-full py-2.5 px-4 rounded-xl border border-dashed border-gray-700/60 hover:border-pink-500/40 bg-gradient-to-br from-white/[0.02] to-transparent hover:from-pink-500/5 text-gray-500 hover:text-gray-300 flex items-center justify-center gap-1.5 transition-all"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
-                    className="h-5 w-5 mr-1"
+                    className="h-4 w-4"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
@@ -342,124 +390,163 @@ export default function MajorSelectionFlow({
                       d="M12 6v6m0 0v6m0-6h6m-6 0H6"
                     />
                   </svg>
-                  Add major
-                </button>
+                  Add another major
+                </motion.button>
               )}
             </div>
 
+            {/* Navigation */}
             <div className="flex justify-between pt-4">
               <button
                 onClick={() => setStep("welcome")}
-                className="py-2 px-4 text-gray-400 hover:text-gray-200"
+                className="py-2 px-4 text-gray-500 hover:text-gray-300 transition-colors text-sm"
               >
                 Back
               </button>
               <button
                 onClick={() => setStep("bio")}
                 disabled={selectedMajors.length === 0}
-                className={`py-2 px-4 rounded-lg font-medium transition-colors ${
+                className={`py-2.5 px-5 rounded-xl font-medium text-sm transition-all ${
                   selectedMajors.length === 0
-                    ? "bg-gray-800 text-gray-600 cursor-not-allowed"
-                    : "bg-pink-600 hover:bg-pink-700"
+                    ? "bg-gray-800/60 text-gray-600 cursor-not-allowed border border-gray-700/40"
+                    : "bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white shadow-[0_2px_8px_rgba(236,72,153,0.25)]"
                 }`}
               >
-                Next
+                Continue
               </button>
             </div>
-          </div>
+          </motion.div>
         )}
 
         {step === "bio" && (
-          <div className="space-y-6">
-            <h2 className="text-xl font-medium text-center text-gray-200">
-              Tell your friends about yourself.
-            </h2>
-            <p className="text-gray-400 text-center text-sm">
-              This will be visible on your profile to your accepted friends.
-              It's totally optional.
-            </p>
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -20 }}
+            className="space-y-5"
+          >
+            <div className="text-center">
+              <h2 className="text-xl font-medium bg-clip-text text-transparent bg-gradient-to-r from-pink-200 to-purple-200">
+                Tell friends about yourself
+              </h2>
+              <p className="text-gray-400 text-sm mt-1.5">
+                Visible to accepted friends only. Totally optional.
+              </p>
+            </div>
 
-            <div className="mt-4">
+            <div>
               <textarea
                 autoFocus
                 value={bio}
                 onChange={(e) => {
-                  // Remove newlines and limit to 200 characters
                   const filteredValue = e.target.value.replace(/[\r\n]/g, "");
                   setBio(filteredValue.slice(0, 200));
                 }}
-                placeholder="What are your interests? Future plans? Fun facts? We don't care. Anything."
-                className="w-full h-32 bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-pink-500 text-gray-200"
+                placeholder="Interests, plans, fun facts... anything goes."
+                className="w-full h-28 bg-gray-900 border border-gray-700/60 hover:border-gray-600/60 focus:border-pink-500/50 rounded-xl px-4 py-3 focus:outline-none focus:ring-1 focus:ring-pink-500/30 text-gray-200 placeholder:text-gray-600 text-sm resize-none transition-all shadow-[inset_0_2px_4px_rgba(0,0,0,0.2)]"
                 maxLength={200}
-                style={{ overflow: "hidden", resize: "none" }}
+                style={{ overflow: "hidden" }}
                 onKeyDown={(e) => {
-                  // Prevent Enter key from creating new lines
                   if (e.key === "Enter") {
                     e.preventDefault();
                   }
                 }}
               />
-              <p className="text-xs text-gray-500 text-right mt-1">
-                {bio.length}/200
-              </p>
+              <div className="flex justify-end mt-1.5">
+                <span
+                  className={`text-xs ${bio.length > 180 ? "text-orange-400" : "text-gray-600"}`}
+                >
+                  {bio.length}/200
+                </span>
+              </div>
             </div>
 
             <div className="flex justify-between pt-4">
               <button
                 onClick={() => setStep("majors")}
-                className="py-2 px-4 text-gray-400 hover:text-gray-200"
+                className="py-2 px-4 text-gray-500 hover:text-gray-300 transition-colors text-sm"
               >
                 Back
               </button>
               <button
                 onClick={() => setStep("year")}
-                className={`py-2 px-4 rounded-lg font-medium transition-colors ${"bg-pink-600 hover:bg-pink-700 text-white"}`}
+                className="py-2.5 px-5 rounded-xl font-medium text-sm bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white shadow-[0_2px_8px_rgba(236,72,153,0.25)] transition-all"
               >
-                {bio.length === 0 ? "Skip" : "Next"}
+                {bio.length === 0 ? "Skip" : "Continue"}
               </button>
             </div>
-          </div>
+          </motion.div>
         )}
 
         {step === "year" && (
-          <div className="space-y-6">
-            <h2 className="text-xl font-medium text-center text-gray-200">
-              Expected Graduation Year
-            </h2>
-
-            <div className="flex justify-center">
-              <input
-                type="number"
-                autoFocus
-                min={new Date().getFullYear()}
-                max={new Date().getFullYear() + 10}
-                value={graduationYear}
-                onChange={(e) => setGraduationYear(e.target.value)}
-                className="bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 w-32 text-center text-lg font-medium focus:outline-none focus:ring-2 focus:ring-pink-500"
-                placeholder="2025"
-              />
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -20 }}
+            className="space-y-6"
+          >
+            <div className="text-center">
+              <h2 className="text-xl font-medium bg-clip-text text-transparent bg-gradient-to-r from-pink-200 to-purple-200">
+                Graduation Year
+              </h2>
+              <p className="text-gray-400 text-sm mt-1.5">
+                When do you expect to graduate?
+              </p>
             </div>
 
-            <div className="flex justify-between pt-4">
+            <div className="flex justify-center">
+              <div className="relative">
+                <input
+                  type="number"
+                  autoFocus
+                  min={new Date().getFullYear()}
+                  max={new Date().getFullYear() + 10}
+                  value={graduationYear}
+                  onChange={(e) => setGraduationYear(e.target.value)}
+                  className="bg-gray-900 border border-gray-700/60 hover:border-gray-600/60 focus:border-pink-500/50 rounded-xl px-6 py-4 w-36 text-center text-2xl font-medium focus:outline-none focus:ring-1 focus:ring-pink-500/30 text-gray-100 transition-all shadow-[inset_0_2px_4px_rgba(0,0,0,0.2)]"
+                  placeholder="2029"
+                />
+                <div className="absolute -bottom-6 left-1/2 -translate-x-1/2">
+                  <span className="text-xs text-gray-500">
+                    {parseInt(graduationYear) === 2029 && "Freshman"}
+                    {parseInt(graduationYear) === 2028 && "Sophomore"}
+                    {parseInt(graduationYear) === 2027 && "Junior"}
+                    {parseInt(graduationYear) === 2026 && "Senior"}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex justify-between pt-8">
               <button
                 onClick={() => setStep("bio")}
-                className="py-2 px-4 text-gray-400 hover:text-gray-200"
+                className="py-2 px-4 text-gray-500 hover:text-gray-300 transition-colors text-sm"
               >
                 Back
               </button>
               <button
                 onClick={handleSubmit}
                 disabled={!graduationYear || isSubmitting}
-                className={`py-2 px-4 rounded-lg font-medium transition-colors ${
+                className={`py-2.5 px-5 rounded-xl font-medium text-sm transition-all flex items-center gap-2 ${
                   !graduationYear || isSubmitting
-                    ? "bg-gray-800 text-gray-600 cursor-not-allowed"
-                    : "bg-pink-600 hover:bg-pink-700"
+                    ? "bg-gray-800/60 text-gray-600 cursor-not-allowed border border-gray-700/40"
+                    : "bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white shadow-[0_2px_8px_rgba(16,185,129,0.3)]"
                 }`}
               >
-                {isSubmitting ? "Saving..." : "Complete Setup"}
+                {isSubmitting ? (
+                  <>
+                    <span className="animate-spin h-4 w-4 border-2 border-white/30 border-t-white rounded-full" />
+                    Saving...
+                  </>
+                ) : (
+                  <>
+                    Complete Setup
+                    <FiCheck size={16} />
+                  </>
+                )}
               </button>
             </div>
-          </div>
+          </motion.div>
         )}
       </motion.div>
     </div>

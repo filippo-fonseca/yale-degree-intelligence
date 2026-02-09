@@ -75,6 +75,7 @@ import MajorTipModal, {
   MajorTipHelpButton,
   resetMajorTipSeen,
 } from "@/components/MajorProgressView/MajorTipModal";
+import { UserAvatar } from "@/components/ui/UserAvatar";
 
 interface UserProfile {
   majors: string[];
@@ -848,18 +849,12 @@ export default function Home() {
               className="p-2 rounded-lg hover:bg-gray-900/50 transition-all border border-gray-800 hover:border-gray-700 flex items-center gap-1"
               title="Settings"
             >
-              {user.photoURL ? (
-                <img
-                  src={user.photoURL}
-                  alt="Profile"
-                  className="w-6 h-6 rounded-full object-cover border-2 border-gray-700"
-                />
-              ) : (
-                <div className="w-6 h-6 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-2xl font-medium border-2 border-gray-700">
-                  {user.displayName?.charAt(0) ||
-                    user.email?.charAt(0).toUpperCase()}
-                </div>
-              )}
+              <UserAvatar
+                photoURL={user.photoURL}
+                displayName={user.displayName}
+                email={user.email}
+                size={24}
+              />
               <FiChevronDown className="text-gray-400 text-sm" />
             </button>
           </div>
@@ -997,7 +992,8 @@ export default function Home() {
                 <div className="px-1 pb-1">
                   <p className="text-[10px] text-gray-600 leading-tight text-justify">
                     DegreeIntelligence is a student-built tool. Data may be
-                    inaccurate. Verify with your DUS.
+                    inaccurate. Verify with your DUS. NOT AFFILIATED AS A YALE
+                    STUDENT GROUP.
                   </p>
                 </div>
               </div>
@@ -1560,19 +1556,19 @@ export default function Home() {
                   {userProfile &&
                     activeTab === "major" &&
                     userProfile?.majors?.length > 1 && (
-                      <div className="mb-6">
-                        <label className="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">
-                          Viewing Progress For:
+                      <div className="mb-4">
+                        <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1.5 uppercase tracking-wider">
+                          Viewing Progress For
                         </label>
-                        <div className="flex flex-wrap gap-2">
+                        <div className="flex flex-wrap gap-1.5">
                           {userProfile.majors.map((major) => (
                             <button
                               key={major}
                               onClick={() => setSelectedMajor(major)}
-                              className={`px-4 py-2 rounded-lg border transition-colors ${
+                              className={`px-3 py-1.5 rounded-xl text-sm transition-all duration-200 ${
                                 selectedMajor === major
-                                  ? "border-blue-500 bg-blue-100 dark:bg-blue-900/20 text-blue-700 dark:text-blue-100"
-                                  : "border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800/50"
+                                  ? "bg-gradient-to-br from-blue-500/20 via-blue-600/15 to-purple-500/20 text-blue-200 border border-blue-500/40 shadow-[inset_0_1px_0_rgba(255,255,255,0.1),0_2px_8px_rgba(59,130,246,0.15)]"
+                                  : "bg-gray-900/40 text-gray-400 border border-gray-800/60 hover:border-gray-700 hover:bg-gray-800/50 hover:text-gray-300 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)]"
                               }`}
                             >
                               {major} - {MAJORS[major] || major}

@@ -78,15 +78,22 @@ export async function syncFriendsPublicData(
 
     // Build public courses array (NO GRADES - this is critical for privacy)
     // Include ALL courses including skipped ones (they count toward requirements)
-    const publicCourses: PublicCourse[] = courses.map((c) => ({
-      code: c.code,
-      semester: c.semester,
-      year: c.year,
-      credits: c.credits,
-      status: c.skipped ? "skipped" : (c.status === "not-taken" ? "completed" : c.status),
-      skipped: c.skipped || false,
-      manualRequirementsFulfilled: c.manualRequirementsFulfilled,
-    }));
+    // Filter out undefined values - Firebase doesn't allow them
+    const publicCourses: PublicCourse[] = courses.map((c) => {
+      const course: PublicCourse = {
+        code: c.code || "",
+        semester: c.semester || "",
+        year: c.year || 0,
+        credits: c.credits || 0,
+        status: c.skipped ? "skipped" : (c.status === "not-taken" ? "completed" : c.status),
+        skipped: c.skipped || false,
+      };
+      // Only include manualRequirementsFulfilled if it exists and is not empty
+      if (c.manualRequirementsFulfilled && c.manualRequirementsFulfilled.length > 0) {
+        course.manualRequirementsFulfilled = c.manualRequirementsFulfilled;
+      }
+      return course;
+    });
 
     // Check if data has changed - skip update if unchanged
     const existingCourses = (existingData.courses || []) as PublicCourse[];
@@ -103,13 +110,13 @@ export async function syncFriendsPublicData(
     await setDoc(doc(db, "friends_public_data", userId), {
       userId,
       enabled: true,
-      enabledAt: existingData.enabledAt,
+      enabledAt: existingData.enabledAt || serverTimestamp(),
       updatedAt: serverTimestamp(),
       displayName: user.displayName || null,
       email: user.email || null,
       photoURL: user.photoURL || null,
       majors: userProfile?.majors || [],
-      graduationYear: userProfile?.graduationYear || null,
+      graduationYear: userProfile?.graduationYear ?? null,
       bio: userProfile?.bio || null,
       courses: publicCourses,
     });
@@ -128,15 +135,22 @@ export async function enableFriendsFeature(
   user: UserInfo
 ): Promise<void> {
   // Include ALL courses including skipped ones (they count toward requirements)
-  const publicCourses: PublicCourse[] = courses.map((c) => ({
-    code: c.code,
-    semester: c.semester,
-    year: c.year,
-    credits: c.credits,
-    status: c.skipped ? "skipped" : (c.status === "not-taken" ? "completed" : c.status),
-    skipped: c.skipped || false,
-    manualRequirementsFulfilled: c.manualRequirementsFulfilled,
-  }));
+  // Filter out undefined values - Firebase doesn't allow them
+  const publicCourses: PublicCourse[] = courses.map((c) => {
+    const course: PublicCourse = {
+      code: c.code || "",
+      semester: c.semester || "",
+      year: c.year || 0,
+      credits: c.credits || 0,
+      status: c.skipped ? "skipped" : (c.status === "not-taken" ? "completed" : c.status),
+      skipped: c.skipped || false,
+    };
+    // Only include manualRequirementsFulfilled if it exists and is not empty
+    if (c.manualRequirementsFulfilled && c.manualRequirementsFulfilled.length > 0) {
+      course.manualRequirementsFulfilled = c.manualRequirementsFulfilled;
+    }
+    return course;
+  });
 
   await setDoc(doc(db, "friends_public_data", userId), {
     userId,
@@ -147,7 +161,7 @@ export async function enableFriendsFeature(
     email: user.email || null,
     photoURL: user.photoURL || null,
     majors: userProfile?.majors || [],
-    graduationYear: userProfile?.graduationYear || null,
+    graduationYear: userProfile?.graduationYear ?? null,
     bio: userProfile?.bio || null,
     courses: publicCourses,
   });

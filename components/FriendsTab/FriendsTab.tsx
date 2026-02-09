@@ -35,6 +35,7 @@ import { toast } from "react-hot-toast";
 import { Panda } from "lucide-react";
 import { YearBadge } from "../ui/YearBadge";
 import { InfoCard } from "../ui/InfoCard";
+import { UserAvatar } from "../ui/UserAvatar";
 
 type UserProfile = {
   uid: string;
@@ -65,29 +66,6 @@ function getDisplayName(profile: UserProfile) {
   return "Yale Student";
 }
 
-function ProfilePic({
-  profile,
-  size = 36,
-}: {
-  profile: UserProfile;
-  size?: number;
-}) {
-  return profile.photoURL ? (
-    <img
-      src={profile.photoURL}
-      alt={getDisplayName(profile)}
-      className={`rounded-full object-cover border-2 border-gray-300 dark:border-gray-700`}
-      style={{ width: size, height: size }}
-    />
-  ) : (
-    <div
-      className="rounded-full bg-gradient-to-br from-pink-500 to-purple-600 flex items-center justify-center text-white font-medium border-2 border-gray-300 dark:border-gray-700"
-      style={{ width: size, height: size, fontSize: size / 2 }}
-    >
-      {getDisplayName(profile).charAt(0).toUpperCase()}
-    </div>
-  );
-}
 
 function CopyButton() {
   const [copied, setCopied] = useState(false);
@@ -127,27 +105,27 @@ const Skeleton = ({ className = "" }: { className?: string }) => (
 );
 
 const FriendRowSkeleton = () => (
-  <div className="flex items-center justify-between p-4 rounded-xl bg-gray-100/50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-800">
-    <div className="flex gap-4">
-      <Skeleton className="h-10 w-10 rounded-full" />
-      <div className="space-y-2">
-        <Skeleton className="h-4 w-40" />
-        <Skeleton className="h-3 w-28" />
+  <div className="flex items-center justify-between p-3 rounded-xl bg-gradient-to-br from-gray-900/60 via-gray-900/40 to-gray-950/60 border border-gray-800/50">
+    <div className="flex gap-3">
+      <Skeleton className="h-9 w-9 rounded-full" />
+      <div className="space-y-1.5">
+        <Skeleton className="h-3.5 w-36" />
+        <Skeleton className="h-2.5 w-24" />
       </div>
     </div>
-    <Skeleton className="h-8 w-32" />
+    <Skeleton className="h-7 w-28" />
   </div>
 );
 
 const RequestRowSkeleton = () => (
-  <div className="flex items-center justify-between p-3 rounded-xl bg-gray-100/50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-800">
+  <div className="flex items-center justify-between p-2.5 rounded-lg bg-gray-800/30 border border-gray-800/40">
     <div className="flex items-center gap-2">
-      <Skeleton className="h-7 w-7 rounded-full" />
-      <Skeleton className="h-4 w-28" />
+      <Skeleton className="h-6 w-6 rounded-full" />
+      <Skeleton className="h-3 w-24" />
     </div>
     <div className="flex gap-1">
-      <Skeleton className="h-7 w-7 rounded-md" />
-      <Skeleton className="h-7 w-7 rounded-md" />
+      <Skeleton className="h-6 w-6 rounded-md" />
+      <Skeleton className="h-6 w-6 rounded-md" />
     </div>
   </div>
 );
@@ -458,34 +436,34 @@ export default function FriendsTab({
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="flex flex-col items-center justify-center py-16 px-8 rounded-xl bg-gray-100/50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-800"
+          className="flex flex-col items-center justify-center py-12 px-6 rounded-xl bg-gradient-to-br from-gray-900/60 via-gray-900/40 to-gray-950/60 backdrop-blur-md border border-gray-800/50 shadow-[inset_0_1px_0_rgba(255,255,255,0.04),0_4px_16px_rgba(0,0,0,0.25)]"
         >
-          <div className="p-4 rounded-full bg-pink-500/10 border border-pink-500/30 mb-6">
-            <FiUsers className="w-12 h-12 text-pink-400" />
+          <div className="p-3 rounded-full bg-pink-500/10 border border-pink-500/25 mb-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]">
+            <FiUsers className="w-10 h-10 text-pink-400" />
           </div>
 
-          <h3 className="text-2xl font-medium text-gray-900 dark:text-gray-100 mb-3 text-center">
+          <h3 className="text-xl font-medium text-gray-100 mb-2 text-center">
             Enable Friends Feature
           </h3>
 
-          <p className="text-gray-600 dark:text-gray-400 text-center max-w-md mb-6">
+          <p className="text-gray-400 text-sm text-center max-w-md mb-5">
             Connect with other Yale students to see what courses they've taken
             and get inspiration for your own academic journey. Your grades are{" "}
-            <strong className="text-gray-700 dark:text-gray-300">never shared</strong> - only
+            <strong className="text-gray-300">never shared</strong> - only
             course codes, semesters, and credits.
           </p>
 
-          <div className="bg-gray-200/50 dark:bg-gray-800/50 rounded-lg p-4 mb-6 max-w-md border border-gray-300 dark:border-gray-700">
-            <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          <div className="bg-gray-800/30 rounded-lg p-3 mb-5 max-w-md border border-gray-700/40">
+            <h4 className="text-xs font-medium text-gray-300 mb-1.5">
               What gets shared with friends:
             </h4>
-            <ul className="text-sm text-gray-600 dark:text-gray-400 space-y-1">
+            <ul className="text-xs text-gray-400 space-y-0.5">
               <li>• Course codes (e.g., CPSC 201)</li>
               <li>• Semesters and years taken</li>
               <li>• Credit counts</li>
               <li>• Your major and graduation year</li>
             </ul>
-            <p className="text-xs text-emerald-400 mt-3">
+            <p className="text-[10px] text-emerald-400 mt-2">
               Your grades and GPA are NEVER shared.
             </p>
           </div>
@@ -503,16 +481,16 @@ export default function FriendsTab({
               }
             }}
             disabled={isEnabling}
-            className="px-6 py-3 bg-pink-600 hover:bg-pink-700 text-white rounded-lg font-medium transition-colors disabled:opacity-50 flex items-center gap-2"
+            className="px-4 py-2 bg-gradient-to-br from-pink-600 to-pink-700 hover:from-pink-500 hover:to-pink-600 text-white text-sm rounded-lg font-medium transition-all disabled:opacity-50 flex items-center gap-2 shadow-[0_2px_8px_rgba(236,72,153,0.25)]"
           >
             {isEnabling ? (
               <>
-                <span className="animate-spin h-4 w-4 border-2 border-white/30 border-t-white rounded-full" />
+                <span className="animate-spin h-3.5 w-3.5 border-2 border-white/30 border-t-white rounded-full" />
                 Enabling...
               </>
             ) : (
               <>
-                <FiToggleRight size={20} />
+                <FiToggleRight size={16} />
                 Enable Friends Feature
               </>
             )}
@@ -524,18 +502,18 @@ export default function FriendsTab({
 
   return (
     <div className="w-full max-w-3xl mx-auto font-louize">
-      <div className="flex items-center justify-between w-full mb-6">
-        <div className="flex items-center gap-3">
-          <h2 className="text-3xl font-medium bg-clip-text text-transparent bg-gradient-to-r from-blue-200 to-purple-200">
+      <div className="flex items-center justify-between w-full mb-5">
+        <div className="flex items-center gap-2">
+          <h2 className="text-2xl font-medium bg-clip-text text-transparent bg-gradient-to-r from-blue-200 to-purple-200">
             Friends & Connections
           </h2>
           <MoreOptionsDropdown onDisable={() => setShowDisableConfirm(true)} />
         </div>
         <button
-          className="px-4 py-2 bg-pink-600 hover:bg-pink-700 text-white rounded-lg transition flex items-center gap-2 text-sm font-medium"
+          className="px-3 py-1.5 bg-gradient-to-br from-pink-600 to-pink-700 hover:from-pink-500 hover:to-pink-600 text-white rounded-lg transition-all flex items-center gap-1.5 text-xs font-medium shadow-[0_2px_8px_rgba(236,72,153,0.2)]"
           onClick={() => setShowSearchModal(true)}
         >
-          <FiUserPlus size={16} /> Add Friend
+          <FiUserPlus size={14} /> Add Friend
         </button>
       </div>
 
@@ -601,50 +579,50 @@ export default function FriendsTab({
         <>
           {/* Requests Section - only show if there are any */}
           {(incomingRequests.length > 0 || sentRequests.length > 0) && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-6">
               {/* Incoming Requests */}
               {incomingRequests.length > 0 && (
-                <div className="p-4 rounded-xl bg-gray-100/30 dark:bg-gray-900/30 border border-gray-200 dark:border-gray-800">
-                  <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3 flex items-center gap-2">
-                    <FiMail size={14} /> Incoming Requests (
+                <div className="p-3 rounded-xl bg-gradient-to-br from-gray-900/60 via-gray-900/40 to-gray-950/60 backdrop-blur-md border border-gray-800/50 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]">
+                  <h3 className="text-xs font-medium text-gray-300 mb-2 flex items-center gap-1.5">
+                    <FiMail size={12} /> Incoming Requests (
                     {incomingRequests.length})
                   </h3>
-                  <div className="space-y-2">
+                  <div className="space-y-1.5">
                     {incomingRequests.slice(0, 3).map((req) => {
                       const sender = userProfilesById[req.from];
                       if (!sender) return null;
                       return (
                         <div
                           key={req.id}
-                          className="flex items-center justify-between p-2 rounded-lg bg-gray-200/50 dark:bg-gray-800/50"
+                          className="flex items-center justify-between p-2 rounded-lg bg-gray-800/30 border border-gray-800/40"
                         >
                           <div className="flex items-center gap-2">
-                            <ProfilePic profile={sender} size={24} />
-                            <span className="text-sm text-gray-800 dark:text-gray-200 truncate">
+                            <UserAvatar photoURL={sender.photoURL} displayName={sender.displayName} email={sender.email} size={22} />
+                            <span className="text-xs text-gray-200 truncate">
                               {getDisplayName(sender)}
                             </span>
                           </div>
                           <div className="flex gap-1">
                             <button
-                              className="p-1.5 rounded bg-emerald-600/20 text-emerald-400 hover:bg-emerald-600/40 transition"
+                              className="p-1 rounded bg-emerald-600/20 text-emerald-400 hover:bg-emerald-600/40 transition border border-emerald-700/30"
                               onClick={() => acceptFriendRequest(req)}
                               title="Accept"
                             >
-                              <FiCheck size={12} />
+                              <FiCheck size={10} />
                             </button>
                             <button
-                              className="p-1.5 rounded bg-red-600/20 text-red-400 hover:bg-red-600/40 transition"
+                              className="p-1 rounded bg-red-600/20 text-red-400 hover:bg-red-600/40 transition border border-red-700/30"
                               onClick={() => rejectFriendRequest(req)}
                               title="Reject"
                             >
-                              <FiX size={12} />
+                              <FiX size={10} />
                             </button>
                           </div>
                         </div>
                       );
                     })}
                     {incomingRequests.length > 3 && (
-                      <p className="text-xs text-gray-500 pt-1">
+                      <p className="text-[10px] text-gray-500 pt-0.5">
                         +{incomingRequests.length - 3} more
                       </p>
                     )}
@@ -654,38 +632,38 @@ export default function FriendsTab({
 
               {/* Sent Requests */}
               {sentRequests.length > 0 && (
-                <div className="p-4 rounded-xl bg-gray-100/30 dark:bg-gray-900/30 border border-gray-200 dark:border-gray-800">
-                  <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3 flex items-center gap-2">
-                    <FiUserCheck size={14} /> Sent Requests (
+                <div className="p-3 rounded-xl bg-gradient-to-br from-gray-900/60 via-gray-900/40 to-gray-950/60 backdrop-blur-md border border-gray-800/50 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]">
+                  <h3 className="text-xs font-medium text-gray-300 mb-2 flex items-center gap-1.5">
+                    <FiUserCheck size={12} /> Sent Requests (
                     {sentRequests.length})
                   </h3>
-                  <div className="space-y-2">
+                  <div className="space-y-1.5">
                     {sentRequests.slice(0, 3).map((req) => {
                       const recipient = userProfilesById[req.to];
                       if (!recipient) return null;
                       return (
                         <div
                           key={req.id}
-                          className="flex items-center justify-between p-2 rounded-lg bg-gray-200/50 dark:bg-gray-800/50"
+                          className="flex items-center justify-between p-2 rounded-lg bg-gray-800/30 border border-gray-800/40"
                         >
                           <div className="flex items-center gap-2">
-                            <ProfilePic profile={recipient} size={24} />
-                            <span className="text-sm text-gray-800 dark:text-gray-200 truncate">
+                            <UserAvatar photoURL={recipient.photoURL} displayName={recipient.displayName} email={recipient.email} size={22} />
+                            <span className="text-xs text-gray-200 truncate">
                               {getDisplayName(recipient)}
                             </span>
                           </div>
                           <button
-                            className="p-1.5 rounded bg-gray-300/50 dark:bg-gray-700/50 text-gray-600 dark:text-gray-400 hover:bg-red-600/30 hover:text-red-400 transition"
+                            className="p-1 rounded bg-gray-700/40 text-gray-400 hover:bg-red-600/30 hover:text-red-400 transition border border-gray-700/40"
                             onClick={() => cancelSentRequest(req.id)}
                             title="Cancel"
                           >
-                            <FiX size={12} />
+                            <FiX size={10} />
                           </button>
                         </div>
                       );
                     })}
                     {sentRequests.length > 3 && (
-                      <p className="text-xs text-gray-500 pt-1">
+                      <p className="text-[10px] text-gray-500 pt-0.5">
                         +{sentRequests.length - 3} more
                       </p>
                     )}
@@ -699,20 +677,20 @@ export default function FriendsTab({
           <AnimatePresence>
             {showSearchModal && (
               <motion.div
-                className="fixed inset-0 z-50 flex items-center justify-center bg-black/60"
+                className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
               >
                 <motion.div
-                  className="bg-gray-100 dark:bg-gray-900 p-6 rounded-lg shadow-xl max-w-2xl w-full h-[400px] flex flex-col"
+                  className="bg-gradient-to-br from-gray-900/95 via-gray-900/90 to-gray-950/95 backdrop-blur-md p-5 rounded-xl shadow-[0_8px_32px_rgba(0,0,0,0.4)] border border-gray-800/50 max-w-2xl w-full h-[380px] flex flex-col"
                   initial={{ scale: 0.95, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
                   exit={{ scale: 0.95, opacity: 0 }}
                   ref={modalRef}
                 >
-                  <div className="flex justify-between items-center mb-4">
-                    <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
+                  <div className="flex justify-between items-center mb-3">
+                    <h3 className="text-base font-semibold text-white">
                       Add a friend on DegreeIntelligence
                     </h3>
                     <button
@@ -720,40 +698,40 @@ export default function FriendsTab({
                         setSearchTerm("");
                         setShowSearchModal(false);
                       }}
-                      className="text-gray-600 dark:text-gray-400 hover:text-red-400 transition"
+                      className="text-gray-500 hover:text-red-400 transition p-1"
                     >
-                      <FiX size={20} />
+                      <FiX size={16} />
                     </button>
                   </div>
 
-                  <div className="flex items-center gap-3 mb-4">
-                    <FiSearch className="text-pink-500 w-5 h-5" />
+                  <div className="flex items-center gap-2 mb-3">
+                    <FiSearch className="text-pink-500 w-4 h-4" />
                     <input
                       type="text"
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
-                      className="bg-gray-200 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg px-4 py-2 w-full text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-3 focus:ring-pink-500 focus:border-pink-500"
-                      placeholder="Your best friend, or perhaps that upperclassman that gives you amazing advice..."
+                      className="bg-gray-800/60 border border-gray-700/50 rounded-lg px-3 py-2 w-full text-sm text-gray-200 focus:outline-none focus:ring-1 focus:ring-pink-500/50 focus:border-pink-500/50 placeholder:text-gray-600"
+                      placeholder="Your best friend, or that upperclassman that gives you advice..."
                     />
                   </div>
 
-                  <div className="space-y-2 max-h-[50vh] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 dark:scrollbar-thumb-gray-600">
+                  <div className="space-y-1.5 flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-700">
                     {searchTerm.length === 0 ? (
                       <NoFriendsResult />
                     ) : filteredUsers.length > 0 ? (
                       filteredUsers.slice(0, 10).map((u) => (
                         <motion.div
                           key={u.uid}
-                          className="flex items-center justify-between p-3 rounded-xl bg-gray-200 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 hover:border-pink-400 transition-all"
-                          whileHover={{ scale: 0.99 }}
+                          className="flex items-center justify-between p-2.5 rounded-lg bg-gray-800/40 border border-gray-700/40 hover:border-pink-600/40 transition-all"
+                          whileHover={{ scale: 0.995 }}
                         >
-                          <div className="flex items-center gap-4">
-                            <ProfilePic profile={u} size={36} />
+                          <div className="flex items-center gap-3">
+                            <UserAvatar photoURL={u.photoURL} displayName={u.displayName} email={u.email} size={32} />
                             <div>
-                              <div className="font-medium text-gray-800 dark:text-gray-200">
+                              <div className="font-medium text-sm text-gray-200">
                                 {getDisplayName(u)}
                               </div>
-                              <div className="text-sm text-gray-600 dark:text-gray-400">
+                              <div className="text-[10px] text-gray-500">
                                 {u.majors?.join(", ")} &middot;{" "}
                                 {u.graduationYear && (
                                   <YearBadge
@@ -765,10 +743,10 @@ export default function FriendsTab({
                             </div>
                           </div>
                           <button
-                            className="flex items-center gap-1 px-3 py-1.5 bg-pink-900/60 text-pink-200 rounded-lg border border-pink-800 hover:bg-pink-800 hover:text-white transition"
+                            className="flex items-center gap-1 px-2 py-1 text-[11px] bg-pink-900/40 text-pink-200 rounded-md border border-pink-800/40 hover:bg-pink-700/50 hover:text-white transition"
                             onClick={() => sendFriendRequest(u.uid)}
                           >
-                            <FiUserPlus />
+                            <FiUserPlus size={12} />
                             Add
                           </button>
                         </motion.div>
@@ -784,12 +762,12 @@ export default function FriendsTab({
 
           {/* Friends List Section */}
           <section>
-            <h3 className="text-lg font-medium text-pink-200 mb-4 flex items-center gap-2">
-              <FiUsers /> Your Friends ({friendProfiles.length})
+            <h3 className="text-sm font-medium text-pink-200 mb-3 flex items-center gap-1.5">
+              <FiUsers size={14} /> Your Friends ({friendProfiles.length})
             </h3>
-            <div className="space-y-3">
+            <div className="space-y-2">
               {friendProfiles.length === 0 && (
-                <div className="text-gray-600 dark:text-gray-400 text-sm">
+                <div className="text-gray-500 text-xs">
                   No friends yet. Go add some above!
                 </div>
               )}
@@ -800,35 +778,35 @@ export default function FriendsTab({
                 return (
                   <motion.div
                     key={f.uid}
-                    className="flex items-center justify-between p-4 rounded-xl bg-gray-100/50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-800 hover:border-purple-400 transition-all"
-                    whileHover={{ scale: 1.015 }}
+                    className="flex items-center justify-between p-3 rounded-xl bg-gradient-to-br from-gray-900/60 via-gray-900/40 to-gray-950/60 backdrop-blur-md border border-gray-800/50 hover:border-purple-600/40 transition-all shadow-[inset_0_1px_0_rgba(255,255,255,0.04),0_4px_12px_rgba(0,0,0,0.15)]"
+                    whileHover={{ scale: 1.01 }}
                   >
-                    <div className="flex gap-4">
-                      <ProfilePic profile={f} size={40} />
+                    <div className="flex gap-3">
+                      <UserAvatar photoURL={f.photoURL} displayName={f.displayName} email={f.email} size={36} />
                       <div>
-                        <div className="font-medium text-pink-200">
+                        <div className="font-medium text-sm text-pink-200">
                           {getDisplayName(f)}
                         </div>
-                        <div className="text-xs text-gray-600 dark:text-gray-400">
+                        <div className="text-[10px] text-gray-500">
                           {f.majors?.join(", ")} &middot;{" "}
                           {f.graduationYear && (
-                            <div className="mt-1">
+                            <span className="inline-block mt-0.5">
                               <YearBadge
                                 graduationYear={f.graduationYear}
                                 noPadding
                               />
-                            </div>
+                            </span>
                           )}
                         </div>
                       </div>
                     </div>
-                    <div className="flex gap-2">
+                    <div className="flex gap-1.5">
                       <Link
                         href={`/user/${f.uid}`}
-                        className="flex items-center gap-1 px-3 py-1.5 bg-gray-200/60 dark:bg-gray-800/60 text-gray-700 dark:text-gray-300 rounded-lg border border-gray-300 dark:border-gray-700 hover:bg-pink-500 hover:text-white transition"
+                        className="flex items-center gap-1 px-2 py-1 text-[11px] bg-gray-800/50 text-gray-300 rounded-lg border border-gray-700/40 hover:bg-pink-600/30 hover:text-pink-200 hover:border-pink-600/40 transition-all"
                       >
-                        <FiUser className="inline-block" />
-                        Open Profile
+                        <FiUser size={11} />
+                        Profile
                       </Link>
                       <FriendActionsDropdown friend={friend} profile={f} />
                     </div>

@@ -24,6 +24,7 @@ import Link from "next/link";
 import { getCourseNameFromCode } from "@/lib/courseCatalog";
 import { truncate } from "@/lib/utils/utils";
 import { YearBadge } from "@/components/ui/YearBadge";
+import { UserAvatar } from "@/components/ui/UserAvatar";
 
 /**
  * Triggers a sync of the target user's friends_public_data with their actual courses.
@@ -273,31 +274,24 @@ export default function UserProfilePage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="w-full max-w-lg p-8 rounded-xl bg-gray-900/50 backdrop-blur-sm border border-gray-800 shadow-[0_8px_32px_rgba(0,0,0,0.3)]"
+            className="w-full max-w-lg p-6 rounded-xl bg-gradient-to-br from-gray-900/60 via-gray-900/40 to-gray-950/60 backdrop-blur-md border border-gray-800/50 shadow-[inset_0_1px_0_rgba(255,255,255,0.04),0_8px_32px_rgba(0,0,0,0.3)]"
           >
             <div className="flex flex-col items-center text-center">
-              <div className="relative mb-4">
-                {userProfile?.photoURL ? (
-                  <img
-                    src={userProfile.photoURL}
-                    alt={getDisplayNameFromEmail(userProfile.email)}
-                    className="w-24 h-24 rounded-full object-cover border-2 border-gray-700"
-                  />
-                ) : (
-                  <div className="w-24 h-24 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-4xl font-medium border-2 border-gray-700">
-                    {getDisplayNameFromEmail(userProfile?.email)
-                      .charAt(0)
-                      .toUpperCase()}
-                  </div>
-                )}
+              <div className="relative mb-3">
+                <UserAvatar
+                  photoURL={userProfile?.photoURL}
+                  displayName={userProfile?.displayName || getDisplayNameFromEmail(userProfile?.email)}
+                  email={userProfile?.email}
+                  size={80}
+                />
               </div>
 
-              <h1 className="text-2xl font-medium text-transparent bg-clip-text bg-gradient-to-r from-blue-200 to-purple-200">
+              <h1 className="text-xl font-medium text-transparent bg-clip-text bg-gradient-to-r from-blue-200 to-purple-200">
                 {getDisplayNameFromEmail(userProfile?.email)}
               </h1>
 
               {userProfile?.majors && userProfile.majors.length > 0 && (
-                <p className="text-sm text-gray-400 mt-1">
+                <p className="text-xs text-gray-400 mt-1">
                   {truncate(
                     userProfile.majors
                       .map((m) => getFullMajorNameById(m) || m)
@@ -308,15 +302,15 @@ export default function UserProfilePage() {
               )}
 
               {userProfile?.graduationYear && (
-                <div className="mt-2">
+                <div className="mt-1.5">
                   <YearBadge graduationYear={userProfile.graduationYear} />
                 </div>
               )}
 
               {userProfile?.bio && (
-                <div className="mt-6 w-full">
-                  <div className="p-4 rounded-lg bg-gray-800/30 border border-gray-700">
-                    <p className="text-gray-300">
+                <div className="mt-4 w-full">
+                  <div className="p-3 rounded-lg bg-gray-800/30 border border-gray-700/40">
+                    <p className="text-sm text-gray-300">
                       {userProfile?.bio || "Yale student."}
                     </p>
                   </div>
@@ -331,17 +325,17 @@ export default function UserProfilePage() {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="mb-12 p-8 rounded-xl bg-gray-900/50 backdrop-blur-sm border border-gray-800 text-center"
+            className="mb-10 p-6 rounded-xl bg-gradient-to-br from-gray-900/60 via-gray-900/40 to-gray-950/60 backdrop-blur-md border border-gray-800/50 text-center shadow-[inset_0_1px_0_rgba(255,255,255,0.04),0_4px_16px_rgba(0,0,0,0.25)]"
           >
-            <div className="flex justify-center mb-4">
-              <div className="p-3 rounded-full bg-gray-800/50 border border-gray-700">
-                <FiLock className="text-gray-400 w-8 h-8" />
+            <div className="flex justify-center mb-3">
+              <div className="p-2.5 rounded-full bg-gray-800/40 border border-gray-700/40">
+                <FiLock className="text-gray-500 w-6 h-6" />
               </div>
             </div>
-            <h3 className="text-lg font-medium text-gray-300 mb-2">
+            <h3 className="text-sm font-medium text-gray-300 mb-1.5">
               Course Data Hidden
             </h3>
-            <p className="text-gray-500 max-w-md mx-auto">
+            <p className="text-xs text-gray-500 max-w-md mx-auto">
               This user hasn't enabled course sharing yet. They can turn it on
               in their settings to share their courses with friends.
             </p>
@@ -353,35 +347,35 @@ export default function UserProfilePage() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.4 }}
-          className="mb-12"
+          className="mb-10"
         >
-          <h2 className="text-xl font-medium mb-6 text-transparent bg-clip-text bg-gradient-to-r from-blue-200 to-purple-200">
+          <h2 className="text-lg font-medium mb-4 text-transparent bg-clip-text bg-gradient-to-r from-blue-200 to-purple-200">
             Academic Overview
           </h2>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="p-4 rounded-xl bg-gray-900/50 backdrop-blur-sm border border-gray-800">
-              <div className="flex items-center gap-3">
-                <div className="p-2 rounded-lg bg-blue-900/20 border border-blue-700/50">
-                  <FiBook className="text-blue-400" />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div className="p-3 rounded-xl bg-gradient-to-br from-gray-900/60 via-gray-900/40 to-gray-950/60 backdrop-blur-md border border-gray-800/50 shadow-[inset_0_1px_0_rgba(255,255,255,0.04),0_4px_12px_rgba(0,0,0,0.2)]">
+              <div className="flex items-center gap-2.5">
+                <div className="p-1.5 rounded-lg bg-blue-900/25 border border-blue-700/40">
+                  <FiBook className="text-blue-400" size={14} />
                 </div>
                 <div>
-                  <p className="text-sm text-gray-400">Courses Taken</p>
-                  <p className="text-xl font-medium">
+                  <p className="text-xs text-gray-500">Courses Taken</p>
+                  <p className="text-lg font-medium">
                     {getCompletedCoursesCount()}
                   </p>
                 </div>
               </div>
             </div>
 
-            <div className="p-4 rounded-xl bg-gray-900/50 backdrop-blur-sm border border-gray-800">
-              <div className="flex items-center gap-3">
-                <div className="p-2 rounded-lg bg-purple-900/20 border border-purple-700/50">
-                  <FiCreditCard className="text-purple-400" />
+            <div className="p-3 rounded-xl bg-gradient-to-br from-gray-900/60 via-gray-900/40 to-gray-950/60 backdrop-blur-md border border-gray-800/50 shadow-[inset_0_1px_0_rgba(255,255,255,0.04),0_4px_12px_rgba(0,0,0,0.2)]">
+              <div className="flex items-center gap-2.5">
+                <div className="p-1.5 rounded-lg bg-purple-900/25 border border-purple-700/40">
+                  <FiCreditCard className="text-purple-400" size={14} />
                 </div>
                 <div>
-                  <p className="text-sm text-gray-400">Credits Completed</p>
-                  <p className="text-xl font-medium">
+                  <p className="text-xs text-gray-500">Credits Completed</p>
+                  <p className="text-lg font-medium">
                     {calculateTotalCredits()}
                   </p>
                 </div>
@@ -395,14 +389,14 @@ export default function UserProfilePage() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.6 }}
-          className="mb-12"
+          className="mb-10"
         >
-          <h2 className="text-xl font-medium mb-6 text-transparent bg-clip-text bg-gradient-to-r from-blue-200 to-purple-200">
+          <h2 className="text-lg font-medium mb-4 text-transparent bg-clip-text bg-gradient-to-r from-blue-200 to-purple-200">
             Academic Journey
           </h2>
-          {courses.length == 0 && <p>No courses taken or in progress.</p>}
+          {courses.length == 0 && <p className="text-sm text-gray-500">No courses taken or in progress.</p>}
 
-          <div className="space-y-12">
+          <div className="space-y-8">
             {Array.from(
               new Set(
                 courses
@@ -432,15 +426,15 @@ export default function UserProfilePage() {
                     key={year}
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="rounded-xl bg-gray-900/50 backdrop-blur-sm border border-gray-800 overflow-hidden"
+                    className="rounded-xl bg-gradient-to-br from-gray-900/60 via-gray-900/40 to-gray-950/60 backdrop-blur-md border border-gray-800/50 overflow-hidden shadow-[inset_0_1px_0_rgba(255,255,255,0.04),0_4px_16px_rgba(0,0,0,0.25)]"
                   >
-                    <div className="p-6 border-b border-gray-800 bg-gradient-to-r from-gray-900/70 to-gray-900/30">
-                      <h3 className="text-lg font-medium text-blue-200">
+                    <div className="p-4 border-b border-gray-800/40 bg-gradient-to-r from-gray-900/60 to-gray-900/20">
+                      <h3 className="text-sm font-medium text-blue-200">
                         Year {year}
                       </h3>
                     </div>
 
-                    <div className="divide-y divide-gray-800">
+                    <div className="divide-y divide-gray-800/40">
                       {semesters.map((semester) => {
                         const semesterCourses = yearCourses.filter(
                           (c) => c.semester === semester
@@ -451,42 +445,41 @@ export default function UserProfilePage() {
                         );
 
                         return (
-                          <div key={`${year}-${semester}`} className="p-6">
-                            <div className="flex items-center justify-between mb-4">
-                              <h4 className="font-medium text-gray-300">
+                          <div key={`${year}-${semester}`} className="p-4">
+                            <div className="flex items-center justify-between mb-3">
+                              <h4 className="font-medium text-sm text-gray-300">
                                 {semester} {year}
                               </h4>
-                              <span className="text-sm text-gray-500">
-                                {semesterCredits} credit
-                                {semesterCredits !== 1 ? "s" : ""}
+                              <span className="text-[10px] text-gray-500 px-1.5 py-0.5 bg-gray-800/40 rounded-md border border-gray-700/40">
+                                {semesterCredits} cr
                               </span>
                             </div>
 
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                               {semesterCourses.map((course) => (
                                 <motion.div
                                   key={course.id}
-                                  whileHover={{ y: -2 }}
-                                  className={`p-4 rounded-lg ${
+                                  whileHover={{ y: -1 }}
+                                  className={`p-3 rounded-lg backdrop-blur-sm shadow-[inset_0_1px_0_rgba(255,255,255,0.03)] ${
                                     course.status === "completed" &&
                                     !course.skipped
-                                      ? "bg-emerald-900/10 border-emerald-800/50"
+                                      ? "bg-emerald-900/15 border-emerald-800/40"
                                       : course.status === "in-progress"
-                                        ? "bg-purple-900/10 border-purple-800/50"
-                                        : "bg-gray-800/10 border-gray-700/50"
+                                        ? "bg-purple-900/15 border-purple-800/40"
+                                        : "bg-gray-800/20 border-gray-700/40"
                                   } border`}
                                 >
                                   <div className="flex justify-between items-start">
                                     <div>
-                                      <h5 className="font-medium">
+                                      <h5 className="font-medium text-sm">
                                         {course.code}
                                         {course.skipped && (
-                                          <span className="ml-2 text-xs text-gray-500">
+                                          <span className="ml-1.5 text-[10px] text-gray-500">
                                             (skipped)
                                           </span>
                                         )}
                                       </h5>
-                                      <p className="text-sm text-gray-400">
+                                      <p className="text-xs text-gray-500 mt-0.5">
                                         {truncate(
                                           getCourseNameFromCode(course.code) ||
                                             "Course",
@@ -495,18 +488,7 @@ export default function UserProfilePage() {
                                       </p>
                                     </div>
                                     <div className="flex flex-col items-end">
-                                      {/* {course.grade && (
-                                        <span
-                                          className={`text-sm font-medium ${
-                                            course.status === "completed"
-                                              ? getGPAColor(course.grade)
-                                              : "text-gray-400"
-                                          }`}
-                                        >
-                                          {course.grade}
-                                        </span>
-                                      )} */}
-                                      <span className="text-xs text-gray-500">
+                                      <span className="text-[10px] text-gray-500">
                                         {course.credits} cr
                                       </span>
                                     </div>
@@ -527,48 +509,48 @@ export default function UserProfilePage() {
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="rounded-xl bg-gray-900/50 backdrop-blur-sm border border-gray-800 overflow-hidden"
+                className="rounded-xl bg-gradient-to-br from-gray-900/60 via-gray-900/40 to-gray-950/60 backdrop-blur-md border border-gray-800/50 overflow-hidden shadow-[inset_0_1px_0_rgba(255,255,255,0.04),0_4px_16px_rgba(0,0,0,0.25)]"
               >
-                <div className="p-6 border-b border-gray-800 bg-gradient-to-r from-gray-900/70 to-gray-900/30">
-                  <h3 className="text-lg font-medium text-blue-200">
+                <div className="p-4 border-b border-gray-800/40 bg-gradient-to-r from-gray-900/60 to-gray-900/20">
+                  <h3 className="text-sm font-medium text-blue-200">
                     Other Courses
                   </h3>
                 </div>
 
-                <div className="p-6">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div className="p-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                     {courses
                       .filter((c) => !c.year || !c.semester)
                       .map((course) => (
                         <motion.div
                           key={course.id}
-                          whileHover={{ y: -2 }}
-                          className={`p-4 rounded-lg ${
+                          whileHover={{ y: -1 }}
+                          className={`p-3 rounded-lg backdrop-blur-sm shadow-[inset_0_1px_0_rgba(255,255,255,0.03)] ${
                             course.status === "completed" && !course.skipped
-                              ? "bg-emerald-900/10 border-emerald-800/50"
+                              ? "bg-emerald-900/15 border-emerald-800/40"
                               : course.status === "in-progress"
-                                ? "bg-purple-900/10 border-purple-800/50"
-                                : "bg-gray-800/10 border-gray-700/50"
+                                ? "bg-purple-900/15 border-purple-800/40"
+                                : "bg-gray-800/20 border-gray-700/40"
                           } border`}
                         >
                           <div className="flex justify-between items-start">
                             <div>
-                              <h5 className="font-medium">
+                              <h5 className="font-medium text-sm">
                                 {course.code}
                                 {course.skipped && (
-                                  <span className="ml-2 text-xs text-gray-500">
+                                  <span className="ml-1.5 text-[10px] text-gray-500">
                                     (skipped)
                                   </span>
                                 )}
                               </h5>
-                              <p className="text-sm text-gray-400">
+                              <p className="text-xs text-gray-500 mt-0.5">
                                 {getCourseNameFromCode(course.code) || "Course"}
                               </p>
                             </div>
                             <div className="flex flex-col items-end">
                               {course.grade && (
                                 <span
-                                  className={`text-sm font-medium ${
+                                  className={`text-xs font-medium ${
                                     course.status === "completed"
                                       ? getGPAColor(course.grade)
                                       : "text-gray-400"
@@ -577,7 +559,7 @@ export default function UserProfilePage() {
                                   {course.grade}
                                 </span>
                               )}
-                              <span className="text-xs text-gray-500">
+                              <span className="text-[10px] text-gray-500">
                                 {course.credits} cr
                               </span>
                             </div>

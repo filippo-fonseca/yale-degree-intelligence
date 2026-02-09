@@ -9,6 +9,7 @@ import { MajorDropdown } from "../ui/MajorDropdown";
 import { YearBadge } from "../ui/YearBadge";
 import Link from "next/link";
 import { Info } from "lucide-react";
+import { UserAvatar } from "../ui/UserAvatar";
 
 interface UserProfile {
   majors: string[];
@@ -237,18 +238,13 @@ export default function UserSettingsModal({
           {/* Header */}
           <div className="flex flex-col items-center mb-3">
             <div className="relative mb-2">
-              {user.photoURL ? (
-                <img
-                  src={user.photoURL}
-                  alt="Profile"
-                  className="w-12 h-12 rounded-full object-cover border-2 border-white/20 shadow-[0_4px_16px_rgba(0,0,0,0.4)] ring-1 ring-purple-500/20"
-                />
-              ) : (
-                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-pink-500 via-purple-500 to-violet-600 flex items-center justify-center text-white text-base font-medium border-2 border-white/20 shadow-[0_4px_16px_rgba(0,0,0,0.4)] ring-1 ring-purple-500/20">
-                  {user.displayName?.charAt(0) ||
-                    user.email?.charAt(0)?.toUpperCase()}
-                </div>
-              )}
+              <UserAvatar
+                photoURL={user.photoURL}
+                displayName={user.displayName}
+                email={user.email}
+                size={48}
+                className="shadow-[0_4px_16px_rgba(0,0,0,0.4)] ring-1 ring-purple-500/20 border-white/20"
+              />
             </div>
             <h2 className="text-base font-semibold text-center text-gray-100">
               {user.displayName || "User"}

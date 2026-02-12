@@ -47,7 +47,12 @@ export default function CleoAITab({
         .filter((m) => m.major_id === majorId)
         .map((m) => ({ code: c.code, requirement: m.requirement_title, credits: c.credits || 1 }))
     );
-    allMajorProgress[majorId] = calculateMajorProgress(majorId, completedCodes, inProgressCodes, skippedCodes, manualReqs);
+    const excludedReqs = courses.flatMap((c) =>
+      (c.excludedFromRequirements || [])
+        .filter((m) => m.major_id === majorId)
+        .map((m) => ({ code: c.code, requirement: m.requirement_title }))
+    );
+    allMajorProgress[majorId] = calculateMajorProgress(majorId, completedCodes, inProgressCodes, skippedCodes, manualReqs, excludedReqs);
   }
 
   // Primary major progress for welcome message

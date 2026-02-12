@@ -413,6 +413,55 @@ export default function MajorProgressView({
     }
   };
 
+  // Exclude a completed course from fulfilling a specific requirement
+  const handleExcludeFromRequirement = async (
+    courseCode: string,
+    requirementTitle: string
+  ) => {
+    if (!user) return;
+    try {
+      // Find the course in the courses array by checking all possible codes
+      const courseToUpdate = courses.find((c) => {
+        const courseInfo = getCourseInfo(c.code);
+        if (!courseInfo) return c.code === courseCode;
+        return courseInfo.codes.includes(courseCode);
+      });
+
+      if (!courseToUpdate) {
+        console.error("Course not found:", courseCode);
+        return;
+      }
+
+      // Add to excludedFromRequirements array
+      const currentExclusions = courseToUpdate.excludedFromRequirements || [];
+      const newExclusion = {
+        major_id: selectedMajor,
+        requirement_title: requirementTitle,
+      };
+
+      // Check if already excluded
+      const alreadyExcluded = currentExclusions.some(
+        (e: any) =>
+          e.major_id === selectedMajor &&
+          e.requirement_title === requirementTitle
+      );
+
+      if (alreadyExcluded) return;
+
+      await setDoc(
+        doc(db, "courses", courseToUpdate.id),
+        {
+          excludedFromRequirements: [...currentExclusions, newExclusion],
+        },
+        { merge: true }
+      );
+
+      await onRequirementChange();
+    } catch (error) {
+      console.error("Error excluding course from requirement:", error);
+    }
+  };
+
   // Calculate stats from server progress
   const completedCredits = progress.completedCredits;
   const inProgressCredits = progress.inProgressCredits || 0;
@@ -459,7 +508,11 @@ export default function MajorProgressView({
         inProgress = true;
         completed = false; // manual+in-progress must behave as in-progress
       } else if (status === "completed") {
-        completed = true;
+        // Only set completed=true if the server didn't explicitly set it to false
+        // (server sets completed=false when course is excluded from this requirement)
+        if (opt.completed !== false) {
+          completed = true;
+        }
         inProgress = false;
       }
       return { ...opt, inProgress, completed, skipped, manual };
@@ -825,11 +878,11 @@ export default function MajorProgressView({
                               .map((opt: any) => (
                                 <div
                                   key={opt.code}
-                                  className={`relative px-2 py-0.5 rounded-full text-xs flex items-center ${
+                                  className={`relative px-2 py-0.5 rounded-full text-xs flex items-center group ${
                                     opt.manual
                                       ? "bg-purple-900/20 text-purple-300 border border-purple-700"
                                       : opt.completed
-                                      ? "bg-emerald-900/20 text-emerald-300 border-emerald-700"
+                                      ? "bg-emerald-900/20 text-emerald-300 border border-emerald-700"
                                       : "bg-gray-900/20 text-gray-300 border border-dashed border-gray-600"
                                   }`}
                                   onClick={(e) => e.stopPropagation()} // don't open modal when clicking the pill
@@ -840,29 +893,39 @@ export default function MajorProgressView({
                                     {opt.manual && ", manual"}
                                     {opt.skipped && ", skipped"})
                                   </span>
-                                  {(opt.skipped || opt.manual) && (
-                                    <button
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        if (opt.skipped) {
-                                          handleUnskip(opt.code);
-                                        } else if (opt.manual) {
-                                          handleRemoveManualCourse(
-                                            opt.code,
-                                            req.name
-                                          );
-                                        }
-                                      }}
-                                      className="ml-1 text-[0.65rem] text-gray-400 hover:text-gray-200"
-                                      title={
-                                        opt.manual
-                                          ? "Remove manual course"
-                                          : "Unskip this course"
+                                  {/* X button for all fulfilled courses */}
+                                  <button
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      if (opt.skipped) {
+                                        handleUnskip(opt.code);
+                                      } else if (opt.manual) {
+                                        handleRemoveManualCourse(
+                                          opt.code,
+                                          req.name
+                                        );
+                                      } else if (opt.completed) {
+                                        handleExcludeFromRequirement(
+                                          opt.code,
+                                          req.name
+                                        );
                                       }
-                                    >
-                                      <FiX size={10} />
-                                    </button>
-                                  )}
+                                    }}
+                                    className={`ml-1 text-[0.65rem] transition-colors ${
+                                      opt.skipped || opt.manual
+                                        ? "text-gray-400 hover:text-gray-200"
+                                        : "text-emerald-500/40 hover:text-red-400"
+                                    }`}
+                                    title={
+                                      opt.manual
+                                        ? "Remove manual course"
+                                        : opt.skipped
+                                        ? "Unskip this course"
+                                        : "Remove from this requirement"
+                                    }
+                                  >
+                                    <FiX size={10} />
+                                  </button>
                                 </div>
                               ))}
                           </div>

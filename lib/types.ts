@@ -15,6 +15,7 @@ export type Course = {
   credits: number;
   skipped?: boolean; // Add this new property
   manualRequirementsFulfilled?: ManualRequirement[];
+  excludedFromRequirements?: ManualRequirement[]; // Courses excluded from fulfilling specific requirements
   distributionals?: string[]; // manually assigned: "Hu", "So", "Sc", "QR", "WR", "L1"-"L5"
 };
   

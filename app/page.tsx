@@ -342,6 +342,15 @@ export default function Home() {
         })),
     );
 
+    const excludedRequirements = courses.flatMap((course) =>
+      (course.excludedFromRequirements || [])
+        .filter((m) => m.major_id === selectedMajor)
+        .map((m) => ({
+          code: course.code,
+          requirement: m.requirement_title,
+        })),
+    );
+
     // This works fine even if all arrays are empty.
     return calculateMajorProgress(
       selectedMajor,
@@ -349,6 +358,7 @@ export default function Home() {
       inProgressCourseCodes,
       skippedCourseCodes,
       manualRequirements,
+      excludedRequirements,
     );
   };
 
@@ -1969,6 +1979,16 @@ export default function Home() {
                                   })),
                             );
 
+                            const excludedRequirements = courses.flatMap(
+                              (course) =>
+                                (course.excludedFromRequirements || [])
+                                  .filter((m) => m.major_id === major)
+                                  .map((m) => ({
+                                    code: course.code,
+                                    requirement: m.requirement_title,
+                                  })),
+                            );
+
                             // Get progress for this major
                             const progress = calculateMajorProgress(
                               major,
@@ -1976,6 +1996,7 @@ export default function Home() {
                               inProgressCourseCodes,
                               skippedCourseCodes,
                               manualRequirements,
+                              excludedRequirements,
                             );
 
                             // Extract all "not taken" requirements

@@ -413,7 +413,8 @@ export default function Simulator({
   // ------------ In-app navigation attempt handler ------------
   useEffect(() => {
     if (onNavigationAttempt) {
-      onNavigationAttempt((callback) => {
+      // Wrap in arrow function to avoid React's functional setState interpretation
+      onNavigationAttempt(() => (callback: () => void) => {
         if (hasChanges) {
           setPendingLeaveCallback(() => callback);
           setShowLeaveConfirm(true);

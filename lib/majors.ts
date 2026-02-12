@@ -65,12 +65,18 @@ export type MajorProgress = {
   inProgressPercentage: number;
 };
 
+export type ExcludedRequirementEntry = {
+  code: string;
+  requirement: string;
+};
+
 export const calculateMajorProgress = (
   majorId: string,
   completedCourseCodes: string[],
   inProgressCourseCodes: string[] = [],
   skippedCourseCodes: string[] = [],
-  manualRequirements: ManualRequirementEntry[] = []
+  manualRequirements: ManualRequirementEntry[] = [],
+  excludedRequirements: ExcludedRequirementEntry[] = []
 ): MajorProgress => {
   const major = majorRequirements[majorId];
   if (!major) throw new Error(`Major ${majorId} not found`);
@@ -79,7 +85,18 @@ export const calculateMajorProgress = (
   const canonicalCompleted = completedCourseCodes.map(code => getCanonicalCode(code) || code);
   const canonicalInProgress = inProgressCourseCodes.map(code => getCanonicalCode(code) || code);
   const canonicalSkipped = skippedCourseCodes.map(code => getCanonicalCode(code) || code);
-  
+
+  // Build a set of exclusions for quick lookup: "reqName:code"
+  const exclusionSet = new Set(
+    excludedRequirements.map(e => `${e.requirement}:${getCanonicalCode(e.code) || e.code}`)
+  );
+
+  // Helper to check if a course is excluded from a requirement
+  const isExcluded = (reqName: string, code: string): boolean => {
+    const canonical = getCanonicalCode(code) || code;
+    return exclusionSet.has(`${reqName}:${code}`) || exclusionSet.has(`${reqName}:${canonical}`);
+  };
+
   // Group manual requirements by requirement name
   const manualByRequirement: Record<string, {code: string, credits: number, isPlanned?: boolean}[]> = {};
   manualRequirements.forEach(m => {
@@ -133,13 +150,16 @@ export const calculateMajorProgress = (
         const code = option.code;
         // Skip if this course was already added manually
         if (manualFulfillments.some(m => m.code === code)) continue;
-        
+
         const course = getCourseInfo(code);
         if (!course) continue;
 
-        const completed = canonicalCompleted.includes(code);
-        const inProgress = canonicalInProgress.includes(code);
-        const skipped = canonicalSkipped.includes(code);
+        // Check if this course is excluded from this requirement
+        const excluded = isExcluded(req.name, code);
+
+        const completed = canonicalCompleted.includes(code) && !excluded;
+        const inProgress = canonicalInProgress.includes(code) && !excluded;
+        const skipped = canonicalSkipped.includes(code) && !excluded;
 
         reqOptions.push({
           code,
@@ -166,13 +186,16 @@ export const calculateMajorProgress = (
         option.options.forEach((code: string) => {
           // Skip if this course was already added manually
           if (manualFulfillments.some(m => m.code === code)) return;
-          
+
           const course = getCourseInfo(code);
           if (!course) return;
 
-          const completed = canonicalCompleted.includes(code);
-          const inProgress = canonicalInProgress.includes(code);
-          const skipped = canonicalSkipped.includes(code);
+          // Check if this course is excluded from this requirement
+          const excluded = isExcluded(req.name, code);
+
+          const completed = canonicalCompleted.includes(code) && !excluded;
+          const inProgress = canonicalInProgress.includes(code) && !excluded;
+          const skipped = canonicalSkipped.includes(code) && !excluded;
 
           reqOptions.push({
             code,
@@ -313,7 +336,8 @@ export function calculatePreviewMajorProgressByMajors(
       completedCanon,
       inProgressCanon,
       skippedCanon,
-      manualRequirements
+      manualRequirements,
+      [] // excludedRequirements - not used in simulator preview
     );
   }
   return out;

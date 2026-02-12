@@ -1,18 +1,13 @@
 "use client";
 
 import { useAuth } from "@/context/AuthContext";
-import LoginPage from "@/components/LoginPage";
 import FileUpload from "@/components/file-upload";
 import { useEffect, useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  FiUpload,
-  FiSettings,
-  FiLogOut,
   FiBarChart2,
   FiBook,
   FiChevronRight,
-  FiUser,
   FiChevronDown,
   FiCoffee,
   FiRefreshCw,
@@ -32,8 +27,6 @@ import {
   setDoc,
   updateDoc,
   getDoc,
-  addDoc,
-  Timestamp,
   writeBatch,
   deleteDoc,
   onSnapshot,
@@ -45,39 +38,32 @@ import {
   enableFriendsFeature,
   disableFriendsFeature,
 } from "@/lib/syncFriendsPublicData";
-import { gradePoints } from "@/lib/constants";
-import {
-  calculateMajorProgress,
-  majorRequirements,
-  MAJORS,
-} from "@/lib/majors";
+import { gradePoints, getDistPillStyle } from "@/lib/constants";
+import { useLocalStorage } from "@/hooks/useLocalStorage";
+import V2AnnouncementModal from "@/components/V2AnnouncementModal/V2AnnouncementModal";
+import { calculateMajorProgress, MAJORS } from "@/lib/majors";
 import MajorProgressView from "@/components/MajorProgressView";
 import StatsView from "@/components/StatsView";
 import MajorSelectionFlow from "@/components/MajorSelectionFlow";
 import { HiDocumentDuplicate } from "react-icons/hi";
 import { RiProgress3Fill } from "react-icons/ri";
 import CompoundLogo from "@/components/ui/CompoundLogo";
-import {
-  getCourseCreditsFromCode,
-  getCourseNameFromCode,
-} from "@/lib/courseCatalog";
+import { getCourseNameFromCode } from "@/lib/courseCatalog";
 import DistributionalsView from "@/components/DistributionalProgress";
-import { FaBuildingCircleCheck, FaHeart } from "react-icons/fa6";
+import { FaBuildingCircleCheck, FaHeart, FaYoutube } from "react-icons/fa6";
 import CustomLoader from "@/components/ui/CustomLoader";
 import UserSettingsModal from "@/components/UserSettingsModal/UserSettingsModal";
 import Link from "next/link";
 import LogoIcon from "@/icons/LogoIcon";
 import CourseModal from "@/components/MajorProgressView/CourseModal";
 import { getGPAColor } from "@/lib/utils/utils";
+import { getSharedCourses } from "@/lib/utils/sharedCourses";
+import ConfirmDeleteModal from "@/components/ConfirmDeleteModal/ConfirmDeleteModal";
 import PublicFacingPage from "@/screens/PublicFacingPage";
 import FriendsTab from "@/components/FriendsTab/FriendsTab";
 import { MessageCircleQuestionMark, MonitorCog, Printer } from "lucide-react";
 import Simulator from "@/components/Simulator/Simulator";
 import CleoAITab from "@/components/CleoAITab/CleoAITab";
-import MajorTipModal, {
-  MajorTipHelpButton,
-  resetMajorTipSeen,
-} from "@/components/MajorProgressView/MajorTipModal";
 import { UserAvatar } from "@/components/ui/UserAvatar";
 
 interface UserProfile {
@@ -86,68 +72,16 @@ interface UserProfile {
   updatedAt: Date;
 }
 
-const useLocalStorage = <T,>(
-  key: string,
-  initialValue: T,
-): [T, (value: T) => void] => {
-  const [storedValue, setStoredValue] = useState<T>(() => {
-    if (typeof window === "undefined") return initialValue;
-    try {
-      const item = window.localStorage.getItem(key);
-      return item ? JSON.parse(item) : initialValue;
-    } catch (error) {
-      console.error(error);
-      return initialValue;
-    }
-  });
-
-  const setValue = (value: T) => {
-    try {
-      setStoredValue(value);
-      if (typeof window !== "undefined") {
-        window.localStorage.setItem(key, JSON.stringify(value));
-      }
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
-  return [storedValue, setValue];
-};
-
-const DIST_PILL_STYLES: Record<string, string> = {
-  Hu: "bg-purple-500/20 text-purple-300 border-purple-500/30",
-  So: "bg-sky-500/20 text-sky-300 border-sky-500/30",
-  Sc: "bg-emerald-500/20 text-emerald-300 border-emerald-500/30",
-  QR: "bg-red-500/20 text-red-300 border-red-500/30",
-  WR: "bg-orange-500/20 text-orange-300 border-orange-500/30",
-  L1: "bg-teal-500/20 text-teal-300 border-teal-500/30",
-  L2: "bg-teal-500/20 text-teal-300 border-teal-500/30",
-  L3: "bg-teal-500/20 text-teal-300 border-teal-500/30",
-  L4: "bg-teal-500/20 text-teal-300 border-teal-500/30",
-  L5: "bg-teal-500/20 text-teal-300 border-teal-500/30",
-};
-
-const getDistPillStyle = (code: string) =>
-  DIST_PILL_STYLES[code] || "bg-gray-800/50 text-gray-400 border-gray-700";
-
 export default function Home() {
   const { user, loading, logout } = useAuth();
   const [courses, setCourses] = useState<Course[]>([]);
   const [hasData, setHasData] = useState(false);
   const [selectedMajor, setSelectedMajor] = useState<string>("");
-  const [isHoveringLogout, setIsHoveringLogout] = useState(false);
   const [showMajorSelection, setShowMajorSelection] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const isBrandNew = userProfile?.graduationYear === 2029;
-
-  const [showBetaBanner, setShowBetaBanner] = useLocalStorage(
-    "showBetaBanner",
-    true,
-  );
-  const [latestAdvice, setLatestAdvice] = useState<string | null>(null);
 
   // NEW: state for confirming deletion of an in-progress course
   const [confirmDelete, setConfirmDelete] = useState<{
@@ -208,6 +142,38 @@ export default function Home() {
   const [showSharedCoursesDropdown, setShowSharedCoursesDropdown] =
     useState(false);
   const sharedCoursesRef = useRef<HTMLDivElement>(null);
+  const [showV2Modal, setShowV2Modal] = useState(false);
+
+  // Check if user has seen v2 announcement modal
+  useEffect(() => {
+    if (!user) return;
+    const checkV2ModalSeen = async () => {
+      try {
+        const userDoc = await getDoc(doc(db, "users", user.uid));
+        const data = userDoc.data();
+        if (!data?.hasSeenV2Modal) {
+          setShowV2Modal(true);
+        }
+      } catch (error) {
+        console.error("Error checking v2 modal status:", error);
+      }
+    };
+    checkV2ModalSeen();
+  }, [user]);
+
+  const dismissV2Modal = async () => {
+    setShowV2Modal(false);
+    if (!user) return;
+    try {
+      await setDoc(
+        doc(db, "users", user.uid),
+        { hasSeenV2Modal: true },
+        { merge: true },
+      );
+    } catch (error) {
+      console.error("Error saving v2 modal status:", error);
+    }
+  };
 
   // Close shared courses dropdown on outside click
   useEffect(() => {
@@ -224,115 +190,6 @@ export default function Home() {
     return () => document.removeEventListener("mousedown", handleClick);
   }, [showSharedCoursesDropdown]);
 
-  // Calculate shared courses between majors (for double/triple majors)
-  const getSharedCourses = () => {
-    if (!userProfile || userProfile.majors.length <= 1)
-      return { courses: [], totalCredits: 0 };
-
-    // Get progress for all majors
-    const allMajorsProgress: Record<
-      string,
-      { completedCourses: Set<string>; courseReqMap: Map<string, string[]> }
-    > = {};
-
-    for (const major of userProfile.majors) {
-      const completedCourseCodes = courses
-        .filter(
-          (course) =>
-            course.status === "completed" &&
-            ((course.grade !== null && course.grade !== "In Progress") ||
-              course.skipped),
-        )
-        .map((course) => course.code);
-
-      const inProgressCourseCodes = courses
-        .filter((course) => course.grade === "In Progress" && !course.skipped)
-        .map((course) => course.code);
-
-      const skippedCourseCodes = courses
-        .filter((course) => course.skipped)
-        .map((course) => course.code);
-
-      const manualRequirements = courses.flatMap((course) =>
-        (course.manualRequirementsFulfilled || [])
-          .filter((m) => m.major_id === major)
-          .map((m) => ({
-            code: course.code,
-            requirement: m.requirement_title,
-            credits: course.credits || 1,
-          })),
-      );
-
-      const excludedRequirements = courses.flatMap((course) =>
-        (course.excludedFromRequirements || [])
-          .filter((m) => m.major_id === major)
-          .map((m) => ({
-            code: course.code,
-            requirement: m.requirement_title,
-          })),
-      );
-
-      const progress = calculateMajorProgress(
-        major,
-        completedCourseCodes,
-        inProgressCourseCodes,
-        skippedCourseCodes,
-        manualRequirements,
-        excludedRequirements,
-      );
-
-      // Extract completed courses and their requirements
-      const completedCourses = new Set<string>();
-      const courseReqMap = new Map<string, string[]>();
-
-      for (const req of progress.completedRequirements) {
-        for (const opt of req.options) {
-          if (opt.completed || opt.skipped) {
-            completedCourses.add(opt.code);
-            const existing = courseReqMap.get(opt.code) || [];
-            courseReqMap.set(opt.code, [...existing, req.name]);
-          }
-        }
-      }
-
-      allMajorsProgress[major] = { completedCourses, courseReqMap };
-    }
-
-    // Find courses that appear in completed requirements of multiple majors
-    const sharedCourses: {
-      code: string;
-      credits: number;
-      majors: { majorId: string; majorName: string; requirements: string[] }[];
-    }[] = [];
-
-    const allCodes = new Set<string>();
-    Object.values(allMajorsProgress).forEach(({ completedCourses }) => {
-      completedCourses.forEach((code) => allCodes.add(code));
-    });
-
-    for (const code of Array.from(allCodes)) {
-      const majorsWithCourse = userProfile.majors.filter((major) =>
-        allMajorsProgress[major].completedCourses.has(code),
-      );
-
-      if (majorsWithCourse.length > 1) {
-        const courseData = courses.find((c) => c.code === code);
-        sharedCourses.push({
-          code,
-          credits: courseData?.credits || 1,
-          majors: majorsWithCourse.map((majorId) => ({
-            majorId,
-            majorName: MAJORS[majorId] || majorId,
-            requirements:
-              allMajorsProgress[majorId].courseReqMap.get(code) || [],
-          })),
-        });
-      }
-    }
-
-    const totalCredits = sharedCourses.reduce((sum, c) => sum + c.credits, 0);
-    return { courses: sharedCourses, totalCredits };
-  };
   const [distSelectorCourseId, setDistSelectorCourseId] = useState<
     string | null
   >(null);
@@ -769,18 +626,6 @@ export default function Home() {
     };
   };
 
-  const stats = calculateStats();
-
-  const getYearStatus = (graduationYear: number): string => {
-    // Direct mapping based on graduation year
-    if (graduationYear >= 2030) return "High School";
-    if (graduationYear === 2029) return "Freshman";
-    if (graduationYear === 2028) return "Sophomore";
-    if (graduationYear === 2027) return "Junior";
-    if (graduationYear <= 2026) return "Senior";
-    return "Unknown";
-  };
-
   const handleProfileUpdate = async (updatedProfile: Partial<UserProfile>) => {
     if (!user) return;
 
@@ -973,6 +818,9 @@ export default function Home() {
         />
       )}
 
+      {/* V2 Announcement Modal - One time show */}
+      <V2AnnouncementModal show={showV2Modal} onDismiss={dismissV2Modal} />
+
       {/* Background elements */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <div className="absolute inset-0 bg-gradient-to-br from-gray-950 via-blue-950/20 to-purple-950/20"></div>
@@ -1039,12 +887,17 @@ export default function Home() {
           </div>
 
           <div className="flex items-center gap-2 lg:gap-3">
-            <span
-              className="hidden lg:inline px-2.5 py-1 text-[11px] rounded-full border border-emerald-800 bg-emerald-900/30 text-emerald-300"
-              title="Welcome to Yale!"
+            <a
+              href="https://www.youtube.com/watch?v=YOUR_VIDEO_ID"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hidden lg:inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] rounded-full border border-emerald-800 bg-emerald-900/30 text-emerald-300 hover:bg-emerald-900/50 hover:border-emerald-700 transition-all cursor-pointer"
+              title="Watch our launch video!"
             >
-              v2: We've made massive updates!
-            </span>
+              <FaYoutube className="text-red-500" size={14} />
+              <strong>Feb 2026 - v2 LAUNCH VID:</strong> We&apos;ve made massive
+              updates!
+            </a>
 
             <button
               onClick={() => setShowSettings(true)}
@@ -2168,7 +2021,7 @@ export default function Home() {
                           {/* Shared Courses Indicator */}
                           {(() => {
                             const { courses: sharedCourses, totalCredits } =
-                              getSharedCourses();
+                              getSharedCourses(userProfile, courses);
                             const isWarning = totalCredits > 2;
                             const hasShared = sharedCourses.length > 0;
 
@@ -2511,84 +2364,5 @@ export default function Home() {
         }}
       />
     </main>
-  );
-}
-
-function ConfirmDeleteModal({
-  isOpen,
-  course,
-  onCancel,
-  onConfirm,
-}: {
-  isOpen: boolean;
-  course: Course | null;
-  onCancel: () => void;
-  onConfirm: () => void;
-}) {
-  return (
-    <AnimatePresence>
-      {isOpen && course && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          className="fixed inset-0 bg-gray-100/70 dark:bg-black/70 backdrop-blur-sm z-[999] flex items-center justify-center p-4"
-          onClick={onCancel}
-        >
-          <motion.div
-            initial={{ scale: 0.9, y: 20 }}
-            animate={{ scale: 1, y: 0 }}
-            exit={{ scale: 0.9, y: 20 }}
-            className="w-full max-w-md bg-white dark:bg-gray-900/90 backdrop-blur-sm p-6 rounded-xl border border-gray-200 dark:border-gray-800 relative shadow-xl dark:shadow-none"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="flex items-start justify-between mb-4">
-              <h3 className="text-xl font-medium text-gray-800 dark:text-gray-200">
-                Delete course?
-              </h3>
-              <button
-                onClick={onCancel}
-                className="p-1 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
-                aria-label="Close"
-              >
-                <FiX className="h-5 w-5" />
-              </button>
-            </div>
-
-            <p className="text-gray-700 dark:text-gray-300">
-              You're about to permanently delete{" "}
-              <span className="font-semibold text-gray-900 dark:text-gray-100">
-                {course.code}
-              </span>{" "}
-              ({getCourseNameFromCode(course.code) || "Course"}) from your{" "}
-              <span className="text-purple-600 dark:text-purple-300">
-                in-progress
-              </span>{" "}
-              list.
-            </p>
-            <p className="text-gray-500 dark:text-gray-400 text-sm mt-2">
-              This only removes the entry from DegreeIntelligence. You can
-              re-import it later by uploading a fresh transcript.
-            </p>
-
-            <div className="mt-6 flex items-center justify-end gap-2">
-              <button
-                onClick={onCancel}
-                className="px-4 py-2 rounded-lg border border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700 bg-white dark:bg-gray-900/50 text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-all"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={onConfirm}
-                className="px-4 py-2 rounded-lg border border-red-300 dark:border-red-800/60 bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-200 hover:bg-red-100 dark:hover:bg-red-900/40 hover:border-red-400 dark:hover:border-red-700 transition-all flex items-center gap-2"
-              >
-                <FiTrash2 className="w-4 h-4" />
-                Delete
-              </button>
-            </div>
-          </motion.div>
-        </motion.div>
-      )}
-    </AnimatePresence>
   );
 }

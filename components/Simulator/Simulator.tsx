@@ -165,6 +165,7 @@ export default function Simulator({
 
   // keep initial snapshot to detect changes
   const initialSemestersRef = useRef<Semester[]>([]);
+  const initialManualReqsRef = useRef<ManualRequirementEntry[]>([]);
 
   // majors to compute – only the user's declared majors
   const majorIds = useMemo<string[]>(() => userMajors, [userMajors]);
@@ -348,7 +349,19 @@ export default function Simulator({
       Array.from(currentPlacements).some((p) => !initialPlacements.has(p)) ||
       Array.from(initialPlacements).some((p) => !currentPlacements.has(p));
 
-    const changed = placementsChanged || simulatorManualReqs.length > 0;
+    // Compare manual requirements against initial state
+    const currentManualKeys = new Set(
+      simulatorManualReqs.map((m) => `${m.code}:${m.requirement}`)
+    );
+    const initialManualKeys = new Set(
+      initialManualReqsRef.current.map((m) => `${m.code}:${m.requirement}`)
+    );
+    const manualReqsChanged =
+      currentManualKeys.size !== initialManualKeys.size ||
+      Array.from(currentManualKeys).some((k) => !initialManualKeys.has(k)) ||
+      Array.from(initialManualKeys).some((k) => !currentManualKeys.has(k));
+
+    const changed = placementsChanged || manualReqsChanged;
 
     setHasChanges(changed);
   }, [semesters, simulatorManualReqs]);
@@ -670,8 +683,9 @@ export default function Simulator({
       );
       setSavedPlans(updatedPlans);
       setCurrentPlanName(savedName);
-      // Update initial snapshot so hasChanges resets
+      // Update initial snapshots so hasChanges resets
       initialSemestersRef.current = JSON.parse(JSON.stringify(semesters)) as Semester[];
+      initialManualReqsRef.current = [...simulatorManualReqs];
       setPlanName("");
       setSelectedPlanToOverwrite(null);
       setShowSaveModal(false);
@@ -683,11 +697,15 @@ export default function Simulator({
   const loadPlan = (planIndex: number) => {
     if (planIndex < 0 || planIndex >= savedPlans.length) return;
     const plan = savedPlans[planIndex];
-    setSemesters(plan.semesters);
-    setSimulatorManualReqs(plan.manualRequirements ?? []);
+
+    // Update initial refs BEFORE setting state to prevent false change detection
     initialSemestersRef.current = JSON.parse(
       JSON.stringify(plan.semesters),
     ) as Semester[];
+    initialManualReqsRef.current = plan.manualRequirements ?? [];
+
+    setSemesters(plan.semesters);
+    setSimulatorManualReqs(plan.manualRequirements ?? []);
 
     const usedCodes = new Set<string>();
     plan.semesters.forEach((sem) =>
@@ -704,6 +722,9 @@ export default function Simulator({
 
     setCurrentPlanName(plan.name);
     setShowPlansModal(false);
+
+    // Reset hasChanges since we just loaded a saved plan
+    setHasChanges(false);
   };
 
   const deletePlan = async (planIndex: number) => {

@@ -232,7 +232,7 @@ export default function MajorSelectionFlow({
             >
               <motion.button
                 onClick={() => setStep("majors")}
-                className="px-6 py-3 bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 rounded-xl text-white font-medium flex items-center gap-2 transition-all shadow-[0_4px_16px_rgba(236,72,153,0.3),inset_0_1px_0_rgba(255,255,255,0.15)] hover:shadow-[0_6px_20px_rgba(236,72,153,0.4)]"
+                className="px-6 py-3 bg-purple-500/10 hover:bg-purple-500/20 rounded-xl text-purple-200 font-medium flex items-center gap-2 transition-all border border-purple-500/30 hover:border-purple-500/50 shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_4px_16px_rgba(139,92,246,0.15)]"
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
               >
@@ -409,7 +409,7 @@ export default function MajorSelectionFlow({
                 className={`py-2.5 px-5 rounded-xl font-medium text-sm transition-all ${
                   selectedMajors.length === 0
                     ? "bg-gray-800/60 text-gray-600 cursor-not-allowed border border-gray-700/40"
-                    : "bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white shadow-[0_2px_8px_rgba(236,72,153,0.25)]"
+                    : "bg-purple-500/10 hover:bg-purple-500/20 text-purple-200 border border-purple-500/30 hover:border-purple-500/50 shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_2px_8px_rgba(139,92,246,0.15)]"
                 }`}
               >
                 Continue
@@ -470,7 +470,7 @@ export default function MajorSelectionFlow({
               </button>
               <button
                 onClick={() => setStep("year")}
-                className="py-2.5 px-5 rounded-xl font-medium text-sm bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white shadow-[0_2px_8px_rgba(236,72,153,0.25)] transition-all"
+                className="py-2.5 px-5 rounded-xl font-medium text-sm bg-purple-500/10 hover:bg-purple-500/20 text-purple-200 border border-purple-500/30 hover:border-purple-500/50 shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_2px_8px_rgba(139,92,246,0.15)] transition-all"
               >
                 {bio.length === 0 ? "Skip" : "Continue"}
               </button>
@@ -503,15 +503,16 @@ export default function MajorSelectionFlow({
                   max={new Date().getFullYear() + 10}
                   value={graduationYear}
                   onChange={(e) => setGraduationYear(e.target.value)}
-                  className="bg-gray-900 border border-gray-700/60 hover:border-gray-600/60 focus:border-pink-500/50 rounded-xl px-6 py-4 w-36 text-center text-2xl font-medium focus:outline-none focus:ring-1 focus:ring-pink-500/30 text-gray-100 transition-all shadow-[inset_0_2px_4px_rgba(0,0,0,0.2)]"
+                  className="bg-gray-900/80 border border-white/[0.08] hover:border-white/[0.12] focus:border-pink-500/50 rounded-xl px-6 py-4 w-36 text-center text-2xl font-medium focus:outline-none focus:ring-1 focus:ring-pink-500/30 text-gray-100 transition-all shadow-[inset_0_2px_4px_rgba(0,0,0,0.3),0_4px_12px_rgba(0,0,0,0.2)] appearance-none [color-scheme:dark] [-moz-appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                   placeholder="2029"
                 />
-                <div className="absolute -bottom-6 left-1/2 -translate-x-1/2">
-                  <span className="text-xs text-gray-500">
+                <div className="absolute -bottom-7 left-1/2 -translate-x-1/2">
+                  <span className="text-xs text-gray-400 px-2 py-0.5 rounded-full bg-white/[0.04] border border-white/[0.06]">
                     {parseInt(graduationYear) === 2029 && "Freshman"}
                     {parseInt(graduationYear) === 2028 && "Sophomore"}
                     {parseInt(graduationYear) === 2027 && "Junior"}
                     {parseInt(graduationYear) === 2026 && "Senior"}
+                    {![2026, 2027, 2028, 2029].includes(parseInt(graduationYear)) && `Class of ${graduationYear}`}
                   </span>
                 </div>
               </div>
@@ -530,12 +531,12 @@ export default function MajorSelectionFlow({
                 className={`py-2.5 px-5 rounded-xl font-medium text-sm transition-all flex items-center gap-2 ${
                   !graduationYear || isSubmitting
                     ? "bg-gray-800/60 text-gray-600 cursor-not-allowed border border-gray-700/40"
-                    : "bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white shadow-[0_2px_8px_rgba(16,185,129,0.3)]"
+                    : "bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 hover:border-emerald-500/50 shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_2px_8px_rgba(16,185,129,0.2)]"
                 }`}
               >
                 {isSubmitting ? (
                   <>
-                    <span className="animate-spin h-4 w-4 border-2 border-white/30 border-t-white rounded-full" />
+                    <span className="animate-spin h-4 w-4 border-2 border-emerald-300/30 border-t-emerald-300 rounded-full" />
                     Saving...
                   </>
                 ) : (

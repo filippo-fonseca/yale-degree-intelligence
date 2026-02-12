@@ -340,8 +340,8 @@ export default function Simulator({
     // Check if sets are different (different size or different contents)
     const placementsChanged =
       currentPlacements.size !== initialPlacements.size ||
-      [...currentPlacements].some((p) => !initialPlacements.has(p)) ||
-      [...initialPlacements].some((p) => !currentPlacements.has(p));
+      Array.from(currentPlacements).some((p) => !initialPlacements.has(p)) ||
+      Array.from(initialPlacements).some((p) => !currentPlacements.has(p));
 
     const changed = placementsChanged || simulatorManualReqs.length > 0;
 

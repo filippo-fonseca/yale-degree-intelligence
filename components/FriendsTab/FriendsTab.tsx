@@ -436,39 +436,51 @@ export default function FriendsTab({
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="flex flex-col items-center justify-center py-12 px-6 rounded-xl bg-gradient-to-br from-gray-900/60 via-gray-900/40 to-gray-950/60 backdrop-blur-md border border-gray-800/50 shadow-[inset_0_1px_0_rgba(255,255,255,0.04),0_4px_16px_rgba(0,0,0,0.25)]"
+          className="flex flex-col items-center justify-center py-10 px-8 rounded-2xl bg-gradient-to-br from-gray-900/80 via-gray-900/60 to-gray-950/80 backdrop-blur-2xl border border-white/[0.08] shadow-[0_8px_48px_rgba(0,0,0,0.4),0_0_80px_rgba(236,72,153,0.06),inset_0_1px_0_rgba(255,255,255,0.08)] ring-1 ring-white/[0.05]"
         >
-          <div className="p-3 rounded-full bg-pink-500/10 border border-pink-500/25 mb-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]">
-            <FiUsers className="w-10 h-10 text-pink-400" />
+          {/* Icon */}
+          <div className="relative mb-6">
+            <div className="absolute inset-0 bg-gradient-to-br from-pink-500/20 to-purple-500/20 rounded-full blur-xl" />
+            <div className="relative p-4 rounded-2xl bg-gradient-to-br from-pink-500/15 to-purple-500/15 border border-pink-500/20 shadow-[inset_0_1px_0_rgba(255,255,255,0.1),0_4px_16px_rgba(236,72,153,0.2)]">
+              <FiUsers className="w-8 h-8 text-pink-300" />
+            </div>
           </div>
 
-          <h3 className="text-xl font-medium text-gray-100 mb-2 text-center">
+          {/* Title */}
+          <h3 className="text-xl font-medium bg-gradient-to-r from-pink-200 via-purple-200 to-blue-200 bg-clip-text text-transparent mb-2 text-center">
             Enable Friends Feature
           </h3>
 
-          <p className="text-gray-400 text-sm text-center max-w-md mb-5">
+          <p className="text-gray-400 text-sm text-center max-w-md mb-6 leading-relaxed">
             Connect with other Yale students to see what courses they've taken
             and get inspiration for your own academic journey. Your grades are{" "}
-            <strong className="text-gray-300">never shared</strong> - only
-            course codes, semesters, and credits.
+            <strong className="text-gray-200">never shared</strong>.
           </p>
 
-          <div className="bg-gray-800/30 rounded-lg p-3 mb-5 max-w-md border border-gray-700/40">
-            <h4 className="text-xs font-medium text-gray-300 mb-1.5">
-              What gets shared with friends:
-            </h4>
-            <ul className="text-xs text-gray-400 space-y-0.5">
-              <li>• Course codes (e.g., CPSC 201)</li>
-              <li>• Semesters and years taken</li>
-              <li>• Credit counts</li>
-              <li>• Your major and graduation year</li>
-            </ul>
-            <p className="text-[10px] text-emerald-400 mt-2">
-              Your grades and GPA are NEVER shared.
-            </p>
+          {/* What's shared card */}
+          <div className="w-full max-w-sm mb-6">
+            <div className="p-4 rounded-xl bg-gradient-to-br from-white/[0.04] to-transparent border border-white/[0.06] shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]">
+              <h4 className="text-xs font-medium text-gray-300 mb-3 flex items-center gap-2">
+                <span className="w-1.5 h-1.5 rounded-full bg-pink-400" />
+                What gets shared with friends
+              </h4>
+              <ul className="text-xs text-gray-400 space-y-1.5 ml-3.5">
+                <li>Course codes (e.g., CPSC 201)</li>
+                <li>Semesters and years taken</li>
+                <li>Credit counts</li>
+                <li>Your major and graduation year</li>
+              </ul>
+              <div className="mt-3 pt-3 border-t border-white/[0.06] flex items-center gap-2">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                <span className="text-[11px] text-emerald-400 font-medium">
+                  Your grades and GPA are NEVER shared
+                </span>
+              </div>
+            </div>
           </div>
 
-          <button
+          {/* Enable button */}
+          <motion.button
             onClick={async () => {
               setIsEnabling(true);
               try {
@@ -481,20 +493,22 @@ export default function FriendsTab({
               }
             }}
             disabled={isEnabling}
-            className="px-4 py-2 bg-gradient-to-br from-pink-600 to-pink-700 hover:from-pink-500 hover:to-pink-600 text-white text-sm rounded-lg font-medium transition-all disabled:opacity-50 flex items-center gap-2 shadow-[0_2px_8px_rgba(236,72,153,0.25)]"
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            className="px-6 py-3 bg-purple-500/10 hover:bg-purple-500/20 text-purple-200 text-sm rounded-xl font-medium transition-all disabled:opacity-50 flex items-center gap-2 border border-purple-500/30 hover:border-purple-500/50 shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_4px_16px_rgba(139,92,246,0.15)]"
           >
             {isEnabling ? (
               <>
-                <span className="animate-spin h-3.5 w-3.5 border-2 border-white/30 border-t-white rounded-full" />
+                <span className="animate-spin h-4 w-4 border-2 border-purple-300/30 border-t-purple-300 rounded-full" />
                 Enabling...
               </>
             ) : (
               <>
-                <FiToggleRight size={16} />
+                <FiToggleRight size={18} />
                 Enable Friends Feature
               </>
             )}
-          </button>
+          </motion.button>
         </motion.div>
       </div>
     );

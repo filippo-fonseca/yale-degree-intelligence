@@ -23,7 +23,13 @@ import {
   FiCheck,
   FiX,
   FiUser,
+  FiAlertCircle,
+  FiZap,
+  FiTrendingUp,
+  FiBarChart2,
+  FiHeart,
 } from "react-icons/fi";
+import { HiSparkles } from "react-icons/hi2";
 import LogoIcon from "@/icons/LogoIcon";
 import CompoundLogo from "@/components/ui/CompoundLogo";
 import Link from "next/link";
@@ -138,19 +144,19 @@ export default function AboutPage() {
       title: "No more spreadsheet nightmares.",
       description:
         "We automated the tedious parts of academic planning so you don't have to maintain those fragile Google Sheets formulas.",
-      emoji: "📊",
+      icon: <FiBarChart2 className="w-5 h-5" />,
     },
     {
       title: "Major (and even concentration) reqs at a glance.",
       description:
         "See exactly what you've completed and what remains for your major—no more digging through PDF requirements or five different poorly organized websites 4 clicks deep.",
-      emoji: "🔍",
+      icon: <FiSearch className="w-5 h-5" />,
     },
     {
       title: "Built by Yalies, for Yalies.",
       description:
         "Born from our own frustrations with double major planning. We're solving the problems we actually faced. Rather than gatekeeping, we decided to make it clean and publish it.",
-      emoji: "🎓",
+      icon: <GraduationCap className="w-5 h-5" />,
     },
   ];
 
@@ -172,8 +178,8 @@ export default function AboutPage() {
       {/* Welcome Banner */}
       <div className="relative mb-8 z-50 bg-gradient-to-r from-emerald-900/20 via-blue-900/20 to-purple-900/20 backdrop-blur-xl border-b border-white/[0.08] shadow-[0_8px_32px_rgba(0,0,0,0.3),inset_0_1px_0_rgba(255,255,255,0.1)]">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-2.5 flex items-center justify-center gap-2">
-          <span className="px-3 py-1.5 text-xs font-semibold rounded-full bg-gradient-to-r from-emerald-500/20 to-emerald-600/20 border border-emerald-500/30 text-emerald-300 shadow-[inset_0_1px_0_rgba(255,255,255,0.1),0_2px_8px_rgba(52,211,153,0.2)]">
-            🎉 News Feature
+          <span className="px-3 py-1.5 text-xs font-semibold rounded-full bg-gradient-to-r from-emerald-500/20 to-emerald-600/20 border border-emerald-500/30 text-emerald-300 shadow-[inset_0_1px_0_rgba(255,255,255,0.1),0_2px_8px_rgba(52,211,153,0.2)] flex items-center gap-1.5">
+            <HiSparkles className="w-3 h-3" /> News Feature
           </span>
           <p className="text-sm text-emerald-100">
             The Yale Daily News ran a feature on us.{" "}
@@ -264,7 +270,7 @@ export default function AboutPage() {
             <div className="mb-3 flex justify-center">
               <div className="relative p-[1px] rounded-xl bg-gradient-to-r from-pink-500/40 via-purple-500/40 to-blue-500/40">
                 <span className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-medium bg-gradient-to-br from-gray-900/90 via-gray-900/80 to-gray-950/90 text-pink-200 shadow-[0_8px_32px_rgba(236,72,153,0.2),inset_0_1px_0_rgba(255,255,255,0.1),inset_0_-1px_0_rgba(0,0,0,0.2)] backdrop-blur-xl">
-                  <span>💙</span> We're so glad you're here. We think you'll
+                  <FiHeart className="w-3 h-3 text-blue-400" /> We're so glad you're here. We think you'll
                   love this.
                 </span>
               </div>
@@ -344,6 +350,62 @@ export default function AboutPage() {
                   We just launched v2. Free. Always.
                 </span>
               </p>
+
+              {/* V2 Launch Video */}
+              <motion.div
+                initial={{ opacity: 0, y: 15 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.5 }}
+                className="mt-8"
+              >
+                {/* Caption */}
+                <div className="mb-4 text-center">
+                  <p className="text-sm text-gray-400 leading-relaxed">
+                    <span className="font-semibold bg-gradient-to-r from-pink-300 via-purple-300 to-blue-300 bg-clip-text text-transparent">
+                      OUR V2 LAUNCH — FEB 2026.
+                    </span>
+                    <br />
+                    <span className="text-gray-500">
+                      it's prettier. it's faster. it's better. you should
+                      probably check it out idk
+                    </span>
+                  </p>
+                </div>
+
+                {/* Video Container */}
+                <div className="relative mx-auto max-w-2xl">
+                  {/* Glow effect */}
+                  <div className="absolute -inset-1 bg-gradient-to-r from-pink-500/20 via-purple-500/20 to-blue-500/20 rounded-2xl blur-xl opacity-60" />
+
+                  {/* Video wrapper */}
+                  <div className="relative rounded-2xl overflow-hidden border-2 border-white/[0.1] shadow-[0_8px_48px_rgba(0,0,0,0.5),0_0_60px_rgba(139,92,246,0.15),inset_0_1px_0_rgba(255,255,255,0.1)] bg-gray-950/80 backdrop-blur-xl">
+                    {/* Decorative top bar */}
+                    <div className="flex items-center gap-1.5 px-4 py-2.5 bg-gradient-to-r from-gray-900/80 to-gray-950/80 border-b border-white/[0.06]">
+                      <div className="w-2.5 h-2.5 rounded-full bg-red-500/80" />
+                      <div className="w-2.5 h-2.5 rounded-full bg-yellow-500/80" />
+                      <div className="w-2.5 h-2.5 rounded-full bg-green-500/80" />
+                      <span className="ml-3 text-[10px] text-gray-500 font-medium tracking-wide">
+                        v2-launch-vid.mp4
+                      </span>
+                    </div>
+
+                    {/* Video embed */}
+                    <div className="aspect-video">
+                      <iframe
+                        width="560"
+                        height="315"
+                        src="https://www.youtube.com/embed/WOqPZC2exwA?si=WvVAvNOZ3Qjv-NjR"
+                        title="YouTube video player"
+                        frameBorder="0"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                        referrerPolicy="strict-origin-when-cross-origin"
+                        allowFullScreen
+                        className="w-full h-full"
+                      ></iframe>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
             </motion.div>
           </motion.div>
         </div>
@@ -371,7 +433,7 @@ export default function AboutPage() {
             {/* Problem */}
             <Card fade>
               <CardHeader
-                icon={<span className="text-red-400 text-base">❗</span>}
+                icon={<FiAlertCircle className="w-4 h-4" />}
                 title="The Problem"
                 color="red"
               />
@@ -393,7 +455,7 @@ export default function AboutPage() {
             {/* Solution */}
             <Card fade delay={0.1}>
               <CardHeader
-                icon={<span className="text-blue-400 text-base">💡</span>}
+                icon={<FiZap className="w-4 h-4" />}
                 title="Our Solution"
                 color="blue"
               />
@@ -415,7 +477,7 @@ export default function AboutPage() {
             {/* Impact */}
             <Card fade>
               <CardHeader
-                icon={<span className="text-green-400 text-base">🚀</span>}
+                icon={<FiTrendingUp className="w-4 h-4" />}
                 title="The Impact"
                 color="green"
               />
@@ -772,63 +834,43 @@ export default function AboutPage() {
                 </div>
               </div>
 
-              <div className="h-[280px] w-full">
-                <div
-                  ref={pieRef}
-                  className="h-[280px] w-full flex items-center justify-center"
+              <div
+                ref={pieRef}
+                className="h-[260px] w-full"
+              >
+                <motion.div
+                  initial={{ scale: 0.9, opacity: 0 }}
+                  animate={pieInView ? { scale: 1, opacity: 1 } : {}}
+                  transition={{ duration: 0.5, ease: "easeOut" }}
+                  className="w-full h-full"
                 >
-                  <motion.div
-                    initial={{ scale: 0.9, opacity: 0 }}
-                    animate={pieInView ? { scale: 1, opacity: 1 } : {}}
-                    transition={{ duration: 0.5, ease: "easeOut" }}
-                    className="w-full h-full"
-                  >
-                    {pieInView && (
-                      <PieChartWrapper
-                        key="pie-mounted"
-                        data={{
-                          labels: statsDemo.gradeDistribution.map(
-                            (g) => g.label,
-                          ),
-                          datasets: [
-                            {
-                              data: statsDemo.gradeDistribution.map(
-                                (g) => g.count,
-                              ),
-                              backgroundColor: CHART_COLORS.slice(
-                                0,
-                                statsDemo.gradeDistribution.length,
-                              ),
-                              borderColor: Array(
-                                statsDemo.gradeDistribution.length,
-                              ).fill("#1F2937"),
-                              borderWidth: 1,
-                            },
-                          ],
-                        }}
-                        showLegend={true}
-                      />
-                    )}
-                  </motion.div>
-                </div>
-              </div>
-
-              {/* Percent breakdown text row */}
-              <div className="mt-3 flex flex-wrap gap-x-3 gap-y-1 text-[10px] text-gray-400">
-                {(() => {
-                  const total = statsDemo.gradeDistribution.reduce(
-                    (s, g) => s + g.count,
-                    0,
-                  );
-                  return statsDemo.gradeDistribution.map((g) => {
-                    const pct = total ? Math.round((g.count / total) * 100) : 0;
-                    return (
-                      <span key={g.label} className="whitespace-nowrap">
-                        <span className="text-gray-300">{g.label}</span>: {pct}%
-                      </span>
-                    );
-                  });
-                })()}
+                  {pieInView && (
+                    <PieChartWrapper
+                      key="pie-mounted"
+                      data={{
+                        labels: statsDemo.gradeDistribution.map(
+                          (g) => g.label,
+                        ),
+                        datasets: [
+                          {
+                            data: statsDemo.gradeDistribution.map(
+                              (g) => g.count,
+                            ),
+                            backgroundColor: CHART_COLORS.slice(
+                              0,
+                              statsDemo.gradeDistribution.length,
+                            ),
+                            borderColor: Array(
+                              statsDemo.gradeDistribution.length,
+                            ).fill("#1F2937"),
+                            borderWidth: 1,
+                          },
+                        ],
+                      }}
+                      showLegend={true}
+                    />
+                  )}
+                </motion.div>
               </div>
             </motion.div>
           </div>
@@ -1065,8 +1107,8 @@ export default function AboutPage() {
                 transition={{ duration: 0.6, delay: i * 0.1 }}
                 className="bg-gradient-to-br from-white/[0.08] via-transparent to-black/10 p-4 rounded-xl border border-white/[0.08] hover:border-white/[0.15] transition-all duration-300 hover:scale-[1.02] shadow-[0_4px_24px_rgba(0,0,0,0.2),inset_0_1px_0_rgba(255,255,255,0.1)] backdrop-blur-sm hover:shadow-[0_8px_32px_rgba(0,0,0,0.3),inset_0_1px_0_rgba(255,255,255,0.12)]"
               >
-                <div className="text-2xl mb-3 drop-shadow-lg">
-                  {feature.emoji}
+                <div className="p-2.5 rounded-xl bg-gradient-to-br from-white/[0.08] via-transparent to-black/10 border border-white/[0.08] text-blue-300 mb-3 w-fit shadow-[inset_0_1px_0_rgba(255,255,255,0.1)]">
+                  {feature.icon}
                 </div>
                 <h3 className="text-base font-medium text-blue-200 mb-1.5">
                   {feature.title}
@@ -1263,7 +1305,7 @@ export default function AboutPage() {
       {/* Footer */}
       <div className="py-6 text-center text-gray-400 text-xs border-t border-white/[0.05]">
         <p className="flex items-center justify-center gap-2">
-          Made with <span className="text-blue-400">💙</span> | Not officially
+          Made with <FiHeart className="w-3 h-3 text-blue-400" /> | Not officially
           affiliated with Yale University. We make no money from this and this
           is NOT a business or job for any of us.
         </p>
@@ -1303,7 +1345,9 @@ export default function AboutPage() {
                 <div className="flex items-center justify-between px-5 py-3 border-b border-white/[0.08]">
                   <div className="flex items-center gap-2">
                     <FiPlayCircle className="text-purple-400" size={16} />
-                    <span className="text-sm font-medium text-white">v2 Launch Video</span>
+                    <span className="text-sm font-medium text-white">
+                      v2 Launch Video
+                    </span>
                   </div>
                   <button
                     onClick={() => setShowVideoModal(false)}
@@ -1316,7 +1360,7 @@ export default function AboutPage() {
                 {/* Video embed */}
                 <div className="aspect-video bg-black/50">
                   <iframe
-                    src="https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1"
+                    src="https://www.youtube.com/embed/WOqPZC2exwA"
                     title="DegreeIntelligence v2 Launch"
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                     allowFullScreen
@@ -1327,7 +1371,11 @@ export default function AboutPage() {
                 {/* Footer */}
                 <div className="px-5 py-3 border-t border-white/[0.08] flex items-center justify-between">
                   <p className="text-xs text-gray-500">
-                    Press <kbd className="px-1.5 py-0.5 rounded bg-white/[0.08] border border-white/[0.1] text-gray-400 text-[10px]">ESC</kbd> or click outside to close
+                    Press{" "}
+                    <kbd className="px-1.5 py-0.5 rounded bg-white/[0.08] border border-white/[0.1] text-gray-400 text-[10px]">
+                      ESC
+                    </kbd>{" "}
+                    or click outside to close
                   </p>
                   <button
                     onClick={() => setShowVideoModal(false)}

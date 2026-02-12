@@ -16,35 +16,55 @@ interface PieChartWrapperProps {
     }[];
   };
   title?: string;
-  showLegend?: boolean; // Add this prop
+  showLegend?: boolean;
 }
 
 export default function PieChartWrapper({
   data,
   title,
-  showLegend = true, // Default to true
+  showLegend = true,
 }: PieChartWrapperProps) {
   return (
-    <div className="w-full h-full p-4">
-      <h3 className="text-lg font-medium mb-4 text-center">{title}</h3>
-      <div className="h-[300px]">
+    <div className="w-full h-full flex flex-col">
+      {title && (
+        <h3 className="text-lg font-medium mb-2 text-center">{title}</h3>
+      )}
+      <div className="flex-1 min-h-0">
         <Pie
           data={data}
           options={{
             responsive: true,
             maintainAspectRatio: false,
+            layout: {
+              padding: {
+                top: 8,
+                bottom: 8,
+                left: 8,
+                right: 8,
+              },
+            },
             plugins: {
               legend: {
-                display: showLegend, // Control visibility here
-                position: "right",
+                display: showLegend,
+                position: "bottom",
                 labels: {
-                  color: "#E5E7EB",
+                  color: "#9CA3AF",
                   font: {
-                    size: 12,
+                    size: 11,
                   },
+                  padding: 12,
+                  usePointStyle: true,
+                  pointStyle: "circle",
                 },
               },
               tooltip: {
+                backgroundColor: "rgba(17, 24, 39, 0.95)",
+                titleColor: "#F3F4F6",
+                bodyColor: "#D1D5DB",
+                borderColor: "rgba(255, 255, 255, 0.1)",
+                borderWidth: 1,
+                cornerRadius: 8,
+                padding: 10,
                 callbacks: {
                   label: (context) => {
                     const label = context.label || "";

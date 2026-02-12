@@ -91,7 +91,8 @@ export default function MissionPage() {
             The principles that guide us.
           </h1>
           <p className="text-sm text-gray-400 max-w-xl mx-auto">
-            Everything we build at DegreeIntelligence stems from these core beliefs.
+            Everything we build at DegreeIntelligence stems from these core
+            beliefs.
           </p>
         </motion.div>
 
@@ -137,13 +138,14 @@ export default function MissionPage() {
           <p className="text-sm text-gray-300 mb-3 leading-relaxed">
             Yale attracts some of the world's brightest minds, yet we force
             students to navigate degree requirements with tools that look like
-            tech from the early 2000s. This isn't just about convenience—it's
-            about removing bureaucratic friction so students can focus on what
-            actually matters: learning, research, and building the future.
+            tech from the early 2000s. This isn't just about convenience. We
+            built this to remove bureaucratic friction so students can focus on
+            what actually matters: learning, research, and building the future.
+            Or whatever you want. It's up to you. {":)"}
           </p>
           <p className="text-sm text-gray-400 leading-relaxed">
-            This manifesto is our way of holding ourselves accountable. DegreeIntelligence
-            is our simple contribution to this vision.
+            This manifesto is our way of holding ourselves accountable.
+            DegreeIntelligence is our simple contribution to this vision.
           </p>
         </motion.div>
 
@@ -174,7 +176,8 @@ export default function MissionPage() {
               <span className="text-xs text-gray-500">DegreeIntelligence</span>
             </div>
             <p className="text-[10px] text-gray-600">
-              Not affiliated with Yale University, Yale College, or DegreeAudit. A free, student-built project.
+              Not affiliated with Yale University, Yale College, or DegreeAudit.
+              A free, student-built project.
             </p>
           </div>
         </div>

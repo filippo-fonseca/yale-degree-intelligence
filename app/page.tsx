@@ -3,7 +3,7 @@
 import { useAuth } from "@/context/AuthContext";
 import LoginPage from "@/components/LoginPage";
 import FileUpload from "@/components/file-upload";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   FiUpload,
@@ -20,6 +20,8 @@ import {
   FiTrash2,
   FiX,
   FiMenu,
+  FiAlertTriangle,
+  FiCheck,
 } from "react-icons/fi";
 import {
   collection,
@@ -187,7 +189,9 @@ export default function Home() {
   );
 
   // Simulator unsaved changes check
-  const [simulatorNavCheck, setSimulatorNavCheck] = useState<((callback: () => void) => void) | null>(null);
+  const [simulatorNavCheck, setSimulatorNavCheck] = useState<
+    ((callback: () => void) => void) | null
+  >(null);
 
   // Safe tab switch that checks for unsaved simulator changes
   const handleTabChange = (newTab: string) => {
@@ -201,11 +205,139 @@ export default function Home() {
   };
 
   const [showUpdateModal, setShowUpdateModal] = useState(false);
+  const [showSharedCoursesDropdown, setShowSharedCoursesDropdown] =
+    useState(false);
+  const sharedCoursesRef = useRef<HTMLDivElement>(null);
+
+  // Close shared courses dropdown on outside click
+  useEffect(() => {
+    if (!showSharedCoursesDropdown) return;
+    const handleClick = (e: MouseEvent) => {
+      if (
+        sharedCoursesRef.current &&
+        !sharedCoursesRef.current.contains(e.target as Node)
+      ) {
+        setShowSharedCoursesDropdown(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, [showSharedCoursesDropdown]);
+
+  // Calculate shared courses between majors (for double/triple majors)
+  const getSharedCourses = () => {
+    if (!userProfile || userProfile.majors.length <= 1)
+      return { courses: [], totalCredits: 0 };
+
+    // Get progress for all majors
+    const allMajorsProgress: Record<
+      string,
+      { completedCourses: Set<string>; courseReqMap: Map<string, string[]> }
+    > = {};
+
+    for (const major of userProfile.majors) {
+      const completedCourseCodes = courses
+        .filter(
+          (course) =>
+            course.status === "completed" &&
+            ((course.grade !== null && course.grade !== "In Progress") ||
+              course.skipped),
+        )
+        .map((course) => course.code);
+
+      const inProgressCourseCodes = courses
+        .filter((course) => course.grade === "In Progress" && !course.skipped)
+        .map((course) => course.code);
+
+      const skippedCourseCodes = courses
+        .filter((course) => course.skipped)
+        .map((course) => course.code);
+
+      const manualRequirements = courses.flatMap((course) =>
+        (course.manualRequirementsFulfilled || [])
+          .filter((m) => m.major_id === major)
+          .map((m) => ({
+            code: course.code,
+            requirement: m.requirement_title,
+            credits: course.credits || 1,
+          })),
+      );
+
+      const excludedRequirements = courses.flatMap((course) =>
+        (course.excludedFromRequirements || [])
+          .filter((m) => m.major_id === major)
+          .map((m) => ({
+            code: course.code,
+            requirement: m.requirement_title,
+          })),
+      );
+
+      const progress = calculateMajorProgress(
+        major,
+        completedCourseCodes,
+        inProgressCourseCodes,
+        skippedCourseCodes,
+        manualRequirements,
+        excludedRequirements,
+      );
+
+      // Extract completed courses and their requirements
+      const completedCourses = new Set<string>();
+      const courseReqMap = new Map<string, string[]>();
+
+      for (const req of progress.completedRequirements) {
+        for (const opt of req.options) {
+          if (opt.completed || opt.skipped) {
+            completedCourses.add(opt.code);
+            const existing = courseReqMap.get(opt.code) || [];
+            courseReqMap.set(opt.code, [...existing, req.name]);
+          }
+        }
+      }
+
+      allMajorsProgress[major] = { completedCourses, courseReqMap };
+    }
+
+    // Find courses that appear in completed requirements of multiple majors
+    const sharedCourses: {
+      code: string;
+      credits: number;
+      majors: { majorId: string; majorName: string; requirements: string[] }[];
+    }[] = [];
+
+    const allCodes = new Set<string>();
+    Object.values(allMajorsProgress).forEach(({ completedCourses }) => {
+      completedCourses.forEach((code) => allCodes.add(code));
+    });
+
+    for (const code of Array.from(allCodes)) {
+      const majorsWithCourse = userProfile.majors.filter((major) =>
+        allMajorsProgress[major].completedCourses.has(code),
+      );
+
+      if (majorsWithCourse.length > 1) {
+        const courseData = courses.find((c) => c.code === code);
+        sharedCourses.push({
+          code,
+          credits: courseData?.credits || 1,
+          majors: majorsWithCourse.map((majorId) => ({
+            majorId,
+            majorName: MAJORS[majorId] || majorId,
+            requirements:
+              allMajorsProgress[majorId].courseReqMap.get(code) || [],
+          })),
+        });
+      }
+    }
+
+    const totalCredits = sharedCourses.reduce((sum, c) => sum + c.credits, 0);
+    return { courses: sharedCourses, totalCredits };
+  };
   const [distSelectorCourseId, setDistSelectorCourseId] = useState<
     string | null
   >(null);
   const [collapsedSemesters, setCollapsedSemesters] = useState<Set<string>>(
-    new Set()
+    new Set(),
   );
 
   // Helper to check if a semester has any in-progress courses
@@ -214,7 +346,7 @@ export default function Home() {
       (c) =>
         `${c.semester} ${c.year}` === semesterKey &&
         c.status === "in-progress" &&
-        !c.skipped
+        !c.skipped,
     );
   };
 
@@ -963,30 +1095,34 @@ export default function Home() {
                   </div>
                   {/* Mobile Nav Items */}
                   <nav className="space-y-1.5 flex-1 overflow-y-auto">
-                    {navItems.filter((item) => !item.disabled && !item.comingSoon).map((item) => (
-                      <motion.button
-                        key={item.id}
-                        whileTap={{ scale: 0.98 }}
-                        onClick={() => {
-                          handleTabChange(item.id);
-                          setSidebarOpen(false);
-                          void new Audio("/audio/pop.mp3").play().catch(() => null);
-                        }}
-                        className={`w-full flex items-center justify-between px-4 py-3 text-left rounded-2xl transition-all duration-300 ${
-                          activeTab === item.id
-                            ? "bg-gradient-to-br from-white/[0.12] via-white/[0.06] to-transparent text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.15)]"
-                            : "text-gray-400 hover:text-white hover:bg-white/[0.04]"
-                        }`}
-                      >
-                        <div className="flex items-center space-x-3">
-                          <item.icon size={item.id === "cleoai" ? 18 : 14} />
-                          <span className="text-sm">{item.label}</span>
-                        </div>
-                        {activeTab === item.id && (
-                          <FiChevronRight className="text-blue-400" />
-                        )}
-                      </motion.button>
-                    ))}
+                    {navItems
+                      .filter((item) => !item.disabled && !item.comingSoon)
+                      .map((item) => (
+                        <motion.button
+                          key={item.id}
+                          whileTap={{ scale: 0.98 }}
+                          onClick={() => {
+                            handleTabChange(item.id);
+                            setSidebarOpen(false);
+                            void new Audio("/audio/pop.mp3")
+                              .play()
+                              .catch(() => null);
+                          }}
+                          className={`w-full flex items-center justify-between px-4 py-3 text-left rounded-2xl transition-all duration-300 ${
+                            activeTab === item.id
+                              ? "bg-gradient-to-br from-white/[0.12] via-white/[0.06] to-transparent text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.15)]"
+                              : "text-gray-400 hover:text-white hover:bg-white/[0.04]"
+                          }`}
+                        >
+                          <div className="flex items-center space-x-3">
+                            <item.icon size={item.id === "cleoai" ? 18 : 14} />
+                            <span className="text-sm">{item.label}</span>
+                          </div>
+                          {activeTab === item.id && (
+                            <FiChevronRight className="text-blue-400" />
+                          )}
+                        </motion.button>
+                      ))}
                   </nav>
                   {/* Mobile bottom section */}
                   <div className="pt-4 border-t border-white/[0.08] space-y-3">
@@ -1012,7 +1148,10 @@ export default function Home() {
                         href="mailto:filippo.fonseca@yale.edu,emir.ahmed@yale.edu"
                         className="flex items-center gap-2 p-2 rounded-lg hover:bg-white/[0.06] transition-all text-gray-400 hover:text-white"
                       >
-                        <MessageCircleQuestionMark className="text-purple-400" size={12} />
+                        <MessageCircleQuestionMark
+                          className="text-purple-400"
+                          size={12}
+                        />
                         <span className="text-xs">Feedback</span>
                       </Link>
                       <Link
@@ -1040,14 +1179,19 @@ export default function Home() {
                         size={32}
                       />
                       <div className="flex-1 text-left">
-                        <p className="text-sm text-white truncate">{user.displayName}</p>
-                        <p className="text-xs text-gray-500 truncate">{user.email}</p>
+                        <p className="text-sm text-white truncate">
+                          {user.displayName}
+                        </p>
+                        <p className="text-xs text-gray-500 truncate">
+                          {user.email}
+                        </p>
                       </div>
                     </button>
 
                     {/* Disclaimer */}
                     <p className="text-[9px] text-gray-600 leading-tight px-1">
-                      Student-built tool. Verify with your DUS. Not affiliated with Yale.
+                      Student-built tool. Verify with your DUS. Not affiliated
+                      with Yale.
                     </p>
                   </div>
                 </motion.aside>
@@ -1065,62 +1209,68 @@ export default function Home() {
             {/* Navigation Items */}
             <nav className="space-y-1.5 flex-1 overflow-y-auto">
               {/* Always-enabled items (not disabled and not comingSoon) */}
-              {navItems.filter((item) => !item.disabled && !item.comingSoon).map((item) => (
-                <motion.button
-                  key={item.id}
-                  whileHover={{ scale: 1.02, x: 2 }}
-                  whileTap={{ scale: 0.98 }}
-                  onClick={() => {
-                    handleTabChange(item.id);
-                    void new Audio("/audio/pop.mp3").play().catch(() => null);
-                  }}
-                  className={`w-full flex items-center justify-between px-4 py-3 text-left rounded-2xl transition-all duration-300 relative ${
-                    activeTab === item.id
-                      ? "bg-gradient-to-br from-white/[0.12] via-white/[0.06] to-transparent text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.15),inset_0_-1px_0_rgba(0,0,0,0.2),0_4px_16px_rgba(0,0,0,0.3),0_0_0_1px_rgba(255,255,255,0.08)] backdrop-blur-sm border border-transparent"
-                      : "text-gray-400 hover:text-white hover:bg-white/[0.04] hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_4px_12px_rgba(0,0,0,0.15)]"
-                  }`}
-                >
-                  <div className="flex items-center space-x-3">
-                    <item.icon
-                      size={item.id === "cleoai" ? 18 : 12}
-                      opacity={
-                        item.id === "cleoai" && activeTab !== "cleoai" ? 0.5 : 1
-                      }
-                    />
-                    <span>{item.label}</span>
-                  </div>
+              {navItems
+                .filter((item) => !item.disabled && !item.comingSoon)
+                .map((item) => (
+                  <motion.button
+                    key={item.id}
+                    whileHover={{ scale: 1.02, x: 2 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={() => {
+                      handleTabChange(item.id);
+                      void new Audio("/audio/pop.mp3").play().catch(() => null);
+                    }}
+                    className={`w-full flex items-center justify-between px-4 py-3 text-left rounded-2xl transition-all duration-300 relative ${
+                      activeTab === item.id
+                        ? "bg-gradient-to-br from-white/[0.12] via-white/[0.06] to-transparent text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.15),inset_0_-1px_0_rgba(0,0,0,0.2),0_4px_16px_rgba(0,0,0,0.3),0_0_0_1px_rgba(255,255,255,0.08)] backdrop-blur-sm border border-transparent"
+                        : "text-gray-400 hover:text-white hover:bg-white/[0.04] hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_4px_12px_rgba(0,0,0,0.15)]"
+                    }`}
+                  >
+                    <div className="flex items-center space-x-3">
+                      <item.icon
+                        size={item.id === "cleoai" ? 18 : 12}
+                        opacity={
+                          item.id === "cleoai" && activeTab !== "cleoai"
+                            ? 0.5
+                            : 1
+                        }
+                      />
+                      <span>{item.label}</span>
+                    </div>
 
-                  {activeTab === item.id && (
-                    <motion.div
-                      initial={{ opacity: 0, x: -10 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      className="text-blue-400"
-                    >
-                      <FiChevronRight />
-                    </motion.div>
-                  )}
-                </motion.button>
-              ))}
+                    {activeTab === item.id && (
+                      <motion.div
+                        initial={{ opacity: 0, x: -10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        className="text-blue-400"
+                      >
+                        <FiChevronRight />
+                      </motion.div>
+                    )}
+                  </motion.button>
+                ))}
 
               {/* Coming soon items (shown in main nav but disabled with badge) */}
-              {navItems.filter((item) => item.comingSoon).map((item) => (
-                <motion.button
-                  key={item.id}
-                  className="w-full flex items-center justify-between px-4 py-3 text-left rounded-2xl transition-all duration-300 relative text-gray-600 cursor-not-allowed opacity-60"
-                  disabled
-                >
-                  <div className="flex items-center space-x-3">
-                    <item.icon
-                      size={item.id === "cleoai" ? 18 : 12}
-                      opacity={0.5}
-                    />
-                    <span>{item.label}</span>
-                    <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-purple-500/20 text-purple-400 border border-purple-500/30">
-                      COMING SOON
-                    </span>
-                  </div>
-                </motion.button>
-              ))}
+              {navItems
+                .filter((item) => item.comingSoon)
+                .map((item) => (
+                  <motion.button
+                    key={item.id}
+                    className="w-full flex items-center justify-between px-4 py-3 text-left rounded-2xl transition-all duration-300 relative text-gray-600 cursor-not-allowed opacity-60"
+                    disabled
+                  >
+                    <div className="flex items-center space-x-3">
+                      <item.icon
+                        size={item.id === "cleoai" ? 18 : 12}
+                        opacity={0.5}
+                      />
+                      <span>{item.label}</span>
+                      <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-purple-500/20 text-purple-400 border border-purple-500/30">
+                        COMING SOON
+                      </span>
+                    </div>
+                  </motion.button>
+                ))}
 
               {/* Subheader for disabled items (only shown when there are data-dependent disabled items) */}
               {navItems.some((item) => item.disabled && !item.comingSoon) && (
@@ -1132,21 +1282,23 @@ export default function Home() {
               )}
 
               {/* Disabled items (data-dependent, not coming soon) */}
-              {navItems.filter((item) => item.disabled && !item.comingSoon).map((item) => (
-                <motion.button
-                  key={item.id}
-                  className="w-full flex items-center justify-between px-4 py-3 text-left rounded-2xl transition-all duration-300 relative text-gray-600 cursor-not-allowed opacity-60"
-                  disabled
-                >
-                  <div className="flex items-center space-x-3">
-                    <item.icon
-                      size={item.id === "cleoai" ? 18 : 12}
-                      opacity={0.5}
-                    />
-                    <span>{item.label}</span>
-                  </div>
-                </motion.button>
-              ))}
+              {navItems
+                .filter((item) => item.disabled && !item.comingSoon)
+                .map((item) => (
+                  <motion.button
+                    key={item.id}
+                    className="w-full flex items-center justify-between px-4 py-3 text-left rounded-2xl transition-all duration-300 relative text-gray-600 cursor-not-allowed opacity-60"
+                    disabled
+                  >
+                    <div className="flex items-center space-x-3">
+                      <item.icon
+                        size={item.id === "cleoai" ? 18 : 12}
+                        opacity={0.5}
+                      />
+                      <span>{item.label}</span>
+                    </div>
+                  </motion.button>
+                ))}
             </nav>
 
             {/* Fixed Bottom Section */}
@@ -1260,7 +1412,10 @@ export default function Home() {
                           onClick={() => setShowUpdateModal(true)}
                           className="flex items-center gap-2 px-3 py-2 lg:px-4 lg:py-2.5 rounded-xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-all shadow-[0_4px_20px_rgba(0,0,0,0.08)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.25)] text-sm"
                         >
-                          <FiRefreshCw className="text-blue-500 dark:text-blue-400" size={16} />
+                          <FiRefreshCw
+                            className="text-blue-500 dark:text-blue-400"
+                            size={16}
+                          />
                           <span className="hidden sm:inline">Update</span>
                         </motion.button>
                       </div>
@@ -1294,324 +1449,356 @@ export default function Home() {
                             );
                           })
                           .map((semester) => {
-                            const isCollapsed = collapsedSemesters.has(semester);
-                            const hasInProgress = semesterHasInProgress(semester);
+                            const isCollapsed =
+                              collapsedSemesters.has(semester);
+                            const hasInProgress =
+                              semesterHasInProgress(semester);
                             const semesterCourses = courses.filter(
-                              (c) => `${c.semester} ${c.year}` === semester
+                              (c) => `${c.semester} ${c.year}` === semester,
                             );
 
                             return (
-                            <motion.div
-                              key={semester}
-                              initial={{ opacity: 0 }}
-                              animate={{ opacity: 1 }}
-                              className="mb-6"
-                            >
-                              {/* Semester Header */}
-                              <button
-                                onClick={() => toggleSemesterCollapse(semester)}
-                                className="w-full flex items-center justify-between mb-3 group"
+                              <motion.div
+                                key={semester}
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                className="mb-6"
                               >
-                                <div className="flex items-center gap-2">
-                                  <h3 className="text-base font-medium text-gray-700 dark:text-gray-300 group-hover:text-white transition-colors">
-                                    {semester}
-                                  </h3>
-                                  {hasInProgress && (
-                                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-purple-500/20 border border-purple-500/30 text-purple-300">
-                                      <span className="w-1 h-1 rounded-full bg-purple-400 animate-pulse" />
-                                      In Progress
-                                    </span>
-                                  )}
-                                  <span className="text-xs text-gray-600">
-                                    {semesterCourses.length} course{semesterCourses.length !== 1 ? "s" : ""}
-                                  </span>
-                                </div>
-                                <motion.div
-                                  animate={{ rotate: isCollapsed ? 0 : 180 }}
-                                  transition={{ duration: 0.2 }}
-                                  className="p-1 rounded-md text-gray-500 group-hover:text-gray-300 group-hover:bg-white/[0.05] transition-all"
+                                {/* Semester Header */}
+                                <button
+                                  onClick={() =>
+                                    toggleSemesterCollapse(semester)
+                                  }
+                                  className="w-full flex items-center justify-between mb-3 group"
                                 >
-                                  <FiChevronDown size={16} />
-                                </motion.div>
-                              </button>
-
-                              {/* Collapsible Courses Grid */}
-                              <AnimatePresence initial={false}>
-                                {!isCollapsed && (
+                                  <div className="flex items-center gap-2">
+                                    <h3 className="text-base font-medium text-gray-700 dark:text-gray-300 group-hover:text-white transition-colors">
+                                      {semester}
+                                    </h3>
+                                    {hasInProgress && (
+                                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-purple-500/20 border border-purple-500/30 text-purple-300">
+                                        <span className="w-1 h-1 rounded-full bg-purple-400 animate-pulse" />
+                                        In Progress
+                                      </span>
+                                    )}
+                                    <span className="text-xs text-gray-600">
+                                      {semesterCourses.length} course
+                                      {semesterCourses.length !== 1 ? "s" : ""}
+                                    </span>
+                                  </div>
                                   <motion.div
-                                    initial={{ height: 0, opacity: 0 }}
-                                    animate={{ height: "auto", opacity: 1 }}
-                                    exit={{ height: 0, opacity: 0 }}
-                                    transition={{ duration: 0.2, ease: "easeInOut" }}
-                                    className="overflow-hidden"
+                                    animate={{ rotate: isCollapsed ? 0 : 180 }}
+                                    transition={{ duration: 0.2 }}
+                                    className="p-1 rounded-md text-gray-500 group-hover:text-gray-300 group-hover:bg-white/[0.05] transition-all"
                                   >
-                              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                {courses
-                                  .filter(
-                                    (c) =>
-                                      `${c.semester} ${c.year}` === semester,
-                                  )
-                                  .map((course) => (
-                                    <motion.div
-                                      key={course.id}
-                                      whileHover={{ y: -2 }}
-                                      className={`relative p-4 cursor-pointer rounded-xl bg-white dark:bg-gray-900/50 backdrop-blur-sm border border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700 transition-all shadow-sm dark:shadow-none`}
-                                      onClick={() => {
-                                        setModalOpen({
-                                          isOpen: true,
-                                          course: {
-                                            id: course.id,
-                                            code: course.code,
-                                            name:
-                                              getCourseNameFromCode(
-                                                course.code,
-                                              ) ?? "Course",
-                                            status: course.status,
-                                            skipped: course.skipped || false,
-                                            distributionals:
-                                              course.distributionals || [],
-                                          },
-                                        });
-                                      }}
-                                    >
-                                      {/* TOP ROW */}
-                                      <div className="flex justify-between items-start">
-                                        <div className="pr-8">
-                                          <h4 className="font-medium text-gray-900 dark:text-white">
-                                            {course.code}
-                                            {course.skipped && (
-                                              <span className="ml-2 text-xs text-gray-500">
-                                                (skipped)
-                                              </span>
-                                            )}
-                                          </h4>
-                                          <p className="text-sm text-gray-500 dark:text-gray-400">
-                                            {getCourseNameFromCode(course.code)}
-                                          </p>
-                                          <div className="flex items-center mt-1 space-x-2">
-                                            <span
-                                              className={`text-xs px-2 py-1 rounded-full ${
-                                                course.status === "completed" &&
-                                                !course.skipped
-                                                  ? getGPAColor(
-                                                      course.grade || "",
-                                                    ) +
-                                                    " bg-emerald-100 dark:bg-emerald-900/20"
-                                                  : course.status ===
-                                                      "in-progress"
-                                                    ? "text-purple-600 dark:text-purple-300 bg-purple-100 dark:bg-purple-900/20"
-                                                    : "text-gray-600 dark:text-gray-300 bg-gray-100 dark:bg-gray-800/20"
-                                              }`}
-                                            >
-                                              {course.status === "completed" &&
-                                              !course.skipped
-                                                ? course.grade || "Completed"
-                                                : course.status ===
-                                                    "in-progress"
-                                                  ? "In Progress"
-                                                  : "Skipped"}
-                                            </span>
-                                            <span className="text-xs text-gray-500">
-                                              {course.credits} credit
-                                              {course.credits !== 1 ? "s" : ""}
-                                            </span>
-                                          </div>
-                                        </div>
+                                    <FiChevronDown size={16} />
+                                  </motion.div>
+                                </button>
 
-                                        {/* NEW: Trash button ONLY for in-progress (and not skipped) */}
-                                        {course.status === "in-progress" &&
-                                          !course.skipped && (
-                                            <button
-                                              aria-label="Delete in-progress course"
-                                              className="absolute top-3 right-3 p-2 rounded-lg border border-red-300 dark:border-red-800/40 bg-red-50 dark:bg-red-900/20 text-red-500 dark:text-red-300 hover:bg-red-100 dark:hover:bg-red-900/30 hover:border-red-400 dark:hover:border-red-700 transition-all"
-                                              onClick={(e) => {
-                                                e.stopPropagation(); // don't open the CourseModal
-                                                openDeleteConfirm(course);
-                                              }}
-                                              title="Delete this in-progress course"
-                                            >
-                                              <FiTrash2 className="w-4 h-4" />
-                                            </button>
-                                          )}
-                                      </div>
-                                      {/* Distributional tags */}
-                                      <div
-                                        className="mt-2"
-                                        onClick={(e) => e.stopPropagation()}
-                                      >
-                                        <div className="flex flex-wrap items-center gap-1.5">
-                                          {(course.distributionals || []).map(
-                                            (d) => (
-                                              <span
-                                                key={d}
-                                                className={`text-[10px] px-2 py-0.5 rounded-full border font-medium ${getDistPillStyle(d)}`}
-                                              >
-                                                {d}
-                                              </span>
-                                            ),
-                                          )}
-                                          {(course.distributionals || [])
-                                            .length === 0 ? (
-                                            // Gradient border when no distributionals assigned
-                                            <button
-                                              onClick={() =>
-                                                setDistSelectorCourseId(
-                                                  distSelectorCourseId ===
-                                                    course.id
-                                                    ? null
-                                                    : course.id,
-                                                )
-                                              }
-                                              className="text-[10px] px-2 py-0.5 rounded-full bg-gradient-to-r from-purple-500/20 via-pink-500/20 to-blue-500/20 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white border border-purple-500/50 hover:border-purple-400/70 transition-all"
-                                            >
-                                              + assign distributional req.
-                                            </button>
-                                          ) : (
-                                            <button
-                                              onClick={() =>
-                                                setDistSelectorCourseId(
-                                                  distSelectorCourseId ===
-                                                    course.id
-                                                    ? null
-                                                    : course.id,
-                                                )
-                                              }
-                                              className="text-[10px] px-2 py-0.5 rounded-full bg-gray-100 dark:bg-gray-800/50 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700/50 border border-dashed border-gray-300 dark:border-gray-700/50 transition-all"
-                                            >
-                                              edit distribs.
-                                            </button>
-                                          )}
-                                        </div>
-                                        <AnimatePresence>
-                                          {distSelectorCourseId ===
-                                            course.id && (
+                                {/* Collapsible Courses Grid */}
+                                <AnimatePresence initial={false}>
+                                  {!isCollapsed && (
+                                    <motion.div
+                                      initial={{ height: 0, opacity: 0 }}
+                                      animate={{ height: "auto", opacity: 1 }}
+                                      exit={{ height: 0, opacity: 0 }}
+                                      transition={{
+                                        duration: 0.2,
+                                        ease: "easeInOut",
+                                      }}
+                                      className="overflow-hidden"
+                                    >
+                                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                        {courses
+                                          .filter(
+                                            (c) =>
+                                              `${c.semester} ${c.year}` ===
+                                              semester,
+                                          )
+                                          .map((course) => (
                                             <motion.div
-                                              initial={{
-                                                opacity: 0,
-                                                height: 0,
+                                              key={course.id}
+                                              whileHover={{ y: -2 }}
+                                              className={`relative p-4 cursor-pointer rounded-xl bg-white dark:bg-gray-900/50 backdrop-blur-sm border border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700 transition-all shadow-sm dark:shadow-none`}
+                                              onClick={() => {
+                                                setModalOpen({
+                                                  isOpen: true,
+                                                  course: {
+                                                    id: course.id,
+                                                    code: course.code,
+                                                    name:
+                                                      getCourseNameFromCode(
+                                                        course.code,
+                                                      ) ?? "Course",
+                                                    status: course.status,
+                                                    skipped:
+                                                      course.skipped || false,
+                                                    distributionals:
+                                                      course.distributionals ||
+                                                      [],
+                                                  },
+                                                });
                                               }}
-                                              animate={{
-                                                opacity: 1,
-                                                height: "auto",
-                                              }}
-                                              exit={{
-                                                opacity: 0,
-                                                height: 0,
-                                              }}
-                                              className="overflow-hidden"
                                             >
-                                              <div className="mt-2 p-3 rounded-lg bg-gray-100 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700/50 space-y-2.5">
-                                                <div>
-                                                  <p className="text-[10px] text-gray-500 uppercase tracking-wider mb-1.5">
-                                                    Areas
-                                                  </p>
-                                                  <div className="flex flex-wrap gap-1.5">
-                                                    {["Hu", "So", "Sc"].map(
-                                                      (d) => (
-                                                        <button
-                                                          key={d}
-                                                          onClick={() =>
-                                                            toggleDistributional(
-                                                              course.id,
-                                                              d,
-                                                            )
-                                                          }
-                                                          className={`text-xs px-2.5 py-1 rounded-full border font-medium transition-all ${
-                                                            (
-                                                              course.distributionals ||
-                                                              []
-                                                            ).includes(d)
-                                                              ? getDistPillStyle(
-                                                                  d,
-                                                                )
-                                                              : "bg-white dark:bg-gray-800/50 text-gray-500 border-gray-300 dark:border-gray-700 hover:border-gray-400 dark:hover:border-gray-600"
-                                                          }`}
-                                                        >
-                                                          {d}
-                                                        </button>
-                                                      ),
+                                              {/* TOP ROW */}
+                                              <div className="flex justify-between items-start">
+                                                <div className="pr-8">
+                                                  <h4 className="font-medium text-gray-900 dark:text-white">
+                                                    {course.code}
+                                                    {course.skipped && (
+                                                      <span className="ml-2 text-xs text-gray-500">
+                                                        (skipped)
+                                                      </span>
                                                     )}
-                                                  </div>
-                                                </div>
-                                                <div>
-                                                  <p className="text-[10px] text-gray-500 uppercase tracking-wider mb-1.5">
-                                                    Skills
+                                                  </h4>
+                                                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                                                    {getCourseNameFromCode(
+                                                      course.code,
+                                                    )}
                                                   </p>
-                                                  <div className="flex flex-wrap gap-1.5">
-                                                    {["QR", "WR"].map((d) => (
-                                                      <button
-                                                        key={d}
-                                                        onClick={() =>
-                                                          toggleDistributional(
-                                                            course.id,
-                                                            d,
-                                                          )
-                                                        }
-                                                        className={`text-xs px-2.5 py-1 rounded-full border font-medium transition-all ${
-                                                          (
-                                                            course.distributionals ||
-                                                            []
-                                                          ).includes(d)
-                                                            ? getDistPillStyle(
-                                                                d,
-                                                              )
-                                                            : "bg-white dark:bg-gray-800/50 text-gray-500 border-gray-300 dark:border-gray-700 hover:border-gray-400 dark:hover:border-gray-600"
-                                                        }`}
-                                                      >
-                                                        {d}
-                                                      </button>
-                                                    ))}
+                                                  <div className="flex items-center mt-1 space-x-2">
+                                                    <span
+                                                      className={`text-xs px-2 py-1 rounded-full ${
+                                                        course.status ===
+                                                          "completed" &&
+                                                        !course.skipped
+                                                          ? getGPAColor(
+                                                              course.grade ||
+                                                                "",
+                                                            ) +
+                                                            " bg-emerald-100 dark:bg-emerald-900/20"
+                                                          : course.status ===
+                                                              "in-progress"
+                                                            ? "text-purple-600 dark:text-purple-300 bg-purple-100 dark:bg-purple-900/20"
+                                                            : "text-gray-600 dark:text-gray-300 bg-gray-100 dark:bg-gray-800/20"
+                                                      }`}
+                                                    >
+                                                      {course.status ===
+                                                        "completed" &&
+                                                      !course.skipped
+                                                        ? course.grade ||
+                                                          "Completed"
+                                                        : course.status ===
+                                                            "in-progress"
+                                                          ? "In Progress"
+                                                          : "Skipped"}
+                                                    </span>
+                                                    <span className="text-xs text-gray-500">
+                                                      {course.credits} credit
+                                                      {course.credits !== 1
+                                                        ? "s"
+                                                        : ""}
+                                                    </span>
                                                   </div>
                                                 </div>
-                                                <div>
-                                                  <p className="text-[10px] text-gray-500 uppercase tracking-wider mb-1.5">
-                                                    Language
-                                                  </p>
-                                                  <div className="flex flex-wrap gap-1.5">
-                                                    {[
-                                                      "L1",
-                                                      "L2",
-                                                      "L3",
-                                                      "L4",
-                                                      "L5",
-                                                    ].map((d) => (
-                                                      <button
-                                                        key={d}
-                                                        onClick={() =>
-                                                          toggleDistributional(
-                                                            course.id,
-                                                            d,
-                                                          )
-                                                        }
-                                                        className={`text-xs px-2.5 py-1 rounded-full border font-medium transition-all ${
-                                                          (
-                                                            course.distributionals ||
-                                                            []
-                                                          ).includes(d)
-                                                            ? getDistPillStyle(
-                                                                d,
-                                                              )
-                                                            : "bg-white dark:bg-gray-800/50 text-gray-500 border-gray-300 dark:border-gray-700 hover:border-gray-400 dark:hover:border-gray-600"
-                                                        }`}
-                                                      >
-                                                        {d}
-                                                      </button>
-                                                    ))}
-                                                  </div>
+
+                                                {/* NEW: Trash button ONLY for in-progress (and not skipped) */}
+                                                {course.status ===
+                                                  "in-progress" &&
+                                                  !course.skipped && (
+                                                    <button
+                                                      aria-label="Delete in-progress course"
+                                                      className="absolute top-3 right-3 p-2 rounded-lg border border-red-300 dark:border-red-800/40 bg-red-50 dark:bg-red-900/20 text-red-500 dark:text-red-300 hover:bg-red-100 dark:hover:bg-red-900/30 hover:border-red-400 dark:hover:border-red-700 transition-all"
+                                                      onClick={(e) => {
+                                                        e.stopPropagation(); // don't open the CourseModal
+                                                        openDeleteConfirm(
+                                                          course,
+                                                        );
+                                                      }}
+                                                      title="Delete this in-progress course"
+                                                    >
+                                                      <FiTrash2 className="w-4 h-4" />
+                                                    </button>
+                                                  )}
+                                              </div>
+                                              {/* Distributional tags */}
+                                              <div
+                                                className="mt-2"
+                                                onClick={(e) =>
+                                                  e.stopPropagation()
+                                                }
+                                              >
+                                                <div className="flex flex-wrap items-center gap-1.5">
+                                                  {(
+                                                    course.distributionals || []
+                                                  ).map((d) => (
+                                                    <span
+                                                      key={d}
+                                                      className={`text-[10px] px-2 py-0.5 rounded-full border font-medium ${getDistPillStyle(d)}`}
+                                                    >
+                                                      {d}
+                                                    </span>
+                                                  ))}
+                                                  {(
+                                                    course.distributionals || []
+                                                  ).length === 0 ? (
+                                                    // Gradient border when no distributionals assigned
+                                                    <button
+                                                      onClick={() =>
+                                                        setDistSelectorCourseId(
+                                                          distSelectorCourseId ===
+                                                            course.id
+                                                            ? null
+                                                            : course.id,
+                                                        )
+                                                      }
+                                                      className="text-[10px] px-2 py-0.5 rounded-full bg-gradient-to-r from-purple-500/20 via-pink-500/20 to-blue-500/20 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white border border-purple-500/50 hover:border-purple-400/70 transition-all"
+                                                    >
+                                                      + assign distributional
+                                                      req.
+                                                    </button>
+                                                  ) : (
+                                                    <button
+                                                      onClick={() =>
+                                                        setDistSelectorCourseId(
+                                                          distSelectorCourseId ===
+                                                            course.id
+                                                            ? null
+                                                            : course.id,
+                                                        )
+                                                      }
+                                                      className="text-[10px] px-2 py-0.5 rounded-full bg-gray-100 dark:bg-gray-800/50 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700/50 border border-dashed border-gray-300 dark:border-gray-700/50 transition-all"
+                                                    >
+                                                      edit distribs.
+                                                    </button>
+                                                  )}
                                                 </div>
+                                                <AnimatePresence>
+                                                  {distSelectorCourseId ===
+                                                    course.id && (
+                                                    <motion.div
+                                                      initial={{
+                                                        opacity: 0,
+                                                        height: 0,
+                                                      }}
+                                                      animate={{
+                                                        opacity: 1,
+                                                        height: "auto",
+                                                      }}
+                                                      exit={{
+                                                        opacity: 0,
+                                                        height: 0,
+                                                      }}
+                                                      className="overflow-hidden"
+                                                    >
+                                                      <div className="mt-2 p-3 rounded-lg bg-gray-100 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700/50 space-y-2.5">
+                                                        <div>
+                                                          <p className="text-[10px] text-gray-500 uppercase tracking-wider mb-1.5">
+                                                            Areas
+                                                          </p>
+                                                          <div className="flex flex-wrap gap-1.5">
+                                                            {[
+                                                              "Hu",
+                                                              "So",
+                                                              "Sc",
+                                                            ].map((d) => (
+                                                              <button
+                                                                key={d}
+                                                                onClick={() =>
+                                                                  toggleDistributional(
+                                                                    course.id,
+                                                                    d,
+                                                                  )
+                                                                }
+                                                                className={`text-xs px-2.5 py-1 rounded-full border font-medium transition-all ${
+                                                                  (
+                                                                    course.distributionals ||
+                                                                    []
+                                                                  ).includes(d)
+                                                                    ? getDistPillStyle(
+                                                                        d,
+                                                                      )
+                                                                    : "bg-white dark:bg-gray-800/50 text-gray-500 border-gray-300 dark:border-gray-700 hover:border-gray-400 dark:hover:border-gray-600"
+                                                                }`}
+                                                              >
+                                                                {d}
+                                                              </button>
+                                                            ))}
+                                                          </div>
+                                                        </div>
+                                                        <div>
+                                                          <p className="text-[10px] text-gray-500 uppercase tracking-wider mb-1.5">
+                                                            Skills
+                                                          </p>
+                                                          <div className="flex flex-wrap gap-1.5">
+                                                            {["QR", "WR"].map(
+                                                              (d) => (
+                                                                <button
+                                                                  key={d}
+                                                                  onClick={() =>
+                                                                    toggleDistributional(
+                                                                      course.id,
+                                                                      d,
+                                                                    )
+                                                                  }
+                                                                  className={`text-xs px-2.5 py-1 rounded-full border font-medium transition-all ${
+                                                                    (
+                                                                      course.distributionals ||
+                                                                      []
+                                                                    ).includes(
+                                                                      d,
+                                                                    )
+                                                                      ? getDistPillStyle(
+                                                                          d,
+                                                                        )
+                                                                      : "bg-white dark:bg-gray-800/50 text-gray-500 border-gray-300 dark:border-gray-700 hover:border-gray-400 dark:hover:border-gray-600"
+                                                                  }`}
+                                                                >
+                                                                  {d}
+                                                                </button>
+                                                              ),
+                                                            )}
+                                                          </div>
+                                                        </div>
+                                                        <div>
+                                                          <p className="text-[10px] text-gray-500 uppercase tracking-wider mb-1.5">
+                                                            Language
+                                                          </p>
+                                                          <div className="flex flex-wrap gap-1.5">
+                                                            {[
+                                                              "L1",
+                                                              "L2",
+                                                              "L3",
+                                                              "L4",
+                                                              "L5",
+                                                            ].map((d) => (
+                                                              <button
+                                                                key={d}
+                                                                onClick={() =>
+                                                                  toggleDistributional(
+                                                                    course.id,
+                                                                    d,
+                                                                  )
+                                                                }
+                                                                className={`text-xs px-2.5 py-1 rounded-full border font-medium transition-all ${
+                                                                  (
+                                                                    course.distributionals ||
+                                                                    []
+                                                                  ).includes(d)
+                                                                    ? getDistPillStyle(
+                                                                        d,
+                                                                      )
+                                                                    : "bg-white dark:bg-gray-800/50 text-gray-500 border-gray-300 dark:border-gray-700 hover:border-gray-400 dark:hover:border-gray-600"
+                                                                }`}
+                                                              >
+                                                                {d}
+                                                              </button>
+                                                            ))}
+                                                          </div>
+                                                        </div>
+                                                      </div>
+                                                    </motion.div>
+                                                  )}
+                                                </AnimatePresence>
                                               </div>
                                             </motion.div>
-                                          )}
-                                        </AnimatePresence>
+                                          ))}
                                       </div>
                                     </motion.div>
-                                  ))}
-                              </div>
-                                  </motion.div>
-                                )}
-                              </AnimatePresence>
-                            </motion.div>
-                          );
+                                  )}
+                                </AnimatePresence>
+                              </motion.div>
+                            );
                           })}
 
                         {courses.some((c) => c.skipped) && (
@@ -1677,15 +1864,38 @@ export default function Home() {
                       {/* Data & Privacy Disclaimer */}
                       <div className="mt-10 p-4 rounded-xl bg-gradient-to-br from-gray-900/40 via-gray-900/30 to-gray-950/40 border border-gray-800/50 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)]">
                         <p className="text-[11px] text-gray-500 leading-relaxed">
-                          <span className="font-medium text-gray-400">By using DegreeIntelligence, you voluntarily share your grades.</span>{" "}
-                          Your transcript PDF is processed locally and is <span className="text-emerald-400/80">never stored</span> on our servers. However, we do store your course and grade data in our database (private only to your profile) to provide you with insights, progress tracking, and recommendations for your major.{" "}
-                          By uploading academic information, you confirm that you are providing your own data and consent to its storage and processing for academic planning purposes.{" "}
-                          <Link href="/terms" target="_blank" className="text-blue-400 hover:text-blue-300 underline underline-offset-2">
+                          <span className="font-medium text-gray-400">
+                            By using DegreeIntelligence, you voluntarily share
+                            your grades.
+                          </span>{" "}
+                          Your transcript PDF is processed locally and is{" "}
+                          <span className="text-emerald-400/80">
+                            never stored
+                          </span>{" "}
+                          on our servers. However, we do store your course and
+                          grade data in our database (private only to your
+                          profile) to provide you with insights, progress
+                          tracking, and recommendations for your major. By
+                          uploading academic information, you confirm that you
+                          are providing your own data and consent to its storage
+                          and processing for academic planning purposes.{" "}
+                          <Link
+                            href="/terms"
+                            target="_blank"
+                            className="text-blue-400 hover:text-blue-300 underline underline-offset-2"
+                          >
                             Read our full terms
-                          </Link>.
+                          </Link>
+                          .
                         </p>
                         <p className="text-[10px] text-gray-600 mt-2 leading-relaxed">
-                          DegreeIntelligence is <span className="font-medium">not affiliated</span> in any way, shape, or form with Yale University, Yale College, or DegreeAudit. We are simply a free, student-built personal project that we wanted to share with the community because we genuinely found it helpful for ourselves.
+                          DegreeIntelligence is{" "}
+                          <span className="font-medium">not affiliated</span> in
+                          any way, shape, or form with Yale University, Yale
+                          College, or DegreeAudit. We are simply a free,
+                          student-built personal project that we wanted to share
+                          with the community because we genuinely found it
+                          helpful for ourselves.
                         </p>
                       </div>
                     </div>
@@ -1779,21 +1989,55 @@ export default function Home() {
                       <div className="w-full max-w-xl mt-5 p-4 rounded-xl bg-gradient-to-br from-gray-900/40 via-gray-900/30 to-gray-950/40 border border-gray-800/50 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)]">
                         <div className="flex items-start gap-3">
                           <div className="p-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20 shrink-0 mt-0.5">
-                            <svg className="w-3.5 h-3.5 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                              <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                            <svg
+                              className="w-3.5 h-3.5 text-emerald-400"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              stroke="currentColor"
+                              strokeWidth={2}
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
+                              />
                             </svg>
                           </div>
                           <div>
                             <p className="text-[11px] text-gray-400 leading-relaxed">
-                              <span className="font-medium text-gray-300">By uploading, you voluntarily share your grades.</span>{" "}
-                              Your transcript PDF is processed locally and is <span className="text-emerald-400">never stored</span> on our servers. However, we store your course and grade data in our database (private only to your profile) to provide insights and recommendations for your major.{" "}
-                              By uploading academic information, you confirm that you are providing your own data and consent to its storage and processing for academic planning purposes.{" "}
-                              <Link href="/terms" target="_blank" className="text-blue-400 hover:text-blue-300 underline underline-offset-2">
+                              <span className="font-medium text-gray-300">
+                                By uploading, you voluntarily share your grades.
+                              </span>{" "}
+                              Your transcript PDF is processed locally and is{" "}
+                              <span className="text-emerald-400">
+                                never stored
+                              </span>{" "}
+                              on our servers. However, we store your course and
+                              grade data in our database (private only to your
+                              profile) to provide insights and recommendations
+                              for your major. By uploading academic information,
+                              you confirm that you are providing your own data
+                              and consent to its storage and processing for
+                              academic planning purposes.{" "}
+                              <Link
+                                href="/terms"
+                                target="_blank"
+                                className="text-blue-400 hover:text-blue-300 underline underline-offset-2"
+                              >
                                 Read our full terms
-                              </Link>.
+                              </Link>
+                              .
                             </p>
                             <p className="text-[10px] text-gray-600 mt-2 leading-relaxed">
-                              DegreeIntelligence is <span className="font-medium">not affiliated</span> in any way, shape, or form with Yale University, Yale College, or DegreeAudit. We are simply a free, student-built personal project that we wanted to share with the community because we genuinely found it helpful for ourselves.
+                              DegreeIntelligence is{" "}
+                              <span className="font-medium">
+                                not affiliated
+                              </span>{" "}
+                              in any way, shape, or form with Yale University,
+                              Yale College, or DegreeAudit. We are simply a
+                              free, student-built personal project that we
+                              wanted to share with the community because we
+                              genuinely found it helpful for ourselves.
                             </p>
                           </div>
                         </div>
@@ -1906,7 +2150,7 @@ export default function Home() {
                         <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1.5 uppercase tracking-wider">
                           Viewing Progress For
                         </label>
-                        <div className="flex flex-wrap gap-1.5">
+                        <div className="flex flex-wrap items-center gap-1.5">
                           {userProfile.majors.map((major) => (
                             <button
                               key={major}
@@ -1920,6 +2164,160 @@ export default function Home() {
                               {major} - {MAJORS[major] || major}
                             </button>
                           ))}
+
+                          {/* Shared Courses Indicator */}
+                          {(() => {
+                            const { courses: sharedCourses, totalCredits } =
+                              getSharedCourses();
+                            const isWarning = totalCredits > 2;
+                            const hasShared = sharedCourses.length > 0;
+
+                            return (
+                              <div
+                                ref={sharedCoursesRef}
+                                className="relative ml-2"
+                              >
+                                <button
+                                  onClick={() =>
+                                    setShowSharedCoursesDropdown(
+                                      !showSharedCoursesDropdown,
+                                    )
+                                  }
+                                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs transition-all duration-200 ${
+                                    isWarning
+                                      ? "bg-amber-900/30 text-amber-300 border border-amber-600/40 hover:border-amber-500/60"
+                                      : "bg-emerald-900/30 text-emerald-300 border border-emerald-600/40 hover:border-emerald-500/60"
+                                  }`}
+                                >
+                                  {isWarning ? (
+                                    <FiAlertTriangle size={12} />
+                                  ) : (
+                                    <FiCheck size={12} />
+                                  )}
+                                  <span>
+                                    {hasShared
+                                      ? `${totalCredits} shared cr${totalCredits !== 1 ? "s" : ""}`
+                                      : "No overlap"}
+                                  </span>
+                                  <FiChevronDown
+                                    size={12}
+                                    className={`transition-transform ${showSharedCoursesDropdown ? "rotate-180" : ""}`}
+                                  />
+                                </button>
+
+                                {/* Dropdown */}
+                                <AnimatePresence>
+                                  {showSharedCoursesDropdown && (
+                                    <motion.div
+                                      initial={{ opacity: 0, y: -5 }}
+                                      animate={{ opacity: 1, y: 0 }}
+                                      exit={{ opacity: 0, y: -5 }}
+                                      className="absolute top-full left-0 mt-2 z-50 w-80 max-h-80 overflow-y-auto rounded-xl bg-gray-900/95 backdrop-blur-xl border border-gray-700/50 shadow-[0_8px_32px_rgba(0,0,0,0.4)] p-3"
+                                    >
+                                      <div className="flex items-center justify-between mb-2">
+                                        <h4 className="text-xs font-medium text-gray-300 uppercase tracking-wider">
+                                          Shared Courses
+                                        </h4>
+                                        <button
+                                          onClick={() =>
+                                            setShowSharedCoursesDropdown(false)
+                                          }
+                                          className="text-gray-500 hover:text-gray-300"
+                                        >
+                                          <FiX size={14} />
+                                        </button>
+                                      </div>
+
+                                      {!hasShared ? (
+                                        <div className="text-center py-4">
+                                          <FiCheck
+                                            className="mx-auto text-emerald-400 mb-2"
+                                            size={24}
+                                          />
+                                          <p className="text-sm text-emerald-300 font-medium">
+                                            All clear!
+                                          </p>
+                                          <p className="text-xs text-gray-500 mt-1">
+                                            No courses are counting toward
+                                            multiple majors.
+                                          </p>
+                                        </div>
+                                      ) : (
+                                        <>
+                                          <div
+                                            className={`text-xs mb-3 p-2 rounded-lg ${
+                                              isWarning
+                                                ? "bg-amber-900/20 text-amber-300 border border-amber-700/30"
+                                                : "bg-emerald-900/20 text-emerald-300 border border-emerald-700/30"
+                                            }`}
+                                          >
+                                            {isWarning ? (
+                                              <>
+                                                <strong>Heads up:</strong> You
+                                                have more than 2 credits shared
+                                                between majors. You may need to
+                                                revise your course plan.
+                                              </>
+                                            ) : (
+                                              <>
+                                                <strong>
+                                                  You&apos;re good!
+                                                </strong>{" "}
+                                                Having 1-2 shared credits
+                                                between majors is typically
+                                                allowed.
+                                              </>
+                                            )}
+                                          </div>
+                                          <p className="text-[10px] text-gray-600 mb-3 italic">
+                                            Note: Pre-requisites don&apos;t
+                                            count toward the 2-credit overlap
+                                            limit. Check manually! We're just
+                                            warning you, just in case.
+                                          </p>
+
+                                          <div className="space-y-2">
+                                            {sharedCourses.map((course) => (
+                                              <div
+                                                key={course.code}
+                                                className="p-2 rounded-lg bg-gray-800/50 border border-gray-700/30"
+                                              >
+                                                <div className="flex items-center justify-between mb-1">
+                                                  <span className="text-sm font-medium text-gray-200">
+                                                    {course.code}
+                                                  </span>
+                                                  <span className="text-[10px] text-gray-500">
+                                                    {course.credits} cr
+                                                  </span>
+                                                </div>
+                                                <div className="space-y-1">
+                                                  {course.majors.map((m) => (
+                                                    <div
+                                                      key={m.majorId}
+                                                      className="text-[11px]"
+                                                    >
+                                                      <span className="text-purple-300">
+                                                        {m.majorName}:
+                                                      </span>{" "}
+                                                      <span className="text-gray-400">
+                                                        {m.requirements.join(
+                                                          ", ",
+                                                        ) || "General"}
+                                                      </span>
+                                                    </div>
+                                                  ))}
+                                                </div>
+                                              </div>
+                                            ))}
+                                          </div>
+                                        </>
+                                      )}
+                                    </motion.div>
+                                  )}
+                                </AnimatePresence>
+                              </div>
+                            );
+                          })()}
                         </div>
                       </div>
                     )}

@@ -167,13 +167,11 @@ const DistributionalsView = ({ courses }: { courses: Course[] }) => {
     >
       {/* Header */}
       <div>
-        <h2 className="text-3xl font-medium bg-clip-text text-transparent bg-gradient-to-r from-blue-200 to-purple-200">
+        <h2 className="text-xl sm:text-2xl lg:text-3xl font-medium bg-clip-text text-transparent bg-gradient-to-r from-blue-200 to-purple-200">
           Your distributional progress.
         </h2>
-        <p className="text-gray-600 dark:text-gray-400 mt-1">
-          Track your progress toward Yale College's distributional requirements.
-          Assign distributionals to your courses in the{" "}
-          <span className="text-gray-700 dark:text-gray-300">My Courses</span> tab.
+        <p className="text-sm lg:text-base text-gray-600 dark:text-gray-400 mt-1">
+          Track your progress toward Yale's distributional requirements.
         </p>
       </div>
 

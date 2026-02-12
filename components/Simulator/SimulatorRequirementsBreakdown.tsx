@@ -128,7 +128,6 @@ export default function SimulatorRequirementsBreakdown({
         if (!prog) return null;
 
         const isOpen = !!expanded[majorId];
-        const pctWithIP = prog.inProgressPercentage ?? prog.percentage;
         const pctCompleted = prog.percentage;
 
         // Manual reqs for this major
@@ -158,6 +157,18 @@ export default function SimulatorRequirementsBreakdown({
           }
         }
 
+        // Calculate three-tier percentages based on requirement completion
+        const totalReqs = prog.completedRequirements.length +
+          prog.inProgressRequirements.length +
+          prog.remainingRequirements.length;
+
+        const completedCount = prog.completedRequirements.length;
+        const withIPCount = completedCount + trueInProgress.length;
+        const withPlannedCount = withIPCount + planned.length;
+
+        const pctWithIP = totalReqs > 0 ? (withIPCount / totalReqs) * 100 : 0;
+        const pctWithPlanned = totalReqs > 0 ? (withPlannedCount / totalReqs) * 100 : 0;
+
         return (
           <div
             key={majorId}
@@ -168,22 +179,35 @@ export default function SimulatorRequirementsBreakdown({
               onClick={() => toggle(majorId)}
               className="w-full flex items-center gap-2.5 p-3 text-left hover:bg-gray-800/20 transition-colors"
             >
-              <ProgressRing percentage={pctWithIP} size={32} strokeWidth={3} />
+              <ProgressRing percentage={pctWithPlanned} size={32} strokeWidth={3} />
 
               <div className="flex-1 min-w-0">
                 <div className="text-xs font-medium text-gray-200 truncate">
                   {MAJORS[majorId] ?? majorId}
                 </div>
-                <div className="flex items-center gap-2 mt-0.5 text-[10px] text-gray-500">
+                <div className="flex items-center flex-wrap gap-x-2 gap-y-0.5 mt-0.5 text-[10px] text-gray-500">
                   <span>
-                    <span className="text-blue-300 font-medium">
-                      {prog.completedCredits}
+                    <span className="text-emerald-300 font-medium">
+                      {pctCompleted.toFixed(0)}%
                     </span>
-                    /{prog.totalCredits} credits
+                    <span className="text-gray-600 ml-0.5">done</span>
                   </span>
-                  <span className="text-purple-300">
-                    {pctWithIP.toFixed(0)}% w/ planned
-                  </span>
+                  {trueInProgress.length > 0 && (
+                    <span>
+                      <span className="text-blue-300 font-medium">
+                        {pctWithIP.toFixed(0)}%
+                      </span>
+                      <span className="text-gray-600 ml-0.5">w/ in-progress</span>
+                    </span>
+                  )}
+                  {planned.length > 0 && (
+                    <span>
+                      <span className="text-purple-300 font-medium">
+                        {pctWithPlanned.toFixed(0)}%
+                      </span>
+                      <span className="text-gray-600 ml-0.5">w/ planned</span>
+                    </span>
+                  )}
                 </div>
               </div>
 
@@ -194,16 +218,24 @@ export default function SimulatorRequirementsBreakdown({
               )}
             </button>
 
-            {/* Progress bar (always visible) */}
+            {/* Progress bar (always visible) - three tiers */}
             <div className="px-3 pb-2.5 -mt-0.5">
               <div className="w-full bg-gray-950/50 h-1.5 rounded-full overflow-hidden relative shadow-[inset_0_1px_2px_rgba(0,0,0,0.3)]">
+                {/* Planned layer (purple, lightest) */}
                 <div
-                  className="h-1.5 bg-gradient-to-r from-purple-400 to-purple-500 opacity-35 absolute top-0 left-0 rounded-full"
+                  className="h-1.5 bg-gradient-to-r from-purple-400 to-purple-500 opacity-30 absolute top-0 left-0 rounded-full"
+                  style={{ width: `${Math.min(100, pctWithPlanned)}%` }}
+                  aria-hidden
+                />
+                {/* In-progress layer (blue, medium) */}
+                <div
+                  className="h-1.5 bg-gradient-to-r from-blue-400 to-blue-500 opacity-50 absolute top-0 left-0 rounded-full"
                   style={{ width: `${Math.min(100, pctWithIP)}%` }}
                   aria-hidden
                 />
+                {/* Completed layer (green, solid) */}
                 <div
-                  className="h-1.5 bg-gradient-to-r from-blue-400 to-blue-500 relative rounded-full shadow-[0_0_6px_rgba(96,165,250,0.3)]"
+                  className="h-1.5 bg-gradient-to-r from-emerald-400 to-emerald-500 relative rounded-full shadow-[0_0_6px_rgba(52,211,153,0.3)]"
                   style={{ width: `${Math.min(100, pctCompleted)}%` }}
                 />
               </div>

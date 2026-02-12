@@ -173,23 +173,24 @@ export default function AboutPage() {
   if (logInFlow) return <LoginPage onBackClick={() => setLogInFlow(false)} />;
 
   return (
-    <div className="min-h-screen pt-2 bg-gradient-to-br from-gray-950 via-gray-900 to-gray-900 font-louize">
+    <div className="min-h-screen pt-2 bg-gradient-to-br from-gray-950 via-gray-900 to-gray-900 font-louize overflow-x-hidden">
       <CosmicBackground mode="stars" opacity={0.9} />
       {/* Welcome Banner */}
-      <div className="relative mb-8 z-50 bg-gradient-to-r from-emerald-900/20 via-blue-900/20 to-purple-900/20 backdrop-blur-xl border-b border-white/[0.08] shadow-[0_8px_32px_rgba(0,0,0,0.3),inset_0_1px_0_rgba(255,255,255,0.1)]">
+      <div className="relative mb-8 mt-14 z-30 bg-gradient-to-r from-emerald-900/20 via-blue-900/20 to-purple-900/20 backdrop-blur-xl border-b border-white/[0.08] shadow-[0_8px_32px_rgba(0,0,0,0.3),inset_0_1px_0_rgba(255,255,255,0.1)]">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-2.5 flex items-center justify-center gap-2">
-          <span className="px-3 py-1.5 text-xs font-semibold rounded-full bg-gradient-to-r from-emerald-500/20 to-emerald-600/20 border border-emerald-500/30 text-emerald-300 shadow-[inset_0_1px_0_rgba(255,255,255,0.1),0_2px_8px_rgba(52,211,153,0.2)] flex items-center gap-1.5">
-            <HiSparkles className="w-3 h-3" /> News Feature
+          <span className="px-2.5 py-1 text-[10px] sm:text-xs font-semibold rounded-full bg-gradient-to-r from-emerald-500/20 to-emerald-600/20 border border-emerald-500/30 text-emerald-300 shadow-[inset_0_1px_0_rgba(255,255,255,0.1),0_2px_8px_rgba(52,211,153,0.2)] flex items-center gap-1 shrink-0">
+            <HiSparkles className="w-3 h-3" /> <span className="hidden sm:inline">News</span>
           </span>
-          <p className="text-sm text-emerald-100">
-            The Yale Daily News ran a feature on us.{" "}
+          <p className="text-[11px] sm:text-sm text-emerald-100">
+            <span className="sm:hidden">The YDN featured us.</span>
+            <span className="hidden sm:inline">The Yale Daily News featured us.</span>{" "}
             <a
               href="https://yaledailynews.com/blog/2025/09/23/new-student-run-platform-aims-to-simplify-degree-planning/"
               target="_blank"
               className="text-blue-300 font-medium hover:text-white hover:underline transition-colors"
             >
               Read it!
-            </a>{" "}
+            </a>
           </p>
         </div>
       </div>
@@ -199,22 +200,23 @@ export default function AboutPage() {
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="fixed top-0 left-0 right-0 z-40 bg-gray-950/70 backdrop-blur-xl border-b border-white/[0.06] shadow-[0_4px_24px_rgba(0,0,0,0.3)]"
+        className="fixed top-0 left-0 right-0 z-50 bg-gray-950/80 backdrop-blur-xl border-b border-white/[0.06] shadow-[0_4px_24px_rgba(0,0,0,0.3)]"
       >
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between">
+        <div className="max-w-6xl mx-auto px-3 sm:px-6 lg:px-8 py-2.5 sm:py-3 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <LogoIcon width={24} height={24} />
+            <LogoIcon width={22} height={22} className="sm:w-6 sm:h-6" />
             <span className="text-sm font-medium text-gray-200 hidden sm:inline">
               DegreeIntelligence
             </span>
           </div>
           <motion.button
-            className="flex items-center gap-2 px-4 py-2 text-sm bg-gradient-to-r from-pink-500/20 via-purple-500/20 to-blue-500/20 hover:from-pink-500/30 hover:via-purple-500/30 hover:to-blue-500/30 backdrop-blur-xl rounded-xl text-white font-medium transition-all shadow-[0_4px_20px_rgba(139,92,246,0.2),inset_0_1px_0_rgba(255,255,255,0.1)] border border-white/[0.1]"
+            className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm bg-gradient-to-r from-pink-500/20 via-purple-500/20 to-blue-500/20 hover:from-pink-500/30 hover:via-purple-500/30 hover:to-blue-500/30 backdrop-blur-xl rounded-lg sm:rounded-xl text-white font-medium transition-all shadow-[0_4px_20px_rgba(139,92,246,0.2),inset_0_1px_0_rgba(255,255,255,0.1)] border border-white/[0.1]"
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             onClick={() => setLogInFlow(true)}
           >
-            <span>Log in with CAS</span>
+            <span className="sm:hidden">Log in</span>
+            <span className="hidden sm:inline">Log in with CAS</span>
             <FiArrowRight size={14} className="opacity-70" />
           </motion.button>
         </div>
@@ -276,8 +278,10 @@ export default function AboutPage() {
               </div>
             </div>
 
-            <h2 className="text-3xl font-bold text-white mb-4">
-              Your Yale Degree,{" "}
+            <h2 className="text-2xl sm:text-3xl font-bold text-white mb-4">
+              Your Yale Degree,
+              <br className="sm:hidden" />
+              <span className="hidden sm:inline"> </span>
               <span className="text-blue-300">made easy.</span>
             </h2>
 
@@ -559,11 +563,12 @@ export default function AboutPage() {
                 >
                   Try Simulator
                 </button>
-                <Link href="/demo#simulator">
-                  <button className="px-4 py-2 text-sm rounded-xl bg-gradient-to-br from-white/[0.06] to-transparent hover:from-white/[0.1] text-white border border-white/[0.08] shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] transition-all duration-200">
-                    Watch Demo
-                  </button>
-                </Link>
+                <button
+                  className="px-4 py-2 text-sm rounded-xl bg-gradient-to-br from-white/[0.06] to-transparent hover:from-white/[0.1] text-white border border-white/[0.08] shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] transition-all duration-200"
+                  onClick={() => setShowVideoModal(true)}
+                >
+                  Watch Demo
+                </button>
               </div>
             </div>
 
@@ -1030,7 +1035,10 @@ export default function AboutPage() {
                     </div>
                   </div>
                   <div className="flex gap-2">
-                    <button className="flex items-center gap-1.5 px-4 py-2 bg-gradient-to-br from-white/[0.06] to-transparent text-gray-300 rounded-xl border border-white/[0.08] hover:bg-pink-500/20 hover:text-white hover:border-pink-500/30 transition-all text-sm shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]">
+                    <button
+                      onClick={() => setLogInFlow(true)}
+                      className="flex items-center gap-1.5 px-4 py-2 bg-gradient-to-br from-white/[0.06] to-transparent text-gray-300 rounded-xl border border-white/[0.08] hover:bg-pink-500/20 hover:text-white hover:border-pink-500/30 transition-all text-sm shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]"
+                    >
                       <FiUser className="inline-block" size={14} />
                       Profile
                     </button>
@@ -1283,15 +1291,7 @@ export default function AboutPage() {
             join the team, we're always looking for fellow Yale students to
             join.
           </p>
-          <div className="flex justify-center gap-3">
-            <a
-              href="https://github.com/your-repo"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="px-4 py-2 text-sm bg-gradient-to-br from-white/[0.08] to-transparent hover:from-white/[0.12] rounded-xl text-white flex items-center gap-2 transition-all hover:scale-105 border border-white/[0.08] hover:border-white/[0.15] shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]"
-            >
-              <FiGithub size={14} /> GitHub
-            </a>
+          <div className="flex justify-center">
             <a
               href="mailto:filippo.fonseca@yale.edu,emir.ahmed@yale.edu"
               className="px-4 py-2 text-sm bg-gradient-to-r from-blue-500/30 via-purple-500/30 to-pink-500/30 hover:from-blue-500/40 hover:via-purple-500/40 hover:to-pink-500/40 rounded-xl text-white flex items-center gap-2 transition-all hover:scale-105 border border-white/[0.1] shadow-[0_4px_16px_rgba(139,92,246,0.25),inset_0_1px_0_rgba(255,255,255,0.15)]"
@@ -1303,17 +1303,17 @@ export default function AboutPage() {
       </div>
 
       {/* Footer */}
-      <div className="py-6 text-center text-gray-400 text-xs border-t border-white/[0.05]">
-        <p className="flex items-center justify-center gap-2">
-          Made with <FiHeart className="w-3 h-3 text-blue-400" /> | Not officially
-          affiliated with Yale University. We make no money from this and this
-          is NOT a business or job for any of us.
+      <div className="py-6 px-4 text-center text-gray-400 text-xs border-t border-white/[0.05]">
+        <p className="flex flex-wrap items-center justify-center gap-1.5 max-w-md mx-auto leading-relaxed">
+          <span className="inline-flex items-center gap-1">Made with <FiHeart className="w-3 h-3 text-blue-400" /></span>
+          <span className="hidden sm:inline">|</span>
+          <span>Not affiliated with Yale University.</span>
         </p>
-        <p className="mt-1.5 text-gray-500">
+        <p className="mt-2 text-gray-500 flex flex-wrap items-center justify-center gap-1.5">
           <span className="px-1.5 py-0.5 rounded-full text-[10px] bg-gradient-to-r from-purple-500/20 to-pink-500/20 border border-purple-500/30 text-purple-300">
             v2.0
-          </span>{" "}
-          - © {new Date().getFullYear()} Yale DegreeIntelligence
+          </span>
+          <span>© {new Date().getFullYear()} DegreeIntelligence</span>
         </p>
       </div>
 

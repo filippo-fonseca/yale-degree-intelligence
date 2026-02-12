@@ -626,7 +626,7 @@ export default function MajorProgressView({
           </p>
         </div>
         <div className="flex items-center gap-4">
-          <div className="text-3xl font-medium bg-clip-text text-transparent bg-gradient-to-r from-blue-200 to-purple-200">
+          <div className="text-2xl lg:text-3xl font-medium bg-clip-text text-transparent bg-gradient-to-r from-blue-200 to-purple-200">
             {showInProgressStats
               ? withInProgressPercentage.toFixed(0)
               : completionPercentage.toFixed(0)}

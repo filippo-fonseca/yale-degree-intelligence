@@ -19,6 +19,7 @@ import {
   FiUsers,
   FiTrash2,
   FiX,
+  FiMenu,
 } from "react-icons/fi";
 import {
   collection,
@@ -136,6 +137,7 @@ export default function Home() {
   const [isHoveringLogout, setIsHoveringLogout] = useState(false);
   const [showMajorSelection, setShowMajorSelection] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const isBrandNew = userProfile?.graduationYear === 2029;
 
@@ -183,6 +185,20 @@ export default function Home() {
     "dashboardActiveTab",
     "upload",
   );
+
+  // Simulator unsaved changes check
+  const [simulatorNavCheck, setSimulatorNavCheck] = useState<((callback: () => void) => void) | null>(null);
+
+  // Safe tab switch that checks for unsaved simulator changes
+  const handleTabChange = (newTab: string) => {
+    if (activeTab === "simulator" && simulatorNavCheck) {
+      simulatorNavCheck(() => {
+        setActiveTab(newTab);
+      });
+    } else {
+      setActiveTab(newTab);
+    }
+  };
 
   const [showUpdateModal, setShowUpdateModal] = useState(false);
   const [distSelectorCourseId, setDistSelectorCourseId] = useState<
@@ -847,52 +863,194 @@ export default function Home() {
         ))}
       </div>
 
-      <div className="relative max-w-7xl mx-auto px-6">
+      <div className="relative max-w-7xl mx-auto px-4 lg:px-6">
         {/* Header */}
         <motion.header
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="flex justify-between items-center py-8"
+          className="flex justify-between items-center py-4 lg:py-8"
         >
-          <div
-            onClick={() => setActiveTab("upload")}
-            className="cursor-pointer transition-all hover:scale-105"
-          >
-            <CompoundLogo />
+          <div className="flex items-center gap-2 lg:gap-3">
+            {/* Mobile hamburger menu */}
+            <button
+              onClick={() => setSidebarOpen(true)}
+              className="lg:hidden p-2 rounded-xl bg-white/[0.06] hover:bg-white/[0.1] border border-white/[0.08] text-gray-300 hover:text-white transition-all"
+              aria-label="Open menu"
+            >
+              <FiMenu size={18} />
+            </button>
+            {/* Logo - icon only on mobile, full on desktop */}
+            <div
+              onClick={() => setActiveTab("upload")}
+              className="cursor-pointer transition-all hover:scale-105"
+            >
+              {/* Mobile: just icon */}
+              <div className="lg:hidden">
+                <LogoIcon width={28} height={28} />
+              </div>
+              {/* Desktop: full logo */}
+              <div className="hidden lg:block">
+                <CompoundLogo />
+              </div>
+            </div>
           </div>
 
-          <div className="flex items-center space-x-3">
+          <div className="flex items-center gap-2 lg:gap-3">
             <span
-              className="hidden md:inline px-2.5 py-1 text-[11px] rounded-full border border-emerald-800 bg-emerald-900/30 text-emerald-300"
+              className="hidden lg:inline px-2.5 py-1 text-[11px] rounded-full border border-emerald-800 bg-emerald-900/30 text-emerald-300"
               title="Welcome to Yale!"
             >
-              🎉 v2: We've made massive updates!
+              v2: We've made massive updates!
             </span>
 
             <button
               onClick={() => setShowSettings(true)}
-              className="p-2 rounded-lg hover:bg-gray-900/50 transition-all border border-gray-800 hover:border-gray-700 flex items-center gap-1"
+              className="p-1.5 lg:p-2 rounded-xl hover:bg-white/[0.06] transition-all border border-white/[0.08] hover:border-white/[0.12] flex items-center gap-1"
               title="Settings"
             >
               <UserAvatar
                 photoURL={user.photoURL}
                 displayName={user.displayName}
                 email={user.email}
-                size={24}
+                size={28}
               />
-              <FiChevronDown className="text-gray-400 text-sm" />
+              <FiChevronDown className="hidden lg:block text-gray-400 text-sm" />
             </button>
           </div>
         </motion.header>
 
-        <div className="flex flex-col lg:flex-row gap-8 pb-8 h-[calc(100vh-120px)]">
-          {/* Sidebar Navigation */}
+        <div className="flex flex-row gap-4 lg:gap-8 pb-4 lg:pb-8 h-[calc(100vh-88px)] lg:h-[calc(100vh-120px)]">
+          {/* Mobile Sidebar Overlay */}
+          <AnimatePresence>
+            {sidebarOpen && (
+              <>
+                {/* Backdrop */}
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  onClick={() => setSidebarOpen(false)}
+                  className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 lg:hidden"
+                />
+                {/* Mobile Sidebar */}
+                <motion.aside
+                  initial={{ x: "-100%" }}
+                  animate={{ x: 0 }}
+                  exit={{ x: "-100%" }}
+                  transition={{ type: "spring", damping: 25, stiffness: 300 }}
+                  className="fixed left-0 top-0 bottom-0 w-72 z-50 lg:hidden flex flex-col justify-between p-4 bg-gradient-to-br from-gray-900 via-gray-900 to-gray-950 border-r border-white/[0.08] shadow-[8px_0_32px_rgba(0,0,0,0.5)]"
+                >
+                  {/* Header with logo and close */}
+                  <div className="flex items-center justify-between mb-6 pb-4 border-b border-white/[0.06]">
+                    <CompoundLogo size="sm" />
+                    <button
+                      onClick={() => setSidebarOpen(false)}
+                      className="p-2 rounded-xl bg-white/[0.06] hover:bg-white/[0.1] border border-white/[0.08] text-gray-300 hover:text-white transition-all"
+                    >
+                      <FiX size={18} />
+                    </button>
+                  </div>
+                  {/* Mobile Nav Items */}
+                  <nav className="space-y-1.5 flex-1 overflow-y-auto">
+                    {navItems.filter((item) => !item.disabled && !item.comingSoon).map((item) => (
+                      <motion.button
+                        key={item.id}
+                        whileTap={{ scale: 0.98 }}
+                        onClick={() => {
+                          handleTabChange(item.id);
+                          setSidebarOpen(false);
+                          void new Audio("/audio/pop.mp3").play().catch(() => null);
+                        }}
+                        className={`w-full flex items-center justify-between px-4 py-3 text-left rounded-2xl transition-all duration-300 ${
+                          activeTab === item.id
+                            ? "bg-gradient-to-br from-white/[0.12] via-white/[0.06] to-transparent text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.15)]"
+                            : "text-gray-400 hover:text-white hover:bg-white/[0.04]"
+                        }`}
+                      >
+                        <div className="flex items-center space-x-3">
+                          <item.icon size={item.id === "cleoai" ? 18 : 14} />
+                          <span className="text-sm">{item.label}</span>
+                        </div>
+                        {activeTab === item.id && (
+                          <FiChevronRight className="text-blue-400" />
+                        )}
+                      </motion.button>
+                    ))}
+                  </nav>
+                  {/* Mobile bottom section */}
+                  <div className="pt-4 border-t border-white/[0.08] space-y-3">
+                    {/* Quick links */}
+                    <div className="grid grid-cols-2 gap-2">
+                      <Link
+                        href="/mission"
+                        onClick={() => setSidebarOpen(false)}
+                        className="flex items-center gap-2 p-2 rounded-lg hover:bg-white/[0.06] transition-all text-gray-400 hover:text-white"
+                      >
+                        <FaHeart className="text-emerald-400" size={12} />
+                        <span className="text-xs">Mission</span>
+                      </Link>
+                      <Link
+                        href="/terms"
+                        onClick={() => setSidebarOpen(false)}
+                        className="flex items-center gap-2 p-2 rounded-lg hover:bg-white/[0.06] transition-all text-gray-400 hover:text-white"
+                      >
+                        <FiBook className="text-blue-400" size={12} />
+                        <span className="text-xs">Terms</span>
+                      </Link>
+                      <Link
+                        href="mailto:filippo.fonseca@yale.edu,emir.ahmed@yale.edu"
+                        className="flex items-center gap-2 p-2 rounded-lg hover:bg-white/[0.06] transition-all text-gray-400 hover:text-white"
+                      >
+                        <MessageCircleQuestionMark className="text-purple-400" size={12} />
+                        <span className="text-xs">Feedback</span>
+                      </Link>
+                      <Link
+                        href="https://coff.ee/filippofonseca"
+                        target="_blank"
+                        className="flex items-center gap-2 p-2 rounded-lg hover:bg-white/[0.06] transition-all text-gray-400 hover:text-white"
+                      >
+                        <FiCoffee className="text-amber-400" size={12} />
+                        <span className="text-xs">Coffee</span>
+                      </Link>
+                    </div>
+
+                    {/* User profile */}
+                    <button
+                      onClick={() => {
+                        setShowSettings(true);
+                        setSidebarOpen(false);
+                      }}
+                      className="w-full flex items-center gap-3 p-2.5 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.06] transition-all"
+                    >
+                      <UserAvatar
+                        photoURL={user.photoURL}
+                        displayName={user.displayName}
+                        email={user.email}
+                        size={32}
+                      />
+                      <div className="flex-1 text-left">
+                        <p className="text-sm text-white truncate">{user.displayName}</p>
+                        <p className="text-xs text-gray-500 truncate">{user.email}</p>
+                      </div>
+                    </button>
+
+                    {/* Disclaimer */}
+                    <p className="text-[9px] text-gray-600 leading-tight px-1">
+                      Student-built tool. Verify with your DUS. Not affiliated with Yale.
+                    </p>
+                  </div>
+                </motion.aside>
+              </>
+            )}
+          </AnimatePresence>
+
+          {/* Desktop Sidebar Navigation */}
           <motion.aside
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.2, duration: 0.5 }}
-            className="w-full lg:w-56 h-full flex flex-col justify-between p-4 rounded-3xl bg-gradient-to-br from-gray-900/70 via-gray-900/50 to-gray-950/70 backdrop-blur-xl border border-white/[0.08] shadow-[0_8px_32px_rgba(0,0,0,0.4),0_0_80px_rgba(59,130,246,0.06),inset_0_1px_0_rgba(255,255,255,0.1),inset_0_-1px_0_rgba(0,0,0,0.3)] ring-1 ring-white/[0.05] overflow-hidden"
+            className="hidden lg:flex w-56 h-full flex-col justify-between p-4 rounded-3xl bg-gradient-to-br from-gray-900/70 via-gray-900/50 to-gray-950/70 backdrop-blur-xl border border-white/[0.08] shadow-[0_8px_32px_rgba(0,0,0,0.4),0_0_80px_rgba(59,130,246,0.06),inset_0_1px_0_rgba(255,255,255,0.1),inset_0_-1px_0_rgba(0,0,0,0.3)] ring-1 ring-white/[0.05] overflow-hidden"
           >
             {/* Navigation Items */}
             <nav className="space-y-1.5 flex-1 overflow-y-auto">
@@ -903,7 +1061,7 @@ export default function Home() {
                   whileHover={{ scale: 1.02, x: 2 }}
                   whileTap={{ scale: 0.98 }}
                   onClick={() => {
-                    setActiveTab(item.id);
+                    handleTabChange(item.id);
                     void new Audio("/audio/pop.mp3").play().catch(() => null);
                   }}
                   className={`w-full flex items-center justify-between px-4 py-3 text-left rounded-2xl transition-all duration-300 relative ${
@@ -1076,25 +1234,24 @@ export default function Home() {
                 >
                   {hasData ? (
                     <div>
-                      <div className="mb-6 flex justify-between items-start">
+                      <div className="mb-4 lg:mb-6 flex flex-col sm:flex-row justify-between items-start gap-3">
                         <div>
-                          <h2 className="text-3xl font-medium bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-200 dark:to-purple-200">
+                          <h2 className="text-xl sm:text-2xl lg:text-3xl font-medium bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-200 dark:to-purple-200">
                             Your academic journey at Yale,{" "}
                             {user?.displayName?.split(" ")[0]}.
                           </h2>
-                          <p className="text-gray-600 dark:text-gray-300">
-                            These are all the classes you've taken, including
-                            their grades and in-progress ones. Upload a more
-                            recent transcript on the top right.
+                          <p className="text-sm lg:text-base text-gray-600 dark:text-gray-300 mt-1">
+                            All your classes, grades, and in-progress courses.
                           </p>
                         </div>
                         <motion.button
                           whileHover={{ scale: 1.03 }}
                           whileTap={{ scale: 0.98 }}
                           onClick={() => setShowUpdateModal(true)}
-                          className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-all shadow-[0_4px_20px_rgba(0,0,0,0.08)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.25)]"
+                          className="flex items-center gap-2 px-3 py-2 lg:px-4 lg:py-2.5 rounded-xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-all shadow-[0_4px_20px_rgba(0,0,0,0.08)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.25)] text-sm"
                         >
-                          <FiRefreshCw className="text-blue-500 dark:text-blue-400" />
+                          <FiRefreshCw className="text-blue-500 dark:text-blue-400" size={16} />
+                          <span className="hidden sm:inline">Update</span>
                         </motion.button>
                       </div>
 
@@ -1862,6 +2019,7 @@ export default function Home() {
                       )}
                       graduationYear={userProfile.graduationYear}
                       userMajors={userProfile.majors}
+                      onNavigationAttempt={setSimulatorNavCheck}
                     />
                   )}
                 </motion.div>

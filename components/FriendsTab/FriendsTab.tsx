@@ -415,7 +415,7 @@ export default function FriendsTab({
   if (!user) {
     return (
       <div className="w-full max-w-3xl mx-auto font-louize">
-        <h2 className="text-3xl font-medium bg-clip-text text-transparent bg-gradient-to-r from-blue-200 to-purple-200">
+        <h2 className="text-xl sm:text-2xl lg:text-3xl font-medium bg-clip-text text-transparent bg-gradient-to-r from-blue-200 to-purple-200">
           Friends & Connections
         </h2>
         <div className="mt-6 text-gray-700 dark:text-gray-300">

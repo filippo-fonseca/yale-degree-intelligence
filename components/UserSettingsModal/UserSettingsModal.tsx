@@ -2,7 +2,7 @@
 
 import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
-import { FiLogOut, FiEdit2, FiMoreVertical, FiTrash2 } from "react-icons/fi";
+import { FiLogOut, FiEdit2, FiMoreVertical, FiTrash2, FiChevronDown } from "react-icons/fi";
 import { User } from "firebase/auth";
 import { MAJORS } from "@/lib/majors";
 import { MajorDropdown } from "../ui/MajorDropdown";
@@ -491,22 +491,27 @@ export default function UserSettingsModal({
             <label className="block text-xs font-medium text-gray-300 mb-1">
               Graduation Year
             </label>
-            <input
-              type="number"
-              inputMode="numeric"
-              min={new Date().getFullYear()}
-              max={new Date().getFullYear() + 4}
-              value={localProfile.graduationYear}
-              onChange={(e) =>
-                setLocalProfile({
-                  ...localProfile,
-                  graduationYear: Number.isNaN(parseInt(e.target.value))
-                    ? localProfile.graduationYear
-                    : parseInt(e.target.value),
-                })
-              }
-              className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-pink-500/40 focus:border-pink-500/50 text-gray-200 text-xs transition-all duration-200"
-            />
+            <div className="relative">
+              <select
+                value={localProfile.graduationYear}
+                onChange={(e) =>
+                  setLocalProfile({
+                    ...localProfile,
+                    graduationYear: parseInt(e.target.value),
+                  })
+                }
+                className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-pink-500/40 focus:border-pink-500/50 text-gray-200 text-xs transition-all duration-200 appearance-none cursor-pointer"
+              >
+                {[2026, 2027, 2028, 2029, 2030].map((year) => (
+                  <option key={year} value={year}>
+                    {year}
+                  </option>
+                ))}
+              </select>
+              <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
+                <FiChevronDown size={14} />
+              </div>
+            </div>
           </div>
 
           {/* Footer links */}

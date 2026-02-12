@@ -1,7 +1,7 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { doc, setDoc } from "firebase/firestore";
 import { db } from "@/config/firebase";
 import { useAuth } from "@/context/AuthContext";
@@ -32,6 +32,24 @@ export default function MajorSelectionFlow({
   const [bio, setBio] = useState<string>("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showMajorsInfo, setShowMajorsInfo] = useState(false);
+  const [isKeyboardOpen, setIsKeyboardOpen] = useState(false);
+
+  // Detect mobile keyboard opening via visualViewport
+  useEffect(() => {
+    if (typeof window === "undefined" || !window.visualViewport) return;
+
+    const viewport = window.visualViewport;
+    const initialHeight = window.innerHeight;
+
+    const handleResize = () => {
+      // If viewport height is significantly smaller than window height, keyboard is likely open
+      const heightDiff = initialHeight - viewport.height;
+      setIsKeyboardOpen(heightDiff > 150);
+    };
+
+    viewport.addEventListener("resize", handleResize);
+    return () => viewport.removeEventListener("resize", handleResize);
+  }, []);
 
   const handleMajorToggle = (majorCode: string) => {
     setSelectedMajors((prev) => {
@@ -82,7 +100,7 @@ export default function MajorSelectionFlow({
     },
     {
       icon: <HiSparkles className="w-5 h-5" />,
-      title: "Smart AI Planning",
+      title: "Smart Planning",
       desc: "Get recommendations for optimal course selection",
       gradient: "from-purple-500/20 to-purple-600/10",
       border: "border-purple-500/20",
@@ -111,7 +129,7 @@ export default function MajorSelectionFlow({
   const currentStepIndex = steps.indexOf(step);
 
   return (
-    <div className="fixed inset-0 bg-gray-950/95 backdrop-blur-md z-50 flex items-center justify-center p-4 overflow-y-auto">
+    <div className={`fixed inset-0 bg-gray-950/95 backdrop-blur-md z-50 flex justify-center p-3 sm:p-4 overflow-y-auto transition-all duration-200 ${isKeyboardOpen ? "items-start pt-4" : "items-center"}`}>
       {/* Background decorative elements */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <div className="absolute inset-0 bg-gradient-to-br from-gray-950 via-blue-950/20 to-purple-950/20" />
@@ -123,7 +141,7 @@ export default function MajorSelectionFlow({
         initial={{ opacity: 0, y: 20, scale: 0.98 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         transition={{ type: "spring", damping: 25, stiffness: 300 }}
-        className="relative w-full max-w-xl bg-gradient-to-br from-gray-900/80 via-gray-900/70 to-gray-950/80 rounded-2xl border border-white/[0.08] p-6 shadow-[0_8px_32px_rgba(0,0,0,0.5),0_0_80px_rgba(139,92,246,0.08),inset_0_1px_0_rgba(255,255,255,0.1),inset_0_-1px_0_rgba(0,0,0,0.3)] backdrop-blur-2xl ring-1 ring-white/[0.05]"
+        className="relative w-full max-w-xl bg-gradient-to-br from-gray-900/80 via-gray-900/70 to-gray-950/80 rounded-2xl border border-white/[0.08] p-4 sm:p-6 shadow-[0_8px_32px_rgba(0,0,0,0.5),0_0_80px_rgba(139,92,246,0.08),inset_0_1px_0_rgba(255,255,255,0.1),inset_0_-1px_0_rgba(0,0,0,0.3)] backdrop-blur-2xl ring-1 ring-white/[0.05] max-h-[90vh] overflow-y-auto"
       >
         {/* Step Progress Indicator (only show after welcome) */}
         {step !== "welcome" && (
@@ -163,11 +181,11 @@ export default function MajorSelectionFlow({
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="space-y-6"
+            className="space-y-4 sm:space-y-6"
           >
             {/* Logo Section */}
-            <div className="flex justify-center mb-4">
-              <div className="relative w-24 h-24">
+            <div className="flex justify-center mb-2 sm:mb-4">
+              <div className="relative w-16 h-16 sm:w-24 sm:h-24">
                 <motion.div
                   animate={{ rotate: 360 }}
                   transition={{
@@ -178,8 +196,12 @@ export default function MajorSelectionFlow({
                   className="absolute inset-0 rounded-full border-2 border-transparent border-t-pink-400/40 border-r-purple-400/40"
                 />
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="p-3 rounded-2xl bg-gradient-to-br from-white/[0.08] via-transparent to-black/10 border border-white/[0.08] shadow-[0_4px_16px_rgba(0,0,0,0.3),inset_0_1px_0_rgba(255,255,255,0.1)]">
-                    <LogoIcon width={36} height={36} />
+                  <div className="p-2 sm:p-3 rounded-xl sm:rounded-2xl bg-gradient-to-br from-white/[0.08] via-transparent to-black/10 border border-white/[0.08] shadow-[0_4px_16px_rgba(0,0,0,0.3),inset_0_1px_0_rgba(255,255,255,0.1)]">
+                    <LogoIcon
+                      width={28}
+                      height={28}
+                      className="sm:w-9 sm:h-9"
+                    />
                   </div>
                 </div>
               </div>
@@ -187,34 +209,40 @@ export default function MajorSelectionFlow({
 
             {/* Title */}
             <div className="text-center flex flex-col items-center justify-center">
-              <CompoundLogo hideLogo animated size="lg" />
-              <p className="text-gray-400 text-sm mt-2">
+              <div className="hidden sm:block">
+                <CompoundLogo hideLogo animated size="lg" />
+              </div>
+              <div className="sm:hidden">
+                <CompoundLogo hideLogo animated size="md" />
+              </div>
+              <p className="text-gray-400 text-xs sm:text-sm mt-1.5 sm:mt-2">
                 Your intelligent academic companion at Yale
               </p>
             </div>
 
             {/* Features Grid */}
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-2 gap-2 sm:gap-3">
               {features.map((feature, index) => (
                 <motion.div
                   key={index}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.1 }}
-                  whileHover={{ y: -2, scale: 1.01 }}
-                  className={`p-3.5 rounded-xl bg-gradient-to-br ${feature.gradient} border ${feature.border} backdrop-blur-sm shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_4px_12px_rgba(0,0,0,0.2)] transition-all duration-300 cursor-default`}
+                  className={`p-2 sm:p-3.5 rounded-xl bg-gradient-to-br ${feature.gradient} border ${feature.border} backdrop-blur-sm shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_4px_12px_rgba(0,0,0,0.2)] transition-all duration-300 cursor-default`}
                 >
-                  <div className="flex items-start gap-3">
+                  <div className="flex items-center sm:items-start gap-2 sm:gap-3">
                     <div
-                      className={`p-2 rounded-lg bg-gray-900/60 border border-white/[0.06] ${feature.iconColor} shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]`}
+                      className={`p-1.5 sm:p-2 rounded-lg bg-gray-900/60 border border-white/[0.06] ${feature.iconColor} shadow-[inset_0_1px_0_rgba(255,255,255,0.05)] shrink-0`}
                     >
-                      {feature.icon}
+                      <div className="w-3.5 h-3.5 sm:w-5 sm:h-5 flex items-center justify-center">
+                        {feature.icon}
+                      </div>
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h3 className="font-medium text-sm text-gray-200">
+                      <h3 className="font-medium text-[11px] sm:text-sm text-gray-200 leading-tight">
                         {feature.title}
                       </h3>
-                      <p className="text-xs text-gray-400 mt-0.5 leading-relaxed">
+                      <p className="text-[10px] sm:text-xs text-gray-400 mt-0.5 leading-relaxed hidden sm:block">
                         {feature.desc}
                       </p>
                     </div>
@@ -228,11 +256,11 @@ export default function MajorSelectionFlow({
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.5 }}
-              className="flex items-center justify-center pt-4"
+              className="flex items-center justify-center pt-2 sm:pt-4"
             >
               <motion.button
                 onClick={() => setStep("majors")}
-                className="px-6 py-3 bg-purple-500/10 hover:bg-purple-500/20 rounded-xl text-purple-200 font-medium flex items-center gap-2 transition-all border border-purple-500/30 hover:border-purple-500/50 shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_4px_16px_rgba(139,92,246,0.15)]"
+                className="px-5 sm:px-6 py-2.5 sm:py-3 bg-purple-500/10 hover:bg-purple-500/20 rounded-xl text-purple-200 font-medium flex items-center gap-2 transition-all border border-purple-500/30 hover:border-purple-500/50 shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_4px_16px_rgba(139,92,246,0.15)] text-sm sm:text-base"
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
               >
@@ -248,14 +276,14 @@ export default function MajorSelectionFlow({
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -20 }}
-            className="space-y-5"
+            className="space-y-4 sm:space-y-5"
           >
             <div className="text-center">
-              <h2 className="text-xl font-medium bg-clip-text text-transparent bg-gradient-to-r from-pink-200 to-purple-200">
+              <h2 className="text-lg sm:text-xl font-medium bg-clip-text text-transparent bg-gradient-to-r from-pink-200 to-purple-200">
                 Select your major(s)
               </h2>
-              <p className="text-gray-400 text-sm mt-1.5">
-                Pick up to 2. Not sure yet? Just choose what you're exploring.
+              <p className="text-gray-400 text-xs sm:text-sm mt-1">
+                Pick up to 2. Not sure? Just choose what you're exploring.
               </p>
             </div>
 
@@ -423,14 +451,14 @@ export default function MajorSelectionFlow({
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -20 }}
-            className="space-y-5"
+            className="space-y-4 sm:space-y-5"
           >
             <div className="text-center">
-              <h2 className="text-xl font-medium bg-clip-text text-transparent bg-gradient-to-r from-pink-200 to-purple-200">
+              <h2 className="text-lg sm:text-xl font-medium bg-clip-text text-transparent bg-gradient-to-r from-pink-200 to-purple-200">
                 Tell friends about yourself
               </h2>
-              <p className="text-gray-400 text-sm mt-1.5">
-                Visible to accepted friends only. Totally optional.
+              <p className="text-gray-400 text-xs sm:text-sm mt-1">
+                Visible to accepted friends only. Optional.
               </p>
             </div>
 
@@ -442,8 +470,8 @@ export default function MajorSelectionFlow({
                   const filteredValue = e.target.value.replace(/[\r\n]/g, "");
                   setBio(filteredValue.slice(0, 200));
                 }}
-                placeholder="Interests, plans, fun facts... anything goes."
-                className="w-full h-28 bg-gray-900 border border-gray-700/60 hover:border-gray-600/60 focus:border-pink-500/50 rounded-xl px-4 py-3 focus:outline-none focus:ring-1 focus:ring-pink-500/30 text-gray-200 placeholder:text-gray-600 text-sm resize-none transition-all shadow-[inset_0_2px_4px_rgba(0,0,0,0.2)]"
+                placeholder="Interests, plans, fun facts..."
+                className="w-full h-24 sm:h-28 bg-gray-900 border border-gray-700/60 hover:border-gray-600/60 focus:border-pink-500/50 rounded-xl px-3 sm:px-4 py-2.5 sm:py-3 focus:outline-none focus:ring-1 focus:ring-pink-500/30 text-gray-200 placeholder:text-gray-600 text-sm resize-none transition-all shadow-[inset_0_2px_4px_rgba(0,0,0,0.2)]"
                 maxLength={200}
                 style={{ overflow: "hidden" }}
                 onKeyDown={(e) => {
@@ -452,7 +480,7 @@ export default function MajorSelectionFlow({
                   }
                 }}
               />
-              <div className="flex justify-end mt-1.5">
+              <div className="flex justify-end mt-1">
                 <span
                   className={`text-xs ${bio.length > 180 ? "text-orange-400" : "text-gray-600"}`}
                 >
@@ -461,16 +489,16 @@ export default function MajorSelectionFlow({
               </div>
             </div>
 
-            <div className="flex justify-between pt-4">
+            <div className="flex justify-between pt-2 sm:pt-4">
               <button
                 onClick={() => setStep("majors")}
-                className="py-2 px-4 text-gray-500 hover:text-gray-300 transition-colors text-sm"
+                className="py-2 px-3 sm:px-4 text-gray-500 hover:text-gray-300 transition-colors text-sm"
               >
                 Back
               </button>
               <button
                 onClick={() => setStep("year")}
-                className="py-2.5 px-5 rounded-xl font-medium text-sm bg-purple-500/10 hover:bg-purple-500/20 text-purple-200 border border-purple-500/30 hover:border-purple-500/50 shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_2px_8px_rgba(139,92,246,0.15)] transition-all"
+                className="py-2 sm:py-2.5 px-4 sm:px-5 rounded-xl font-medium text-sm bg-purple-500/10 hover:bg-purple-500/20 text-purple-200 border border-purple-500/30 hover:border-purple-500/50 shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_2px_8px_rgba(139,92,246,0.15)] transition-all"
               >
                 {bio.length === 0 ? "Skip" : "Continue"}
               </button>
@@ -483,52 +511,60 @@ export default function MajorSelectionFlow({
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -20 }}
-            className="space-y-6"
+            className="space-y-4 sm:space-y-6"
           >
             <div className="text-center">
-              <h2 className="text-xl font-medium bg-clip-text text-transparent bg-gradient-to-r from-pink-200 to-purple-200">
+              <h2 className="text-lg sm:text-xl font-medium bg-clip-text text-transparent bg-gradient-to-r from-pink-200 to-purple-200">
                 Graduation Year
               </h2>
-              <p className="text-gray-400 text-sm mt-1.5">
+              <p className="text-gray-400 text-xs sm:text-sm mt-1">
                 When do you expect to graduate?
               </p>
             </div>
 
             <div className="flex justify-center">
               <div className="relative">
-                <input
-                  type="number"
+                <select
                   autoFocus
-                  min={new Date().getFullYear()}
-                  max={new Date().getFullYear() + 10}
                   value={graduationYear}
                   onChange={(e) => setGraduationYear(e.target.value)}
-                  className="bg-gray-900/80 border border-white/[0.08] hover:border-white/[0.12] focus:border-pink-500/50 rounded-xl px-6 py-4 w-36 text-center text-2xl font-medium focus:outline-none focus:ring-1 focus:ring-pink-500/30 text-gray-100 transition-all shadow-[inset_0_2px_4px_rgba(0,0,0,0.3),0_4px_12px_rgba(0,0,0,0.2)] appearance-none [color-scheme:dark] [-moz-appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                  placeholder="2029"
-                />
-                <div className="absolute -bottom-7 left-1/2 -translate-x-1/2">
-                  <span className="text-xs text-gray-400 px-2 py-0.5 rounded-full bg-white/[0.04] border border-white/[0.06]">
+                  className="bg-gray-900/80 border border-white/[0.08] hover:border-white/[0.12] focus:border-pink-500/50 rounded-xl px-5 sm:px-6 py-3 sm:py-4 w-32 sm:w-36 text-center text-xl sm:text-2xl font-medium focus:outline-none focus:ring-1 focus:ring-pink-500/30 text-gray-100 transition-all shadow-[inset_0_2px_4px_rgba(0,0,0,0.3),0_4px_12px_rgba(0,0,0,0.2)] appearance-none cursor-pointer"
+                  style={{ textAlignLast: "center" }}
+                >
+                  {[2026, 2027, 2028, 2029, 2030].map((year) => (
+                    <option key={year} value={year.toString()}>
+                      {year}
+                    </option>
+                  ))}
+                </select>
+                <div className="absolute right-3 sm:right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
+                  <FiChevronDown size={16} />
+                </div>
+                <div className="absolute -bottom-6 sm:-bottom-7 left-1/2 -translate-x-1/2">
+                  <span className="text-[10px] sm:text-xs text-gray-400 px-2 py-0.5 rounded-full bg-white/[0.04] border border-white/[0.06] whitespace-nowrap">
                     {parseInt(graduationYear) === 2029 && "Freshman"}
                     {parseInt(graduationYear) === 2028 && "Sophomore"}
                     {parseInt(graduationYear) === 2027 && "Junior"}
                     {parseInt(graduationYear) === 2026 && "Senior"}
-                    {![2026, 2027, 2028, 2029].includes(parseInt(graduationYear)) && `Class of ${graduationYear}`}
+                    {![2026, 2027, 2028, 2029].includes(
+                      parseInt(graduationYear),
+                    ) && `Class of ${graduationYear}`}
                   </span>
                 </div>
               </div>
             </div>
 
-            <div className="flex justify-between pt-8">
+            <div className="flex justify-between pt-6 sm:pt-8">
               <button
                 onClick={() => setStep("bio")}
-                className="py-2 px-4 text-gray-500 hover:text-gray-300 transition-colors text-sm"
+                className="py-2 px-3 sm:px-4 text-gray-500 hover:text-gray-300 transition-colors text-sm"
               >
                 Back
               </button>
               <button
                 onClick={handleSubmit}
                 disabled={!graduationYear || isSubmitting}
-                className={`py-2.5 px-5 rounded-xl font-medium text-sm transition-all flex items-center gap-2 ${
+                className={`py-2 sm:py-2.5 px-4 sm:px-5 rounded-xl font-medium text-sm transition-all flex items-center gap-2 ${
                   !graduationYear || isSubmitting
                     ? "bg-gray-800/60 text-gray-600 cursor-not-allowed border border-gray-700/40"
                     : "bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 hover:border-emerald-500/50 shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_2px_8px_rgba(16,185,129,0.2)]"
@@ -541,7 +577,8 @@ export default function MajorSelectionFlow({
                   </>
                 ) : (
                   <>
-                    Complete Setup
+                    <span className="hidden sm:inline">Complete Setup</span>
+                    <span className="sm:hidden">Complete</span>
                     <FiCheck size={16} />
                   </>
                 )}

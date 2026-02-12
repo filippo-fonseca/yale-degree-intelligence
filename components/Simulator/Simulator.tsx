@@ -38,6 +38,7 @@ interface SimulatorProps {
   completedCourses: Course[];
   graduationYear: number;
   userMajors: string[];
+  onNavigationAttempt?: (callback: () => void) => void;
 }
 
 type Plan = {
@@ -114,6 +115,7 @@ export default function Simulator({
   completedCourses,
   graduationYear,
   userMajors,
+  onNavigationAttempt,
 }: SimulatorProps) {
   const { user } = useAuth();
 
@@ -140,6 +142,9 @@ export default function Simulator({
   const [plansLoaded, setPlansLoaded] = useState(false);
   // Track currently loaded plan
   const [currentPlanName, setCurrentPlanName] = useState<string | null>(null);
+  // Unsaved changes leave confirmation
+  const [showLeaveConfirm, setShowLeaveConfirm] = useState(false);
+  const [pendingLeaveCallback, setPendingLeaveCallback] = useState<(() => void) | null>(null);
 
   // Simulator-local manual requirements (plan-scoped, NOT in Firebase courses)
   const [simulatorManualReqs, setSimulatorManualReqs] = useState<
@@ -378,6 +383,7 @@ export default function Simulator({
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
+        if (showLeaveConfirm) setShowLeaveConfirm(false);
         if (showPlanSelector) setShowPlanSelector(false);
         if (showSaveModal) {
           setShowSaveModal(false);
@@ -389,7 +395,47 @@ export default function Simulator({
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [showPlanSelector, showSaveModal, showPlansModal]);
+  }, [showLeaveConfirm, showPlanSelector, showSaveModal, showPlansModal]);
+
+  // ------------ Browser beforeunload warning ------------
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (hasChanges) {
+        e.preventDefault();
+        e.returnValue = "You have unsaved changes. Are you sure you want to leave?";
+        return e.returnValue;
+      }
+    };
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+  }, [hasChanges]);
+
+  // ------------ In-app navigation attempt handler ------------
+  useEffect(() => {
+    if (onNavigationAttempt) {
+      onNavigationAttempt((callback) => {
+        if (hasChanges) {
+          setPendingLeaveCallback(() => callback);
+          setShowLeaveConfirm(true);
+        } else {
+          callback();
+        }
+      });
+    }
+  }, [onNavigationAttempt, hasChanges]);
+
+  const handleConfirmLeave = () => {
+    setShowLeaveConfirm(false);
+    if (pendingLeaveCallback) {
+      pendingLeaveCallback();
+      setPendingLeaveCallback(null);
+    }
+  };
+
+  const handleCancelLeave = () => {
+    setShowLeaveConfirm(false);
+    setPendingLeaveCallback(null);
+  };
 
   // ------------ Drag & Drop ------------
   const playPopSound = () => {
@@ -710,7 +756,7 @@ export default function Simulator({
       {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div className="mb-6">
-          <h2 className="text-3xl font-medium bg-clip-text text-transparent bg-gradient-to-r from-blue-200 to-purple-200">
+          <h2 className="text-xl sm:text-2xl lg:text-3xl font-medium bg-clip-text text-transparent bg-gradient-to-r from-blue-200 to-purple-200">
             Need to visualize? No problem.
           </h2>
           <p className="text-gray-400">
@@ -1407,6 +1453,67 @@ export default function Simulator({
               <p className="text-center text-[11px] text-gray-600 mt-4">
                 Press <kbd className="px-1.5 py-0.5 rounded bg-white/[0.06] border border-white/[0.08] text-gray-400">Esc</kbd> or click outside to dismiss
               </p>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Unsaved Changes Confirmation Modal */}
+      <AnimatePresence>
+        {showLeaveConfirm && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/70 backdrop-blur-md z-[60] flex items-center justify-center p-4"
+            onClick={handleCancelLeave}
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 10 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 10 }}
+              transition={{ duration: 0.2, ease: "easeOut" }}
+              onClick={(e) => e.stopPropagation()}
+              className="w-full max-w-sm p-5 rounded-2xl bg-gradient-to-br from-gray-900/95 via-gray-900/90 to-gray-950/95 backdrop-blur-2xl border border-white/[0.08] shadow-[0_8px_48px_rgba(0,0,0,0.5),0_0_80px_rgba(251,146,60,0.08),inset_0_1px_0_rgba(255,255,255,0.08)] ring-1 ring-white/[0.05]"
+            >
+              {/* Warning Icon */}
+              <div className="flex justify-center mb-4">
+                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-amber-500/20 to-orange-500/10 border border-amber-500/30 flex items-center justify-center">
+                  <svg className="w-6 h-6 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                  </svg>
+                </div>
+              </div>
+
+              {/* Content */}
+              <div className="text-center mb-5">
+                <h3 className="text-lg font-medium text-gray-100 mb-1.5">
+                  Unsaved Changes
+                </h3>
+                <p className="text-sm text-gray-400">
+                  You have unsaved changes in your plan. Are you sure you want to leave? Your changes will be lost.
+                </p>
+              </div>
+
+              {/* Actions */}
+              <div className="flex gap-2">
+                <motion.button
+                  onClick={handleCancelLeave}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="flex-1 py-2.5 px-4 text-sm rounded-xl font-medium bg-gradient-to-r from-purple-500/20 to-blue-500/20 text-white border border-purple-500/30 hover:border-purple-400/40 shadow-[0_2px_12px_rgba(139,92,246,0.15),inset_0_1px_0_rgba(255,255,255,0.08)] transition-all"
+                >
+                  Stay
+                </motion.button>
+                <motion.button
+                  onClick={handleConfirmLeave}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="flex-1 py-2.5 px-4 text-sm rounded-xl font-medium bg-white/[0.04] text-gray-400 hover:text-gray-300 hover:bg-white/[0.06] border border-white/[0.06] transition-all"
+                >
+                  Leave
+                </motion.button>
+              </div>
             </motion.div>
           </motion.div>
         )}

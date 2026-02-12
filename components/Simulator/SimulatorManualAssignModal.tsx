@@ -128,8 +128,8 @@ export default function SimulatorManualAssignModal({
                   )}
                 </p>
                 <p className="text-xs text-gray-500 mt-1">
-                  This course wasn&apos;t auto-detected for any requirement.
-                  Pick one below or skip.
+                  This course wasn&apos;t auto-detected for any requirement for
+                  your major(s).
                 </p>
               </div>
               <button

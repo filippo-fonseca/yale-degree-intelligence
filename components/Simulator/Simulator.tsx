@@ -12,6 +12,7 @@ import {
 import { Info } from "lucide-react";
 import { Course } from "@/lib/types";
 import { getCourseNameFromCode, getCanonicalCode } from "@/lib/courseCatalog";
+import toast from "react-hot-toast";
 import { useAuth } from "@/context/AuthContext";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import { db } from "@/config/firebase";
@@ -192,6 +193,65 @@ export default function Simulator({
     };
   }, [majorIds]);
 
+  // Find which requirement(s) a course matches for toast notification
+  const getMatchedRequirements = useMemo(() => {
+    return (courseCode: string): { majorName: string; requirementName: string }[] => {
+      const matches: { majorName: string; requirementName: string }[] = [];
+      const canon = getCanonicalCode(courseCode) || courseCode;
+
+      for (const majorId of majorIds) {
+        const major = majorRequirements[majorId];
+        if (!major) continue;
+
+        for (const req of major.requirements) {
+          let found = false;
+          for (const opt of req.options) {
+            if (opt.type === "course") {
+              const optCanon = getCanonicalCode(opt.code) || opt.code;
+              if (opt.code === courseCode || opt.code === canon || optCanon === courseCode || optCanon === canon) {
+                found = true;
+                break;
+              }
+            } else if (opt.type === "group") {
+              for (const code of (opt as { type: "group"; options: string[] }).options) {
+                const codeCanon = getCanonicalCode(code) || code;
+                if (code === courseCode || code === canon || codeCanon === courseCode || codeCanon === canon) {
+                  found = true;
+                  break;
+                }
+              }
+            }
+            if (found) break;
+          }
+          if (found) {
+            matches.push({ majorName: major.name, requirementName: req.name });
+          }
+        }
+      }
+      return matches;
+    };
+  }, [majorIds]);
+
+  // Show toast for auto-matched course
+  const showAutoMatchToast = (courseCode: string) => {
+    const matches = getMatchedRequirements(courseCode);
+    if (matches.length === 0) return;
+
+    const firstMatch = matches[0];
+
+    if (matches.length === 1) {
+      toast.success(
+        `Auto-detected match: "${firstMatch.requirementName}" (${firstMatch.majorName})`,
+        { duration: 3000 }
+      );
+    } else {
+      toast.success(
+        `Auto-detected match: "${firstMatch.requirementName}" (${firstMatch.majorName}) +${matches.length - 1} more`,
+        { duration: 3000 }
+      );
+    }
+  };
+
   // ------------ Build initial semesters & pools ------------
   useEffect(() => {
     // 1) Build semester list starting from earliest known term or grad - 4y
@@ -261,16 +321,29 @@ export default function Simulator({
   useEffect(() => {
     if (initialSemestersRef.current.length === 0) return;
 
-    const currentCodes = semesters.flatMap((s) => s.courses.map((c) => c.code));
-    const initialCodes = initialSemestersRef.current.flatMap((s) =>
-      s.courses.map((c) => c.code),
+    // Create a set of "semesterId:courseCode" to detect both additions/deletions AND moves
+    const currentPlacements = new Set(
+      semesters.flatMap((s) =>
+        s.courses
+          .filter((c) => c.status === "not-taken") // Only track planned courses
+          .map((c) => `${s.id}:${c.code}`)
+      )
+    );
+    const initialPlacements = new Set(
+      initialSemestersRef.current.flatMap((s) =>
+        s.courses
+          .filter((c) => c.status === "not-taken")
+          .map((c) => `${s.id}:${c.code}`)
+      )
     );
 
-    const changed =
-      currentCodes.length !== initialCodes.length ||
-      currentCodes.some((code) => !initialCodes.includes(code)) ||
-      initialCodes.some((code) => !currentCodes.includes(code)) ||
-      simulatorManualReqs.length > 0;
+    // Check if sets are different (different size or different contents)
+    const placementsChanged =
+      currentPlacements.size !== initialPlacements.size ||
+      [...currentPlacements].some((p) => !initialPlacements.has(p)) ||
+      [...initialPlacements].some((p) => !currentPlacements.has(p));
+
+    const changed = placementsChanged || simulatorManualReqs.length > 0;
 
     setHasChanges(changed);
   }, [semesters, simulatorManualReqs]);
@@ -371,6 +444,9 @@ export default function Simulator({
       // Auto-detect: prompt manual assignment if not in any requirement
       if (!isCourseInAnyRequirement(draggedCourse.code)) {
         setManualAssignPending({ course: draggedCourse, semesterId });
+      } else {
+        // Show toast for auto-matched course
+        showAutoMatchToast(draggedCourse.code);
       }
     }
 
@@ -1214,6 +1290,9 @@ export default function Simulator({
               course: manualCourse,
               semesterId: lookupSemesterId,
             });
+          } else {
+            // Show toast for auto-matched course
+            showAutoMatchToast(manualCourse.code);
           }
 
           setLookupSemesterId(null);

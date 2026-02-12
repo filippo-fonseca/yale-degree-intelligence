@@ -3,121 +3,121 @@
 import { motion } from "framer-motion";
 import Link from "next/link";
 import LogoIcon from "@/icons/LogoIcon";
-import { FiArrowRight } from "react-icons/fi";
-import CompoundLogo from "@/components/ui/CompoundLogo";
+import { FiArrowLeft, FiArrowRight } from "react-icons/fi";
+import CosmicBackground from "@/components/CosmicBackground/page";
 
 export default function MissionPage() {
   const commandments = [
     {
       number: "01",
-      title: "Democratize Academic Planning.",
+      title: "Democratize Academic Planning",
       description:
-        "We believe every Yale student deserves equal access to clear, intuitive tools for navigating their academic journey.",
+        "Every Yale student deserves equal access to clear, intuitive tools for navigating their academic journey.",
     },
     {
       number: "02",
-      title: "Eliminate Administrative Friction.",
+      title: "Eliminate Administrative Friction",
       description:
         "If a process can be automated, it should be. No student should waste hours deciphering PDF requirements or maintaining spreadsheets.",
     },
     {
       number: "03",
-      title: "Build for Students, by Students.",
+      title: "Build for Students, by Students",
       description:
         "Our solutions emerge from lived experience. We solve the problems we've actually faced, not hypothetical ones.",
     },
     {
       number: "04",
-      title: "Clarity Over Complexity.",
+      title: "Clarity Over Complexity",
       description:
         "Academic requirements should be immediately understandable, not hidden behind layers of institutional jargon.",
     },
     {
       number: "05",
-      title: "Open by Default.",
+      title: "Open by Default",
       description:
         "Tools this essential shouldn't be gatekept. We build and share our progress transparently.",
     },
     {
       number: "06",
-      title: "Iterate Relentlessly.",
+      title: "Iterate Relentlessly",
       description:
-        "The perfect system doesn't exist. We'll keep improving based on real student feedback until we get as close as possible.",
+        "The perfect system doesn't exist. We keep improving based on real student feedback.",
     },
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-blue-900/80 to-purple-900 font-louize">
-      {/* Header */}
-      <header className="border-b border-gray-800">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex justify-between items-center">
-          <Link href="/">
-            <div className="flex items-center gap-2">
-              <LogoIcon className="w-8 h-8 text-white" />
-              <CompoundLogo hideLogo animated size="sm" />
-            </div>
-          </Link>
-          <nav className="flex gap-6">
-            {/* <Link
-              href="/about"
-              className="text-gray-400 hover:text-white transition-colors"
-            >
-              Home
-            </Link> */}
-            {/* <Link
-              href="/"
-              className="text-gray-400 hover:text-white transition-colors"
-            >
-              Access platform
-            </Link> */}
-            <Link
-              href="/"
-              className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-blue-500/20 border border-blue-500/50 hover:bg-blue-500/30 text-blue-200 hover:text-white transition-colors"
-            >
-              <span>Access platform</span>
-              <FiArrowRight className="text-sm" />
-            </Link>
-          </nav>
-        </div>
-      </header>
+    <div className="min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-gray-900 font-louize">
+      <CosmicBackground mode="stars" opacity={0.7} />
 
-      {/* Manifesto Section */}
-      <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+      {/* Header */}
+      <motion.header
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="sticky top-0 z-40 bg-gray-950/70 backdrop-blur-xl border-b border-white/[0.06] shadow-[0_4px_24px_rgba(0,0,0,0.3)]"
+      >
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex justify-between items-center">
+          <Link href="/" className="flex items-center gap-2 group">
+            <LogoIcon width={24} height={24} />
+            <span className="text-sm font-medium text-gray-300 group-hover:text-white transition-colors">
+              DegreeIntelligence
+            </span>
+          </Link>
+          <Link
+            href="/"
+            className="flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-lg bg-gradient-to-r from-blue-500/20 to-purple-500/20 hover:from-blue-500/30 hover:to-purple-500/30 border border-white/[0.1] text-gray-300 hover:text-white transition-all shadow-[inset_0_1px_0_rgba(255,255,255,0.1)]"
+          >
+            <FiArrowLeft size={12} />
+            <span>Back to platform</span>
+          </Link>
+        </div>
+      </motion.header>
+
+      {/* Main Content */}
+      <main className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        {/* Hero */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="text-center mb-20"
+          className="text-center mb-12"
         >
-          <h1 className="text-5xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-blue-200 to-purple-300 mb-6">
-            Hey! This is our manifesto.
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 mb-4 rounded-full text-[10px] font-medium tracking-wide uppercase bg-gradient-to-r from-pink-500/15 via-purple-500/15 to-blue-500/15 border border-white/[0.08] text-gray-400 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]">
+            <span className="w-1 h-1 rounded-full bg-purple-400 animate-pulse" />
+            Our Manifesto
+          </div>
+          <h1 className="text-3xl sm:text-4xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-blue-200 via-purple-200 to-pink-200 mb-3">
+            The principles that guide us.
           </h1>
-          <p className="text-xl text-gray-300 max-w-2xl mx-auto">
-            The principles that guide everything we build at DegreeIntelligence.
+          <p className="text-sm text-gray-400 max-w-xl mx-auto">
+            Everything we build at DegreeIntelligence stems from these core beliefs.
           </p>
         </motion.div>
 
-        {/* Commandments */}
-        <div className="space-y-16">
+        {/* Commandments Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-12">
           {commandments.map((item, index) => (
             <motion.div
               key={index}
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: index * 0.1 }}
-              className="flex gap-8 group"
+              transition={{ duration: 0.5, delay: index * 0.08 }}
+              className="group p-4 rounded-xl bg-gradient-to-br from-white/[0.06] via-transparent to-black/10 backdrop-blur-sm border border-white/[0.08] hover:border-white/[0.15] transition-all duration-300 shadow-[0_4px_24px_rgba(0,0,0,0.2),inset_0_1px_0_rgba(255,255,255,0.08)] hover:shadow-[0_8px_32px_rgba(0,0,0,0.3),inset_0_1px_0_rgba(255,255,255,0.1)]"
             >
-              <div className="flex flex-col items-center w-16 flex-shrink-0">
-                <span className="text-2xl font-medium text-gray-500 group-hover:text-blue-300 transition-colors">
+              <div className="flex items-start gap-3">
+                <span className="text-xs font-medium text-gray-600 group-hover:text-purple-400 transition-colors pt-0.5">
                   {item.number}
                 </span>
-              </div>
-              <div className="flex-1">
-                <h2 className="text-2xl font-bold text-white mb-3">
-                  {item.title}
-                </h2>
-                <p className="text-lg text-gray-400">{item.description}</p>
+                <div className="flex-1">
+                  <h2 className="text-sm font-medium text-white mb-1.5">
+                    {item.title}
+                  </h2>
+                  <p className="text-xs text-gray-400 leading-relaxed">
+                    {item.description}
+                  </p>
+                </div>
               </div>
             </motion.div>
           ))}
@@ -128,39 +128,54 @@ export default function MissionPage() {
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.8, delay: 0.4 }}
-          className="mt-32 border-t border-gray-800 pt-12"
+          transition={{ duration: 0.8, delay: 0.2 }}
+          className="p-5 rounded-2xl bg-gradient-to-br from-gray-900/70 via-gray-900/50 to-gray-950/70 backdrop-blur-xl border border-white/[0.08] shadow-[0_8px_48px_rgba(0,0,0,0.4),0_0_80px_rgba(139,92,246,0.06),inset_0_1px_0_rgba(255,255,255,0.1)] ring-1 ring-white/[0.05]"
         >
-          <h3 className="text-3xl font-bold text-white mb-6">
+          <h3 className="text-lg font-medium bg-clip-text text-transparent bg-gradient-to-r from-blue-200 to-purple-200 mb-3">
             Why this matters
           </h3>
-          <p className="text-lg text-gray-300 mb-8">
+          <p className="text-sm text-gray-300 mb-3 leading-relaxed">
             Yale attracts some of the world's brightest minds, yet we force
             students to navigate degree requirements with tools that look like
-            tech straight out of the early 2000s. This isn't just about
-            convenience... it's about the removal of bureaucratic friction.
-            Without it, we free students can focus on what actually matters:
-            learning, research, and building the future.
+            tech from the early 2000s. This isn't just about convenience—it's
+            about removing bureaucratic friction so students can focus on what
+            actually matters: learning, research, and building the future.
           </p>
-          <p className="text-lg text-gray-300">
-            This silly manifesto is our way of holding ourselves accountable to
-            these principles, while D.I. is our simple contribution to this
-            vision.
+          <p className="text-sm text-gray-400 leading-relaxed">
+            This manifesto is our way of holding ourselves accountable. DegreeIntelligence
+            is our simple contribution to this vision.
           </p>
+        </motion.div>
+
+        {/* CTA */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6, delay: 0.3 }}
+          className="mt-8 text-center"
+        >
+          <Link
+            href="/"
+            className="inline-flex items-center gap-2 px-5 py-2.5 text-sm rounded-xl bg-gradient-to-r from-blue-500/25 via-purple-500/25 to-pink-500/25 hover:from-blue-500/35 hover:via-purple-500/35 hover:to-pink-500/35 text-white font-medium border border-white/[0.1] shadow-[0_4px_20px_rgba(139,92,246,0.2),inset_0_1px_0_rgba(255,255,255,0.15)] transition-all"
+          >
+            Get started with DegreeIntelligence
+            <FiArrowRight size={14} className="opacity-70" />
+          </Link>
         </motion.div>
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-gray-800 mt-24 py-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col md:flex-row justify-between items-center">
-            <div className="flex items-center gap-2 mb-4 md:mb-0">
-              <LogoIcon className="w-6 h-6 text-white" />
-              <CompoundLogo hideLogo animated size="sm" />
+      <footer className="border-t border-white/[0.05] mt-12 py-6">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col sm:flex-row justify-between items-center gap-3">
+            <div className="flex items-center gap-2">
+              <LogoIcon width={18} height={18} />
+              <span className="text-xs text-gray-500">DegreeIntelligence</span>
             </div>
-            <div className="text-sm text-gray-500">
-              Not officially affiliated with Yale University
-            </div>
+            <p className="text-[10px] text-gray-600">
+              Not affiliated with Yale University, Yale College, or DegreeAudit. A free, student-built project.
+            </p>
           </div>
         </div>
       </footer>

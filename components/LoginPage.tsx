@@ -1,11 +1,12 @@
 "use client";
 
 import { useAuth } from "@/context/AuthContext";
-import { Button } from "./ui/button";
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import CompoundLogo from "./ui/CompoundLogo";
 import LogoIcon from "@/icons/LogoIcon";
+import { FiArrowRight, FiArrowLeft } from "react-icons/fi";
+import CosmicBackground from "@/components/CosmicBackground/page";
 
 export default function LoginPage({
   onBackClick,
@@ -14,241 +15,194 @@ export default function LoginPage({
 }) {
   const { signInWithGoogle, loading } = useAuth();
   const [isHovering, setIsHovering] = useState(false);
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [activeFeature, setActiveFeature] = useState(0);
 
   const features = [
     {
-      title: "AI Academic Planning. Done right.",
+      title: "AI Academic Planning",
       description:
-        "All we need is YHub transcript for intelligent, personalized suggestions.",
+        "Intelligent, personalized course suggestions from your transcript.",
     },
     {
-      title: "Major & Distributional Insights.",
-      description:
-        "Track your major requirements, distributionals, & get real-time guidance.",
+      title: "Major & Distributional Tracking",
+      description: "Real-time progress tracking for all your requirements.",
     },
     {
-      title: "Goodbye Google Sheets.",
-      description:
-        "No more broken formulas or outdated planners — this is DegreeIntelligence.",
+      title: "Goodbye Spreadsheets",
+      description: "No more broken formulas — this is DegreeIntelligence.",
     },
   ];
 
   useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      setMousePosition({ x: e.clientX, y: e.clientY });
-    };
-    window.addEventListener("mousemove", handleMouseMove);
-
     const featureInterval = setInterval(() => {
       setActiveFeature((prev) => (prev + 1) % features.length);
-    }, 4000);
+    }, 3500);
 
-    return () => {
-      window.removeEventListener("mousemove", handleMouseMove);
-      clearInterval(featureInterval);
-    };
+    return () => clearInterval(featureInterval);
   }, []);
 
-  const gradientPosition = {
-    x:
-      mousePosition.x / (typeof window !== "undefined" ? window.innerWidth : 1),
-    y:
-      mousePosition.y /
-      (typeof window !== "undefined" ? window.innerHeight : 1),
-  };
-
   return (
-    <div
-      className={`relative flex flex-col items-center justify-center min-h-screen p-4 bg-gradient-to-br from-gray-900 via-blue-900/80 to-purple-900 overflow-hidden font-louize`}
-    >
-      {/* Dynamic gradient background */}
-      <motion.div
-        className="absolute inset-0 opacity-30 pointer-events-none"
-        animate={{
-          backgroundPosition: `${gradientPosition.x * 100}% ${
-            gradientPosition.y * 100
-          }%`,
-        }}
-        transition={{ type: "spring", damping: 30 }}
-        style={{
-          backgroundImage: `
-            radial-gradient(circle at center, rgba(165, 142, 251, 0.8) 0%, transparent 60%),
-            radial-gradient(circle at 30% 70%, rgba(100, 210, 255, 0.6) 0%, transparent 55%),
-            radial-gradient(circle at 70% 30%, rgba(255, 118, 117, 0.6) 0%, transparent 55%)
-          `,
-        }}
-      />
+    <div className="relative flex flex-col items-center justify-center min-h-screen p-4 bg-gradient-to-br from-gray-950 via-gray-900 to-gray-900 overflow-hidden font-louize">
+      <CosmicBackground mode="stars" opacity={0.7} />
 
-      {/* Floating Yale-inspired elements */}
-      {[...Array(15)].map((_, i) => (
-        <motion.div
-          key={i}
-          className="absolute rounded-full bg-white/10 backdrop-blur-sm"
-          initial={{
-            x: Math.random() * 100,
-            y: Math.random() * 100,
-            scale: Math.random() * 0.5 + 0.5,
-          }}
-          animate={{
-            x: [null, Math.random() * 100],
-            y: [null, Math.random() * 100],
-          }}
-          transition={{
-            duration: Math.random() * 15 + 15,
-            repeat: Infinity,
-            repeatType: "reverse",
-            ease: "easeInOut",
-          }}
-          style={{
-            width: `${Math.random() * 10 + 5}px`,
-            height: `${Math.random() * 10 + 5}px`,
-            left: `${Math.random() * 100}%`,
-            top: `${Math.random() * 100}%`,
-          }}
-        />
-      ))}
+      {/* Ambient glow */}
+      <div className="pointer-events-none absolute inset-0 -z-10">
+        <div className="absolute left-1/2 top-1/3 -translate-x-1/2 -translate-y-1/2 h-[500px] w-[600px] rounded-full bg-gradient-to-r from-blue-600/15 via-purple-600/15 to-pink-600/15 blur-3xl" />
+      </div>
 
-      {/* Main content */}
+      {/* Main card */}
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8 }}
-        className="relative z-10 w-full max-w-xl"
+        initial={{ opacity: 0, y: 20, scale: 0.98 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        transition={{ duration: 0.5, ease: "easeOut" }}
+        className="relative z-10 w-full max-w-md"
       >
-        <div className="p-1 rounded-2xl bg-gradient-to-r from-purple-500/20 via-blue-500/20 to-pink-500/20">
-          <div className="p-8 space-y-8 backdrop-blur-lg bg-gray-100/70 dark:bg-gray-900/70 rounded-xl border border-gray-200/50 dark:border-gray-800/50 shadow-2xl">
-            {/* Yale crest animation */}
-            <motion.div
-              whileHover={{ scale: 1.05 }}
-              className="flex justify-center"
-            >
-              <div className="relative w-32 h-32">
-                <motion.div
-                  animate={{ rotate: 360 }}
-                  transition={{
-                    duration: 20,
-                    repeat: Infinity,
-                    ease: "linear",
-                  }}
-                  className="absolute inset-0 rounded-full border-2 border-transparent border-t-blue-400/30 border-r-purple-400/30"
-                />
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-300 to-purple-300">
-                    {/* <CompoundLogo animated /> */}
-                    <LogoIcon width={64} height={64} />
-                  </div>
-                </div>
+        <div className="p-6 rounded-2xl bg-gradient-to-br from-gray-900/80 via-gray-900/60 to-gray-950/80 backdrop-blur-2xl border border-white/[0.08] shadow-[0_8px_48px_rgba(0,0,0,0.5),0_0_100px_rgba(139,92,246,0.08),inset_0_1px_0_rgba(255,255,255,0.1)] ring-1 ring-white/[0.05]">
+          {/* Logo */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.1, duration: 0.4 }}
+            className="flex justify-center mb-5"
+          >
+            <div className="relative w-16 h-16">
+              <motion.div
+                animate={{ rotate: 360 }}
+                transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+                className="absolute inset-0 rounded-full border border-transparent border-t-blue-400/30 border-r-purple-400/30"
+              />
+              <div className="absolute inset-0 flex items-center justify-center">
+                <LogoIcon width={36} height={36} />
               </div>
-            </motion.div>
-
-            <div className="space-y-2 text-center">
-              <motion.h1
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.3 }}
-                className="flex items-center justify-center text-4xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-blue-200 to-purple-300"
-              >
-                <CompoundLogo hideLogo animated size="xl" />
-              </motion.h1>
-              <motion.p
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.5 }}
-                className="text-lg text-gray-700 dark:text-gray-300"
-              >
-                Here you'll navigate Yale journey with clarity, not
-                spreadsheets.
-              </motion.p>
             </div>
+          </motion.div>
 
-            {/* Rotating feature showcase */}
-            <div className="h-24 flex items-center justify-center">
+          {/* Title */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.2 }}
+            className="text-center mb-4"
+          >
+            <h1 className="flex items-center justify-center mb-2">
+              <CompoundLogo hideLogo animated size="lg" />
+            </h1>
+            <p className="text-sm text-gray-400">
+              Navigate your Yale journey with clarity.
+            </p>
+          </motion.div>
+
+          {/* Feature carousel */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.3 }}
+            className="mb-5"
+          >
+            <div className="h-[72px] flex items-center justify-center p-4 rounded-xl bg-gradient-to-br from-white/[0.04] to-transparent border border-white/[0.06] shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]">
               <AnimatePresence mode="wait">
                 <motion.div
                   key={activeFeature}
-                  initial={{ opacity: 0, y: 10 }}
+                  initial={{ opacity: 0, y: 8 }}
                   animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  transition={{ duration: 0.5 }}
+                  exit={{ opacity: 0, y: -8 }}
+                  transition={{ duration: 0.3 }}
                   className="text-center"
                 >
-                  <h3 className="text-xl font-medium text-blue-200">
+                  <h3 className="text-sm font-medium bg-gradient-to-r from-blue-200 to-purple-200 bg-clip-text text-transparent mb-0.5">
                     {features[activeFeature].title}
                   </h3>
-                  <p className="text-gray-700 dark:text-gray-300">
+                  <p className="text-xs text-gray-400">
                     {features[activeFeature].description}
                   </p>
                 </motion.div>
               </AnimatePresence>
             </div>
 
-            {/* Auth button */}
-            <motion.div
+            {/* Feature indicators */}
+            <div className="flex justify-center gap-1.5 mt-3">
+              {features.map((_, i) => (
+                <button
+                  key={i}
+                  onClick={() => setActiveFeature(i)}
+                  className={`h-1 rounded-full transition-all duration-300 ${
+                    i === activeFeature
+                      ? "w-4 bg-gradient-to-r from-blue-400 to-purple-400"
+                      : "w-1 bg-gray-600 hover:bg-gray-500"
+                  }`}
+                />
+              ))}
+            </div>
+          </motion.div>
+
+          {/* CAS Login button */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.4 }}
+          >
+            <motion.button
+              onClick={signInWithGoogle}
+              disabled={loading}
               onHoverStart={() => setIsHovering(true)}
               onHoverEnd={() => setIsHovering(false)}
-              className="pt-4"
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              className="w-full py-3 px-4 rounded-xl font-medium text-sm text-white bg-gradient-to-r from-blue-500/30 via-purple-500/30 to-pink-500/30 hover:from-blue-500/40 hover:via-purple-500/40 hover:to-pink-500/40 border border-white/[0.1] shadow-[0_4px_20px_rgba(139,92,246,0.25),inset_0_1px_0_rgba(255,255,255,0.15),inset_0_-1px_0_rgba(0,0,0,0.2)] transition-all duration-300 flex items-center justify-center gap-2"
             >
-              <Button
-                onClick={signInWithGoogle}
-                disabled={loading}
-                className={`w-full h-14 text-lg font-medium rounded-xl transition-all duration-500 ${
-                  isHovering
-                    ? "bg-gradient-to-br from-blue-500 to-purple-600 shadow-lg shadow-blue-500/30"
-                    : "bg-gradient-to-br from-blue-600 to-purple-700 shadow-md"
-                }`}
-              >
-                {loading ? (
+              {loading ? (
+                <motion.span
+                  animate={{ opacity: [0.5, 1, 0.5] }}
+                  transition={{ duration: 1.5, repeat: Infinity }}
+                  className="text-gray-300"
+                >
+                  Authenticating...
+                </motion.span>
+              ) : (
+                <>
+                  <span>Log in with Yale CAS</span>
                   <motion.span
-                    animate={{ opacity: [0.5, 1, 0.5] }}
-                    transition={{ duration: 1.5, repeat: Infinity }}
+                    animate={isHovering ? { x: [0, 3, 0] } : {}}
+                    transition={{ duration: 0.4 }}
                   >
-                    Securing Access...
+                    <FiArrowRight size={14} className="opacity-70" />
                   </motion.span>
-                ) : (
-                  <span className="flex items-center justify-center gap-2">
-                    <span>Log in with CAS</span>
-                    <motion.span
-                      animate={isHovering ? { x: [0, 2, 0] } : {}}
-                      transition={{ duration: 0.5 }}
-                    >
-                      →
-                    </motion.span>
-                  </span>
-                )}
-              </Button>
-            </motion.div>
+                </>
+              )}
+            </motion.button>
+          </motion.div>
 
-            {/* Premium badge */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 1 }}
-              className="pt-2 text-center"
-            >
-              <div className="inline-flex items-center px-3 py-1 rounded-full bg-gradient-to-r from-blue-900/40 to-purple-900/40 border border-blue-700/30">
-                <span className="text-xs font-medium text-blue-200">
-                  MADE BY YALIES, FOR YALIES.
-                </span>
-              </div>
-            </motion.div>
+          {/* Badge */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.5 }}
+            className="mt-4 flex justify-center"
+          >
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-medium tracking-wide uppercase bg-gradient-to-r from-blue-500/15 via-purple-500/15 to-pink-500/15 border border-white/[0.08] text-gray-400 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]">
+              <span className="w-1 h-1 rounded-full bg-emerald-400 animate-pulse" />
+              For Yalies, by Yalies
+            </span>
+          </motion.div>
 
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.7 }}
-              className="text-center mt-4"
+          {/* Back link */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.6 }}
+            className="mt-4 text-center"
+          >
+            <button
               onClick={onBackClick}
+              className="text-xs text-gray-500 hover:text-gray-300 transition-colors inline-flex items-center gap-1.5 group"
             >
-              <a
-                href="/"
-                className="text-sm text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white transition-colors inline-flex items-center"
-              >
-                <span>←</span> Return to homepage
-              </a>
-            </motion.div>
-          </div>
+              <FiArrowLeft
+                size={12}
+                className="group-hover:-translate-x-0.5 transition-transform"
+              />
+              Back to homepage
+            </button>
+          </motion.div>
         </div>
       </motion.div>
 
@@ -256,20 +210,23 @@ export default function LoginPage({
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ delay: 1.2 }}
-        className="absolute bottom-6 text-center text-sm"
+        transition={{ delay: 0.8 }}
+        className="absolute bottom-4 text-center"
       >
-        <p className="text-gray-600 dark:text-gray-400">
-          Hey there! Thanks for stopping by. We're Filippo Fonseca & Emir Ahmed.{" "}
+        <p className="text-xs text-gray-500">
+          Built by Yalies, for Yalies. NOT associated with Yale University in
+          any way, shape, or form. Just a personal proj. ·{" "}
           <a
             href="mailto:filippo.fonseca@yale.edu,emir.ahmed@yale.edu"
-            className="text-black dark:text-white font-normal hover:underline"
+            className="text-gray-400 hover:text-white transition-colors"
           >
-            Have feedback?
+            Feedback?
           </a>
         </p>
-        <p className="text-xs mt-1 text-gray-600 dark:text-gray-400">
-          v0.0.1. Not officially affiliated or partnered with Yale University.
+        <p className="text-[10px] mt-0.5 text-gray-600">
+          v2.0 · Not affiliated with Yale University. Any data you upload is
+          from your own volition and you agree to our storage practices. We will
+          NOT store your transcript.
         </p>
       </motion.div>
     </div>

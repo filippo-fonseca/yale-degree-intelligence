@@ -188,6 +188,32 @@ export default function Home() {
   const [distSelectorCourseId, setDistSelectorCourseId] = useState<
     string | null
   >(null);
+  const [collapsedSemesters, setCollapsedSemesters] = useState<Set<string>>(
+    new Set()
+  );
+
+  // Helper to check if a semester has any in-progress courses
+  const semesterHasInProgress = (semesterKey: string) => {
+    return courses.some(
+      (c) =>
+        `${c.semester} ${c.year}` === semesterKey &&
+        c.status === "in-progress" &&
+        !c.skipped
+    );
+  };
+
+  // Toggle semester collapse
+  const toggleSemesterCollapse = (semesterKey: string) => {
+    setCollapsedSemesters((prev) => {
+      const next = new Set(prev);
+      if (next.has(semesterKey)) {
+        next.delete(semesterKey);
+      } else {
+        next.add(semesterKey);
+      }
+      return next;
+    });
+  };
 
   const navItems = [
     {
@@ -224,7 +250,7 @@ export default function Home() {
       id: "cleoai",
       icon: LogoIcon,
       label: "Dan",
-      disabled: !hasData,
+      comingSoon: true,
     },
     {
       id: "distributionals",
@@ -870,40 +896,30 @@ export default function Home() {
           >
             {/* Navigation Items */}
             <nav className="space-y-1.5 flex-1 overflow-y-auto">
-              {navItems.map((item) => (
+              {/* Always-enabled items (not disabled and not comingSoon) */}
+              {navItems.filter((item) => !item.disabled && !item.comingSoon).map((item) => (
                 <motion.button
                   key={item.id}
-                  whileHover={!item.disabled ? { scale: 1.02, x: 2 } : {}}
-                  whileTap={!item.disabled ? { scale: 0.98 } : {}}
+                  whileHover={{ scale: 1.02, x: 2 }}
+                  whileTap={{ scale: 0.98 }}
                   onClick={() => {
-                    if (!item.disabled) {
-                      setActiveTab(item.id);
-                      void new Audio("/audio/pop.mp3").play().catch(() => null);
-                    }
+                    setActiveTab(item.id);
+                    void new Audio("/audio/pop.mp3").play().catch(() => null);
                   }}
                   className={`w-full flex items-center justify-between px-4 py-3 text-left rounded-2xl transition-all duration-300 relative ${
                     activeTab === item.id
                       ? "bg-gradient-to-br from-white/[0.12] via-white/[0.06] to-transparent text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.15),inset_0_-1px_0_rgba(0,0,0,0.2),0_4px_16px_rgba(0,0,0,0.3),0_0_0_1px_rgba(255,255,255,0.08)] backdrop-blur-sm border border-transparent"
-                      : item.disabled
-                        ? "text-gray-600 cursor-not-allowed"
-                        : "text-gray-400 hover:text-white hover:bg-white/[0.04] hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_4px_12px_rgba(0,0,0,0.15)]"
+                      : "text-gray-400 hover:text-white hover:bg-white/[0.04] hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_4px_12px_rgba(0,0,0,0.15)]"
                   }`}
-                  disabled={item.disabled}
                 >
                   <div className="flex items-center space-x-3">
                     <item.icon
-                      size={activeTab === "cleoai" ? 18 : 12}
+                      size={item.id === "cleoai" ? 18 : 12}
                       opacity={
-                        item.id == "cleoai" && activeTab !== "cleoai" ? 0.5 : 1
+                        item.id === "cleoai" && activeTab !== "cleoai" ? 0.5 : 1
                       }
                     />
                     <span>{item.label}</span>
-
-                    {item.badge && isBrandNew && (
-                      <span className="ml-1 px-2 py-0.5 text-[10px] rounded-full bg-emerald-900/30 border border-emerald-800 text-emerald-300">
-                        {item.badge}
-                      </span>
-                    )}
                   </div>
 
                   {activeTab === item.id && (
@@ -915,10 +931,52 @@ export default function Home() {
                       <FiChevronRight />
                     </motion.div>
                   )}
-                  {/* 
-                    Removed tooltip rendering because 'tooltip' property does not exist on navItems' type.
-                    If you want to support tooltips, add 'tooltip?: string' to the navItems type and ensure all items are updated accordingly.
-                  */}
+                </motion.button>
+              ))}
+
+              {/* Coming soon items (shown in main nav but disabled with badge) */}
+              {navItems.filter((item) => item.comingSoon).map((item) => (
+                <motion.button
+                  key={item.id}
+                  className="w-full flex items-center justify-between px-4 py-3 text-left rounded-2xl transition-all duration-300 relative text-gray-600 cursor-not-allowed opacity-60"
+                  disabled
+                >
+                  <div className="flex items-center space-x-3">
+                    <item.icon
+                      size={item.id === "cleoai" ? 18 : 12}
+                      opacity={0.5}
+                    />
+                    <span>{item.label}</span>
+                    <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-purple-500/20 text-purple-400 border border-purple-500/30">
+                      COMING SOON
+                    </span>
+                  </div>
+                </motion.button>
+              ))}
+
+              {/* Subheader for disabled items (only shown when there are data-dependent disabled items) */}
+              {navItems.some((item) => item.disabled && !item.comingSoon) && (
+                <div className="pt-3 pb-1 px-4">
+                  <p className="text-[9px] font-medium uppercase tracking-widest text-gray-600">
+                    After you upload courses:
+                  </p>
+                </div>
+              )}
+
+              {/* Disabled items (data-dependent, not coming soon) */}
+              {navItems.filter((item) => item.disabled && !item.comingSoon).map((item) => (
+                <motion.button
+                  key={item.id}
+                  className="w-full flex items-center justify-between px-4 py-3 text-left rounded-2xl transition-all duration-300 relative text-gray-600 cursor-not-allowed opacity-60"
+                  disabled
+                >
+                  <div className="flex items-center space-x-3">
+                    <item.icon
+                      size={item.id === "cleoai" ? 18 : 12}
+                      opacity={0.5}
+                    />
+                    <span>{item.label}</span>
+                  </div>
                 </motion.button>
               ))}
             </nav>
@@ -1068,17 +1126,58 @@ export default function Home() {
                               ]
                             );
                           })
-                          .map((semester) => (
+                          .map((semester) => {
+                            const isCollapsed = collapsedSemesters.has(semester);
+                            const hasInProgress = semesterHasInProgress(semester);
+                            const semesterCourses = courses.filter(
+                              (c) => `${c.semester} ${c.year}` === semester
+                            );
+
+                            return (
                             <motion.div
                               key={semester}
                               initial={{ opacity: 0 }}
                               animate={{ opacity: 1 }}
-                              className="mb-8"
+                              className="mb-6"
                             >
-                              <h3 className="text-lg font-medium mb-4 text-gray-700 dark:text-gray-300">
-                                {semester}
-                              </h3>
+                              {/* Semester Header */}
+                              <button
+                                onClick={() => toggleSemesterCollapse(semester)}
+                                className="w-full flex items-center justify-between mb-3 group"
+                              >
+                                <div className="flex items-center gap-2">
+                                  <h3 className="text-base font-medium text-gray-700 dark:text-gray-300 group-hover:text-white transition-colors">
+                                    {semester}
+                                  </h3>
+                                  {hasInProgress && (
+                                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-purple-500/20 border border-purple-500/30 text-purple-300">
+                                      <span className="w-1 h-1 rounded-full bg-purple-400 animate-pulse" />
+                                      In Progress
+                                    </span>
+                                  )}
+                                  <span className="text-xs text-gray-600">
+                                    {semesterCourses.length} course{semesterCourses.length !== 1 ? "s" : ""}
+                                  </span>
+                                </div>
+                                <motion.div
+                                  animate={{ rotate: isCollapsed ? 0 : 180 }}
+                                  transition={{ duration: 0.2 }}
+                                  className="p-1 rounded-md text-gray-500 group-hover:text-gray-300 group-hover:bg-white/[0.05] transition-all"
+                                >
+                                  <FiChevronDown size={16} />
+                                </motion.div>
+                              </button>
 
+                              {/* Collapsible Courses Grid */}
+                              <AnimatePresence initial={false}>
+                                {!isCollapsed && (
+                                  <motion.div
+                                    initial={{ height: 0, opacity: 0 }}
+                                    animate={{ height: "auto", opacity: 1 }}
+                                    exit={{ height: 0, opacity: 0 }}
+                                    transition={{ duration: 0.2, ease: "easeInOut" }}
+                                    className="overflow-hidden"
+                                  >
                               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                                 {courses
                                   .filter(
@@ -1341,8 +1440,12 @@ export default function Home() {
                                     </motion.div>
                                   ))}
                               </div>
+                                  </motion.div>
+                                )}
+                              </AnimatePresence>
                             </motion.div>
-                          ))}
+                          );
+                          })}
 
                         {courses.some((c) => c.skipped) && (
                           <motion.div
@@ -1403,54 +1506,130 @@ export default function Home() {
                           </motion.div>
                         )}
                       </div>
-                    </div>
-                  ) : isBrandNew ? (
-                    /* (unchanged empty-state content) */
-                    <div className="flex flex-col items-center justify-center py-12">
-                      {/* ... keep your existing new-user content ... */}
-                      <div
-                        id="upload-transcript"
-                        className="w-full max-w-lg bg-white dark:bg-gray-900/50 backdrop-blur-sm p-8 rounded-xl border border-gray-200 dark:border-gray-800 mt-8 shadow-sm dark:shadow-none"
-                      >
-                        <h4 className="text-lg font-medium text-gray-800 dark:text-gray-200 mb-2">
-                          After registration, upload your unofficial transcript
-                          here.
-                        </h4>
-                        <p className="text-sm text-gray-500 mb-4">
-                          We'll parse your current classes now and fill in
-                          grades later when they post.
+
+                      {/* Data & Privacy Disclaimer */}
+                      <div className="mt-10 p-4 rounded-xl bg-gradient-to-br from-gray-900/40 via-gray-900/30 to-gray-950/40 border border-gray-800/50 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)]">
+                        <p className="text-[11px] text-gray-500 leading-relaxed">
+                          <span className="font-medium text-gray-400">By using DegreeIntelligence, you voluntarily share your grades.</span>{" "}
+                          Your transcript PDF is processed locally and is <span className="text-emerald-400/80">never stored</span> on our servers. However, we do store your course and grade data in our database (private only to your profile) to provide you with insights, progress tracking, and recommendations for your major.{" "}
+                          By uploading academic information, you confirm that you are providing your own data and consent to its storage and processing for academic planning purposes.{" "}
+                          <Link href="/terms" target="_blank" className="text-blue-400 hover:text-blue-300 underline underline-offset-2">
+                            Read our full terms
+                          </Link>.
                         </p>
-                        <FileUpload onSuccess={parseAndStoreCourses} />
-                        <p className="text-center text-gray-500 text-sm mt-4">
-                          We never store your actual transcript file. See our{" "}
-                          <Link
-                            href="/terms"
-                            className="text-gray-700 dark:text-gray-300 hover:underline"
-                          >
-                            terms
-                          </Link>
-                          .
+                        <p className="text-[10px] text-gray-600 mt-2 leading-relaxed">
+                          DegreeIntelligence is <span className="font-medium">not affiliated</span> in any way, shape, or form with Yale University, Yale College, or DegreeAudit. We are simply a free, student-built personal project that we wanted to share with the community because we genuinely found it helpful for ourselves.
                         </p>
                       </div>
                     </div>
                   ) : (
-                    /* (unchanged pre-upload content) */
-                    <div className="flex flex-col items-center justify-center py-12">
-                      {/* ... keep your existing pre-upload content ... */}
-                      <div className="w-full max-w-lg bg-white dark:bg-gray-900/50 backdrop-blur-sm p-8 rounded-xl border border-gray-200 dark:border-gray-800 shadow-sm dark:shadow-none">
-                        <FileUpload onSuccess={parseAndStoreCourses} />
-                        <p className="text-center text-gray-500 text-sm mt-4">
-                          By uploading your transcript, you agree to our{" "}
-                          <Link
-                            href="/terms"
-                            className="text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-300 hover:underline transition-all hover:scale-[1.3]"
-                            target="_blank"
-                          >
-                            terms.
-                          </Link>{" "}
-                          We will NEVER store your actual transcript file in our
-                          database, and all analysis is handled locally.
+                    <div className="flex flex-col items-center justify-center py-8">
+                      {/* Header */}
+                      <div className="text-center mb-6">
+                        <h2 className="text-2xl font-medium bg-clip-text text-transparent bg-gradient-to-r from-pink-200 to-purple-200 mb-2">
+                          Let's get your courses loaded, {user?.displayName}.
+                        </h2>
+                        <p className="text-gray-400 text-sm">
+                          {isBrandNew
+                            ? "After registration, we'll parse your classes and fill in grades when they post."
+                            : "Upload your unofficial transcript to see your academic journey. We won't store the file."}
                         </p>
+                      </div>
+
+                      {/* Tutorial Steps */}
+                      <div className="w-full max-w-xl mb-6">
+                        <div className="p-4 rounded-xl bg-gradient-to-br from-gray-900/60 via-gray-900/40 to-gray-950/60 backdrop-blur-md border border-gray-800/50 shadow-[inset_0_1px_0_rgba(255,255,255,0.04),0_4px_16px_rgba(0,0,0,0.25)]">
+                          <h3 className="text-sm font-medium text-gray-300 mb-3 flex items-center gap-2">
+                            <span className="p-1.5 rounded-lg bg-pink-500/10 border border-pink-500/20">
+                              <Printer size={14} className="text-pink-400" />
+                            </span>
+                            How to get your transcript
+                          </h3>
+                          <div className="space-y-3">
+                            <div className="flex items-start gap-3">
+                              <div className="flex-shrink-0 w-6 h-6 rounded-full bg-gradient-to-br from-pink-500 to-purple-600 flex items-center justify-center text-white text-xs font-medium shadow-[0_2px_8px_rgba(236,72,153,0.3)]">
+                                1
+                              </div>
+                              <div className="flex-1 pt-0.5">
+                                <p className="text-sm text-gray-300">
+                                  Go to{" "}
+                                  <a
+                                    href="https://yub.yale.edu"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="text-pink-400 hover:text-pink-300 underline underline-offset-2"
+                                  >
+                                    Yale Hub
+                                  </a>{" "}
+                                  and sign in
+                                </p>
+                              </div>
+                            </div>
+                            <div className="flex items-start gap-3">
+                              <div className="flex-shrink-0 w-6 h-6 rounded-full bg-gradient-to-br from-pink-500 to-purple-600 flex items-center justify-center text-white text-xs font-medium shadow-[0_2px_8px_rgba(236,72,153,0.3)]">
+                                2
+                              </div>
+                              <div className="flex-1 pt-0.5">
+                                <p className="text-sm text-gray-300">
+                                  Navigate to{" "}
+                                  <span className="px-1.5 py-0.5 rounded bg-gray-800/60 border border-gray-700/50 text-gray-200 font-mono text-xs">
+                                    Academics
+                                  </span>{" "}
+                                  →{" "}
+                                  <span className="px-1.5 py-0.5 rounded bg-gray-800/60 border border-gray-700/50 text-gray-200 font-mono text-xs">
+                                    Unofficial Transcript
+                                  </span>
+                                </p>
+                              </div>
+                            </div>
+                            <div className="flex items-start gap-3">
+                              <div className="flex-shrink-0 w-6 h-6 rounded-full bg-gradient-to-br from-pink-500 to-purple-600 flex items-center justify-center text-white text-xs font-medium shadow-[0_2px_8px_rgba(236,72,153,0.3)]">
+                                3
+                              </div>
+                              <div className="flex-1 pt-0.5">
+                                <p className="text-sm text-gray-300">
+                                  Click{" "}
+                                  <span className="px-1.5 py-0.5 rounded bg-blue-500/20 border border-blue-500/30 text-blue-300 font-medium text-xs">
+                                    Print
+                                  </span>{" "}
+                                  and save as PDF. Then upload it here.
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Upload Area */}
+                      <div
+                        id="upload-transcript"
+                        className="w-full max-w-xl p-6 rounded-xl bg-gradient-to-br from-gray-900/60 via-gray-900/40 to-gray-950/60 backdrop-blur-md border border-gray-800/50 shadow-[inset_0_1px_0_rgba(255,255,255,0.04),0_4px_16px_rgba(0,0,0,0.25)]"
+                      >
+                        <FileUpload onSuccess={parseAndStoreCourses} />
+                      </div>
+
+                      {/* Data & Privacy Disclaimer */}
+                      <div className="w-full max-w-xl mt-5 p-4 rounded-xl bg-gradient-to-br from-gray-900/40 via-gray-900/30 to-gray-950/40 border border-gray-800/50 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)]">
+                        <div className="flex items-start gap-3">
+                          <div className="p-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20 shrink-0 mt-0.5">
+                            <svg className="w-3.5 h-3.5 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                            </svg>
+                          </div>
+                          <div>
+                            <p className="text-[11px] text-gray-400 leading-relaxed">
+                              <span className="font-medium text-gray-300">By uploading, you voluntarily share your grades.</span>{" "}
+                              Your transcript PDF is processed locally and is <span className="text-emerald-400">never stored</span> on our servers. However, we store your course and grade data in our database (private only to your profile) to provide insights and recommendations for your major.{" "}
+                              By uploading academic information, you confirm that you are providing your own data and consent to its storage and processing for academic planning purposes.{" "}
+                              <Link href="/terms" target="_blank" className="text-blue-400 hover:text-blue-300 underline underline-offset-2">
+                                Read our full terms
+                              </Link>.
+                            </p>
+                            <p className="text-[10px] text-gray-600 mt-2 leading-relaxed">
+                              DegreeIntelligence is <span className="font-medium">not affiliated</span> in any way, shape, or form with Yale University, Yale College, or DegreeAudit. We are simply a free, student-built personal project that we wanted to share with the community because we genuinely found it helpful for ourselves.
+                            </p>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   )}

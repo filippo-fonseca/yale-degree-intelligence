@@ -95,7 +95,7 @@ export default function UserProfilePage() {
           // Own profile: fetch from courses collection (with grades)
           // Keep ALL courses including skipped ones for progress calculation
           const coursesSnapshot = await getDocs(
-            query(collection(db, "courses"), where("userId", "==", userId))
+            query(collection(db, "courses"), where("userId", "==", userId)),
           );
           const coursesData = coursesSnapshot.docs.map((doc) => ({
             id: doc.id,
@@ -108,7 +108,7 @@ export default function UserProfilePage() {
           await syncFriendData(userId as string);
 
           const publicDataDoc = await getDoc(
-            doc(db, "friends_public_data", userId as string)
+            doc(db, "friends_public_data", userId as string),
           );
 
           if (!publicDataDoc.exists() || !publicDataDoc.data().enabled) {
@@ -132,7 +132,7 @@ export default function UserProfilePage() {
                 userId: userId as string,
                 skipped: c.skipped || c.status === "skipped", // Include skipped flag
                 manualRequirementsFulfilled: c.manualRequirementsFulfilled,
-              })
+              }),
             );
 
             setCourses(publicCourses);
@@ -198,7 +198,7 @@ export default function UserProfilePage() {
         // Check "friends" collection for mutual friendship
         const friendsQ = query(
           collection(db, "friends"),
-          where("users", "array-contains", user.uid)
+          where("users", "array-contains", user.uid),
         );
         const friendsSnap = await getDocs(friendsQ);
         let allowed = false;
@@ -280,7 +280,10 @@ export default function UserProfilePage() {
               <div className="relative mb-3">
                 <UserAvatar
                   photoURL={userProfile?.photoURL}
-                  displayName={userProfile?.displayName || getDisplayNameFromEmail(userProfile?.email)}
+                  displayName={
+                    userProfile?.displayName ||
+                    getDisplayNameFromEmail(userProfile?.email)
+                  }
                   email={userProfile?.email}
                   size={80}
                 />
@@ -296,7 +299,7 @@ export default function UserProfilePage() {
                     userProfile.majors
                       .map((m) => getFullMajorNameById(m) || m)
                       .join(", "),
-                    70
+                    70,
                   )}
                 </p>
               )}
@@ -394,21 +397,25 @@ export default function UserProfilePage() {
           <h2 className="text-lg font-medium mb-4 text-transparent bg-clip-text bg-gradient-to-r from-blue-200 to-purple-200">
             Academic Journey
           </h2>
-          {courses.length == 0 && <p className="text-sm text-gray-500">No courses taken or in progress.</p>}
+          {courses.length == 0 && (
+            <p className="text-sm text-gray-500">
+              No courses taken or in progress.
+            </p>
+          )}
 
           <div className="space-y-8">
             {Array.from(
               new Set(
                 courses
                   .map((c) => c.year)
-                  .filter((y): y is number => y !== undefined)
-              )
+                  .filter((y): y is number => y !== undefined),
+              ),
             )
               .sort((a, b) => a - b)
               .map((year) => {
                 const yearCourses = courses.filter((c) => c.year === year);
                 const semesters = Array.from(
-                  new Set(yearCourses.map((c) => c.semester))
+                  new Set(yearCourses.map((c) => c.semester)),
                 )
                   .filter((s): s is string => s !== undefined)
                   .sort((a, b) => {
@@ -437,11 +444,11 @@ export default function UserProfilePage() {
                     <div className="divide-y divide-gray-800/40">
                       {semesters.map((semester) => {
                         const semesterCourses = yearCourses.filter(
-                          (c) => c.semester === semester
+                          (c) => c.semester === semester,
                         );
                         const semesterCredits = semesterCourses.reduce(
                           (sum: number, c) => sum + (c.credits || 0),
-                          0
+                          0,
                         );
 
                         return (
@@ -483,7 +490,7 @@ export default function UserProfilePage() {
                                         {truncate(
                                           getCourseNameFromCode(course.code) ||
                                             "Course",
-                                          50
+                                          50,
                                         )}
                                       </p>
                                     </div>

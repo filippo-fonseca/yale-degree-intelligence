@@ -6,6 +6,7 @@ import {
   useMotionValue,
   useSpring,
   useTransform,
+  AnimatePresence,
 } from "framer-motion";
 import {
   FiArrowRight,
@@ -26,7 +27,7 @@ import {
 import LogoIcon from "@/icons/LogoIcon";
 import CompoundLogo from "@/components/ui/CompoundLogo";
 import Link from "next/link";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import LoginPage from "@/components/LoginPage";
 import dynamic from "next/dynamic";
 import { GraduationCap, BookOpen, Award, Clock } from "lucide-react";
@@ -108,6 +109,23 @@ function MajorProgressBar({ percent }: { percent: number }) {
 
 export default function AboutPage() {
   const [logInFlow, setLogInFlow] = useState(false);
+  const [showVideoModal, setShowVideoModal] = useState(false);
+
+  // Close modal on ESC key
+  useEffect(() => {
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setShowVideoModal(false);
+    };
+    if (showVideoModal) {
+      document.addEventListener("keydown", handleEsc);
+      document.body.style.overflow = "hidden";
+    }
+    return () => {
+      document.removeEventListener("keydown", handleEsc);
+      document.body.style.overflow = "";
+    };
+  }, [showVideoModal]);
+
   const lineRef = useRef<HTMLDivElement | null>(null);
   const lineInView = useInView(lineRef, { once: true, amount: 0.35 });
   const pieRef = useRef<HTMLDivElement | null>(null);
@@ -170,33 +188,41 @@ export default function AboutPage() {
         </div>
       </div>
 
-      {/* Access Platform Button - Top Right */}
-      <motion.div
-        initial={{ opacity: 0, y: -10 }}
+      {/* Sticky Navbar */}
+      <motion.nav
+        initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.2 }}
-        className="fixed top-20 right-4 sm:right-6 z-40"
+        transition={{ duration: 0.5 }}
+        className="fixed top-0 left-0 right-0 z-40 bg-gray-950/70 backdrop-blur-xl border-b border-white/[0.06] shadow-[0_4px_24px_rgba(0,0,0,0.3)]"
       >
-        <motion.button
-          className="flex items-center gap-2.5 px-4 py-2 text-sm bg-gradient-to-r from-blue-500/15 via-blue-500/20 to-purple-500/15 hover:from-blue-500/25 hover:via-blue-500/30 hover:to-purple-500/25 backdrop-blur-xl rounded-xl text-white font-medium transition-all shadow-[0_4px_20px_rgba(59,130,246,0.2),inset_0_1px_0_rgba(255,255,255,0.1)] border border-white/[0.1]"
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
-          onClick={() => setLogInFlow(true)}
-        >
-          <span>Log in with CAS</span>
-          <FiArrowRight size={14} className="opacity-70" />
-        </motion.button>
-      </motion.div>
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <LogoIcon width={24} height={24} />
+            <span className="text-sm font-medium text-gray-200 hidden sm:inline">
+              DegreeIntelligence
+            </span>
+          </div>
+          <motion.button
+            className="flex items-center gap-2 px-4 py-2 text-sm bg-gradient-to-r from-pink-500/20 via-purple-500/20 to-blue-500/20 hover:from-pink-500/30 hover:via-purple-500/30 hover:to-blue-500/30 backdrop-blur-xl rounded-xl text-white font-medium transition-all shadow-[0_4px_20px_rgba(139,92,246,0.2),inset_0_1px_0_rgba(255,255,255,0.1)] border border-white/[0.1]"
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            onClick={() => setLogInFlow(true)}
+          >
+            <span>Log in with CAS</span>
+            <FiArrowRight size={14} className="opacity-70" />
+          </motion.button>
+        </div>
+      </motion.nav>
 
       {/* Hero Section */}
-      <div className="relative pt-6 sm:pt-8">
+      <div className="relative pt-6 sm:pt-8l">
         {/* increased top padding to fix logo spacing */}
         <div className="max-w-6xl mx-auto px-4 pb-3 sm:px-6 lg:px-8 relative z-10">
           <motion.div
             initial={{ opacity: 1, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
-            className="text-center mx-auto max-w-3xl p-6 sm:p-8 rounded-2xl bg-gradient-to-br from-gray-900/60 via-gray-900/40 to-gray-950/60 backdrop-blur-xl border border-white/[0.08] shadow-[0_8px_48px_rgba(0,0,0,0.4),0_0_100px_rgba(139,92,246,0.08),inset_0_1px_0_rgba(255,255,255,0.1)] ring-1 ring-white/[0.05]"
+            className="text-center p-6 sm:p-8 rounded-2xl bg-gradient-to-br from-gray-900/60 via-gray-900/40 to-gray-950/60 backdrop-blur-xl border border-white/[0.08] shadow-[0_8px_48px_rgba(0,0,0,0.4),0_0_100px_rgba(139,92,246,0.08),inset_0_1px_0_rgba(255,255,255,0.1)] ring-1 ring-white/[0.05]"
           >
             {/* Version Badge */}
             <motion.div
@@ -238,7 +264,8 @@ export default function AboutPage() {
             <div className="mb-3 flex justify-center">
               <div className="relative p-[1px] rounded-xl bg-gradient-to-r from-pink-500/40 via-purple-500/40 to-blue-500/40">
                 <span className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-medium bg-gradient-to-br from-gray-900/90 via-gray-900/80 to-gray-950/90 text-pink-200 shadow-[0_8px_32px_rgba(236,72,153,0.2),inset_0_1px_0_rgba(255,255,255,0.1),inset_0_-1px_0_rgba(0,0,0,0.2)] backdrop-blur-xl">
-                  <span>💙</span> We're so glad you're here. We think you'll love this.
+                  <span>💙</span> We're so glad you're here. We think you'll
+                  love this.
                 </span>
               </div>
             </div>
@@ -256,29 +283,48 @@ export default function AboutPage() {
                 className="inline-flex items-center gap-1.5 text-transparent bg-clip-text bg-gradient-to-r from-blue-300 to-purple-300 hover:from-blue-200 hover:to-purple-200 font-medium transition-all group"
               >
                 For Yalies, by Yalies
-                <span className="text-purple-400 text-sm opacity-70 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all">↓</span>
+                <span className="text-purple-400 text-sm opacity-70 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all">
+                  ↓
+                </span>
               </Link>
             </p>
 
             <motion.div className="flex flex-wrap justify-center gap-3">
-              <Link href="#simulator">
-                <motion.button
-                  className="px-5 py-2.5 text-sm bg-gradient-to-r from-pink-500/20 via-pink-500/30 to-purple-500/20 hover:from-pink-500/30 hover:via-pink-500/40 hover:to-purple-500/30 backdrop-blur-xl rounded-xl text-white font-medium flex items-center gap-2 transition-all shadow-[0_8px_32px_rgba(236,72,153,0.25),inset_0_1px_0_rgba(255,255,255,0.15),inset_0_-1px_0_rgba(0,0,0,0.2)] border border-white/[0.1] ring-1 ring-pink-500/30"
-                  whileHover={{ scale: 1.03, y: -2 }}
-                  whileTap={{ scale: 0.98 }}
-                >
-                  Our features
-                  <FiPlayCircle className="opacity-80" size={14} />
-                </motion.button>
-              </Link>
               <motion.button
-                className="px-5 py-2.5 text-sm bg-gradient-to-r from-pink-500/25 via-pink-500/35 to-purple-500/25 hover:from-pink-500/35 hover:via-pink-500/45 hover:to-purple-500/35 backdrop-blur-xl rounded-xl text-white font-medium flex items-center gap-2 transition-all shadow-[0_8px_32px_rgba(236,72,153,0.3),0_0_0_1px_rgba(236,72,153,0.2),inset_0_1px_0_rgba(255,255,255,0.2),inset_0_-1px_0_rgba(0,0,0,0.2)] border border-pink-500/30"
+                className="px-5 py-2.5 text-sm bg-gradient-to-br from-white/[0.06] to-transparent hover:from-white/[0.1] backdrop-blur-xl rounded-xl text-gray-300 hover:text-white font-medium flex items-center gap-2 transition-all shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] border border-white/[0.08] hover:border-white/[0.15]"
+                whileHover={{ scale: 1.03, y: -2 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={() => setShowVideoModal(true)}
+              >
+                See v2 launch vid
+                <FiPlayCircle className="opacity-70" size={14} />
+              </motion.button>
+              <motion.button
+                className="group relative px-5 py-2.5 text-sm rounded-xl text-white font-medium flex items-center gap-2 transition-all overflow-hidden"
                 whileHover={{ scale: 1.03, y: -2 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={() => setLogInFlow(true)}
               >
-                Access Platform
-                <FiArrowRight className="opacity-80" size={14} />
+                {/* Animated gradient border */}
+                <span
+                  className="absolute inset-0 rounded-xl bg-[conic-gradient(from_var(--angle),#06b6d4,#8b5cf6,#ec4899,#f97316,#06b6d4)] p-[2px] animate-border-spin"
+                  style={{ "--angle": "0deg" } as React.CSSProperties}
+                >
+                  <span className="flex h-full w-full rounded-[10px] bg-gray-900/95 backdrop-blur-xl" />
+                </span>
+                {/* Glow effect */}
+                <span
+                  className="absolute inset-0 rounded-xl opacity-50 blur-md bg-[conic-gradient(from_var(--angle),#06b6d4,#8b5cf6,#ec4899,#f97316,#06b6d4)] animate-border-spin"
+                  style={{ "--angle": "0deg" } as React.CSSProperties}
+                />
+                {/* Button content */}
+                <span className="relative z-10 flex items-center gap-2">
+                  Log in with CAS
+                  <FiArrowRight
+                    className="opacity-80 group-hover:translate-x-0.5 transition-transform"
+                    size={14}
+                  />
+                </span>
               </motion.button>
             </motion.div>
 
@@ -293,9 +339,9 @@ export default function AboutPage() {
                 1 in 8 Yale undergrads already use DegreeIntelligence.
               </p>
               <p className="text-base text-gray-400 mt-2">
-                Why don't you?{" "}
+                Why don't you? Even if you do...{" "}
                 <span className="text-purple-300 font-medium">
-                  We just launched v2.
+                  We just launched v2. Free. Always.
                 </span>
               </p>
             </motion.div>
@@ -423,7 +469,10 @@ export default function AboutPage() {
                     icon: <FiSave size={14} />,
                     text: "Save and duplicate plans instantly",
                   },
-                  { icon: <FiShare2 size={14} />, text: "Share with friends / mentors" },
+                  {
+                    icon: <FiShare2 size={14} />,
+                    text: "Share with friends / mentors",
+                  },
                   {
                     icon: <FiUsers size={14} />,
                     text: "See where friends slotted courses",
@@ -580,7 +629,9 @@ export default function AboutPage() {
                     decimals={1}
                   />
                 </p>
-                <p className="text-[10px] text-gray-400 mt-0.5">across 6 semesters</p>
+                <p className="text-[10px] text-gray-400 mt-0.5">
+                  across 6 semesters
+                </p>
               </motion.div>
             </div>
           </div>
@@ -871,7 +922,10 @@ export default function AboutPage() {
             {/* Add Friend Button */}
             <div className="flex items-center justify-between mb-5">
               <h3 className="text-base font-medium text-pink-200 flex items-center gap-2">
-                <FiUsers size={14} className="drop-shadow-[0_0_6px_rgba(236,72,153,0.5)]" />{" "}
+                <FiUsers
+                  size={14}
+                  className="drop-shadow-[0_0_6px_rgba(236,72,153,0.5)]"
+                />{" "}
                 Your Friends (3)
               </h3>
               <button
@@ -1025,7 +1079,10 @@ export default function AboutPage() {
       </div>
 
       {/* Team Section */}
-      <div id="team" className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 scroll-mt-20">
+      <div
+        id="team"
+        className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 scroll-mt-20"
+      >
         <div className="text-center mb-8">
           <h2 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-200 to-purple-200 mb-3">
             It's nice to meet you!
@@ -1218,6 +1275,73 @@ export default function AboutPage() {
         </p>
       </div>
 
+      {/* Video Modal */}
+      <AnimatePresence>
+        {showVideoModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4"
+            onClick={() => setShowVideoModal(false)}
+          >
+            {/* Backdrop */}
+            <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" />
+
+            {/* Modal */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              transition={{ duration: 0.3, ease: "easeOut" }}
+              className="relative w-full max-w-4xl"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="rounded-2xl bg-gradient-to-br from-gray-900/95 via-gray-900/90 to-gray-950/95 backdrop-blur-2xl border border-white/[0.1] shadow-[0_8px_64px_rgba(0,0,0,0.6),0_0_100px_rgba(139,92,246,0.1),inset_0_1px_0_rgba(255,255,255,0.1)] ring-1 ring-white/[0.05] overflow-hidden">
+                {/* Header */}
+                <div className="flex items-center justify-between px-5 py-3 border-b border-white/[0.08]">
+                  <div className="flex items-center gap-2">
+                    <FiPlayCircle className="text-purple-400" size={16} />
+                    <span className="text-sm font-medium text-white">v2 Launch Video</span>
+                  </div>
+                  <button
+                    onClick={() => setShowVideoModal(false)}
+                    className="p-1.5 rounded-lg bg-white/[0.05] hover:bg-white/[0.1] border border-white/[0.08] text-gray-400 hover:text-white transition-all"
+                  >
+                    <FiX size={16} />
+                  </button>
+                </div>
+
+                {/* Video embed */}
+                <div className="aspect-video bg-black/50">
+                  <iframe
+                    src="https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1"
+                    title="DegreeIntelligence v2 Launch"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                    className="w-full h-full"
+                  />
+                </div>
+
+                {/* Footer */}
+                <div className="px-5 py-3 border-t border-white/[0.08] flex items-center justify-between">
+                  <p className="text-xs text-gray-500">
+                    Press <kbd className="px-1.5 py-0.5 rounded bg-white/[0.08] border border-white/[0.1] text-gray-400 text-[10px]">ESC</kbd> or click outside to close
+                  </p>
+                  <button
+                    onClick={() => setShowVideoModal(false)}
+                    className="px-3 py-1.5 text-xs rounded-lg bg-gradient-to-br from-white/[0.06] to-transparent hover:from-white/[0.1] border border-white/[0.08] text-gray-300 hover:text-white transition-all"
+                  >
+                    Close
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Shared components */}
       <style jsx global>{`
         .hide-scrollbar::-webkit-scrollbar {
@@ -1226,6 +1350,25 @@ export default function AboutPage() {
         .hide-scrollbar {
           -ms-overflow-style: none;
           scrollbar-width: none;
+        }
+
+        @property --angle {
+          syntax: "<angle>";
+          initial-value: 0deg;
+          inherits: false;
+        }
+
+        @keyframes border-spin {
+          from {
+            --angle: 0deg;
+          }
+          to {
+            --angle: 360deg;
+          }
+        }
+
+        .animate-border-spin {
+          animation: border-spin 3s linear infinite;
         }
       `}</style>
     </div>

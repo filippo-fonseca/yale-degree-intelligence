@@ -409,7 +409,7 @@ export default function FriendsTab({
       !incomingRequests.some((req) => req.from === u.uid) &&
       (u.displayName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         u.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        u.majors.join(" ").toLowerCase().includes(searchTerm.toLowerCase())),
+        (u.majors || []).join(" ").toLowerCase().includes(searchTerm.toLowerCase())),
   );
 
   if (!user) {
@@ -746,7 +746,8 @@ export default function FriendsTab({
                                 {getDisplayName(u)}
                               </div>
                               <div className="text-[10px] text-gray-500">
-                                {u.majors?.join(", ")} &middot;{" "}
+                                {u.majors?.length > 0 && u.majors.join(", ")}
+                                {u.majors?.length > 0 && u.graduationYear && " · "}
                                 {u.graduationYear && (
                                   <YearBadge
                                     graduationYear={u.graduationYear}
@@ -802,7 +803,8 @@ export default function FriendsTab({
                           {getDisplayName(f)}
                         </div>
                         <div className="text-[10px] text-gray-500">
-                          {f.majors?.join(", ")} &middot;{" "}
+                          {f.majors?.length > 0 && f.majors.join(", ")}
+                          {f.majors?.length > 0 && f.graduationYear && " · "}
                           {f.graduationYear && (
                             <span className="inline-block mt-0.5">
                               <YearBadge

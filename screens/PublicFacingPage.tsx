@@ -802,6 +802,9 @@ export default function AboutPage() {
                         "& .MuiChartsAxis-bottom .MuiChartsAxis-tickLabel": {
                           fill: "#9CA3AF",
                         },
+                        "& .MuiChartsAxis-left .MuiChartsAxis-label": {
+                          fill: "#9CA3AF",
+                        },
                         "& .MuiChartsAxis-left .MuiChartsAxis-line, & .MuiChartsAxis-bottom .MuiChartsAxis-line":
                           {
                             stroke: "#374151",

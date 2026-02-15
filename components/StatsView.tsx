@@ -8,24 +8,14 @@ import {
   BookOpen,
   Award,
   Clock,
+  BarChart2,
+  PieChart as PieChartIcon,
+  Radar as RadarIcon,
 } from "lucide-react";
+import PieChartWrapper from "./ui/PieChartWrapper";
 import { InfoCard } from "./ui/InfoCard";
-import dynamic from "next/dynamic";
+import { LineChart } from "@mui/x-charts/LineChart";
 import { axisClasses } from "@mui/x-charts";
-import { useState, useEffect } from "react";
-
-// Dynamically import LineChart to avoid SSR issues
-const LineChart = dynamic(
-  () => import("@mui/x-charts/LineChart").then((mod) => mod.LineChart),
-  {
-    ssr: false,
-    loading: () => (
-      <div className="h-[400px] w-full flex items-center justify-center">
-        <div className="text-gray-500 text-sm">Loading chart...</div>
-      </div>
-    ),
-  }
-);
 
 const COLORS = [
   "#8B5CF6", // purple
@@ -158,8 +148,36 @@ export default function StatsView({ courses }: { courses: Course[] }) {
   // Progress to graduation (assuming 120 credits needed)
   const progressToGraduation = Math.min(100, (summary.totalCredits / 36) * 100);
 
+  const filteredGradeDistribution = gradeDistribution.filter(
+    (g) => g.count > 0,
+  );
+
+  const gradeChartData = {
+    labels: filteredGradeDistribution.map((g) => g.grade),
+    datasets: [
+      {
+        data: filteredGradeDistribution.map((g) => g.count),
+        backgroundColor: COLORS.slice(0, filteredGradeDistribution.length),
+        borderColor: "#1F2937",
+        borderWidth: 1,
+      },
+    ],
+  };
+
+  const creditChartData = {
+    labels: departmentData.map((d) => d.department),
+    datasets: [
+      {
+        data: departmentData.map((d) => d.credits),
+        backgroundColor: COLORS,
+        borderColor: "#1F2937",
+        borderWidth: 1,
+      },
+    ],
+  };
+
   return (
-    <div className={`space-y-6 font-louize text-gray-800 dark:text-gray-200`}>
+    <div className={`space-y-8 font-louize text-gray-800 dark:text-gray-200`}>
       {/* Summary Cards */}
       <InfoCard>
         We're actively working on new stats. Have any suggestions?{" "}
@@ -174,7 +192,7 @@ export default function StatsView({ courses }: { courses: Course[] }) {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3"
+        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4"
       >
         <StatCard
           label="Cumulative GPA"
@@ -194,7 +212,7 @@ export default function StatsView({ courses }: { courses: Course[] }) {
           value={summary.totalCredits}
           color={getCreditsColor(summary.totalCredits)}
           icon={<BookOpen className="h-5 w-5" />}
-          secondaryLabel={`${progressToGraduation.toFixed(0)}% to graduation`}
+          secondaryLabel={`${progressToGraduation.toFixed(0)}% to graduation min`}
         />
         <StatCard
           label="Courses Completed"
@@ -222,15 +240,15 @@ export default function StatsView({ courses }: { courses: Course[] }) {
           }
           color="text-blue-300"
           icon={<Clock className="h-5 w-5" />}
-          secondaryLabel={`Across ${
+          secondaryLabel={`Across your ${
             semesterData.filter((elem) => !elem.semester.includes("Summer"))
               .length
-          } semesters`}
+          } completed semesters`}
         />
       </motion.div>
 
       {/* GPA Charts Section */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Cumulative GPA Chart */}
         <ChartBox
           title="Cumulative GPA Progression"
@@ -238,80 +256,71 @@ export default function StatsView({ courses }: { courses: Course[] }) {
           description="The overall progression of your cumulative GPA over time."
         >
           <div className="h-[400px] w-full">
-            {cumulativeData.length > 0 ? (
-              <LineChart
-                xAxis={[
-                  {
-                    scaleType: "point",
-                    data: cumulativeData.map((item) => item.semester),
-                    tickLabelStyle: {
-                      angle: 45,
-                      textAnchor: "start",
-                      fontSize: 12,
-                      fill: "#9CA3AF",
-                    },
+            <LineChart
+              xAxis={[
+                {
+                  scaleType: "point",
+                  data: cumulativeData.map((item) => item.semester),
+                  tickLabelStyle: {
+                    angle: 45,
+                    textAnchor: "start",
+                    fontSize: 12,
+                    fill: "#9CA3AF",
                   },
-                ]}
-                yAxis={[
-                  {
-                    label: "GPA",
-                    min: Math.max(
-                      0,
-                      Math.floor(
-                        Math.min(
-                          ...cumulativeData.map((item) => item.cumulativeGpa),
-                        ),
-                      ),
+                },
+              ]}
+              yAxis={[
+                {
+                  label: "GPA",
+                  min: Math.floor(
+                    Math.min(
+                      ...cumulativeData.map((item) => item.cumulativeGpa),
                     ),
-                    max: 4,
-                    tickInterval: [0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4],
+                  ),
+                  max: 4,
+                  tickInterval: [0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4],
+                },
+              ]}
+              series={[
+                {
+                  data: cumulativeData.map((item) => item.cumulativeGpa),
+                  showMark: true,
+                  color: "#8B5CF6", // purple
+                  curve: "natural",
+                  area: true,
+                },
+              ]}
+              grid={{ vertical: true, horizontal: true }}
+              margin={{ left: 70, right: 30, top: 30, bottom: 100 }}
+              sx={{
+                [`.${axisClasses.left} .${axisClasses.label}`]: {
+                  transform: "translate(-20px, 0)",
+                  fill: "#9CA3AF",
+                },
+                [`.${axisClasses.bottom} .${axisClasses.label}`]: {
+                  transform: "translate(0, 60px)",
+                  fill: "#9CA3AF",
+                },
+                [`.${axisClasses.root} line`]: {
+                  stroke: "#374151",
+                  opacity: 0.3,
+                },
+                [`.${axisClasses.root} text`]: {
+                  fill: "#9CA3AF",
+                },
+                backgroundColor: "transparent",
+              }}
+              slotProps={{
+                tooltip: {
+                  sx: {
+                    backgroundColor: "#1F2937",
+                    borderColor: "#374151",
+                    color: "#F3F4F6",
+                    borderRadius: "0.5rem",
                   },
-                ]}
-                series={[
-                  {
-                    data: cumulativeData.map((item) => item.cumulativeGpa),
-                    showMark: true,
-                    color: "#8B5CF6", // purple
-                    curve: "natural",
-                    area: true,
-                  },
-                ]}
-                grid={{ vertical: true, horizontal: true }}
-                margin={{ left: 70, right: 30, top: 30, bottom: 100 }}
-                sx={{
-                  [`.${axisClasses.left} .${axisClasses.label}`]: {
-                    transform: "translate(-20px, 0)",
-                    fill: "#9CA3AF",
-                  },
-                  [`.${axisClasses.bottom} .${axisClasses.label}`]: {
-                    transform: "translate(0, 60px)",
-                    fill: "#9CA3AF",
-                  },
-                  [`.${axisClasses.root} line`]: {
-                    stroke: "#374151",
-                    opacity: 0.3,
-                  },
-                  [`.${axisClasses.root} text`]: {
-                    fill: "#9CA3AF",
-                  },
-                  backgroundColor: "transparent",
-                }}
-                slotProps={{
-                  tooltip: {
-                    sx: {
-                      backgroundColor: "#1F2937",
-                      borderColor: "#374151",
-                      color: "#F3F4F6",
-                      borderRadius: "0.5rem",
-                    },
-                  },
-                }}
-              />
-            ) : (
-              <div className="h-full flex items-center justify-center text-gray-500 text-sm">
-                No data available
-              </div>
-            )}
+                },
+              }}
+            />
           </div>
         </ChartBox>
 
@@ -322,81 +331,120 @@ export default function StatsView({ courses }: { courses: Course[] }) {
           description="Your GPA for each individual semester (in isolation)."
         >
           <div className="h-[400px] w-full">
-            {sortedSemData.length > 0 ? (
-              <LineChart
-                xAxis={[
-                  {
-                    scaleType: "point",
-                    data: sortedSemData.map((item) => item.semester),
-                    tickLabelStyle: {
-                      angle: 45,
-                      textAnchor: "start",
-                      fontSize: 12,
-                      fill: "#9CA3AF",
-                    },
-                  },
-                ]}
-                yAxis={[
-                  {
-                    label: "GPA",
-                    min: Math.max(
-                      0,
-                      Math.floor(
-                        Math.min(...sortedSemData.map((item) => item.gpa)),
-                      ),
-                    ),
-                    max: 4,
-                    tickInterval: [0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4],
-                  },
-                ]}
-                series={[
-                  {
-                    data: sortedSemData.map((item) => item.gpa),
-                    showMark: true,
-                    color: "#3B82F6", // blue
-                    area: true,
-                  },
-                ]}
-                grid={{ vertical: true, horizontal: true }}
-                margin={{ left: 70, right: 30, top: 30, bottom: 100 }}
-                sx={{
-                  [`.${axisClasses.left} .${axisClasses.label}`]: {
-                    transform: "translate(-20px, 0)",
+            <LineChart
+              xAxis={[
+                {
+                  scaleType: "point",
+                  data: sortedSemData.map((item) => item.semester),
+                  tickLabelStyle: {
+                    angle: 45,
+                    textAnchor: "start",
+                    fontSize: 12,
                     fill: "#9CA3AF",
                   },
-                  [`.${axisClasses.bottom} .${axisClasses.label}`]: {
-                    transform: "translate(0, 60px)",
-                    fill: "#9CA3AF",
+                },
+              ]}
+              yAxis={[
+                {
+                  label: "GPA",
+                  min: Math.floor(
+                    Math.min(...sortedSemData.map((item) => item.gpa)),
+                  ),
+                  max: 4,
+                  tickInterval: [0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4],
+                },
+              ]}
+              series={[
+                {
+                  data: sortedSemData.map((item) => item.gpa),
+                  showMark: true,
+                  color: "#3B82F6", // blue
+                  area: true,
+                },
+              ]}
+              grid={{ vertical: true, horizontal: true }}
+              margin={{ left: 70, right: 30, top: 30, bottom: 100 }}
+              sx={{
+                [`.${axisClasses.left} .${axisClasses.label}`]: {
+                  transform: "translate(-20px, 0)",
+                  fill: "#9CA3AF",
+                },
+                [`.${axisClasses.bottom} .${axisClasses.label}`]: {
+                  transform: "translate(0, 60px)",
+                  fill: "#9CA3AF",
+                },
+                [`.${axisClasses.root} line`]: {
+                  stroke: "#374151",
+                  opacity: 0.3,
+                },
+                [`.${axisClasses.root} text`]: {
+                  fill: "#9CA3AF",
+                },
+                backgroundColor: "transparent",
+              }}
+              slotProps={{
+                tooltip: {
+                  sx: {
+                    backgroundColor: "#1F2937",
+                    borderColor: "#374151",
+                    color: "#F3F4F6",
+                    borderRadius: "0.5rem",
                   },
-                  [`.${axisClasses.root} line`]: {
-                    stroke: "#374151",
-                    opacity: 0.3,
-                  },
-                  [`.${axisClasses.root} text`]: {
-                    fill: "#9CA3AF",
-                  },
-                  backgroundColor: "transparent",
-                }}
-                slotProps={{
-                  tooltip: {
-                    sx: {
-                      backgroundColor: "#1F2937",
-                      borderColor: "#374151",
-                      color: "#F3F4F6",
-                      borderRadius: "0.5rem",
-                    },
-                  },
-                }}
-              />
-            ) : (
-              <div className="h-full flex items-center justify-center text-gray-500 text-sm">
-                No data available
-              </div>
-            )}
+                },
+              }}
+            />
           </div>
         </ChartBox>
       </div>
 
+      {/* Additional Charts Grid - Temporarily disabled
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <ChartBox
+          title="Grade Distribution"
+          icon={<PieChartIcon className="h-5 w-5" />}
+          description="A breakdown of your grades across all courses."
+        >
+          <PieChartWrapper
+            data={{
+              labels: filteredGradeDistribution.map((g) => g.grade),
+              datasets: [
+                {
+                  data: filteredGradeDistribution.map((g) => g.count),
+                  backgroundColor: COLORS.slice(
+                    0,
+                    filteredGradeDistribution.length,
+                  ),
+                  borderColor: Array(filteredGradeDistribution.length).fill(
+                    "#1F2937",
+                  ),
+                  borderWidth: 1,
+                },
+              ],
+            }}
+            showLegend={true}
+          />
+        </ChartBox>
+
+        {departmentData.length > 0 && (
+          <ChartBox
+            title="Credit Allocation"
+            icon={<PieChartIcon className="h-5 w-5" />}
+            description="A fun way to visualize your degree of class variedness at Yale!"
+          >
+            <PieChartWrapper
+              data={{
+                ...creditChartData,
+                datasets: creditChartData.datasets.map((ds) => ({
+                  ...ds,
+                  borderColor: Array(ds.data.length).fill(ds.borderColor),
+                })),
+              }}
+              showLegend={true}
+            />
+          </ChartBox>
+        )}
+      </div>
+      */}
     </div>
   );
 }
@@ -420,38 +468,34 @@ function StatCard({
 }) {
   return (
     <motion.div
-      whileHover={{ y: -1 }}
-      className="p-4 rounded-xl bg-gradient-to-br from-gray-900/60 via-gray-900/40 to-gray-950/60 backdrop-blur-md border border-gray-800/50 hover:border-gray-700/60 transition-all shadow-[inset_0_1px_0_rgba(255,255,255,0.04),0_4px_12px_rgba(0,0,0,0.2)]"
+      whileHover={{ y: -2 }}
+      className="p-6 rounded-xl bg-gray-100/50 dark:bg-gray-900/50 backdrop-blur-sm border border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700 transition-all shadow-sm dark:shadow-none"
     >
       <div className="flex items-center justify-between">
-        <p className="text-xs text-gray-500">{label}</p>
-        {icon && (
-          <div
-            className={`${color} opacity-70 p-1.5 rounded-lg bg-gray-800/40`}
-          >
-            {icon}
-          </div>
-        )}
+        <p className="text-sm text-gray-600 dark:text-gray-400">{label}</p>
+        {icon && <div className={`${color} opacity-80`}>{icon}</div>}
       </div>
-      <div className="flex items-end justify-between mt-1.5">
-        <p className={`text-2xl font-medium ${color}`}>{value}</p>
+      <div className="flex items-end justify-between mt-2">
+        <p className={`text-3xl font-medium ${color}`}>{value}</p>
       </div>
       {secondaryLabel && (
-        <p className="text-[11px] text-gray-500 mt-1">{secondaryLabel}</p>
+        <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
+          {secondaryLabel}
+        </p>
       )}
       {change !== 0 && (
         <p
-          className={`text-[11px] mt-1 ${
+          className={`text-xs mt-1 ${
             change > 0
               ? "text-emerald-400"
               : change > -0.05
-                ? "text-gray-500"
+                ? "text-gray-600 dark:text-gray-400"
                 : "text-red-400"
           }`}
         >
           {change > 0 ? "+" : ""}
           {change.toFixed(2)}{" "}
-          <span className="text-gray-500">{changeText}</span>
+          <span className="text-gray-600 dark:text-gray-400">{changeText}</span>
         </p>
       )}
     </motion.div>
@@ -473,19 +517,21 @@ function ChartBox({
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="p-5 rounded-xl bg-gradient-to-br from-gray-900/60 via-gray-900/40 to-gray-950/60 backdrop-blur-md border border-gray-800/50 shadow-[inset_0_1px_0_rgba(255,255,255,0.04),0_4px_16px_rgba(0,0,0,0.25)]"
+      className="p-6 rounded-xl bg-gray-100/50 dark:bg-gray-900/50 backdrop-blur-sm border border-gray-200 dark:border-gray-800 shadow-sm dark:shadow-none"
     >
-      <div className="flex items-start justify-between mb-3">
+      <div className="flex items-start justify-between mb-4">
         <div>
-          <h3 className="font-medium text-base text-transparent bg-clip-text bg-gradient-to-r from-blue-200 to-purple-200">
+          <h3 className="font-medium text-lg text-transparent bg-clip-text bg-gradient-to-r from-blue-200 to-purple-200">
             {title}
           </h3>
           {description && (
-            <p className="text-[11px] text-gray-500 mt-0.5">{description}</p>
+            <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
+              {description}
+            </p>
           )}
         </div>
         {icon && (
-          <div className="p-1.5 rounded-lg bg-gradient-to-br from-gray-800/60 to-gray-900/60 border border-gray-700/30 text-blue-400 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]">
+          <div className="p-2 rounded-full bg-gray-200/50 dark:bg-gray-800/50 text-blue-500 dark:text-blue-300">
             {icon}
           </div>
         )}

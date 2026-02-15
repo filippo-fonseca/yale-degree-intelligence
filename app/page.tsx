@@ -1269,7 +1269,9 @@ export default function Home() {
                             className="text-blue-500 dark:text-blue-400"
                             size={16}
                           />
-                          <span className="hidden sm:inline">Update</span>
+                          <span className="hidden sm:inline">
+                            Update courses
+                          </span>
                         </motion.button>
                       </div>
 

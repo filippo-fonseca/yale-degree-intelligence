@@ -155,13 +155,26 @@ export function MajorTipHelpButton({
   label?: string;
 }) {
   return (
-    <button
-      onClick={onClick}
-      className={`mt-1 inline-flex items-center gap-1.5 text-xs px-2 py-1 rounded-lg border border-gray-800 hover:border-blue-500 bg-gray-900/40 text-gray-300 hover:text-white hover:bg-blue-300/30 transition ${className}`}
-      title="What do 'Manual fulfill' and 'Skip' mean?"
-    >
-      <HelpCircle className="w-4 h-4" />
-      {label}
-    </button>
+    <div className={`relative ${className}`}>
+      {/* Animated gradient border */}
+      <div
+        className="border-none absolute -inset-[1px] rounded-lg bg-[conic-gradient(from_var(--angle),#ec4899,#8b5cf6,#3b82f6,#ec4899)] opacity-75 blur-[2px] animate-border-spin"
+        style={{ "--angle": "0deg" } as React.CSSProperties}
+      />
+      <div
+        className="absolute -inset-[1px] rounded-lg bg-[conic-gradient(from_var(--angle),#ec4899,#8b5cf6,#3b82f6,#ec4899)] animate-border-spin"
+        style={{ "--angle": "0deg" } as React.CSSProperties}
+      />
+      <button
+        onClick={onClick}
+        className="relative flex items-center justify-between w-full p-3 bg-gray-900 rounded-lg text-sm text-gray-300 hover:bg-gray-800 transition-colors"
+        title="What do 'Manual fulfill' and 'Skip' mean?"
+      >
+        <div className="flex items-center gap-2">
+          <HelpCircle className="w-4 h-4 text-pink-500" />
+          <span>{label}</span>
+        </div>
+      </button>
+    </div>
   );
 }

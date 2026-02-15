@@ -186,3 +186,23 @@
 body {
   @apply bg-gray-100 dark:bg-gray-900 transition-colors duration-300;
 }
+
+/* Animated gradient border */
+@property --angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+
+@keyframes border-spin {
+  from {
+    --angle: 0deg;
+  }
+  to {
+    --angle: 360deg;
+  }
+}
+
+.animate-border-spin {
+  animation: border-spin 3s linear infinite;
+}

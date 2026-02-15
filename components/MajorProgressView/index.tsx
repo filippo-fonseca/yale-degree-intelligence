@@ -133,7 +133,9 @@ const SectionGrid = React.memo(function SectionGrid({
     <div className="space-y-3">
       <div className={`text-sm font-medium ${subtitleClass}`}>
         {title}{" "}
-        <span className="text-gray-600 dark:text-gray-400 font-normal">({items.length})</span>
+        <span className="text-gray-600 dark:text-gray-400 font-normal">
+          ({items.length})
+        </span>
       </div>
       {items.length === 0 ? (
         <div className="text-xs text-gray-500 dark:text-gray-500">
@@ -154,8 +156,8 @@ const SectionGrid = React.memo(function SectionGrid({
                   reqInProgress > 0
                     ? "bg-gradient-to-br from-blue-950/40 via-gray-900/50 to-gray-950/50 border-blue-800/30 hover:border-blue-600/40"
                     : notStarted
-                    ? "bg-gradient-to-br from-red-950/30 via-gray-900/50 to-gray-950/50 border-red-800/25 hover:border-red-600/35"
-                    : "bg-gradient-to-br from-red-950/30 via-gray-900/50 to-gray-950/50 border-red-800/25 hover:border-red-600/35"
+                      ? "bg-gradient-to-br from-red-950/30 via-gray-900/50 to-gray-950/50 border-red-800/25 hover:border-red-600/35"
+                      : "bg-gradient-to-br from-red-950/30 via-gray-900/50 to-gray-950/50 border-red-800/25 hover:border-red-600/35"
                 }`}
                 onClick={() => onOpenRequirement(req)}
                 onKeyDown={(e) => {
@@ -171,8 +173,8 @@ const SectionGrid = React.memo(function SectionGrid({
                       reqInProgress > 0
                         ? "text-blue-300"
                         : notStarted
-                        ? "text-red-300"
-                        : "text-red-300"
+                          ? "text-red-300"
+                          : "text-red-300"
                     }`}
                   >
                     {req.name}
@@ -182,8 +184,8 @@ const SectionGrid = React.memo(function SectionGrid({
                       reqInProgress > 0
                         ? "bg-blue-900/30 text-blue-300 border border-blue-700/30"
                         : notStarted
-                        ? "bg-red-900/30 text-red-300 border border-red-700/30"
-                        : "bg-red-900/30 text-red-300 border border-red-700/30"
+                          ? "bg-red-900/30 text-red-300 border border-red-700/30"
+                          : "bg-red-900/30 text-red-300 border border-red-700/30"
                     }`}
                   >
                     {reqInProgress + reqCompleted}/{req.required}
@@ -196,8 +198,8 @@ const SectionGrid = React.memo(function SectionGrid({
                       reqInProgress > 0
                         ? "text-blue-300/70"
                         : notStarted
-                        ? "text-red-300/70"
-                        : "text-red-300/70"
+                          ? "text-red-300/70"
+                          : "text-red-300/70"
                     }`}
                   >
                     {req.description}
@@ -212,14 +214,14 @@ const SectionGrid = React.memo(function SectionGrid({
                         opt.manual
                           ? "bg-purple-900/20 text-purple-300 border border-purple-700"
                           : opt.completed
-                          ? "bg-emerald-900/20 text-emerald-300 border border-emerald-700"
-                          : opt.inProgress
-                          ? "bg-blue-900/20 text-blue-300 border border-blue-700"
-                          : opt.skipped
-                          ? "bg-gray-900/20 text-gray-300 border border-dashed border-gray-600"
-                          : notStarted
-                          ? "bg-red-900/20 text-red-300 border border-red-700"
-                          : "bg-red-900/20 text-red-300 border border-red-700"
+                            ? "bg-emerald-900/20 text-emerald-300 border border-emerald-700"
+                            : opt.inProgress
+                              ? "bg-blue-900/20 text-blue-300 border border-blue-700"
+                              : opt.skipped
+                                ? "bg-gray-900/20 text-gray-300 border border-dashed border-gray-600"
+                                : notStarted
+                                  ? "bg-red-900/20 text-red-300 border border-red-700"
+                                  : "bg-red-900/20 text-red-300 border border-red-700"
                       }`}
                       onClick={(e) => {
                         e.stopPropagation(); // don't open the requirement modal
@@ -234,12 +236,12 @@ const SectionGrid = React.memo(function SectionGrid({
                         {opt.manual
                           ? ", manual"
                           : opt.skipped
-                          ? ", skipped"
-                          : opt.inProgress
-                          ? ", in progress"
-                          : opt.completed
-                          ? ", complete"
-                          : ""}
+                            ? ", skipped"
+                            : opt.inProgress
+                              ? ", in progress"
+                              : opt.completed
+                                ? ", complete"
+                                : ""}
                         )
                       </span>
                       {(opt.skipped || opt.manual) && (
@@ -382,7 +384,7 @@ export default function MajorProgressView({
 
   const handleRemoveManualCourse = async (
     courseCode: string,
-    requirementTitle: string
+    requirementTitle: string,
   ) => {
     if (!user) return;
     try {
@@ -404,7 +406,7 @@ export default function MajorProgressView({
           ...courseToUpdate,
           manualRequirementsFulfilled: null,
         },
-        { merge: true }
+        { merge: true },
       );
 
       await onRequirementChange();
@@ -416,7 +418,7 @@ export default function MajorProgressView({
   // Exclude a completed course from fulfilling a specific requirement
   const handleExcludeFromRequirement = async (
     courseCode: string,
-    requirementTitle: string
+    requirementTitle: string,
   ) => {
     if (!user) return;
     try {
@@ -443,7 +445,7 @@ export default function MajorProgressView({
       const alreadyExcluded = currentExclusions.some(
         (e: any) =>
           e.major_id === selectedMajor &&
-          e.requirement_title === requirementTitle
+          e.requirement_title === requirementTitle,
       );
 
       if (alreadyExcluded) return;
@@ -453,7 +455,7 @@ export default function MajorProgressView({
         {
           excludedFromRequirements: [...currentExclusions, newExclusion],
         },
-        { merge: true }
+        { merge: true },
       );
 
       await onRequirementChange();
@@ -463,12 +465,12 @@ export default function MajorProgressView({
   };
 
   // Calculate stats from server progress
-  const completedCredits = progress.completedCredits;
-  const inProgressCredits = progress.inProgressCredits || 0;
-  const totalCredits = progress.totalCredits;
+  const completedCredits = progress?.completedCredits;
+  const inProgressCredits = progress?.inProgressCredits || 0;
+  const totalCredits = progress?.totalCredits;
   const completionPercentage = progress.percentage;
   const withInProgressPercentage =
-    progress.inProgressPercentage || progress.percentage;
+    progress?.inProgressPercentage || progress?.percentage;
 
   /* ---------------------------
      NORMALIZATION + DEDUPE (memoized)
@@ -487,8 +489,8 @@ export default function MajorProgressView({
         (c.grade === "In Progress"
           ? "in-progress"
           : c.grade
-          ? "completed"
-          : "not-taken");
+            ? "completed"
+            : "not-taken");
       const codes = info?.codes?.length ? info.codes : [c.code];
       for (const k of codes) m.set(k, status);
     }
@@ -517,7 +519,7 @@ export default function MajorProgressView({
       }
       return { ...opt, inProgress, completed, skipped, manual };
     },
-    [codeStatusMap]
+    [codeStatusMap],
   );
 
   // 3) Normalize each requirement (completed + remaining buckets from server)
@@ -526,16 +528,16 @@ export default function MajorProgressView({
       ...req,
       options: (req.options || []).map(normalizeOpt),
     }),
-    [normalizeOpt]
+    [normalizeOpt],
   );
 
   const completedNorm = useMemo(
     () => (progress.completedRequirements || []).map(normalizeReq),
-    [progress.completedRequirements, normalizeReq]
+    [progress.completedRequirements, normalizeReq],
   );
   const remainingNorm = useMemo(
     () => (progress.remainingRequirements || []).map(normalizeReq),
-    [progress.remainingRequirements, normalizeReq]
+    [progress.remainingRequirements, normalizeReq],
   );
 
   // 4) Strict completed = sum of credits from options that are completed after normalization
@@ -589,7 +591,7 @@ export default function MajorProgressView({
       description: a.description ?? b.description,
       options: mergeOptions([...(a.options || []), ...(b.options || [])]),
     }),
-    [mergeOptions]
+    [mergeOptions],
   );
 
   // 6) Build remainingForUI WITHOUT duplicates
@@ -624,16 +626,16 @@ export default function MajorProgressView({
   const inProgressReqs = useMemo(
     () =>
       withStats.filter(
-        (r) => r.reqInProgress > 0 && r.reqCompleted < (r.req.required || 0)
+        (r) => r.reqInProgress > 0 && r.reqCompleted < (r.req.required || 0),
       ),
-    [withStats]
+    [withStats],
   );
   const idleReqs = useMemo(
     () =>
       withStats.filter(
-        (r) => r.reqInProgress === 0 && r.reqCompleted < (r.req.required || 0)
+        (r) => r.reqInProgress === 0 && r.reqCompleted < (r.req.required || 0),
       ),
-    [withStats]
+    [withStats],
   );
 
   // Stable callbacks passed to subgrid
@@ -646,10 +648,10 @@ export default function MajorProgressView({
         status: opt.skipped
           ? "skipped"
           : opt.inProgress
-          ? "in-progress"
-          : opt.completed
-          ? "completed"
-          : "not-taken",
+            ? "in-progress"
+            : opt.completed
+              ? "completed"
+              : "not-taken",
         skipped: opt.skipped || false,
       },
     });
@@ -663,7 +665,7 @@ export default function MajorProgressView({
         requirement: `${selectedMajor}|${reqName}`,
       });
     },
-    [selectedMajor]
+    [selectedMajor],
   );
 
   return (
@@ -707,7 +709,9 @@ export default function MajorProgressView({
 
         {/* Stats toggle */}
         <div className="flex items-center gap-1.5 mt-2">
-          <span className="text-[10px] text-gray-500 uppercase tracking-wider">Show:</span>
+          <span className="text-[10px] text-gray-500 uppercase tracking-wider">
+            Show:
+          </span>
           <button
             onClick={() => setShowInProgressStats(false)}
             className={`px-2.5 py-1 text-[11px] rounded-lg transition-all duration-200 ${
@@ -754,22 +758,23 @@ export default function MajorProgressView({
       </div>
 
       {/* <DegreeIntelligenceBlurb /> */}
-
-      <InfoCard
-        autoHide
-        previewText="A few tips on how to navegate this page. It's complex at first, we get it!"
-      >
-        Pro tip: Click on each course for actions and more info. Also, while our
-        infrastructure is robust, sometimes there are cases where we weren't
-        able to garner all plausible options for a given requirement; this is
-        why we have enabled manual course fulfillment. Just click on the
-        "Fulfill manually" button for that requirement and add a course from
-        your transcript; we'll automatically count it towards your major
-        progress and requirements stats. This also applies, for example, for
-        interdepartmental courses and/or excpetions that your DUS has perhaps
-        given you permission to use for a certain requirement, etc. Our platform
-        is modular!
-      </InfoCard>
+      <div className="p-1">
+        <InfoCard
+          autoHide
+          previewText="A few tips on how to navigate this page. It's complex at first, we get it!"
+        >
+          Pro tip: Click on each course for actions and more info. Also, while
+          our infrastructure is robust, sometimes there are cases where we
+          weren't able to garner all plausible options for a given requirement;
+          this is why we have enabled manual course fulfillment. Just click on
+          the "Fulfill manually" button for that requirement and add a course
+          from your transcript; we'll automatically count it towards your major
+          progress and requirements stats. This also applies, for example, for
+          interdepartmental courses and/or excpetions that your DUS has perhaps
+          given you permission to use for a certain requirement, etc. Our
+          platform is modular!
+        </InfoCard>
+      </div>
 
       {/* Requirements Sections */}
       <div className="space-y-6">
@@ -790,13 +795,15 @@ export default function MajorProgressView({
                 credits)
               </h4>
             </button>
-            <MajorTipHelpButton
-              onClick={() => {
-                resetMajorTipSeen("myMajorTipModalShown"); // optional: keep the “seen” logic in sync
-                setForceMajorTipOpen(true); // opens instantly
-              }}
-              className="mt-2 border border-blue-300"
-            />
+            <div className="p-1">
+              <MajorTipHelpButton
+                onClick={() => {
+                  resetMajorTipSeen("myMajorTipModalShown"); // optional: keep the "seen" logic in sync
+                  setForceMajorTipOpen(true); // opens instantly
+                }}
+                className="mt-2"
+              />
+            </div>
             <MajorTipModal
               storageKey="myMajorTipModalShown"
               autoOpenOnMount
@@ -873,7 +880,7 @@ export default function MajorProgressView({
                             {req.options
                               .filter(
                                 (opt: any) =>
-                                  opt.completed || opt.manual || opt.skipped
+                                  opt.completed || opt.manual || opt.skipped,
                               )
                               .map((opt: any) => (
                                 <div
@@ -882,8 +889,8 @@ export default function MajorProgressView({
                                     opt.manual
                                       ? "bg-purple-900/20 text-purple-300 border border-purple-700"
                                       : opt.completed
-                                      ? "bg-emerald-900/20 text-emerald-300 border border-emerald-700"
-                                      : "bg-gray-900/20 text-gray-300 border border-dashed border-gray-600"
+                                        ? "bg-emerald-900/20 text-emerald-300 border border-emerald-700"
+                                        : "bg-gray-900/20 text-gray-300 border border-dashed border-gray-600"
                                   }`}
                                   onClick={(e) => e.stopPropagation()} // don't open modal when clicking the pill
                                 >
@@ -902,12 +909,12 @@ export default function MajorProgressView({
                                       } else if (opt.manual) {
                                         handleRemoveManualCourse(
                                           opt.code,
-                                          req.name
+                                          req.name,
                                         );
                                       } else if (opt.completed) {
                                         handleExcludeFromRequirement(
                                           opt.code,
-                                          req.name
+                                          req.name,
                                         );
                                       }
                                     }}
@@ -920,8 +927,8 @@ export default function MajorProgressView({
                                       opt.manual
                                         ? "Remove manual course"
                                         : opt.skipped
-                                        ? "Unskip this course"
-                                        : "Remove from this requirement"
+                                          ? "Unskip this course"
+                                          : "Remove from this requirement"
                                     }
                                   >
                                     <FiX size={10} />
@@ -955,7 +962,7 @@ export default function MajorProgressView({
                 Remaining (
                 {remainingForUI.reduce(
                   (total: number, req: any) => total + (req.required || 0),
-                  0
+                  0,
                 )}{" "}
                 credits)
               </h4>

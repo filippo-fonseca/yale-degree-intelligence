@@ -1057,10 +1057,10 @@ export default function Home() {
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.2, duration: 0.5 }}
-            className="hidden lg:flex w-56 h-full flex-col justify-between p-4 rounded-3xl bg-gradient-to-br from-gray-900/70 via-gray-900/50 to-gray-950/70 backdrop-blur-xl border border-white/[0.08] shadow-[0_8px_32px_rgba(0,0,0,0.4),0_0_80px_rgba(59,130,246,0.06),inset_0_1px_0_rgba(255,255,255,0.1),inset_0_-1px_0_rgba(0,0,0,0.3)] ring-1 ring-white/[0.05] overflow-hidden"
+            className="hidden lg:flex w-56 h-full flex-col justify-between p-4 rounded-3xl bg-gradient-to-br from-gray-900/70 via-gray-900/50 to-gray-950/70 backdrop-blur-xl border border-white/[0.08] shadow-[0_8px_32px_rgba(0,0,0,0.4),0_0_80px_rgba(59,130,246,0.06),inset_0_1px_0_rgba(255,255,255,0.1),inset_0_-1px_0_rgba(0,0,0,0.3)] ring-1 ring-white/[0.05] overflow-visible"
           >
             {/* Navigation Items */}
-            <nav className="space-y-1.5 flex-1 overflow-y-auto">
+            <nav className="space-y-1.5 flex-1 overflow-y-auto overflow-x-visible px-1">
               {/* Always-enabled items (not disabled and not comingSoon) */}
               {navItems
                 .filter((item) => !item.disabled && !item.comingSoon)
@@ -2291,7 +2291,6 @@ export default function Home() {
                       )}
                       graduationYear={userProfile.graduationYear}
                       userMajors={userProfile.majors}
-                      onNavigationAttempt={setSimulatorNavCheck}
                     />
                   )}
                 </motion.div>

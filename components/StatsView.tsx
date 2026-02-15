@@ -8,14 +8,24 @@ import {
   BookOpen,
   Award,
   Clock,
-  BarChart2,
-  PieChart as PieChartIcon,
-  Radar as RadarIcon,
 } from "lucide-react";
-import PieChartWrapper from "./ui/PieChartWrapper";
 import { InfoCard } from "./ui/InfoCard";
-import { LineChart } from "@mui/x-charts/LineChart";
+import dynamic from "next/dynamic";
 import { axisClasses } from "@mui/x-charts";
+import { useState, useEffect } from "react";
+
+// Dynamically import LineChart to avoid SSR issues
+const LineChart = dynamic(
+  () => import("@mui/x-charts/LineChart").then((mod) => mod.LineChart),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="h-[400px] w-full flex items-center justify-center">
+        <div className="text-gray-500 text-sm">Loading chart...</div>
+      </div>
+    ),
+  }
+);
 
 const COLORS = [
   "#8B5CF6", // purple
@@ -41,7 +51,7 @@ export default function StatsView({ courses }: { courses: Course[] }) {
       !c.skipped &&
       c.status !== "in-progress" &&
       c.grade &&
-      gradePoints[c.grade]
+      gradePoints[c.grade],
   );
 
   const summary = activeCourses.reduce(
@@ -50,7 +60,7 @@ export default function StatsView({ courses }: { courses: Course[] }) {
       acc.totalGradePoints += gradePoints[c.grade!] * (c.credits || 1);
       return acc;
     },
-    { totalCredits: 0, totalGradePoints: 0 }
+    { totalCredits: 0, totalGradePoints: 0 },
   );
 
   const overallGpa =
@@ -77,7 +87,10 @@ export default function StatsView({ courses }: { courses: Course[] }) {
       acc[key].courses.push(c);
       return acc;
     },
-    {} as Record<string, { credits: number; points: number; courses: Course[] }>
+    {} as Record<
+      string,
+      { credits: number; points: number; courses: Course[] }
+    >,
   );
 
   const semesterData = Object.entries(semesterGroups)
@@ -103,12 +116,12 @@ export default function StatsView({ courses }: { courses: Course[] }) {
     cumPts = 0;
   const cumulativeData = sortedSemData.map((entry) => {
     const semCourses = activeCourses.filter(
-      (c) => `${c.semester} ${c.year}` === entry.semester
+      (c) => `${c.semester} ${c.year}` === entry.semester,
     );
     const sc = semCourses.reduce((s, c) => s + (c.credits || 0), 0);
     const sp = semCourses.reduce(
       (s, c) => s + gradePoints[c.grade!] * (c.credits || 1),
-      0
+      0,
     );
     cumCreds += sc;
     cumPts += sp;
@@ -130,8 +143,8 @@ export default function StatsView({ courses }: { courses: Course[] }) {
         acc[dept].count += 1;
         return acc;
       },
-      {} as Record<string, { creds: number; pts: number; count: number }>
-    )
+      {} as Record<string, { creds: number; pts: number; count: number }>,
+    ),
   )
     .map(([dept, d]) => ({
       department: dept,
@@ -144,34 +157,6 @@ export default function StatsView({ courses }: { courses: Course[] }) {
 
   // Progress to graduation (assuming 120 credits needed)
   const progressToGraduation = Math.min(100, (summary.totalCredits / 36) * 100);
-
-  const filteredGradeDistribution = gradeDistribution.filter(
-    (g) => g.count > 0
-  );
-
-  const gradeChartData = {
-    labels: filteredGradeDistribution.map((g) => g.grade),
-    datasets: [
-      {
-        data: filteredGradeDistribution.map((g) => g.count),
-        backgroundColor: COLORS.slice(0, filteredGradeDistribution.length),
-        borderColor: "#1F2937",
-        borderWidth: 1,
-      },
-    ],
-  };
-
-  const creditChartData = {
-    labels: departmentData.map((d) => d.department),
-    datasets: [
-      {
-        data: departmentData.map((d) => d.credits),
-        backgroundColor: COLORS,
-        borderColor: "#1F2937",
-        borderWidth: 1,
-      },
-    ],
-  };
 
   return (
     <div className={`space-y-6 font-louize text-gray-800 dark:text-gray-200`}>
@@ -218,7 +203,7 @@ export default function StatsView({ courses }: { courses: Course[] }) {
           icon={<Award className="h-5 w-5" />}
           secondaryLabel={`${gradeDistribution.reduce(
             (acc, g) => acc + g.count,
-            0
+            0,
           )} grades recorded`}
         />
         <StatCard
@@ -230,7 +215,7 @@ export default function StatsView({ courses }: { courses: Course[] }) {
                     .filter((elem) => !elem.semester.includes("Summer"))
                     .reduce((acc, s) => acc + s.credits, 0) /
                   semesterData.filter(
-                    (elem) => !elem.semester.includes("Summer")
+                    (elem) => !elem.semester.includes("Summer"),
                   ).length
                 ).toFixed(1)
               : "0"
@@ -253,71 +238,80 @@ export default function StatsView({ courses }: { courses: Course[] }) {
           description="The overall progression of your cumulative GPA over time."
         >
           <div className="h-[400px] w-full">
-            <LineChart
-              xAxis={[
-                {
-                  scaleType: "point",
-                  data: cumulativeData.map((item) => item.semester),
-                  tickLabelStyle: {
-                    angle: 45,
-                    textAnchor: "start",
-                    fontSize: 12,
+            {cumulativeData.length > 0 ? (
+              <LineChart
+                xAxis={[
+                  {
+                    scaleType: "point",
+                    data: cumulativeData.map((item) => item.semester),
+                    tickLabelStyle: {
+                      angle: 45,
+                      textAnchor: "start",
+                      fontSize: 12,
+                      fill: "#9CA3AF",
+                    },
+                  },
+                ]}
+                yAxis={[
+                  {
+                    label: "GPA",
+                    min: Math.max(
+                      0,
+                      Math.floor(
+                        Math.min(
+                          ...cumulativeData.map((item) => item.cumulativeGpa),
+                        ),
+                      ),
+                    ),
+                    max: 4,
+                    tickInterval: [0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4],
+                  },
+                ]}
+                series={[
+                  {
+                    data: cumulativeData.map((item) => item.cumulativeGpa),
+                    showMark: true,
+                    color: "#8B5CF6", // purple
+                    curve: "natural",
+                    area: true,
+                  },
+                ]}
+                grid={{ vertical: true, horizontal: true }}
+                margin={{ left: 70, right: 30, top: 30, bottom: 100 }}
+                sx={{
+                  [`.${axisClasses.left} .${axisClasses.label}`]: {
+                    transform: "translate(-20px, 0)",
                     fill: "#9CA3AF",
                   },
-                },
-              ]}
-              yAxis={[
-                {
-                  label: "GPA",
-                  min: Math.floor(
-                    Math.min(
-                      ...cumulativeData.map((item) => item.cumulativeGpa)
-                    )
-                  ),
-                  max: 4,
-                  tickInterval: [0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4],
-                },
-              ]}
-              series={[
-                {
-                  data: cumulativeData.map((item) => item.cumulativeGpa),
-                  showMark: true,
-                  color: "#8B5CF6", // purple
-                  curve: "natural",
-                  area: true,
-                },
-              ]}
-              grid={{ vertical: true, horizontal: true }}
-              margin={{ left: 70, right: 30, top: 30, bottom: 100 }}
-              sx={{
-                [`.${axisClasses.left} .${axisClasses.label}`]: {
-                  transform: "translate(-20px, 0)",
-                  fill: "#9CA3AF",
-                },
-                [`.${axisClasses.bottom} .${axisClasses.label}`]: {
-                  transform: "translate(0, 60px)",
-                  fill: "#9CA3AF",
-                },
-                [`.${axisClasses.root} line`]: {
-                  stroke: "#374151",
-                  opacity: 0.3,
-                },
-                [`.${axisClasses.root} text`]: {
-                  fill: "#9CA3AF",
-                },
-                backgroundColor: "transparent",
-              }}
-              slotProps={{
-                tooltip: {
-                  sx: {
-                    backgroundColor: "#1F2937",
-                    borderColor: "#374151",
-                    color: "#F3F4F6",
-                    borderRadius: "0.5rem",
+                  [`.${axisClasses.bottom} .${axisClasses.label}`]: {
+                    transform: "translate(0, 60px)",
+                    fill: "#9CA3AF",
                   },
-                },
-              }}
-            />
+                  [`.${axisClasses.root} line`]: {
+                    stroke: "#374151",
+                    opacity: 0.3,
+                  },
+                  [`.${axisClasses.root} text`]: {
+                    fill: "#9CA3AF",
+                  },
+                  backgroundColor: "transparent",
+                }}
+                slotProps={{
+                  tooltip: {
+                    sx: {
+                      backgroundColor: "#1F2937",
+                      borderColor: "#374151",
+                      color: "#F3F4F6",
+                      borderRadius: "0.5rem",
+                    },
+                  },
+                }}
+              />
+            ) : (
+              <div className="h-full flex items-center justify-center text-gray-500 text-sm">
+                No data available
+              </div>
+            )}
           </div>
         </ChartBox>
 
@@ -328,121 +322,81 @@ export default function StatsView({ courses }: { courses: Course[] }) {
           description="Your GPA for each individual semester (in isolation)."
         >
           <div className="h-[400px] w-full">
-            <LineChart
-              xAxis={[
-                {
-                  scaleType: "point",
-                  data: sortedSemData.map((item) => item.semester),
-                  tickLabelStyle: {
-                    angle: 45,
-                    textAnchor: "start",
-                    fontSize: 12,
+            {sortedSemData.length > 0 ? (
+              <LineChart
+                xAxis={[
+                  {
+                    scaleType: "point",
+                    data: sortedSemData.map((item) => item.semester),
+                    tickLabelStyle: {
+                      angle: 45,
+                      textAnchor: "start",
+                      fontSize: 12,
+                      fill: "#9CA3AF",
+                    },
+                  },
+                ]}
+                yAxis={[
+                  {
+                    label: "GPA",
+                    min: Math.max(
+                      0,
+                      Math.floor(
+                        Math.min(...sortedSemData.map((item) => item.gpa)),
+                      ),
+                    ),
+                    max: 4,
+                    tickInterval: [0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4],
+                  },
+                ]}
+                series={[
+                  {
+                    data: sortedSemData.map((item) => item.gpa),
+                    showMark: true,
+                    color: "#3B82F6", // blue
+                    area: true,
+                  },
+                ]}
+                grid={{ vertical: true, horizontal: true }}
+                margin={{ left: 70, right: 30, top: 30, bottom: 100 }}
+                sx={{
+                  [`.${axisClasses.left} .${axisClasses.label}`]: {
+                    transform: "translate(-20px, 0)",
                     fill: "#9CA3AF",
                   },
-                },
-              ]}
-              yAxis={[
-                {
-                  label: "GPA",
-                  min: Math.floor(
-                    Math.min(...sortedSemData.map((item) => item.gpa))
-                  ),
-                  max: 4,
-                  tickInterval: [0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4],
-                },
-              ]}
-              series={[
-                {
-                  data: sortedSemData.map((item) => item.gpa),
-                  showMark: true,
-                  color: "#3B82F6", // blue
-                  area: true,
-                },
-              ]}
-              grid={{ vertical: true, horizontal: true }}
-              margin={{ left: 70, right: 30, top: 30, bottom: 100 }}
-              sx={{
-                [`.${axisClasses.left} .${axisClasses.label}`]: {
-                  transform: "translate(-20px, 0)",
-                  fill: "#9CA3AF",
-                },
-                [`.${axisClasses.bottom} .${axisClasses.label}`]: {
-                  transform: "translate(0, 60px)",
-                  fill: "#9CA3AF",
-                },
-                [`.${axisClasses.root} line`]: {
-                  stroke: "#374151",
-                  opacity: 0.3,
-                },
-                [`.${axisClasses.root} text`]: {
-                  fill: "#9CA3AF",
-                },
-                backgroundColor: "transparent",
-              }}
-              slotProps={{
-                tooltip: {
-                  sx: {
-                    backgroundColor: "#1F2937",
-                    borderColor: "#374151",
-                    color: "#F3F4F6",
-                    borderRadius: "0.5rem",
+                  [`.${axisClasses.bottom} .${axisClasses.label}`]: {
+                    transform: "translate(0, 60px)",
+                    fill: "#9CA3AF",
                   },
-                },
-              }}
-            />
+                  [`.${axisClasses.root} line`]: {
+                    stroke: "#374151",
+                    opacity: 0.3,
+                  },
+                  [`.${axisClasses.root} text`]: {
+                    fill: "#9CA3AF",
+                  },
+                  backgroundColor: "transparent",
+                }}
+                slotProps={{
+                  tooltip: {
+                    sx: {
+                      backgroundColor: "#1F2937",
+                      borderColor: "#374151",
+                      color: "#F3F4F6",
+                      borderRadius: "0.5rem",
+                    },
+                  },
+                }}
+              />
+            ) : (
+              <div className="h-full flex items-center justify-center text-gray-500 text-sm">
+                No data available
+              </div>
+            )}
           </div>
         </ChartBox>
       </div>
 
-      {/* Additional Charts Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        {/* Grade Distribution */}
-        <ChartBox
-          title="Grade Distribution"
-          icon={<PieChartIcon className="h-5 w-5" />}
-          description="A breakdown of your grades across all courses."
-        >
-          <PieChartWrapper
-            data={{
-              labels: filteredGradeDistribution.map((g) => g.grade),
-              datasets: [
-                {
-                  data: filteredGradeDistribution.map((g) => g.count),
-                  backgroundColor: COLORS.slice(
-                    0,
-                    filteredGradeDistribution.length
-                  ),
-                  borderColor: Array(filteredGradeDistribution.length).fill(
-                    "#1F2937"
-                  ),
-                  borderWidth: 1,
-                },
-              ],
-            }}
-            showLegend={true}
-          />
-        </ChartBox>
-
-        {/* Credits Distribution */}
-        {departmentData.length > 0 && (
-          <ChartBox
-            title="Credit Allocation"
-            icon={<PieChartIcon className="h-5 w-5" />}
-            description="A fun way to visualize your degree of class variedness at Yale!"
-          >
-            <PieChartWrapper
-              data={{
-                ...creditChartData,
-                datasets: creditChartData.datasets.map((ds) => ({
-                  ...ds,
-                  borderColor: Array(ds.data.length).fill(ds.borderColor),
-                })),
-              }}
-              showLegend={true}
-            />
-          </ChartBox>
-        )}
-      </div>
     </div>
   );
 }
@@ -472,7 +426,9 @@ function StatCard({
       <div className="flex items-center justify-between">
         <p className="text-xs text-gray-500">{label}</p>
         {icon && (
-          <div className={`${color} opacity-70 p-1.5 rounded-lg bg-gray-800/40`}>
+          <div
+            className={`${color} opacity-70 p-1.5 rounded-lg bg-gray-800/40`}
+          >
             {icon}
           </div>
         )}

@@ -401,7 +401,7 @@ export default function AboutPage() {
                       <iframe
                         width="560"
                         height="315"
-                        src="https://www.youtube.com/embed/WOqPZC2exwA?si=WvVAvNOZ3Qjv-NjR"
+                        src="https://www.youtube.com/embed/5H1kjMWQfgs?si=F9mSXs1G_Wy1Fkx-"
                         title="YouTube video player"
                         frameBorder="0"
                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"

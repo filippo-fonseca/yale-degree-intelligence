@@ -20,16 +20,27 @@ export function InfoCard({
 
   if (autoHide && !isExpanded) {
     return (
-      <button
-        onClick={() => setIsExpanded(true)}
-        className={`flex items-center justify-between w-full p-3 bg-gray-800/50 rounded-lg border border-gray-700 text-sm text-gray-300 hover:bg-gray-800/70 transition-colors ${className}`}
-      >
-        <div className="flex items-center gap-2">
-          <div>{icon}</div>
-          <span>{previewText}</span>
-        </div>
-        <FiChevronDown className="w-4 h-4 text-gray-400" />
-      </button>
+      <div className={`relative group ${className}`}>
+        {/* Animated gradient border */}
+        <div
+          className="absolute -inset-[1px] rounded-lg bg-[conic-gradient(from_var(--angle),#ec4899,#8b5cf6,#3b82f6,#ec4899)] opacity-75 blur-[2px] animate-border-spin"
+          style={{ "--angle": "0deg" } as React.CSSProperties}
+        />
+        <div
+          className="absolute -inset-[1px] rounded-lg bg-[conic-gradient(from_var(--angle),#ec4899,#8b5cf6,#3b82f6,#ec4899)] animate-border-spin"
+          style={{ "--angle": "0deg" } as React.CSSProperties}
+        />
+        <button
+          onClick={() => setIsExpanded(true)}
+          className="relative flex items-center justify-between w-full p-3 bg-gray-900 rounded-lg text-sm text-gray-300 hover:bg-gray-800 transition-colors"
+        >
+          <div className="flex items-center gap-2">
+            <div className="text-pink-500">{icon}</div>
+            <span>{previewText}</span>
+          </div>
+          <FiChevronDown className="w-4 h-4 text-pink-400 animate-bounce" />
+        </button>
+      </div>
     );
   }
 

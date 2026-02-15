@@ -38,7 +38,6 @@ interface SimulatorProps {
   completedCourses: Course[];
   graduationYear: number;
   userMajors: string[];
-  onNavigationAttempt?: (callback: () => void) => void;
 }
 
 type Plan = {
@@ -115,7 +114,6 @@ export default function Simulator({
   completedCourses,
   graduationYear,
   userMajors,
-  onNavigationAttempt,
 }: SimulatorProps) {
   const { user } = useAuth();
 
@@ -142,9 +140,6 @@ export default function Simulator({
   const [plansLoaded, setPlansLoaded] = useState(false);
   // Track currently loaded plan
   const [currentPlanName, setCurrentPlanName] = useState<string | null>(null);
-  // Unsaved changes leave confirmation
-  const [showLeaveConfirm, setShowLeaveConfirm] = useState(false);
-  const [pendingLeaveCallback, setPendingLeaveCallback] = useState<(() => void) | null>(null);
 
   // Simulator-local manual requirements (plan-scoped, NOT in Firebase courses)
   const [simulatorManualReqs, setSimulatorManualReqs] = useState<
@@ -165,7 +160,6 @@ export default function Simulator({
 
   // keep initial snapshot to detect changes
   const initialSemestersRef = useRef<Semester[]>([]);
-  const initialManualReqsRef = useRef<ManualRequirementEntry[]>([]);
 
   // majors to compute – only the user's declared majors
   const majorIds = useMemo<string[]>(() => userMajors, [userMajors]);
@@ -201,7 +195,9 @@ export default function Simulator({
 
   // Find which requirement(s) a course matches for toast notification
   const getMatchedRequirements = useMemo(() => {
-    return (courseCode: string): { majorName: string; requirementName: string }[] => {
+    return (
+      courseCode: string,
+    ): { majorName: string; requirementName: string }[] => {
       const matches: { majorName: string; requirementName: string }[] = [];
       const canon = getCanonicalCode(courseCode) || courseCode;
 
@@ -214,14 +210,25 @@ export default function Simulator({
           for (const opt of req.options) {
             if (opt.type === "course") {
               const optCanon = getCanonicalCode(opt.code) || opt.code;
-              if (opt.code === courseCode || opt.code === canon || optCanon === courseCode || optCanon === canon) {
+              if (
+                opt.code === courseCode ||
+                opt.code === canon ||
+                optCanon === courseCode ||
+                optCanon === canon
+              ) {
                 found = true;
                 break;
               }
             } else if (opt.type === "group") {
-              for (const code of (opt as { type: "group"; options: string[] }).options) {
+              for (const code of (opt as { type: "group"; options: string[] })
+                .options) {
                 const codeCanon = getCanonicalCode(code) || code;
-                if (code === courseCode || code === canon || codeCanon === courseCode || codeCanon === canon) {
+                if (
+                  code === courseCode ||
+                  code === canon ||
+                  codeCanon === courseCode ||
+                  codeCanon === canon
+                ) {
                   found = true;
                   break;
                 }
@@ -248,12 +255,12 @@ export default function Simulator({
     if (matches.length === 1) {
       toast.success(
         `Auto-detected match: "${firstMatch.requirementName}" (${firstMatch.majorName})`,
-        { duration: 3000 }
+        { duration: 3000 },
       );
     } else {
       toast.success(
         `Auto-detected match: "${firstMatch.requirementName}" (${firstMatch.majorName}) +${matches.length - 1} more`,
-        { duration: 3000 }
+        { duration: 3000 },
       );
     }
   };
@@ -332,15 +339,15 @@ export default function Simulator({
       semesters.flatMap((s) =>
         s.courses
           .filter((c) => c.status === "not-taken") // Only track planned courses
-          .map((c) => `${s.id}:${c.code}`)
-      )
+          .map((c) => `${s.id}:${c.code}`),
+      ),
     );
     const initialPlacements = new Set(
       initialSemestersRef.current.flatMap((s) =>
         s.courses
           .filter((c) => c.status === "not-taken")
-          .map((c) => `${s.id}:${c.code}`)
-      )
+          .map((c) => `${s.id}:${c.code}`),
+      ),
     );
 
     // Check if sets are different (different size or different contents)
@@ -349,19 +356,7 @@ export default function Simulator({
       Array.from(currentPlacements).some((p) => !initialPlacements.has(p)) ||
       Array.from(initialPlacements).some((p) => !currentPlacements.has(p));
 
-    // Compare manual requirements against initial state
-    const currentManualKeys = new Set(
-      simulatorManualReqs.map((m) => `${m.code}:${m.requirement}`)
-    );
-    const initialManualKeys = new Set(
-      initialManualReqsRef.current.map((m) => `${m.code}:${m.requirement}`)
-    );
-    const manualReqsChanged =
-      currentManualKeys.size !== initialManualKeys.size ||
-      Array.from(currentManualKeys).some((k) => !initialManualKeys.has(k)) ||
-      Array.from(initialManualKeys).some((k) => !currentManualKeys.has(k));
-
-    const changed = placementsChanged || manualReqsChanged;
+    const changed = placementsChanged || simulatorManualReqs.length > 0;
 
     setHasChanges(changed);
   }, [semesters, simulatorManualReqs]);
@@ -396,7 +391,6 @@ export default function Simulator({
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
-        if (showLeaveConfirm) setShowLeaveConfirm(false);
         if (showPlanSelector) setShowPlanSelector(false);
         if (showSaveModal) {
           setShowSaveModal(false);
@@ -408,52 +402,11 @@ export default function Simulator({
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [showLeaveConfirm, showPlanSelector, showSaveModal, showPlansModal]);
-
-  // ------------ Browser beforeunload warning ------------
-  useEffect(() => {
-    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
-      if (hasChanges) {
-        e.preventDefault();
-        e.returnValue = "You have unsaved changes. Are you sure you want to leave?";
-        return e.returnValue;
-      }
-    };
-    window.addEventListener("beforeunload", handleBeforeUnload);
-    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
-  }, [hasChanges]);
-
-  // ------------ In-app navigation attempt handler ------------
-  useEffect(() => {
-    if (onNavigationAttempt) {
-      // Wrap in arrow function to avoid React's functional setState interpretation
-      onNavigationAttempt(() => (callback: () => void) => {
-        if (hasChanges) {
-          setPendingLeaveCallback(() => callback);
-          setShowLeaveConfirm(true);
-        } else {
-          callback();
-        }
-      });
-    }
-  }, [onNavigationAttempt, hasChanges]);
-
-  const handleConfirmLeave = () => {
-    setShowLeaveConfirm(false);
-    if (pendingLeaveCallback) {
-      pendingLeaveCallback();
-      setPendingLeaveCallback(null);
-    }
-  };
-
-  const handleCancelLeave = () => {
-    setShowLeaveConfirm(false);
-    setPendingLeaveCallback(null);
-  };
+  }, [showPlanSelector, showSaveModal, showPlansModal]);
 
   // ------------ Drag & Drop ------------
   const playPopSound = () => {
-    const audio = new Audio('/audio/pop.mp3');
+    const audio = new Audio("/audio/pop.mp3");
     audio.volume = 0.5;
     audio.play().catch(() => {}); // Ignore errors if audio can't play
   };
@@ -683,9 +636,10 @@ export default function Simulator({
       );
       setSavedPlans(updatedPlans);
       setCurrentPlanName(savedName);
-      // Update initial snapshots so hasChanges resets
-      initialSemestersRef.current = JSON.parse(JSON.stringify(semesters)) as Semester[];
-      initialManualReqsRef.current = [...simulatorManualReqs];
+      // Update initial snapshot so hasChanges resets
+      initialSemestersRef.current = JSON.parse(
+        JSON.stringify(semesters),
+      ) as Semester[];
       setPlanName("");
       setSelectedPlanToOverwrite(null);
       setShowSaveModal(false);
@@ -697,15 +651,11 @@ export default function Simulator({
   const loadPlan = (planIndex: number) => {
     if (planIndex < 0 || planIndex >= savedPlans.length) return;
     const plan = savedPlans[planIndex];
-
-    // Update initial refs BEFORE setting state to prevent false change detection
+    setSemesters(plan.semesters);
+    setSimulatorManualReqs(plan.manualRequirements ?? []);
     initialSemestersRef.current = JSON.parse(
       JSON.stringify(plan.semesters),
     ) as Semester[];
-    initialManualReqsRef.current = plan.manualRequirements ?? [];
-
-    setSemesters(plan.semesters);
-    setSimulatorManualReqs(plan.manualRequirements ?? []);
 
     const usedCodes = new Set<string>();
     plan.semesters.forEach((sem) =>
@@ -722,9 +672,6 @@ export default function Simulator({
 
     setCurrentPlanName(plan.name);
     setShowPlansModal(false);
-
-    // Reset hasChanges since we just loaded a saved plan
-    setHasChanges(false);
   };
 
   const deletePlan = async (planIndex: number) => {
@@ -778,7 +725,7 @@ export default function Simulator({
       {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div className="mb-6">
-          <h2 className="text-xl sm:text-2xl lg:text-3xl font-medium bg-clip-text text-transparent bg-gradient-to-r from-blue-200 to-purple-200">
+          <h2 className="text-3xl font-medium bg-clip-text text-transparent bg-gradient-to-r from-blue-200 to-purple-200">
             Need to visualize? No problem.
           </h2>
           <p className="text-gray-400">
@@ -790,17 +737,25 @@ export default function Simulator({
             <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white/[0.03] border border-white/[0.06]">
               {currentPlanName ? (
                 <>
-                  <div className={`w-1.5 h-1.5 rounded-full ${hasChanges ? 'bg-amber-400' : 'bg-emerald-400'}`} />
-                  <span className="text-xs text-gray-300">{currentPlanName}</span>
+                  <div
+                    className={`w-1.5 h-1.5 rounded-full ${hasChanges ? "bg-amber-400" : "bg-emerald-400"}`}
+                  />
+                  <span className="text-xs text-gray-300">
+                    {currentPlanName}
+                  </span>
                   {hasChanges && (
-                    <span className="text-[10px] text-amber-400/80 ml-1">· unsaved changes</span>
+                    <span className="text-[10px] text-amber-400/80 ml-1">
+                      · unsaved changes
+                    </span>
                   )}
                 </>
               ) : (
                 <>
-                  <div className={`w-1.5 h-1.5 rounded-full ${hasChanges ? 'bg-blue-400 animate-pulse' : 'bg-gray-500'}`} />
+                  <div
+                    className={`w-1.5 h-1.5 rounded-full ${hasChanges ? "bg-blue-400 animate-pulse" : "bg-gray-500"}`}
+                  />
                   <span className="text-xs text-gray-400">
-                    {hasChanges ? 'New plan in progress' : 'No plan loaded'}
+                    {hasChanges ? "New plan in progress" : "No plan loaded"}
                   </span>
                 </>
               )}
@@ -871,8 +826,8 @@ export default function Simulator({
                 work fine).
               </li>
               <li>
-                Click the trash icon on a course to remove it (if
-                it's not completed/in-progress).
+                Click the trash icon on a course to remove it (if it's not
+                completed/in-progress).
               </li>
               <li>
                 Completed/in-progress are pre-assigned and cannot be moved.
@@ -1158,7 +1113,9 @@ export default function Simulator({
                 <div className="mb-5">
                   <div className="flex items-center gap-3 mb-3">
                     <div className="flex-1 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
-                    <span className="text-xs text-gray-500 uppercase tracking-wider">or overwrite</span>
+                    <span className="text-xs text-gray-500 uppercase tracking-wider">
+                      or overwrite
+                    </span>
                     <div className="flex-1 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
                   </div>
                   <div className="max-h-32 overflow-y-auto rounded-xl border border-white/[0.06] bg-white/[0.02]">
@@ -1176,12 +1133,17 @@ export default function Simulator({
                         }}
                       >
                         <div className="flex justify-between items-center">
-                          <span className="text-gray-300 font-medium">{plan.name}</span>
+                          <span className="text-gray-300 font-medium">
+                            {plan.name}
+                          </span>
                           <span className="text-[10px] text-gray-500">
-                            {new Date(plan.createdAt).toLocaleDateString("en-US", {
-                              month: "short",
-                              day: "numeric",
-                            })}
+                            {new Date(plan.createdAt).toLocaleDateString(
+                              "en-US",
+                              {
+                                month: "short",
+                                day: "numeric",
+                              },
+                            )}
                           </span>
                         </div>
                       </button>
@@ -1207,8 +1169,12 @@ export default function Simulator({
                 <motion.button
                   onClick={savePlan}
                   disabled={!planName.trim() || !hasChanges}
-                  whileHover={planName.trim() && hasChanges ? { scale: 1.02 } : {}}
-                  whileTap={planName.trim() && hasChanges ? { scale: 0.98 } : {}}
+                  whileHover={
+                    planName.trim() && hasChanges ? { scale: 1.02 } : {}
+                  }
+                  whileTap={
+                    planName.trim() && hasChanges ? { scale: 0.98 } : {}
+                  }
                   className={`px-4 py-2 text-sm rounded-xl font-medium transition-all ${
                     planName.trim() && hasChanges
                       ? "bg-gradient-to-r from-purple-500/30 to-blue-500/30 text-white border border-purple-500/30 hover:border-purple-400/40 shadow-[0_2px_12px_rgba(139,92,246,0.2),inset_0_1px_0_rgba(255,255,255,0.1)]"
@@ -1271,7 +1237,8 @@ export default function Simulator({
                     const plannedCount = plan.semesters.reduce(
                       (acc, sem) =>
                         acc +
-                        sem.courses.filter((c) => c.status === "not-taken").length,
+                        sem.courses.filter((c) => c.status === "not-taken")
+                          .length,
                       0,
                     );
                     return (
@@ -1288,12 +1255,16 @@ export default function Simulator({
                               {plan.name}
                             </h5>
                             <p className="text-[11px] text-gray-500 mt-0.5">
-                              {plannedCount} planned course{plannedCount !== 1 ? "s" : ""} ·{" "}
-                              {new Date(plan.createdAt).toLocaleDateString("en-US", {
-                                month: "short",
-                                day: "numeric",
-                                year: "numeric",
-                              })}
+                              {plannedCount} planned course
+                              {plannedCount !== 1 ? "s" : ""} ·{" "}
+                              {new Date(plan.createdAt).toLocaleDateString(
+                                "en-US",
+                                {
+                                  month: "short",
+                                  day: "numeric",
+                                  year: "numeric",
+                                },
+                              )}
                             </p>
                           </div>
                         </div>
@@ -1416,7 +1387,8 @@ export default function Simulator({
                   const plannedCount = plan.semesters.reduce(
                     (acc, sem) =>
                       acc +
-                      sem.courses.filter((c) => c.status === "not-taken").length,
+                      sem.courses.filter((c) => c.status === "not-taken")
+                        .length,
                     0,
                   );
                   return (
@@ -1436,12 +1408,16 @@ export default function Simulator({
                             {plan.name}
                           </h4>
                           <p className="text-xs text-gray-500 mt-0.5">
-                            {plannedCount} planned course{plannedCount !== 1 ? "s" : ""} ·{" "}
-                            {new Date(plan.createdAt).toLocaleDateString("en-US", {
-                              month: "short",
-                              day: "numeric",
-                              year: "numeric",
-                            })}
+                            {plannedCount} planned course
+                            {plannedCount !== 1 ? "s" : ""} ·{" "}
+                            {new Date(plan.createdAt).toLocaleDateString(
+                              "en-US",
+                              {
+                                month: "short",
+                                day: "numeric",
+                                year: "numeric",
+                              },
+                            )}
                           </p>
                         </div>
                         <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-500/20 to-blue-500/20 border border-purple-500/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
@@ -1456,7 +1432,9 @@ export default function Simulator({
               {/* Divider */}
               <div className="flex items-center gap-3 my-4">
                 <div className="flex-1 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
-                <span className="text-xs text-gray-500 uppercase tracking-wider">or</span>
+                <span className="text-xs text-gray-500 uppercase tracking-wider">
+                  or
+                </span>
                 <div className="flex-1 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
               </div>
 
@@ -1473,69 +1451,12 @@ export default function Simulator({
 
               {/* Skip hint */}
               <p className="text-center text-[11px] text-gray-600 mt-4">
-                Press <kbd className="px-1.5 py-0.5 rounded bg-white/[0.06] border border-white/[0.08] text-gray-400">Esc</kbd> or click outside to dismiss
+                Press{" "}
+                <kbd className="px-1.5 py-0.5 rounded bg-white/[0.06] border border-white/[0.08] text-gray-400">
+                  Esc
+                </kbd>{" "}
+                or click outside to dismiss
               </p>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Unsaved Changes Confirmation Modal */}
-      <AnimatePresence>
-        {showLeaveConfirm && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/70 backdrop-blur-md z-[60] flex items-center justify-center p-4"
-            onClick={handleCancelLeave}
-          >
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95, y: 10 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: 10 }}
-              transition={{ duration: 0.2, ease: "easeOut" }}
-              onClick={(e) => e.stopPropagation()}
-              className="w-full max-w-sm p-5 rounded-2xl bg-gradient-to-br from-gray-900/95 via-gray-900/90 to-gray-950/95 backdrop-blur-2xl border border-white/[0.08] shadow-[0_8px_48px_rgba(0,0,0,0.5),0_0_80px_rgba(251,146,60,0.08),inset_0_1px_0_rgba(255,255,255,0.08)] ring-1 ring-white/[0.05]"
-            >
-              {/* Warning Icon */}
-              <div className="flex justify-center mb-4">
-                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-amber-500/20 to-orange-500/10 border border-amber-500/30 flex items-center justify-center">
-                  <svg className="w-6 h-6 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                  </svg>
-                </div>
-              </div>
-
-              {/* Content */}
-              <div className="text-center mb-5">
-                <h3 className="text-lg font-medium text-gray-100 mb-1.5">
-                  Unsaved Changes
-                </h3>
-                <p className="text-sm text-gray-400">
-                  You have unsaved changes in your plan. Are you sure you want to leave? Your changes will be lost.
-                </p>
-              </div>
-
-              {/* Actions */}
-              <div className="flex gap-2">
-                <motion.button
-                  onClick={handleCancelLeave}
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  className="flex-1 py-2.5 px-4 text-sm rounded-xl font-medium bg-gradient-to-r from-purple-500/20 to-blue-500/20 text-white border border-purple-500/30 hover:border-purple-400/40 shadow-[0_2px_12px_rgba(139,92,246,0.15),inset_0_1px_0_rgba(255,255,255,0.08)] transition-all"
-                >
-                  Stay
-                </motion.button>
-                <motion.button
-                  onClick={handleConfirmLeave}
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  className="flex-1 py-2.5 px-4 text-sm rounded-xl font-medium bg-white/[0.04] text-gray-400 hover:text-gray-300 hover:bg-white/[0.06] border border-white/[0.06] transition-all"
-                >
-                  Leave
-                </motion.button>
-              </div>
             </motion.div>
           </motion.div>
         )}

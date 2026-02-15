@@ -30,7 +30,7 @@
     "firebase-admin": "^13.6.1",
     "framer-motion": "^12.23.1",
     "lucide-react": "^0.525.0",
-    "next": "^15.3.5",
+    "next": "15.5.12",
     "openai": "^5.8.2",
     "pdf2json": "^3.0.4",
     "plugin": "^0.3.3",

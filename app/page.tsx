@@ -888,7 +888,7 @@ export default function Home() {
 
           <div className="flex items-center gap-2 lg:gap-3">
             <a
-              href="https://www.youtube.com/watch?v=YOUR_VIDEO_ID"
+              href="https://youtu.be/5H1kjMWQfgs"
               target="_blank"
               rel="noopener noreferrer"
               className="hidden lg:inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] rounded-full border border-emerald-800 bg-emerald-900/30 text-emerald-300 hover:bg-emerald-900/50 hover:border-emerald-700 transition-all cursor-pointer"

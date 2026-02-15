@@ -144,9 +144,10 @@ export default function Home() {
   const sharedCoursesRef = useRef<HTMLDivElement>(null);
   const [showV2Modal, setShowV2Modal] = useState(false);
 
-  // Check if user has seen v2 announcement modal - only show on "my courses" tab after onboarding
+  // Check if user has seen v2 announcement modal - only show on "my courses" tab after onboarding is complete
   useEffect(() => {
-    if (!user || !hasData || activeTab !== "upload") return;
+    // Don't show if: no user, onboarding in progress, or not on upload tab
+    if (!user || showMajorSelection || activeTab !== "upload") return;
     const checkV2ModalSeen = async () => {
       try {
         const userDoc = await getDoc(doc(db, "users", user.uid));
@@ -159,7 +160,7 @@ export default function Home() {
       }
     };
     checkV2ModalSeen();
-  }, [user, hasData, activeTab]);
+  }, [user, showMajorSelection, activeTab]);
 
   const dismissV2Modal = async () => {
     setShowV2Modal(false);

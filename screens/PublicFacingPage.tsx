@@ -519,7 +519,7 @@ export default function AboutPage() {
             {/* Left: copy + bullets */}
             <div className="flex-1 min-w-0">
               <h3 className="text-2xl font-bold text-white mb-2">
-                Simulator — drag, drop, done.
+                Simulator: drag, drop, done.
               </h3>
               <p className="text-gray-300 text-sm mb-4 max-w-xl">
                 Build a semester-by-semester plan by dragging courses from your

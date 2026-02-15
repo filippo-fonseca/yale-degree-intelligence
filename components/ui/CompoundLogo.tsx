@@ -6,12 +6,14 @@ interface CompoundLogoProps {
   animated?: boolean;
   hideLogo?: boolean;
   size?: "sm" | "md" | "lg" | "xl";
+  lightMode?: boolean;
 }
 
 const CompoundLogo: React.FC<CompoundLogoProps> = ({
   animated = false,
   hideLogo = false,
   size = "md",
+  lightMode = false,
 }) => {
   const sizeClasses = {
     sm: {
@@ -54,6 +56,7 @@ const CompoundLogo: React.FC<CompoundLogoProps> = ({
     >
       {!hideLogo && (
         <LogoIcon
+          lightMode={lightMode}
           className={
             size === "xl"
               ? "h-10 w-10"
@@ -67,7 +70,11 @@ const CompoundLogo: React.FC<CompoundLogoProps> = ({
       )}
       <div className="relative">
         <h1
-          className={`${sizeClasses[size].text} font-medium tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-blue-200 to-purple-200`}
+          className={`${sizeClasses[size].text} font-medium tracking-tight bg-clip-text text-transparent ${
+            lightMode
+              ? "bg-gradient-to-r from-blue-600 to-purple-600"
+              : "bg-gradient-to-r from-blue-200 to-purple-200"
+          }`}
         >
           DegreeIntelligence
         </h1>
@@ -75,9 +82,11 @@ const CompoundLogo: React.FC<CompoundLogoProps> = ({
           whileHover={{ scale: 1.05 }}
           animate={animated ? "animate" : undefined}
           variants={animationVariants}
-          className={`font-sf absolute ${sizeClasses[size].badge} font-bold rounded-lg transform rotate-12
-           bg-gray-900 border border-gray-800 shadow-[inset_2px_2px_4px_rgba(0,0,0,0.3),inset_-2px_-2px_4px_rgba(255,255,255,0.05)]
-           text-pink-400 hover:shadow-[inset_3px_3px_6px_rgba(0,0,0,0.4),inset_-3px_-3px_6px_rgba(255,255,255,0.1)] transition-all`}
+          className={`font-sf absolute ${sizeClasses[size].badge} font-bold rounded-lg transform rotate-12 transition-all ${
+            lightMode
+              ? "bg-white border border-gray-200 text-pink-600 shadow-md"
+              : "bg-gray-900 border border-gray-800 shadow-[inset_2px_2px_4px_rgba(0,0,0,0.3),inset_-2px_-2px_4px_rgba(255,255,255,0.05)] text-pink-400 hover:shadow-[inset_3px_3px_6px_rgba(0,0,0,0.4),inset_-3px_-3px_6px_rgba(255,255,255,0.1)]"
+          }`}
         >
           YALE
         </motion.span>

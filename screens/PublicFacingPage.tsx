@@ -179,11 +179,14 @@ export default function AboutPage() {
       <div className="relative mb-8 mt-14 z-30 bg-gradient-to-r from-emerald-900/20 via-blue-900/20 to-purple-900/20 backdrop-blur-xl border-b border-white/[0.08] shadow-[0_8px_32px_rgba(0,0,0,0.3),inset_0_1px_0_rgba(255,255,255,0.1)]">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-2.5 flex items-center justify-center gap-2">
           <span className="px-2.5 py-1 text-[10px] sm:text-xs font-semibold rounded-full bg-gradient-to-r from-emerald-500/20 to-emerald-600/20 border border-emerald-500/30 text-emerald-300 shadow-[inset_0_1px_0_rgba(255,255,255,0.1),0_2px_8px_rgba(52,211,153,0.2)] flex items-center gap-1 shrink-0">
-            <HiSparkles className="w-3 h-3" /> <span className="hidden sm:inline">News</span>
+            <HiSparkles className="w-3 h-3" />{" "}
+            <span className="hidden sm:inline">News</span>
           </span>
           <p className="text-[11px] sm:text-sm text-emerald-100">
             <span className="sm:hidden">The YDN featured us.</span>
-            <span className="hidden sm:inline">The Yale Daily News featured us.</span>{" "}
+            <span className="hidden sm:inline">
+              The Yale Daily News featured us.
+            </span>{" "}
             <a
               href="https://yaledailynews.com/blog/2025/09/23/new-student-run-platform-aims-to-simplify-degree-planning/"
               target="_blank"
@@ -272,8 +275,8 @@ export default function AboutPage() {
             <div className="mb-3 flex justify-center">
               <div className="relative p-[1px] rounded-xl bg-gradient-to-r from-pink-500/40 via-purple-500/40 to-blue-500/40">
                 <span className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-medium bg-gradient-to-br from-gray-900/90 via-gray-900/80 to-gray-950/90 text-pink-200 shadow-[0_8px_32px_rgba(236,72,153,0.2),inset_0_1px_0_rgba(255,255,255,0.1),inset_0_-1px_0_rgba(0,0,0,0.2)] backdrop-blur-xl">
-                  <FiHeart className="w-3 h-3 text-blue-400" /> We're so glad you're here. We think you'll
-                  love this.
+                  <FiHeart className="w-3 h-3 text-blue-400" /> We're so glad
+                  you're here. We think you'll love this.
                 </span>
               </div>
             </div>
@@ -839,10 +842,7 @@ export default function AboutPage() {
                 </div>
               </div>
 
-              <div
-                ref={pieRef}
-                className="h-[260px] w-full"
-              >
+              <div ref={pieRef} className="h-[260px] w-full">
                 <motion.div
                   initial={{ scale: 0.9, opacity: 0 }}
                   animate={pieInView ? { scale: 1, opacity: 1 } : {}}
@@ -853,9 +853,7 @@ export default function AboutPage() {
                     <PieChartWrapper
                       key="pie-mounted"
                       data={{
-                        labels: statsDemo.gradeDistribution.map(
-                          (g) => g.label,
-                        ),
+                        labels: statsDemo.gradeDistribution.map((g) => g.label),
                         datasets: [
                           {
                             data: statsDemo.gradeDistribution.map(
@@ -1305,7 +1303,9 @@ export default function AboutPage() {
       {/* Footer */}
       <div className="py-6 px-4 text-center text-gray-400 text-xs border-t border-white/[0.05]">
         <p className="flex flex-wrap items-center justify-center gap-1.5 max-w-md mx-auto leading-relaxed">
-          <span className="inline-flex items-center gap-1">Made with <FiHeart className="w-3 h-3 text-blue-400" /></span>
+          <span className="inline-flex items-center gap-1">
+            Made with <FiHeart className="w-3 h-3 text-blue-400" />
+          </span>
           <span className="hidden sm:inline">|</span>
           <span>Not affiliated with Yale University.</span>
         </p>
@@ -1360,7 +1360,7 @@ export default function AboutPage() {
                 {/* Video embed */}
                 <div className="aspect-video bg-black/50">
                   <iframe
-                    src="https://www.youtube.com/embed/WOqPZC2exwA"
+                    src="https://youtu.be/5H1kjMWQfgs"
                     title="DegreeIntelligence v2 Launch"
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                     allowFullScreen

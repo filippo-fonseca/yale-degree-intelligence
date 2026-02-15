@@ -15,6 +15,8 @@ export type Course = {
   credits: number;
   skipped?: boolean; // Add this new property
   manualRequirementsFulfilled?: ManualRequirement[];
+  excludedFromRequirements?: ManualRequirement[]; // Courses excluded from fulfilling specific requirements
+  distributionals?: string[]; // manually assigned: "Hu", "So", "Sc", "QR", "WR", "L1"-"L5"
 };
   
 export type Semester = {
@@ -33,8 +35,55 @@ export interface Message {
 
 export interface Conversation {
   id: string;
+  userId: string;
   title: string;
   messages: Message[];
   createdAt: string;
   updatedAt: string;
+}
+
+// For CleoAI conversation context summary (stored to avoid re-sending full context)
+export interface ConversationContext {
+  userSnapshot: {
+    name: string;
+    email: string;
+    graduationYear: number;
+    majors: string[];
+  };
+  statsSnapshot: {
+    gpa: string;
+    totalCredits: number;
+    completedCourses: number;
+  };
+  createdAt: string;
+}
+
+// Friends feature - public course data (NO grades)
+export interface PublicCourse {
+  code: string;
+  semester: string;
+  year: number;
+  credits: number;
+  status: "completed" | "in-progress" | "skipped";
+  skipped?: boolean; // Explicit flag for skipped courses (counts toward requirements)
+  manualRequirementsFulfilled?: ManualRequirement[]; // For tracking manually assigned requirements
+}
+
+export interface FriendsPublicData {
+  userId: string;
+  enabled: boolean;
+  enabledAt: Date | null;
+  updatedAt: Date;
+  displayName?: string;
+  email?: string;
+  photoURL?: string;
+  majors: string[];
+  graduationYear?: number;
+  bio?: string;
+  courses: PublicCourse[];
+}
+
+export interface FriendsLookup {
+  users: [string, string];
+  createdAt: Date;
 }

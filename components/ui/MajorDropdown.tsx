@@ -128,17 +128,17 @@ export function MajorDropdown({
       <button
         ref={buttonRef}
         onClick={() => setIsOpen((v) => !v)}
-        className="w-full text-left p-3 rounded-lg border border-gray-700 bg-gray-800 hover:bg-gray-800/50 flex justify-between items-center"
+        className="w-full text-left px-2.5 py-2 rounded-lg border border-gray-700 bg-gray-800 hover:bg-gray-800/70 flex justify-between items-center"
       >
         <div className="flex items-center">
-          <div className="w-4 h-4 rounded-full bg-pink-500 mr-3 flex-shrink-0" />
+          <div className="w-2.5 h-2.5 rounded-full bg-pink-500 mr-2 flex-shrink-0" />
           <div>
-            <div className="font-medium">{value}</div>
-            <div className="text-sm text-gray-400">{selectedMajorName}</div>
+            <div className="text-xs font-medium text-gray-200">{value}</div>
+            <div className="text-[10px] text-gray-400 truncate max-w-[180px]">{selectedMajorName}</div>
           </div>
         </div>
         <svg
-          className={`h-5 w-5 text-gray-400 transition-transform ${
+          className={`h-3.5 w-3.5 text-gray-400 transition-transform flex-shrink-0 ${
             isOpen ? "rotate-180" : ""
           }`}
           xmlns="http://www.w3.org/2000/svg"
@@ -164,24 +164,24 @@ export function MajorDropdown({
             style={{
               top: pos ? pos.top : 0,
               left: pos?.left ?? 0,
-              width: pos?.width ?? 320,
-              transform: pos?.openUp ? "translateY(-8px)" : "translateY(8px)",
+              width: pos?.width ?? 280,
+              transform: pos?.openUp ? "translateY(-6px)" : "translateY(6px)",
             }}
           >
             <div className="bg-gray-800 border border-gray-700 rounded-lg shadow-lg overflow-hidden">
               {/* Search bar */}
-              <div className="p-2 border-b border-gray-700">
+              <div className="p-1.5 border-b border-gray-700">
                 <div className="relative">
                   <input
                     ref={searchInputRef}
                     type="text"
-                    placeholder="Search Yale majors & concentrations..."
+                    placeholder="Search majors..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full bg-gray-900 text-xs text-gray-200 px-3 py-2 pl-8 rounded-md border border-gray-700 focus:outline-none focus:ring-1 focus:ring-pink-500"
+                    className="w-full bg-gray-900 text-[11px] text-gray-200 px-2.5 py-1.5 pl-7 rounded-md border border-gray-700 focus:outline-none focus:ring-1 focus:ring-pink-500"
                   />
                   <svg
-                    className="absolute left-2 top-2.5 h-4 w-4 text-gray-400"
+                    className="absolute left-2 top-2 h-3 w-3 text-gray-500"
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"
                     viewBox="0 0 24 24"
@@ -198,7 +198,7 @@ export function MajorDropdown({
               </div>
 
               {/* Majors list */}
-              <div className="max-h-60 overflow-y-auto">
+              <div className="max-h-48 overflow-y-auto">
                 {filteredMajors.length > 0 ? (
                   filteredMajors.map(([code, name]) => (
                     <button
@@ -208,7 +208,7 @@ export function MajorDropdown({
                         setIsOpen(false);
                       }}
                       disabled={disabledOptions.includes(code)}
-                      className={`w-full text-left p-3 hover:bg-gray-700/50 ${
+                      className={`w-full text-left px-2.5 py-1.5 hover:bg-gray-700/50 ${
                         value === code ? "bg-pink-900/20" : ""
                       } ${
                         disabledOptions.includes(code)
@@ -218,17 +218,17 @@ export function MajorDropdown({
                     >
                       <div className="flex items-center">
                         {value === code && (
-                          <div className="w-4 h-4 rounded-full bg-pink-500 mr-3 flex-shrink-0" />
+                          <div className="w-2 h-2 rounded-full bg-pink-500 mr-2 flex-shrink-0" />
                         )}
-                        <div>
-                          <div className="font-medium">{code}</div>
-                          <div className="text-sm text-gray-400">{name}</div>
+                        <div className={value !== code ? "ml-4" : ""}>
+                          <div className="text-xs font-medium text-gray-200">{code}</div>
+                          <div className="text-[10px] text-gray-400">{name}</div>
                         </div>
                       </div>
                     </button>
                   ))
                 ) : (
-                  <div className="p-3 text-center text-gray-400">
+                  <div className="px-2.5 py-2 text-center text-[11px] text-gray-500">
                     No majors found
                   </div>
                 )}

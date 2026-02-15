@@ -228,7 +228,9 @@ const semestersLeft = semestersLeftArr.length;
         selectedMajor,
         completedCourseCodes,
         inProgressCourseCodes,
-        skippedCourseCodes
+        skippedCourseCodes,
+        [], // manualRequirements
+        []  // excludedRequirements
       );
     };
 

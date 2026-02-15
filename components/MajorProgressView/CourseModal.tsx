@@ -26,18 +26,43 @@ import { Info } from "lucide-react";
 
 type CourseStatus = "completed" | "in-progress" | "not-taken" | "skipped";
 
+const DIST_CATEGORIES = {
+  areas: ["Hu", "So", "Sc"],
+  skills: ["QR", "WR"],
+  languages: ["L1", "L2", "L3", "L4", "L5"],
+};
+
+const DIST_PILL_STYLES: Record<string, string> = {
+  Hu: "bg-purple-500/20 text-purple-300 border-purple-500/30",
+  So: "bg-sky-500/20 text-sky-300 border-sky-500/30",
+  Sc: "bg-emerald-500/20 text-emerald-300 border-emerald-500/30",
+  QR: "bg-red-500/20 text-red-300 border-red-500/30",
+  WR: "bg-orange-500/20 text-orange-300 border-orange-500/30",
+  L1: "bg-teal-500/20 text-teal-300 border-teal-500/30",
+  L2: "bg-teal-500/20 text-teal-300 border-teal-500/30",
+  L3: "bg-teal-500/20 text-teal-300 border-teal-500/30",
+  L4: "bg-teal-500/20 text-teal-300 border-teal-500/30",
+  L5: "bg-teal-500/20 text-teal-300 border-teal-500/30",
+};
+
+const getDistPillStyle = (code: string) =>
+  DIST_PILL_STYLES[code] || "bg-gray-200/50 dark:bg-gray-800/50 text-gray-600 dark:text-gray-400 border-gray-300 dark:border-gray-700";
+
 interface CourseModalProps {
   isOpen: boolean;
   course: {
+    id?: string;
     code: string;
     name: string;
     status: CourseStatus;
     skipped?: boolean;
+    distributionals?: string[];
   } | null;
   onClose: () => void;
-  onSkip?: (code: string, name: string) => void; // Made optional
-  onRefresh?: () => void; // Made optional
-  allowSkip?: boolean; // New prop to control skip functionality
+  onSkip?: (code: string, name: string) => void;
+  onRefresh?: () => void;
+  allowSkip?: boolean;
+  onToggleDistributional?: (courseId: string, dist: string) => void;
 }
 
 export default function CourseModal({
@@ -46,7 +71,8 @@ export default function CourseModal({
   onClose,
   onSkip,
   onRefresh,
-  allowSkip = true, // Default to true for backward compatibility
+  allowSkip = true,
+  onToggleDistributional,
 }: CourseModalProps) {
   const { user } = useAuth();
   const dropdownRef = useRef<HTMLDivElement | null>(null);
@@ -57,6 +83,8 @@ export default function CourseModal({
     null
   );
   const [courseCredits, setCourseCredits] = useState<number | undefined>();
+  const [showDistEditor, setShowDistEditor] = useState(false);
+  const [localDistributionals, setLocalDistributionals] = useState<string[]>([]);
 
   useEffect(() => {
     if (!user) return;
@@ -124,6 +152,26 @@ export default function CourseModal({
     return () => document.removeEventListener("mousedown", handleClick);
   }, [dropdownOpen]);
 
+  // Sync local distributionals with course prop and reset editor state
+  useEffect(() => {
+    if (course) {
+      setLocalDistributionals(course.distributionals || []);
+    }
+    setShowDistEditor(false);
+  }, [course, isOpen]);
+
+  const handleToggleDist = (dist: string) => {
+    if (!course?.id || !onToggleDistributional) return;
+
+    // Optimistic update
+    setLocalDistributionals((prev) =>
+      prev.includes(dist) ? prev.filter((d) => d !== dist) : [...prev, dist]
+    );
+
+    // Call parent handler
+    onToggleDistributional(course.id, dist);
+  };
+
   const handleDeleteCourse = async () => {
     if (!user || !course || !onRefresh) return;
     try {
@@ -155,7 +203,7 @@ export default function CourseModal({
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 bg-black/70 z-[999] flex items-center justify-center p-4"
+          className="fixed inset-0 bg-gray-100/70 dark:bg-black/70 z-[999] flex items-center justify-center p-4"
           onClick={onClose}
         >
           <motion.div
@@ -261,6 +309,121 @@ export default function CourseModal({
               {course.name} <br /> {courseCredits}{" "}
               {courseCredits === 1 ? "credit" : "credits"}
             </p>
+
+            {/* Distributionals Section */}
+            {(course.status === "completed" || course.status === "in-progress") && !course.skipped && onToggleDistributional && (
+              <div className="mt-4 pt-4 border-t border-gray-700">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm text-gray-400">Distributional Requirements</span>
+                  {localDistributionals.length === 0 && !showDistEditor ? (
+                    // Gradient border when no distributionals assigned
+                    <button
+                      onClick={() => setShowDistEditor(!showDistEditor)}
+                      className="text-xs px-3 py-1 rounded-full bg-gradient-to-r from-purple-500/20 via-pink-500/20 to-blue-500/20 text-gray-200 hover:text-white border border-purple-500/50 hover:border-purple-400/70 transition-all"
+                    >
+                      + Assign
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => setShowDistEditor(!showDistEditor)}
+                      className="text-xs px-2 py-1 rounded-full bg-gray-700/50 text-gray-300 hover:bg-gray-600/50 transition-all"
+                    >
+                      {showDistEditor ? "Done" : "Edit"}
+                    </button>
+                  )}
+                </div>
+
+                {/* Display assigned distributionals */}
+                {localDistributionals.length > 0 && !showDistEditor && (
+                  <div className="flex flex-wrap gap-1.5">
+                    {localDistributionals.map((d) => (
+                      <span
+                        key={d}
+                        className={`text-xs px-2 py-0.5 rounded-full border ${getDistPillStyle(d)}`}
+                      >
+                        {d}
+                      </span>
+                    ))}
+                  </div>
+                )}
+
+                {localDistributionals.length === 0 && !showDistEditor && (
+                  <p className="text-xs text-gray-500">No distributionals assigned</p>
+                )}
+
+                {/* Distributional Editor */}
+                <AnimatePresence>
+                  {showDistEditor && (
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: "auto" }}
+                      exit={{ opacity: 0, height: 0 }}
+                      className="space-y-3 mt-2"
+                    >
+                      {/* Areas */}
+                      <div>
+                        <p className="text-xs text-gray-500 mb-1">Areas</p>
+                        <div className="flex flex-wrap gap-1.5">
+                          {DIST_CATEGORIES.areas.map((d) => (
+                            <button
+                              key={d}
+                              onClick={() => handleToggleDist(d)}
+                              className={`text-xs px-2.5 py-1 rounded-full border font-medium transition-all ${
+                                localDistributionals.includes(d)
+                                  ? getDistPillStyle(d)
+                                  : "bg-gray-800/30 text-gray-500 border-gray-700/50 hover:border-gray-600"
+                              }`}
+                            >
+                              {d}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Skills */}
+                      <div>
+                        <p className="text-xs text-gray-500 mb-1">Skills</p>
+                        <div className="flex flex-wrap gap-1.5">
+                          {DIST_CATEGORIES.skills.map((d) => (
+                            <button
+                              key={d}
+                              onClick={() => handleToggleDist(d)}
+                              className={`text-xs px-2.5 py-1 rounded-full border font-medium transition-all ${
+                                localDistributionals.includes(d)
+                                  ? getDistPillStyle(d)
+                                  : "bg-gray-800/30 text-gray-500 border-gray-700/50 hover:border-gray-600"
+                              }`}
+                            >
+                              {d}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Languages */}
+                      <div>
+                        <p className="text-xs text-gray-500 mb-1">Languages</p>
+                        <div className="flex flex-wrap gap-1.5">
+                          {DIST_CATEGORIES.languages.map((d) => (
+                            <button
+                              key={d}
+                              onClick={() => handleToggleDist(d)}
+                              className={`text-xs px-2.5 py-1 rounded-full border font-medium transition-all ${
+                                localDistributionals.includes(d)
+                                  ? getDistPillStyle(d)
+                                  : "bg-gray-800/30 text-gray-500 border-gray-700/50 hover:border-gray-600"
+                              }`}
+                            >
+                              {d}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            )}
           </motion.div>
         </motion.div>
       )}

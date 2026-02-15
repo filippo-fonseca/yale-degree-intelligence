@@ -174,7 +174,7 @@ export default function StatsView({ courses }: { courses: Course[] }) {
   };
 
   return (
-    <div className={`space-y-8 font-louize text-gray-200`}>
+    <div className={`space-y-6 font-louize text-gray-800 dark:text-gray-200`}>
       {/* Summary Cards */}
       <InfoCard>
         We're actively working on new stats. Have any suggestions?{" "}
@@ -189,7 +189,7 @@ export default function StatsView({ courses }: { courses: Course[] }) {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4"
+        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3"
       >
         <StatCard
           label="Cumulative GPA"
@@ -245,7 +245,7 @@ export default function StatsView({ courses }: { courses: Course[] }) {
       </motion.div>
 
       {/* GPA Charts Section */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {/* Cumulative GPA Chart */}
         <ChartBox
           title="Cumulative GPA Progression"
@@ -395,7 +395,7 @@ export default function StatsView({ courses }: { courses: Course[] }) {
       </div>
 
       {/* Additional Charts Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {/* Grade Distribution */}
         <ChartBox
           title="Grade Distribution"
@@ -466,32 +466,36 @@ function StatCard({
 }) {
   return (
     <motion.div
-      whileHover={{ y: -2 }}
-      className="p-6 rounded-xl bg-gray-900/50 backdrop-blur-sm border border-gray-800 hover:border-gray-700 transition-all"
+      whileHover={{ y: -1 }}
+      className="p-4 rounded-xl bg-gradient-to-br from-gray-900/60 via-gray-900/40 to-gray-950/60 backdrop-blur-md border border-gray-800/50 hover:border-gray-700/60 transition-all shadow-[inset_0_1px_0_rgba(255,255,255,0.04),0_4px_12px_rgba(0,0,0,0.2)]"
     >
       <div className="flex items-center justify-between">
-        <p className="text-sm text-gray-400">{label}</p>
-        {icon && <div className={`${color} opacity-80`}>{icon}</div>}
+        <p className="text-xs text-gray-500">{label}</p>
+        {icon && (
+          <div className={`${color} opacity-70 p-1.5 rounded-lg bg-gray-800/40`}>
+            {icon}
+          </div>
+        )}
       </div>
-      <div className="flex items-end justify-between mt-2">
-        <p className={`text-3xl font-medium ${color}`}>{value}</p>
+      <div className="flex items-end justify-between mt-1.5">
+        <p className={`text-2xl font-medium ${color}`}>{value}</p>
       </div>
       {secondaryLabel && (
-        <p className="text-xs text-gray-400 mt-1">{secondaryLabel}</p>
+        <p className="text-[11px] text-gray-500 mt-1">{secondaryLabel}</p>
       )}
       {change !== 0 && (
         <p
-          className={`text-xs mt-1 ${
+          className={`text-[11px] mt-1 ${
             change > 0
               ? "text-emerald-400"
               : change > -0.05
-                ? "text-gray-400"
+                ? "text-gray-500"
                 : "text-red-400"
           }`}
         >
           {change > 0 ? "+" : ""}
           {change.toFixed(2)}{" "}
-          <span className="text-gray-400">{changeText}</span>
+          <span className="text-gray-500">{changeText}</span>
         </p>
       )}
     </motion.div>
@@ -513,19 +517,19 @@ function ChartBox({
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="p-6 rounded-xl bg-gray-900/50 backdrop-blur-sm border border-gray-800"
+      className="p-5 rounded-xl bg-gradient-to-br from-gray-900/60 via-gray-900/40 to-gray-950/60 backdrop-blur-md border border-gray-800/50 shadow-[inset_0_1px_0_rgba(255,255,255,0.04),0_4px_16px_rgba(0,0,0,0.25)]"
     >
-      <div className="flex items-start justify-between mb-4">
+      <div className="flex items-start justify-between mb-3">
         <div>
-          <h3 className="font-medium text-lg text-transparent bg-clip-text bg-gradient-to-r from-blue-200 to-purple-200">
+          <h3 className="font-medium text-base text-transparent bg-clip-text bg-gradient-to-r from-blue-200 to-purple-200">
             {title}
           </h3>
           {description && (
-            <p className="text-xs text-gray-400 mt-1">{description}</p>
+            <p className="text-[11px] text-gray-500 mt-0.5">{description}</p>
           )}
         </div>
         {icon && (
-          <div className="p-2 rounded-full bg-gray-800/50 text-blue-300">
+          <div className="p-1.5 rounded-lg bg-gradient-to-br from-gray-800/60 to-gray-900/60 border border-gray-700/30 text-blue-400 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]">
             {icon}
           </div>
         )}

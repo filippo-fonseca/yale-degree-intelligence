@@ -1,3 +1,20 @@
+// Distributional pill styling
+export const DIST_PILL_STYLES: Record<string, string> = {
+  Hu: "bg-purple-500/20 text-purple-300 border-purple-500/30",
+  So: "bg-sky-500/20 text-sky-300 border-sky-500/30",
+  Sc: "bg-emerald-500/20 text-emerald-300 border-emerald-500/30",
+  QR: "bg-red-500/20 text-red-300 border-red-500/30",
+  WR: "bg-orange-500/20 text-orange-300 border-orange-500/30",
+  L1: "bg-teal-500/20 text-teal-300 border-teal-500/30",
+  L2: "bg-teal-500/20 text-teal-300 border-teal-500/30",
+  L3: "bg-teal-500/20 text-teal-300 border-teal-500/30",
+  L4: "bg-teal-500/20 text-teal-300 border-teal-500/30",
+  L5: "bg-teal-500/20 text-teal-300 border-teal-500/30",
+};
+
+export const getDistPillStyle = (code: string) =>
+  DIST_PILL_STYLES[code] || "bg-gray-800/50 text-gray-400 border-gray-700";
+
 // Grade point mapping (Yale's grading scale)
 export const gradePoints: Record<string, number> = {
     'A': 4.0,

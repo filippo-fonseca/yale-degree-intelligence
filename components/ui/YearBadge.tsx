@@ -8,19 +8,12 @@ interface YearBadgeProps {
 }
 
 const getYearStatus = (graduationYear: number): string => {
-  const now = new Date();
-  const currentYear = now.getFullYear();
-  const currentMonth = now.getMonth();
-
-  const academicYear = currentMonth >= 8 ? currentYear + 1 : currentYear;
-  const yearsRemaining = graduationYear - academicYear;
-
-  if (yearsRemaining > 4) return "High School";
-  if (yearsRemaining === 4) return "Freshman";
-  if (yearsRemaining === 3) return "Sophomore";
-  if (yearsRemaining === 2) return "Junior";
-  if (yearsRemaining === 1) return "Senior";
-  if (yearsRemaining <= 0) return "Graduated";
+  // Direct mapping based on graduation year
+  if (graduationYear >= 2030) return "High School";
+  if (graduationYear === 2029) return "Freshman";
+  if (graduationYear === 2028) return "Sophomore";
+  if (graduationYear === 2027) return "Junior";
+  if (graduationYear <= 2026) return "Senior";
 
   return "Unknown";
 };
@@ -49,15 +42,15 @@ export const YearBadge: React.FC<YearBadgeProps> = ({
   return (
     <div className="flex items-center">
       <span
-        className={`text-xs font-medium rounded-full flex items-center ${
-          noPadding ? "" : "px-2.5 py-0.5"
+        className={`text-[10px] font-medium rounded-full flex items-center ${
+          noPadding ? "" : "px-2 py-0.5"
         }`}
       >
         <span
-          className={`w-2 h-2 rounded-full mr-1.5 ${getDotColor(yearStatus)}`}
+          className={`w-1.5 h-1.5 rounded-full mr-1 ${getDotColor(yearStatus)}`}
         ></span>
-        <span className="text-gray-300">
-          {yearStatus} • Class of {graduationYear}
+        <span className="text-gray-400">
+          {yearStatus} • '{graduationYear.toString().slice(-2)}
         </span>
       </span>
     </div>

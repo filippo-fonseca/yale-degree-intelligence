@@ -1,14 +1,15 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
-import { FiLogOut, FiEdit2 } from "react-icons/fi";
+import { FiLogOut, FiEdit2, FiMoreVertical, FiTrash2, FiChevronDown } from "react-icons/fi";
 import { User } from "firebase/auth";
 import { MAJORS } from "@/lib/majors";
 import { MajorDropdown } from "../ui/MajorDropdown";
 import { YearBadge } from "../ui/YearBadge";
 import Link from "next/link";
 import { Info } from "lucide-react";
+import { UserAvatar } from "../ui/UserAvatar";
 
 interface UserProfile {
   majors: string[];
@@ -20,22 +21,28 @@ interface UserProfile {
 interface UserSettingsModalProps {
   user: User;
   userProfile: UserProfile | null;
+  friendsEnabled: boolean;
   onClose: () => void;
   onSave: (updatedProfile: Partial<UserProfile>) => Promise<void>;
+  onToggleFriends: (enabled: boolean) => Promise<void>;
   onLogout: () => void;
+  onDeleteAccount: () => Promise<void>;
 }
 
 export default function UserSettingsModal({
   user,
   userProfile,
+  friendsEnabled,
   onClose,
   onSave,
+  onToggleFriends,
   onLogout,
+  onDeleteAccount,
 }: UserSettingsModalProps) {
   const [isHoveringLogout, setIsHoveringLogout] = useState(false);
   const [localProfile, setLocalProfile] = useState<UserProfile | null>(null);
   const [duplicateMajorError, setDuplicateMajorError] = useState<string | null>(
-    null
+    null,
   );
   const [isSaving, setIsSaving] = useState(false);
 
@@ -45,6 +52,17 @@ export default function UserSettingsModal({
   const [isSavingBio, setIsSavingBio] = useState(false);
   const [bioJustSaved, setBioJustSaved] = useState(false);
   const [bioCount, setBioCount] = useState(0);
+
+  // More menu and delete account
+  const [showMoreMenu, setShowMoreMenu] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const moreMenuRef = useRef<HTMLDivElement>(null);
+
+  // Friends feature toggle
+  const [isTogglingFriends, setIsTogglingFriends] = useState(false);
+  const [showDisableFriendsConfirm, setShowDisableFriendsConfirm] =
+    useState(false);
 
   const modalRef = useRef<HTMLDivElement>(null);
 
@@ -70,19 +88,41 @@ export default function UserSettingsModal({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [onClose]);
 
-  const getYearStatus = (graduationYear: number): string => {
-    const now = new Date();
-    const currentYear = now.getFullYear();
-    const currentMonth = now.getMonth();
-    const academicYear = currentMonth >= 8 ? currentYear + 1 : currentYear;
-    const yearsRemaining = graduationYear - academicYear;
+  // Close more menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        moreMenuRef.current &&
+        !moreMenuRef.current.contains(event.target as Node)
+      ) {
+        setShowMoreMenu(false);
+      }
+    };
+    if (showMoreMenu) {
+      document.addEventListener("mousedown", handleClickOutside);
+      return () =>
+        document.removeEventListener("mousedown", handleClickOutside);
+    }
+  }, [showMoreMenu]);
 
-    if (yearsRemaining > 4) return "High School";
-    if (yearsRemaining === 4) return "Freshman";
-    if (yearsRemaining === 3) return "Sophomore";
-    if (yearsRemaining === 2) return "Junior";
-    if (yearsRemaining === 1) return "Senior";
-    if (yearsRemaining <= 0) return "Graduated";
+  const handleDeleteAccount = async () => {
+    setIsDeleting(true);
+    try {
+      await onDeleteAccount();
+    } catch (error) {
+      console.error("Failed to delete account:", error);
+      setIsDeleting(false);
+      setShowDeleteConfirm(false);
+    }
+  };
+
+  const getYearStatus = (graduationYear: number): string => {
+    // Direct mapping based on graduation year
+    if (graduationYear >= 2030) return "High School";
+    if (graduationYear === 2029) return "Freshman";
+    if (graduationYear === 2028) return "Sophomore";
+    if (graduationYear === 2027) return "Junior";
+    if (graduationYear <= 2026) return "Senior";
     return "Unknown";
   };
 
@@ -105,7 +145,7 @@ export default function UserSettingsModal({
   const handleAddMajor = () => {
     if (!localProfile || localProfile.majors.length >= 3) return;
     const availableMajor = Object.keys(MAJORS).find(
-      (major) => !localProfile.majors.includes(major)
+      (major) => !localProfile.majors.includes(major),
     );
     if (availableMajor) {
       setLocalProfile({
@@ -186,52 +226,48 @@ export default function UserSettingsModal({
   if (!localProfile) return null;
 
   return (
-    <div className="fixed inset-0 bg-gray-950/90 backdrop-blur-sm z-50 flex items-center justify-center p-3 overflow-y-auto">
+    <div className="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-3 overflow-y-auto">
       <motion.div
         ref={modalRef}
-        initial={{ opacity: 0, y: 15 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="w-full max-w-md bg-gray-900 rounded-xl border border-gray-800 shadow-xl overflow-visible"
+        initial={{ opacity: 0, y: 15, scale: 0.98 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        transition={{ type: "spring", damping: 25, stiffness: 300 }}
+        className="w-full max-w-sm bg-gradient-to-br from-gray-900/90 via-gray-900/80 to-gray-950/90 rounded-2xl border border-white/[0.08] shadow-[0_24px_80px_rgba(0,0,0,0.5),0_0_120px_rgba(139,92,246,0.08),inset_0_1px_0_rgba(255,255,255,0.1),inset_0_-1px_0_rgba(0,0,0,0.3)] backdrop-blur-2xl ring-1 ring-white/[0.05] overflow-visible"
       >
-        <div className="p-5 max-h-[85vh] overflow-y-auto">
+        <div className="p-4 max-h-[85vh] overflow-y-auto">
           {/* Header */}
-          <div className="flex flex-col items-center mb-4">
-            <div className="relative mb-2.5">
-              {user.photoURL ? (
-                <img
-                  src={user.photoURL}
-                  alt="Profile"
-                  className="w-14 h-14 rounded-full object-cover border border-gray-700"
-                />
-              ) : (
-                <div className="w-14 h-14 rounded-full bg-gradient-to-br from-pink-500 to-purple-600 flex items-center justify-center text-white text-lg font-medium border border-gray-700">
-                  {user.displayName?.charAt(0) ||
-                    user.email?.charAt(0)?.toUpperCase()}
-                </div>
-              )}
+          <div className="flex flex-col items-center mb-3">
+            <div className="relative mb-2">
+              <UserAvatar
+                photoURL={user.photoURL}
+                displayName={user.displayName}
+                email={user.email}
+                size={48}
+                className="shadow-[0_4px_16px_rgba(0,0,0,0.4)] ring-1 ring-purple-500/20 border-white/20"
+              />
             </div>
-            <h2 className="text-lg font-semibold text-center text-gray-100">
+            <h2 className="text-base font-semibold text-center text-gray-100">
               {user.displayName || "User"}
             </h2>
-            <p className="text-gray-400 text-sm mt-0.5">{user.email}</p>
+            <p className="text-gray-400 text-xs">{user.email}</p>
             {localProfile.graduationYear && (
-              <div className="mt-1.5">
+              <div className="mt-1">
                 <YearBadge graduationYear={localProfile.graduationYear} />
               </div>
             )}
           </div>
 
           {/* Bio */}
-          <div className="mb-4 rounded-lg border border-gray-800 bg-gray-900/60">
-            <div className="flex items-center justify-between px-3 py-2 border-b border-gray-800">
-              <span className="text-sm font-medium text-gray-300">Bio</span>
+          <div className="mb-3 rounded-xl border border-white/[0.08] bg-gradient-to-br from-white/[0.06] via-transparent to-black/10 shadow-[0_2px_12px_rgba(0,0,0,0.2)] backdrop-blur-sm">
+            <div className="flex items-center justify-between px-3 py-2 border-b border-white/[0.06]">
+              <span className="text-xs font-medium text-gray-200">Bio</span>
               {!isEditingBio && (
                 <button
                   onClick={() => setIsEditingBio(true)}
-                  className="inline-flex items-center gap-1 text-xs px-2 py-1 rounded border border-gray-700 hover:border-pink-500 hover:bg-gray-900/60 text-gray-300 transition-colors"
+                  className="inline-flex items-center gap-1 text-[11px] px-2 py-1 rounded-lg border border-white/[0.08] hover:border-pink-500/50 hover:bg-white/[0.04] text-gray-400 hover:text-white transition-all duration-200"
                   title="Edit bio"
                 >
-                  <FiEdit2 className="h-3.5 w-3.5" />
+                  <FiEdit2 className="h-3 w-3" />
                   Edit
                 </button>
               )}
@@ -239,11 +275,11 @@ export default function UserSettingsModal({
             {!isEditingBio ? (
               <div className="px-3 py-2">
                 {localProfile.bio ? (
-                  <p className="text-gray-300 text-sm leading-snug">
+                  <p className="text-gray-300 text-xs leading-snug">
                     {localProfile.bio}
                   </p>
                 ) : (
-                  <p className="text-gray-500 text-sm italic">No bio yet</p>
+                  <p className="text-gray-500 text-xs italic">No bio yet</p>
                 )}
               </div>
             ) : (
@@ -255,60 +291,164 @@ export default function UserSettingsModal({
                     onChange={(e) => {
                       setTempBio(e.target.value);
                       setBioCount(e.target.value.length);
-                      // once user types again, clear the saved indicator
                       if (bioJustSaved) setBioJustSaved(false);
                     }}
                     placeholder="Tell us about yourself..."
                     maxLength={BIO_MAX}
-                    rows={3}
-                    className="w-full bg-gray-800 border border-gray-700 rounded px-3 py-2 pr-12 focus:outline-none focus:ring-1 focus:ring-pink-500 text-gray-200 placeholder:text-gray-500 text-sm resize-none"
+                    rows={2}
+                    className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 pr-10 focus:outline-none focus:ring-1 focus:ring-pink-500/40 focus:border-pink-500/50 text-gray-200 placeholder:text-gray-500 text-xs resize-none transition-all duration-200"
                   />
-                  <div className="absolute bottom-1.5 right-3 text-xs text-gray-500">
+                  <div className="absolute bottom-1 right-2 text-[10px] text-gray-500">
                     {bioCount}/{BIO_MAX}
                   </div>
                 </div>
-                <div className="flex justify-end gap-2">
+                <div className="flex justify-end gap-1.5">
                   <button
                     onClick={handleCancelBio}
                     disabled={isSavingBio}
-                    className="px-2.5 py-1 text-xs rounded border border-gray-700 hover:bg-gray-800/60 text-gray-300 disabled:opacity-70"
+                    className="px-2 py-1 text-[11px] rounded-lg border border-white/[0.08] hover:border-white/[0.15] hover:bg-white/[0.04] text-gray-300 disabled:opacity-70 transition-all duration-200"
                   >
                     Cancel
                   </button>
                   <button
                     onClick={handleSaveBio}
                     disabled={isSavingBio}
-                    className={`px-2.5 py-1 text-xs rounded text-white disabled:opacity-70 ${
+                    className={`px-2 py-1 text-[11px] rounded-lg text-white disabled:opacity-70 transition-all duration-200 ${
                       bioJustSaved
-                        ? "bg-emerald-600 hover:bg-emerald-700"
-                        : "bg-pink-600 hover:bg-pink-700"
+                        ? "bg-gradient-to-r from-emerald-500 to-emerald-600"
+                        : "bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700"
                     }`}
                   >
-                    {isSavingBio
-                      ? "Saving..."
-                      : bioJustSaved
-                        ? "Saved"
-                        : "Set bio"}
+                    {isSavingBio ? "..." : bioJustSaved ? "Saved" : "Save"}
                   </button>
                 </div>
               </div>
             )}
           </div>
 
+          {/* Friends Feature Toggle */}
+          <div className="mb-3 rounded-xl border border-white/[0.08] bg-gradient-to-br from-white/[0.06] via-transparent to-black/10 shadow-[0_2px_12px_rgba(0,0,0,0.2)] backdrop-blur-sm">
+            <div className="flex items-center justify-between px-3 py-2.5">
+              <div className="flex-1 mr-2">
+                <span className="text-xs font-medium text-gray-200">
+                  Friends Feature
+                </span>
+                <p className="text-[10px] text-gray-400 mt-0.5">
+                  Let friends see your courses (grades hidden)
+                </p>
+              </div>
+              <label className="relative inline-flex items-center cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={friendsEnabled}
+                  disabled={isTogglingFriends}
+                  onChange={async (e) => {
+                    if (!e.target.checked && friendsEnabled) {
+                      setShowDisableFriendsConfirm(true);
+                    } else {
+                      setIsTogglingFriends(true);
+                      try {
+                        await onToggleFriends(true);
+                      } finally {
+                        setIsTogglingFriends(false);
+                      }
+                    }
+                  }}
+                  className="sr-only peer"
+                />
+                <div className="w-9 h-5 bg-gray-800/80 border border-white/[0.08] peer-focus:outline-none peer-focus:ring-1 peer-focus:ring-pink-500/50 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-gradient-to-br after:from-white after:to-gray-200 after:rounded-full after:h-4 after:w-4 after:transition-all after:shadow-[0_1px_4px_rgba(0,0,0,0.3)] peer-checked:bg-gradient-to-r peer-checked:from-pink-500 peer-checked:to-purple-600 peer-disabled:opacity-50 shadow-[inset_0_1px_2px_rgba(0,0,0,0.3)]"></div>
+              </label>
+            </div>
+            {friendsEnabled && (
+              <div className="px-3 pb-2 -mt-1">
+                <p className="text-[10px] text-emerald-400">
+                  Course list visible to friends
+                </p>
+              </div>
+            )}
+          </div>
+
+          {/* Disable Friends Confirmation Modal */}
+          <AnimatePresence>
+            {showDisableFriendsConfirm && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="fixed inset-0 bg-black/70 backdrop-blur-md z-[9999] flex items-center justify-center p-4"
+                onClick={(e) => {
+                  if (e.target === e.currentTarget && !isTogglingFriends) {
+                    setShowDisableFriendsConfirm(false);
+                  }
+                }}
+              >
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.95, y: 10 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.95, y: 10 }}
+                  className="bg-gradient-to-br from-gray-900/95 via-gray-900/90 to-gray-950/95 border border-white/[0.1] rounded-2xl p-4 max-w-xs w-full shadow-[0_16px_48px_rgba(0,0,0,0.5)] backdrop-blur-2xl"
+                >
+                  <div className="flex items-center gap-2 mb-3">
+                    <div className="p-2 bg-gradient-to-br from-red-500/20 to-red-600/10 rounded-xl border border-red-500/20">
+                      <FiTrash2 className="text-red-400" size={16} />
+                    </div>
+                    <h3 className="text-sm font-semibold text-gray-100">
+                      Disable Friends?
+                    </h3>
+                  </div>
+                  <p className="text-gray-400 text-xs mb-3">
+                    This will <strong className="text-red-400">remove all friends</strong> and hide your courses.
+                  </p>
+                  <div className="flex justify-end gap-2">
+                    <button
+                      onClick={() => setShowDisableFriendsConfirm(false)}
+                      disabled={isTogglingFriends}
+                      className="px-3 py-1.5 rounded-lg border border-white/[0.08] hover:border-white/[0.15] hover:bg-white/[0.04] text-gray-300 text-xs disabled:opacity-50 transition-all duration-200"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      onClick={async () => {
+                        setIsTogglingFriends(true);
+                        try {
+                          await onToggleFriends(false);
+                          setShowDisableFriendsConfirm(false);
+                        } finally {
+                          setIsTogglingFriends(false);
+                        }
+                      }}
+                      disabled={isTogglingFriends}
+                      className="px-3 py-1.5 rounded-lg bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white text-xs disabled:opacity-50 flex items-center gap-1.5 transition-all duration-200"
+                    >
+                      {isTogglingFriends ? (
+                        <>
+                          <span className="animate-spin h-2.5 w-2.5 border-2 border-white/30 border-t-white rounded-full" />
+                          ...
+                        </>
+                      ) : (
+                        "Disable"
+                      )}
+                    </button>
+                  </div>
+                </motion.div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
           {/* Majors */}
-          <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-300 mb-1.5">
+          <div className="mb-3">
+            <label className="block text-xs font-medium text-gray-300 mb-1">
               Majors
             </label>
             {duplicateMajorError && (
-              <div className="mb-1 text-xs text-red-400">
+              <div className="mb-1 text-[10px] text-red-400">
                 {duplicateMajorError}
               </div>
             )}
-            <div className="space-y-2">
+            <div className="space-y-1.5">
               {localProfile.majors.map((major, index) => (
                 <div key={index} className="relative z-[60] overflow-visible">
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-1.5">
                     <div className="flex-1">
                       <MajorDropdown
                         value={major}
@@ -316,14 +456,14 @@ export default function UserSettingsModal({
                           handleMajorChange(index, newMajor)
                         }
                         disabledOptions={localProfile.majors.filter(
-                          (m) => m !== major
+                          (m) => m !== major,
                         )}
                       />
                     </div>
                     {index > 0 && (
                       <button
                         onClick={() => handleRemoveMajor(index)}
-                        className="text-red-400 hover:text-red-300 px-2 py-1 rounded hover:bg-red-400/10 transition-colors text-sm"
+                        className="text-red-400 hover:text-red-300 px-1.5 py-0.5 rounded hover:bg-red-400/10 transition-colors text-xs"
                         title="Remove major"
                       >
                         ×
@@ -335,7 +475,7 @@ export default function UserSettingsModal({
               {localProfile.majors.length < 2 && (
                 <button
                   onClick={handleAddMajor}
-                  className="text-xs text-pink-400 hover:text-pink-300 flex items-center gap-1"
+                  className="text-[11px] text-pink-400 hover:text-pink-300 flex items-center gap-1"
                   disabled={
                     Object.keys(MAJORS).length === localProfile.majors.length
                   }
@@ -347,80 +487,179 @@ export default function UserSettingsModal({
           </div>
 
           {/* Year */}
-          <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-300 mb-1.5">
+          <div className="mb-3">
+            <label className="block text-xs font-medium text-gray-300 mb-1">
               Graduation Year
             </label>
-            <input
-              type="number"
-              inputMode="numeric"
-              min={new Date().getFullYear()}
-              max={new Date().getFullYear() + 4}
-              value={localProfile.graduationYear}
-              onChange={(e) =>
-                setLocalProfile({
-                  ...localProfile,
-                  graduationYear: Number.isNaN(parseInt(e.target.value))
-                    ? localProfile.graduationYear
-                    : parseInt(e.target.value),
-                })
-              }
-              className="w-full bg-gray-800 border border-gray-700 rounded px-3 py-2 focus:outline-none focus:ring-1 focus:ring-pink-500 text-gray-200 text-sm"
-            />
+            <div className="relative">
+              <select
+                value={localProfile.graduationYear}
+                onChange={(e) =>
+                  setLocalProfile({
+                    ...localProfile,
+                    graduationYear: parseInt(e.target.value),
+                  })
+                }
+                className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-pink-500/40 focus:border-pink-500/50 text-gray-200 text-xs transition-all duration-200 appearance-none cursor-pointer"
+              >
+                {[2026, 2027, 2028, 2029, 2030].map((year) => (
+                  <option key={year} value={year}>
+                    {year}
+                  </option>
+                ))}
+              </select>
+              <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
+                <FiChevronDown size={14} />
+              </div>
+            </div>
           </div>
 
           {/* Footer links */}
-          <div className="mt-2 flex items-center justify-center gap-2 relative">
+          <div className="mt-2 flex items-center justify-center gap-1.5 relative">
             <Link
               href={`/user/${user.uid}`}
-              className="cursor-pointer text-xs px-3 py-1.5 rounded border border-gray-800 hover:border-pink-500 hover:bg-gray-900/50 text-gray-300"
+              className="cursor-pointer text-[11px] px-3 py-1.5 rounded-lg border border-white/[0.08] hover:border-pink-500/50 hover:bg-white/[0.04] text-gray-400 hover:text-white transition-all duration-200"
             >
-              View your public profile
+              View public profile
             </Link>
             <div className="relative group">
-              <Info className="h-3.5 w-3.5 text-gray-400 hover:text-gray-200 transition-colors cursor-pointer" />
-              <div className="absolute top-full mt-1 left-1/2 -translate-x-1/2 bg-gray-800 text-gray-300 text-[11px] px-2 py-0.5 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-[70] pointer-events-none border border-gray-700">
-                Visible to friends only
+              <Info className="h-3 w-3 text-gray-500 hover:text-gray-300 transition-colors cursor-pointer" />
+              <div className="absolute top-full mt-1 left-1/2 -translate-x-1/2 bg-gray-800 text-gray-300 text-[10px] px-1.5 py-0.5 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-[70] pointer-events-none border border-gray-700">
+                Friends only
               </div>
             </div>
           </div>
 
           {/* Actions */}
-          <div className="flex justify-between mt-4">
-            <motion.button
-              onHoverStart={() => setIsHoveringLogout(true)}
-              onHoverEnd={() => setIsHoveringLogout(false)}
-              onClick={onLogout}
-              className="flex items-center justify-center gap-1.5 px-3 py-1.5 rounded border border-gray-800 hover:border-gray-700 text-gray-200 text-sm"
-            >
-              <span>Sign out</span>
-              <motion.div
-                animate={isHoveringLogout ? { x: 1 } : { x: 0 }}
-                transition={{ type: "spring", stiffness: 500 }}
+          <div className="flex justify-between mt-3">
+            <div className="flex items-center gap-1.5">
+              <motion.button
+                onHoverStart={() => setIsHoveringLogout(true)}
+                onHoverEnd={() => setIsHoveringLogout(false)}
+                onClick={onLogout}
+                className="flex items-center justify-center gap-1 px-3 py-1.5 rounded-lg border border-white/[0.08] hover:border-white/[0.15] hover:bg-white/[0.04] text-gray-300 text-xs transition-all duration-200"
               >
-                <FiLogOut size={14} />
-              </motion.div>
-            </motion.button>
-            <div className="flex gap-2">
+                <span>Sign out</span>
+                <motion.div
+                  animate={isHoveringLogout ? { x: 1 } : { x: 0 }}
+                  transition={{ type: "spring", stiffness: 500 }}
+                >
+                  <FiLogOut size={12} />
+                </motion.div>
+              </motion.button>
+
+              {/* More menu */}
+              <div className="relative" ref={moreMenuRef}>
+                <button
+                  onClick={() => setShowMoreMenu(!showMoreMenu)}
+                  className="p-1.5 rounded-lg border border-white/[0.08] hover:border-white/[0.15] hover:bg-white/[0.04] text-gray-400 hover:text-gray-200 transition-all duration-200"
+                  title="More options"
+                >
+                  <FiMoreVertical size={14} />
+                </button>
+
+                <AnimatePresence>
+                  {showMoreMenu && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -5, scale: 0.95 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: -5, scale: 0.95 }}
+                      className="absolute bottom-full left-0 mb-1.5 w-36 bg-gradient-to-br from-gray-800/95 to-gray-900/95 border border-white/[0.1] rounded-xl shadow-[0_4px_16px_rgba(0,0,0,0.4)] backdrop-blur-xl overflow-hidden z-[80]"
+                    >
+                      <button
+                        onClick={() => {
+                          setShowMoreMenu(false);
+                          setShowDeleteConfirm(true);
+                        }}
+                        className="w-full flex items-center gap-2 px-3 py-2 text-red-400 hover:bg-red-500/10 hover:text-red-300 text-xs transition-all duration-200"
+                      >
+                        <FiTrash2 size={12} />
+                        Delete Account
+                      </button>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            </div>
+            <div className="flex gap-1.5">
               <button
                 onClick={onClose}
-                className="px-3 py-1.5 rounded border border-gray-700 hover:bg-gray-800/50 text-gray-200 text-sm"
+                className="px-3 py-1.5 rounded-lg border border-white/[0.08] hover:border-white/[0.15] hover:bg-white/[0.04] text-gray-300 text-xs transition-all duration-200"
               >
                 Cancel
               </button>
               <button
                 onClick={handleSave}
                 disabled={isSaving || !hasChanges() || hasDuplicateMajors()}
-                className={`px-3 py-1.5 rounded text-sm ${
+                className={`px-3 py-1.5 rounded-lg text-xs transition-all duration-200 ${
                   hasChanges() && !hasDuplicateMajors() && !isSaving
-                    ? "bg-pink-600 hover:bg-pink-700 text-white"
-                    : "bg-gray-800 text-gray-500 cursor-not-allowed"
+                    ? "bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white"
+                    : "bg-gray-800/50 text-gray-500 cursor-not-allowed border border-white/[0.05]"
                 }`}
               >
-                {isSaving ? "Saving..." : "Save"}
+                {isSaving ? "..." : "Save"}
               </button>
             </div>
           </div>
+
+          {/* Delete Account Confirmation Modal */}
+          <AnimatePresence>
+            {showDeleteConfirm && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="fixed inset-0 bg-black/70 backdrop-blur-md z-[9999] flex items-center justify-center p-4"
+                onClick={(e) => {
+                  if (e.target === e.currentTarget && !isDeleting) {
+                    setShowDeleteConfirm(false);
+                  }
+                }}
+              >
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.95, y: 10 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.95, y: 10 }}
+                  className="bg-gradient-to-br from-gray-900/95 via-gray-900/90 to-gray-950/95 border border-white/[0.1] rounded-2xl p-4 max-w-xs w-full shadow-[0_16px_48px_rgba(0,0,0,0.5)] backdrop-blur-2xl"
+                >
+                  <div className="flex items-center gap-2 mb-3">
+                    <div className="p-2 bg-gradient-to-br from-red-500/20 to-red-600/10 rounded-xl border border-red-500/20">
+                      <FiTrash2 className="text-red-400" size={16} />
+                    </div>
+                    <h3 className="text-sm font-semibold text-gray-100">
+                      Delete Account
+                    </h3>
+                  </div>
+                  <p className="text-gray-400 text-xs mb-3">
+                    Permanently remove all data including courses, friends, and conversations. Cannot be undone.
+                  </p>
+                  <div className="flex justify-end gap-2">
+                    <button
+                      onClick={() => setShowDeleteConfirm(false)}
+                      disabled={isDeleting}
+                      className="px-3 py-1.5 rounded-lg border border-white/[0.08] hover:border-white/[0.15] hover:bg-white/[0.04] text-gray-300 text-xs disabled:opacity-50 transition-all duration-200"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      onClick={handleDeleteAccount}
+                      disabled={isDeleting}
+                      className="px-3 py-1.5 rounded-lg bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white text-xs disabled:opacity-50 flex items-center gap-1.5 transition-all duration-200"
+                    >
+                      {isDeleting ? (
+                        <>
+                          <span className="animate-spin h-2.5 w-2.5 border-2 border-white/30 border-t-white rounded-full" />
+                          ...
+                        </>
+                      ) : (
+                        "Delete"
+                      )}
+                    </button>
+                  </div>
+                </motion.div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       </motion.div>
     </div>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   FiChevronDown,
@@ -9,18 +9,27 @@ import {
   FiPlus,
   FiTrash2,
 } from "react-icons/fi";
+import { Info } from "lucide-react";
 import { Course } from "@/lib/types";
-import { getCourseNameFromCode } from "@/lib/courseCatalog";
+import { getCourseNameFromCode, getCanonicalCode } from "@/lib/courseCatalog";
+import toast from "react-hot-toast";
 import { useAuth } from "@/context/AuthContext";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import { db } from "@/config/firebase";
 import ManualCourseLookupModal from "./ManualCourseLookupModal";
-import { truncate } from "@/lib/utils/utils";
-import { Info } from "lucide-react";
+import SimulatorManualAssignModal from "./SimulatorManualAssignModal";
+import SimulatorRequirementsBreakdown from "./SimulatorRequirementsBreakdown";
+import {
+  calculatePreviewMajorProgressByMajors,
+  MajorProgress,
+  ManualRequirementEntry,
+  majorRequirements,
+} from "@/lib/majors";
 
+// ----------------- Types -----------------
 interface Semester {
   id: string;
-  name: string;
+  name: string; // e.g. "Fall 2026"
   courses: Course[];
 }
 
@@ -28,47 +37,96 @@ interface SimulatorProps {
   remainingCourses: Course[];
   completedCourses: Course[];
   graduationYear: number;
+  userMajors: string[];
+  onNavigationAttempt?: (callback: () => void) => void;
 }
 
-// --- Credit helpers ---
-const getCourseCredits = (c: Course): number => {
-  // Adjust keys to match your schema if needed
-  const raw =
-    (c as any).credits ??
-    (c as any).credit ??
-    (c as any).units ??
-    (c as any).yaleCredits ??
-    (c as any).ECTS;
+type Plan = {
+  name: string;
+  semesters: Semester[];
+  manualRequirements?: ManualRequirementEntry[];
+  createdAt: string; // ISO
+};
 
-  const n = typeof raw === "string" ? parseFloat(raw) : Number(raw);
-  return Number.isFinite(n) ? n : 1; // default to 1 if missing
+type PreviewProgressMap = Record<string, MajorProgress>;
+
+type PlannedCoursePick = Pick<Course, "code" | "status"> & {
+  status: "in-progress"; // coerced for preview semantics
+};
+
+type MaybeCreditFields = Partial<{
+  credits: number | string;
+  credit: number | string;
+  units: number | string;
+  yaleCredits: number | string;
+  ECTS: number | string;
+}>;
+
+// ----------------- Helpers -----------------
+const getCourseCredits = (c: Course & MaybeCreditFields): number => {
+  const raw = c.credits ?? c.credit ?? c.units ?? c.yaleCredits ?? c.ECTS;
+
+  const n =
+    typeof raw === "string"
+      ? parseFloat(raw)
+      : typeof raw === "number"
+        ? raw
+        : NaN;
+
+  return Number.isFinite(n) ? (n as number) : 1; // default to 1 if missing
 };
 
 const getSemesterCredits = (sem: Semester): number =>
-  sem.courses.reduce((sum, c) => sum + getCourseCredits(c), 0);
+  sem.courses.reduce(
+    (sum, c) => sum + getCourseCredits(c as Course & MaybeCreditFields),
+    0,
+  );
 
 function compareSemesters(a: string, b: string) {
   const [semA, yearA] = a.split(" ");
   const [semB, yearB] = b.split(" ");
   const yA = parseInt(yearA, 10);
   const yB = parseInt(yearB, 10);
-
   if (yA !== yB) return yA - yB;
-  const order = { Spring: 0, Fall: 1 };
-  return order[semA as keyof typeof order] - order[semB as keyof typeof order];
+  const order: Record<"Spring" | "Fall", number> = { Spring: 0, Fall: 1 };
+  return order[semA as "Spring" | "Fall"] - order[semB as "Spring" | "Fall"];
 }
 
+function isPastSemester(semesterName: string) {
+  const [sem, yearStr] = semesterName.split(" ");
+  const year = parseInt(yearStr, 10);
+  const now = new Date();
+  const currentYear = now.getFullYear();
+  const currentMonth = now.getMonth(); // 0 = Jan
+
+  if (year < currentYear) return true;
+  if (year > currentYear) return false;
+
+  // Coarse cutoffs so you can't alter clearly past terms:
+  // treat Feb+ as "Fall is in the past"; treat Jun+ as "Spring is in the past"
+  if (sem === "Fall" && currentMonth > 1) return true; // > Feb
+  if (sem === "Spring" && currentMonth > 5) return true; // > Jun
+  return false;
+}
+
+// ----------------- Component -----------------
 export default function Simulator({
   remainingCourses,
   completedCourses,
   graduationYear,
+  userMajors,
+  onNavigationAttempt,
 }: SimulatorProps) {
   const { user } = useAuth();
+
   const [semesters, setSemesters] = useState<Semester[]>([]);
   const [availableCourses, setAvailableCourses] = useState<Course[]>([]);
   const [draggedCourse, setDraggedCourse] = useState<Course | null>(null);
+  const [dragSourceSemester, setDragSourceSemester] = useState<string | null>(
+    null,
+  );
   const [showHelp, setShowHelp] = useState(false);
-  const [savedPlans, setSavedPlans] = useState<any[]>([]);
+  const [savedPlans, setSavedPlans] = useState<Plan[]>([]);
   const [planName, setPlanName] = useState("");
   const [showSaveModal, setShowSaveModal] = useState(false);
   const [showPlansModal, setShowPlansModal] = useState(false);
@@ -78,26 +136,147 @@ export default function Simulator({
     number | null
   >(null);
   const [hasChanges, setHasChanges] = useState(false);
-  const initialSemestersRef = useRef<Semester[]>([]);
   const [showPool, setShowPool] = useState(false);
+  // Plan selector modal shown on initial load
+  const [showPlanSelector, setShowPlanSelector] = useState(false);
+  const [plansLoaded, setPlansLoaded] = useState(false);
+  // Track currently loaded plan
+  const [currentPlanName, setCurrentPlanName] = useState<string | null>(null);
+  // Unsaved changes leave confirmation
+  const [showLeaveConfirm, setShowLeaveConfirm] = useState(false);
+  const [pendingLeaveCallback, setPendingLeaveCallback] = useState<(() => void) | null>(null);
 
+  // Simulator-local manual requirements (plan-scoped, NOT in Firebase courses)
+  const [simulatorManualReqs, setSimulatorManualReqs] = useState<
+    ManualRequirementEntry[]
+  >([]);
+  // Manual assignment modal state
+  const [manualAssignPending, setManualAssignPending] = useState<{
+    course: Course;
+    semesterId: string;
+  } | null>(null);
+
+  // Preview state
+  const [previewProgress, setPreviewProgress] = useState<PreviewProgressMap>(
+    {},
+  );
+  const [isPreviewLoading, setIsPreviewLoading] = useState<boolean>(false);
+  const [previewError, setPreviewError] = useState<string | null>(null);
+
+  // keep initial snapshot to detect changes
+  const initialSemestersRef = useRef<Semester[]>([]);
+  const initialManualReqsRef = useRef<ManualRequirementEntry[]>([]);
+
+  // majors to compute – only the user's declared majors
+  const majorIds = useMemo<string[]>(() => userMajors, [userMajors]);
+
+  // Auto-detect: does a course code appear in any requirement option across all user majors?
+  const isCourseInAnyRequirement = useMemo(() => {
+    const allOptionCodes = new Set<string>();
+    for (const majorId of majorIds) {
+      const major = majorRequirements[majorId];
+      if (!major) continue;
+      for (const req of major.requirements) {
+        for (const opt of req.options) {
+          if (opt.type === "course") {
+            allOptionCodes.add(opt.code);
+            const canon = getCanonicalCode(opt.code);
+            if (canon) allOptionCodes.add(canon);
+          } else if (opt.type === "group") {
+            for (const code of (opt as { type: "group"; options: string[] })
+              .options) {
+              allOptionCodes.add(code);
+              const canon = getCanonicalCode(code);
+              if (canon) allOptionCodes.add(canon);
+            }
+          }
+        }
+      }
+    }
+    return (courseCode: string): boolean => {
+      const canon = getCanonicalCode(courseCode) || courseCode;
+      return allOptionCodes.has(courseCode) || allOptionCodes.has(canon);
+    };
+  }, [majorIds]);
+
+  // Find which requirement(s) a course matches for toast notification
+  const getMatchedRequirements = useMemo(() => {
+    return (courseCode: string): { majorName: string; requirementName: string }[] => {
+      const matches: { majorName: string; requirementName: string }[] = [];
+      const canon = getCanonicalCode(courseCode) || courseCode;
+
+      for (const majorId of majorIds) {
+        const major = majorRequirements[majorId];
+        if (!major) continue;
+
+        for (const req of major.requirements) {
+          let found = false;
+          for (const opt of req.options) {
+            if (opt.type === "course") {
+              const optCanon = getCanonicalCode(opt.code) || opt.code;
+              if (opt.code === courseCode || opt.code === canon || optCanon === courseCode || optCanon === canon) {
+                found = true;
+                break;
+              }
+            } else if (opt.type === "group") {
+              for (const code of (opt as { type: "group"; options: string[] }).options) {
+                const codeCanon = getCanonicalCode(code) || code;
+                if (code === courseCode || code === canon || codeCanon === courseCode || codeCanon === canon) {
+                  found = true;
+                  break;
+                }
+              }
+            }
+            if (found) break;
+          }
+          if (found) {
+            matches.push({ majorName: major.name, requirementName: req.name });
+          }
+        }
+      }
+      return matches;
+    };
+  }, [majorIds]);
+
+  // Show toast for auto-matched course
+  const showAutoMatchToast = (courseCode: string) => {
+    const matches = getMatchedRequirements(courseCode);
+    if (matches.length === 0) return;
+
+    const firstMatch = matches[0];
+
+    if (matches.length === 1) {
+      toast.success(
+        `Auto-detected match: "${firstMatch.requirementName}" (${firstMatch.majorName})`,
+        { duration: 3000 }
+      );
+    } else {
+      toast.success(
+        `Auto-detected match: "${firstMatch.requirementName}" (${firstMatch.majorName}) +${matches.length - 1} more`,
+        { duration: 3000 }
+      );
+    }
+  };
+
+  // ------------ Build initial semesters & pools ------------
   useEffect(() => {
-    // 1. Build semester list
+    // 1) Build semester list starting from earliest known term or grad - 4y
     let semestersArr: Semester[] = [];
     let startYear = graduationYear - 4;
     let startSemester: "Fall" | "Spring" = "Fall";
 
     if (completedCourses.length > 0) {
-      let minYear = Math.min(...completedCourses.map((c) => c.year));
-      let minSem = "Fall";
+      const minYear = Math.min(...completedCourses.map((c) => c.year));
       const coursesInMinYear = completedCourses.filter(
-        (c) => c.year === minYear
+        (c) => c.year === minYear,
       );
-      if (coursesInMinYear.some((c) => c.semester === "Spring")) {
-        minSem = "Spring";
-      }
+      const minSem: "Fall" | "Spring" = coursesInMinYear.some(
+        (c) => c.semester === "Spring",
+      )
+        ? "Spring"
+        : "Fall";
       startYear = minYear;
-      startSemester = minSem as "Fall" | "Spring";
+      startSemester = minSem;
     }
 
     let year = startYear;
@@ -119,102 +298,220 @@ export default function Simulator({
       }
     }
 
-    // 2. Assign completed/in-progress courses
+    // 2) Assign completed/in-progress courses to their terms
     completedCourses.forEach((course) => {
       const idx = semestersArr.findIndex(
-        (s) => s.name === `${course.semester} ${course.year}`
+        (s) => s.name === `${course.semester} ${course.year}`,
       );
       if (idx !== -1) {
-        (semestersArr[idx].courses as Course[]).push(course);
+        semestersArr[idx].courses.push(course);
       }
     });
 
     setSemesters(semestersArr);
-    // Set initial snapshot **after** assigning completed/in-progress courses!
-    initialSemestersRef.current = JSON.parse(JSON.stringify(semestersArr));
+    initialSemestersRef.current = JSON.parse(
+      JSON.stringify(semestersArr),
+    ) as Semester[];
 
+    // 3) Build pool of available (not-taken & not already taken)
     setAvailableCourses(
       remainingCourses.filter(
         (rc) =>
           !completedCourses.some((cc) => cc.code === rc.code) &&
-          rc.status === "not-taken"
-      )
+          rc.status === "not-taken",
+      ),
     );
   }, [graduationYear, remainingCourses, completedCourses]);
 
-  // Check for changes
+  // ------------ Change detection ------------
   useEffect(() => {
     if (initialSemestersRef.current.length === 0) return;
 
-    const currentCourses = semesters.flatMap((s) =>
-      s.courses.map((c) => c.code)
+    // Create a set of "semesterId:courseCode" to detect both additions/deletions AND moves
+    const currentPlacements = new Set(
+      semesters.flatMap((s) =>
+        s.courses
+          .filter((c) => c.status === "not-taken") // Only track planned courses
+          .map((c) => `${s.id}:${c.code}`)
+      )
     );
-    const initialCourses = initialSemestersRef.current.flatMap((s) =>
-      s.courses.map((c) => c.code)
+    const initialPlacements = new Set(
+      initialSemestersRef.current.flatMap((s) =>
+        s.courses
+          .filter((c) => c.status === "not-taken")
+          .map((c) => `${s.id}:${c.code}`)
+      )
     );
 
-    const coursesChanged =
-      currentCourses.length !== initialCourses.length ||
-      !currentCourses.every((code) => initialCourses.includes(code)) ||
-      !initialCourses.every((code) => currentCourses.includes(code));
+    // Check if sets are different (different size or different contents)
+    const placementsChanged =
+      currentPlacements.size !== initialPlacements.size ||
+      Array.from(currentPlacements).some((p) => !initialPlacements.has(p)) ||
+      Array.from(initialPlacements).some((p) => !currentPlacements.has(p));
 
-    setHasChanges(coursesChanged);
-  }, [semesters]);
+    // Compare manual requirements against initial state
+    const currentManualKeys = new Set(
+      simulatorManualReqs.map((m) => `${m.code}:${m.requirement}`)
+    );
+    const initialManualKeys = new Set(
+      initialManualReqsRef.current.map((m) => `${m.code}:${m.requirement}`)
+    );
+    const manualReqsChanged =
+      currentManualKeys.size !== initialManualKeys.size ||
+      Array.from(currentManualKeys).some((k) => !initialManualKeys.has(k)) ||
+      Array.from(initialManualKeys).some((k) => !currentManualKeys.has(k));
 
-  // Assign completed courses to semesters
-  // useEffect(() => {
-  //   if (!semesters.length || !completedCourses.length) return;
+    const changed = placementsChanged || manualReqsChanged;
 
-  //   const updatedSemesters = semesters.map((sem) => ({
-  //     ...sem,
-  //     courses: [],
-  //   }));
+    setHasChanges(changed);
+  }, [semesters, simulatorManualReqs]);
 
-  //   completedCourses.forEach((course) => {
-  //     const idx = updatedSemesters.findIndex(
-  //       (s) => s.name === `${course.semester} ${course.year}`
-  //     );
-  //     if (idx !== -1) {
-  //       (updatedSemesters[idx].courses as Course[]).push(course);
-  //     }
-  //   });
+  // ------------ Saved plans load ------------
+  useEffect(() => {
+    if (!user) return;
+    const loadSavedPlans = async () => {
+      try {
+        const docRef = doc(db, "users", user.uid);
+        const docSnap = await getDoc(docRef);
+        const data = docSnap.exists()
+          ? (docSnap.data() as { savedPlans?: Plan[] })
+          : null;
+        if (data?.savedPlans) {
+          setSavedPlans(data.savedPlans);
+          // Show plan selector on initial load if user has saved plans
+          if (data.savedPlans.length > 0) {
+            setShowPlanSelector(true);
+          }
+        }
+        setPlansLoaded(true);
+      } catch (e) {
+        console.error("Error loading saved plans:", e);
+        setPlansLoaded(true);
+      }
+    };
+    loadSavedPlans();
+  }, [user]);
 
-  //   setSemesters(updatedSemesters);
-  // }, [completedCourses, semesters.length]);
+  // ------------ Keyboard handler for modals ------------
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        if (showLeaveConfirm) setShowLeaveConfirm(false);
+        if (showPlanSelector) setShowPlanSelector(false);
+        if (showSaveModal) {
+          setShowSaveModal(false);
+          setSelectedPlanToOverwrite(null);
+          setPlanName("");
+        }
+        if (showPlansModal) setShowPlansModal(false);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [showLeaveConfirm, showPlanSelector, showSaveModal, showPlansModal]);
 
-  function isPastSemester(semesterName: string) {
-    const [sem, yearStr] = semesterName.split(" ");
-    const year = parseInt(yearStr, 10);
-    const now = new Date();
-    const currentYear = now.getFullYear();
-    const currentMonth = now.getMonth();
+  // ------------ Browser beforeunload warning ------------
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (hasChanges) {
+        e.preventDefault();
+        e.returnValue = "You have unsaved changes. Are you sure you want to leave?";
+        return e.returnValue;
+      }
+    };
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+  }, [hasChanges]);
 
-    if (year < currentYear) return true;
-    if (year > currentYear) return false;
-    if (sem === "Fall" && currentMonth > 1) return true;
-    if (sem === "Spring" && currentMonth > 5) return true;
-    return false;
-  }
+  // ------------ In-app navigation attempt handler ------------
+  useEffect(() => {
+    if (onNavigationAttempt) {
+      // Wrap in arrow function to avoid React's functional setState interpretation
+      onNavigationAttempt(() => (callback: () => void) => {
+        if (hasChanges) {
+          setPendingLeaveCallback(() => callback);
+          setShowLeaveConfirm(true);
+        } else {
+          callback();
+        }
+      });
+    }
+  }, [onNavigationAttempt, hasChanges]);
 
-  // DRAG-AND-DROP LOGIC
-  const handleDragStart = (course: Course) => setDraggedCourse(course);
+  const handleConfirmLeave = () => {
+    setShowLeaveConfirm(false);
+    if (pendingLeaveCallback) {
+      pendingLeaveCallback();
+      setPendingLeaveCallback(null);
+    }
+  };
+
+  const handleCancelLeave = () => {
+    setShowLeaveConfirm(false);
+    setPendingLeaveCallback(null);
+  };
+
+  // ------------ Drag & Drop ------------
+  const playPopSound = () => {
+    const audio = new Audio('/audio/pop.mp3');
+    audio.volume = 0.5;
+    audio.play().catch(() => {}); // Ignore errors if audio can't play
+  };
+
+  const handleDragStart = (course: Course, sourceSemesterId?: string) => {
+    setDraggedCourse(course);
+    setDragSourceSemester(sourceSemesterId ?? null);
+  };
 
   const handleDrop = (semesterId: string) => {
     if (!draggedCourse) return;
 
+    // Dropping back on the same semester — no-op
+    if (dragSourceSemester === semesterId) {
+      setDraggedCourse(null);
+      setDragSourceSemester(null);
+      return;
+    }
+
+    // Play pop sound on successful drop
+    playPopSound();
+
     setSemesters((prev) =>
-      prev.map((sem) =>
-        sem.id === semesterId
-          ? sem.courses.some((c) => c.code === draggedCourse.code)
+      prev.map((sem) => {
+        // Remove from source semester (inter-semester move)
+        if (dragSourceSemester && sem.id === dragSourceSemester) {
+          return {
+            ...sem,
+            courses: sem.courses.filter((c) => c.code !== draggedCourse.code),
+          };
+        }
+        // Add to target semester (if not already there)
+        if (sem.id === semesterId) {
+          return sem.courses.some((c) => c.code === draggedCourse.code)
             ? sem
-            : { ...sem, courses: [...sem.courses, draggedCourse] }
-          : sem
-      )
+            : { ...sem, courses: [...sem.courses, draggedCourse] };
+        }
+        return sem;
+      }),
     );
-    setAvailableCourses((prev) =>
-      prev.filter((c) => c.code !== draggedCourse.code)
-    );
+
+    // Only remove from pool if dragged from pool (not from another semester)
+    if (!dragSourceSemester) {
+      setAvailableCourses((prev) =>
+        prev.filter((c) => c.code !== draggedCourse.code),
+      );
+
+      // Auto-detect: prompt manual assignment if not in any requirement
+      if (!isCourseInAnyRequirement(draggedCourse.code)) {
+        setManualAssignPending({ course: draggedCourse, semesterId });
+      } else {
+        // Show toast for auto-matched course
+        showAutoMatchToast(draggedCourse.code);
+      }
+    }
+
     setDraggedCourse(null);
+    setDragSourceSemester(null);
   };
 
   const removeCourseFromSemester = (semesterId: string, courseCode: string) => {
@@ -223,61 +520,172 @@ export default function Simulator({
         sem.id === semesterId
           ? {
               ...sem,
-              courses: sem.courses.filter(
-                (c): c is Course => !!c && c.code !== courseCode
-              ),
+              courses: sem.courses.filter((c) => c && c.code !== courseCode),
             }
-          : sem
-      )
+          : sem,
+      ),
     );
+
+    // Clean up any simulator manual reqs for this course
+    setSimulatorManualReqs((prev) => prev.filter((m) => m.code !== courseCode));
+
     const rc = remainingCourses.find((c) => c.code === courseCode);
     if (rc && rc.status === "not-taken") {
       setAvailableCourses((prev) =>
-        prev.some((c) => c.code === rc.code) ? prev : [...prev, rc]
+        prev.some((c) => c.code === rc.code) ? prev : [...prev, rc],
       );
     }
   };
 
-  // SAVING & LOADING PLANS
-  useEffect(() => {
-    if (!user) return;
-    const loadSavedPlans = async () => {
-      try {
-        const docRef = doc(db, "users", user.uid);
-        const docSnap = await getDoc(docRef);
-        if (docSnap.exists() && docSnap.data().savedPlans) {
-          setSavedPlans(docSnap.data().savedPlans);
+  // ------------ Planned set (for preview) ------------
+  const plannedNow = useMemo<PlannedCoursePick[]>(() => {
+    const codes = new Set<string>();
+    const list: PlannedCoursePick[] = [];
+    semesters.forEach((s) => {
+      s.courses.forEach((c) => {
+        if (c?.code && c.status === "not-taken" && !codes.has(c.code)) {
+          codes.add(c.code);
+          list.push({ code: c.code, status: "in-progress" });
         }
-      } catch (e) {
-        console.error("Error loading saved plans:", e);
-      }
-    };
-    loadSavedPlans();
-  }, [user]);
+      });
+    });
+    return list;
+  }, [semesters]);
 
+  const plannedCodes = useMemo<string[]>(
+    () => plannedNow.map((c) => c.code),
+    [plannedNow],
+  );
+
+  // ------------ Live preview progress (local compute) ------------
+  useEffect(() => {
+    if (!user) {
+      setPreviewProgress({});
+      return;
+    }
+
+    setIsPreviewLoading(true);
+    setPreviewError(null);
+
+    // Inputs for progress calc
+    const completedCodes = completedCourses.map((c) => c.code);
+    const inProgCodes = semesters.flatMap((s) =>
+      s.courses.filter((c) => c.status === "in-progress").map((c) => c.code),
+    );
+    const plannedCodesLocal = plannedCodes; // from memo
+    const skippedCodes: string[] = []; // wire up if you track skips
+
+    // Extract permanent manual fulfillments from Firebase courses
+    const permanentManualReqs: ManualRequirementEntry[] =
+      completedCourses.flatMap((course) =>
+        (course.manualRequirementsFulfilled || [])
+          .filter((m) => majorIds.includes(m.major_id))
+          .map((m) => ({
+            code: course.code,
+            requirement: m.requirement_title,
+            credits: course.credits || 1,
+          })),
+      );
+
+    // Merge permanent manual reqs with simulator-local manual reqs
+    // Simulator manuals are ALWAYS planned (for future courses)
+    const manualReqs = [
+      ...permanentManualReqs,
+      ...simulatorManualReqs.map((m) => ({ ...m, isPlanned: true })),
+    ];
+
+    try {
+      // 1) Batch compute for all majors
+      const all = calculatePreviewMajorProgressByMajors(
+        majorIds,
+        completedCodes,
+        inProgCodes,
+        skippedCodes,
+        manualReqs,
+        plannedCodesLocal,
+      );
+
+      setPreviewProgress(all);
+    } catch (batchErr) {
+      // 2) Fallback: compute per-major so one bad major doesn't break others
+      console.error("[PreviewProgress] batch compute failed:", batchErr);
+      const result: PreviewProgressMap = {};
+      let successes = 0;
+      let failures = 0;
+
+      for (const mid of majorIds) {
+        try {
+          const one = calculatePreviewMajorProgressByMajors(
+            [mid],
+            completedCodes,
+            inProgCodes,
+            skippedCodes,
+            manualReqs,
+            plannedCodesLocal,
+          )[mid];
+
+          if (one) {
+            // keep only majors with any signal
+            if (
+              (one.completedCredits ?? 0) > 0 ||
+              (one.inProgressCredits ?? 0) > 0
+            ) {
+              result[mid] = one;
+              successes++;
+            }
+          }
+        } catch (perErr) {
+          failures++;
+          console.error(`[PreviewProgress] failed for major "${mid}":`, perErr);
+        }
+      }
+
+      setPreviewProgress(result);
+
+      if (successes === 0) {
+        setPreviewError("Could not load simulated major progress.");
+      }
+    } finally {
+      setIsPreviewLoading(false);
+    }
+  }, [
+    user,
+    majorIds,
+    semesters,
+    completedCourses,
+    plannedCodes,
+    simulatorManualReqs,
+  ]);
+
+  // ------------ Save / Load / Delete Plans ------------
   const savePlan = async () => {
     if (!user || !planName.trim()) return;
     try {
-      const newPlan = {
-        name: planName,
+      const savedName = planName.trim();
+      const newPlan: Plan = {
+        name: savedName,
         semesters,
+        manualRequirements: simulatorManualReqs,
         createdAt: new Date().toISOString(),
       };
 
-      let updatedPlans;
-      if (selectedPlanToOverwrite !== null) {
-        updatedPlans = [...savedPlans];
-        updatedPlans[selectedPlanToOverwrite] = newPlan;
-      } else {
-        updatedPlans = [...savedPlans, newPlan];
-      }
+      const updatedPlans: Plan[] =
+        selectedPlanToOverwrite !== null
+          ? savedPlans.map((p, i) =>
+              i === selectedPlanToOverwrite ? newPlan : p,
+            )
+          : [...savedPlans, newPlan];
 
       await setDoc(
         doc(db, "users", user.uid),
         { savedPlans: updatedPlans },
-        { merge: true }
+        { merge: true },
       );
       setSavedPlans(updatedPlans);
+      setCurrentPlanName(savedName);
+      // Update initial snapshots so hasChanges resets
+      initialSemestersRef.current = JSON.parse(JSON.stringify(semesters)) as Semester[];
+      initialManualReqsRef.current = [...simulatorManualReqs];
       setPlanName("");
       setSelectedPlanToOverwrite(null);
       setShowSaveModal(false);
@@ -289,32 +697,44 @@ export default function Simulator({
   const loadPlan = (planIndex: number) => {
     if (planIndex < 0 || planIndex >= savedPlans.length) return;
     const plan = savedPlans[planIndex];
+
+    // Update initial refs BEFORE setting state to prevent false change detection
+    initialSemestersRef.current = JSON.parse(
+      JSON.stringify(plan.semesters),
+    ) as Semester[];
+    initialManualReqsRef.current = plan.manualRequirements ?? [];
+
     setSemesters(plan.semesters);
-    initialSemestersRef.current = JSON.parse(JSON.stringify(plan.semesters));
+    setSimulatorManualReqs(plan.manualRequirements ?? []);
 
     const usedCodes = new Set<string>();
-    plan.semesters.forEach((sem: Semester) =>
-      sem.courses.forEach((course: Course) => usedCodes.add(course.code))
+    plan.semesters.forEach((sem) =>
+      sem.courses.forEach((course) => usedCodes.add(course.code)),
     );
+
     setAvailableCourses(
       remainingCourses.filter(
         (c) =>
           !usedCodes.has(c.code) &&
-          !completedCourses.some((cc) => cc.code === c.code)
-      )
+          !completedCourses.some((cc) => cc.code === c.code),
+      ),
     );
+
+    setCurrentPlanName(plan.name);
     setShowPlansModal(false);
+
+    // Reset hasChanges since we just loaded a saved plan
+    setHasChanges(false);
   };
 
   const deletePlan = async (planIndex: number) => {
     if (!user || planIndex < 0 || planIndex >= savedPlans.length) return;
     try {
-      const updatedPlans = [...savedPlans];
-      updatedPlans.splice(planIndex, 1);
+      const updatedPlans = savedPlans.filter((_, i) => i !== planIndex);
       await setDoc(
         doc(db, "users", user.uid),
         { savedPlans: updatedPlans },
-        { merge: true }
+        { merge: true },
       );
       setSavedPlans(updatedPlans);
     } catch (e) {
@@ -327,60 +747,89 @@ export default function Simulator({
       prev.map((sem) => ({
         ...sem,
         courses: sem.courses.filter(
-          (c) => c.status === "completed" || c.status === "in-progress"
+          (c) => c.status === "completed" || c.status === "in-progress",
         ),
-      }))
+      })),
     );
     setAvailableCourses(
       remainingCourses.filter(
         (rc) =>
           !completedCourses.some((cc) => cc.code === rc.code) &&
-          rc.status === "not-taken"
-      )
+          rc.status === "not-taken",
+      ),
     );
+    setSimulatorManualReqs([]);
+    setCurrentPlanName(null);
   };
 
-  function hasInProgress(semester: Semester) {
-    return semester.courses.some((c) => c.status === "in-progress");
-  }
+  const hasInProgress = (semester: Semester) =>
+    semester.courses.some((c) => c.status === "in-progress");
 
-  // ----------- RENDER ----------- //
+  // ----------------- Render -----------------
   return (
-    <div className="space-y-4 font-louize">
+    <div
+      className="space-y-4 font-louize"
+      onDragEnd={() => {
+        setDraggedCourse(null);
+        setDragSourceSemester(null);
+        setHoveredSemester(null);
+      }}
+    >
       {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div className="mb-6">
-          <h2 className="text-3xl font-medium bg-clip-text text-transparent bg-gradient-to-r from-blue-200 to-purple-200">
+          <h2 className="text-xl sm:text-2xl lg:text-3xl font-medium bg-clip-text text-transparent bg-gradient-to-r from-blue-200 to-purple-200">
             Need to visualize? No problem.
           </h2>
-          <p>
+          <p className="text-gray-400">
             Your interactive, tailor-made, drag-and-drop Yale degree simulator
             is here.
           </p>
+          {/* Current Plan Status */}
+          <div className="mt-2 flex items-center gap-2">
+            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white/[0.03] border border-white/[0.06]">
+              {currentPlanName ? (
+                <>
+                  <div className={`w-1.5 h-1.5 rounded-full ${hasChanges ? 'bg-amber-400' : 'bg-emerald-400'}`} />
+                  <span className="text-xs text-gray-300">{currentPlanName}</span>
+                  {hasChanges && (
+                    <span className="text-[10px] text-amber-400/80 ml-1">· unsaved changes</span>
+                  )}
+                </>
+              ) : (
+                <>
+                  <div className={`w-1.5 h-1.5 rounded-full ${hasChanges ? 'bg-blue-400 animate-pulse' : 'bg-gray-500'}`} />
+                  <span className="text-xs text-gray-400">
+                    {hasChanges ? 'New plan in progress' : 'No plan loaded'}
+                  </span>
+                </>
+              )}
+            </div>
+          </div>
         </div>
         <div className="flex items-start gap-2 flex-wrap">
           <button
             onClick={() => setShowHelp((v) => !v)}
-            className="px-3 py-1.5 text-xs rounded-lg bg-gray-800 text-gray-300 hover:bg-gray-700 flex items-center gap-1 transition-all"
+            className="px-3 py-1.5 text-xs rounded-xl bg-white/[0.04] backdrop-blur-sm text-gray-400 hover:text-gray-200 hover:bg-white/[0.06] border border-white/[0.06] flex items-center gap-1.5 transition-all"
           >
-            <FiInfo size={14} />
+            <FiInfo size={12} />
             Help
           </button>
           {user && (
             <>
               <button
                 onClick={() => setShowPlansModal(true)}
-                className="px-3 py-1.5 text-xs rounded-lg bg-blue-900/30 text-blue-300 hover:bg-blue-800/30"
+                className="px-3 py-1.5 text-xs rounded-xl bg-gradient-to-r from-blue-500/10 to-purple-500/10 backdrop-blur-sm text-blue-300 hover:text-blue-200 hover:from-blue-500/15 hover:to-purple-500/15 border border-blue-500/20 hover:border-blue-400/30 transition-all"
               >
                 Load Plan
               </button>
               <button
                 onClick={() => setShowSaveModal(true)}
-                className={`px-3 py-1.5 text-xs rounded-lg ${
+                className={`px-3 py-1.5 text-xs rounded-xl backdrop-blur-sm transition-all ${
                   hasChanges
-                    ? "bg-purple-900/30 text-purple-300 hover:bg-purple-800/30"
-                    : "bg-gray-800/50 text-gray-500 opacity-70 cursor-not-allowed"
-                } transition-all`}
+                    ? "bg-gradient-to-r from-purple-500/15 to-pink-500/15 text-purple-300 hover:text-purple-200 hover:from-purple-500/20 hover:to-pink-500/20 border border-purple-500/20 hover:border-purple-400/30"
+                    : "bg-white/[0.02] text-gray-600 border border-white/[0.04] cursor-not-allowed"
+                }`}
                 disabled={!hasChanges}
               >
                 Save Plan
@@ -389,7 +838,7 @@ export default function Simulator({
           )}
           <button
             onClick={resetSimulator}
-            className="px-3 py-1.5 text-xs rounded-lg bg-red-900/30 text-red-300 hover:bg-red-800/30"
+            className="px-3 py-1.5 text-xs rounded-xl bg-red-500/10 backdrop-blur-sm text-red-400 hover:text-red-300 hover:bg-red-500/15 border border-red-500/20 hover:border-red-400/30 transition-all"
           >
             Reset
           </button>
@@ -403,67 +852,93 @@ export default function Simulator({
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
-            className="overflow-hidden bg-gray-900/50 rounded-xl border border-gray-800 p-4"
+            className="overflow-hidden bg-gradient-to-br from-white/[0.03] to-transparent backdrop-blur-xl rounded-xl border border-white/[0.06] p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_4px_20px_rgba(0,0,0,0.15)]"
           >
-            <h4 className="font-medium text-gray-300 mb-2">
+            <h4 className="font-medium text-sm bg-gradient-to-r from-blue-200 to-purple-200 bg-clip-text text-transparent mb-2">
               How to use the simulator
             </h4>
-            <ul className="text-sm text-gray-400 space-y-2 list-disc list-inside">
+            <ul className="text-xs text-gray-400 space-y-1.5 list-disc list-inside">
               <li>
                 Use this simulator to plan out your remaining semesters and see
-                how your courses fit together.
+                fit.
               </li>
               <li>
-                We’ve made a pool of the remaining credits in your indicated
-                major for quick drag-and-drop access, but you can always look up
-                any course from any department and add it manually (especially
-                for fun classes/distribs or courses we've not managed to
-                automatically include from your major).
-              </li>
-              <li>Drag/add courses into any semester.</li>
-              <li>
-                NOTE: You can drop <b>multiple</b> courses per semester, of
-                course.
+                The pool shows remaining courses in your major; you can also add
+                any course manually.
               </li>
               <li>
-                <b>Click</b> a course pill already added to a semester to remove
-                it.
+                Drag/add courses into any semester (multiple courses per term
+                work fine).
               </li>
               <li>
-                Completed/in-progress courses are <b>pre-assigned</b> to
-                semesters and can’t be dragged from the pool.
+                Click the trash icon on a course to remove it (if
+                it's not completed/in-progress).
               </li>
               <li>
-                <b>Save</b> or <b>load</b> your plans to try out what-ifs and
-                come back to them later!
+                Completed/in-progress are pre-assigned and cannot be moved.
               </li>
+              <li>Save or load plans to explore what-ifs and revisit later.</li>
             </ul>
           </motion.div>
         )}
       </AnimatePresence>
 
+      {/* Live Major Progress Preview */}
+      <div className="space-y-3">
+        <div>
+          <h3 className="text-lg font-medium bg-clip-text text-transparent bg-gradient-to-r from-blue-200 to-purple-200">
+            Major progress
+          </h3>
+          <p className="text-xs text-gray-500 mt-0.5">
+            Live preview — reflects completed, in-progress, and courses placed
+            on the grid.
+          </p>
+        </div>
+
+        {isPreviewLoading && (
+          <div className="text-sm text-gray-400">Updating preview…</div>
+        )}
+        {previewError && (
+          <div className="text-sm text-red-300">{previewError}</div>
+        )}
+
+        <SimulatorRequirementsBreakdown
+          majorIds={majorIds}
+          previewProgress={previewProgress}
+          plannedCodes={plannedCodes}
+          simulatorManualReqs={simulatorManualReqs}
+          onRemoveManualReq={(code, requirement) => {
+            setSimulatorManualReqs((prev) =>
+              prev.filter(
+                (m) => !(m.code === code && m.requirement === requirement),
+              ),
+            );
+          }}
+        />
+      </div>
+
       {/* Available Courses Pool */}
       <div className="sticky top-0 z-30 mb-2" style={{ top: "0px" }}>
-        <div className="bg-pink-900/20 backdrop-blur rounded-xl border border-pink-800/50 shadow-lg shadow-indigo-900/10 overflow-hidden">
+        <div className="bg-gradient-to-br from-pink-950/30 via-gray-900/50 to-gray-950/50 backdrop-blur-md rounded-xl border border-pink-800/30 shadow-[inset_0_1px_0_rgba(255,255,255,0.04),0_4px_16px_rgba(0,0,0,0.25)] overflow-hidden">
           <button
             onClick={() => setShowPool(!showPool)}
-            className={`flex items-center justify-between w-full p-4 ${
-              showPool ? "border-b border-pink-800/50" : ""
-            } bg-pink-900/20 text-gray-300 hover:bg-pink-900/30 transition-colors`}
+            className={`flex items-center justify-between w-full p-3 ${
+              showPool ? "border-b border-pink-800/30" : ""
+            } text-gray-300 hover:bg-pink-900/20 transition-colors`}
           >
-            <div className="flex items-center gap-2 font-medium">
+            <div className="flex items-center gap-2 font-medium text-sm">
               <div>Quick-add: Pool of remaining courses from your major</div>
               <div className="relative group">
-                <Info className="h-4 w-4 text-gray-400 hover:text-gray-200 transition-colors cursor-pointer" />
-                <div className="absolute z-50 bottom-full mt-2 left-1/2 -translate-x-1/2 bg-gray-800 text-gray-300 text-xs px-3 py-1 rounded-md opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+                <Info className="h-3.5 w-3.5 text-gray-500 hover:text-gray-300 transition-colors cursor-pointer" />
+                <div className="absolute z-50 bottom-full mt-2 left-1/2 -translate-x-1/2 bg-gray-900/95 backdrop-blur-sm text-gray-300 text-[10px] px-2 py-1 rounded-md border border-gray-800/50 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
                   May not include all. Add manually if not.
                 </div>
               </div>
             </div>
             {showPool ? (
-              <FiChevronUp className="w-4 h-4 text-gray-400" />
+              <FiChevronUp className="w-3.5 h-3.5 text-gray-500" />
             ) : (
-              <FiChevronDown className="w-4 h-4 text-gray-400" />
+              <FiChevronDown className="w-3.5 h-3.5 text-gray-500" />
             )}
           </button>
 
@@ -474,30 +949,29 @@ export default function Simulator({
                 animate={{ opacity: 1, height: "auto" }}
                 exit={{ opacity: 0, height: 0 }}
                 transition={{ duration: 0.2 }}
-                className="p-4 pt-4"
+                className="p-3"
               >
                 {availableCourses.length === 0 ? (
-                  <p className="text-sm text-gray-500 italic">
+                  <p className="text-[11px] text-gray-500 italic">
                     All available courses have been scheduled. Remove one from a
                     semester to add it back.
                   </p>
                 ) : (
-                  <div className="max-h-32 overflow-y-auto pr-1 flex flex-wrap gap-2">
+                  <div className="max-h-28 overflow-y-auto pr-1 flex flex-wrap gap-1.5">
                     {availableCourses.map((course) => (
                       <motion.div
                         key={course.code}
                         draggable
                         onDragStart={() => handleDragStart(course)}
-                        whileHover={{ scale: 1.03 }}
-                        whileTap={{ scale: 0.97 }}
-                        className="px-3 py-1.5 rounded-full bg-pink-900/20 text-pink-300 border border-pink-700 text-sm cursor-grab active:cursor-grabbing select-none"
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                        className="px-2 py-1 rounded-lg bg-pink-900/25 text-pink-300 border border-pink-700/40 text-xs cursor-grab active:cursor-grabbing select-none shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]"
                       >
                         {course.code}
-                        <span className="text-xs text-blue-200/70 ml-1">
-                          {truncate(
-                            getCourseNameFromCode(course.code) ?? "",
-                            20
-                          )}
+                        <span className="text-[10px] text-pink-200/50 ml-1">
+                          {(getCourseNameFromCode(course.code) ?? "").length > 0
+                            ? ` ${getCourseNameFromCode(course.code)}`
+                            : ""}
                         </span>
                       </motion.div>
                     ))}
@@ -510,20 +984,20 @@ export default function Simulator({
       </div>
 
       {/* Semesters Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
         {semesters.map((semester) => {
           const semCredits = getSemesterCredits(semester);
           const semCreditsLabel = Number.isInteger(semCredits)
             ? String(semCredits)
             : semCredits.toFixed(1);
+
           return (
             <motion.div
               key={semester.id}
               onDragOver={(e) => {
                 e.preventDefault();
-                if (!isPastSemester(semester.name)) {
+                if (!isPastSemester(semester.name))
                   setHoveredSemester(semester.id);
-                }
               }}
               onDragLeave={() => setHoveredSemester(null)}
               onDrop={() => {
@@ -531,42 +1005,39 @@ export default function Simulator({
                 handleDrop(semester.id);
                 setHoveredSemester(null);
               }}
-              className={`bg-gray-900/50 rounded-xl border p-4 min-h-[180px] flex flex-col transition-all
-            ${
-              hasInProgress(semester)
-                ? "border-blue-600/70 ring-2 ring-blue-400/40"
-                : "border-gray-800"
-            }
-            ${
-              hoveredSemester === semester.id &&
-              draggedCourse &&
-              !isPastSemester(semester.name)
-                ? "ring-2 ring-pink-400 scale-95 bg-gray-800/70"
-                : ""
-            }
-          `}
+              className={`bg-gradient-to-br from-gray-900/60 via-gray-900/40 to-gray-950/60 backdrop-blur-md rounded-xl border p-3 min-h-[160px] flex flex-col transition-all shadow-[inset_0_1px_0_rgba(255,255,255,0.04),0_4px_12px_rgba(0,0,0,0.2)]
+                ${
+                  hasInProgress(semester)
+                    ? "border-blue-700/50 ring-1 ring-blue-500/30"
+                    : "border-gray-800/50"
+                }
+                ${
+                  hoveredSemester === semester.id &&
+                  draggedCourse &&
+                  !isPastSemester(semester.name)
+                    ? "ring-2 ring-pink-400/60 scale-[0.98] bg-gray-800/60"
+                    : ""
+                }`}
             >
-              <div className="flex justify-between items-center mb-3">
-                <h4 className="font-medium text-gray-300">{semester.name}</h4>
-
-                <div className="flex items-center gap-2">
-                  {/* Credits pill */}
+              <div className="flex justify-between items-center mb-2">
+                <h4 className="font-medium text-sm text-gray-300">
+                  {semester.name}
+                </h4>
+                <div className="flex items-center gap-1.5">
                   <span
-                    className="px-2 py-0.5 rounded-full text-xs bg-gray-800/70 text-gray-200 border border-gray-700
-                 shadow-sm shadow-black/20"
+                    className="px-1.5 py-0.5 rounded-md text-[10px] bg-gray-800/60 text-gray-300 border border-gray-700/40"
                     title="Sum of credits in this semester"
                   >
                     {semCreditsLabel} cr
                   </span>
-
                   {!isPastSemester(semester.name) && (
                     <button
                       onClick={() => setLookupSemesterId(semester.id)}
-                      className="ml-1 px-2 py-1 text-xs rounded-lg bg-blue-800/30 text-blue-200 hover:bg-blue-700/60 border border-blue-900"
+                      className="px-1.5 py-0.5 text-[10px] rounded-md bg-blue-900/30 text-blue-300 hover:bg-blue-800/40 border border-blue-800/40 transition-all"
                       type="button"
                     >
-                      <FiPlus className="inline-block mr-1" />
-                      Manual add
+                      <FiPlus className="inline-block mr-0.5" size={10} />
+                      Add
                     </button>
                   )}
                 </div>
@@ -574,47 +1045,46 @@ export default function Simulator({
 
               {semester.courses.length === 0 ? (
                 <div
-                  className={`flex-1 flex items-center justify-center border-2 border-dashed rounded-lg p-4 min-h-[52px] transition-all
-              ${
-                hoveredSemester === semester.id &&
-                draggedCourse &&
-                !isPastSemester(semester.name)
-                  ? "border-pink-400 bg-purple-900/20"
-                  : "border-gray-700"
-              }
-            `}
+                  className={`flex-1 flex items-center justify-center border border-dashed rounded-lg p-3 min-h-[48px] transition-all
+                    ${
+                      hoveredSemester === semester.id &&
+                      draggedCourse &&
+                      !isPastSemester(semester.name)
+                        ? "border-pink-400/60 bg-pink-900/15"
+                        : "border-gray-700/50"
+                    }`}
                 >
-                  <p className="text-sm text-gray-500 text-center opacity-70">
-                    Drag from pool or add others manually
+                  <p className="text-[11px] text-gray-500 text-center opacity-70">
+                    Drag from pool or add manually
                   </p>
                 </div>
               ) : (
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap gap-1.5">
                   {semester.courses.map((course) => (
                     <motion.div
                       key={`${semester.id}-${course.code}`}
-                      whileHover={{ scale: 1.03 }}
-                      whileTap={{ scale: 0.97 }}
-                      className={`w-full flex items-center justify-between px-3 py-1.5 rounded-full text-sm cursor-pointer select-none transition-all border relative group
-        ${
-          course.status === "completed"
-            ? "bg-emerald-900/20 text-emerald-300 border-emerald-700"
-            : course.status === "in-progress"
-            ? "bg-blue-900/20 text-blue-300 border-blue-700"
-            : "bg-amber-900/20 text-pink-300 border-pink-700 hover:bg-pink-800/30"
-        }`}
+                      draggable={course.status === "not-taken"}
+                      onDragStart={
+                        course.status === "not-taken"
+                          ? () => handleDragStart(course, semester.id)
+                          : undefined
+                      }
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      className={`w-full flex items-center justify-between px-2 py-1 rounded-lg text-xs select-none transition-all border relative group shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]
+                        ${
+                          course.status === "completed"
+                            ? "bg-emerald-900/25 text-emerald-300 border-emerald-700/40"
+                            : course.status === "in-progress"
+                              ? "bg-blue-900/25 text-blue-300 border-blue-700/40"
+                              : "bg-pink-900/20 text-pink-300 border-pink-700/40 hover:bg-pink-800/30 cursor-grab active:cursor-grabbing"
+                        }`}
                     >
                       <div className="flex items-center justify-between w-full">
                         <div>
                           {course.code}
-                          <span className="text-xs opacity-70 ml-1">
-                            {truncate(
-                              getCourseNameFromCode(course.code) ?? "",
-                              course.status === "completed" ||
-                                course.status === "in-progress"
-                                ? 30
-                                : 20
-                            )}
+                          <span className="text-[10px] opacity-60 ml-1">
+                            {getCourseNameFromCode(course.code) ?? ""}
                           </span>
                         </div>
                         {course.status === "not-taken" && (
@@ -623,12 +1093,12 @@ export default function Simulator({
                               e.stopPropagation();
                               removeCourseFromSemester(
                                 semester.id,
-                                course.code
+                                course.code,
                               );
                             }}
-                            className="ml-2 opacity-0 group-hover:opacity-100 transition-opacity text-red-300 hover:text-red-200"
+                            className="ml-1.5 opacity-0 group-hover:opacity-100 transition-opacity text-red-300 hover:text-red-200"
                           >
-                            <FiTrash2 className="h-3.5 w-3.5" />
+                            <FiTrash2 className="h-3 w-3" />
                           </button>
                         )}
                       </div>
@@ -648,40 +1118,56 @@ export default function Simulator({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+            className="fixed inset-0 bg-black/60 backdrop-blur-md z-50 flex items-center justify-center p-4"
             onClick={() => setShowSaveModal(false)}
           >
             <motion.div
-              initial={{ scale: 0.9, y: 20 }}
-              animate={{ scale: 1, y: 0 }}
+              initial={{ opacity: 0, scale: 0.95, y: 10 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 10 }}
+              transition={{ duration: 0.25, ease: "easeOut" }}
               onClick={(e) => e.stopPropagation()}
-              className="w-full max-w-md bg-gray-900/90 backdrop-blur-sm p-6 rounded-xl border border-gray-800 relative"
+              className="w-full max-w-md p-6 rounded-2xl bg-gradient-to-br from-gray-900/95 via-gray-900/90 to-gray-950/95 backdrop-blur-2xl border border-white/[0.08] shadow-[0_8px_48px_rgba(0,0,0,0.5),0_0_80px_rgba(139,92,246,0.06),inset_0_1px_0_rgba(255,255,255,0.08)] ring-1 ring-white/[0.05]"
             >
-              <h4 className="text-lg font-medium mb-4 text-gray-200">
-                {selectedPlanToOverwrite !== null
-                  ? "Overwrite Plan"
-                  : "Save New Plan"}
-              </h4>
-              <input
-                type="text"
-                value={planName}
-                onChange={(e) => setPlanName(e.target.value)}
-                placeholder="Enter a name for this plan"
-                className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-gray-200 mb-4"
-              />
+              {/* Header */}
+              <div className="mb-5">
+                <h3 className="text-lg font-medium bg-gradient-to-r from-blue-200 via-purple-200 to-pink-200 bg-clip-text text-transparent">
+                  {selectedPlanToOverwrite !== null
+                    ? "Overwrite Plan"
+                    : "Save Your Plan"}
+                </h3>
+                <p className="text-xs text-gray-500 mt-1">
+                  Give your plan a name to save your progress.
+                </p>
+              </div>
 
+              {/* Plan Name Input */}
+              <div className="mb-4">
+                <input
+                  type="text"
+                  value={planName}
+                  onChange={(e) => setPlanName(e.target.value)}
+                  placeholder="e.g., Senior Year Schedule, Plan B..."
+                  className="w-full px-4 py-3 text-sm bg-white/[0.04] border border-white/[0.08] rounded-xl text-gray-200 placeholder-gray-500 focus:outline-none focus:border-purple-500/40 focus:ring-1 focus:ring-purple-500/20 transition-all shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]"
+                  autoFocus
+                />
+              </div>
+
+              {/* Overwrite existing plans */}
               {savedPlans.length > 0 && (
-                <div className="mb-4">
-                  <label className="block text-sm text-gray-400 mb-2">
-                    Or overwrite existing plan:
-                  </label>
-                  <div className="max-h-40 overflow-y-auto border border-gray-700 rounded-lg">
+                <div className="mb-5">
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="flex-1 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+                    <span className="text-xs text-gray-500 uppercase tracking-wider">or overwrite</span>
+                    <div className="flex-1 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+                  </div>
+                  <div className="max-h-32 overflow-y-auto rounded-xl border border-white/[0.06] bg-white/[0.02]">
                     {savedPlans.map((plan, index) => (
-                      <div
-                        key={index}
-                        className={`p-3 border-b border-gray-700 cursor-pointer hover:bg-gray-800/50 ${
+                      <button
+                        key={`${plan.createdAt}-${index}`}
+                        className={`w-full p-3 text-left border-b border-white/[0.04] last:border-b-0 hover:bg-white/[0.04] text-sm transition-all ${
                           selectedPlanToOverwrite === index
-                            ? "bg-blue-900/30"
+                            ? "bg-purple-500/10 border-l-2 border-l-purple-500"
                             : ""
                         }`}
                         onClick={() => {
@@ -689,39 +1175,48 @@ export default function Simulator({
                           setPlanName(plan.name);
                         }}
                       >
-                        <div className="flex justify-between">
-                          <span>{plan.name}</span>
-                          <span className="text-xs text-gray-500">
-                            {new Date(plan.createdAt).toLocaleDateString()}
+                        <div className="flex justify-between items-center">
+                          <span className="text-gray-300 font-medium">{plan.name}</span>
+                          <span className="text-[10px] text-gray-500">
+                            {new Date(plan.createdAt).toLocaleDateString("en-US", {
+                              month: "short",
+                              day: "numeric",
+                            })}
                           </span>
                         </div>
-                      </div>
+                      </button>
                     ))}
                   </div>
                 </div>
               )}
 
+              {/* Actions */}
               <div className="flex justify-end gap-2">
-                <button
+                <motion.button
                   onClick={() => {
                     setShowSaveModal(false);
                     setSelectedPlanToOverwrite(null);
+                    setPlanName("");
                   }}
-                  className="px-4 py-2 rounded-lg bg-gray-800 text-gray-300 hover:bg-gray-700 transition-colors"
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="px-4 py-2 text-sm rounded-xl bg-white/[0.04] text-gray-400 hover:text-gray-300 hover:bg-white/[0.06] border border-white/[0.06] transition-all"
                 >
                   Cancel
-                </button>
-                <button
+                </motion.button>
+                <motion.button
                   onClick={savePlan}
                   disabled={!planName.trim() || !hasChanges}
-                  className={`px-4 py-2 rounded-lg ${
+                  whileHover={planName.trim() && hasChanges ? { scale: 1.02 } : {}}
+                  whileTap={planName.trim() && hasChanges ? { scale: 0.98 } : {}}
+                  className={`px-4 py-2 text-sm rounded-xl font-medium transition-all ${
                     planName.trim() && hasChanges
-                      ? "bg-purple-900/50 text-purple-300 hover:bg-purple-800/50"
-                      : "bg-gray-800 text-gray-500 cursor-not-allowed"
-                  } transition-colors`}
+                      ? "bg-gradient-to-r from-purple-500/30 to-blue-500/30 text-white border border-purple-500/30 hover:border-purple-400/40 shadow-[0_2px_12px_rgba(139,92,246,0.2),inset_0_1px_0_rgba(255,255,255,0.1)]"
+                      : "bg-white/[0.02] text-gray-600 border border-white/[0.04] cursor-not-allowed"
+                  }`}
                 >
-                  {selectedPlanToOverwrite !== null ? "Overwrite" : "Save"}
-                </button>
+                  {selectedPlanToOverwrite !== null ? "Overwrite" : "Save Plan"}
+                </motion.button>
               </div>
             </motion.div>
           </motion.div>
@@ -735,71 +1230,115 @@ export default function Simulator({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+            className="fixed inset-0 bg-black/60 backdrop-blur-md z-50 flex items-center justify-center p-4"
             onClick={() => setShowPlansModal(false)}
           >
             <motion.div
-              initial={{ scale: 0.9, y: 20 }}
-              animate={{ scale: 1, y: 0 }}
+              initial={{ opacity: 0, scale: 0.95, y: 10 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 10 }}
+              transition={{ duration: 0.25, ease: "easeOut" }}
               onClick={(e) => e.stopPropagation()}
-              className="w-full max-w-md bg-gray-900/90 backdrop-blur-sm p-6 rounded-xl border border-gray-800 relative"
-              style={{ maxHeight: "80vh", height: "500px" }}
+              className="w-full max-w-md p-6 rounded-2xl bg-gradient-to-br from-gray-900/95 via-gray-900/90 to-gray-950/95 backdrop-blur-2xl border border-white/[0.08] shadow-[0_8px_48px_rgba(0,0,0,0.5),0_0_80px_rgba(139,92,246,0.06),inset_0_1px_0_rgba(255,255,255,0.08)] ring-1 ring-white/[0.05]"
+              style={{ maxHeight: "80vh" }}
             >
-              <h4 className="text-lg font-medium mb-4 text-gray-200">
-                Your Saved Plans
-              </h4>
+              {/* Header */}
+              <div className="mb-5">
+                <h3 className="text-lg font-medium bg-gradient-to-r from-blue-200 via-purple-200 to-pink-200 bg-clip-text text-transparent">
+                  Your Saved Plans
+                </h3>
+                <p className="text-xs text-gray-500 mt-1">
+                  Load a previous plan or manage your saved plans.
+                </p>
+              </div>
+
               {savedPlans.length === 0 ? (
-                <div className="h-full flex items-center justify-center">
-                  <p className="text-gray-400 py-4">No saved plans found</p>
+                <div className="py-12 text-center">
+                  <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-gradient-to-br from-white/[0.04] to-transparent border border-white/[0.06] flex items-center justify-center">
+                    <FiPlus className="w-5 h-5 text-gray-500" />
+                  </div>
+                  <p className="text-gray-500 text-sm">No saved plans yet</p>
+                  <p className="text-gray-600 text-xs mt-1">
+                    Make changes and save to create your first plan.
+                  </p>
                 </div>
               ) : (
                 <div
-                  className="overflow-y-auto"
-                  style={{ maxHeight: "calc(80vh - 120px)" }}
+                  className="space-y-2 overflow-y-auto pr-1"
+                  style={{ maxHeight: "calc(80vh - 180px)" }}
                 >
-                  {savedPlans.map((plan, index) => (
-                    <div
-                      key={plan.createdAt}
-                      className="p-3 bg-gray-800 rounded-lg border border-gray-700 mb-2"
-                    >
-                      <div className="flex justify-between items-center">
-                        <h5 className="font-medium text-gray-300">
-                          {plan.name}
-                        </h5>
-                        <div className="text-xs text-gray-500">
-                          {new Date(plan.createdAt).toLocaleDateString()}
+                  {savedPlans.map((plan, index) => {
+                    const plannedCount = plan.semesters.reduce(
+                      (acc, sem) =>
+                        acc +
+                        sem.courses.filter((c) => c.status === "not-taken").length,
+                      0,
+                    );
+                    return (
+                      <motion.div
+                        key={`${plan.createdAt}-${index}`}
+                        initial={{ opacity: 0, y: 5 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: index * 0.05 }}
+                        className="p-4 rounded-xl bg-gradient-to-br from-white/[0.04] to-transparent border border-white/[0.06] hover:border-white/[0.1] transition-all group"
+                      >
+                        <div className="flex justify-between items-start mb-3">
+                          <div>
+                            <h5 className="font-medium text-sm text-gray-200 group-hover:text-white transition-colors">
+                              {plan.name}
+                            </h5>
+                            <p className="text-[11px] text-gray-500 mt-0.5">
+                              {plannedCount} planned course{plannedCount !== 1 ? "s" : ""} ·{" "}
+                              {new Date(plan.createdAt).toLocaleDateString("en-US", {
+                                month: "short",
+                                day: "numeric",
+                                year: "numeric",
+                              })}
+                            </p>
+                          </div>
                         </div>
-                      </div>
-                      <div className="flex justify-end gap-2 mt-2">
-                        <button
-                          onClick={() => loadPlan(index)}
-                          className="px-3 py-1 text-xs rounded bg-blue-900/30 text-blue-300 hover:bg-blue-800/30 transition-colors"
-                        >
-                          Load
-                        </button>
-                        <button
-                          onClick={() => deletePlan(index)}
-                          className="px-3 py-1 text-xs rounded bg-red-900/30 text-red-300 hover:bg-red-800/30 transition-colors"
-                        >
-                          Delete
-                        </button>
-                      </div>
-                    </div>
-                  ))}
+                        <div className="flex justify-end gap-2">
+                          <motion.button
+                            onClick={() => deletePlan(index)}
+                            whileHover={{ scale: 1.02 }}
+                            whileTap={{ scale: 0.98 }}
+                            className="px-3 py-1.5 text-xs rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20 hover:text-red-300 border border-red-500/20 transition-all flex items-center gap-1"
+                          >
+                            <FiTrash2 size={11} />
+                            Delete
+                          </motion.button>
+                          <motion.button
+                            onClick={() => loadPlan(index)}
+                            whileHover={{ scale: 1.02 }}
+                            whileTap={{ scale: 0.98 }}
+                            className="px-3 py-1.5 text-xs rounded-lg bg-gradient-to-r from-blue-500/20 to-purple-500/20 text-blue-300 hover:text-blue-200 border border-blue-500/30 hover:border-blue-400/40 transition-all shadow-[0_2px_8px_rgba(59,130,246,0.15),inset_0_1px_0_rgba(255,255,255,0.08)]"
+                          >
+                            Load Plan
+                          </motion.button>
+                        </div>
+                      </motion.div>
+                    );
+                  })}
                 </div>
               )}
-              <div className="mt-4 flex justify-end">
-                <button
+
+              {/* Close button */}
+              <div className="mt-5 flex justify-end">
+                <motion.button
                   onClick={() => setShowPlansModal(false)}
-                  className="px-4 py-2 rounded-lg bg-gray-800 text-gray-300 hover:bg-gray-700 transition-colors"
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="px-4 py-2 text-sm rounded-xl bg-white/[0.04] text-gray-400 hover:text-gray-300 hover:bg-white/[0.06] border border-white/[0.06] transition-all"
                 >
                   Close
-                </button>
+                </motion.button>
               </div>
             </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Manual Course Lookup Modal */}
       <ManualCourseLookupModal
         isOpen={lookupSemesterId !== null}
         onClose={() => setLookupSemesterId(null)}
@@ -808,27 +1347,199 @@ export default function Simulator({
           setSemesters((prev) =>
             prev.map((sem) =>
               sem.id === lookupSemesterId
-                ? {
-                    ...sem,
-                    courses: [...sem.courses, manualCourse],
-                  }
-                : sem
-            )
+                ? { ...sem, courses: [...sem.courses, manualCourse] }
+                : sem,
+            ),
           );
+
+          // Auto-detect: prompt manual assignment if not in any requirement
+          if (!isCourseInAnyRequirement(manualCourse.code)) {
+            setManualAssignPending({
+              course: manualCourse,
+              semesterId: lookupSemesterId,
+            });
+          } else {
+            // Show toast for auto-matched course
+            showAutoMatchToast(manualCourse.code);
+          }
+
           setLookupSemesterId(null);
         }}
-        // alreadyAddedCodes={[
-        //   ...semesters.flatMap((s) =>
-        //     (s.courses ?? [])
-        //       .filter((c): c is Course => !!c && typeof c.code === "string")
-        //       .map((c) => c?.code)
-        //   ),
-        //   ...availableCourses
-        //     .filter((c): c is Course => !!c && typeof c.code === "string")
-        //     .map((c) => c?.code),
-        // ]}
         userId={user?.uid || ""}
       />
+
+      {/* Manual requirement assignment modal */}
+      <SimulatorManualAssignModal
+        isOpen={manualAssignPending !== null}
+        course={manualAssignPending?.course ?? null}
+        majorIds={majorIds}
+        previewProgress={previewProgress}
+        onAssign={(entry) => {
+          setSimulatorManualReqs((prev) => [...prev, entry]);
+          setManualAssignPending(null);
+        }}
+        onSkip={() => setManualAssignPending(null)}
+        onClose={() => setManualAssignPending(null)}
+      />
+
+      {/* Plan Selector Modal - shown on initial load */}
+      <AnimatePresence>
+        {showPlanSelector && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/60 backdrop-blur-md z-50 flex items-center justify-center p-4"
+            onClick={() => setShowPlanSelector(false)}
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 10 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 10 }}
+              transition={{ duration: 0.25, ease: "easeOut" }}
+              onClick={(e) => e.stopPropagation()}
+              className="w-full max-w-lg p-6 rounded-2xl bg-gradient-to-br from-gray-900/95 via-gray-900/90 to-gray-950/95 backdrop-blur-2xl border border-white/[0.08] shadow-[0_8px_48px_rgba(0,0,0,0.5),0_0_80px_rgba(139,92,246,0.06),inset_0_1px_0_rgba(255,255,255,0.08)] ring-1 ring-white/[0.05]"
+            >
+              {/* Header */}
+              <div className="text-center mb-6">
+                <h3 className="text-xl font-medium bg-gradient-to-r from-blue-200 via-purple-200 to-pink-200 bg-clip-text text-transparent mb-1">
+                  Welcome to the Simulator
+                </h3>
+                <p className="text-sm text-gray-400">
+                  Pick up where you left off, or start fresh.
+                </p>
+              </div>
+
+              {/* Saved Plans List */}
+              <div className="space-y-2 max-h-[280px] overflow-y-auto pr-1 mb-4">
+                {savedPlans.map((plan, index) => {
+                  const plannedCount = plan.semesters.reduce(
+                    (acc, sem) =>
+                      acc +
+                      sem.courses.filter((c) => c.status === "not-taken").length,
+                    0,
+                  );
+                  return (
+                    <motion.button
+                      key={`${plan.createdAt}-${index}`}
+                      onClick={() => {
+                        loadPlan(index);
+                        setShowPlanSelector(false);
+                      }}
+                      whileHover={{ scale: 1.01 }}
+                      whileTap={{ scale: 0.99 }}
+                      className="w-full p-4 rounded-xl text-left bg-gradient-to-br from-white/[0.04] to-transparent border border-white/[0.06] hover:border-purple-500/30 hover:bg-white/[0.06] transition-all duration-200 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] group"
+                    >
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <h4 className="font-medium text-gray-200 group-hover:text-white transition-colors">
+                            {plan.name}
+                          </h4>
+                          <p className="text-xs text-gray-500 mt-0.5">
+                            {plannedCount} planned course{plannedCount !== 1 ? "s" : ""} ·{" "}
+                            {new Date(plan.createdAt).toLocaleDateString("en-US", {
+                              month: "short",
+                              day: "numeric",
+                              year: "numeric",
+                            })}
+                          </p>
+                        </div>
+                        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-500/20 to-blue-500/20 border border-purple-500/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                          <FiChevronUp className="w-4 h-4 text-purple-300 rotate-90" />
+                        </div>
+                      </div>
+                    </motion.button>
+                  );
+                })}
+              </div>
+
+              {/* Divider */}
+              <div className="flex items-center gap-3 my-4">
+                <div className="flex-1 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+                <span className="text-xs text-gray-500 uppercase tracking-wider">or</span>
+                <div className="flex-1 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+              </div>
+
+              {/* Start Fresh Button */}
+              <motion.button
+                onClick={() => setShowPlanSelector(false)}
+                whileHover={{ scale: 1.01 }}
+                whileTap={{ scale: 0.99 }}
+                className="w-full py-3 px-4 rounded-xl font-medium text-sm text-white bg-gradient-to-r from-blue-500/20 via-purple-500/20 to-pink-500/20 hover:from-blue-500/30 hover:via-purple-500/30 hover:to-pink-500/30 border border-white/[0.08] shadow-[0_2px_12px_rgba(139,92,246,0.15),inset_0_1px_0_rgba(255,255,255,0.1)] transition-all duration-200 flex items-center justify-center gap-2"
+              >
+                <FiPlus size={14} className="opacity-70" />
+                Start Fresh / Create New Plan
+              </motion.button>
+
+              {/* Skip hint */}
+              <p className="text-center text-[11px] text-gray-600 mt-4">
+                Press <kbd className="px-1.5 py-0.5 rounded bg-white/[0.06] border border-white/[0.08] text-gray-400">Esc</kbd> or click outside to dismiss
+              </p>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Unsaved Changes Confirmation Modal */}
+      <AnimatePresence>
+        {showLeaveConfirm && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/70 backdrop-blur-md z-[60] flex items-center justify-center p-4"
+            onClick={handleCancelLeave}
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 10 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 10 }}
+              transition={{ duration: 0.2, ease: "easeOut" }}
+              onClick={(e) => e.stopPropagation()}
+              className="w-full max-w-sm p-5 rounded-2xl bg-gradient-to-br from-gray-900/95 via-gray-900/90 to-gray-950/95 backdrop-blur-2xl border border-white/[0.08] shadow-[0_8px_48px_rgba(0,0,0,0.5),0_0_80px_rgba(251,146,60,0.08),inset_0_1px_0_rgba(255,255,255,0.08)] ring-1 ring-white/[0.05]"
+            >
+              {/* Warning Icon */}
+              <div className="flex justify-center mb-4">
+                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-amber-500/20 to-orange-500/10 border border-amber-500/30 flex items-center justify-center">
+                  <svg className="w-6 h-6 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                  </svg>
+                </div>
+              </div>
+
+              {/* Content */}
+              <div className="text-center mb-5">
+                <h3 className="text-lg font-medium text-gray-100 mb-1.5">
+                  Unsaved Changes
+                </h3>
+                <p className="text-sm text-gray-400">
+                  You have unsaved changes in your plan. Are you sure you want to leave? Your changes will be lost.
+                </p>
+              </div>
+
+              {/* Actions */}
+              <div className="flex gap-2">
+                <motion.button
+                  onClick={handleCancelLeave}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="flex-1 py-2.5 px-4 text-sm rounded-xl font-medium bg-gradient-to-r from-purple-500/20 to-blue-500/20 text-white border border-purple-500/30 hover:border-purple-400/40 shadow-[0_2px_12px_rgba(139,92,246,0.15),inset_0_1px_0_rgba(255,255,255,0.08)] transition-all"
+                >
+                  Stay
+                </motion.button>
+                <motion.button
+                  onClick={handleConfirmLeave}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="flex-1 py-2.5 px-4 text-sm rounded-xl font-medium bg-white/[0.04] text-gray-400 hover:text-gray-300 hover:bg-white/[0.06] border border-white/[0.06] transition-all"
+                >
+                  Leave
+                </motion.button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

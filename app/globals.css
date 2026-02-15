@@ -2,19 +2,45 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Light mode (default) */
 :root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
-  /* --neumorph-light: #ffffff;
-  --neumorph-dark: #e0e0e0; */
-  --neumorph-dark-light: #2d3748;
-  --neumorph-dark-dark: #1a202c;
-  --neumorphic-light: #1F2937;
+  --foreground-rgb: 24, 24, 27;
+  --background-rgb: 250, 250, 250;
+  --surface-rgb: 255, 255, 255;
+  --surface-secondary-rgb: 244, 244, 245;
+  --border-rgb: 228, 228, 231;
+  --muted-rgb: 113, 113, 122;
+
+  /* Neumorphic for light mode */
+  --neumorphic-bg: #f0f0f3;
+  --neumorphic-light: #ffffff;
+  --neumorphic-dark: #d1d1d4;
+  --neumorphic-shadow: 6px 6px 12px #d1d1d4, -6px -6px 12px #ffffff;
+  --neumorphic-shadow-inset: inset 3px 3px 6px #d1d1d4, inset -3px -3px 6px #ffffff;
+  --neumorphic-shadow-sm: 3px 3px 6px #d1d1d4, -3px -3px 6px #ffffff;
+
+  /* Accent colors */
+  --accent-pink: 236, 72, 153;
+  --accent-purple: 139, 92, 246;
+  --accent-blue: 59, 130, 246;
+}
+
+/* Dark mode */
+.dark {
+  --foreground-rgb: 250, 250, 250;
+  --background-rgb: 0, 0, 0;
+  --surface-rgb: 24, 24, 27;
+  --surface-secondary-rgb: 39, 39, 42;
+  --border-rgb: 63, 63, 70;
+  --muted-rgb: 161, 161, 170;
+
+  /* Neumorphic for dark mode */
+  --neumorphic-bg: #1F2937;
+  --neumorphic-light: #2d3748;
   --neumorphic-dark: #111827;
   --neumorphic-shadow: 8px 8px 16px #0d121c, -8px -8px 16px #252f43;
   --neumorphic-shadow-inset: inset 3px 3px 6px #0d121c, inset -3px -3px 6px #252f43;
-  --neumorphic-shadow-active: 4px 4px 8px #0d121c, -4px -4px 8px #252f43;
+  --neumorphic-shadow-sm: 4px 4px 8px #0d121c, -4px -4px 8px #252f43;
 }
 
 @theme {
@@ -26,32 +52,39 @@
   .font-louize {
     font-family: var(--font-louize);
   }
-  
+
   .font-sf {
     font-family: var(--font-sf);
   }
-}
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 0, 0, 0;
-    --background-end-rgb: 0, 0, 0;
+  /* Theme-aware background utilities */
+  .bg-theme {
+    background-color: rgb(var(--background-rgb));
+  }
+
+  .bg-surface {
+    background-color: rgb(var(--surface-rgb));
+  }
+
+  .bg-surface-secondary {
+    background-color: rgb(var(--surface-secondary-rgb));
+  }
+
+  .text-theme {
+    color: rgb(var(--foreground-rgb));
+  }
+
+  .text-muted {
+    color: rgb(var(--muted-rgb));
+  }
+
+  .border-theme {
+    border-color: rgb(var(--border-rgb));
   }
 }
 
-body {
-  color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
-}
-
 .neumorphic-card {
-  background: linear-gradient(145deg, #1F2937, #111827);
+  background: linear-gradient(145deg, var(--neumorphic-light), var(--neumorphic-dark));
   box-shadow: var(--neumorphic-shadow);
   border-radius: 12px;
   transition: all 0.3s ease;
@@ -62,7 +95,7 @@ body {
 }
 
 .neumorphic-btn {
-  background: linear-gradient(145deg, #1F2937, #111827);
+  background: linear-gradient(145deg, var(--neumorphic-light), var(--neumorphic-dark));
   box-shadow: var(--neumorphic-shadow);
   border-radius: 10px;
   transition: all 0.3s ease;
@@ -73,7 +106,7 @@ body {
 }
 
 .neumorphic-btn-active {
-  background: linear-gradient(145deg, #1F2937, #111827);
+  background: linear-gradient(145deg, var(--neumorphic-light), var(--neumorphic-dark));
   box-shadow: var(--neumorphic-shadow-inset);
 }
 
@@ -81,7 +114,7 @@ body {
   width: 50px;
   height: 50px;
   border-radius: 50%;
-  background: linear-gradient(145deg, #1F2937, #111827);
+  background: linear-gradient(145deg, var(--neumorphic-light), var(--neumorphic-dark));
   box-shadow: var(--neumorphic-shadow);
   position: relative;
 }
@@ -94,25 +127,38 @@ body {
   right: 5px;
   bottom: 5px;
   border-radius: 50%;
-  background: linear-gradient(145deg, #1F2937, #111827);
+  background: linear-gradient(145deg, var(--neumorphic-light), var(--neumorphic-dark));
   box-shadow: var(--neumorphic-shadow-inset);
 }
 
-/* Custom scrollbar */
+/* Custom scrollbar - Light mode */
 ::-webkit-scrollbar {
   width: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #1F2937;
+  background: #f3f4f6;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #4B5563;
+  background: #d1d5db;
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
+}
+
+/* Custom scrollbar - Dark mode */
+.dark ::-webkit-scrollbar-track {
+  background: #1F2937;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: #4B5563;
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
   background: #6B7280;
 }
 

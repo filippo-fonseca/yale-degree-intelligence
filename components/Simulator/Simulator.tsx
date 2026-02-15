@@ -8,6 +8,7 @@ import {
   FiInfo,
   FiPlus,
   FiTrash2,
+  FiRefreshCw,
 } from "react-icons/fi";
 import { Info } from "lucide-react";
 import { Course } from "@/lib/types";
@@ -140,6 +141,8 @@ export default function Simulator({
   const [plansLoaded, setPlansLoaded] = useState(false);
   // Track currently loaded plan
   const [currentPlanName, setCurrentPlanName] = useState<string | null>(null);
+  // Track scroll state for sticky nav background
+  const [isScrolled, setIsScrolled] = useState(false);
 
   // Simulator-local manual requirements (plan-scoped, NOT in Firebase courses)
   const [simulatorManualReqs, setSimulatorManualReqs] = useState<
@@ -160,6 +163,7 @@ export default function Simulator({
 
   // keep initial snapshot to detect changes
   const initialSemestersRef = useRef<Semester[]>([]);
+  const initialManualReqsRef = useRef<ManualRequirementEntry[]>([]);
 
   // majors to compute – only the user's declared majors
   const majorIds = useMemo<string[]>(() => userMajors, [userMajors]);
@@ -319,6 +323,7 @@ export default function Simulator({
     initialSemestersRef.current = JSON.parse(
       JSON.stringify(semestersArr),
     ) as Semester[];
+    initialManualReqsRef.current = [];
 
     // 3) Build pool of available (not-taken & not already taken)
     setAvailableCourses(
@@ -356,7 +361,12 @@ export default function Simulator({
       Array.from(currentPlacements).some((p) => !initialPlacements.has(p)) ||
       Array.from(initialPlacements).some((p) => !currentPlacements.has(p));
 
-    const changed = placementsChanged || simulatorManualReqs.length > 0;
+    // Compare manual requirements
+    const currentManualReqsStr = JSON.stringify(simulatorManualReqs);
+    const initialManualReqsStr = JSON.stringify(initialManualReqsRef.current);
+    const manualReqsChanged = currentManualReqsStr !== initialManualReqsStr;
+
+    const changed = placementsChanged || manualReqsChanged;
 
     setHasChanges(changed);
   }, [semesters, simulatorManualReqs]);
@@ -403,6 +413,15 @@ export default function Simulator({
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [showPlanSelector, showSaveModal, showPlansModal]);
+
+  // ------------ Scroll detection for sticky nav ------------
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 10);
+    };
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   // ------------ Drag & Drop ------------
   const playPopSound = () => {
@@ -611,6 +630,35 @@ export default function Simulator({
   ]);
 
   // ------------ Save / Load / Delete Plans ------------
+
+  // Helper to load a plan from Plan object directly
+  const loadPlanData = (plan: Plan) => {
+    setSemesters(plan.semesters);
+    setSimulatorManualReqs(plan.manualRequirements ?? []);
+    initialSemestersRef.current = JSON.parse(
+      JSON.stringify(plan.semesters),
+    ) as Semester[];
+    initialManualReqsRef.current = JSON.parse(
+      JSON.stringify(plan.manualRequirements ?? []),
+    ) as ManualRequirementEntry[];
+
+    const usedCodes = new Set<string>();
+    plan.semesters.forEach((sem) =>
+      sem.courses.forEach((course) => usedCodes.add(course.code)),
+    );
+
+    setAvailableCourses(
+      remainingCourses.filter(
+        (c) =>
+          !usedCodes.has(c.code) &&
+          !completedCourses.some((cc) => cc.code === c.code),
+      ),
+    );
+
+    setCurrentPlanName(plan.name);
+    setHasChanges(false);
+  };
+
   const savePlan = async () => {
     if (!user || !planName.trim()) return;
     try {
@@ -635,42 +683,24 @@ export default function Simulator({
         { merge: true },
       );
       setSavedPlans(updatedPlans);
-      setCurrentPlanName(savedName);
-      // Update initial snapshot so hasChanges resets
-      initialSemestersRef.current = JSON.parse(
-        JSON.stringify(semesters),
-      ) as Semester[];
+
+      // Load the saved plan
+      loadPlanData(newPlan);
+
       setPlanName("");
       setSelectedPlanToOverwrite(null);
       setShowSaveModal(false);
+      toast.success(`Plan "${savedName}" saved!`);
     } catch (error) {
       console.error("Error saving plan:", error);
+      toast.error("Failed to save plan");
     }
   };
 
   const loadPlan = (planIndex: number) => {
     if (planIndex < 0 || planIndex >= savedPlans.length) return;
     const plan = savedPlans[planIndex];
-    setSemesters(plan.semesters);
-    setSimulatorManualReqs(plan.manualRequirements ?? []);
-    initialSemestersRef.current = JSON.parse(
-      JSON.stringify(plan.semesters),
-    ) as Semester[];
-
-    const usedCodes = new Set<string>();
-    plan.semesters.forEach((sem) =>
-      sem.courses.forEach((course) => usedCodes.add(course.code)),
-    );
-
-    setAvailableCourses(
-      remainingCourses.filter(
-        (c) =>
-          !usedCodes.has(c.code) &&
-          !completedCourses.some((cc) => cc.code === c.code),
-      ),
-    );
-
-    setCurrentPlanName(plan.name);
+    loadPlanData(plan);
     setShowPlansModal(false);
   };
 
@@ -723,80 +753,98 @@ export default function Simulator({
       }}
     >
       {/* Header */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-        <div className="mb-6">
-          <h2 className="text-3xl font-medium bg-clip-text text-transparent bg-gradient-to-r from-blue-200 to-purple-200">
-            Need to visualize? No problem.
-          </h2>
-          <p className="text-gray-400">
-            Your interactive, tailor-made, drag-and-drop Yale degree simulator
-            is here.
-          </p>
+      <div className="mb-4">
+        <h2 className="text-3xl font-medium bg-clip-text text-transparent bg-gradient-to-r from-blue-200 to-purple-200">
+          Need to visualize? No problem.
+        </h2>
+        <p className="text-gray-400">
+          Your interactive, tailor-made, drag-and-drop Yale degree simulator is
+          here.
+        </p>
+      </div>
+
+      {/* Sticky Toolbar */}
+      <div
+        className={`sticky top-0 z-30 -mx-4 px-6 py-3 mb-4 backdrop-blur-xl transition-all duration-200 ${
+          isScrolled
+            ? "bg-gradient-to-r from-gray-900/95 via-gray-950/95 to-gray-900/95 border-b border-white/[0.06] shadow-[0_4px_20px_rgba(0,0,0,0.3)]"
+            : "bg-transparent border-b border-transparent"
+        }`}
+      >
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
           {/* Current Plan Status */}
-          <div className="mt-2 flex items-center gap-2">
-            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white/[0.03] border border-white/[0.06]">
+          <div className="flex items-center gap-3">
+            <span className="text-xs text-gray-500 uppercase tracking-wider">
+              Plan:
+            </span>
+            <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-white/[0.04] border border-white/[0.08]">
               {currentPlanName ? (
                 <>
                   <div
-                    className={`w-1.5 h-1.5 rounded-full ${hasChanges ? "bg-amber-400" : "bg-emerald-400"}`}
+                    className={`w-2.5 h-2.5 rounded-full ${hasChanges ? "bg-amber-400 animate-pulse" : "bg-emerald-400"}`}
                   />
-                  <span className="text-xs text-gray-300">
+                  <span className="text-base font-medium text-gray-200">
                     {currentPlanName}
                   </span>
                   {hasChanges && (
-                    <span className="text-[10px] text-amber-400/80 ml-1">
-                      · unsaved changes
+                    <span className="text-xs text-amber-400 ml-1 px-2 py-0.5 rounded-full bg-amber-400/10 border border-amber-400/20">
+                      unsaved
                     </span>
                   )}
                 </>
               ) : (
                 <>
                   <div
-                    className={`w-1.5 h-1.5 rounded-full ${hasChanges ? "bg-blue-400 animate-pulse" : "bg-gray-500"}`}
+                    className={`w-2.5 h-2.5 rounded-full ${hasChanges ? "bg-blue-400 animate-pulse" : "bg-gray-500"}`}
                   />
-                  <span className="text-xs text-gray-400">
-                    {hasChanges ? "New plan in progress" : "No plan loaded"}
+                  <span className="text-sm text-gray-400">
+                    {hasChanges ? "Unsaved new plan" : "No plan loaded"}
                   </span>
                 </>
               )}
             </div>
           </div>
-        </div>
-        <div className="flex items-start gap-2 flex-wrap">
-          <button
-            onClick={() => setShowHelp((v) => !v)}
-            className="px-3 py-1.5 text-xs rounded-xl bg-white/[0.04] backdrop-blur-sm text-gray-400 hover:text-gray-200 hover:bg-white/[0.06] border border-white/[0.06] flex items-center gap-1.5 transition-all"
-          >
-            <FiInfo size={12} />
-            Help
-          </button>
-          {user && (
-            <>
-              <button
-                onClick={() => setShowPlansModal(true)}
-                className="px-3 py-1.5 text-xs rounded-xl bg-gradient-to-r from-blue-500/10 to-purple-500/10 backdrop-blur-sm text-blue-300 hover:text-blue-200 hover:from-blue-500/15 hover:to-purple-500/15 border border-blue-500/20 hover:border-blue-400/30 transition-all"
-              >
-                Load Plan
-              </button>
-              <button
-                onClick={() => setShowSaveModal(true)}
-                className={`px-3 py-1.5 text-xs rounded-xl backdrop-blur-sm transition-all ${
-                  hasChanges
-                    ? "bg-gradient-to-r from-purple-500/15 to-pink-500/15 text-purple-300 hover:text-purple-200 hover:from-purple-500/20 hover:to-pink-500/20 border border-purple-500/20 hover:border-purple-400/30"
-                    : "bg-white/[0.02] text-gray-600 border border-white/[0.04] cursor-not-allowed"
-                }`}
-                disabled={!hasChanges}
-              >
-                Save Plan
-              </button>
-            </>
-          )}
-          <button
-            onClick={resetSimulator}
-            className="px-3 py-1.5 text-xs rounded-xl bg-red-500/10 backdrop-blur-sm text-red-400 hover:text-red-300 hover:bg-red-500/15 border border-red-500/20 hover:border-red-400/30 transition-all"
-          >
-            Reset
-          </button>
+
+          {/* Action Buttons */}
+          <div className="flex items-center gap-2 flex-wrap">
+            <button
+              onClick={() => setShowHelp((v) => !v)}
+              className="px-4 py-2 text-sm rounded-xl bg-white/[0.04] backdrop-blur-sm text-gray-400 hover:text-gray-200 hover:bg-white/[0.08] border border-white/[0.08] flex items-center gap-2 transition-all"
+            >
+              <FiInfo size={14} />
+              Help
+            </button>
+            {user && (
+              <>
+                <button
+                  onClick={() => setShowPlansModal(true)}
+                  className="px-4 py-2 text-sm rounded-xl bg-gradient-to-r from-blue-500/15 to-purple-500/15 backdrop-blur-sm text-blue-300 hover:text-blue-200 hover:from-blue-500/20 hover:to-purple-500/20 border border-blue-500/30 hover:border-blue-400/40 flex items-center gap-2 transition-all"
+                >
+                  <FiChevronDown size={14} />
+                  Load Plan
+                </button>
+                <button
+                  onClick={() => setShowSaveModal(true)}
+                  className={`px-4 py-2 text-sm rounded-xl backdrop-blur-sm transition-all flex items-center gap-2 ${
+                    hasChanges
+                      ? "bg-gradient-to-r from-emerald-500/20 to-teal-500/20 text-emerald-300 hover:text-emerald-200 hover:from-emerald-500/25 hover:to-teal-500/25 border border-emerald-500/30 hover:border-emerald-400/40"
+                      : "bg-white/[0.02] text-gray-600 border border-white/[0.04] cursor-not-allowed"
+                  }`}
+                  disabled={!hasChanges}
+                >
+                  <FiPlus size={14} />
+                  Save Current
+                </button>
+              </>
+            )}
+            <button
+              onClick={resetSimulator}
+              className="px-4 py-2 text-sm rounded-xl bg-red-500/10 backdrop-blur-sm text-red-400 hover:text-red-300 hover:bg-red-500/15 border border-red-500/20 hover:border-red-400/30 flex items-center gap-2 transition-all"
+            >
+              <FiRefreshCw size={14} />
+              Clear canvas
+            </button>
+          </div>
         </div>
       </div>
 
@@ -873,7 +921,7 @@ export default function Simulator({
       </div>
 
       {/* Available Courses Pool */}
-      <div className="sticky top-0 z-30 mb-2" style={{ top: "0px" }}>
+      <div className="sticky top-[72px] z-20 mb-2">
         <div className="bg-gradient-to-br from-pink-950/30 via-gray-900/50 to-gray-950/50 backdrop-blur-md rounded-xl border border-pink-800/30 shadow-[inset_0_1px_0_rgba(255,255,255,0.04),0_4px_16px_rgba(0,0,0,0.25)] overflow-hidden">
           <button
             onClick={() => setShowPool(!showPool)}
@@ -1374,7 +1422,7 @@ export default function Simulator({
               {/* Header */}
               <div className="text-center mb-6">
                 <h3 className="text-xl font-medium bg-gradient-to-r from-blue-200 via-purple-200 to-pink-200 bg-clip-text text-transparent mb-1">
-                  Welcome to the Simulator
+                  Welcome to your Yale Simulator.
                 </h3>
                 <p className="text-sm text-gray-400">
                   Pick up where you left off, or start fresh.
@@ -1382,7 +1430,7 @@ export default function Simulator({
               </div>
 
               {/* Saved Plans List */}
-              <div className="space-y-2 max-h-[280px] overflow-y-auto pr-1 mb-4">
+              <div className="space-y-2 max-h-[280px] overflow-y-auto px-1 mb-4">
                 {savedPlans.map((plan, index) => {
                   const plannedCount = plan.semesters.reduce(
                     (acc, sem) =>

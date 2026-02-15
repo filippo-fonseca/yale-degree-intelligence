@@ -2,7 +2,13 @@
 
 import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
-import { FiLogOut, FiEdit2, FiMoreVertical, FiTrash2, FiChevronDown } from "react-icons/fi";
+import {
+  FiLogOut,
+  FiEdit2,
+  FiMoreVertical,
+  FiTrash2,
+  FiChevronDown,
+} from "react-icons/fi";
 import { User } from "firebase/auth";
 import { MAJORS } from "@/lib/majors";
 import { MajorDropdown } from "../ui/MajorDropdown";
@@ -334,7 +340,7 @@ export default function UserSettingsModal({
                   Friends Feature
                 </span>
                 <p className="text-[10px] text-gray-400 mt-0.5">
-                  Let friends see your courses (grades hidden)
+                  Let friends see your courses (grades are always hidden, ofc).
                 </p>
               </div>
               <label className="relative inline-flex items-center cursor-pointer">
@@ -362,7 +368,7 @@ export default function UserSettingsModal({
             {friendsEnabled && (
               <div className="px-3 pb-2 -mt-1">
                 <p className="text-[10px] text-emerald-400">
-                  Course list visible to friends
+                  Course list is visible to friends.
                 </p>
               </div>
             )}
@@ -397,7 +403,9 @@ export default function UserSettingsModal({
                     </h3>
                   </div>
                   <p className="text-gray-400 text-xs mb-3">
-                    This will <strong className="text-red-400">remove all friends</strong> and hide your courses.
+                    This will{" "}
+                    <strong className="text-red-400">remove all friends</strong>{" "}
+                    and hide your courses.
                   </p>
                   <div className="flex justify-end gap-2">
                     <button
@@ -631,7 +639,8 @@ export default function UserSettingsModal({
                     </h3>
                   </div>
                   <p className="text-gray-400 text-xs mb-3">
-                    Permanently remove all data including courses, friends, and conversations. Cannot be undone.
+                    Permanently remove all data including courses, friends, and
+                    conversations. Cannot be undone.
                   </p>
                   <div className="flex justify-end gap-2">
                     <button

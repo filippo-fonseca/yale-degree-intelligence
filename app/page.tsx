@@ -40,7 +40,6 @@ import {
 } from "@/lib/syncFriendsPublicData";
 import { gradePoints, getDistPillStyle } from "@/lib/constants";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
-import V2AnnouncementModal from "@/components/V2AnnouncementModal/V2AnnouncementModal";
 import { calculateMajorProgress, MAJORS } from "@/lib/majors";
 import MajorProgressView from "@/components/MajorProgressView";
 import StatsView from "@/components/StatsView";
@@ -142,39 +141,6 @@ export default function Home() {
   const [showSharedCoursesDropdown, setShowSharedCoursesDropdown] =
     useState(false);
   const sharedCoursesRef = useRef<HTMLDivElement>(null);
-  const [showV2Modal, setShowV2Modal] = useState(false);
-
-  // Check if user has seen v2 announcement modal - only show on "my courses" tab after onboarding is complete
-  useEffect(() => {
-    // Don't show if: no user, onboarding in progress, or not on upload tab
-    if (!user || showMajorSelection || activeTab !== "upload") return;
-    const checkV2ModalSeen = async () => {
-      try {
-        const userDoc = await getDoc(doc(db, "users", user.uid));
-        const data = userDoc.data();
-        if (!data?.hasSeenV2Modal) {
-          setShowV2Modal(true);
-        }
-      } catch (error) {
-        console.error("Error checking v2 modal status:", error);
-      }
-    };
-    checkV2ModalSeen();
-  }, [user, showMajorSelection, activeTab]);
-
-  const dismissV2Modal = async () => {
-    setShowV2Modal(false);
-    if (!user) return;
-    try {
-      await setDoc(
-        doc(db, "users", user.uid),
-        { hasSeenV2Modal: true },
-        { merge: true },
-      );
-    } catch (error) {
-      console.error("Error saving v2 modal status:", error);
-    }
-  };
 
   // Close shared courses dropdown on outside click
   useEffect(() => {
@@ -818,9 +784,6 @@ export default function Home() {
           }}
         />
       )}
-
-      {/* V2 Announcement Modal - One time show */}
-      <V2AnnouncementModal show={showV2Modal} onDismiss={dismissV2Modal} />
 
       {/* Background elements */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
@@ -2177,12 +2140,22 @@ export default function Home() {
                         </div>
                       </div>
                     )}
-                  <MajorProgressView
-                    selectedMajor={selectedMajor}
-                    progress={getMajorProgress()!}
-                    onRequirementChange={fetchCourses}
-                    courses={courses}
-                  />
+                  {getMajorProgress() ? (
+                    <MajorProgressView
+                      selectedMajor={selectedMajor}
+                      progress={getMajorProgress()!}
+                      onRequirementChange={fetchCourses}
+                      courses={courses}
+                    />
+                  ) : (
+                    <div className="flex flex-col items-center justify-center py-16 text-center">
+                      <p className="text-gray-400 text-lg">
+                        {!selectedMajor
+                          ? "Please select a major to view your progress."
+                          : "Loading your major progress..."}
+                      </p>
+                    </div>
+                  )}
                 </motion.div>
               )}
               {activeTab === "simulator" && (

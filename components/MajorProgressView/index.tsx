@@ -468,7 +468,7 @@ export default function MajorProgressView({
   const completedCredits = progress?.completedCredits;
   const inProgressCredits = progress?.inProgressCredits || 0;
   const totalCredits = progress?.totalCredits;
-  const completionPercentage = progress.percentage;
+  const completionPercentage = progress?.percentage;
   const withInProgressPercentage =
     progress?.inProgressPercentage || progress?.percentage;
 

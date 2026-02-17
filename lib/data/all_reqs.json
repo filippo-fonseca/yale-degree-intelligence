@@ -2459,7 +2459,7 @@
       }
     ]
   },
-  "APHY": {
+  "APHY_BS": {
     "id": "APHY_BS",
     "name": "Applied Physics, B.S.",
     "description": "Bachelor of Science in Applied Physics",
@@ -4148,7 +4148,7 @@
       }
     ]
   },
-  "ARCG": {
+  "ARCG_BA": {
     "id": "ARCG_BA",
     "name": "Archaeological Studies, B.A.",
     "description": "Bachelor of Arts in Archaeological Studies",
@@ -10449,7 +10449,7 @@
       }
     ]
   },
-  "CENG_ABET": {
+  "CENG_ABET_BS": {
     "id": "CENG_ABET_BS",
     "name": "Chemical Engineering, B.S. (ABET)",
     "description": "Bachelor of Science in Chemical Engineering (ABET-accredited)",

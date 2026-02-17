@@ -349,7 +349,7 @@ export default function AboutPage() {
               className="mt-8 pt-6 border-t border-white/[0.08]"
             >
               <p className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-blue-200 via-purple-200 to-pink-200 bg-clip-text text-transparent leading-relaxed">
-                1 in 8 Yale undergrads already use DegreeIntelligence.
+                1 in 7 Yale undergrads already use DegreeIntelligence.
               </p>
               <p className="text-base text-gray-400 mt-2">
                 Why don't you? Even if you do...{" "}

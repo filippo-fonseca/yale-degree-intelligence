@@ -17,6 +17,7 @@ import {
   FiMenu,
   FiAlertTriangle,
   FiCheck,
+  FiPlus,
 } from "react-icons/fi";
 import {
   collection,
@@ -58,6 +59,7 @@ import CourseModal from "@/components/MajorProgressView/CourseModal";
 import { getGPAColor } from "@/lib/utils/utils";
 import { getSharedCourses } from "@/lib/utils/sharedCourses";
 import ConfirmDeleteModal from "@/components/ConfirmDeleteModal/ConfirmDeleteModal";
+import ManualCourseEntryModal from "@/components/ManualCourseEntryModal";
 import PublicFacingPage from "@/screens/PublicFacingPage";
 import FriendsTab from "@/components/FriendsTab/FriendsTab";
 import { MessageCircleQuestionMark, MonitorCog, Printer } from "lucide-react";
@@ -138,6 +140,7 @@ export default function Home() {
   };
 
   const [showUpdateModal, setShowUpdateModal] = useState(false);
+  const [showManualEntryModal, setShowManualEntryModal] = useState(false);
   const [showSharedCoursesDropdown, setShowSharedCoursesDropdown] =
     useState(false);
   const sharedCoursesRef = useRef<HTMLDivElement>(null);
@@ -558,6 +561,85 @@ export default function Home() {
     }
 
     if (showUpdateModal) setShowUpdateModal(false);
+  };
+
+  // Handler for manually entered courses
+  const handleManualCourseEntry = async (coursesToAdd: Omit<Course, "id">[]) => {
+    if (!user) return;
+
+    // Check for duplicates against existing courses
+    const existingCoursesQuery = query(
+      collection(db, "courses"),
+      where("userId", "==", user.uid),
+    );
+    const existingSnapshot = await getDocs(existingCoursesQuery);
+
+    const existingCoursesMap = new Map<
+      string,
+      { docId: string; grade: string | null }
+    >();
+    existingSnapshot.docs.forEach((docSnap) => {
+      const data = docSnap.data();
+      const key = `${data.semester}-${data.year}-${data.code}`;
+      existingCoursesMap.set(key, { docId: docSnap.id, grade: data.grade || null });
+    });
+
+    const newCoursesToAdd: Omit<Course, "id">[] = [];
+
+    for (const course of coursesToAdd) {
+      const key = `${course.semester}-${course.year}-${course.code}`;
+      const existingCourse = existingCoursesMap.get(key);
+
+      if (existingCourse) {
+        // If course exists with different grade, delete old and add new
+        if (existingCourse.grade !== course.grade) {
+          await deleteDoc(doc(db, "courses", existingCourse.docId));
+          newCoursesToAdd.push(course);
+        }
+        // If same grade, skip (duplicate)
+      } else {
+        newCoursesToAdd.push(course);
+      }
+    }
+
+    if (newCoursesToAdd.length > 0) {
+      const batchWrites = newCoursesToAdd.map((course) => {
+        const docRef = doc(collection(db, "courses"));
+        return setDoc(docRef, course);
+      });
+      await Promise.all(batchWrites);
+    }
+
+    // Refresh courses
+    await fetchCourses();
+
+    // Check and remove any duplicates
+    try {
+      await checkAndRemoveDuplicates(user.uid);
+      await fetchCourses();
+    } catch (error) {
+      console.error("Error during duplicate check:", error);
+    }
+
+    // Sync to friends_public_data if enabled
+    if (friendsEnabled) {
+      const q = query(
+        collection(db, "courses"),
+        where("userId", "==", user.uid),
+      );
+      const snap = await getDocs(q);
+      const freshCourses = snap.docs.map((d) => ({
+        id: d.id,
+        ...d.data(),
+      })) as Course[];
+      await syncFriendsPublicData(user.uid, freshCourses, userProfile, {
+        displayName: user.displayName,
+        email: user.email,
+        photoURL: user.photoURL,
+      });
+    }
+
+    setShowManualEntryModal(false);
   };
 
   const calculateStats = () => {
@@ -1223,20 +1305,23 @@ export default function Home() {
                             All your classes, grades, and in-progress courses.
                           </p>
                         </div>
-                        <motion.button
-                          whileHover={{ scale: 1.03 }}
-                          whileTap={{ scale: 0.98 }}
-                          onClick={() => setShowUpdateModal(true)}
-                          className="flex items-center gap-2 px-3 py-2 lg:px-4 lg:py-2.5 rounded-xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-all shadow-[0_4px_20px_rgba(0,0,0,0.08)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.25)] text-sm"
-                        >
-                          <FiRefreshCw
-                            className="text-blue-500 dark:text-blue-400"
-                            size={16}
-                          />
-                          <span className="hidden sm:inline">
-                            Update courses
-                          </span>
-                        </motion.button>
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={() => setShowManualEntryModal(true)}
+                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gray-800/50 border border-gray-700/50 hover:border-pink-500/40 hover:bg-gray-800 text-gray-400 hover:text-pink-300 transition-all text-sm"
+                            title="Add courses manually"
+                          >
+                            <FiPlus size={14} />
+                            <span className="hidden sm:inline">Add</span>
+                          </button>
+                          <button
+                            onClick={() => setShowUpdateModal(true)}
+                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gray-800/50 border border-gray-700/50 hover:border-blue-500/40 hover:bg-gray-800 text-gray-400 hover:text-blue-300 transition-all text-sm"
+                          >
+                            <FiRefreshCw size={14} />
+                            <span className="hidden sm:inline">Re-upload</span>
+                          </button>
+                        </div>
                       </div>
 
                       <div className="space-y-8">
@@ -1337,7 +1422,9 @@ export default function Home() {
                                           .map((course) => (
                                             <motion.div
                                               key={course.id}
-                                              whileHover={{ y: -2 }}
+                                              whileHover={{ scale: 0.98 }}
+                                              whileTap={{ scale: 0.96 }}
+                                              transition={{ duration: 0.1 }}
                                               className={`relative p-4 cursor-pointer rounded-xl bg-white dark:bg-gray-900/50 backdrop-blur-sm border border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700 transition-all shadow-sm dark:shadow-none`}
                                               onClick={() => {
                                                 setModalOpen({
@@ -1411,24 +1498,20 @@ export default function Home() {
                                                   </div>
                                                 </div>
 
-                                                {/* NEW: Trash button ONLY for in-progress (and not skipped) */}
-                                                {course.status ===
-                                                  "in-progress" &&
-                                                  !course.skipped && (
-                                                    <button
-                                                      aria-label="Delete in-progress course"
-                                                      className="absolute top-3 right-3 p-2 rounded-lg border border-red-300 dark:border-red-800/40 bg-red-50 dark:bg-red-900/20 text-red-500 dark:text-red-300 hover:bg-red-100 dark:hover:bg-red-900/30 hover:border-red-400 dark:hover:border-red-700 transition-all"
-                                                      onClick={(e) => {
-                                                        e.stopPropagation(); // don't open the CourseModal
-                                                        openDeleteConfirm(
-                                                          course,
-                                                        );
-                                                      }}
-                                                      title="Delete this in-progress course"
-                                                    >
-                                                      <FiTrash2 className="w-4 h-4" />
-                                                    </button>
-                                                  )}
+                                                {/* Trash button for any course (except skipped) */}
+                                                {!course.skipped && (
+                                                  <button
+                                                    aria-label="Delete course"
+                                                    className="absolute top-3 right-3 p-1.5 rounded-lg border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 text-gray-400 dark:text-gray-500 hover:border-red-400 dark:hover:border-red-800 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-500 dark:hover:text-red-400 transition-all"
+                                                    onClick={(e) => {
+                                                      e.stopPropagation();
+                                                      openDeleteConfirm(course);
+                                                    }}
+                                                    title="Delete course"
+                                                  >
+                                                    <FiTrash2 className="w-3.5 h-3.5" />
+                                                  </button>
+                                                )}
                                               </div>
                                               {/* Distributional tags */}
                                               <div
@@ -1645,7 +1728,9 @@ export default function Home() {
                                 .map((course) => (
                                   <motion.div
                                     key={course.id}
-                                    whileHover={{ y: -2 }}
+                                    whileHover={{ scale: 0.98 }}
+                                    whileTap={{ scale: 0.96 }}
+                                    transition={{ duration: 0.1 }}
                                     className="p-4 rounded-xl bg-white dark:bg-gray-900/50 backdrop-blur-sm border border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700 transition-all border-l-2 shadow-sm dark:shadow-none"
                                   >
                                     <div className="flex justify-between items-start">
@@ -1804,6 +1889,20 @@ export default function Home() {
                         <FileUpload onSuccess={parseAndStoreCourses} />
                       </div>
 
+                      {/* Manual Entry Option */}
+                      <div className="w-full max-w-xl mt-3 text-center">
+                        <p className="text-sm text-gray-500 dark:text-gray-400">
+                          Prefer to type in your courses manually?{" "}
+                          <button
+                            onClick={() => setShowManualEntryModal(true)}
+                            className="text-pink-400 hover:text-pink-300 underline underline-offset-2 transition-colors"
+                          >
+                            Click here
+                          </button>
+                          .
+                        </p>
+                      </div>
+
                       {/* Data & Privacy Disclaimer */}
                       <div className="w-full max-w-xl mt-5 p-4 rounded-xl bg-gradient-to-br from-gray-900/40 via-gray-900/30 to-gray-950/40 border border-gray-800/50 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)]">
                         <div className="flex items-start gap-3">
@@ -1919,6 +2018,15 @@ export default function Home() {
                   </motion.div>
                 </motion.div>
               )}
+
+              {/* Manual Course Entry Modal */}
+              <ManualCourseEntryModal
+                isOpen={showManualEntryModal}
+                onClose={() => setShowManualEntryModal(false)}
+                onSubmit={handleManualCourseEntry}
+                userId={user?.uid || ""}
+              />
+
               {activeTab === "stats" && (
                 <motion.div
                   key="stats"

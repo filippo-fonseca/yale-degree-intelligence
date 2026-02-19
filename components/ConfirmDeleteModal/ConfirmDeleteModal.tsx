@@ -53,15 +53,28 @@ export default function ConfirmDeleteModal({
               <span className="font-semibold text-gray-900 dark:text-gray-100">
                 {course.code}
               </span>{" "}
-              ({getCourseNameFromCode(course.code) || "Course"}) from your{" "}
-              <span className="text-purple-600 dark:text-purple-300">
-                in-progress
-              </span>{" "}
-              list.
+              ({getCourseNameFromCode(course.code) || "Course"})
+              {course.status === "in-progress" ? (
+                <>
+                  {" "}from your{" "}
+                  <span className="text-purple-600 dark:text-purple-300">
+                    in-progress
+                  </span>{" "}
+                  courses.
+                </>
+              ) : (
+                <>
+                  {" "}from{" "}
+                  <span className="text-gray-900 dark:text-gray-100">
+                    {course.semester} {course.year}
+                  </span>
+                  .
+                </>
+              )}
             </p>
             <p className="text-gray-500 dark:text-gray-400 text-sm mt-2">
               This only removes the entry from DegreeIntelligence. You can
-              re-import it later by uploading a fresh transcript.
+              re-add it later by uploading a transcript or adding manually.
             </p>
 
             <div className="mt-6 flex items-center justify-end gap-2">

@@ -103,9 +103,11 @@ function isPastSemester(semesterName: string) {
   if (year > currentYear) return false;
 
   // Coarse cutoffs so you can't alter clearly past terms:
-  // treat Feb+ as "Fall is in the past"; treat Jun+ as "Spring is in the past"
-  if (sem === "Fall" && currentMonth > 1) return true; // > Feb
-  if (sem === "Spring" && currentMonth > 5) return true; // > Jun
+  // Fall of current year is editable until January of the next year
+  // (at which point year < currentYear catches it)
+  // Spring is past once it ends (June+)
+  if (sem === "Fall" && currentMonth > 11) return true; // > Dec (never true, handled by next year check)
+  if (sem === "Spring" && currentMonth > 5) return true; // > Jun (Spring ended)
   return false;
 }
 

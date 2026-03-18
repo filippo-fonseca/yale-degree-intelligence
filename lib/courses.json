@@ -5309,6 +5309,15 @@
   {
     "codes": [
       "BENG 4971",
+      "BENG 471"
+    ],
+    "name": "Senior Project",
+    "credits": 1.0,
+    "department": "BENG"
+  },
+  {
+    "codes": [
+      "BENG 4972",
       "BENG 472"
     ],
     "name": "Special Projects",
@@ -5318,6 +5327,15 @@
   {
     "codes": [
       "BENG 4973",
+      "BENG 473"
+    ],
+    "name": "Senior Project",
+    "credits": 1.0,
+    "department": "BENG"
+  },
+  {
+    "codes": [
+      "BENG 4974",
       "BENG 474"
     ],
     "name": "Senior Project",

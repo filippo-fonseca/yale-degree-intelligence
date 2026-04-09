@@ -157,14 +157,34 @@ export default function SimulatorRequirementsBreakdown({
           }
         }
 
-        // Calculate three-tier percentages based on requirement completion
+        // Calculate three-tier percentages based on fractional requirement completion
+        // Each requirement contributes proportionally based on credits completed/planned
         const totalReqs = prog.completedRequirements.length +
           prog.inProgressRequirements.length +
           prog.remainingRequirements.length;
 
+        // Helper to calculate fractional completion of a requirement (based on credits)
+        const getFractionCompleted = (req: typeof prog.completedRequirements[number]) => {
+          const completedCredits = req.options
+            .filter(o => o.completed)
+            .reduce((sum, o) => sum + o.credits, 0);
+          const inProgressCredits = req.options
+            .filter(o => o.inProgress)
+            .reduce((sum, o) => sum + o.credits, 0);
+          const totalProgress = Math.min(completedCredits + inProgressCredits, req.required);
+          return req.required > 0 ? totalProgress / req.required : 0;
+        };
+
+        // Completed requirements contribute 1.0 each (fully satisfied)
         const completedCount = prog.completedRequirements.length;
-        const withIPCount = completedCount + trueInProgress.length;
-        const withPlannedCount = withIPCount + planned.length;
+
+        // True in-progress: add fractional contribution based on completed + in-progress
+        const trueIPFraction = trueInProgress.reduce((sum, req) => sum + getFractionCompleted(req), 0);
+        const withIPCount = completedCount + trueIPFraction;
+
+        // Planned: add fractional contribution based on completed + planned
+        const plannedFraction = planned.reduce((sum, req) => sum + getFractionCompleted(req), 0);
+        const withPlannedCount = withIPCount + plannedFraction;
 
         const pctWithIP = totalReqs > 0 ? (withIPCount / totalReqs) * 100 : 0;
         const pctWithPlanned = totalReqs > 0 ? (withPlannedCount / totalReqs) * 100 : 0;
@@ -282,6 +302,7 @@ export default function SimulatorRequirementsBreakdown({
                         manualReqs={manualForMajor}
                         onRemoveManual={onRemoveManualReq}
                         isPlanned={isPlanned}
+                        showCombinedProgress
                       />
                     )}
 
@@ -325,6 +346,7 @@ function ReqSection({
   manualReqs,
   onRemoveManual,
   isPlanned,
+  showCombinedProgress = false,
 }: {
   title: string;
   reqs: CompletedRequirement[];
@@ -332,6 +354,7 @@ function ReqSection({
   manualReqs: ManualRequirementEntry[];
   onRemoveManual: (code: string, requirement: string) => void;
   isPlanned: (code: string) => boolean;
+  showCombinedProgress?: boolean;
 }) {
   const titleColor: Record<typeof color, string> = {
     green: "text-emerald-400",
@@ -358,17 +381,33 @@ function ReqSection({
             (m) => m.requirement === req.name
           );
 
+          // Calculate credit progress for this requirement
+          const completedCredits = req.options
+            .filter(o => o.completed)
+            .reduce((sum, o) => sum + o.credits, 0);
+          const inProgressCredits = req.options
+            .filter(o => o.inProgress)
+            .reduce((sum, o) => sum + o.credits, 0);
+          const displayCredits = showCombinedProgress
+            ? completedCredits + inProgressCredits
+            : completedCredits;
+          const isIncomplete = showCombinedProgress && displayCredits < req.required;
+
           return (
             <div
               key={req.name}
-              className="px-2.5 py-1.5 rounded-lg bg-gray-800/30 border border-gray-800/40"
+              className={`px-2.5 py-1.5 rounded-lg bg-gray-800/30 border ${
+                isIncomplete ? "border-red-500/50" : "border-gray-800/40"
+              }`}
             >
               <div className="flex items-center justify-between mb-1">
                 <span className="text-xs text-gray-300 font-medium truncate mr-2">
                   {req.name}
                 </span>
-                <span className="text-[10px] text-gray-500 flex-shrink-0">
-                  {req.completed}/{req.required}
+                <span className={`text-[10px] flex-shrink-0 ${
+                  isIncomplete ? "text-red-400 font-medium" : "text-gray-500"
+                }`}>
+                  {displayCredits}/{req.required}
                 </span>
               </div>
 

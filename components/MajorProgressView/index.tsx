@@ -535,6 +535,10 @@ export default function MajorProgressView({
     () => (progress.completedRequirements || []).map(normalizeReq),
     [progress.completedRequirements, normalizeReq],
   );
+  const inProgressNorm = useMemo(
+    () => (progress.inProgressRequirements || []).map(normalizeReq),
+    [progress.inProgressRequirements, normalizeReq],
+  );
   const remainingNorm = useMemo(
     () => (progress.remainingRequirements || []).map(normalizeReq),
     [progress.remainingRequirements, normalizeReq],
@@ -595,15 +599,20 @@ export default function MajorProgressView({
   );
 
   // 6) Build remainingForUI WITHOUT duplicates
+  // Includes: remainingNorm, inProgressNorm (from majors.ts), and demotedFromCompleted
   const remainingForUI = useMemo(() => {
     const map = new Map<string, any>();
     for (const r of remainingNorm) map.set(reqKeyFn(r), r);
+    for (const r of inProgressNorm) {
+      const k = reqKeyFn(r);
+      map.set(k, map.has(k) ? mergeReq(map.get(k), r) : r);
+    }
     for (const r of demotedFromCompleted) {
       const k = reqKeyFn(r);
       map.set(k, map.has(k) ? mergeReq(map.get(k), r) : r);
     }
     return Array.from(map.values());
-  }, [remainingNorm, demotedFromCompleted, mergeReq, reqKeyFn]);
+  }, [remainingNorm, inProgressNorm, demotedFromCompleted, mergeReq, reqKeyFn]);
 
   // Precompute stats/splits for Remaining
   const withStats = useMemo(() => {

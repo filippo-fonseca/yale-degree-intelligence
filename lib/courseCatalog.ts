@@ -1,4 +1,4 @@
-import courses from './courses.json';
+import courses from './new_courses.json';
 
 export type CourseInfo = {
   codes: string[]; // First code (i.e. codes[0]) is the canonical/default
@@ -6,6 +6,8 @@ export type CourseInfo = {
   credits: number;
   department: string;
   distributionals?: string[];
+  isFall?: boolean;
+  isSpring?: boolean;
 };
 
 // Create a lookup map from all codes to their canonical course info
@@ -51,4 +53,22 @@ export const getCourseDistributionalsFromCode = (code: string): string[] | undef
 export const getOtherCodesForCourse = (code: string): string[] => {
   const course = getCourseInfo(code);
   return course ? course.codes.slice(1) : [];
+}
+
+// Check if a course is offered next year (has isFall or isSpring)
+export const isCourseOfferedNextYear = (code: string): boolean => {
+  const course = getCourseInfo(code);
+  return course ? (course.isFall === true || course.isSpring === true) : false;
+}
+
+// Check if a course is offered in Fall
+export const isCourseOfferedInFall = (code: string): boolean => {
+  const course = getCourseInfo(code);
+  return course?.isFall === true;
+}
+
+// Check if a course is offered in Spring
+export const isCourseOfferedInSpring = (code: string): boolean => {
+  const course = getCourseInfo(code);
+  return course?.isSpring === true;
 }

@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FiSearch, FiX, FiPlus } from "react-icons/fi";
-import coursesData from "@/lib/courses.json";
+import coursesData from "@/lib/new_courses.json";
 import { Course } from "@/lib/types";
 import { Panda } from "lucide-react";
 import Link from "next/link";
@@ -20,7 +20,7 @@ export default function ManualCourseLookupModal({
   userId,
 }: ManualCourseLookupModalProps) {
   const [searchTerm, setSearchTerm] = useState("");
-  const modalRef = useRef<HTMLDivElement>(null); // Ref to the modal div
+  const modalRef = useRef<HTMLDivElement>(null);
 
   // Close modal if click outside of modal
   useEffect(() => {
@@ -52,23 +52,24 @@ export default function ManualCourseLookupModal({
     return map;
   }, []);
 
-  // For display: array of canonical course objects (only one per course)
+  // For display: array of all canonical course objects
   const allCanonicalCourses = useMemo(() => {
     return (coursesData as any[]).map((course) => ({
       ...course,
       canonicalCode: course.codes?.[0],
       allCodes: course.codes,
+      isFall: course.isFall === true,
+      isSpring: course.isSpring === true,
     }));
   }, []);
 
-  // Filter for search, allowing match on *any* code, name, or department, but deduping by canonical code
+  // Filter for search, allowing match on *any* code, name, or department
   const filteredCourses = useMemo(() => {
     if (!searchTerm.trim()) return [];
     const lower = searchTerm.toLowerCase();
 
     return allCanonicalCourses
       .filter((course) => {
-        // Match any code (old or new), or name, or department
         const codesMatch = course.allCodes?.some((code: string) =>
           code.toLowerCase().includes(lower)
         );
@@ -78,7 +79,7 @@ export default function ManualCourseLookupModal({
           .includes(lower);
         return codesMatch || nameMatch || deptMatch;
       })
-      .slice(0, 15); // For performance
+      .slice(0, 15);
   }, [searchTerm, allCanonicalCourses]);
 
   return (
@@ -91,10 +92,10 @@ export default function ManualCourseLookupModal({
           exit={{ opacity: 0 }}
         >
           <motion.div
-            ref={modalRef} // Assign the ref here
+            ref={modalRef}
             className="bg-gray-900 p-6 rounded-xl max-w-xl w-full border border-gray-800 flex flex-col"
             style={{
-              height: "480px", // <--- Constant modal height
+              height: "480px",
               minHeight: "480px",
               maxHeight: "480px",
             }}
@@ -153,11 +154,50 @@ export default function ManualCourseLookupModal({
                     className="flex justify-between items-center px-3 py-2 bg-gray-800 rounded-lg border border-gray-700 hover:border-pink-400 transition cursor-pointer"
                   >
                     <div>
-                      <div className="font-medium text-gray-200">
+                      <div className="font-medium text-gray-200 flex items-center gap-2">
                         {c.canonicalCode}{" "}
                         <span className="text-xs text-gray-400 font-normal">
                           {c.department}
                         </span>
+                        {/* Semester emojis */}
+                        {c.isFall && c.isSpring ? (
+                          <span className="inline-flex items-center gap-1">
+                            <span
+                              className="inline-flex items-center px-1.5 py-0.5 rounded-md bg-gray-700/50 shadow-[inset_1px_1px_2px_rgba(0,0,0,0.3),inset_-1px_-1px_2px_rgba(255,255,255,0.05)] text-[11px]"
+                              title="Offered in Fall"
+                            >
+                              🍁
+                            </span>
+                            <span
+                              className="inline-flex items-center px-1.5 py-0.5 rounded-md bg-gray-700/50 shadow-[inset_1px_1px_2px_rgba(0,0,0,0.3),inset_-1px_-1px_2px_rgba(255,255,255,0.05)] text-[11px]"
+                              title="Offered in Spring"
+                            >
+                              🌰
+                            </span>
+                          </span>
+                        ) : c.isFall ? (
+                          <span
+                            className="inline-flex items-center px-1.5 py-0.5 rounded-md bg-gray-700/50 shadow-[inset_1px_1px_2px_rgba(0,0,0,0.3),inset_-1px_-1px_2px_rgba(255,255,255,0.05)] text-[11px]"
+                            title="Offered in Fall"
+                          >
+                            🍁
+                          </span>
+                        ) : c.isSpring ? (
+                          <span
+                            className="inline-flex items-center px-1.5 py-0.5 rounded-md bg-gray-700/50 shadow-[inset_1px_1px_2px_rgba(0,0,0,0.3),inset_-1px_-1px_2px_rgba(255,255,255,0.05)] text-[11px]"
+                            title="Offered in Spring"
+                          >
+                            🌰
+                          </span>
+                        ) : (
+                          <span
+                            className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-gray-700/50 shadow-[inset_1px_1px_2px_rgba(0,0,0,0.3),inset_-1px_-1px_2px_rgba(255,255,255,0.05)] text-[10px] text-gray-400"
+                            title="Verify semester offering on courses.yale.edu"
+                          >
+                            <span>❓</span>
+                            <span className="hidden sm:inline">verify semester offering</span>
+                          </span>
+                        )}
                       </div>
                       <div className="text-sm text-gray-400">{c.name}</div>
                       <div className="text-xs text-gray-500">

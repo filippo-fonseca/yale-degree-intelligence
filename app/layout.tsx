@@ -78,7 +78,7 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={`${louize.variable} ${sf.variable} dark`}>
+    <html lang="en" className={`${louize.variable} ${sf.variable} dark`} suppressHydrationWarning>
       <head />
       <AuthProvider>
         <ThemeProvider>

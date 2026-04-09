@@ -3,7 +3,7 @@
 import { useState, useEffect, useMemo, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FiX, FiPlus, FiSearch, FiTrash2, FiCheck, FiEdit3 } from "react-icons/fi";
-import coursesData from "@/lib/courses.json";
+import coursesData from "@/lib/new_courses.json";
 import { Course } from "@/lib/types";
 
 interface ManualCourseEntry {
@@ -57,6 +57,8 @@ export default function ManualCourseEntryModal({
       ...course,
       canonicalCode: course.codes?.[0],
       allCodes: course.codes,
+      isFall: course.isFall === true,
+      isSpring: course.isSpring === true,
     }));
   }, []);
 
@@ -208,6 +210,42 @@ export default function ManualCourseEntryModal({
 
   const validCount = entries.filter((e) => e.code).length;
 
+  // Render semester emoji for a course
+  const renderSemesterIcon = (course: { isFall: boolean; isSpring: boolean }) => {
+    const boxClasses = "inline-flex items-center px-1 py-0.5 rounded bg-gray-700/50 shadow-[inset_1px_1px_2px_rgba(0,0,0,0.3),inset_-1px_-1px_2px_rgba(255,255,255,0.05)] text-[10px]";
+
+    if (course.isFall && course.isSpring) {
+      return (
+        <span className="inline-flex items-center gap-1">
+          <span className={boxClasses} title="Offered in Fall">
+            🍁
+          </span>
+          <span className={boxClasses} title="Offered in Spring">
+            🌰
+          </span>
+        </span>
+      );
+    } else if (course.isFall) {
+      return (
+        <span className={boxClasses} title="Offered in Fall">
+          🍁
+        </span>
+      );
+    } else if (course.isSpring) {
+      return (
+        <span className={boxClasses} title="Offered in Spring">
+          🌰
+        </span>
+      );
+    } else {
+      return (
+        <span className={`${boxClasses} text-gray-400`} title="Verify semester offering on courses.yale.edu">
+          ❓
+        </span>
+      );
+    }
+  };
+
   return (
     <AnimatePresence>
       {isOpen && (
@@ -297,7 +335,10 @@ export default function ManualCourseEntryModal({
                                         onClick={() => selectCourse(entry.id, course)}
                                         className="w-full px-3 py-2 text-left hover:bg-gray-700/50 transition-colors border-b border-gray-700/50 last:border-b-0"
                                       >
-                                        <div className="text-sm font-medium text-white">{course.canonicalCode}</div>
+                                        <div className="text-sm font-medium text-white flex items-center gap-1.5">
+                                          {course.canonicalCode}
+                                          {renderSemesterIcon(course)}
+                                        </div>
                                         <div className="text-xs text-gray-400 truncate">{course.name}</div>
                                       </button>
                                     ))}

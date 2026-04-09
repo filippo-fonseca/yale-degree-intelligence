@@ -1419,9 +1419,9 @@ export default function Home() {
                                               `${c.semester} ${c.year}` ===
                                               semester,
                                           )
-                                          .map((course) => (
+                                          .map((course, idx) => (
                                             <motion.div
-                                              key={course.id}
+                                              key={course.id || `${course.code}-${idx}`}
                                               whileHover={{ scale: 0.98 }}
                                               whileTap={{ scale: 0.96 }}
                                               transition={{ duration: 0.1 }}
@@ -1523,9 +1523,9 @@ export default function Home() {
                                                 <div className="flex flex-wrap items-center gap-1.5">
                                                   {(
                                                     course.distributionals || []
-                                                  ).map((d) => (
+                                                  ).map((d, dIdx) => (
                                                     <span
-                                                      key={d}
+                                                      key={`${d}-${dIdx}`}
                                                       className={`text-[10px] px-2 py-0.5 rounded-full border font-medium ${getDistPillStyle(d)}`}
                                                     >
                                                       {d}
@@ -1725,9 +1725,9 @@ export default function Home() {
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                               {courses
                                 .filter((c) => c.skipped)
-                                .map((course) => (
+                                .map((course, idx) => (
                                   <motion.div
-                                    key={course.id}
+                                    key={course.id || `skipped-${course.code}-${idx}`}
                                     whileHover={{ scale: 0.98 }}
                                     whileTap={{ scale: 0.96 }}
                                     transition={{ duration: 0.1 }}

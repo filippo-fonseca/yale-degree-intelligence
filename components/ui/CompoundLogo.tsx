@@ -70,10 +70,8 @@ const CompoundLogo: React.FC<CompoundLogoProps> = ({
       )}
       <div className="relative">
         <h1
-          className={`${sizeClasses[size].text} font-medium tracking-tight bg-clip-text text-transparent ${
-            lightMode
-              ? "bg-gradient-to-r from-blue-600 to-purple-600"
-              : "bg-gradient-to-r from-blue-200 to-purple-200"
+          className={`${sizeClasses[size].text} font-medium tracking-tight ${
+            lightMode ? "text-gray-900" : "text-white"
           }`}
         >
           DegreeIntelligence

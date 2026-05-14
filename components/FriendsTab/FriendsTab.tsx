@@ -415,7 +415,7 @@ export default function FriendsTab({
   if (!user) {
     return (
       <div className="w-full max-w-3xl mx-auto font-louize">
-        <h2 className="text-xl sm:text-2xl lg:text-3xl font-medium bg-clip-text text-transparent bg-gradient-to-r from-blue-200 to-purple-200">
+        <h2 className="text-xl sm:text-2xl lg:text-3xl font-medium text-gray-900 dark:text-white">
           Friends & Connections
         </h2>
         <div className="mt-6 text-gray-700 dark:text-gray-300">
@@ -429,7 +429,7 @@ export default function FriendsTab({
   if (!friendsEnabled) {
     return (
       <div className="w-full max-w-3xl mx-auto font-louize">
-        <h2 className="text-3xl font-medium bg-clip-text text-transparent bg-gradient-to-r from-blue-200 to-purple-200 mb-6">
+        <h2 className="text-3xl font-medium text-gray-900 dark:text-white mb-6">
           Friends & Connections
         </h2>
 
@@ -447,7 +447,7 @@ export default function FriendsTab({
           </div>
 
           {/* Title */}
-          <h3 className="text-xl font-medium bg-gradient-to-r from-pink-200 via-purple-200 to-blue-200 bg-clip-text text-transparent mb-2 text-center">
+          <h3 className="text-xl font-medium text-gray-900 dark:text-white mb-2 text-center">
             Enable Friends Feature
           </h3>
 
@@ -518,7 +518,7 @@ export default function FriendsTab({
     <div className="w-full max-w-3xl mx-auto font-louize">
       <div className="flex items-center justify-between w-full mb-5">
         <div className="flex items-center gap-2">
-          <h2 className="text-2xl font-medium bg-clip-text text-transparent bg-gradient-to-r from-blue-200 to-purple-200">
+          <h2 className="text-2xl font-medium text-gray-900 dark:text-white">
             Friends & Connections
           </h2>
           <MoreOptionsDropdown onDisable={() => setShowDisableConfirm(true)} />

@@ -87,7 +87,7 @@ export default function MissionPage() {
             <span className="w-1 h-1 rounded-full bg-purple-400 animate-pulse" />
             Our Manifesto
           </div>
-          <h1 className="text-3xl sm:text-4xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-blue-200 via-purple-200 to-pink-200 mb-3">
+          <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-white mb-3">
             The principles that guide us.
           </h1>
           <p className="text-sm text-gray-400 max-w-xl mx-auto">
@@ -132,7 +132,7 @@ export default function MissionPage() {
           transition={{ duration: 0.8, delay: 0.2 }}
           className="p-5 rounded-2xl bg-gradient-to-br from-gray-900/70 via-gray-900/50 to-gray-950/70 backdrop-blur-xl border border-white/[0.08] shadow-[0_8px_48px_rgba(0,0,0,0.4),0_0_80px_rgba(139,92,246,0.06),inset_0_1px_0_rgba(255,255,255,0.1)] ring-1 ring-white/[0.05]"
         >
-          <h3 className="text-lg font-medium bg-clip-text text-transparent bg-gradient-to-r from-blue-200 to-purple-200 mb-3">
+          <h3 className="text-lg font-medium text-white mb-3">
             Why this matters
           </h3>
           <p className="text-sm text-gray-300 mb-3 leading-relaxed">

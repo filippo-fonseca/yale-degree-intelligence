@@ -268,7 +268,7 @@ export default function AboutPage() {
               </div>
             </div>
 
-            <h1 className="flex items-center justify-center text-4xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-blue-200 to-purple-300 mb-3">
+            <h1 className="flex items-center justify-center text-4xl font-bold tracking-tight text-white mb-3">
               <CompoundLogo hideLogo animated size="lg" />
             </h1>
             {/* Welcome Badge */}
@@ -427,7 +427,7 @@ export default function AboutPage() {
       <div className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="bg-gradient-to-br from-gray-900/70 via-gray-900/50 to-gray-950/70 backdrop-blur-2xl rounded-2xl p-6 border border-white/[0.08] shadow-[0_8px_48px_rgba(0,0,0,0.4),0_0_80px_rgba(139,92,246,0.08),inset_0_1px_0_rgba(255,255,255,0.1)] ring-1 ring-white/[0.05]">
           <div className="text-center mb-8">
-            <h2 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-200 to-purple-200 mb-3">
+            <h2 className="text-2xl font-bold text-white mb-3">
               Our blueprint, broken down.
             </h2>
             <p className="text-sm text-gray-300 max-w-2xl mx-auto">
@@ -717,7 +717,7 @@ export default function AboutPage() {
             >
               <div className="flex items-start justify-between mb-3">
                 <div>
-                  <h4 className="font-medium text-base text-transparent bg-clip-text bg-gradient-to-r from-blue-200 to-purple-200">
+                  <h4 className="font-medium text-base text-white">
                     Cumulative GPA
                   </h4>
                   <p className="text-[10px] text-gray-400 mt-0.5">
@@ -827,7 +827,7 @@ export default function AboutPage() {
             >
               <div className="flex items-start justify-between mb-3">
                 <div>
-                  <h4 className="font-medium text-base text-transparent bg-clip-text bg-gradient-to-r from-blue-200 to-purple-200">
+                  <h4 className="font-medium text-base text-white">
                     Grade distribution
                   </h4>
                   <p className="text-[10px] text-gray-400 mt-0.5">
@@ -956,7 +956,7 @@ export default function AboutPage() {
       <section className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="bg-gradient-to-br from-gray-900/70 via-gray-900/50 to-gray-950/70 backdrop-blur-2xl rounded-2xl p-6 border border-white/[0.08] shadow-[0_8px_48px_rgba(0,0,0,0.4),0_0_100px_rgba(236,72,153,0.08),inset_0_1px_0_rgba(255,255,255,0.1)] ring-1 ring-pink-500/20">
           <div className="text-center mb-8 flex flex-col gap-2">
-            <h2 className="text-2xl font-medium bg-clip-text text-transparent bg-gradient-to-r from-pink-200 to-purple-200">
+            <h2 className="text-2xl font-medium text-white">
               Friends & Connections
             </h2>
             <p className="text-gray-300 text-sm max-w-2xl mx-auto">
@@ -1095,7 +1095,7 @@ export default function AboutPage() {
           className="bg-gradient-to-br from-gray-900/70 via-gray-900/50 to-gray-950/70 backdrop-blur-2xl rounded-2xl p-6 border border-white/[0.08] shadow-[0_8px_48px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.1)] ring-1 ring-white/[0.05]"
         >
           <div className="text-center mb-8">
-            <h2 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-200 to-purple-200 mb-3">
+            <h2 className="text-2xl font-bold text-white mb-3">
               What it is and why we built this.
             </h2>
             <p className="text-sm text-gray-300 max-w-2xl mx-auto">
@@ -1135,7 +1135,7 @@ export default function AboutPage() {
         className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 scroll-mt-20"
       >
         <div className="text-center mb-8">
-          <h2 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-200 to-purple-200 mb-3">
+          <h2 className="text-2xl font-bold text-white mb-3">
             It's nice to meet you!
           </h2>
           <p className="text-sm text-gray-300 max-w-2xl mx-auto">
@@ -1223,7 +1223,7 @@ export default function AboutPage() {
       {/* <section className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="bg-gray-900/80 backdrop-blur-lg rounded-2xl p-8 border border-gray-800/50 shadow-xl">
           <div className="text-center mb-8">
-            <h2 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-200 to-purple-200">
+            <h2 className="text-3xl font-bold text-white">
               Wait, wait wait... are you trying to replace{" "}
               <span className="text-blue-300">CourseTable</span>?
             </h2>

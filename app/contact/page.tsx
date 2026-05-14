@@ -93,7 +93,7 @@ export default function ContactPage() {
           animate={{ opacity: 1, y: 0 }}
           className="mb-8"
         >
-          <h1 className="text-3xl font-medium bg-clip-text text-transparent bg-gradient-to-r from-blue-200 to-purple-200">
+          <h1 className="text-3xl font-medium text-white">
             Contact us
           </h1>
           <p className="text-gray-400 mt-1">

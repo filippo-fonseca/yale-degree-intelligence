@@ -109,7 +109,7 @@ export default function LoginPage({
                   transition={{ duration: 0.3 }}
                   className="text-center"
                 >
-                  <h3 className="text-sm font-medium bg-gradient-to-r from-blue-200 to-purple-200 bg-clip-text text-transparent mb-0.5">
+                  <h3 className="text-sm font-medium text-white mb-0.5">
                     {features[activeFeature].title}
                   </h3>
                   <p className="text-xs text-gray-400">

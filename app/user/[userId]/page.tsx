@@ -289,7 +289,7 @@ export default function UserProfilePage() {
                 />
               </div>
 
-              <h1 className="text-xl font-medium text-transparent bg-clip-text bg-gradient-to-r from-blue-200 to-purple-200">
+              <h1 className="text-xl font-medium text-white">
                 {getDisplayNameFromEmail(userProfile?.email)}
               </h1>
 
@@ -352,7 +352,7 @@ export default function UserProfilePage() {
           transition={{ delay: 0.4 }}
           className="mb-10"
         >
-          <h2 className="text-lg font-medium mb-4 text-transparent bg-clip-text bg-gradient-to-r from-blue-200 to-purple-200">
+          <h2 className="text-lg font-medium mb-4 text-white">
             Academic Overview
           </h2>
 
@@ -394,7 +394,7 @@ export default function UserProfilePage() {
           transition={{ delay: 0.6 }}
           className="mb-10"
         >
-          <h2 className="text-lg font-medium mb-4 text-transparent bg-clip-text bg-gradient-to-r from-blue-200 to-purple-200">
+          <h2 className="text-lg font-medium mb-4 text-white">
             Academic Journey
           </h2>
           {courses.length == 0 && (

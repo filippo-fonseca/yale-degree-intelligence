@@ -1297,7 +1297,7 @@ export default function Home() {
                     <div>
                       <div className="mb-4 lg:mb-6 flex flex-col sm:flex-row justify-between items-start gap-3">
                         <div>
-                          <h2 className="text-xl sm:text-2xl lg:text-3xl font-medium bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-200 dark:to-purple-200">
+                          <h2 className="text-xl sm:text-2xl lg:text-3xl font-medium text-gray-900 dark:text-white">
                             Your academic journey at Yale,{" "}
                             {user?.displayName?.split(" ")[0]}.
                           </h2>
@@ -1807,7 +1807,7 @@ export default function Home() {
                     <div className="flex flex-col items-center justify-center py-8">
                       {/* Header */}
                       <div className="text-center mb-6">
-                        <h2 className="text-2xl font-medium bg-clip-text text-transparent bg-gradient-to-r from-pink-200 to-purple-200 mb-2">
+                        <h2 className="text-2xl font-medium text-gray-900 dark:text-white mb-2">
                           Let's get your courses loaded, {user?.displayName}.
                         </h2>
                         <p className="text-gray-400 text-sm">
@@ -2036,7 +2036,7 @@ export default function Home() {
                   transition={{ duration: 0.3 }}
                 >
                   <div className="mb-6">
-                    <h2 className="text-3xl font-medium bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-200 dark:to-purple-200">
+                    <h2 className="text-3xl font-medium text-gray-900 dark:text-white">
                       Numbers aren't everything, but they're important.
                     </h2>
                     <p className="text-gray-600 dark:text-gray-300">
@@ -2057,7 +2057,7 @@ export default function Home() {
                 >
                   {user && userProfile && (
                     <div className="mb-6">
-                      <h2 className="text-3xl font-medium bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-200 dark:to-purple-200">
+                      <h2 className="text-3xl font-medium text-gray-900 dark:text-white">
                         This is how you're doing for your{" "}
                         {userProfile?.majors?.length > 1 ? "majors" : "major"},{" "}
                         {user?.displayName?.split(" ")[0]}.

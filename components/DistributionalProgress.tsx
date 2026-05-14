@@ -167,7 +167,7 @@ const DistributionalsView = ({ courses }: { courses: Course[] }) => {
     >
       {/* Header */}
       <div>
-        <h2 className="text-xl sm:text-2xl lg:text-3xl font-medium bg-clip-text text-transparent bg-gradient-to-r from-blue-200 to-purple-200">
+        <h2 className="text-xl sm:text-2xl lg:text-3xl font-medium text-gray-900 dark:text-white">
           Your distributional progress.
         </h2>
         <p className="text-sm lg:text-base text-gray-600 dark:text-gray-400 mt-1">

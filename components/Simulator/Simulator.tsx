@@ -756,7 +756,7 @@ export default function Simulator({
     >
       {/* Header */}
       <div className="mb-4">
-        <h2 className="text-3xl font-medium bg-clip-text text-transparent bg-gradient-to-r from-blue-200 to-purple-200">
+        <h2 className="text-3xl font-medium text-gray-900 dark:text-white">
           Need to visualize? No problem.
         </h2>
         <p className="text-gray-400">
@@ -859,7 +859,7 @@ export default function Simulator({
             exit={{ opacity: 0, height: 0 }}
             className="overflow-hidden bg-gradient-to-br from-white/[0.03] to-transparent backdrop-blur-xl rounded-xl border border-white/[0.06] p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_4px_20px_rgba(0,0,0,0.15)]"
           >
-            <h4 className="font-medium text-sm bg-gradient-to-r from-blue-200 to-purple-200 bg-clip-text text-transparent mb-2">
+            <h4 className="font-medium text-sm text-gray-900 dark:text-white mb-2">
               How to use the simulator
             </h4>
             <ul className="text-xs text-gray-400 space-y-1.5 list-disc list-inside">
@@ -891,7 +891,7 @@ export default function Simulator({
       {/* Live Major Progress Preview */}
       <div className="space-y-3">
         <div>
-          <h3 className="text-lg font-medium bg-clip-text text-transparent bg-gradient-to-r from-blue-200 to-purple-200">
+          <h3 className="text-lg font-medium text-gray-900 dark:text-white">
             Major progress
           </h3>
           <p className="text-xs text-gray-500 mt-0.5">
@@ -1136,7 +1136,7 @@ export default function Simulator({
             >
               {/* Header */}
               <div className="mb-5">
-                <h3 className="text-lg font-medium bg-gradient-to-r from-blue-200 via-purple-200 to-pink-200 bg-clip-text text-transparent">
+                <h3 className="text-lg font-medium text-gray-900 dark:text-white">
                   {selectedPlanToOverwrite !== null
                     ? "Overwrite Plan"
                     : "Save Your Plan"}
@@ -1260,7 +1260,7 @@ export default function Simulator({
             >
               {/* Header */}
               <div className="mb-5">
-                <h3 className="text-lg font-medium bg-gradient-to-r from-blue-200 via-purple-200 to-pink-200 bg-clip-text text-transparent">
+                <h3 className="text-lg font-medium text-gray-900 dark:text-white">
                   Your Saved Plans
                 </h3>
                 <p className="text-xs text-gray-500 mt-1">
@@ -1423,7 +1423,7 @@ export default function Simulator({
             >
               {/* Header */}
               <div className="text-center mb-6">
-                <h3 className="text-xl font-medium bg-gradient-to-r from-blue-200 via-purple-200 to-pink-200 bg-clip-text text-transparent mb-1">
+                <h3 className="text-xl font-medium text-gray-900 dark:text-white mb-1">
                   Welcome to your Yale Simulator.
                 </h3>
                 <p className="text-sm text-gray-400">

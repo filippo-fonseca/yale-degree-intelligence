@@ -682,7 +682,7 @@ export default function MajorProgressView({
       {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <h3 className="text-xl font-medium bg-clip-text text-transparent bg-gradient-to-r from-blue-200 to-purple-200">
+          <h3 className="text-xl font-medium text-gray-900 dark:text-white">
             {MAJORS[selectedMajor]}
           </h3>
           <p className="text-sm text-gray-500">
@@ -690,7 +690,7 @@ export default function MajorProgressView({
           </p>
         </div>
         <div className="flex items-center gap-4">
-          <div className="text-2xl lg:text-3xl font-medium bg-clip-text text-transparent bg-gradient-to-r from-blue-200 to-purple-200">
+          <div className="text-2xl lg:text-3xl font-medium text-gray-900 dark:text-white">
             {showInProgressStats
               ? withInProgressPercentage.toFixed(0)
               : completionPercentage.toFixed(0)}

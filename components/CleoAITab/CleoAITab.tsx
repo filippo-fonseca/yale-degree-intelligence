@@ -251,7 +251,7 @@ What can I help you with? I can help plan your schedule, find courses that count
         <div className="flex items-center gap-2.5">
           <BulldogIcon className="w-8 h-8 text-blue-400" />
           <div>
-            <h2 className="text-xl font-medium bg-clip-text text-transparent bg-gradient-to-r from-blue-300 to-blue-100">
+            <h2 className="text-xl font-medium text-gray-900 dark:text-white">
               Handsome Dan
             </h2>
             <p className="text-gray-500 text-xs">Your Yale bulldog advisor</p>

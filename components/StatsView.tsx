@@ -521,7 +521,7 @@ function ChartBox({
     >
       <div className="flex items-start justify-between mb-4">
         <div>
-          <h3 className="font-medium text-lg text-transparent bg-clip-text bg-gradient-to-r from-blue-200 to-purple-200">
+          <h3 className="font-medium text-lg text-gray-900 dark:text-white">
             {title}
           </h3>
           {description && (

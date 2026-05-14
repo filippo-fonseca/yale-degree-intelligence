@@ -279,7 +279,7 @@ export default function MajorSelectionFlow({
             className="space-y-4 sm:space-y-5"
           >
             <div className="text-center">
-              <h2 className="text-lg sm:text-xl font-medium bg-clip-text text-transparent bg-gradient-to-r from-pink-200 to-purple-200">
+              <h2 className="text-lg sm:text-xl font-medium text-white">
                 Select your major(s)
               </h2>
               <p className="text-gray-400 text-xs sm:text-sm mt-1">
@@ -454,7 +454,7 @@ export default function MajorSelectionFlow({
             className="space-y-4 sm:space-y-5"
           >
             <div className="text-center">
-              <h2 className="text-lg sm:text-xl font-medium bg-clip-text text-transparent bg-gradient-to-r from-pink-200 to-purple-200">
+              <h2 className="text-lg sm:text-xl font-medium text-white">
                 Tell friends about yourself
               </h2>
               <p className="text-gray-400 text-xs sm:text-sm mt-1">
@@ -514,7 +514,7 @@ export default function MajorSelectionFlow({
             className="space-y-4 sm:space-y-6"
           >
             <div className="text-center">
-              <h2 className="text-lg sm:text-xl font-medium bg-clip-text text-transparent bg-gradient-to-r from-pink-200 to-purple-200">
+              <h2 className="text-lg sm:text-xl font-medium text-white">
                 Graduation Year
               </h2>
               <p className="text-gray-400 text-xs sm:text-sm mt-1">

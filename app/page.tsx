@@ -21,6 +21,8 @@ import {
   FiPlus,
   FiSun,
   FiMoon,
+  FiChevronsLeft,
+  FiChevronsRight,
 } from "react-icons/fi";
 import {
   collection,
@@ -88,6 +90,12 @@ export default function Home() {
   const [showMajorSelection, setShowMajorSelection] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarPinned, setSidebarPinned] = useLocalStorage<boolean>(
+    "di-sidebar-pinned",
+    true,
+  );
+  const [sidebarHovered, setSidebarHovered] = useState(false);
+  const sidebarExpanded = sidebarPinned || sidebarHovered;
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const isBrandNew = userProfile?.graduationYear === 2029;
 
@@ -1132,10 +1140,32 @@ export default function Home() {
           {/* Desktop Sidebar Navigation */}
           <motion.aside
             initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.2, duration: 0.5 }}
-            className="hidden lg:flex w-56 h-full flex-col justify-between p-4 rounded-3xl bg-gradient-to-br from-white/90 via-gray-50/80 to-white/70 dark:from-gray-900/70 dark:via-gray-900/50 dark:to-gray-950/70 backdrop-blur-xl border border-black/[0.06] dark:border-white/[0.08] shadow-[0_8px_32px_rgba(0,0,0,0.1),0_0_80px_rgba(59,130,246,0.04),inset_0_1px_0_rgba(255,255,255,0.8),inset_0_-1px_0_rgba(0,0,0,0.05)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.4),0_0_80px_rgba(59,130,246,0.06),inset_0_1px_0_rgba(255,255,255,0.1),inset_0_-1px_0_rgba(0,0,0,0.3)] ring-1 ring-black/[0.04] dark:ring-white/[0.05] overflow-visible"
+            animate={{ opacity: 1, x: 0, width: sidebarExpanded ? 224 : 76 }}
+            transition={{ width: { type: "spring", stiffness: 380, damping: 38 } }}
+            onMouseEnter={() => setSidebarHovered(true)}
+            onMouseLeave={() => setSidebarHovered(false)}
+            className="hidden lg:flex h-full flex-col justify-between p-3 rounded-3xl bg-gradient-to-br from-white/90 via-gray-50/80 to-white/70 dark:from-gray-900/70 dark:via-gray-900/50 dark:to-gray-950/70 backdrop-blur-xl border border-black/[0.06] dark:border-white/[0.08] shadow-[0_8px_32px_rgba(0,0,0,0.1),0_0_80px_rgba(59,130,246,0.04),inset_0_1px_0_rgba(255,255,255,0.8),inset_0_-1px_0_rgba(0,0,0,0.05)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.4),0_0_80px_rgba(59,130,246,0.06),inset_0_1px_0_rgba(255,255,255,0.1),inset_0_-1px_0_rgba(0,0,0,0.3)] ring-1 ring-black/[0.04] dark:ring-white/[0.05] overflow-visible"
           >
+            {/* Pin / collapse toggle */}
+            <div
+              className={`flex mb-1.5 ${sidebarExpanded ? "justify-end" : "justify-center"}`}
+            >
+              <button
+                onClick={() => setSidebarPinned(!sidebarPinned)}
+                title={sidebarPinned ? "Collapse sidebar" : "Keep sidebar open"}
+                aria-label={
+                  sidebarPinned ? "Collapse sidebar" : "Keep sidebar open"
+                }
+                className="p-1.5 rounded-lg text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-black/[0.04] dark:hover:bg-white/[0.06] transition-all"
+              >
+                {sidebarPinned ? (
+                  <FiChevronsLeft size={16} />
+                ) : (
+                  <FiChevronsRight size={16} />
+                )}
+              </button>
+            </div>
+
             {/* Navigation Items */}
             <nav className="space-y-1.5 flex-1 overflow-y-auto overflow-x-visible px-1">
               {/* Always-enabled items (not disabled and not comingSoon) */}
@@ -1149,7 +1179,10 @@ export default function Home() {
                       handleTabChange(item.id);
                       void new Audio("/audio/pop.mp3").play().catch(() => null);
                     }}
-                    className={`relative w-full flex items-center justify-between px-4 py-3 text-left rounded-2xl transition-colors duration-200 ${
+                    title={sidebarExpanded ? undefined : item.label}
+                    className={`relative w-full flex items-center px-3 py-3 text-left rounded-2xl transition-colors duration-200 ${
+                      sidebarExpanded ? "justify-between" : "justify-center"
+                    } ${
                       activeTab === item.id
                         ? "text-gray-900 dark:text-white"
                         : "text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-black/[0.03] dark:hover:bg-white/[0.04]"
@@ -1175,10 +1208,12 @@ export default function Home() {
                             : 1
                         }
                       />
-                      <span>{item.label}</span>
+                      {sidebarExpanded && (
+                        <span className="whitespace-nowrap">{item.label}</span>
+                      )}
                     </div>
 
-                    {activeTab === item.id && (
+                    {sidebarExpanded && activeTab === item.id && (
                       <FiChevronRight className="relative z-10 text-blue-500 dark:text-blue-400" />
                     )}
                   </motion.button>
@@ -1190,7 +1225,10 @@ export default function Home() {
                 .map((item) => (
                   <motion.button
                     key={item.id}
-                    className="w-full flex items-center justify-between px-4 py-3 text-left rounded-2xl transition-all duration-300 relative text-gray-400 dark:text-gray-600 cursor-not-allowed opacity-60"
+                    title={sidebarExpanded ? undefined : item.label}
+                    className={`w-full flex items-center px-3 py-3 text-left rounded-2xl transition-all duration-300 relative text-gray-400 dark:text-gray-600 cursor-not-allowed opacity-60 ${
+                      sidebarExpanded ? "justify-between" : "justify-center"
+                    }`}
                     disabled
                   >
                     <div className="flex items-center space-x-3">
@@ -1198,22 +1236,27 @@ export default function Home() {
                         size={item.id === "cleoai" ? 18 : 12}
                         opacity={0.5}
                       />
-                      <span>{item.label}</span>
-                      <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-purple-500/20 text-purple-400 border border-purple-500/30">
-                        COMING SOON
-                      </span>
+                      {sidebarExpanded && (
+                        <span className="whitespace-nowrap">{item.label}</span>
+                      )}
+                      {sidebarExpanded && (
+                        <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-purple-500/20 text-purple-400 border border-purple-500/30">
+                          COMING SOON
+                        </span>
+                      )}
                     </div>
                   </motion.button>
                 ))}
 
               {/* Subheader for disabled items (only shown when there are data-dependent disabled items) */}
-              {navItems.some((item) => item.disabled && !item.comingSoon) && (
-                <div className="pt-3 pb-1 px-4">
-                  <p className="text-[9px] font-medium uppercase tracking-widest text-gray-400 dark:text-gray-600">
-                    After you upload courses:
-                  </p>
-                </div>
-              )}
+              {sidebarExpanded &&
+                navItems.some((item) => item.disabled && !item.comingSoon) && (
+                  <div className="pt-3 pb-1 px-4">
+                    <p className="text-[9px] font-medium uppercase tracking-widest text-gray-400 dark:text-gray-600">
+                      After you upload courses:
+                    </p>
+                  </div>
+                )}
 
               {/* Disabled items (data-dependent, not coming soon) */}
               {navItems
@@ -1221,7 +1264,10 @@ export default function Home() {
                 .map((item) => (
                   <motion.button
                     key={item.id}
-                    className="w-full flex items-center justify-between px-4 py-3 text-left rounded-2xl transition-all duration-300 relative text-gray-400 dark:text-gray-600 cursor-not-allowed opacity-60"
+                    title={sidebarExpanded ? undefined : item.label}
+                    className={`w-full flex items-center px-3 py-3 text-left rounded-2xl transition-all duration-300 relative text-gray-400 dark:text-gray-600 cursor-not-allowed opacity-60 ${
+                      sidebarExpanded ? "justify-between" : "justify-center"
+                    }`}
                     disabled
                   >
                     <div className="flex items-center space-x-3">
@@ -1229,14 +1275,20 @@ export default function Home() {
                         size={item.id === "cleoai" ? 18 : 12}
                         opacity={0.5}
                       />
-                      <span>{item.label}</span>
+                      {sidebarExpanded && (
+                        <span className="whitespace-nowrap">{item.label}</span>
+                      )}
                     </div>
                   </motion.button>
                 ))}
             </nav>
 
             {/* Fixed Bottom Section */}
-            <div className="sticky bottom-0 left-0 right-0 pt-2">
+            <div
+              className={`sticky bottom-0 left-0 right-0 pt-2 ${
+                sidebarExpanded ? "" : "hidden"
+              }`}
+            >
               <div className="space-y-2">
                 {/* Neumorphic Action Card */}
                 <motion.div

@@ -71,6 +71,9 @@ interface UserProfile {
   majors: string[];
   graduationYear: number;
   updatedAt: Date;
+  // Shared courses the user has manually marked as prerequisites, which are
+  // exempt from the cross-major overlap warning (Yale's prereq data is spotty).
+  prereqOverrides?: string[];
 }
 
 export default function Home() {
@@ -700,6 +703,25 @@ export default function Home() {
       setShowSettings(false);
     } catch (error) {
       console.error("Error updating profile:", error);
+    }
+  };
+
+  // Mark/unmark a shared course as a prerequisite (exempt from overlap warning).
+  // Persisted on the profile; the onSnapshot subscription refreshes the UI.
+  const handleTogglePrereqOverride = async (code: string) => {
+    if (!user) return;
+    const current = userProfile?.prereqOverrides || [];
+    const next = current.includes(code)
+      ? current.filter((c) => c !== code)
+      : [...current, code];
+    try {
+      await setDoc(
+        doc(db, "users", user.uid),
+        { prereqOverrides: next, updatedAt: new Date() },
+        { merge: true },
+      );
+    } catch (error) {
+      console.error("Error updating prerequisite overrides:", error);
     }
   };
 
@@ -2094,10 +2116,16 @@ export default function Home() {
 
                           {/* Shared Courses Indicator */}
                           {(() => {
-                            const { courses: sharedCourses, totalCredits } =
-                              getSharedCourses(userProfile, courses);
+                            const {
+                              courses: sharedCourses,
+                              totalCredits,
+                              overriddenCredits,
+                            } = getSharedCourses(userProfile, courses);
                             const isWarning = totalCredits > 2;
                             const hasShared = sharedCourses.length > 0;
+                            const overrideCount = sharedCourses.filter(
+                              (c) => c.isPrereqOverride,
+                            ).length;
 
                             return (
                               <div
@@ -2122,7 +2150,7 @@ export default function Home() {
                                     <FiCheck size={12} />
                                   )}
                                   <span>
-                                    {hasShared
+                                    {totalCredits > 0
                                       ? `${totalCredits} shared cr${totalCredits !== 1 ? "s" : ""}`
                                       : "No overlap"}
                                   </span>
@@ -2143,7 +2171,7 @@ export default function Home() {
                                     >
                                       <div className="flex items-center justify-between mb-2">
                                         <h4 className="text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider">
-                                          Shared Courses
+                                          Major Conflict Manager
                                         </h4>
                                         <button
                                           onClick={() =>
@@ -2197,20 +2225,45 @@ export default function Home() {
                                             )}
                                           </div>
                                           <p className="text-[10px] text-gray-400 dark:text-gray-600 mb-3 italic">
-                                            Note: Pre-requisites don&apos;t
-                                            count toward the 2-credit overlap
-                                            limit. Check manually! We're just
-                                            warning you, just in case.
+                                            Prerequisites don&apos;t count toward
+                                            the 2-credit overlap limit, but Yale
+                                            isn&apos;t always clear about which
+                                            courses are prereqs. If you know one
+                                            is, mark it below to exempt it from
+                                            the warning.
                                           </p>
+                                          {overrideCount > 0 && (
+                                            <p className="text-[10px] text-emerald-600 dark:text-emerald-400 mb-3 -mt-1.5">
+                                              {overriddenCredits} cr
+                                              {overriddenCredits !== 1
+                                                ? "s"
+                                                : ""}{" "}
+                                              waived as prerequisite
+                                              {overrideCount !== 1
+                                                ? "s"
+                                                : ""}
+                                              .
+                                            </p>
+                                          )}
 
                                           <div className="space-y-2">
                                             {sharedCourses.map((course) => (
                                               <div
                                                 key={course.code}
-                                                className="p-2 rounded-lg bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700/30"
+                                                className={`p-2 rounded-lg border transition-all ${
+                                                  course.isPrereqOverride
+                                                    ? "bg-emerald-50/60 dark:bg-emerald-900/10 border-emerald-300/60 dark:border-emerald-700/30"
+                                                    : "bg-gray-50 dark:bg-gray-800/50 border-gray-200 dark:border-gray-700/30"
+                                                }`}
                                               >
                                                 <div className="flex items-center justify-between mb-1">
-                                                  <span className="text-sm font-medium text-gray-800 dark:text-gray-200">
+                                                  <span
+                                                    className={`text-sm font-medium ${
+                                                      course.isPrereqOverride
+                                                        ? "text-gray-500 dark:text-gray-400 line-through"
+                                                        : "text-gray-800 dark:text-gray-200"
+                                                    }`}
+                                                  >
                                                     {course.code}
                                                   </span>
                                                   <span className="text-[10px] text-gray-400 dark:text-gray-500">
@@ -2234,6 +2287,30 @@ export default function Home() {
                                                     </div>
                                                   ))}
                                                 </div>
+                                                <button
+                                                  onClick={() =>
+                                                    handleTogglePrereqOverride(
+                                                      course.code,
+                                                    )
+                                                  }
+                                                  className={`mt-2 w-full flex items-center justify-center gap-1.5 px-2 py-1 rounded-md text-[11px] font-medium border transition-all ${
+                                                    course.isPrereqOverride
+                                                      ? "border-gray-300 dark:border-gray-700 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800"
+                                                      : "border-emerald-400/60 dark:border-emerald-600/40 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-50 dark:hover:bg-emerald-900/20"
+                                                  }`}
+                                                >
+                                                  {course.isPrereqOverride ? (
+                                                    <>
+                                                      <FiX size={11} />
+                                                      Unmark prerequisite
+                                                    </>
+                                                  ) : (
+                                                    <>
+                                                      <FiCheck size={11} />
+                                                      Mark as prerequisite
+                                                    </>
+                                                  )}
+                                                </button>
                                               </div>
                                             ))}
                                           </div>

@@ -5,17 +5,24 @@ interface UserProfile {
   majors: string[];
   graduationYear: number;
   updatedAt: Date;
+  prereqOverrides?: string[];
 }
 
 interface SharedCourse {
   code: string;
   credits: number;
   majors: { majorId: string; majorName: string; requirements: string[] }[];
+  // True when the user has marked this course as a prerequisite, exempting it
+  // from the overlap warning.
+  isPrereqOverride: boolean;
 }
 
 interface SharedCoursesResult {
   courses: SharedCourse[];
+  // Credits that actually count toward the overlap warning (excludes overrides).
   totalCredits: number;
+  // Credits the user has waived via prerequisite overrides.
+  overriddenCredits: number;
 }
 
 /**
@@ -26,8 +33,10 @@ export function getSharedCourses(
   courses: Course[]
 ): SharedCoursesResult {
   if (!userProfile || userProfile.majors.length <= 1) {
-    return { courses: [], totalCredits: 0 };
+    return { courses: [], totalCredits: 0, overriddenCredits: 0 };
   }
+
+  const prereqOverrides = new Set(userProfile.prereqOverrides || []);
 
   // Get progress for all majors
   const allMajorsProgress: Record<
@@ -116,6 +125,7 @@ export function getSharedCourses(
       sharedCourses.push({
         code,
         credits: courseData?.credits || 1,
+        isPrereqOverride: prereqOverrides.has(code),
         majors: majorsWithCourse.map((majorId) => ({
           majorId,
           majorName: MAJORS[majorId] || majorId,
@@ -126,6 +136,18 @@ export function getSharedCourses(
     }
   }
 
-  const totalCredits = sharedCourses.reduce((sum, c) => sum + c.credits, 0);
-  return { courses: sharedCourses, totalCredits };
+  // Sort overridden (prereq) courses to the bottom so active conflicts surface.
+  sharedCourses.sort(
+    (a, b) => Number(a.isPrereqOverride) - Number(b.isPrereqOverride)
+  );
+
+  const totalCredits = sharedCourses.reduce(
+    (sum, c) => (c.isPrereqOverride ? sum : sum + c.credits),
+    0
+  );
+  const overriddenCredits = sharedCourses.reduce(
+    (sum, c) => (c.isPrereqOverride ? sum + c.credits : sum),
+    0
+  );
+  return { courses: sharedCourses, totalCredits, overriddenCredits };
 }

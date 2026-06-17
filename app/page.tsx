@@ -1369,7 +1369,7 @@ export default function Home() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3, duration: 0.5 }}
-            className="flex-1 h-full overflow-y-auto"
+            className="flex-1 min-w-0 h-full overflow-y-auto overflow-x-clip"
           >
             <AnimatePresence mode="wait">
               {activeTab === "upload" && (

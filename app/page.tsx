@@ -2035,12 +2035,12 @@ export default function Home() {
                   exit={{ opacity: 0 }}
                   transition={{ duration: 0.3 }}
                 >
-                  <div className="mb-6">
-                    <h2 className="text-3xl font-medium text-gray-900 dark:text-white">
+                  <div className="mb-4">
+                    <h2 className="text-2xl font-medium text-gray-900 dark:text-white">
                       Numbers aren't everything, but they're important.
                     </h2>
-                    <p className="text-gray-600 dark:text-gray-300">
-                      Here's a comprehesive visual overview of your academic
+                    <p className="text-sm text-gray-600 dark:text-gray-300">
+                      Here's a comprehensive visual overview of your academic
                       trajectory over your time at Yale.
                     </p>
                   </div>

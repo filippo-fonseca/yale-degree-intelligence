@@ -88,7 +88,7 @@ function MajorStatCard({
   return (
     <motion.div
       whileHover={{ y: -1 }}
-      className="p-3 rounded-xl bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 backdrop-blur-md border border-gray-200 dark:border-gray-800/50 hover:border-gray-300 dark:hover:border-gray-700/60 transition-all relative shadow-[inset_0_1px_0_rgba(255,255,255,0.04),0_4px_12px_rgba(0,0,0,0.08)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.04),0_4px_12px_rgba(0,0,0,0.2)]"
+      className="p-3 rounded-xl bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 backdrop-blur-md border border-gray-200 dark:border-gray-800/50 hover:border-gray-300 dark:hover:border-gray-700/60 transition-all relative shadow-neu"
     >
       {infoTooltip && (
         <div className="absolute top-2 right-2 group">
@@ -152,7 +152,7 @@ const SectionGrid = React.memo(function SectionGrid({
                 key={reqKey}
                 layout
                 initial={false}
-                className={`p-3 hover:scale-[0.98] rounded-xl backdrop-blur-md border transition-all relative cursor-pointer shadow-[inset_0_1px_0_rgba(255,255,255,0.03),0_4px_12px_rgba(0,0,0,0.08)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.03),0_4px_12px_rgba(0,0,0,0.15)] ${
+                className={`p-3 hover:scale-[0.98] rounded-xl backdrop-blur-md border transition-all relative cursor-pointer shadow-neu-sm ${
                   reqInProgress > 0
                     ? "bg-blue-50 dark:bg-transparent dark:bg-gradient-to-br dark:from-blue-950/40 dark:via-gray-900/50 dark:to-gray-950/50 border-blue-200 dark:border-blue-800/30 hover:border-blue-300 dark:hover:border-blue-600/40"
                     : notStarted
@@ -700,7 +700,7 @@ export default function MajorProgressView({
       </div>
 
       {/* Progress bar + Stats toggle - Compact neumorphic */}
-      <div className="p-3 rounded-xl bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 border border-gray-200 dark:border-gray-800/50 shadow-[inset_0_1px_0_rgba(255,255,255,0.04),0_4px_12px_rgba(0,0,0,0.08)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.04),0_4px_12px_rgba(0,0,0,0.2)]">
+      <div className="p-3 rounded-xl bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 border border-gray-200 dark:border-gray-800/50 shadow-neu">
         <div className="w-full bg-gray-200 dark:bg-gray-950/60 rounded-full h-1.5 shadow-[inset_0_1px_2px_rgba(0,0,0,0.1)] dark:shadow-[inset_0_1px_2px_rgba(0,0,0,0.3)]">
           <motion.div
             initial={{ width: 0 }}
@@ -837,7 +837,7 @@ export default function MajorProgressView({
                           key={reqKey}
                           layout
                           initial={false}
-                          className={`p-3 hover:scale-[0.98] transition-all rounded-xl border cursor-pointer backdrop-blur-md shadow-[inset_0_1px_0_rgba(255,255,255,0.03),0_4px_12px_rgba(0,0,0,0.08)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.03),0_4px_12px_rgba(0,0,0,0.15)] ${
+                          className={`p-3 hover:scale-[0.98] transition-all rounded-xl border cursor-pointer backdrop-blur-md shadow-neu-sm ${
                             isFullyCompleted
                               ? "bg-emerald-50 dark:bg-transparent dark:bg-gradient-to-br dark:from-emerald-950/30 dark:via-gray-900/50 dark:to-gray-950/50 border-emerald-200 dark:border-emerald-800/25 hover:border-emerald-300 dark:hover:border-emerald-600/35"
                               : "bg-red-50 dark:bg-transparent dark:bg-gradient-to-br dark:from-red-950/30 dark:via-gray-900/50 dark:to-gray-950/50 border-red-200 dark:border-red-800/25 hover:border-red-300 dark:hover:border-red-600/35"

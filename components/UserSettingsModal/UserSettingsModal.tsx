@@ -8,6 +8,7 @@ import {
   FiMoreVertical,
   FiTrash2,
   FiChevronDown,
+  FiX,
 } from "react-icons/fi";
 import { User } from "firebase/auth";
 import { MAJORS } from "@/lib/majors";
@@ -127,11 +128,11 @@ export default function UserSettingsModal({
 
   const getYearStatus = (graduationYear: number): string => {
     // Direct mapping based on graduation year
-    if (graduationYear >= 2030) return "High School";
-    if (graduationYear === 2029) return "Freshman";
-    if (graduationYear === 2028) return "Sophomore";
-    if (graduationYear === 2027) return "Junior";
-    if (graduationYear <= 2026) return "Senior";
+    if (graduationYear >= 2031) return "High School";
+    if (graduationYear === 2030) return "Freshman";
+    if (graduationYear === 2029) return "Sophomore";
+    if (graduationYear === 2028) return "Junior";
+    if (graduationYear <= 2027) return "Senior";
     return "Unknown";
   };
 
@@ -241,8 +242,15 @@ export default function UserSettingsModal({
         initial={{ opacity: 0, y: 15, scale: 0.98 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         transition={{ type: "spring", damping: 25, stiffness: 300 }}
-        className="w-full max-w-sm bg-white/95 dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/90 dark:via-gray-900/80 dark:to-gray-950/90 rounded-2xl border border-black/[0.06] dark:border-white/[0.08] shadow-[0_24px_80px_rgba(0,0,0,0.18)] dark:shadow-[0_24px_80px_rgba(0,0,0,0.5),0_0_120px_rgba(139,92,246,0.08),inset_0_1px_0_rgba(255,255,255,0.1),inset_0_-1px_0_rgba(0,0,0,0.3)] backdrop-blur-2xl ring-1 ring-black/[0.04] dark:ring-white/[0.05] overflow-visible"
+        className="relative w-full max-w-md bg-white/95 dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/90 dark:via-gray-900/80 dark:to-gray-950/90 rounded-2xl border border-black/[0.06] dark:border-white/[0.08] shadow-[0_24px_80px_rgba(0,0,0,0.18)] dark:shadow-[0_24px_80px_rgba(0,0,0,0.5),0_0_120px_rgba(139,92,246,0.08),inset_0_1px_0_rgba(255,255,255,0.1),inset_0_-1px_0_rgba(0,0,0,0.3)] backdrop-blur-2xl ring-1 ring-black/[0.04] dark:ring-white/[0.05] overflow-visible"
       >
+        <button
+          onClick={onClose}
+          aria-label="Close settings"
+          className="absolute top-3 right-3 z-10 p-1.5 rounded-lg text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-black/[0.04] dark:hover:bg-white/[0.06] transition-all"
+        >
+          <FiX size={18} />
+        </button>
         <div className="p-4 max-h-[85vh] overflow-y-auto">
           {/* Header */}
           <div className="flex flex-col items-center mb-3">
@@ -341,8 +349,10 @@ export default function UserSettingsModal({
             )}
           </div>
 
-          {/* Appearance / Theme Toggle */}
-          <div className="mb-3 rounded-xl border border-black/[0.06] dark:border-white/[0.08] bg-gray-50 dark:bg-transparent dark:bg-gradient-to-br dark:from-white/[0.06] dark:via-transparent dark:to-black/10 shadow-sm dark:shadow-[0_2px_12px_rgba(0,0,0,0.2)] backdrop-blur-sm">
+          {/* Appearance + Friends toggles (side by side) */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
+            {/* Appearance / Theme Toggle */}
+            <div className="rounded-xl border border-black/[0.06] dark:border-white/[0.08] bg-gray-50 dark:bg-transparent dark:bg-gradient-to-br dark:from-white/[0.06] dark:via-transparent dark:to-black/10 shadow-sm dark:shadow-[0_2px_12px_rgba(0,0,0,0.2)] backdrop-blur-sm">
             <div className="flex items-center justify-between px-3 py-2.5">
               <div className="flex items-center gap-2">
                 <div className="p-1.5 rounded-lg bg-black/[0.04] dark:bg-white/[0.06] text-amber-500 dark:text-amber-300">
@@ -367,23 +377,23 @@ export default function UserSettingsModal({
                 aria-checked={isDark}
                 aria-label="Toggle dark mode"
                 onClick={toggleTheme}
-                className={`relative inline-flex w-9 h-5 rounded-full border transition-colors duration-200 ${
+                className={`relative inline-flex w-11 h-6 rounded-full transition-colors duration-200 ${
                   isDark
-                    ? "bg-gradient-to-r from-indigo-500 to-purple-600 border-white/[0.08]"
-                    : "bg-gray-300 border-black/[0.06]"
+                    ? "bg-gradient-to-r from-indigo-500 to-purple-600 shadow-[inset_0_1px_2px_rgba(0,0,0,0.35)]"
+                    : "bg-gray-300 shadow-[inset_0_1px_3px_rgba(0,0,0,0.22)]"
                 }`}
               >
                 <span
-                  className={`absolute top-[2px] left-[2px] h-4 w-4 rounded-full bg-gradient-to-br from-white to-gray-200 shadow-[0_1px_4px_rgba(0,0,0,0.3)] transition-transform duration-200 ${
-                    isDark ? "translate-x-4" : "translate-x-0"
+                  className={`absolute top-[3px] left-[3px] h-[18px] w-[18px] rounded-full bg-white shadow-[0_1px_3px_rgba(0,0,0,0.45)] transition-transform duration-200 ${
+                    isDark ? "translate-x-5" : "translate-x-0"
                   }`}
                 />
               </button>
             </div>
           </div>
 
-          {/* Friends Feature Toggle */}
-          <div className="mb-3 rounded-xl border border-black/[0.06] dark:border-white/[0.08] bg-gray-50 dark:bg-transparent dark:bg-gradient-to-br dark:from-white/[0.06] dark:via-transparent dark:to-black/10 shadow-sm dark:shadow-[0_2px_12px_rgba(0,0,0,0.2)] backdrop-blur-sm">
+            {/* Friends Feature Toggle */}
+            <div className="rounded-xl border border-black/[0.06] dark:border-white/[0.08] bg-gray-50 dark:bg-transparent dark:bg-gradient-to-br dark:from-white/[0.06] dark:via-transparent dark:to-black/10 shadow-sm dark:shadow-[0_2px_12px_rgba(0,0,0,0.2)] backdrop-blur-sm">
             <div className="flex items-center justify-between px-3 py-2.5">
               <div className="flex-1 mr-2">
                 <span className="text-xs font-medium text-gray-800 dark:text-gray-200">
@@ -412,7 +422,7 @@ export default function UserSettingsModal({
                   }}
                   className="sr-only peer"
                 />
-                <div className="w-9 h-5 bg-gray-300 dark:bg-gray-800/80 border border-black/[0.06] dark:border-white/[0.08] peer-focus:outline-none peer-focus:ring-1 peer-focus:ring-pink-500/50 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-gradient-to-br after:from-white after:to-gray-200 after:rounded-full after:h-4 after:w-4 after:transition-all after:shadow-[0_1px_4px_rgba(0,0,0,0.3)] peer-checked:bg-gradient-to-r peer-checked:from-pink-500 peer-checked:to-purple-600 peer-disabled:opacity-50 shadow-[inset_0_1px_2px_rgba(0,0,0,0.3)]"></div>
+                <div className="w-11 h-6 rounded-full peer transition-colors bg-gray-300 dark:bg-gray-600 shadow-[inset_0_1px_3px_rgba(0,0,0,0.22)] dark:shadow-[inset_0_1px_3px_rgba(0,0,0,0.5)] peer-focus:ring-2 peer-focus:ring-pink-500/40 peer-checked:bg-gradient-to-r peer-checked:from-pink-500 peer-checked:to-purple-600 peer-disabled:opacity-50 after:content-[''] after:absolute after:top-[3px] after:left-[3px] after:h-[18px] after:w-[18px] after:rounded-full after:bg-white after:shadow-[0_1px_3px_rgba(0,0,0,0.45)] after:transition-transform peer-checked:after:translate-x-5"></div>
               </label>
             </div>
             {friendsEnabled && (
@@ -422,6 +432,7 @@ export default function UserSettingsModal({
                 </p>
               </div>
             )}
+            </div>
           </div>
 
           {/* Disable Friends Confirmation Modal */}
@@ -461,7 +472,7 @@ export default function UserSettingsModal({
                     <button
                       onClick={() => setShowDisableFriendsConfirm(false)}
                       disabled={isTogglingFriends}
-                      className="px-3 py-1.5 rounded-lg border border-black/[0.06] dark:border-white/[0.08] hover:border-gray-300 dark:hover:border-white/[0.15] hover:bg-black/[0.03] dark:hover:bg-white/[0.04] text-gray-600 dark:text-gray-300 text-xs disabled:opacity-50 transition-all duration-200"
+                      className="px-3 py-1.5 rounded-lg bg-gray-100 dark:bg-white/[0.04] border border-gray-200 dark:border-white/[0.08] hover:bg-gray-200 dark:hover:bg-white/[0.08] hover:border-gray-300 dark:hover:border-white/[0.15] text-gray-700 dark:text-gray-300 text-xs disabled:opacity-50 transition-all duration-200"
                     >
                       Cancel
                     </button>
@@ -560,7 +571,7 @@ export default function UserSettingsModal({
                 }
                 className="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-pink-500/40 focus:border-pink-500/50 text-gray-900 dark:text-gray-200 text-xs transition-all duration-200 appearance-none cursor-pointer"
               >
-                {[2026, 2027, 2028, 2029, 2030].map((year) => (
+                {[2027, 2028, 2029, 2030, 2031].map((year) => (
                   <option key={year} value={year}>
                     {year}
                   </option>
@@ -696,7 +707,7 @@ export default function UserSettingsModal({
                     <button
                       onClick={() => setShowDeleteConfirm(false)}
                       disabled={isDeleting}
-                      className="px-3 py-1.5 rounded-lg border border-black/[0.06] dark:border-white/[0.08] hover:border-gray-300 dark:hover:border-white/[0.15] hover:bg-black/[0.03] dark:hover:bg-white/[0.04] text-gray-600 dark:text-gray-300 text-xs disabled:opacity-50 transition-all duration-200"
+                      className="px-3 py-1.5 rounded-lg bg-gray-100 dark:bg-white/[0.04] border border-gray-200 dark:border-white/[0.08] hover:bg-gray-200 dark:hover:bg-white/[0.08] hover:border-gray-300 dark:hover:border-white/[0.15] text-gray-700 dark:text-gray-300 text-xs disabled:opacity-50 transition-all duration-200"
                     >
                       Cancel
                     </button>

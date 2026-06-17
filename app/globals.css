@@ -178,6 +178,40 @@
   box-shadow: inset 3px 3px 6px #1a202c, inset -3px -3px 6px #2d3748;
 }
 
+/* Reusable neumorphic card depth (raised), theme-aware. */
+.shadow-neu {
+  box-shadow:
+    6px 6px 16px rgba(0, 0, 0, 0.09),
+    -6px -6px 14px rgba(255, 255, 255, 0.9);
+}
+.dark .shadow-neu {
+  box-shadow:
+    8px 8px 22px rgba(0, 0, 0, 0.6),
+    -5px -5px 14px rgba(255, 255, 255, 0.04);
+}
+.shadow-neu-sm {
+  box-shadow:
+    4px 4px 10px rgba(0, 0, 0, 0.08),
+    -4px -4px 10px rgba(255, 255, 255, 0.85);
+}
+.dark .shadow-neu-sm {
+  box-shadow:
+    5px 5px 14px rgba(0, 0, 0, 0.5),
+    -3px -3px 9px rgba(255, 255, 255, 0.035);
+}
+.shadow-neu:hover,
+.shadow-neu-sm:hover {
+  box-shadow:
+    8px 8px 20px rgba(0, 0, 0, 0.12),
+    -7px -7px 16px rgba(255, 255, 255, 0.95);
+}
+.dark .shadow-neu:hover,
+.dark .shadow-neu-sm:hover {
+  box-shadow:
+    10px 10px 26px rgba(0, 0, 0, 0.65),
+    -6px -6px 16px rgba(255, 255, 255, 0.05);
+}
+
 .dark {
   --neumorph-light: #2d3748;
   --neumorph-dark: #1a202c;

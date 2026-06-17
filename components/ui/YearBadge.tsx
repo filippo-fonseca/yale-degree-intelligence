@@ -9,11 +9,11 @@ interface YearBadgeProps {
 
 const getYearStatus = (graduationYear: number): string => {
   // Direct mapping based on graduation year
-  if (graduationYear >= 2030) return "High School";
-  if (graduationYear === 2029) return "Freshman";
-  if (graduationYear === 2028) return "Sophomore";
-  if (graduationYear === 2027) return "Junior";
-  if (graduationYear <= 2026) return "Senior";
+  if (graduationYear >= 2031) return "High School";
+  if (graduationYear === 2030) return "Freshman";
+  if (graduationYear === 2029) return "Sophomore";
+  if (graduationYear === 2028) return "Junior";
+  if (graduationYear <= 2027) return "Senior";
 
   return "Unknown";
 };

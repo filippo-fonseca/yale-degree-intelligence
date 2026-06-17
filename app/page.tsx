@@ -1343,14 +1343,16 @@ export default function Home() {
                             title="Add courses manually"
                           >
                             <FiPlus size={14} />
-                            <span className="hidden sm:inline">Add</span>
+                            <span className="hidden sm:inline">Manual add</span>
                           </button>
                           <button
                             onClick={() => setShowUpdateModal(true)}
                             className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gray-100 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700/50 hover:border-blue-500/40 hover:bg-gray-200 dark:hover:bg-gray-800 text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-300 transition-all text-sm"
                           >
                             <FiRefreshCw size={14} />
-                            <span className="hidden sm:inline">Re-upload</span>
+                            <span className="hidden sm:inline">
+                              Re-upload transcript
+                            </span>
                           </button>
                         </div>
                       </div>
@@ -2040,11 +2042,47 @@ export default function Home() {
                     <h3 className="text-xl font-medium mb-4 text-gray-800 dark:text-gray-200">
                       Update your transcript
                     </h3>
-                    <p className="text-gray-600 dark:text-gray-400 mb-6">
+                    <p className="text-gray-600 dark:text-gray-400 mb-4">
                       Upload a new transcript to update your course history.
                       We'll only add new courses that aren't already in your
                       record.
                     </p>
+                    <div className="mb-5 p-3 rounded-xl bg-gray-50 dark:bg-gray-800/40 border border-gray-200 dark:border-gray-700/50">
+                      <p className="text-[11px] font-medium text-gray-500 dark:text-gray-400 mb-2 uppercase tracking-wider">
+                        How to get your transcript
+                      </p>
+                      <ol className="space-y-1.5 text-sm text-gray-700 dark:text-gray-300">
+                        <li>
+                          1. Go to{" "}
+                          <a
+                            href="https://yub.yale.edu"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-pink-600 dark:text-pink-400 hover:underline underline-offset-2"
+                          >
+                            Yale Hub
+                          </a>{" "}
+                          and sign in
+                        </li>
+                        <li>
+                          2. Go to{" "}
+                          <span className="font-mono text-xs px-1 py-0.5 rounded bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700/50 text-gray-800 dark:text-gray-200">
+                            Academics
+                          </span>{" "}
+                          →{" "}
+                          <span className="font-mono text-xs px-1 py-0.5 rounded bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700/50 text-gray-800 dark:text-gray-200">
+                            Unofficial Transcript
+                          </span>
+                        </li>
+                        <li>
+                          3. Click{" "}
+                          <span className="font-medium text-blue-600 dark:text-blue-300">
+                            Print
+                          </span>
+                          , save as PDF, and upload it below
+                        </li>
+                      </ol>
+                    </div>
                     <FileUpload onSuccess={parseAndStoreCourses} />
                   </motion.div>
                 </motion.div>

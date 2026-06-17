@@ -20,7 +20,8 @@ function buildContext(userContext: any): string {
   const now = new Date();
   const currentYear = now.getFullYear();
   const currentMonth = now.getMonth();
-  const isSpring = currentMonth < 6;
+  // Cutoff is June 1st: from June onward the current term is Fall.
+  const isSpring = currentMonth < 5;
   const currentSemester = isSpring ? "Spring" : "Fall";
 
   const yearsLeft = gradYear ? gradYear - currentYear : null;

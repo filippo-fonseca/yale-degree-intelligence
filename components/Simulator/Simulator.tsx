@@ -107,7 +107,7 @@ function isPastSemester(semesterName: string) {
   // (at which point year < currentYear catches it)
   // Spring is past once it ends (June+)
   if (sem === "Fall" && currentMonth > 11) return true; // > Dec (never true, handled by next year check)
-  if (sem === "Spring" && currentMonth > 5) return true; // > Jun (Spring ended)
+  if (sem === "Spring" && currentMonth >= 5) return true; // June 1+ (Spring ended)
   return false;
 }
 

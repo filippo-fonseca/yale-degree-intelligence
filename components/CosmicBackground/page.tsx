@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { useTheme } from "@/context/ThemeContext";
 
 type Mode = "stars" | "neurons";
 
@@ -20,11 +21,13 @@ export default function CosmicBackground({
   opacity = 0.9,
   className = "",
 }: CosmicBackgroundProps) {
+  const { resolvedTheme } = useTheme();
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const rafRef = useRef<number | null>(null);
 
   useEffect(() => {
-    const canvas = canvasRef.current!;
+    if (!canvasRef.current) return;
+    const canvas = canvasRef.current;
     const ctx = canvas.getContext("2d")!;
     let width = 0;
     let height = 0;
@@ -397,6 +400,8 @@ export default function CosmicBackground({
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
     };
   }, [mode, opacity]);
+
+  if (resolvedTheme !== "dark") return null;
 
   return (
     <canvas

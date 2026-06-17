@@ -68,43 +68,43 @@ export default function MajorTipModal({
             exit={{ scale: 0.97, opacity: 0 }}
             transition={{ type: "spring", stiffness: 260, damping: 22 }}
             onClick={(e) => e.stopPropagation()}
-            className="w-full max-w-lg rounded-2xl border border-gray-800 bg-gray-900/90 text-gray-200 shadow-[0_10px_40px_rgba(0,0,0,0.45)]"
+            className="w-full max-w-lg rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900/90 text-gray-700 dark:text-gray-200 shadow-[0_10px_40px_rgba(0,0,0,0.15)] dark:shadow-[0_10px_40px_rgba(0,0,0,0.45)]"
           >
-            <div className="p-5 border-b border-gray-800 flex items-center justify-between">
+            <div className="p-5 border-b border-gray-200 dark:border-gray-800 flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="p-2 rounded-xl bg-blue-900/30 border border-blue-800/60">
-                  <CheckCircle2 className="w-5 h-5 text-blue-300" />
+                <div className="p-2 rounded-xl bg-blue-100 dark:bg-blue-900/30 border border-blue-300 dark:border-blue-800/60">
+                  <CheckCircle2 className="w-5 h-5 text-blue-600 dark:text-blue-300" />
                 </div>
-                <h3 className="text-lg font-semibold">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
                   About “Manual fulfill” & “Skip”
                 </h3>
               </div>
               <button
                 onClick={dismiss}
-                className="p-2 rounded-lg hover:bg-gray-800 transition"
+                className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition"
                 aria-label="Close"
                 title="Close"
               >
-                <XIcon className="w-4 h-4 text-gray-400" />
+                <XIcon className="w-4 h-4 text-gray-500 dark:text-gray-400" />
               </button>
             </div>
 
-            <div className="p-5 space-y-3 text-sm leading-relaxed text-gray-300">
+            <div className="p-5 space-y-3 text-sm leading-relaxed text-gray-700 dark:text-gray-300">
               <p>
                 {user?.displayName?.split(" ")[0]}, we know you might{" "}
-                <span className="font-medium text-blue-200">
+                <span className="font-medium text-blue-600 dark:text-blue-200">
                   fulfill more requirements
                 </span>{" "}
                 than we can automatically detect, as the DUS for each major
                 might not all list specific courses that apply for a given
                 requirement all the time.
               </p>
-              <p className="text-gray-400">
+              <p className="text-gray-500 dark:text-gray-400">
                 That’s why every requirement includes:
               </p>
-              <ul className="list-disc list-inside space-y-1 text-gray-400">
+              <ul className="list-disc list-inside space-y-1 text-gray-500 dark:text-gray-400">
                 <li>
-                  <span className="text-gray-200 font-medium">
+                  <span className="text-gray-800 dark:text-gray-200 font-medium">
                     Manual fulfill
                   </span>{" "}
                   — mark a requirement as satisfied by linking a class directly
@@ -112,7 +112,7 @@ export default function MajorTipModal({
                   manually" button on each requirement's card.
                 </li>
                 <li>
-                  <span className="text-gray-200 font-medium">
+                  <span className="text-gray-800 dark:text-gray-200 font-medium">
                     Skip a class
                   </span>{" "}
                   — indicate an approved exemption to a listed class on a
@@ -123,7 +123,7 @@ export default function MajorTipModal({
                   and clicking "Mark as skipped".
                 </li>
               </ul>
-              <p className="text-gray-500">
+              <p className="text-gray-400 dark:text-gray-500">
                 Use these when your DUS/department confirms you’re covered but
                 our parser can’t infer it automatically.
               </p>
@@ -132,7 +132,7 @@ export default function MajorTipModal({
             <div className="p-5 pt-0 flex items-center justify-end gap-2">
               <button
                 onClick={dismiss}
-                className="px-4 py-2 rounded-lg border border-gray-800 hover:border-gray-700 bg-gray-900/60 text-gray-300 hover:text-white transition"
+                className="px-4 py-2 rounded-lg border border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700 bg-gray-50 dark:bg-gray-900/60 text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition"
               >
                 Got it
               </button>
@@ -167,7 +167,7 @@ export function MajorTipHelpButton({
       />
       <button
         onClick={onClick}
-        className="relative flex items-center justify-between w-full p-3 bg-gray-900 rounded-lg text-sm text-gray-300 hover:bg-gray-800 transition-colors"
+        className="relative flex items-center justify-between w-full p-3 bg-white dark:bg-gray-900 rounded-lg text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
         title="What do 'Manual fulfill' and 'Skip' mean?"
       >
         <div className="flex items-center gap-2">

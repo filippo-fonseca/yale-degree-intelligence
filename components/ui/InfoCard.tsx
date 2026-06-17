@@ -32,7 +32,7 @@ export function InfoCard({
         />
         <button
           onClick={() => setIsExpanded(true)}
-          className="relative flex items-center justify-between w-full p-3 bg-gray-900 rounded-lg text-sm text-gray-300 hover:bg-gray-800 transition-colors"
+          className="relative flex items-center justify-between w-full p-3 bg-white dark:bg-gray-900 rounded-lg text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
         >
           <div className="flex items-center gap-2">
             <div className="text-pink-500">{icon}</div>
@@ -46,7 +46,7 @@ export function InfoCard({
 
   return (
     <div
-      className={`flex flex-col gap-2 p-3 bg-gray-800/50 rounded-lg border border-gray-700 text-sm text-gray-300 ${className}`}
+      className={`flex flex-col gap-2 p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg border border-gray-200 dark:border-gray-700 text-sm text-gray-700 dark:text-gray-300 ${className}`}
     >
       {autoHide && (
         <div className="flex justify-between items-center">
@@ -56,7 +56,7 @@ export function InfoCard({
           </div>
           <button
             onClick={() => setIsExpanded(false)}
-            className="text-gray-400 hover:text-gray-200 transition-colors"
+            className="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors"
             aria-label="Hide info"
           >
             <FiX className="w-4 h-4" />
@@ -67,7 +67,7 @@ export function InfoCard({
       {autoHide && (
         <button
           onClick={() => setIsExpanded(false)}
-          className="self-end flex items-center gap-1 text-xs text-gray-400 hover:text-gray-200 transition-colors mt-1"
+          className="self-end flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors mt-1"
         >
           <span>Collapse</span>
           <FiChevronUp className="w-3 h-3" />

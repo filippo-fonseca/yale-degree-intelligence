@@ -80,7 +80,7 @@ function CopyButton() {
   return (
     <button
       onClick={handleCopy}
-      className="inline-flex items-center gap-1 font-semibold text-pink-500 hover:text-pink-200 underline hover:no-underline transition"
+      className="inline-flex items-center gap-1 font-semibold text-pink-500 hover:text-pink-600 dark:hover:text-pink-200 underline hover:no-underline transition"
     >
       {copied ? (
         <>
@@ -105,7 +105,7 @@ const Skeleton = ({ className = "" }: { className?: string }) => (
 );
 
 const FriendRowSkeleton = () => (
-  <div className="flex items-center justify-between p-3 rounded-xl bg-gradient-to-br from-gray-900/60 via-gray-900/40 to-gray-950/60 border border-gray-800/50">
+  <div className="flex items-center justify-between p-3 rounded-xl bg-gray-50 dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 border border-gray-200 dark:border-gray-800/50">
     <div className="flex gap-3">
       <Skeleton className="h-9 w-9 rounded-full" />
       <div className="space-y-1.5">
@@ -118,7 +118,7 @@ const FriendRowSkeleton = () => (
 );
 
 const RequestRowSkeleton = () => (
-  <div className="flex items-center justify-between p-2.5 rounded-lg bg-gray-800/30 border border-gray-800/40">
+  <div className="flex items-center justify-between p-2.5 rounded-lg bg-gray-100/50 dark:bg-gray-800/30 border border-gray-200/60 dark:border-gray-800/40">
     <div className="flex items-center gap-2">
       <Skeleton className="h-6 w-6 rounded-full" />
       <Skeleton className="h-3 w-24" />
@@ -436,13 +436,13 @@ export default function FriendsTab({
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="flex flex-col items-center justify-center py-10 px-8 rounded-2xl bg-gradient-to-br from-gray-900/80 via-gray-900/60 to-gray-950/80 backdrop-blur-2xl border border-white/[0.08] shadow-[0_8px_48px_rgba(0,0,0,0.4),0_0_80px_rgba(236,72,153,0.06),inset_0_1px_0_rgba(255,255,255,0.08)] ring-1 ring-white/[0.05]"
+          className="flex flex-col items-center justify-center py-10 px-8 rounded-2xl bg-gradient-to-br from-gray-50/80 via-white/60 to-gray-100/80 dark:from-gray-900/80 dark:via-gray-900/60 dark:to-gray-950/80 backdrop-blur-2xl border border-black/[0.06] dark:border-white/[0.08] shadow-[0_8px_48px_rgba(0,0,0,0.4),0_0_80px_rgba(236,72,153,0.06),inset_0_1px_0_rgba(255,255,255,0.08)] ring-1 ring-white/[0.05]"
         >
           {/* Icon */}
           <div className="relative mb-6">
             <div className="absolute inset-0 bg-gradient-to-br from-pink-500/20 to-purple-500/20 rounded-full blur-xl" />
             <div className="relative p-4 rounded-2xl bg-gradient-to-br from-pink-500/15 to-purple-500/15 border border-pink-500/20 shadow-[inset_0_1px_0_rgba(255,255,255,0.1),0_4px_16px_rgba(236,72,153,0.2)]">
-              <FiUsers className="w-8 h-8 text-pink-300" />
+              <FiUsers className="w-8 h-8 text-pink-500 dark:text-pink-300" />
             </div>
           </div>
 
@@ -451,20 +451,20 @@ export default function FriendsTab({
             Enable Friends Feature
           </h3>
 
-          <p className="text-gray-400 text-sm text-center max-w-md mb-6 leading-relaxed">
+          <p className="text-gray-500 dark:text-gray-400 text-sm text-center max-w-md mb-6 leading-relaxed">
             Connect with other Yale students to see what courses they've taken
             and get inspiration for your own academic journey. Your grades are{" "}
-            <strong className="text-gray-200">never shared</strong>.
+            <strong className="text-gray-800 dark:text-gray-200">never shared</strong>.
           </p>
 
           {/* What's shared card */}
           <div className="w-full max-w-sm mb-6">
             <div className="p-4 rounded-xl bg-gradient-to-br from-white/[0.04] to-transparent border border-white/[0.06] shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]">
-              <h4 className="text-xs font-medium text-gray-300 mb-3 flex items-center gap-2">
+              <h4 className="text-xs font-medium text-gray-700 dark:text-gray-300 mb-3 flex items-center gap-2">
                 <span className="w-1.5 h-1.5 rounded-full bg-pink-400" />
                 What gets shared with friends
               </h4>
-              <ul className="text-xs text-gray-400 space-y-1.5 ml-3.5">
+              <ul className="text-xs text-gray-500 dark:text-gray-400 space-y-1.5 ml-3.5">
                 <li>Course codes (e.g., CPSC 201)</li>
                 <li>Semesters and years taken</li>
                 <li>Credit counts</li>
@@ -495,7 +495,7 @@ export default function FriendsTab({
             disabled={isEnabling}
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
-            className="px-6 py-3 bg-purple-500/10 hover:bg-purple-500/20 text-purple-200 text-sm rounded-xl font-medium transition-all disabled:opacity-50 flex items-center gap-2 border border-purple-500/30 hover:border-purple-500/50 shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_4px_16px_rgba(139,92,246,0.15)]"
+            className="px-6 py-3 bg-purple-500/10 hover:bg-purple-500/20 text-purple-600 dark:text-purple-200 text-sm rounded-xl font-medium transition-all disabled:opacity-50 flex items-center gap-2 border border-purple-500/30 hover:border-purple-500/50 shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_4px_16px_rgba(139,92,246,0.15)]"
           >
             {isEnabling ? (
               <>
@@ -596,8 +596,8 @@ export default function FriendsTab({
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-6">
               {/* Incoming Requests */}
               {incomingRequests.length > 0 && (
-                <div className="p-3 rounded-xl bg-gradient-to-br from-gray-900/60 via-gray-900/40 to-gray-950/60 backdrop-blur-md border border-gray-800/50 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]">
-                  <h3 className="text-xs font-medium text-gray-300 mb-2 flex items-center gap-1.5">
+                <div className="p-3 rounded-xl bg-gray-50 dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 backdrop-blur-md border border-gray-200 dark:border-gray-800/50 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]">
+                  <h3 className="text-xs font-medium text-gray-700 dark:text-gray-300 mb-2 flex items-center gap-1.5">
                     <FiMail size={12} /> Incoming Requests (
                     {incomingRequests.length})
                   </h3>
@@ -608,11 +608,11 @@ export default function FriendsTab({
                       return (
                         <div
                           key={req.id}
-                          className="flex items-center justify-between p-2 rounded-lg bg-gray-800/30 border border-gray-800/40"
+                          className="flex items-center justify-between p-2 rounded-lg bg-gray-100/50 dark:bg-gray-800/30 border border-gray-200/60 dark:border-gray-800/40"
                         >
                           <div className="flex items-center gap-2">
                             <UserAvatar photoURL={sender.photoURL} displayName={sender.displayName} email={sender.email} size={22} />
-                            <span className="text-xs text-gray-200 truncate">
+                            <span className="text-xs text-gray-800 dark:text-gray-200 truncate">
                               {getDisplayName(sender)}
                             </span>
                           </div>
@@ -636,7 +636,7 @@ export default function FriendsTab({
                       );
                     })}
                     {incomingRequests.length > 3 && (
-                      <p className="text-[10px] text-gray-500 pt-0.5">
+                      <p className="text-[10px] text-gray-400 dark:text-gray-500 pt-0.5">
                         +{incomingRequests.length - 3} more
                       </p>
                     )}
@@ -646,8 +646,8 @@ export default function FriendsTab({
 
               {/* Sent Requests */}
               {sentRequests.length > 0 && (
-                <div className="p-3 rounded-xl bg-gradient-to-br from-gray-900/60 via-gray-900/40 to-gray-950/60 backdrop-blur-md border border-gray-800/50 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]">
-                  <h3 className="text-xs font-medium text-gray-300 mb-2 flex items-center gap-1.5">
+                <div className="p-3 rounded-xl bg-gray-50 dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 backdrop-blur-md border border-gray-200 dark:border-gray-800/50 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]">
+                  <h3 className="text-xs font-medium text-gray-700 dark:text-gray-300 mb-2 flex items-center gap-1.5">
                     <FiUserCheck size={12} /> Sent Requests (
                     {sentRequests.length})
                   </h3>
@@ -658,16 +658,16 @@ export default function FriendsTab({
                       return (
                         <div
                           key={req.id}
-                          className="flex items-center justify-between p-2 rounded-lg bg-gray-800/30 border border-gray-800/40"
+                          className="flex items-center justify-between p-2 rounded-lg bg-gray-100/50 dark:bg-gray-800/30 border border-gray-200/60 dark:border-gray-800/40"
                         >
                           <div className="flex items-center gap-2">
                             <UserAvatar photoURL={recipient.photoURL} displayName={recipient.displayName} email={recipient.email} size={22} />
-                            <span className="text-xs text-gray-200 truncate">
+                            <span className="text-xs text-gray-800 dark:text-gray-200 truncate">
                               {getDisplayName(recipient)}
                             </span>
                           </div>
                           <button
-                            className="p-1 rounded bg-gray-700/40 text-gray-400 hover:bg-red-600/30 hover:text-red-400 transition border border-gray-700/40"
+                            className="p-1 rounded bg-black/[0.04] dark:bg-gray-700/40 text-gray-500 dark:text-gray-400 hover:bg-red-600/20 dark:hover:bg-red-600/30 hover:text-red-500 dark:hover:text-red-400 transition border border-black/[0.06] dark:border-gray-700/40"
                             onClick={() => cancelSentRequest(req.id)}
                             title="Cancel"
                           >
@@ -677,7 +677,7 @@ export default function FriendsTab({
                       );
                     })}
                     {sentRequests.length > 3 && (
-                      <p className="text-[10px] text-gray-500 pt-0.5">
+                      <p className="text-[10px] text-gray-400 dark:text-gray-500 pt-0.5">
                         +{sentRequests.length - 3} more
                       </p>
                     )}
@@ -697,14 +697,14 @@ export default function FriendsTab({
                 exit={{ opacity: 0 }}
               >
                 <motion.div
-                  className="bg-gradient-to-br from-gray-900/95 via-gray-900/90 to-gray-950/95 backdrop-blur-md p-5 rounded-xl shadow-[0_8px_32px_rgba(0,0,0,0.4)] border border-gray-800/50 max-w-2xl w-full h-[380px] flex flex-col"
+                  className="bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/95 dark:via-gray-900/90 dark:to-gray-950/95 backdrop-blur-md p-5 rounded-xl shadow-[0_8px_32px_rgba(0,0,0,0.4)] border border-gray-200 dark:border-gray-800/50 max-w-2xl w-full h-[380px] flex flex-col"
                   initial={{ scale: 0.95, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
                   exit={{ scale: 0.95, opacity: 0 }}
                   ref={modalRef}
                 >
                   <div className="flex justify-between items-center mb-3">
-                    <h3 className="text-base font-semibold text-white">
+                    <h3 className="text-base font-semibold text-gray-900 dark:text-white">
                       Add a friend on DegreeIntelligence
                     </h3>
                     <button
@@ -712,7 +712,7 @@ export default function FriendsTab({
                         setSearchTerm("");
                         setShowSearchModal(false);
                       }}
-                      className="text-gray-500 hover:text-red-400 transition p-1"
+                      className="text-gray-400 dark:text-gray-500 hover:text-red-500 dark:hover:text-red-400 transition p-1"
                     >
                       <FiX size={16} />
                     </button>
@@ -724,28 +724,28 @@ export default function FriendsTab({
                       type="text"
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
-                      className="bg-gray-800/60 border border-gray-700/50 rounded-lg px-3 py-2 w-full text-sm text-gray-200 focus:outline-none focus:ring-1 focus:ring-pink-500/50 focus:border-pink-500/50 placeholder:text-gray-600"
+                      className="bg-white dark:bg-gray-800/60 border border-gray-300 dark:border-gray-700/50 rounded-lg px-3 py-2 w-full text-sm text-gray-900 dark:text-gray-200 focus:outline-none focus:ring-1 focus:ring-pink-500/50 focus:border-pink-500/50 placeholder:text-gray-400 dark:placeholder:text-gray-600"
                       placeholder="Your best friend, or that upperclassman that gives you advice..."
                     />
                   </div>
 
-                  <div className="space-y-1.5 flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-700">
+                  <div className="space-y-1.5 flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-700">
                     {searchTerm.length === 0 ? (
                       <NoFriendsResult />
                     ) : filteredUsers.length > 0 ? (
                       filteredUsers.slice(0, 10).map((u) => (
                         <motion.div
                           key={u.uid}
-                          className="flex items-center justify-between p-2.5 rounded-lg bg-gray-800/40 border border-gray-700/40 hover:border-pink-600/40 transition-all"
+                          className="flex items-center justify-between p-2.5 rounded-lg bg-gray-50 dark:bg-gray-800/40 border border-gray-200 dark:border-gray-700/40 hover:border-pink-600/40 transition-all"
                           whileHover={{ scale: 0.995 }}
                         >
                           <div className="flex items-center gap-3">
                             <UserAvatar photoURL={u.photoURL} displayName={u.displayName} email={u.email} size={32} />
                             <div>
-                              <div className="font-medium text-sm text-gray-200">
+                              <div className="font-medium text-sm text-gray-800 dark:text-gray-200">
                                 {getDisplayName(u)}
                               </div>
-                              <div className="text-[10px] text-gray-500">
+                              <div className="text-[10px] text-gray-400 dark:text-gray-500">
                                 {u.majors?.length > 0 && u.majors.join(", ")}
                                 {u.majors?.length > 0 && u.graduationYear && " · "}
                                 {u.graduationYear && (
@@ -758,7 +758,7 @@ export default function FriendsTab({
                             </div>
                           </div>
                           <button
-                            className="flex items-center gap-1 px-2 py-1 text-[11px] bg-pink-900/40 text-pink-200 rounded-md border border-pink-800/40 hover:bg-pink-700/50 hover:text-white transition"
+                            className="flex items-center gap-1 px-2 py-1 text-[11px] bg-pink-100 dark:bg-pink-900/40 text-pink-600 dark:text-pink-200 rounded-md border border-pink-300/60 dark:border-pink-800/40 hover:bg-pink-200 dark:hover:bg-pink-700/50 hover:text-pink-700 dark:hover:text-white transition"
                             onClick={() => sendFriendRequest(u.uid)}
                           >
                             <FiUserPlus size={12} />
@@ -777,12 +777,12 @@ export default function FriendsTab({
 
           {/* Friends List Section */}
           <section>
-            <h3 className="text-sm font-medium text-pink-200 mb-3 flex items-center gap-1.5">
+            <h3 className="text-sm font-medium text-pink-500 dark:text-pink-200 mb-3 flex items-center gap-1.5">
               <FiUsers size={14} /> Your Friends ({friendProfiles.length})
             </h3>
             <div className="space-y-2">
               {friendProfiles.length === 0 && (
-                <div className="text-gray-500 text-xs">
+                <div className="text-gray-400 dark:text-gray-500 text-xs">
                   No friends yet. Go add some above!
                 </div>
               )}
@@ -793,16 +793,16 @@ export default function FriendsTab({
                 return (
                   <motion.div
                     key={f.uid}
-                    className="flex items-center justify-between p-3 rounded-xl bg-gradient-to-br from-gray-900/60 via-gray-900/40 to-gray-950/60 backdrop-blur-md border border-gray-800/50 hover:border-purple-600/40 transition-all shadow-[inset_0_1px_0_rgba(255,255,255,0.04),0_4px_12px_rgba(0,0,0,0.15)]"
+                    className="flex items-center justify-between p-3 rounded-xl bg-gray-50 dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 backdrop-blur-md border border-gray-200 dark:border-gray-800/50 hover:border-purple-600/40 transition-all shadow-[inset_0_1px_0_rgba(255,255,255,0.04),0_4px_12px_rgba(0,0,0,0.15)]"
                     whileHover={{ scale: 1.01 }}
                   >
                     <div className="flex gap-3">
                       <UserAvatar photoURL={f.photoURL} displayName={f.displayName} email={f.email} size={36} />
                       <div>
-                        <div className="font-medium text-sm text-pink-200">
+                        <div className="font-medium text-sm text-pink-600 dark:text-pink-200">
                           {getDisplayName(f)}
                         </div>
-                        <div className="text-[10px] text-gray-500">
+                        <div className="text-[10px] text-gray-400 dark:text-gray-500">
                           {f.majors?.length > 0 && f.majors.join(", ")}
                           {f.majors?.length > 0 && f.graduationYear && " · "}
                           {f.graduationYear && (
@@ -819,7 +819,7 @@ export default function FriendsTab({
                     <div className="flex gap-1.5">
                       <Link
                         href={`/user/${f.uid}`}
-                        className="flex items-center gap-1 px-2 py-1 text-[11px] bg-gray-800/50 text-gray-300 rounded-lg border border-gray-700/40 hover:bg-pink-600/30 hover:text-pink-200 hover:border-pink-600/40 transition-all"
+                        className="flex items-center gap-1 px-2 py-1 text-[11px] bg-black/[0.04] dark:bg-gray-800/50 text-gray-600 dark:text-gray-300 rounded-lg border border-black/[0.06] dark:border-gray-700/40 hover:bg-pink-600/20 dark:hover:bg-pink-600/30 hover:text-pink-600 dark:hover:text-pink-200 hover:border-pink-600/40 transition-all"
                       >
                         <FiUser size={11} />
                         Profile

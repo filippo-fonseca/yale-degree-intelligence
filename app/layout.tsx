@@ -78,15 +78,26 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={`${louize.variable} ${sf.variable} dark`} suppressHydrationWarning>
-      <head />
+    <html
+      lang="en"
+      className={`${louize.variable} ${sf.variable}`}
+      suppressHydrationWarning
+    >
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var t=localStorage.getItem('di-theme');var d=t!=='light';document.documentElement.classList.toggle('dark',d);document.documentElement.style.colorScheme=d?'dark':'light';}catch(e){document.documentElement.classList.add('dark');}})();`,
+          }}
+        />
+      </head>
       <AuthProvider>
         <ThemeProvider>
-          <body className="bg-black text-white">
+          <body className="bg-white text-gray-900 dark:bg-black dark:text-white transition-colors duration-300">
             <Toaster
               position="top-center"
               toastOptions={{
-                className: "!bg-[#1f1f1f] !text-white",
+                className:
+                  "!bg-white !text-gray-900 dark:!bg-[#1f1f1f] dark:!text-white !border !border-gray-200 dark:!border-white/10",
                 style: {
                   fontSize: "0.875rem",
                   borderRadius: "8px",

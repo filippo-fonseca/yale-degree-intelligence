@@ -24,31 +24,31 @@ const COLOR_CLASSES: Record<
 > = {
   purple: {
     card: "bg-purple-500/10 border-purple-500/30",
-    text: "text-purple-300",
+    text: "text-purple-600 dark:text-purple-300",
     accent: "bg-purple-500/20",
     bar: "#a855f7",
   },
   sky: {
     card: "bg-sky-500/10 border-sky-500/30",
-    text: "text-sky-300",
+    text: "text-sky-600 dark:text-sky-300",
     accent: "bg-sky-500/20",
     bar: "#38bdf8",
   },
   emerald: {
     card: "bg-emerald-500/10 border-emerald-500/30",
-    text: "text-emerald-300",
+    text: "text-emerald-600 dark:text-emerald-300",
     accent: "bg-emerald-500/20",
     bar: "#34d399",
   },
   red: {
     card: "bg-red-500/10 border-red-500/30",
-    text: "text-red-300",
+    text: "text-red-600 dark:text-red-300",
     accent: "bg-red-500/20",
     bar: "#f87171",
   },
   orange: {
     card: "bg-orange-500/10 border-orange-500/30",
-    text: "text-orange-300",
+    text: "text-orange-600 dark:text-orange-300",
     accent: "bg-orange-500/20",
     bar: "#fb923c",
   },
@@ -98,7 +98,7 @@ const DistributionalsView = ({ courses }: { courses: Course[] }) => {
             <span
               className={`text-sm font-semibold px-2.5 py-1 rounded-lg ${
                 fulfilled
-                  ? "bg-emerald-500/20 text-emerald-300"
+                  ? "bg-emerald-500/20 text-emerald-600 dark:text-emerald-300"
                   : `${colors.accent} ${colors.text}`
               }`}
             >
@@ -131,7 +131,7 @@ const DistributionalsView = ({ courses }: { courses: Course[] }) => {
             {Math.min(count, 2)} of 2 credits
           </span>
           {count > 2 && (
-            <span className="text-xs text-gray-500">(+{count - 2} extra)</span>
+            <span className="text-xs text-gray-400 dark:text-gray-500">(+{count - 2} extra)</span>
           )}
         </div>
 
@@ -147,7 +147,7 @@ const DistributionalsView = ({ courses }: { courses: Course[] }) => {
                   <span className="text-xs text-gray-700 dark:text-gray-300 font-medium">
                     {course.code}
                   </span>
-                  <span className="text-xs text-gray-500 truncate ml-2 max-w-[140px]">
+                  <span className="text-xs text-gray-400 dark:text-gray-500 truncate ml-2 max-w-[140px]">
                     {getCourseNameFromCode(course.code)}
                   </span>
                 </div>
@@ -178,10 +178,10 @@ const DistributionalsView = ({ courses }: { courses: Course[] }) => {
       {/* Prompt if no distributionals assigned */}
       {!hasAnyDistributionals && (
         <div className="p-4 rounded-xl bg-blue-500/10 border border-blue-500/20">
-          <p className="text-sm text-blue-300">
+          <p className="text-sm text-blue-600 dark:text-blue-300">
             You haven't tagged any courses with distributionals yet. Head to the{" "}
             <strong>My Courses</strong> tab and click{" "}
-            <span className="font-mono text-blue-200">+ dist</span> on your
+            <span className="font-mono text-blue-500 dark:text-blue-200">+ dist</span> on your
             courses to start tracking.
           </p>
         </div>
@@ -202,14 +202,14 @@ const DistributionalsView = ({ courses }: { courses: Course[] }) => {
             initial={{ width: 0 }}
             animate={{ width: `${(totalCompleted / 10) * 100}%` }}
             transition={{ duration: 0.8, ease: "easeOut" }}
-            className="h-full rounded-full bg-gradient-to-r from-blue-500 to-purple-500"
+            className="h-full rounded-full bg-gradient-to-r from-purple-500 to-purple-600"
           />
         </div>
       </div>
 
       {/* Areas */}
       <div>
-        <h3 className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-3">
+        <h3 className="text-sm font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-3">
           Areas
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -219,7 +219,7 @@ const DistributionalsView = ({ courses }: { courses: Course[] }) => {
 
       {/* Skills */}
       <div>
-        <h3 className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-3">
+        <h3 className="text-sm font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-3">
           Skills
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -260,24 +260,24 @@ const DistributionalsView = ({ courses }: { courses: Course[] }) => {
 
         return (
           <div>
-            <h3 className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-3">
+            <h3 className="text-sm font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-3">
               Language
             </h3>
-            <div className="p-5 rounded-xl bg-gray-900/50 border border-gray-800">
+            <div className="p-5 rounded-xl bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-800">
               {/* Progress header */}
               {placementLevel !== null && (
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-2">
-                    <span className="text-sm text-gray-400">
-                      Placed into <span className="text-teal-300 font-medium">L{placementLevel}</span>
+                    <span className="text-sm text-gray-500 dark:text-gray-400">
+                      Placed into <span className="text-teal-600 dark:text-teal-300 font-medium">L{placementLevel}</span>
                     </span>
                     {isComplete && (
-                      <span className="px-2 py-0.5 text-xs rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                      <span className="px-2 py-0.5 text-xs rounded-full bg-emerald-500/20 text-emerald-600 dark:text-emerald-300 border border-emerald-500/30">
                         Complete
                       </span>
                     )}
                   </div>
-                  <span className="text-sm font-medium text-gray-200">
+                  <span className="text-sm font-medium text-gray-800 dark:text-gray-200">
                     {Math.round(progress * 100)}%
                   </span>
                 </div>
@@ -285,7 +285,7 @@ const DistributionalsView = ({ courses }: { courses: Course[] }) => {
 
               {/* Progress bar (only if we know placement) */}
               {placementLevel !== null && (
-                <div className="w-full h-2 bg-gray-800 rounded-full overflow-hidden mb-4">
+                <div className="w-full h-2 bg-gray-200 dark:bg-gray-800 rounded-full overflow-hidden mb-4">
                   <motion.div
                     initial={{ width: 0 }}
                     animate={{ width: `${progress * 100}%` }}
@@ -299,7 +299,7 @@ const DistributionalsView = ({ courses }: { courses: Course[] }) => {
               {/* L-level track */}
               <div className="relative py-2 mb-4">
                 {/* Background track line */}
-                <div className="absolute top-[22px] left-[10%] right-[10%] h-0.5 bg-gray-800 rounded-full" />
+                <div className="absolute top-[22px] left-[10%] right-[10%] h-0.5 bg-gray-200 dark:bg-gray-800 rounded-full" />
                 <div className="relative flex justify-between px-2">
                   {LANG_LEVELS.map((level) => {
                     const levelNum = parseInt(level.slice(1));
@@ -317,23 +317,23 @@ const DistributionalsView = ({ courses }: { courses: Course[] }) => {
 
                     if (hasLevel) {
                       // Completed
-                      circleClass = "bg-teal-500/20 border-teal-400 text-teal-300 shadow-[0_0_12px_rgba(45,212,191,0.15)]";
+                      circleClass = "bg-teal-500/20 border-teal-400 text-teal-600 dark:text-teal-300 shadow-[0_0_12px_rgba(45,212,191,0.15)]";
                       showCheck = true;
                     } else if (isNext) {
                       // Next needed - highlight
-                      circleClass = "bg-amber-500/20 border-amber-400 text-amber-300 ring-2 ring-amber-400/30 ring-offset-2 ring-offset-gray-900";
+                      circleClass = "bg-amber-500/20 border-amber-400 text-amber-600 dark:text-amber-300 ring-2 ring-amber-400/30 ring-offset-2 ring-offset-white dark:ring-offset-gray-900";
                       subLabel = "Next";
                     } else if (isRequired) {
                       // Required but not next
-                      circleClass = "bg-gray-800 border-gray-600 text-gray-400";
+                      circleClass = "bg-gray-100 dark:bg-gray-800 border-gray-400 dark:border-gray-600 text-gray-500 dark:text-gray-400";
                       subLabel = "Needed";
                     } else if (isNotNeeded) {
                       // Not required for this placement
-                      circleClass = "bg-gray-900/50 border-gray-800 text-gray-600";
+                      circleClass = "bg-white/50 dark:bg-gray-900/50 border-gray-300 dark:border-gray-800 text-gray-400 dark:text-gray-600";
                       subLabel = levelNum < (placementLevel || 0) ? "Placed out" : "";
                     } else {
                       // No placement determined yet
-                      circleClass = "bg-gray-900 border-gray-700 text-gray-500";
+                      circleClass = "bg-white dark:bg-gray-900 border-gray-300 dark:border-gray-700 text-gray-400 dark:text-gray-500";
                     }
 
                     return (
@@ -349,19 +349,19 @@ const DistributionalsView = ({ courses }: { courses: Course[] }) => {
                         </div>
                         <span
                           className={`text-xs mt-1.5 font-medium ${
-                            hasLevel ? "text-teal-300" : isNext ? "text-amber-300" : isRequired ? "text-gray-400" : "text-gray-600"
+                            hasLevel ? "text-teal-600 dark:text-teal-300" : isNext ? "text-amber-600 dark:text-amber-300" : isRequired ? "text-gray-500 dark:text-gray-400" : "text-gray-400 dark:text-gray-600"
                           }`}
                         >
                           {level}
                         </span>
                         {/* Show course code if completed, otherwise show status label */}
                         {coursesForLevel.length > 0 ? (
-                          <span className="text-[10px] text-gray-500 mt-0.5 max-w-[70px] truncate text-center">
+                          <span className="text-[10px] text-gray-400 dark:text-gray-500 mt-0.5 max-w-[70px] truncate text-center">
                             {coursesForLevel[0].code}
                           </span>
                         ) : subLabel ? (
                           <span className={`text-[10px] mt-0.5 ${
-                            isNext ? "text-amber-400 font-medium" : "text-gray-600"
+                            isNext ? "text-amber-500 dark:text-amber-400 font-medium" : "text-gray-400 dark:text-gray-600"
                           }`}>
                             {subLabel}
                           </span>
@@ -375,13 +375,13 @@ const DistributionalsView = ({ courses }: { courses: Course[] }) => {
               {/* Status message */}
               {placementLevel === null ? (
                 <div className="p-3 rounded-lg bg-blue-500/10 border border-blue-500/20 mb-3">
-                  <p className="text-xs text-blue-300">
+                  <p className="text-xs text-blue-600 dark:text-blue-300">
                     Tag your first language course to track your progress. Your placement level will be inferred from the lowest L-level you tag.
                   </p>
                 </div>
               ) : !isComplete && nextNeeded ? (
                 <div className="p-3 rounded-lg bg-amber-500/10 border border-amber-500/20 mb-3">
-                  <p className="text-xs text-amber-300">
+                  <p className="text-xs text-amber-600 dark:text-amber-300">
                     <strong>Next up:</strong> You need to complete an <span className="font-semibold">{nextNeeded}</span> course.
                     {requiredLevels.length - completedRequired.length > 1 && (
                       <> Then: {requiredLevels.filter(l => getCount(l) === 0 && l !== nextNeeded).join(", ")}.</>
@@ -390,21 +390,21 @@ const DistributionalsView = ({ courses }: { courses: Course[] }) => {
                 </div>
               ) : isComplete ? (
                 <div className="p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/20 mb-3">
-                  <p className="text-xs text-emerald-300">
+                  <p className="text-xs text-emerald-600 dark:text-emerald-300">
                     You've completed your language requirement based on your L{placementLevel} placement.
                   </p>
                 </div>
               ) : null}
 
               {/* Language info */}
-              <div className="p-3 rounded-lg bg-gray-800/30 border border-gray-800">
+              <div className="p-3 rounded-lg bg-gray-100/50 dark:bg-gray-800/30 border border-gray-200 dark:border-gray-800">
                 <div className="flex items-start gap-2">
                   <FiInfo
-                    className="text-gray-500 mt-0.5 flex-shrink-0"
+                    className="text-gray-400 dark:text-gray-500 mt-0.5 flex-shrink-0"
                     size={14}
                   />
-                  <p className="text-xs text-gray-500 leading-relaxed">
-                    Requirements by placement: <span className="text-gray-400">L1 → needs L1-L3</span> | <span className="text-gray-400">L2 → needs L2-L4</span> | <span className="text-gray-400">L3 → needs L3-L4</span> | <span className="text-gray-400">L4/L5 → just that course</span>.
+                  <p className="text-xs text-gray-500 dark:text-gray-500 leading-relaxed">
+                    Requirements by placement: <span className="text-gray-600 dark:text-gray-400">L1 → needs L1-L3</span> | <span className="text-gray-600 dark:text-gray-400">L2 → needs L2-L4</span> | <span className="text-gray-600 dark:text-gray-400">L3 → needs L3-L4</span> | <span className="text-gray-600 dark:text-gray-400">L4/L5 → just that course</span>.
                     Your placement is inferred from your lowest tagged level. Consult your dean or DUS for specifics.
                   </p>
                 </div>
@@ -415,20 +415,20 @@ const DistributionalsView = ({ courses }: { courses: Course[] }) => {
       })()}
 
       {/* Info footer */}
-      <div className="p-4 rounded-xl bg-gray-900/30 border border-gray-800/50">
+      <div className="p-4 rounded-xl bg-gray-100/50 dark:bg-gray-900/30 border border-gray-200 dark:border-gray-800/50">
         <div className="flex items-start gap-3">
-          <FiInfo className="text-blue-400 mt-0.5 flex-shrink-0" size={16} />
-          <div className="text-sm text-gray-400 space-y-1">
+          <FiInfo className="text-blue-500 dark:text-blue-400 mt-0.5 flex-shrink-0" size={16} />
+          <div className="text-sm text-gray-500 dark:text-gray-400 space-y-1">
             <p>
-              <span className="text-gray-300 font-medium">Areas</span> require 2
+              <span className="text-gray-700 dark:text-gray-300 font-medium">Areas</span> require 2
               credits each in Humanities & Arts (Hu), Social Sciences (So), and
               Sciences (Sc).
             </p>
             <p>
-              <span className="text-gray-300 font-medium">Skills</span> require 2
+              <span className="text-gray-700 dark:text-gray-300 font-medium">Skills</span> require 2
               credits each in Quantitative Reasoning (QR) and Writing (WR).
             </p>
-            <p className="text-xs text-gray-500 mt-2">
+            <p className="text-xs text-gray-400 dark:text-gray-500 mt-2">
               This data is based on your manual tagging. Always verify with your
               dean or DUS.
             </p>

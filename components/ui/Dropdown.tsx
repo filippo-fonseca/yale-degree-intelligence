@@ -64,7 +64,7 @@ export function MajorDropdown({
       {/* Dropdown trigger */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full text-left p-3 rounded-lg border border-gray-700 bg-gray-800 hover:bg-gray-800/50 flex justify-between items-center"
+        className="w-full text-left p-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800/50 text-gray-900 dark:text-white flex justify-between items-center"
       >
         <div className="flex items-center">
           {value ? (
@@ -72,15 +72,15 @@ export function MajorDropdown({
               <div className="w-4 h-4 rounded-full bg-blue-500 mr-3 flex-shrink-0" />
               <div>
                 <div className="font-medium">{value}</div>
-                <div className="text-sm text-gray-400">{selectedMajorName}</div>
+                <div className="text-sm text-gray-500 dark:text-gray-400">{selectedMajorName}</div>
               </div>
             </>
           ) : (
-            <div className="text-gray-400">{placeholder}</div>
+            <div className="text-gray-500 dark:text-gray-400">{placeholder}</div>
           )}
         </div>
         <svg
-          className={`h-5 w-5 text-gray-400 transition-transform ${
+          className={`h-5 w-5 text-gray-500 dark:text-gray-400 transition-transform ${
             isOpen ? "rotate-180" : ""
           }`}
           xmlns="http://www.w3.org/2000/svg"
@@ -97,9 +97,9 @@ export function MajorDropdown({
 
       {/* Dropdown content */}
       {isOpen && (
-        <div className="absolute z-10 mt-1 w-full bg-gray-800 border border-gray-700 rounded-lg shadow-lg overflow-hidden">
+        <div className="absolute z-10 mt-1 w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg overflow-hidden">
           {/* Search bar */}
-          <div className="p-2 border-b border-gray-700">
+          <div className="p-2 border-b border-gray-200 dark:border-gray-700">
             <div className="relative">
               <input
                 ref={searchInputRef}
@@ -107,10 +107,10 @@ export function MajorDropdown({
                 placeholder="Search majors & concentrations..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full bg-gray-900 text-gray-200 px-3 py-2 pl-8 rounded-md border border-gray-700 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="w-full bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-200 placeholder-gray-400 dark:placeholder-gray-500 px-3 py-2 pl-8 rounded-md border border-gray-300 dark:border-gray-700 focus:outline-none focus:ring-1 focus:ring-blue-500"
               />
               <svg
-                className="absolute left-2 top-2.5 h-4 w-4 text-gray-400"
+                className="absolute left-2 top-2.5 h-4 w-4 text-gray-500 dark:text-gray-400"
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
                 viewBox="0 0 24 24"
@@ -137,7 +137,7 @@ export function MajorDropdown({
                     setIsOpen(false);
                   }}
                   disabled={disabledOptions.includes(code)}
-                  className={`w-full text-left p-3 hover:bg-gray-700/50 ${
+                  className={`w-full text-left p-3 hover:bg-gray-100 dark:hover:bg-gray-700/50 text-gray-900 dark:text-white ${
                     value === code ? "bg-blue-900/20" : ""
                   } ${
                     disabledOptions.includes(code)
@@ -151,13 +151,13 @@ export function MajorDropdown({
                     )}
                     <div>
                       <div className="font-medium">{code}</div>
-                      <div className="text-sm text-gray-400">{name}</div>
+                      <div className="text-sm text-gray-500 dark:text-gray-400">{name}</div>
                     </div>
                   </div>
                 </button>
               ))
             ) : (
-              <div className="p-3 text-center text-gray-400">
+              <div className="p-3 text-center text-gray-500 dark:text-gray-400">
                 No majors found
               </div>
             )}

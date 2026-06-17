@@ -15,6 +15,7 @@ import PieChartWrapper from "./ui/PieChartWrapper";
 import { InfoCard } from "./ui/InfoCard";
 import { LineChart } from "@mui/x-charts/LineChart";
 import { axisClasses } from "@mui/x-charts";
+import { useTheme } from "@/context/ThemeContext";
 
 const COLORS = [
   "#8B5CF6", // purple
@@ -37,62 +38,82 @@ const seasonOrder: Record<string, number> = {
 const CHART_FONT =
   "var(--font-sf), ui-sans-serif, system-ui, -apple-system, sans-serif";
 
-// Shared styling so every MUI x-chart matches our dark theme + app font.
-const lineChartSx = {
-  fontFamily: CHART_FONT,
-  [`.${axisClasses.left} .${axisClasses.label}`]: {
-    transform: "translate(-20px, 0)",
-    fill: "#9CA3AF",
-  },
-  [`.${axisClasses.bottom} .${axisClasses.label}`]: {
-    transform: "translate(0, 60px)",
-    fill: "#9CA3AF",
-  },
-  [`.${axisClasses.root} line`]: {
-    stroke: "#374151",
-    opacity: 0.3,
-  },
-  [`.${axisClasses.root} text`]: {
-    fill: "#9CA3AF",
+// Shared styling so every MUI x-chart matches the active theme + app font.
+const makeLineChartSx = (isDark: boolean) => {
+  const axisText = isDark ? "#9CA3AF" : "#4B5563";
+  const gridLine = isDark ? "#374151" : "#E5E7EB";
+  return {
     fontFamily: CHART_FONT,
-  },
-  backgroundColor: "transparent",
+    [`.${axisClasses.left} .${axisClasses.label}`]: {
+      transform: "translate(-20px, 0)",
+      fill: axisText,
+    },
+    [`.${axisClasses.bottom} .${axisClasses.label}`]: {
+      transform: "translate(0, 60px)",
+      fill: axisText,
+    },
+    [`.${axisClasses.root} line`]: {
+      stroke: gridLine,
+      opacity: isDark ? 0.3 : 0.8,
+    },
+    [`.${axisClasses.root} text`]: {
+      fill: axisText,
+      fontFamily: CHART_FONT,
+    },
+    backgroundColor: "transparent",
+  };
 };
 
 // Tooltip styling. The `sx` lands directly on the tooltip Paper, so the
 // surface props go at the root; the cell colors need `!important` to beat
-// MUI's default (near-black) text on valueCell/labelCell in the light theme.
-const chartTooltipSlotProps = {
-  tooltip: {
-    sx: {
-      backgroundColor: "rgba(17, 24, 39, 0.97)",
-      backgroundImage: "none",
-      border: "1px solid rgba(255, 255, 255, 0.12)",
-      borderRadius: "0.6rem",
-      boxShadow: "0 12px 32px rgba(0, 0, 0, 0.55)",
-      color: "#F3F4F6",
-      fontFamily: CHART_FONT,
-      overflow: "hidden",
-      "& caption, & th, & td, & .MuiChartsTooltip-cell, & .MuiChartsTooltip-valueCell, & .MuiChartsTooltip-axisValueCell, & .MuiTypography-root":
-        {
-          color: "#F3F4F6 !important",
-          fontFamily: CHART_FONT,
-          fontSize: "0.78rem",
+// MUI's default theme text color.
+const makeChartTooltipSlotProps = (isDark: boolean) => {
+  const surface = isDark ? "rgba(17, 24, 39, 0.97)" : "rgba(255, 255, 255, 0.98)";
+  const border = isDark ? "rgba(255, 255, 255, 0.12)" : "rgba(0, 0, 0, 0.08)";
+  const primary = isDark ? "#F3F4F6" : "#111827";
+  const secondary = isDark ? "#D1D5DB" : "#4B5563";
+  const shadow = isDark
+    ? "0 12px 32px rgba(0, 0, 0, 0.55)"
+    : "0 12px 32px rgba(0, 0, 0, 0.18)";
+  return {
+    tooltip: {
+      sx: {
+        backgroundColor: surface,
+        backgroundImage: "none",
+        border: `1px solid ${border}`,
+        borderRadius: "0.6rem",
+        boxShadow: shadow,
+        color: primary,
+        fontFamily: CHART_FONT,
+        overflow: "hidden",
+        "& caption, & th, & td, & .MuiChartsTooltip-cell, & .MuiChartsTooltip-valueCell, & .MuiChartsTooltip-axisValueCell, & .MuiTypography-root":
+          {
+            color: `${primary} !important`,
+            fontFamily: CHART_FONT,
+            fontSize: "0.78rem",
+          },
+        "& .MuiChartsTooltip-labelCell": {
+          color: `${secondary} !important`,
         },
-      "& .MuiChartsTooltip-labelCell": {
-        color: "#D1D5DB !important",
-      },
-      "& caption": {
-        borderColor: "rgba(255, 255, 255, 0.12)",
-      },
-      "& .MuiChartsTooltip-mark": {
-        borderColor: "rgba(255, 255, 255, 0.25)",
+        "& caption": {
+          borderColor: border,
+        },
+        "& .MuiChartsTooltip-mark": {
+          borderColor: border,
+        },
       },
     },
-  },
+  };
 };
 
 export default function StatsView({ courses }: { courses: Course[] }) {
+  const { resolvedTheme } = useTheme();
+  const isDark = resolvedTheme === "dark";
+  const lineChartSx = makeLineChartSx(isDark);
+  const chartTooltipSlotProps = makeChartTooltipSlotProps(isDark);
+  const axisTickColor = isDark ? "#9CA3AF" : "#4B5563";
+  const pieBorderColor = isDark ? "#0B1120" : "#FFFFFF";
+
   const activeCourses = courses.filter(
     (c) =>
       !c.skipped &&
@@ -217,7 +238,7 @@ export default function StatsView({ courses }: { courses: Course[] }) {
         backgroundColor: departmentData.map(
           (_, i) => COLORS[i % COLORS.length],
         ),
-        borderColor: Array(departmentData.length).fill("#0B1120"),
+        borderColor: Array(departmentData.length).fill(pieBorderColor),
         borderWidth: 2,
       },
     ],
@@ -231,7 +252,7 @@ export default function StatsView({ courses }: { courses: Course[] }) {
         backgroundColor: filteredGradeDistribution.map(
           (_, i) => COLORS[i % COLORS.length],
         ),
-        borderColor: Array(filteredGradeDistribution.length).fill("#0B1120"),
+        borderColor: Array(filteredGradeDistribution.length).fill(pieBorderColor),
         borderWidth: 2,
       },
     ],
@@ -244,7 +265,7 @@ export default function StatsView({ courses }: { courses: Course[] }) {
         We're actively working on new stats. Have any suggestions?{" "}
         <a
           href="mailto:filippo.fonseca@yale.edu,emir.ahmed@yale.edu"
-          className="text-white hover:underline hover:scale-110 transition-transform duration-200"
+          className="text-pink-600 dark:text-white font-medium hover:underline hover:scale-110 inline-block transition-transform duration-200"
         >
           Let us know.
         </a>
@@ -326,7 +347,7 @@ export default function StatsView({ courses }: { courses: Course[] }) {
                     angle: 45,
                     textAnchor: "start",
                     fontSize: 11,
-                    fill: "#9CA3AF",
+                    fill: axisTickColor,
                   },
                 },
               ]}
@@ -375,7 +396,7 @@ export default function StatsView({ courses }: { courses: Course[] }) {
                     angle: 45,
                     textAnchor: "start",
                     fontSize: 11,
-                    fill: "#9CA3AF",
+                    fill: axisTickColor,
                   },
                 },
               ]}

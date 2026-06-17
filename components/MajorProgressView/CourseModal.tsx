@@ -210,13 +210,13 @@ export default function CourseModal({
             initial={{ scale: 0.9, y: 20 }}
             animate={{ scale: 1, y: 0 }}
             exit={{ scale: 0.9, y: 20 }}
-            className="bg-gray-800 rounded-xl border border-gray-700 max-w-md w-full p-4"
+            className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 max-w-md w-full p-4"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex justify-between items-start mb-4">
               <div>
-                <h3 className="text-lg font-medium">{course.code}</h3>
-                <p className="text-gray-400 text-sm">
+                <h3 className="text-lg font-medium text-gray-900 dark:text-white">{course.code}</h3>
+                <p className="text-gray-500 dark:text-gray-400 text-sm">
                   Previously {getOtherCodesForCourse(course.code)}
                 </p>
               </div>
@@ -224,12 +224,12 @@ export default function CourseModal({
                 <span
                   className={`text-xs px-2 py-1 rounded-full ${
                     course.status === "completed"
-                      ? "bg-emerald-900/20 text-emerald-300"
+                      ? "bg-emerald-100 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-300"
                       : course.status === "in-progress"
-                      ? "bg-blue-900/20 text-blue-300"
+                      ? "bg-blue-100 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300"
                       : course.status === "skipped"
-                      ? "bg-gray-800/20 text-gray-300"
-                      : "bg-amber-900/20 text-red-300"
+                      ? "bg-gray-200 dark:bg-gray-800/20 text-gray-600 dark:text-gray-300"
+                      : "bg-amber-100 dark:bg-amber-900/20 text-red-700 dark:text-red-300"
                   }`}
                 >
                   {course.status === "completed"
@@ -249,8 +249,8 @@ export default function CourseModal({
                     <span
                       className={`text-xs px-2 py-1 rounded-full ${
                         course.status === "completed"
-                          ? "bg-emerald-900/20 text-emerald-300"
-                          : "bg-blue-900/20 text-blue-300"
+                          ? "bg-emerald-100 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-300"
+                          : "bg-blue-100 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300"
                       }`}
                     >
                       {courseSemesterTaken}
@@ -262,7 +262,7 @@ export default function CourseModal({
                   !course.skipped &&
                   courseGrade && (
                     <span
-                      className={`text-xs px-2 py-1 rounded-full bg-emerald-900/20 ${getGPAColor(
+                      className={`text-xs px-2 py-1 rounded-full bg-emerald-100 dark:bg-emerald-900/20 ${getGPAColor(
                         courseGrade
                       )}`}
                     >
@@ -281,15 +281,15 @@ export default function CourseModal({
                           setCourseGrade(null);
                           onSkip?.(course.code, course.name);
                         }}
-                        className="flex items-center border border-pink-300 gap-1 text-xs px-2 py-1 rounded-full bg-pink-900/20 text-pink-300 hover:bg-pink-900/30 transition-all transform hover:scale-105"
+                        className="flex items-center border border-pink-300 gap-1 text-xs px-2 py-1 rounded-full bg-pink-100 dark:bg-pink-900/20 text-pink-600 dark:text-pink-300 hover:bg-pink-200 dark:hover:bg-pink-900/30 transition-all transform hover:scale-105"
                       >
                         <FiCornerDownLeft size={12} />
                         Mark as skipped
                       </button>
 
                       <div className="relative group">
-                        <Info className="h-4 w-4 text-gray-400 hover:text-gray-200 transition-colors cursor-pointer" />
-                        <div className="absolute border border-pink-500 top-full mt-3 left-1/2 -translate-x-1/2 bg-gray-800 text-gray-300 text-xs p-2 rounded-md opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-50 pointer-events-none">
+                        <Info className="h-4 w-4 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors cursor-pointer" />
+                        <div className="absolute border border-pink-500 top-full mt-3 left-1/2 -translate-x-1/2 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 text-xs p-2 rounded-md opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-50 pointer-events-none">
                           Sometimes you can count a class as "taken" without
                           necessarily taking the exact course
                           <br /> (like via placement or another class). In that
@@ -305,28 +305,28 @@ export default function CourseModal({
                   )}
               </div>
             </div>
-            <p className="text-gray-300">
+            <p className="text-gray-700 dark:text-gray-300">
               {course.name} <br /> {courseCredits}{" "}
               {courseCredits === 1 ? "credit" : "credits"}
             </p>
 
             {/* Distributionals Section */}
             {(course.status === "completed" || course.status === "in-progress") && !course.skipped && onToggleDistributional && (
-              <div className="mt-4 pt-4 border-t border-gray-700">
+              <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm text-gray-400">Distributional Requirements</span>
+                  <span className="text-sm text-gray-500 dark:text-gray-400">Distributional Requirements</span>
                   {localDistributionals.length === 0 && !showDistEditor ? (
                     // Gradient border when no distributionals assigned
                     <button
                       onClick={() => setShowDistEditor(!showDistEditor)}
-                      className="text-xs px-3 py-1 rounded-full bg-gradient-to-r from-purple-500/20 via-pink-500/20 to-blue-500/20 text-gray-200 hover:text-white border border-purple-500/50 hover:border-purple-400/70 transition-all"
+                      className="text-xs px-3 py-1 rounded-full bg-gradient-to-r from-purple-500/20 via-pink-500/20 to-blue-500/20 text-gray-700 dark:text-gray-200 hover:text-gray-900 dark:hover:text-white border border-purple-500/50 hover:border-purple-400/70 transition-all"
                     >
                       + Assign
                     </button>
                   ) : (
                     <button
                       onClick={() => setShowDistEditor(!showDistEditor)}
-                      className="text-xs px-2 py-1 rounded-full bg-gray-700/50 text-gray-300 hover:bg-gray-600/50 transition-all"
+                      className="text-xs px-2 py-1 rounded-full bg-gray-200 dark:bg-gray-700/50 text-gray-600 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600/50 transition-all"
                     >
                       {showDistEditor ? "Done" : "Edit"}
                     </button>
@@ -348,7 +348,7 @@ export default function CourseModal({
                 )}
 
                 {localDistributionals.length === 0 && !showDistEditor && (
-                  <p className="text-xs text-gray-500">No distributionals assigned</p>
+                  <p className="text-xs text-gray-400 dark:text-gray-500">No distributionals assigned</p>
                 )}
 
                 {/* Distributional Editor */}
@@ -362,7 +362,7 @@ export default function CourseModal({
                     >
                       {/* Areas */}
                       <div>
-                        <p className="text-xs text-gray-500 mb-1">Areas</p>
+                        <p className="text-xs text-gray-400 dark:text-gray-500 mb-1">Areas</p>
                         <div className="flex flex-wrap gap-1.5">
                           {DIST_CATEGORIES.areas.map((d) => (
                             <button
@@ -371,7 +371,7 @@ export default function CourseModal({
                               className={`text-xs px-2.5 py-1 rounded-full border font-medium transition-all ${
                                 localDistributionals.includes(d)
                                   ? getDistPillStyle(d)
-                                  : "bg-gray-800/30 text-gray-500 border-gray-700/50 hover:border-gray-600"
+                                  : "bg-gray-100 dark:bg-gray-800/30 text-gray-400 dark:text-gray-500 border-gray-200 dark:border-gray-700/50 hover:border-gray-400 dark:hover:border-gray-600"
                               }`}
                             >
                               {d}
@@ -382,7 +382,7 @@ export default function CourseModal({
 
                       {/* Skills */}
                       <div>
-                        <p className="text-xs text-gray-500 mb-1">Skills</p>
+                        <p className="text-xs text-gray-400 dark:text-gray-500 mb-1">Skills</p>
                         <div className="flex flex-wrap gap-1.5">
                           {DIST_CATEGORIES.skills.map((d) => (
                             <button
@@ -391,7 +391,7 @@ export default function CourseModal({
                               className={`text-xs px-2.5 py-1 rounded-full border font-medium transition-all ${
                                 localDistributionals.includes(d)
                                   ? getDistPillStyle(d)
-                                  : "bg-gray-800/30 text-gray-500 border-gray-700/50 hover:border-gray-600"
+                                  : "bg-gray-100 dark:bg-gray-800/30 text-gray-400 dark:text-gray-500 border-gray-200 dark:border-gray-700/50 hover:border-gray-400 dark:hover:border-gray-600"
                               }`}
                             >
                               {d}
@@ -402,7 +402,7 @@ export default function CourseModal({
 
                       {/* Languages */}
                       <div>
-                        <p className="text-xs text-gray-500 mb-1">Languages</p>
+                        <p className="text-xs text-gray-400 dark:text-gray-500 mb-1">Languages</p>
                         <div className="flex flex-wrap gap-1.5">
                           {DIST_CATEGORIES.languages.map((d) => (
                             <button
@@ -411,7 +411,7 @@ export default function CourseModal({
                               className={`text-xs px-2.5 py-1 rounded-full border font-medium transition-all ${
                                 localDistributionals.includes(d)
                                   ? getDistPillStyle(d)
-                                  : "bg-gray-800/30 text-gray-500 border-gray-700/50 hover:border-gray-600"
+                                  : "bg-gray-100 dark:bg-gray-800/30 text-gray-400 dark:text-gray-500 border-gray-200 dark:border-gray-700/50 hover:border-gray-400 dark:hover:border-gray-600"
                               }`}
                             >
                               {d}

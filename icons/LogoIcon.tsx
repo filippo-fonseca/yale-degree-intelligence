@@ -1,5 +1,8 @@
+"use client";
+
 import React, { useId } from "react";
 import { IconProps } from ".";
+import { useTheme } from "@/context/ThemeContext";
 
 interface LogoIconProps extends IconProps {
   lightMode?: boolean;
@@ -7,7 +10,12 @@ interface LogoIconProps extends IconProps {
 }
 
 const LogoIcon = ({ lightMode = false, variant, ...props }: LogoIconProps) => {
+  const { resolvedTheme } = useTheme();
   const isDarkOnLight = variant === "darkOnLight";
+  // Use the darker "light" palette whenever the caller asks for it OR the app is
+  // in light mode (and no explicit variant override is set); otherwise the
+  // near-white default palette is invisible on a white background.
+  const effLight = lightMode || (variant === undefined && resolvedTheme === "light");
   const uniqueId = useId();
   const paint0 = `paint0_${uniqueId}`;
   const paint1 = `paint1_${uniqueId}`;
@@ -29,7 +37,7 @@ const LogoIcon = ({ lightMode = false, variant, ...props }: LogoIconProps) => {
           fill={`url(#${paint0})`}
         />
       </g>
-      <circle cx="641.5" cy="142.5" r="142.5" fill={isDarkOnLight ? "white" : lightMode ? "#f3f4f6" : "white"} />
+      <circle cx="641.5" cy="142.5" r="142.5" fill={isDarkOnLight ? "white" : effLight ?"#f3f4f6" : "white"} />
       <g clipPath={`url(#${clip1})`}>
         <path
           d="M641.5 0C562.923 0 499 63.9231 499 142.5C499 221.077 562.923 285 641.5 285C720.077 285 784 221.077 784 142.5C784 63.9231 720.077 0 641.5 0ZM698.274 93.5156L653.375 149.649V201.875C653.375 208.442 648.067 213.75 641.5 213.75C634.933 213.75 629.625 208.442 629.625 201.875V149.649L584.726 93.5156C580.629 88.3856 581.472 80.9162 586.578 76.8194C591.72 72.7106 599.178 73.5656 603.274 78.6719L641.5 126.457L679.726 78.6719C683.846 73.5775 691.304 72.7106 696.422 76.8194C701.54 80.9281 702.371 88.3975 698.274 93.5156Z"
@@ -45,8 +53,8 @@ const LogoIcon = ({ lightMode = false, variant, ...props }: LogoIconProps) => {
           y2="787"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stopColor={isDarkOnLight ? "#030712" : lightMode ? "#2563eb" : "#BFDBFE"} />
-          <stop offset="1" stopColor={isDarkOnLight ? "#1f2937" : lightMode ? "#3b82f6" : "white"} />
+          <stop stopColor={isDarkOnLight ? "#030712" : effLight ?"#2563eb" : "#BFDBFE"} />
+          <stop offset="1" stopColor={isDarkOnLight ? "#1f2937" : effLight ?"#3b82f6" : "white"} />
         </linearGradient>
         <linearGradient
           id={paint1}
@@ -56,8 +64,8 @@ const LogoIcon = ({ lightMode = false, variant, ...props }: LogoIconProps) => {
           y2="285"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stopColor={isDarkOnLight ? "#db2777" : lightMode ? "#db2777" : "#F4C4F3"} />
-          <stop offset="1" stopColor={isDarkOnLight ? "#ec4899" : lightMode ? "#ec4899" : "#FC67FA"} />
+          <stop stopColor={isDarkOnLight ? "#db2777" : effLight ?"#db2777" : "#F4C4F3"} />
+          <stop offset="1" stopColor={isDarkOnLight ? "#ec4899" : effLight ?"#ec4899" : "#FC67FA"} />
         </linearGradient>
         <clipPath id={clip0}>
           <rect

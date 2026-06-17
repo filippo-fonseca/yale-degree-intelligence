@@ -75,14 +75,14 @@ export default function DegreeIntelligence() {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="p-5 rounded-xl bg-gradient-to-br from-gray-800/50 to-gray-900/50 border border-gray-700/50 shadow-neumorphic"
+        className="p-5 rounded-xl bg-gray-50 dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-800/50 dark:to-gray-900/50 border border-gray-200 dark:border-gray-700/50 shadow-neumorphic"
       >
         <div className="flex items-center gap-3">
-          <div className="animate-pulse w-10 h-10 rounded-lg bg-gray-700/50"></div>
+          <div className="animate-pulse w-10 h-10 rounded-lg bg-gray-200 dark:bg-gray-700/50"></div>
           <div className="space-y-2 flex-1">
-            <div className="animate-pulse h-4 w-1/3 rounded bg-gray-700/50"></div>
-            <div className="animate-pulse h-3 w-full rounded bg-gray-700/50"></div>
-            <div className="animate-pulse h-3 w-2/3 rounded bg-gray-700/50"></div>
+            <div className="animate-pulse h-4 w-1/3 rounded bg-gray-200 dark:bg-gray-700/50"></div>
+            <div className="animate-pulse h-3 w-full rounded bg-gray-200 dark:bg-gray-700/50"></div>
+            <div className="animate-pulse h-3 w-2/3 rounded bg-gray-200 dark:bg-gray-700/50"></div>
           </div>
         </div>
       </motion.div>
@@ -109,7 +109,7 @@ export default function DegreeIntelligence() {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="p-5 rounded-xl bg-gradient-to-br from-gray-800/50 to-gray-900/50 border border-gray-700/50 shadow-neumorphic"
+      className="p-5 rounded-xl bg-gray-50 dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-800/50 dark:to-gray-900/50 border border-gray-200 dark:border-gray-700/50 shadow-neumorphic"
     >
       <div className="flex items-start gap-5">
         <div className="flex-shrink-0">
@@ -129,19 +129,19 @@ export default function DegreeIntelligence() {
                 />
               </svg>
             </div>
-            <div className="absolute -bottom-2 -right-3 bg-purple-500 text-white text-xs px-1.5 py-0.5 rounded-full border-2 border-gray-900">
+            <div className="absolute -bottom-2 -right-3 bg-purple-500 text-white text-xs px-1.5 py-0.5 rounded-full border-2 border-white dark:border-gray-900">
               AI
             </div>
           </div>
         </div>
         <div className="flex-1">
-          <h4 className="font-medium text-white/90 flex items-center gap-2">
+          <h4 className="font-medium text-gray-900 dark:text-white/90 flex items-center gap-2">
             Cleo
             <span className="text-xs bg-purple-500/20 text-purple-300 px-2 py-0.5 rounded-full">
               Beta
             </span>
           </h4>
-          <div className="mt-2 text-sm text-gray-300 space-y-2">
+          <div className="mt-2 text-sm text-gray-700 dark:text-gray-300 space-y-2">
             {/* <p>{advice.advice}</p> */}
             <p>
               I'm coming to your DegreeIntelligence platform soon! Stay tuned.

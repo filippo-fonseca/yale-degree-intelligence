@@ -3,6 +3,7 @@
 import { Pie } from "react-chartjs-2";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 import { useEffect, useState } from "react";
+import { useTheme } from "@/context/ThemeContext";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
@@ -29,6 +30,8 @@ export default function PieChartWrapper({
   showLegend = true,
 }: PieChartWrapperProps) {
   const [isMounted, setIsMounted] = useState(false);
+  const { resolvedTheme } = useTheme();
+  const isDark = resolvedTheme === "dark";
 
   useEffect(() => {
     setIsMounted(true);
@@ -80,7 +83,7 @@ export default function PieChartWrapper({
                 display: showLegend,
                 position: "bottom",
                 labels: {
-                  color: "#9CA3AF",
+                  color: isDark ? "#9CA3AF" : "#4B5563",
                   font: {
                     size: 11,
                     family: CHART_FONT,
@@ -91,10 +94,14 @@ export default function PieChartWrapper({
                 },
               },
               tooltip: {
-                backgroundColor: "rgba(17, 24, 39, 0.97)",
-                titleColor: "#F3F4F6",
-                bodyColor: "#E5E7EB",
-                borderColor: "rgba(255, 255, 255, 0.12)",
+                backgroundColor: isDark
+                  ? "rgba(17, 24, 39, 0.97)"
+                  : "rgba(255, 255, 255, 0.98)",
+                titleColor: isDark ? "#F3F4F6" : "#111827",
+                bodyColor: isDark ? "#E5E7EB" : "#374151",
+                borderColor: isDark
+                  ? "rgba(255, 255, 255, 0.12)"
+                  : "rgba(0, 0, 0, 0.08)",
                 borderWidth: 1,
                 cornerRadius: 8,
                 padding: 10,

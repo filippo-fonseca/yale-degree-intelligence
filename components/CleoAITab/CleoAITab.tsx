@@ -254,12 +254,12 @@ What can I help you with? I can help plan your schedule, find courses that count
             <h2 className="text-xl font-medium text-gray-900 dark:text-white">
               Handsome Dan
             </h2>
-            <p className="text-gray-500 text-xs">Your Yale bulldog advisor</p>
+            <p className="text-gray-400 dark:text-gray-500 text-xs">Your Yale bulldog advisor</p>
           </div>
         </div>
         <button
           onClick={resetConversation}
-          className="p-1.5 rounded-lg bg-gray-800/40 hover:bg-gray-700/50 text-gray-500 hover:text-gray-300 border border-gray-700/40 transition-all shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]"
+          className="p-1.5 rounded-lg bg-black/[0.04] dark:bg-gray-800/40 hover:bg-black/[0.08] dark:hover:bg-gray-700/50 text-gray-500 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 border border-black/[0.06] dark:border-gray-700/40 transition-all shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]"
           title="Reset conversation"
         >
           <FiRefreshCw size={14} />
@@ -278,17 +278,17 @@ What can I help you with? I can help plan your schedule, find courses that count
             <div
               className={`max-w-[85%] rounded-xl p-3 backdrop-blur-md shadow-[inset_0_1px_0_rgba(255,255,255,0.04),0_4px_12px_rgba(0,0,0,0.15)] ${
                 message.role === "user"
-                  ? "bg-gradient-to-br from-blue-900/40 to-blue-950/40 text-blue-100 border border-blue-700/30"
-                  : "bg-gradient-to-br from-gray-900/60 via-gray-900/40 to-gray-950/60 text-gray-200 border border-gray-800/50"
+                  ? "bg-gradient-to-br from-blue-100 to-blue-50 dark:from-blue-900/40 dark:to-blue-950/40 text-blue-900 dark:text-blue-100 border border-blue-300/60 dark:border-blue-700/30"
+                  : "bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 text-gray-800 dark:text-gray-200 border border-gray-200 dark:border-gray-800/50"
               }`}
             >
               {message.role === "assistant" && (
                 <div className="flex items-center gap-1.5 mb-1.5">
                   <BulldogIcon className="w-3.5 h-3.5 text-blue-400" />
-                  <span className="text-[10px] font-medium text-gray-500">Dan</span>
+                  <span className="text-[10px] font-medium text-gray-400 dark:text-gray-500">Dan</span>
                 </div>
               )}
-              <div className="prose prose-invert prose-sm max-w-none prose-p:my-1 prose-ul:my-1 prose-li:my-0 text-sm">
+              <div className="prose prose-sm dark:prose-invert max-w-none prose-p:my-1 prose-ul:my-1 prose-li:my-0 text-sm">
                 <ReactMarkdown>{message.content}</ReactMarkdown>
               </div>
             </div>
@@ -296,10 +296,10 @@ What can I help you with? I can help plan your schedule, find courses that count
         ))}
         {isLoading && (
           <div className="flex justify-start">
-            <div className="rounded-xl p-3 bg-gradient-to-br from-gray-900/60 via-gray-900/40 to-gray-950/60 backdrop-blur-md border border-gray-800/50 shadow-[inset_0_1px_0_rgba(255,255,255,0.04),0_4px_12px_rgba(0,0,0,0.15)]">
+            <div className="rounded-xl p-3 bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 backdrop-blur-md border border-gray-200 dark:border-gray-800/50 shadow-[inset_0_1px_0_rgba(255,255,255,0.04),0_4px_12px_rgba(0,0,0,0.15)]">
               <div className="flex items-center gap-1.5">
                 <BulldogIcon className="w-3.5 h-3.5 text-blue-400" />
-                <span className="text-[10px] text-gray-500">Dan is sniffing around...</span>
+                <span className="text-[10px] text-gray-400 dark:text-gray-500">Dan is sniffing around...</span>
               </div>
               <div className="flex space-x-1 mt-1.5">
                 <div className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-bounce" />
@@ -313,14 +313,14 @@ What can I help you with? I can help plan your schedule, find courses that count
       </div>
 
       {/* Input */}
-      <div className="border-t border-gray-800/40 pt-3">
+      <div className="border-t border-gray-200 dark:border-gray-800/40 pt-3">
         <div className="relative">
           <textarea
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder="Ask Dan about requirements, courses, planning..."
-            className="w-full px-3 py-2.5 pr-11 text-sm bg-gray-900 border border-gray-700 rounded-xl text-gray-200 focus:outline-none focus:ring-1 focus:ring-purple-500/40 focus:border-purple-600/50 resize-none placeholder:text-gray-500 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]"
+            className="w-full px-3 py-2.5 pr-11 text-sm bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-xl text-gray-900 dark:text-gray-200 focus:outline-none focus:ring-1 focus:ring-purple-500/40 focus:border-purple-600/50 resize-none placeholder:text-gray-400 dark:placeholder:text-gray-500 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]"
             rows={2}
             disabled={isLoading}
           />
@@ -330,7 +330,7 @@ What can I help you with? I can help plan your schedule, find courses that count
             className={`absolute right-2.5 bottom-2.5 p-1.5 rounded-lg transition-all ${
               input.trim()
                 ? "bg-gradient-to-br from-purple-600 to-purple-700 text-white hover:from-purple-500 hover:to-purple-600 shadow-[0_2px_8px_rgba(147,51,234,0.3)]"
-                : "bg-gray-800/60 text-gray-500 cursor-not-allowed border border-gray-700/40"
+                : "bg-black/[0.06] dark:bg-gray-800/60 text-gray-400 dark:text-gray-500 cursor-not-allowed border border-black/[0.06] dark:border-gray-700/40"
             }`}
           >
             <FiSend size={14} />

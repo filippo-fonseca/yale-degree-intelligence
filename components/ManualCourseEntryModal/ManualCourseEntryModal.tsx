@@ -212,7 +212,7 @@ export default function ManualCourseEntryModal({
 
   // Render semester emoji for a course
   const renderSemesterIcon = (course: { isFall: boolean; isSpring: boolean }) => {
-    const boxClasses = "inline-flex items-center px-1 py-0.5 rounded bg-gray-700/50 shadow-[inset_1px_1px_2px_rgba(0,0,0,0.3),inset_-1px_-1px_2px_rgba(255,255,255,0.05)] text-[10px]";
+    const boxClasses = "inline-flex items-center px-1 py-0.5 rounded bg-gray-200 dark:bg-gray-700/50 shadow-[inset_1px_1px_2px_rgba(0,0,0,0.3),inset_-1px_-1px_2px_rgba(255,255,255,0.05)] text-[10px]";
 
     if (course.isFall && course.isSpring) {
       return (
@@ -239,7 +239,7 @@ export default function ManualCourseEntryModal({
       );
     } else {
       return (
-        <span className={`${boxClasses} text-gray-400`} title="Verify semester offering on courses.yale.edu">
+        <span className={`${boxClasses} text-gray-500 dark:text-gray-400`} title="Verify semester offering on courses.yale.edu">
           ❓
         </span>
       );
@@ -261,20 +261,20 @@ export default function ManualCourseEntryModal({
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.95, opacity: 0 }}
             transition={{ duration: 0.15 }}
-            className="w-full max-w-lg bg-gray-900/95 backdrop-blur-md rounded-xl border border-gray-800 shadow-2xl max-h-[85vh] flex flex-col"
+            className="w-full max-w-lg bg-white dark:bg-gray-900/95 backdrop-blur-md rounded-xl border border-gray-200 dark:border-gray-800 shadow-2xl max-h-[85vh] flex flex-col"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header */}
-            <div className="flex items-center justify-between px-5 py-4 border-b border-gray-800/80">
+            <div className="flex items-center justify-between px-5 py-4 border-b border-gray-200 dark:border-gray-800/80">
               <div>
-                <h3 className="text-base font-medium text-white">Add courses manually</h3>
-                <p className="text-xs text-gray-500 mt-0.5">
+                <h3 className="text-base font-medium text-gray-900 dark:text-white">Add courses manually</h3>
+                <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
                   Search or enter courses one by one
                 </p>
               </div>
               <button
                 onClick={onClose}
-                className="p-1.5 rounded-lg text-gray-500 hover:text-white hover:bg-white/10 transition-colors"
+                className="p-1.5 rounded-lg text-gray-400 dark:text-gray-500 hover:text-gray-900 dark:hover:text-white hover:bg-black/[0.06] dark:hover:bg-white/10 transition-colors"
               >
                 <FiX size={18} />
               </button>
@@ -287,7 +287,7 @@ export default function ManualCourseEntryModal({
                   <div className="w-12 h-12 rounded-full bg-pink-500/10 border border-pink-500/20 flex items-center justify-center mb-3">
                     <FiPlus className="w-5 h-5 text-pink-400" />
                   </div>
-                  <p className="text-gray-400 text-sm mb-4">
+                  <p className="text-gray-500 dark:text-gray-400 text-sm mb-4">
                     No courses added yet
                   </p>
                   <button
@@ -302,12 +302,12 @@ export default function ManualCourseEntryModal({
                   {entries.map((entry) => (
                     <div
                       key={entry.id}
-                      className="relative p-3 rounded-lg bg-gray-800/50 border border-gray-700/50 overflow-visible"
+                      className="relative p-3 rounded-lg bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700/50 overflow-visible"
                     >
                       {/* Remove button */}
                       <button
                         onClick={() => removeEntry(entry.id)}
-                        className="absolute top-2 right-2 p-1 rounded text-gray-500 hover:text-red-400 hover:bg-red-500/10 transition-colors"
+                        className="absolute top-2 right-2 p-1 rounded text-gray-400 dark:text-gray-500 hover:text-red-400 hover:bg-red-500/10 transition-colors"
                       >
                         <FiTrash2 size={14} />
                       </button>
@@ -318,35 +318,35 @@ export default function ManualCourseEntryModal({
                           {!showCustomInput ? (
                             <>
                               <div className="relative">
-                                <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 z-10" size={14} />
+                                <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 z-10" size={14} />
                                 <input
                                   ref={searchInputRef}
                                   type="text"
                                   value={searchTerm}
                                   onChange={(e) => setSearchTerm(e.target.value)}
-                                  className="w-full bg-gray-800 border border-gray-700 rounded-lg pl-9 pr-3 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-pink-500/50"
+                                  className="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg pl-9 pr-3 py-2 text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:border-pink-500/50"
                                   placeholder="Search course code or name..."
                                 />
                                 {filteredCourses.length > 0 && (
-                                  <div className="absolute left-0 right-0 top-full mt-1 z-20 border border-gray-700 rounded-lg overflow-hidden max-h-36 overflow-y-auto bg-gray-800 shadow-xl">
+                                  <div className="absolute left-0 right-0 top-full mt-1 z-20 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden max-h-36 overflow-y-auto bg-white dark:bg-gray-800 shadow-xl">
                                     {filteredCourses.map((course) => (
                                       <button
                                         key={course.canonicalCode}
                                         onClick={() => selectCourse(entry.id, course)}
-                                        className="w-full px-3 py-2 text-left hover:bg-gray-700/50 transition-colors border-b border-gray-700/50 last:border-b-0"
+                                        className="w-full px-3 py-2 text-left hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-colors border-b border-gray-100 dark:border-gray-700/50 last:border-b-0"
                                       >
-                                        <div className="text-sm font-medium text-white flex items-center gap-1.5">
+                                        <div className="text-sm font-medium text-gray-900 dark:text-white flex items-center gap-1.5">
                                           {course.canonicalCode}
                                           {renderSemesterIcon(course)}
                                         </div>
-                                        <div className="text-xs text-gray-400 truncate">{course.name}</div>
+                                        <div className="text-xs text-gray-500 dark:text-gray-400 truncate">{course.name}</div>
                                       </button>
                                     ))}
                                   </div>
                                 )}
                               </div>
                               {searchTerm && filteredCourses.length === 0 && (
-                                <p className="mt-2 text-xs text-gray-500">No results found</p>
+                                <p className="mt-2 text-xs text-gray-400 dark:text-gray-500">No results found</p>
                               )}
                               <button
                                 onClick={() => setShowCustomInput(true)}
@@ -357,12 +357,12 @@ export default function ManualCourseEntryModal({
                             </>
                           ) : (
                             <div className="space-y-2">
-                              <p className="text-xs text-gray-400 mb-2">Enter course details manually:</p>
+                              <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">Enter course details manually:</p>
                               <input
                                 type="text"
                                 value={customCodeInput}
                                 onChange={(e) => setCustomCodeInput(e.target.value)}
-                                className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-pink-500/50"
+                                className="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg px-3 py-2 text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:border-pink-500/50"
                                 placeholder="Course code (e.g., CPSC 201)"
                                 autoFocus
                               />
@@ -370,7 +370,7 @@ export default function ManualCourseEntryModal({
                                 type="text"
                                 value={customNameInput}
                                 onChange={(e) => setCustomNameInput(e.target.value)}
-                                className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-pink-500/50"
+                                className="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg px-3 py-2 text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:border-pink-500/50"
                                 placeholder="Course name (optional)"
                               />
                               <div className="flex items-center gap-2">
@@ -380,7 +380,7 @@ export default function ManualCourseEntryModal({
                                     setCustomCodeInput("");
                                     setCustomNameInput("");
                                   }}
-                                  className="text-xs text-gray-500 hover:text-gray-300 transition-colors"
+                                  className="text-xs text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition-colors"
                                 >
                                   Back to search
                                 </button>
@@ -406,13 +406,13 @@ export default function ManualCourseEntryModal({
                             className="w-full text-left group"
                           >
                             <div className="flex items-center gap-2">
-                              <span className="text-sm font-medium text-white">{entry.code}</span>
+                              <span className="text-sm font-medium text-gray-900 dark:text-white">{entry.code}</span>
                               {entry.isCustom && (
-                                <span className="text-[10px] px-1.5 py-0.5 rounded bg-gray-700 text-gray-400">custom</span>
+                                <span className="text-[10px] px-1.5 py-0.5 rounded bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400">custom</span>
                               )}
-                              <FiEdit3 size={12} className="text-gray-600 group-hover:text-gray-400 transition-colors" />
+                              <FiEdit3 size={12} className="text-gray-400 dark:text-gray-600 group-hover:text-gray-600 dark:group-hover:text-gray-400 transition-colors" />
                             </div>
-                            <div className="text-xs text-gray-500">{entry.courseName}</div>
+                            <div className="text-xs text-gray-400 dark:text-gray-500">{entry.courseName}</div>
                           </button>
                         </div>
                       ) : (
@@ -423,7 +423,7 @@ export default function ManualCourseEntryModal({
                               setSearchTerm("");
                               setShowCustomInput(false);
                             }}
-                            className="w-full py-2 rounded-lg border border-dashed border-gray-600 text-gray-500 text-sm hover:border-pink-500/50 hover:text-pink-400 transition-colors flex items-center justify-center gap-2"
+                            className="w-full py-2 rounded-lg border border-dashed border-gray-300 dark:border-gray-600 text-gray-400 dark:text-gray-500 text-sm hover:border-pink-500/50 hover:text-pink-400 transition-colors flex items-center justify-center gap-2"
                           >
                             <FiSearch size={14} />
                             Search for a course
@@ -435,41 +435,41 @@ export default function ManualCourseEntryModal({
                       {entry.code && (
                         <div className="grid grid-cols-4 gap-2">
                           <div>
-                            <label className="block text-[10px] text-gray-500 mb-1 uppercase tracking-wide">Grade</label>
+                            <label className="block text-[10px] text-gray-400 dark:text-gray-500 mb-1 uppercase tracking-wide">Grade</label>
                             <select
                               value={entry.grade}
                               onChange={(e) => updateEntry(entry.id, { grade: e.target.value })}
-                              className="w-full px-2 py-1.5 bg-gray-800 border border-gray-700 rounded text-xs text-white focus:outline-none focus:border-pink-500/50"
+                              className="w-full px-2 py-1.5 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded text-xs text-gray-900 dark:text-white focus:outline-none focus:border-pink-500/50"
                             >
                               {GRADES.map((g) => <option key={g} value={g}>{g}</option>)}
                             </select>
                           </div>
                           <div>
-                            <label className="block text-[10px] text-gray-500 mb-1 uppercase tracking-wide">Semester</label>
+                            <label className="block text-[10px] text-gray-400 dark:text-gray-500 mb-1 uppercase tracking-wide">Semester</label>
                             <select
                               value={entry.semester}
                               onChange={(e) => updateEntry(entry.id, { semester: e.target.value })}
-                              className="w-full px-2 py-1.5 bg-gray-800 border border-gray-700 rounded text-xs text-white focus:outline-none focus:border-pink-500/50"
+                              className="w-full px-2 py-1.5 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded text-xs text-gray-900 dark:text-white focus:outline-none focus:border-pink-500/50"
                             >
                               {SEMESTERS.map((s) => <option key={s} value={s}>{s}</option>)}
                             </select>
                           </div>
                           <div>
-                            <label className="block text-[10px] text-gray-500 mb-1 uppercase tracking-wide">Year</label>
+                            <label className="block text-[10px] text-gray-400 dark:text-gray-500 mb-1 uppercase tracking-wide">Year</label>
                             <select
                               value={entry.year}
                               onChange={(e) => updateEntry(entry.id, { year: parseInt(e.target.value) })}
-                              className="w-full px-2 py-1.5 bg-gray-800 border border-gray-700 rounded text-xs text-white focus:outline-none focus:border-pink-500/50"
+                              className="w-full px-2 py-1.5 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded text-xs text-gray-900 dark:text-white focus:outline-none focus:border-pink-500/50"
                             >
                               {YEARS.map((y) => <option key={y} value={y}>{y}</option>)}
                             </select>
                           </div>
                           <div>
-                            <label className="block text-[10px] text-gray-500 mb-1 uppercase tracking-wide">Credits</label>
+                            <label className="block text-[10px] text-gray-400 dark:text-gray-500 mb-1 uppercase tracking-wide">Credits</label>
                             <select
                               value={entry.credits}
                               onChange={(e) => updateEntry(entry.id, { credits: parseFloat(e.target.value) })}
-                              className="w-full px-2 py-1.5 bg-gray-800 border border-gray-700 rounded text-xs text-white focus:outline-none focus:border-pink-500/50"
+                              className="w-full px-2 py-1.5 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded text-xs text-gray-900 dark:text-white focus:outline-none focus:border-pink-500/50"
                             >
                               {CREDITS.map((c) => <option key={c} value={c}>{c}</option>)}
                             </select>
@@ -482,7 +482,7 @@ export default function ManualCourseEntryModal({
                   {/* Add another */}
                   <button
                     onClick={addNewEntry}
-                    className="w-full py-2 rounded-lg border border-dashed border-gray-700 text-gray-500 text-sm hover:border-gray-600 hover:text-gray-400 transition-colors flex items-center justify-center gap-1.5"
+                    className="w-full py-2 rounded-lg border border-dashed border-gray-300 dark:border-gray-700 text-gray-400 dark:text-gray-500 text-sm hover:border-gray-400 dark:hover:border-gray-600 hover:text-gray-600 dark:hover:text-gray-400 transition-colors flex items-center justify-center gap-1.5"
                   >
                     <FiPlus size={14} />
                     Add another
@@ -495,14 +495,14 @@ export default function ManualCourseEntryModal({
 
             {/* Footer */}
             {entries.length > 0 && (
-              <div className="px-5 py-3 border-t border-gray-800/80 flex items-center justify-between">
-                <span className="text-xs text-gray-500">
+              <div className="px-5 py-3 border-t border-gray-200 dark:border-gray-800/80 flex items-center justify-between">
+                <span className="text-xs text-gray-400 dark:text-gray-500">
                   {validCount} course{validCount !== 1 ? "s" : ""} ready
                 </span>
                 <div className="flex items-center gap-2">
                   <button
                     onClick={onClose}
-                    className="px-3 py-1.5 rounded-lg border border-gray-700 text-gray-400 text-sm hover:text-white hover:border-gray-600 transition-colors"
+                    className="px-3 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400 text-sm hover:text-gray-900 dark:hover:text-white hover:border-gray-300 dark:hover:border-gray-600 transition-colors"
                   >
                     Cancel
                   </button>

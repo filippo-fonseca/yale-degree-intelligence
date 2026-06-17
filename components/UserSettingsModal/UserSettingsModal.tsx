@@ -14,8 +14,9 @@ import { MAJORS } from "@/lib/majors";
 import { MajorDropdown } from "../ui/MajorDropdown";
 import { YearBadge } from "../ui/YearBadge";
 import Link from "next/link";
-import { Info } from "lucide-react";
+import { Info, Sun, Moon } from "lucide-react";
 import { UserAvatar } from "../ui/UserAvatar";
+import { useTheme } from "@/context/ThemeContext";
 
 interface UserProfile {
   majors: string[];
@@ -45,6 +46,8 @@ export default function UserSettingsModal({
   onLogout,
   onDeleteAccount,
 }: UserSettingsModalProps) {
+  const { resolvedTheme, toggleTheme } = useTheme();
+  const isDark = resolvedTheme === "dark";
   const [isHoveringLogout, setIsHoveringLogout] = useState(false);
   const [localProfile, setLocalProfile] = useState<UserProfile | null>(null);
   const [duplicateMajorError, setDuplicateMajorError] = useState<string | null>(
@@ -238,7 +241,7 @@ export default function UserSettingsModal({
         initial={{ opacity: 0, y: 15, scale: 0.98 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         transition={{ type: "spring", damping: 25, stiffness: 300 }}
-        className="w-full max-w-sm bg-gradient-to-br from-gray-900/90 via-gray-900/80 to-gray-950/90 rounded-2xl border border-white/[0.08] shadow-[0_24px_80px_rgba(0,0,0,0.5),0_0_120px_rgba(139,92,246,0.08),inset_0_1px_0_rgba(255,255,255,0.1),inset_0_-1px_0_rgba(0,0,0,0.3)] backdrop-blur-2xl ring-1 ring-white/[0.05] overflow-visible"
+        className="w-full max-w-sm bg-white/95 dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/90 dark:via-gray-900/80 dark:to-gray-950/90 rounded-2xl border border-black/[0.06] dark:border-white/[0.08] shadow-[0_24px_80px_rgba(0,0,0,0.18)] dark:shadow-[0_24px_80px_rgba(0,0,0,0.5),0_0_120px_rgba(139,92,246,0.08),inset_0_1px_0_rgba(255,255,255,0.1),inset_0_-1px_0_rgba(0,0,0,0.3)] backdrop-blur-2xl ring-1 ring-black/[0.04] dark:ring-white/[0.05] overflow-visible"
       >
         <div className="p-4 max-h-[85vh] overflow-y-auto">
           {/* Header */}
@@ -252,10 +255,12 @@ export default function UserSettingsModal({
                 className="shadow-[0_4px_16px_rgba(0,0,0,0.4)] ring-1 ring-purple-500/20 border-white/20"
               />
             </div>
-            <h2 className="text-base font-semibold text-center text-gray-100">
+            <h2 className="text-base font-semibold text-center text-gray-900 dark:text-gray-100">
               {user.displayName || "User"}
             </h2>
-            <p className="text-gray-400 text-xs">{user.email}</p>
+            <p className="text-gray-500 dark:text-gray-400 text-xs">
+              {user.email}
+            </p>
             {localProfile.graduationYear && (
               <div className="mt-1">
                 <YearBadge graduationYear={localProfile.graduationYear} />
@@ -264,13 +269,15 @@ export default function UserSettingsModal({
           </div>
 
           {/* Bio */}
-          <div className="mb-3 rounded-xl border border-white/[0.08] bg-gradient-to-br from-white/[0.06] via-transparent to-black/10 shadow-[0_2px_12px_rgba(0,0,0,0.2)] backdrop-blur-sm">
-            <div className="flex items-center justify-between px-3 py-2 border-b border-white/[0.06]">
-              <span className="text-xs font-medium text-gray-200">Bio</span>
+          <div className="mb-3 rounded-xl border border-black/[0.06] dark:border-white/[0.08] bg-gray-50 dark:bg-transparent dark:bg-gradient-to-br dark:from-white/[0.06] dark:via-transparent dark:to-black/10 shadow-sm dark:shadow-[0_2px_12px_rgba(0,0,0,0.2)] backdrop-blur-sm">
+            <div className="flex items-center justify-between px-3 py-2 border-b border-black/[0.06] dark:border-white/[0.06]">
+              <span className="text-xs font-medium text-gray-800 dark:text-gray-200">
+                Bio
+              </span>
               {!isEditingBio && (
                 <button
                   onClick={() => setIsEditingBio(true)}
-                  className="inline-flex items-center gap-1 text-[11px] px-2 py-1 rounded-lg border border-white/[0.08] hover:border-pink-500/50 hover:bg-white/[0.04] text-gray-400 hover:text-white transition-all duration-200"
+                  className="inline-flex items-center gap-1 text-[11px] px-2 py-1 rounded-lg border border-black/[0.06] dark:border-white/[0.08] hover:border-pink-500/50 hover:bg-black/[0.03] dark:hover:bg-white/[0.04] text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-all duration-200"
                   title="Edit bio"
                 >
                   <FiEdit2 className="h-3 w-3" />
@@ -281,11 +288,13 @@ export default function UserSettingsModal({
             {!isEditingBio ? (
               <div className="px-3 py-2">
                 {localProfile.bio ? (
-                  <p className="text-gray-300 text-xs leading-snug">
+                  <p className="text-gray-700 dark:text-gray-300 text-xs leading-snug">
                     {localProfile.bio}
                   </p>
                 ) : (
-                  <p className="text-gray-500 text-xs italic">No bio yet</p>
+                  <p className="text-gray-400 dark:text-gray-500 text-xs italic">
+                    No bio yet
+                  </p>
                 )}
               </div>
             ) : (
@@ -302,9 +311,9 @@ export default function UserSettingsModal({
                     placeholder="Tell us about yourself..."
                     maxLength={BIO_MAX}
                     rows={2}
-                    className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 pr-10 focus:outline-none focus:ring-1 focus:ring-pink-500/40 focus:border-pink-500/50 text-gray-200 placeholder:text-gray-500 text-xs resize-none transition-all duration-200"
+                    className="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg px-3 py-2 pr-10 focus:outline-none focus:ring-1 focus:ring-pink-500/40 focus:border-pink-500/50 text-gray-900 dark:text-gray-200 placeholder:text-gray-400 dark:placeholder:text-gray-500 text-xs resize-none transition-all duration-200"
                   />
-                  <div className="absolute bottom-1 right-2 text-[10px] text-gray-500">
+                  <div className="absolute bottom-1 right-2 text-[10px] text-gray-400 dark:text-gray-500">
                     {bioCount}/{BIO_MAX}
                   </div>
                 </div>
@@ -312,7 +321,7 @@ export default function UserSettingsModal({
                   <button
                     onClick={handleCancelBio}
                     disabled={isSavingBio}
-                    className="px-2 py-1 text-[11px] rounded-lg border border-white/[0.08] hover:border-white/[0.15] hover:bg-white/[0.04] text-gray-300 disabled:opacity-70 transition-all duration-200"
+                    className="px-2 py-1 text-[11px] rounded-lg border border-black/[0.06] dark:border-white/[0.08] hover:border-gray-300 dark:hover:border-white/[0.15] hover:bg-black/[0.03] dark:hover:bg-white/[0.04] text-gray-600 dark:text-gray-300 disabled:opacity-70 transition-all duration-200"
                   >
                     Cancel
                   </button>
@@ -332,14 +341,55 @@ export default function UserSettingsModal({
             )}
           </div>
 
+          {/* Appearance / Theme Toggle */}
+          <div className="mb-3 rounded-xl border border-black/[0.06] dark:border-white/[0.08] bg-gray-50 dark:bg-transparent dark:bg-gradient-to-br dark:from-white/[0.06] dark:via-transparent dark:to-black/10 shadow-sm dark:shadow-[0_2px_12px_rgba(0,0,0,0.2)] backdrop-blur-sm">
+            <div className="flex items-center justify-between px-3 py-2.5">
+              <div className="flex items-center gap-2">
+                <div className="p-1.5 rounded-lg bg-black/[0.04] dark:bg-white/[0.06] text-amber-500 dark:text-amber-300">
+                  {isDark ? (
+                    <Moon className="h-3.5 w-3.5" />
+                  ) : (
+                    <Sun className="h-3.5 w-3.5" />
+                  )}
+                </div>
+                <div>
+                  <span className="text-xs font-medium text-gray-800 dark:text-gray-200">
+                    Appearance
+                  </span>
+                  <p className="text-[10px] text-gray-500 dark:text-gray-400 mt-0.5">
+                    {isDark ? "Dark mode" : "Light mode"}
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                role="switch"
+                aria-checked={isDark}
+                aria-label="Toggle dark mode"
+                onClick={toggleTheme}
+                className={`relative inline-flex w-9 h-5 rounded-full border transition-colors duration-200 ${
+                  isDark
+                    ? "bg-gradient-to-r from-indigo-500 to-purple-600 border-white/[0.08]"
+                    : "bg-gray-300 border-black/[0.06]"
+                }`}
+              >
+                <span
+                  className={`absolute top-[2px] left-[2px] h-4 w-4 rounded-full bg-gradient-to-br from-white to-gray-200 shadow-[0_1px_4px_rgba(0,0,0,0.3)] transition-transform duration-200 ${
+                    isDark ? "translate-x-4" : "translate-x-0"
+                  }`}
+                />
+              </button>
+            </div>
+          </div>
+
           {/* Friends Feature Toggle */}
-          <div className="mb-3 rounded-xl border border-white/[0.08] bg-gradient-to-br from-white/[0.06] via-transparent to-black/10 shadow-[0_2px_12px_rgba(0,0,0,0.2)] backdrop-blur-sm">
+          <div className="mb-3 rounded-xl border border-black/[0.06] dark:border-white/[0.08] bg-gray-50 dark:bg-transparent dark:bg-gradient-to-br dark:from-white/[0.06] dark:via-transparent dark:to-black/10 shadow-sm dark:shadow-[0_2px_12px_rgba(0,0,0,0.2)] backdrop-blur-sm">
             <div className="flex items-center justify-between px-3 py-2.5">
               <div className="flex-1 mr-2">
-                <span className="text-xs font-medium text-gray-200">
+                <span className="text-xs font-medium text-gray-800 dark:text-gray-200">
                   Friends Feature
                 </span>
-                <p className="text-[10px] text-gray-400 mt-0.5">
+                <p className="text-[10px] text-gray-500 dark:text-gray-400 mt-0.5">
                   Let friends see your courses (grades are always hidden, ofc).
                 </p>
               </div>
@@ -362,12 +412,12 @@ export default function UserSettingsModal({
                   }}
                   className="sr-only peer"
                 />
-                <div className="w-9 h-5 bg-gray-800/80 border border-white/[0.08] peer-focus:outline-none peer-focus:ring-1 peer-focus:ring-pink-500/50 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-gradient-to-br after:from-white after:to-gray-200 after:rounded-full after:h-4 after:w-4 after:transition-all after:shadow-[0_1px_4px_rgba(0,0,0,0.3)] peer-checked:bg-gradient-to-r peer-checked:from-pink-500 peer-checked:to-purple-600 peer-disabled:opacity-50 shadow-[inset_0_1px_2px_rgba(0,0,0,0.3)]"></div>
+                <div className="w-9 h-5 bg-gray-300 dark:bg-gray-800/80 border border-black/[0.06] dark:border-white/[0.08] peer-focus:outline-none peer-focus:ring-1 peer-focus:ring-pink-500/50 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-gradient-to-br after:from-white after:to-gray-200 after:rounded-full after:h-4 after:w-4 after:transition-all after:shadow-[0_1px_4px_rgba(0,0,0,0.3)] peer-checked:bg-gradient-to-r peer-checked:from-pink-500 peer-checked:to-purple-600 peer-disabled:opacity-50 shadow-[inset_0_1px_2px_rgba(0,0,0,0.3)]"></div>
               </label>
             </div>
             {friendsEnabled && (
               <div className="px-3 pb-2 -mt-1">
-                <p className="text-[10px] text-emerald-400">
+                <p className="text-[10px] text-emerald-600 dark:text-emerald-400">
                   Course list is visible to friends.
                 </p>
               </div>
@@ -392,17 +442,17 @@ export default function UserSettingsModal({
                   initial={{ opacity: 0, scale: 0.95, y: 10 }}
                   animate={{ opacity: 1, scale: 1, y: 0 }}
                   exit={{ opacity: 0, scale: 0.95, y: 10 }}
-                  className="bg-gradient-to-br from-gray-900/95 via-gray-900/90 to-gray-950/95 border border-white/[0.1] rounded-2xl p-4 max-w-xs w-full shadow-[0_16px_48px_rgba(0,0,0,0.5)] backdrop-blur-2xl"
+                  className="bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/95 dark:via-gray-900/90 dark:to-gray-950/95 border border-gray-200 dark:border-white/[0.1] rounded-2xl p-4 max-w-xs w-full shadow-[0_16px_48px_rgba(0,0,0,0.5)] backdrop-blur-2xl"
                 >
                   <div className="flex items-center gap-2 mb-3">
                     <div className="p-2 bg-gradient-to-br from-red-500/20 to-red-600/10 rounded-xl border border-red-500/20">
                       <FiTrash2 className="text-red-400" size={16} />
                     </div>
-                    <h3 className="text-sm font-semibold text-gray-100">
+                    <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">
                       Disable Friends?
                     </h3>
                   </div>
-                  <p className="text-gray-400 text-xs mb-3">
+                  <p className="text-gray-500 dark:text-gray-400 text-xs mb-3">
                     This will{" "}
                     <strong className="text-red-400">remove all friends</strong>{" "}
                     and hide your courses.
@@ -411,7 +461,7 @@ export default function UserSettingsModal({
                     <button
                       onClick={() => setShowDisableFriendsConfirm(false)}
                       disabled={isTogglingFriends}
-                      className="px-3 py-1.5 rounded-lg border border-white/[0.08] hover:border-white/[0.15] hover:bg-white/[0.04] text-gray-300 text-xs disabled:opacity-50 transition-all duration-200"
+                      className="px-3 py-1.5 rounded-lg border border-black/[0.06] dark:border-white/[0.08] hover:border-gray-300 dark:hover:border-white/[0.15] hover:bg-black/[0.03] dark:hover:bg-white/[0.04] text-gray-600 dark:text-gray-300 text-xs disabled:opacity-50 transition-all duration-200"
                     >
                       Cancel
                     </button>
@@ -445,7 +495,7 @@ export default function UserSettingsModal({
 
           {/* Majors */}
           <div className="mb-3">
-            <label className="block text-xs font-medium text-gray-300 mb-1">
+            <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
               Majors
             </label>
             {duplicateMajorError && (
@@ -496,7 +546,7 @@ export default function UserSettingsModal({
 
           {/* Year */}
           <div className="mb-3">
-            <label className="block text-xs font-medium text-gray-300 mb-1">
+            <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
               Graduation Year
             </label>
             <div className="relative">
@@ -508,7 +558,7 @@ export default function UserSettingsModal({
                     graduationYear: parseInt(e.target.value),
                   })
                 }
-                className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-pink-500/40 focus:border-pink-500/50 text-gray-200 text-xs transition-all duration-200 appearance-none cursor-pointer"
+                className="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-pink-500/40 focus:border-pink-500/50 text-gray-900 dark:text-gray-200 text-xs transition-all duration-200 appearance-none cursor-pointer"
               >
                 {[2026, 2027, 2028, 2029, 2030].map((year) => (
                   <option key={year} value={year}>
@@ -516,7 +566,7 @@ export default function UserSettingsModal({
                   </option>
                 ))}
               </select>
-              <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
+              <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-500 dark:text-gray-400">
                 <FiChevronDown size={14} />
               </div>
             </div>
@@ -526,13 +576,13 @@ export default function UserSettingsModal({
           <div className="mt-2 flex items-center justify-center gap-1.5 relative">
             <Link
               href={`/user/${user.uid}`}
-              className="cursor-pointer text-[11px] px-3 py-1.5 rounded-lg border border-white/[0.08] hover:border-pink-500/50 hover:bg-white/[0.04] text-gray-400 hover:text-white transition-all duration-200"
+              className="cursor-pointer text-[11px] px-3 py-1.5 rounded-lg border border-black/[0.06] dark:border-white/[0.08] hover:border-pink-500/50 hover:bg-black/[0.03] dark:hover:bg-white/[0.04] text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-all duration-200"
             >
               View public profile
             </Link>
             <div className="relative group">
-              <Info className="h-3 w-3 text-gray-500 hover:text-gray-300 transition-colors cursor-pointer" />
-              <div className="absolute top-full mt-1 left-1/2 -translate-x-1/2 bg-gray-800 text-gray-300 text-[10px] px-1.5 py-0.5 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-[70] pointer-events-none border border-gray-700">
+              <Info className="h-3 w-3 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors cursor-pointer" />
+              <div className="absolute top-full mt-1 left-1/2 -translate-x-1/2 bg-gray-900 dark:bg-gray-800 text-gray-100 text-[10px] px-1.5 py-0.5 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-[70] pointer-events-none border border-gray-700">
                 Friends only
               </div>
             </div>
@@ -545,7 +595,7 @@ export default function UserSettingsModal({
                 onHoverStart={() => setIsHoveringLogout(true)}
                 onHoverEnd={() => setIsHoveringLogout(false)}
                 onClick={onLogout}
-                className="flex items-center justify-center gap-1 px-3 py-1.5 rounded-lg border border-white/[0.08] hover:border-white/[0.15] hover:bg-white/[0.04] text-gray-300 text-xs transition-all duration-200"
+                className="flex items-center justify-center gap-1 px-3 py-1.5 rounded-lg border border-black/[0.06] dark:border-white/[0.08] hover:border-gray-300 dark:hover:border-white/[0.15] hover:bg-black/[0.03] dark:hover:bg-white/[0.04] text-gray-600 dark:text-gray-300 text-xs transition-all duration-200"
               >
                 <span>Sign out</span>
                 <motion.div
@@ -560,7 +610,7 @@ export default function UserSettingsModal({
               <div className="relative" ref={moreMenuRef}>
                 <button
                   onClick={() => setShowMoreMenu(!showMoreMenu)}
-                  className="p-1.5 rounded-lg border border-white/[0.08] hover:border-white/[0.15] hover:bg-white/[0.04] text-gray-400 hover:text-gray-200 transition-all duration-200"
+                  className="p-1.5 rounded-lg border border-black/[0.06] dark:border-white/[0.08] hover:border-gray-300 dark:hover:border-white/[0.15] hover:bg-black/[0.03] dark:hover:bg-white/[0.04] text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 transition-all duration-200"
                   title="More options"
                 >
                   <FiMoreVertical size={14} />
@@ -572,7 +622,7 @@ export default function UserSettingsModal({
                       initial={{ opacity: 0, y: -5, scale: 0.95 }}
                       animate={{ opacity: 1, y: 0, scale: 1 }}
                       exit={{ opacity: 0, y: -5, scale: 0.95 }}
-                      className="absolute bottom-full left-0 mb-1.5 w-36 bg-gradient-to-br from-gray-800/95 to-gray-900/95 border border-white/[0.1] rounded-xl shadow-[0_4px_16px_rgba(0,0,0,0.4)] backdrop-blur-xl overflow-hidden z-[80]"
+                      className="absolute bottom-full left-0 mb-1.5 w-36 bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-800/95 dark:to-gray-900/95 border border-gray-200 dark:border-white/[0.1] rounded-xl shadow-[0_4px_16px_rgba(0,0,0,0.18)] dark:shadow-[0_4px_16px_rgba(0,0,0,0.4)] backdrop-blur-xl overflow-hidden z-[80]"
                     >
                       <button
                         onClick={() => {
@@ -592,7 +642,7 @@ export default function UserSettingsModal({
             <div className="flex gap-1.5">
               <button
                 onClick={onClose}
-                className="px-3 py-1.5 rounded-lg border border-white/[0.08] hover:border-white/[0.15] hover:bg-white/[0.04] text-gray-300 text-xs transition-all duration-200"
+                className="px-3 py-1.5 rounded-lg border border-black/[0.06] dark:border-white/[0.08] hover:border-gray-300 dark:hover:border-white/[0.15] hover:bg-black/[0.03] dark:hover:bg-white/[0.04] text-gray-600 dark:text-gray-300 text-xs transition-all duration-200"
               >
                 Cancel
               </button>
@@ -602,7 +652,7 @@ export default function UserSettingsModal({
                 className={`px-3 py-1.5 rounded-lg text-xs transition-all duration-200 ${
                   hasChanges() && !hasDuplicateMajors() && !isSaving
                     ? "bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white"
-                    : "bg-gray-800/50 text-gray-500 cursor-not-allowed border border-white/[0.05]"
+                    : "bg-gray-100 dark:bg-gray-800/50 text-gray-400 dark:text-gray-500 cursor-not-allowed border border-black/[0.05] dark:border-white/[0.05]"
                 }`}
               >
                 {isSaving ? "..." : "Save"}
@@ -628,17 +678,17 @@ export default function UserSettingsModal({
                   initial={{ opacity: 0, scale: 0.95, y: 10 }}
                   animate={{ opacity: 1, scale: 1, y: 0 }}
                   exit={{ opacity: 0, scale: 0.95, y: 10 }}
-                  className="bg-gradient-to-br from-gray-900/95 via-gray-900/90 to-gray-950/95 border border-white/[0.1] rounded-2xl p-4 max-w-xs w-full shadow-[0_16px_48px_rgba(0,0,0,0.5)] backdrop-blur-2xl"
+                  className="bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/95 dark:via-gray-900/90 dark:to-gray-950/95 border border-gray-200 dark:border-white/[0.1] rounded-2xl p-4 max-w-xs w-full shadow-[0_16px_48px_rgba(0,0,0,0.5)] backdrop-blur-2xl"
                 >
                   <div className="flex items-center gap-2 mb-3">
                     <div className="p-2 bg-gradient-to-br from-red-500/20 to-red-600/10 rounded-xl border border-red-500/20">
                       <FiTrash2 className="text-red-400" size={16} />
                     </div>
-                    <h3 className="text-sm font-semibold text-gray-100">
+                    <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">
                       Delete Account
                     </h3>
                   </div>
-                  <p className="text-gray-400 text-xs mb-3">
+                  <p className="text-gray-500 dark:text-gray-400 text-xs mb-3">
                     Permanently remove all data including courses, friends, and
                     conversations. Cannot be undone.
                   </p>
@@ -646,7 +696,7 @@ export default function UserSettingsModal({
                     <button
                       onClick={() => setShowDeleteConfirm(false)}
                       disabled={isDeleting}
-                      className="px-3 py-1.5 rounded-lg border border-white/[0.08] hover:border-white/[0.15] hover:bg-white/[0.04] text-gray-300 text-xs disabled:opacity-50 transition-all duration-200"
+                      className="px-3 py-1.5 rounded-lg border border-black/[0.06] dark:border-white/[0.08] hover:border-gray-300 dark:hover:border-white/[0.15] hover:bg-black/[0.03] dark:hover:bg-white/[0.04] text-gray-600 dark:text-gray-300 text-xs disabled:opacity-50 transition-all duration-200"
                     >
                       Cancel
                     </button>

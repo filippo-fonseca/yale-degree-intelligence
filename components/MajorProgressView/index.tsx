@@ -77,7 +77,7 @@ function getCourseStatusColor({
 function MajorStatCard({
   label,
   value,
-  color = "text-white",
+  color = "text-gray-900 dark:text-white",
   infoTooltip,
 }: {
   label: string;
@@ -88,17 +88,17 @@ function MajorStatCard({
   return (
     <motion.div
       whileHover={{ y: -1 }}
-      className="p-3 rounded-xl bg-gradient-to-br from-gray-900/60 via-gray-900/40 to-gray-950/60 backdrop-blur-md border border-gray-800/50 hover:border-gray-700/60 transition-all relative shadow-[inset_0_1px_0_rgba(255,255,255,0.04),0_4px_12px_rgba(0,0,0,0.2)]"
+      className="p-3 rounded-xl bg-white dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 backdrop-blur-md border border-gray-200 dark:border-gray-800/50 hover:border-gray-300 dark:hover:border-gray-700/60 transition-all relative shadow-[inset_0_1px_0_rgba(255,255,255,0.04),0_4px_12px_rgba(0,0,0,0.08)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.04),0_4px_12px_rgba(0,0,0,0.2)]"
     >
       {infoTooltip && (
         <div className="absolute top-2 right-2 group">
-          <FiInfo className="w-3.5 h-3.5 text-gray-500 hover:text-gray-400" />
-          <div className="absolute z-10 right-0 w-44 p-2 text-[11px] text-gray-300 bg-gray-900/95 backdrop-blur-sm rounded-lg border border-gray-800/50 shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
+          <FiInfo className="w-3.5 h-3.5 text-gray-500 hover:text-gray-700 dark:hover:text-gray-400" />
+          <div className="absolute z-10 right-0 w-44 p-2 text-[11px] text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-900/95 backdrop-blur-sm rounded-lg border border-gray-200 dark:border-gray-800/50 shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
             {infoTooltip}
           </div>
         </div>
       )}
-      <p className="text-xs text-gray-500">{label}</p>
+      <p className="text-xs text-gray-400 dark:text-gray-500">{label}</p>
       <p className={`text-lg font-medium mt-0.5 ${color}`}>{value}</p>
     </motion.div>
   );
@@ -152,12 +152,12 @@ const SectionGrid = React.memo(function SectionGrid({
                 key={reqKey}
                 layout
                 initial={false}
-                className={`p-3 hover:scale-[0.98] rounded-xl backdrop-blur-md border transition-all relative cursor-pointer shadow-[inset_0_1px_0_rgba(255,255,255,0.03),0_4px_12px_rgba(0,0,0,0.15)] ${
+                className={`p-3 hover:scale-[0.98] rounded-xl backdrop-blur-md border transition-all relative cursor-pointer shadow-[inset_0_1px_0_rgba(255,255,255,0.03),0_4px_12px_rgba(0,0,0,0.08)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.03),0_4px_12px_rgba(0,0,0,0.15)] ${
                   reqInProgress > 0
-                    ? "bg-gradient-to-br from-blue-950/40 via-gray-900/50 to-gray-950/50 border-blue-800/30 hover:border-blue-600/40"
+                    ? "bg-blue-50 dark:bg-gradient-to-br dark:from-blue-950/40 dark:via-gray-900/50 dark:to-gray-950/50 border-blue-200 dark:border-blue-800/30 hover:border-blue-300 dark:hover:border-blue-600/40"
                     : notStarted
-                      ? "bg-gradient-to-br from-red-950/30 via-gray-900/50 to-gray-950/50 border-red-800/25 hover:border-red-600/35"
-                      : "bg-gradient-to-br from-red-950/30 via-gray-900/50 to-gray-950/50 border-red-800/25 hover:border-red-600/35"
+                      ? "bg-red-50 dark:bg-gradient-to-br dark:from-red-950/30 dark:via-gray-900/50 dark:to-gray-950/50 border-red-200 dark:border-red-800/25 hover:border-red-300 dark:hover:border-red-600/35"
+                      : "bg-red-50 dark:bg-gradient-to-br dark:from-red-950/30 dark:via-gray-900/50 dark:to-gray-950/50 border-red-200 dark:border-red-800/25 hover:border-red-300 dark:hover:border-red-600/35"
                 }`}
                 onClick={() => onOpenRequirement(req)}
                 onKeyDown={(e) => {
@@ -171,10 +171,10 @@ const SectionGrid = React.memo(function SectionGrid({
                   <h5
                     className={`font-medium text-sm ${
                       reqInProgress > 0
-                        ? "text-blue-300"
+                        ? "text-blue-600 dark:text-blue-300"
                         : notStarted
-                          ? "text-red-300"
-                          : "text-red-300"
+                          ? "text-red-600 dark:text-red-300"
+                          : "text-red-600 dark:text-red-300"
                     }`}
                   >
                     {req.name}
@@ -182,10 +182,10 @@ const SectionGrid = React.memo(function SectionGrid({
                   <span
                     className={`text-[10px] px-1.5 py-0.5 rounded-md ${
                       reqInProgress > 0
-                        ? "bg-blue-900/30 text-blue-300 border border-blue-700/30"
+                        ? "bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-300 border border-blue-300 dark:border-blue-700/30"
                         : notStarted
-                          ? "bg-red-900/30 text-red-300 border border-red-700/30"
-                          : "bg-red-900/30 text-red-300 border border-red-700/30"
+                          ? "bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-300 border border-red-300 dark:border-red-700/30"
+                          : "bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-300 border border-red-300 dark:border-red-700/30"
                     }`}
                   >
                     {reqInProgress + reqCompleted}/{req.required}
@@ -196,10 +196,10 @@ const SectionGrid = React.memo(function SectionGrid({
                   <p
                     className={`text-[11px] mb-2 ${
                       reqInProgress > 0
-                        ? "text-blue-300/70"
+                        ? "text-blue-500 dark:text-blue-300/70"
                         : notStarted
-                          ? "text-red-300/70"
-                          : "text-red-300/70"
+                          ? "text-red-500 dark:text-red-300/70"
+                          : "text-red-500 dark:text-red-300/70"
                     }`}
                   >
                     {req.description}
@@ -218,7 +218,7 @@ const SectionGrid = React.memo(function SectionGrid({
                             : opt.inProgress
                               ? "bg-blue-900/20 text-blue-300 border border-blue-700"
                               : opt.skipped
-                                ? "bg-gray-900/20 text-gray-300 border border-dashed border-gray-600"
+                                ? "bg-gray-200 dark:bg-gray-900/20 text-gray-600 dark:text-gray-300 border border-dashed border-gray-400 dark:border-gray-600"
                                 : notStarted
                                   ? "bg-red-900/20 text-red-300 border border-red-700"
                                   : "bg-red-900/20 text-red-300 border border-red-700"
@@ -252,7 +252,7 @@ const SectionGrid = React.memo(function SectionGrid({
                             else if (opt.manual)
                               onRemoveManual(opt.code, req.name);
                           }}
-                          className="ml-1 text-[0.65rem] text-gray-400 hover:text-gray-200"
+                          className="ml-1 text-[0.65rem] text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
                           title={
                             opt.manual
                               ? "Remove manual course"
@@ -271,8 +271,8 @@ const SectionGrid = React.memo(function SectionGrid({
                       e.stopPropagation();
                       onAddManual(req.name);
                     }}
-                    className={`px-2 py-0.5 rounded-full text-xs flex items-center gap-1 
-                    bg-pink-900/20 text-pink-300 hover:bg-pink-800/30
+                    className={`px-2 py-0.5 rounded-full text-xs flex items-center gap-1
+                    bg-pink-100 dark:bg-pink-900/20 text-pink-600 dark:text-pink-300 hover:bg-pink-200 dark:hover:bg-pink-800/30
                      transition-colors`}
                     title="Add a course manually for this requirement"
                   >
@@ -700,8 +700,8 @@ export default function MajorProgressView({
       </div>
 
       {/* Progress bar + Stats toggle - Compact neumorphic */}
-      <div className="p-3 rounded-xl bg-gradient-to-br from-gray-900/60 via-gray-900/40 to-gray-950/60 border border-gray-800/50 shadow-[inset_0_1px_0_rgba(255,255,255,0.04),0_4px_12px_rgba(0,0,0,0.2)]">
-        <div className="w-full bg-gray-950/60 rounded-full h-1.5 shadow-[inset_0_1px_2px_rgba(0,0,0,0.3)]">
+      <div className="p-3 rounded-xl bg-white dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 border border-gray-200 dark:border-gray-800/50 shadow-[inset_0_1px_0_rgba(255,255,255,0.04),0_4px_12px_rgba(0,0,0,0.08)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.04),0_4px_12px_rgba(0,0,0,0.2)]">
+        <div className="w-full bg-gray-200 dark:bg-gray-950/60 rounded-full h-1.5 shadow-[inset_0_1px_2px_rgba(0,0,0,0.1)] dark:shadow-[inset_0_1px_2px_rgba(0,0,0,0.3)]">
           <motion.div
             initial={{ width: 0 }}
             animate={{
@@ -718,15 +718,15 @@ export default function MajorProgressView({
 
         {/* Stats toggle */}
         <div className="flex items-center gap-1.5 mt-2">
-          <span className="text-[10px] text-gray-500 uppercase tracking-wider">
+          <span className="text-[10px] text-gray-400 dark:text-gray-500 uppercase tracking-wider">
             Show:
           </span>
           <button
             onClick={() => setShowInProgressStats(false)}
             className={`px-2.5 py-1 text-[11px] rounded-lg transition-all duration-200 ${
               !showInProgressStats
-                ? "bg-blue-500/15 text-blue-300 border border-blue-600/40 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]"
-                : "bg-gray-900/50 text-gray-500 border border-gray-800/50 hover:text-gray-400 hover:bg-gray-800/50"
+                ? "bg-blue-500/15 text-blue-600 dark:text-blue-300 border border-blue-600/40 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]"
+                : "bg-gray-100 dark:bg-gray-900/50 text-gray-400 dark:text-gray-500 border border-gray-200 dark:border-gray-800/50 hover:text-gray-600 dark:hover:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-800/50"
             }`}
           >
             Completed Only
@@ -735,8 +735,8 @@ export default function MajorProgressView({
             onClick={() => setShowInProgressStats(true)}
             className={`px-2.5 py-1 text-[11px] rounded-lg transition-all duration-200 ${
               showInProgressStats
-                ? "bg-purple-500/15 text-purple-300 border border-purple-600/40 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]"
-                : "bg-gray-900/50 text-gray-500 border border-gray-800/50 hover:text-gray-400 hover:bg-gray-800/50"
+                ? "bg-purple-500/15 text-purple-600 dark:text-purple-300 border border-purple-600/40 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]"
+                : "bg-gray-100 dark:bg-gray-900/50 text-gray-400 dark:text-gray-500 border border-gray-200 dark:border-gray-800/50 hover:text-gray-600 dark:hover:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-800/50"
             }`}
           >
             + In Progress
@@ -753,7 +753,7 @@ export default function MajorProgressView({
               ? `${completedCredits + inProgressCredits}/${totalCredits}`
               : `${completedCredits}/${totalCredits}`
           }
-          color={showInProgressStats ? "text-purple-300" : "text-blue-300"}
+          color={showInProgressStats ? "text-purple-600 dark:text-purple-300" : "text-blue-600 dark:text-blue-300"}
           infoTooltip="This shows your completed credits out of the total—including any prereqs!—required for your indicated major."
         />
         <MajorStatCard
@@ -762,7 +762,7 @@ export default function MajorProgressView({
             ? withInProgressPercentage
             : completionPercentage
           ).toFixed(0)}%`}
-          color="text-emerald-300"
+          color="text-emerald-600 dark:text-emerald-300"
         />
       </div>
 
@@ -792,7 +792,7 @@ export default function MajorProgressView({
           <div className="space-y-4">
             <button
               onClick={() => toggleSection("completed")}
-              className="flex items-center gap-2 text-emerald-300 hover:text-emerald-200 transition-colors"
+              className="flex items-center gap-2 text-emerald-600 dark:text-emerald-300 hover:text-emerald-700 dark:hover:text-emerald-200 transition-colors"
             >
               <motion.div
                 animate={{ rotate: expandedSections.completed ? 0 : -90 }}
@@ -837,10 +837,10 @@ export default function MajorProgressView({
                           key={reqKey}
                           layout
                           initial={false}
-                          className={`p-3 hover:scale-[0.98] transition-all rounded-xl border cursor-pointer backdrop-blur-md shadow-[inset_0_1px_0_rgba(255,255,255,0.03),0_4px_12px_rgba(0,0,0,0.15)] ${
+                          className={`p-3 hover:scale-[0.98] transition-all rounded-xl border cursor-pointer backdrop-blur-md shadow-[inset_0_1px_0_rgba(255,255,255,0.03),0_4px_12px_rgba(0,0,0,0.08)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.03),0_4px_12px_rgba(0,0,0,0.15)] ${
                             isFullyCompleted
-                              ? "bg-gradient-to-br from-emerald-950/30 via-gray-900/50 to-gray-950/50 border-emerald-800/25 hover:border-emerald-600/35"
-                              : "bg-gradient-to-br from-red-950/30 via-gray-900/50 to-gray-950/50 border-red-800/25 hover:border-red-600/35"
+                              ? "bg-emerald-50 dark:bg-gradient-to-br dark:from-emerald-950/30 dark:via-gray-900/50 dark:to-gray-950/50 border-emerald-200 dark:border-emerald-800/25 hover:border-emerald-300 dark:hover:border-emerald-600/35"
+                              : "bg-red-50 dark:bg-gradient-to-br dark:from-red-950/30 dark:via-gray-900/50 dark:to-gray-950/50 border-red-200 dark:border-red-800/25 hover:border-red-300 dark:hover:border-red-600/35"
                           }`}
                           onClick={() =>
                             setReqModal({
@@ -871,17 +871,17 @@ export default function MajorProgressView({
                           }}
                         >
                           <div className="flex justify-between items-start mb-1.5">
-                            <h5 className="font-medium text-sm text-emerald-300">
+                            <h5 className="font-medium text-sm text-emerald-700 dark:text-emerald-300">
                               {req.name}
                             </h5>
                             <div className="flex items-center gap-2">
-                              <span className="text-[10px] bg-emerald-900/30 text-emerald-300 px-1.5 py-0.5 rounded-md border border-emerald-700/30">
+                              <span className="text-[10px] bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 px-1.5 py-0.5 rounded-md border border-emerald-300 dark:border-emerald-700/30">
                                 ✓
                               </span>
                             </div>
                           </div>
                           {req.description && (
-                            <p className="text-[11px] mb-2 text-emerald-300/70">
+                            <p className="text-[11px] mb-2 text-emerald-600 dark:text-emerald-300/70">
                               {req.description}
                             </p>
                           )}
@@ -899,7 +899,7 @@ export default function MajorProgressView({
                                       ? "bg-purple-900/20 text-purple-300 border border-purple-700"
                                       : opt.completed
                                         ? "bg-emerald-900/20 text-emerald-300 border border-emerald-700"
-                                        : "bg-gray-900/20 text-gray-300 border border-dashed border-gray-600"
+                                        : "bg-gray-200 dark:bg-gray-900/20 text-gray-600 dark:text-gray-300 border border-dashed border-gray-400 dark:border-gray-600"
                                   }`}
                                   onClick={(e) => e.stopPropagation()} // don't open modal when clicking the pill
                                 >
@@ -929,8 +929,8 @@ export default function MajorProgressView({
                                     }}
                                     className={`ml-1 text-[0.65rem] transition-colors ${
                                       opt.skipped || opt.manual
-                                        ? "text-gray-400 hover:text-gray-200"
-                                        : "text-emerald-500/40 hover:text-red-400"
+                                        ? "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
+                                        : "text-emerald-600/60 dark:text-emerald-500/40 hover:text-red-500 dark:hover:text-red-400"
                                     }`}
                                     title={
                                       opt.manual
@@ -960,7 +960,7 @@ export default function MajorProgressView({
           <div className="space-y-4">
             <button
               onClick={() => toggleSection("remaining")}
-              className="flex items-center gap-2 text-red-300 hover:text-red-200 transition-colors"
+              className="flex items-center gap-2 text-red-600 dark:text-red-300 hover:text-red-700 dark:hover:text-red-200 transition-colors"
             >
               <motion.div
                 animate={{ rotate: expandedSections.remaining ? 0 : -90 }}
@@ -989,7 +989,7 @@ export default function MajorProgressView({
                     {/* Subsection: In Progress */}
                     <SectionGrid
                       title="Currently in progress"
-                      subtitleClass="text-blue-300"
+                      subtitleClass="text-blue-600 dark:text-blue-300"
                       items={inProgressReqs}
                       onOpenCourse={handleOpenCourse}
                       onUnskip={handleUnskip}
@@ -1012,7 +1012,7 @@ export default function MajorProgressView({
                     {/* Subsection: Not started / No current progress */}
                     <SectionGrid
                       title="Not started / no current progress"
-                      subtitleClass="text-red-300"
+                      subtitleClass="text-red-600 dark:text-red-300"
                       items={idleReqs}
                       onOpenCourse={handleOpenCourse}
                       onUnskip={handleUnskip}

@@ -759,7 +759,7 @@ export default function Simulator({
         <h2 className="text-3xl font-medium text-gray-900 dark:text-white">
           Need to visualize? No problem.
         </h2>
-        <p className="text-gray-400">
+        <p className="text-gray-500 dark:text-gray-400">
           Your interactive, tailor-made, drag-and-drop Yale degree simulator is
           here.
         </p>
@@ -769,23 +769,23 @@ export default function Simulator({
       <div
         className={`sticky top-0 z-30 -mx-4 px-6 py-3 mb-4 backdrop-blur-xl transition-all duration-200 ${
           isScrolled
-            ? "bg-gradient-to-r from-gray-900/95 via-gray-950/95 to-gray-900/95 border-b border-white/[0.06] shadow-[0_4px_20px_rgba(0,0,0,0.3)]"
+            ? "bg-white/95 dark:bg-gradient-to-r dark:from-gray-900/95 dark:via-gray-950/95 dark:to-gray-900/95 border-b border-gray-200 dark:border-white/[0.06] shadow-[0_4px_20px_rgba(0,0,0,0.08)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.3)]"
             : "bg-transparent border-b border-transparent"
         }`}
       >
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
           {/* Current Plan Status */}
           <div className="flex items-center gap-3">
-            <span className="text-xs text-gray-500 uppercase tracking-wider">
+            <span className="text-xs text-gray-400 dark:text-gray-500 uppercase tracking-wider">
               Plan:
             </span>
-            <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-white/[0.04] border border-white/[0.08]">
+            <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-black/[0.04] dark:bg-white/[0.04] border border-black/[0.06] dark:border-white/[0.08]">
               {currentPlanName ? (
                 <>
                   <div
                     className={`w-2.5 h-2.5 rounded-full ${hasChanges ? "bg-amber-400 animate-pulse" : "bg-emerald-400"}`}
                   />
-                  <span className="text-base font-medium text-gray-200">
+                  <span className="text-base font-medium text-gray-800 dark:text-gray-200">
                     {currentPlanName}
                   </span>
                   {hasChanges && (
@@ -799,7 +799,7 @@ export default function Simulator({
                   <div
                     className={`w-2.5 h-2.5 rounded-full ${hasChanges ? "bg-blue-400 animate-pulse" : "bg-gray-500"}`}
                   />
-                  <span className="text-sm text-gray-400">
+                  <span className="text-sm text-gray-500 dark:text-gray-400">
                     {hasChanges ? "Unsaved new plan" : "No plan loaded"}
                   </span>
                 </>
@@ -811,7 +811,7 @@ export default function Simulator({
           <div className="flex items-center gap-2 flex-wrap">
             <button
               onClick={() => setShowHelp((v) => !v)}
-              className="px-4 py-2 text-sm rounded-xl bg-white/[0.04] backdrop-blur-sm text-gray-400 hover:text-gray-200 hover:bg-white/[0.08] border border-white/[0.08] flex items-center gap-2 transition-all"
+              className="px-4 py-2 text-sm rounded-xl bg-black/[0.04] dark:bg-white/[0.04] backdrop-blur-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-black/[0.06] dark:hover:bg-white/[0.08] border border-black/[0.06] dark:border-white/[0.08] flex items-center gap-2 transition-all"
             >
               <FiInfo size={14} />
               Help
@@ -830,7 +830,7 @@ export default function Simulator({
                   className={`px-4 py-2 text-sm rounded-xl backdrop-blur-sm transition-all flex items-center gap-2 ${
                     hasChanges
                       ? "bg-gradient-to-r from-emerald-500/20 to-teal-500/20 text-emerald-300 hover:text-emerald-200 hover:from-emerald-500/25 hover:to-teal-500/25 border border-emerald-500/30 hover:border-emerald-400/40"
-                      : "bg-white/[0.02] text-gray-600 border border-white/[0.04] cursor-not-allowed"
+                      : "bg-black/[0.02] dark:bg-white/[0.02] text-gray-400 dark:text-gray-600 border border-black/[0.04] dark:border-white/[0.04] cursor-not-allowed"
                   }`}
                   disabled={!hasChanges}
                 >
@@ -857,12 +857,12 @@ export default function Simulator({
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
-            className="overflow-hidden bg-gradient-to-br from-white/[0.03] to-transparent backdrop-blur-xl rounded-xl border border-white/[0.06] p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_4px_20px_rgba(0,0,0,0.15)]"
+            className="overflow-hidden bg-gray-50 dark:bg-gradient-to-br dark:from-white/[0.03] dark:to-transparent backdrop-blur-xl rounded-xl border border-gray-200 dark:border-white/[0.06] p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_4px_20px_rgba(0,0,0,0.08)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_4px_20px_rgba(0,0,0,0.15)]"
           >
             <h4 className="font-medium text-sm text-gray-900 dark:text-white mb-2">
               How to use the simulator
             </h4>
-            <ul className="text-xs text-gray-400 space-y-1.5 list-disc list-inside">
+            <ul className="text-xs text-gray-500 dark:text-gray-400 space-y-1.5 list-disc list-inside">
               <li>
                 Use this simulator to plan out your remaining semesters and see
                 fit.
@@ -894,17 +894,17 @@ export default function Simulator({
           <h3 className="text-lg font-medium text-gray-900 dark:text-white">
             Major progress
           </h3>
-          <p className="text-xs text-gray-500 mt-0.5">
+          <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
             Live preview — reflects completed, in-progress, and courses placed
             on the grid.
           </p>
         </div>
 
         {isPreviewLoading && (
-          <div className="text-sm text-gray-400">Updating preview…</div>
+          <div className="text-sm text-gray-500 dark:text-gray-400">Updating preview…</div>
         )}
         {previewError && (
-          <div className="text-sm text-red-300">{previewError}</div>
+          <div className="text-sm text-red-600 dark:text-red-300">{previewError}</div>
         )}
 
         <SimulatorRequirementsBreakdown
@@ -924,18 +924,18 @@ export default function Simulator({
 
       {/* Available Courses Pool */}
       <div className="sticky top-[72px] z-20 mb-2">
-        <div className="bg-gradient-to-br from-pink-950/30 via-gray-900/50 to-gray-950/50 backdrop-blur-md rounded-xl border border-pink-800/30 shadow-[inset_0_1px_0_rgba(255,255,255,0.04),0_4px_16px_rgba(0,0,0,0.25)] overflow-hidden">
+        <div className="bg-white dark:bg-gradient-to-br dark:from-pink-950/30 dark:via-gray-900/50 dark:to-gray-950/50 backdrop-blur-md rounded-xl border border-pink-200 dark:border-pink-800/30 shadow-[inset_0_1px_0_rgba(255,255,255,0.04),0_4px_16px_rgba(0,0,0,0.08)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.04),0_4px_16px_rgba(0,0,0,0.25)] overflow-hidden">
           <button
             onClick={() => setShowPool(!showPool)}
             className={`flex items-center justify-between w-full p-3 ${
-              showPool ? "border-b border-pink-800/30" : ""
-            } text-gray-300 hover:bg-pink-900/20 transition-colors`}
+              showPool ? "border-b border-pink-200 dark:border-pink-800/30" : ""
+            } text-gray-700 dark:text-gray-300 hover:bg-pink-50 dark:hover:bg-pink-900/20 transition-colors`}
           >
             <div className="flex items-center gap-2 font-medium text-sm">
               <div>Quick-add: Pool of remaining courses from your major</div>
               <div className="relative group">
-                <Info className="h-3.5 w-3.5 text-gray-500 hover:text-gray-300 transition-colors cursor-pointer" />
-                <div className="absolute z-50 bottom-full mt-2 left-1/2 -translate-x-1/2 bg-gray-900/95 backdrop-blur-sm text-gray-300 text-[10px] px-2 py-1 rounded-md border border-gray-800/50 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+                <Info className="h-3.5 w-3.5 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition-colors cursor-pointer" />
+                <div className="absolute z-50 bottom-full mt-2 left-1/2 -translate-x-1/2 bg-white dark:bg-gray-900/95 backdrop-blur-sm text-gray-700 dark:text-gray-300 text-[10px] px-2 py-1 rounded-md border border-gray-200 dark:border-gray-800/50 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
                   May not include all. Add manually if not.
                 </div>
               </div>
@@ -957,7 +957,7 @@ export default function Simulator({
                 className="p-3"
               >
                 {availableCourses.length === 0 ? (
-                  <p className="text-[11px] text-gray-500 italic">
+                  <p className="text-[11px] text-gray-400 dark:text-gray-500 italic">
                     All available courses have been scheduled. Remove one from a
                     semester to add it back.
                   </p>
@@ -970,10 +970,10 @@ export default function Simulator({
                         onDragStart={() => handleDragStart(course)}
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.98 }}
-                        className="px-2 py-1 rounded-lg bg-pink-900/25 text-pink-300 border border-pink-700/40 text-xs cursor-grab active:cursor-grabbing select-none shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]"
+                        className="px-2 py-1 rounded-lg bg-pink-100 dark:bg-pink-900/25 text-pink-700 dark:text-pink-300 border border-pink-300 dark:border-pink-700/40 text-xs cursor-grab active:cursor-grabbing select-none shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]"
                       >
                         {course.code}
-                        <span className="text-[10px] text-pink-200/50 ml-1">
+                        <span className="text-[10px] text-pink-500/70 dark:text-pink-200/50 ml-1">
                           {(getCourseNameFromCode(course.code) ?? "").length > 0
                             ? ` ${getCourseNameFromCode(course.code)}`
                             : ""}
@@ -1010,27 +1010,27 @@ export default function Simulator({
                 handleDrop(semester.id);
                 setHoveredSemester(null);
               }}
-              className={`bg-gradient-to-br from-gray-900/60 via-gray-900/40 to-gray-950/60 backdrop-blur-md rounded-xl border p-3 min-h-[160px] flex flex-col transition-all shadow-[inset_0_1px_0_rgba(255,255,255,0.04),0_4px_12px_rgba(0,0,0,0.2)]
+              className={`bg-white dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 backdrop-blur-md rounded-xl border p-3 min-h-[160px] flex flex-col transition-all shadow-[inset_0_1px_0_rgba(255,255,255,0.04),0_4px_12px_rgba(0,0,0,0.08)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.04),0_4px_12px_rgba(0,0,0,0.2)]
                 ${
                   hasInProgress(semester)
                     ? "border-blue-700/50 ring-1 ring-blue-500/30"
-                    : "border-gray-800/50"
+                    : "border-gray-200 dark:border-gray-800/50"
                 }
                 ${
                   hoveredSemester === semester.id &&
                   draggedCourse &&
                   !isPastSemester(semester.name)
-                    ? "ring-2 ring-pink-400/60 scale-[0.98] bg-gray-800/60"
+                    ? "ring-2 ring-pink-400/60 scale-[0.98] bg-gray-100 dark:bg-gray-800/60"
                     : ""
                 }`}
             >
               <div className="flex justify-between items-center mb-2">
-                <h4 className="font-medium text-sm text-gray-300">
+                <h4 className="font-medium text-sm text-gray-700 dark:text-gray-300">
                   {semester.name}
                 </h4>
                 <div className="flex items-center gap-1.5">
                   <span
-                    className="px-1.5 py-0.5 rounded-md text-[10px] bg-gray-800/60 text-gray-300 border border-gray-700/40"
+                    className="px-1.5 py-0.5 rounded-md text-[10px] bg-gray-100 dark:bg-gray-800/60 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-700/40"
                     title="Sum of credits in this semester"
                   >
                     {semCreditsLabel} cr
@@ -1055,11 +1055,11 @@ export default function Simulator({
                       hoveredSemester === semester.id &&
                       draggedCourse &&
                       !isPastSemester(semester.name)
-                        ? "border-pink-400/60 bg-pink-900/15"
-                        : "border-gray-700/50"
+                        ? "border-pink-400/60 bg-pink-50 dark:bg-pink-900/15"
+                        : "border-gray-200 dark:border-gray-700/50"
                     }`}
                 >
-                  <p className="text-[11px] text-gray-500 text-center opacity-70">
+                  <p className="text-[11px] text-gray-400 dark:text-gray-500 text-center opacity-70">
                     Drag from pool or add manually
                   </p>
                 </div>
@@ -1082,7 +1082,7 @@ export default function Simulator({
                             ? "bg-emerald-900/25 text-emerald-300 border-emerald-700/40"
                             : course.status === "in-progress"
                               ? "bg-blue-900/25 text-blue-300 border-blue-700/40"
-                              : "bg-pink-900/20 text-pink-300 border-pink-700/40 hover:bg-pink-800/30 cursor-grab active:cursor-grabbing"
+                              : "bg-pink-100 dark:bg-pink-900/20 text-pink-700 dark:text-pink-300 border-pink-300 dark:border-pink-700/40 hover:bg-pink-200 dark:hover:bg-pink-800/30 cursor-grab active:cursor-grabbing"
                         }`}
                     >
                       <div className="flex items-center justify-between w-full">
@@ -1132,7 +1132,7 @@ export default function Simulator({
               exit={{ opacity: 0, scale: 0.95, y: 10 }}
               transition={{ duration: 0.25, ease: "easeOut" }}
               onClick={(e) => e.stopPropagation()}
-              className="w-full max-w-md p-6 rounded-2xl bg-gradient-to-br from-gray-900/95 via-gray-900/90 to-gray-950/95 backdrop-blur-2xl border border-white/[0.08] shadow-[0_8px_48px_rgba(0,0,0,0.5),0_0_80px_rgba(139,92,246,0.06),inset_0_1px_0_rgba(255,255,255,0.08)] ring-1 ring-white/[0.05]"
+              className="w-full max-w-md p-6 rounded-2xl bg-white dark:bg-gradient-to-br dark:from-gray-900/95 dark:via-gray-900/90 dark:to-gray-950/95 backdrop-blur-2xl border border-gray-200 dark:border-white/[0.08] shadow-[0_8px_48px_rgba(0,0,0,0.15),0_0_80px_rgba(139,92,246,0.04),inset_0_1px_0_rgba(255,255,255,0.08)] dark:shadow-[0_8px_48px_rgba(0,0,0,0.5),0_0_80px_rgba(139,92,246,0.06),inset_0_1px_0_rgba(255,255,255,0.08)] ring-1 ring-black/[0.04] dark:ring-white/[0.05]"
             >
               {/* Header */}
               <div className="mb-5">
@@ -1141,7 +1141,7 @@ export default function Simulator({
                     ? "Overwrite Plan"
                     : "Save Your Plan"}
                 </h3>
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
                   Give your plan a name to save your progress.
                 </p>
               </div>
@@ -1153,7 +1153,7 @@ export default function Simulator({
                   value={planName}
                   onChange={(e) => setPlanName(e.target.value)}
                   placeholder="e.g., Senior Year Schedule, Plan B..."
-                  className="w-full px-4 py-3 text-sm bg-white/[0.04] border border-white/[0.08] rounded-xl text-gray-200 placeholder-gray-500 focus:outline-none focus:border-purple-500/40 focus:ring-1 focus:ring-purple-500/20 transition-all shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]"
+                  className="w-full px-4 py-3 text-sm bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-xl text-gray-900 dark:text-gray-200 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:border-purple-500/40 focus:ring-1 focus:ring-purple-500/20 transition-all shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]"
                   autoFocus
                 />
               </div>
@@ -1163,16 +1163,16 @@ export default function Simulator({
                 <div className="mb-5">
                   <div className="flex items-center gap-3 mb-3">
                     <div className="flex-1 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
-                    <span className="text-xs text-gray-500 uppercase tracking-wider">
+                    <span className="text-xs text-gray-400 dark:text-gray-500 uppercase tracking-wider">
                       or overwrite
                     </span>
                     <div className="flex-1 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
                   </div>
-                  <div className="max-h-32 overflow-y-auto rounded-xl border border-white/[0.06] bg-white/[0.02]">
+                  <div className="max-h-32 overflow-y-auto rounded-xl border border-gray-200 dark:border-white/[0.06] bg-gray-50/50 dark:bg-white/[0.02]">
                     {savedPlans.map((plan, index) => (
                       <button
                         key={`${plan.createdAt}-${index}`}
-                        className={`w-full p-3 text-left border-b border-white/[0.04] last:border-b-0 hover:bg-white/[0.04] text-sm transition-all ${
+                        className={`w-full p-3 text-left border-b border-gray-100 dark:border-white/[0.04] last:border-b-0 hover:bg-gray-100 dark:hover:bg-white/[0.04] text-sm transition-all ${
                           selectedPlanToOverwrite === index
                             ? "bg-purple-500/10 border-l-2 border-l-purple-500"
                             : ""
@@ -1183,10 +1183,10 @@ export default function Simulator({
                         }}
                       >
                         <div className="flex justify-between items-center">
-                          <span className="text-gray-300 font-medium">
+                          <span className="text-gray-700 dark:text-gray-300 font-medium">
                             {plan.name}
                           </span>
-                          <span className="text-[10px] text-gray-500">
+                          <span className="text-[10px] text-gray-400 dark:text-gray-500">
                             {new Date(plan.createdAt).toLocaleDateString(
                               "en-US",
                               {
@@ -1212,7 +1212,7 @@ export default function Simulator({
                   }}
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
-                  className="px-4 py-2 text-sm rounded-xl bg-white/[0.04] text-gray-400 hover:text-gray-300 hover:bg-white/[0.06] border border-white/[0.06] transition-all"
+                  className="px-4 py-2 text-sm rounded-xl bg-black/[0.04] dark:bg-white/[0.04] text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-black/[0.06] dark:hover:bg-white/[0.06] border border-black/[0.06] dark:border-white/[0.06] transition-all"
                 >
                   Cancel
                 </motion.button>
@@ -1227,8 +1227,8 @@ export default function Simulator({
                   }
                   className={`px-4 py-2 text-sm rounded-xl font-medium transition-all ${
                     planName.trim() && hasChanges
-                      ? "bg-gradient-to-r from-purple-500/30 to-blue-500/30 text-white border border-purple-500/30 hover:border-purple-400/40 shadow-[0_2px_12px_rgba(139,92,246,0.2),inset_0_1px_0_rgba(255,255,255,0.1)]"
-                      : "bg-white/[0.02] text-gray-600 border border-white/[0.04] cursor-not-allowed"
+                      ? "bg-gradient-to-r from-purple-500/30 to-blue-500/30 text-gray-900 dark:text-white border border-purple-500/30 hover:border-purple-400/40 shadow-[0_2px_12px_rgba(139,92,246,0.2),inset_0_1px_0_rgba(255,255,255,0.1)]"
+                      : "bg-black/[0.02] dark:bg-white/[0.02] text-gray-400 dark:text-gray-600 border border-black/[0.04] dark:border-white/[0.04] cursor-not-allowed"
                   }`}
                 >
                   {selectedPlanToOverwrite !== null ? "Overwrite" : "Save Plan"}
@@ -1255,7 +1255,7 @@ export default function Simulator({
               exit={{ opacity: 0, scale: 0.95, y: 10 }}
               transition={{ duration: 0.25, ease: "easeOut" }}
               onClick={(e) => e.stopPropagation()}
-              className="w-full max-w-md p-6 rounded-2xl bg-gradient-to-br from-gray-900/95 via-gray-900/90 to-gray-950/95 backdrop-blur-2xl border border-white/[0.08] shadow-[0_8px_48px_rgba(0,0,0,0.5),0_0_80px_rgba(139,92,246,0.06),inset_0_1px_0_rgba(255,255,255,0.08)] ring-1 ring-white/[0.05]"
+              className="w-full max-w-md p-6 rounded-2xl bg-white dark:bg-gradient-to-br dark:from-gray-900/95 dark:via-gray-900/90 dark:to-gray-950/95 backdrop-blur-2xl border border-gray-200 dark:border-white/[0.08] shadow-[0_8px_48px_rgba(0,0,0,0.1),0_0_80px_rgba(139,92,246,0.02)] dark:shadow-[0_8px_48px_rgba(0,0,0,0.5),0_0_80px_rgba(139,92,246,0.06),inset_0_1px_0_rgba(255,255,255,0.08)] ring-1 ring-black/[0.04] dark:ring-white/[0.05]"
               style={{ maxHeight: "80vh" }}
             >
               {/* Header */}
@@ -1263,18 +1263,18 @@ export default function Simulator({
                 <h3 className="text-lg font-medium text-gray-900 dark:text-white">
                   Your Saved Plans
                 </h3>
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
                   Load a previous plan or manage your saved plans.
                 </p>
               </div>
 
               {savedPlans.length === 0 ? (
                 <div className="py-12 text-center">
-                  <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-gradient-to-br from-white/[0.04] to-transparent border border-white/[0.06] flex items-center justify-center">
-                    <FiPlus className="w-5 h-5 text-gray-500" />
+                  <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-gray-100 dark:bg-gradient-to-br dark:from-white/[0.04] dark:to-transparent border border-gray-200 dark:border-white/[0.06] flex items-center justify-center">
+                    <FiPlus className="w-5 h-5 text-gray-400 dark:text-gray-500" />
                   </div>
-                  <p className="text-gray-500 text-sm">No saved plans yet</p>
-                  <p className="text-gray-600 text-xs mt-1">
+                  <p className="text-gray-500 dark:text-gray-500 text-sm">No saved plans yet</p>
+                  <p className="text-gray-400 dark:text-gray-600 text-xs mt-1">
                     Make changes and save to create your first plan.
                   </p>
                 </div>
@@ -1297,11 +1297,11 @@ export default function Simulator({
                         initial={{ opacity: 0, y: 5 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: index * 0.05 }}
-                        className="p-4 rounded-xl bg-gradient-to-br from-white/[0.04] to-transparent border border-white/[0.06] hover:border-white/[0.1] transition-all group"
+                        className="p-4 rounded-xl bg-gray-50 dark:bg-gradient-to-br dark:from-white/[0.04] dark:to-transparent border border-gray-200 dark:border-white/[0.06] hover:border-gray-300 dark:hover:border-white/[0.1] transition-all group"
                       >
                         <div className="flex justify-between items-start mb-3">
                           <div>
-                            <h5 className="font-medium text-sm text-gray-200 group-hover:text-white transition-colors">
+                            <h5 className="font-medium text-sm text-gray-700 dark:text-gray-200 group-hover:text-gray-900 dark:group-hover:text-white transition-colors">
                               {plan.name}
                             </h5>
                             <p className="text-[11px] text-gray-500 mt-0.5">
@@ -1349,7 +1349,7 @@ export default function Simulator({
                   onClick={() => setShowPlansModal(false)}
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
-                  className="px-4 py-2 text-sm rounded-xl bg-white/[0.04] text-gray-400 hover:text-gray-300 hover:bg-white/[0.06] border border-white/[0.06] transition-all"
+                  className="px-4 py-2 text-sm rounded-xl bg-black/[0.04] dark:bg-white/[0.04] text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-black/[0.06] dark:hover:bg-white/[0.06] border border-black/[0.06] dark:border-white/[0.06] transition-all"
                 >
                   Close
                 </motion.button>
@@ -1419,14 +1419,14 @@ export default function Simulator({
               exit={{ opacity: 0, scale: 0.95, y: 10 }}
               transition={{ duration: 0.25, ease: "easeOut" }}
               onClick={(e) => e.stopPropagation()}
-              className="w-full max-w-lg p-6 rounded-2xl bg-gradient-to-br from-gray-900/95 via-gray-900/90 to-gray-950/95 backdrop-blur-2xl border border-white/[0.08] shadow-[0_8px_48px_rgba(0,0,0,0.5),0_0_80px_rgba(139,92,246,0.06),inset_0_1px_0_rgba(255,255,255,0.08)] ring-1 ring-white/[0.05]"
+              className="w-full max-w-lg p-6 rounded-2xl bg-white dark:bg-gradient-to-br dark:from-gray-900/95 dark:via-gray-900/90 dark:to-gray-950/95 backdrop-blur-2xl border border-gray-200 dark:border-white/[0.08] shadow-[0_8px_48px_rgba(0,0,0,0.1)] dark:shadow-[0_8px_48px_rgba(0,0,0,0.5),0_0_80px_rgba(139,92,246,0.06),inset_0_1px_0_rgba(255,255,255,0.08)] ring-1 ring-black/[0.04] dark:ring-white/[0.05]"
             >
               {/* Header */}
               <div className="text-center mb-6">
                 <h3 className="text-xl font-medium text-gray-900 dark:text-white mb-1">
                   Welcome to your Yale Simulator.
                 </h3>
-                <p className="text-sm text-gray-400">
+                <p className="text-sm text-gray-500 dark:text-gray-400">
                   Pick up where you left off, or start fresh.
                 </p>
               </div>
@@ -1450,14 +1450,14 @@ export default function Simulator({
                       }}
                       whileHover={{ scale: 1.01 }}
                       whileTap={{ scale: 0.99 }}
-                      className="w-full p-4 rounded-xl text-left bg-gradient-to-br from-white/[0.04] to-transparent border border-white/[0.06] hover:border-purple-500/30 hover:bg-white/[0.06] transition-all duration-200 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] group"
+                      className="w-full p-4 rounded-xl text-left bg-gray-50 dark:bg-gradient-to-br dark:from-white/[0.04] dark:to-transparent border border-gray-200 dark:border-white/[0.06] hover:border-purple-500/30 hover:bg-purple-50 dark:hover:bg-white/[0.06] transition-all duration-200 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] group"
                     >
                       <div className="flex items-center justify-between">
                         <div>
-                          <h4 className="font-medium text-gray-200 group-hover:text-white transition-colors">
+                          <h4 className="font-medium text-gray-700 dark:text-gray-200 group-hover:text-gray-900 dark:group-hover:text-white transition-colors">
                             {plan.name}
                           </h4>
-                          <p className="text-xs text-gray-500 mt-0.5">
+                          <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
                             {plannedCount} planned course
                             {plannedCount !== 1 ? "s" : ""} ·{" "}
                             {new Date(plan.createdAt).toLocaleDateString(
@@ -1482,7 +1482,7 @@ export default function Simulator({
               {/* Divider */}
               <div className="flex items-center gap-3 my-4">
                 <div className="flex-1 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
-                <span className="text-xs text-gray-500 uppercase tracking-wider">
+                <span className="text-xs text-gray-400 dark:text-gray-500 uppercase tracking-wider">
                   or
                 </span>
                 <div className="flex-1 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
@@ -1493,16 +1493,16 @@ export default function Simulator({
                 onClick={() => setShowPlanSelector(false)}
                 whileHover={{ scale: 1.01 }}
                 whileTap={{ scale: 0.99 }}
-                className="w-full py-3 px-4 rounded-xl font-medium text-sm text-white bg-gradient-to-r from-blue-500/20 via-purple-500/20 to-pink-500/20 hover:from-blue-500/30 hover:via-purple-500/30 hover:to-pink-500/30 border border-white/[0.08] shadow-[0_2px_12px_rgba(139,92,246,0.15),inset_0_1px_0_rgba(255,255,255,0.1)] transition-all duration-200 flex items-center justify-center gap-2"
+                className="w-full py-3 px-4 rounded-xl font-medium text-sm text-gray-800 dark:text-white bg-gradient-to-r from-blue-500/20 via-purple-500/20 to-pink-500/20 hover:from-blue-500/30 hover:via-purple-500/30 hover:to-pink-500/30 border border-black/[0.08] dark:border-white/[0.08] shadow-[0_2px_12px_rgba(139,92,246,0.1),inset_0_1px_0_rgba(255,255,255,0.1)] transition-all duration-200 flex items-center justify-center gap-2"
               >
                 <FiPlus size={14} className="opacity-70" />
                 Start Fresh / Create New Plan
               </motion.button>
 
               {/* Skip hint */}
-              <p className="text-center text-[11px] text-gray-600 mt-4">
+              <p className="text-center text-[11px] text-gray-400 dark:text-gray-600 mt-4">
                 Press{" "}
-                <kbd className="px-1.5 py-0.5 rounded bg-white/[0.06] border border-white/[0.08] text-gray-400">
+                <kbd className="px-1.5 py-0.5 rounded bg-black/[0.06] dark:bg-white/[0.06] border border-black/[0.08] dark:border-white/[0.08] text-gray-500 dark:text-gray-400">
                   Esc
                 </kbd>{" "}
                 or click outside to dismiss

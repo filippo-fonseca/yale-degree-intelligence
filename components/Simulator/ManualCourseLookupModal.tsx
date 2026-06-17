@@ -93,7 +93,7 @@ export default function ManualCourseLookupModal({
         >
           <motion.div
             ref={modalRef}
-            className="bg-gray-900 p-6 rounded-xl max-w-xl w-full border border-gray-800 flex flex-col"
+            className="bg-white dark:bg-gray-900 p-6 rounded-xl max-w-xl w-full border border-gray-200 dark:border-gray-800 flex flex-col"
             style={{
               height: "480px",
               minHeight: "480px",
@@ -105,7 +105,7 @@ export default function ManualCourseLookupModal({
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-semibold text-white">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
                 Add any Yale course
               </h3>
               <button
@@ -113,7 +113,7 @@ export default function ManualCourseLookupModal({
                   setSearchTerm("");
                   onClose();
                 }}
-                className="text-gray-400 hover:text-red-400 transition"
+                className="text-gray-500 dark:text-gray-400 hover:text-red-400 transition"
               >
                 <FiX size={20} />
               </button>
@@ -126,50 +126,50 @@ export default function ManualCourseLookupModal({
                 autoFocus
                 onChange={(e) => setSearchTerm(e.target.value)}
                 placeholder="Type a code, name, or department…"
-                className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-gray-200"
+                className="w-full px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg text-gray-900 dark:text-gray-200 placeholder-gray-400 dark:placeholder-gray-500"
               />
             </div>
             <div className="flex-1 overflow-y-auto space-y-2">
               {searchTerm.length === 0 ? (
-                <div className="flex flex-col items-center justify-center text-gray-500 text-center py-8 gap-4">
+                <div className="flex flex-col items-center justify-center text-gray-400 dark:text-gray-500 text-center py-8 gap-4">
                   <Panda size={32} />
                   <div>
                     Can't find a course?{" "}
                     <Link
                       href="mailto:filippo.fonseca@yale.edu,emir.ahmed@yale.edu"
-                      className="text-gray-400 hover:text-pink-400 transition"
+                      className="text-gray-500 dark:text-gray-400 hover:text-pink-400 transition"
                     >
                       Let us know.
                     </Link>{" "}
                   </div>
                 </div>
               ) : filteredCourses.length === 0 ? (
-                <div className="text-gray-500 text-center py-8">
+                <div className="text-gray-400 dark:text-gray-500 text-center py-8">
                   No results found.
                 </div>
               ) : (
                 filteredCourses.map((c) => (
                   <div
                     key={c.canonicalCode}
-                    className="flex justify-between items-center px-3 py-2 bg-gray-800 rounded-lg border border-gray-700 hover:border-pink-400 transition cursor-pointer"
+                    className="flex justify-between items-center px-3 py-2 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-pink-400 transition cursor-pointer"
                   >
                     <div>
-                      <div className="font-medium text-gray-200 flex items-center gap-2">
+                      <div className="font-medium text-gray-800 dark:text-gray-200 flex items-center gap-2">
                         {c.canonicalCode}{" "}
-                        <span className="text-xs text-gray-400 font-normal">
+                        <span className="text-xs text-gray-500 dark:text-gray-400 font-normal">
                           {c.department}
                         </span>
                         {/* Semester emojis */}
                         {c.isFall && c.isSpring ? (
                           <span className="inline-flex items-center gap-1">
                             <span
-                              className="inline-flex items-center px-1.5 py-0.5 rounded-md bg-gray-700/50 shadow-[inset_1px_1px_2px_rgba(0,0,0,0.3),inset_-1px_-1px_2px_rgba(255,255,255,0.05)] text-[11px]"
+                              className="inline-flex items-center px-1.5 py-0.5 rounded-md bg-gray-200/80 dark:bg-gray-700/50 shadow-[inset_1px_1px_2px_rgba(0,0,0,0.1),inset_-1px_-1px_2px_rgba(255,255,255,0.05)] text-[11px]"
                               title="Offered in Fall"
                             >
                               🍁
                             </span>
                             <span
-                              className="inline-flex items-center px-1.5 py-0.5 rounded-md bg-gray-700/50 shadow-[inset_1px_1px_2px_rgba(0,0,0,0.3),inset_-1px_-1px_2px_rgba(255,255,255,0.05)] text-[11px]"
+                              className="inline-flex items-center px-1.5 py-0.5 rounded-md bg-gray-200/80 dark:bg-gray-700/50 shadow-[inset_1px_1px_2px_rgba(0,0,0,0.1),inset_-1px_-1px_2px_rgba(255,255,255,0.05)] text-[11px]"
                               title="Offered in Spring"
                             >
                               🌰
@@ -177,21 +177,21 @@ export default function ManualCourseLookupModal({
                           </span>
                         ) : c.isFall ? (
                           <span
-                            className="inline-flex items-center px-1.5 py-0.5 rounded-md bg-gray-700/50 shadow-[inset_1px_1px_2px_rgba(0,0,0,0.3),inset_-1px_-1px_2px_rgba(255,255,255,0.05)] text-[11px]"
+                            className="inline-flex items-center px-1.5 py-0.5 rounded-md bg-gray-200/80 dark:bg-gray-700/50 shadow-[inset_1px_1px_2px_rgba(0,0,0,0.1),inset_-1px_-1px_2px_rgba(255,255,255,0.05)] text-[11px]"
                             title="Offered in Fall"
                           >
                             🍁
                           </span>
                         ) : c.isSpring ? (
                           <span
-                            className="inline-flex items-center px-1.5 py-0.5 rounded-md bg-gray-700/50 shadow-[inset_1px_1px_2px_rgba(0,0,0,0.3),inset_-1px_-1px_2px_rgba(255,255,255,0.05)] text-[11px]"
+                            className="inline-flex items-center px-1.5 py-0.5 rounded-md bg-gray-200/80 dark:bg-gray-700/50 shadow-[inset_1px_1px_2px_rgba(0,0,0,0.1),inset_-1px_-1px_2px_rgba(255,255,255,0.05)] text-[11px]"
                             title="Offered in Spring"
                           >
                             🌰
                           </span>
                         ) : (
                           <span
-                            className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-gray-700/50 shadow-[inset_1px_1px_2px_rgba(0,0,0,0.3),inset_-1px_-1px_2px_rgba(255,255,255,0.05)] text-[10px] text-gray-400"
+                            className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-gray-200/80 dark:bg-gray-700/50 shadow-[inset_1px_1px_2px_rgba(0,0,0,0.1),inset_-1px_-1px_2px_rgba(255,255,255,0.05)] text-[10px] text-gray-500 dark:text-gray-400"
                             title="Verify semester offering on courses.yale.edu"
                           >
                             <span>❓</span>
@@ -199,10 +199,10 @@ export default function ManualCourseLookupModal({
                           </span>
                         )}
                       </div>
-                      <div className="text-sm text-gray-400">{c.name}</div>
-                      <div className="text-xs text-gray-500">
+                      <div className="text-sm text-gray-500 dark:text-gray-400">{c.name}</div>
+                      <div className="text-xs text-gray-400 dark:text-gray-500">
                         {c.credits} credit{c.credits !== 1 ? "s" : ""}{" "}
-                        <span className="text-xs text-gray-500">
+                        <span className="text-xs text-gray-400 dark:text-gray-500">
                           {c.allCodes.length > 1 &&
                             `(aka: ${c.allCodes.slice(1).join(", ")})`}
                         </span>

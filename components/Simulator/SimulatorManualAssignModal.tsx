@@ -105,7 +105,7 @@ export default function SimulatorManualAssignModal({
           onClick={handleClose}
         >
           <motion.div
-            className="bg-gray-900 p-6 rounded-xl max-w-md w-full border border-gray-800 flex flex-col max-h-[80vh]"
+            className="bg-white dark:bg-gray-900 p-6 rounded-xl max-w-md w-full border border-gray-200 dark:border-gray-800 flex flex-col max-h-[80vh]"
             initial={{ scale: 0.97, y: 20 }}
             animate={{ scale: 1, y: 0 }}
             exit={{ scale: 0.97, y: 20 }}
@@ -114,11 +114,11 @@ export default function SimulatorManualAssignModal({
             {/* Header */}
             <div className="flex justify-between items-start mb-4">
               <div>
-                <h3 className="text-base font-semibold text-white">
+                <h3 className="text-base font-semibold text-gray-900 dark:text-white">
                   Assign to a requirement?
                 </h3>
-                <p className="text-sm text-gray-400 mt-1">
-                  <span className="text-pink-300 font-medium">
+                <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                  <span className="text-pink-600 dark:text-pink-300 font-medium">
                     {course.code}
                   </span>
                   {getCourseNameFromCode(course.code) && (
@@ -127,14 +127,14 @@ export default function SimulatorManualAssignModal({
                     </span>
                   )}
                 </p>
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
                   This course wasn&apos;t auto-detected for any requirement for
                   your major(s).
                 </p>
               </div>
               <button
                 onClick={handleClose}
-                className="text-gray-400 hover:text-red-400 transition flex-shrink-0 ml-2"
+                className="text-gray-500 dark:text-gray-400 hover:text-red-400 transition flex-shrink-0 ml-2"
               >
                 <FiX size={18} />
               </button>
@@ -143,7 +143,7 @@ export default function SimulatorManualAssignModal({
             {/* Major selector (if 2 majors) */}
             {majorIds.length > 1 && !selectedMajor && (
               <div className="space-y-2 mb-4">
-                <p className="text-xs text-gray-400 font-medium uppercase tracking-wide">
+                <p className="text-xs text-gray-500 dark:text-gray-400 font-medium uppercase tracking-wide">
                   Which major?
                 </p>
                 <div className="flex gap-2">
@@ -151,10 +151,10 @@ export default function SimulatorManualAssignModal({
                     <button
                       key={mid}
                       onClick={() => setSelectedMajor(mid)}
-                      className="flex-1 px-3 py-2.5 rounded-lg border border-gray-700 bg-gray-800/50 text-sm text-gray-200 hover:border-purple-500 hover:bg-purple-900/20 transition-colors text-left"
+                      className="flex-1 px-3 py-2.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 text-sm text-gray-700 dark:text-gray-200 hover:border-purple-500 hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-colors text-left"
                     >
                       <div className="font-medium">{mid}</div>
-                      <div className="text-xs text-gray-500 mt-0.5">
+                      <div className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
                         {MAJORS[mid] ?? mid}
                       </div>
                     </button>
@@ -170,22 +170,22 @@ export default function SimulatorManualAssignModal({
                   <div className="flex items-center gap-2 mb-3">
                     <button
                       onClick={() => setSelectedMajor(null)}
-                      className="text-xs text-purple-400 hover:text-purple-300 transition"
+                      className="text-xs text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 transition"
                     >
                       &larr; Back
                     </button>
-                    <span className="text-xs text-gray-500">
+                    <span className="text-xs text-gray-400 dark:text-gray-500">
                       {MAJORS[activeMajor] ?? activeMajor}
                     </span>
                   </div>
                 )}
 
-                <p className="text-xs text-gray-400 font-medium uppercase tracking-wide mb-2">
+                <p className="text-xs text-gray-500 dark:text-gray-400 font-medium uppercase tracking-wide mb-2">
                   Unfulfilled requirements
                 </p>
 
                 {unfulfilledReqs.length === 0 ? (
-                  <p className="text-sm text-gray-500 py-4 text-center">
+                  <p className="text-sm text-gray-400 dark:text-gray-500 py-4 text-center">
                     All requirements are satisfied for this major.
                   </p>
                 ) : (
@@ -194,18 +194,18 @@ export default function SimulatorManualAssignModal({
                       <button
                         key={req.name}
                         onClick={() => handleAssign(req.name)}
-                        className="w-full text-left px-3 py-2.5 rounded-lg border border-gray-700/60 bg-gray-800/30 hover:border-purple-500/60 hover:bg-purple-900/20 transition-colors group"
+                        className="w-full text-left px-3 py-2.5 rounded-lg border border-gray-200 dark:border-gray-700/60 bg-gray-50/50 dark:bg-gray-800/30 hover:border-purple-500/60 hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-colors group"
                       >
                         <div className="flex items-center justify-between">
-                          <span className="text-sm text-gray-200 group-hover:text-purple-200 transition-colors">
+                          <span className="text-sm text-gray-700 dark:text-gray-200 group-hover:text-purple-600 dark:group-hover:text-purple-200 transition-colors">
                             {req.name}
                           </span>
-                          <span className="text-xs text-gray-500 ml-2 flex-shrink-0">
+                          <span className="text-xs text-gray-400 dark:text-gray-500 ml-2 flex-shrink-0">
                             {req.completed}/{req.required}
                           </span>
                         </div>
                         {req.description && (
-                          <div className="text-xs text-gray-500 mt-0.5 line-clamp-1">
+                          <div className="text-xs text-gray-400 dark:text-gray-500 mt-0.5 line-clamp-1">
                             {req.description}
                           </div>
                         )}
@@ -217,10 +217,10 @@ export default function SimulatorManualAssignModal({
             )}
 
             {/* Skip button */}
-            <div className="mt-4 pt-3 border-t border-gray-800">
+            <div className="mt-4 pt-3 border-t border-gray-200 dark:border-gray-800">
               <button
                 onClick={handleSkip}
-                className="w-full px-4 py-2 rounded-lg bg-gray-800/50 text-gray-400 hover:bg-gray-700/50 hover:text-gray-300 transition-colors text-sm"
+                className="w-full px-4 py-2 rounded-lg bg-gray-100 dark:bg-gray-800/50 text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700/50 hover:text-gray-700 dark:hover:text-gray-300 transition-colors text-sm"
               >
                 Skip &mdash; not for my major
               </button>

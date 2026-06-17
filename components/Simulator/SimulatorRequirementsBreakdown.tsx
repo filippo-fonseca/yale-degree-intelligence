@@ -33,7 +33,7 @@ function ProgressRing({
         cy={size / 2}
         r={radius}
         fill="none"
-        stroke="rgba(255,255,255,0.08)"
+        stroke="rgba(100,100,100,0.15)"
         strokeWidth={strokeWidth}
       />
       <circle
@@ -192,40 +192,40 @@ export default function SimulatorRequirementsBreakdown({
         return (
           <div
             key={majorId}
-            className="rounded-xl bg-gradient-to-br from-gray-900/60 via-gray-900/40 to-gray-950/60 backdrop-blur-md border border-gray-800/50 overflow-hidden shadow-[inset_0_1px_0_rgba(255,255,255,0.04),0_4px_12px_rgba(0,0,0,0.2)]"
+            className="rounded-xl bg-white dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 border border-gray-200 dark:border-gray-800/50 overflow-hidden shadow-[inset_0_1px_0_rgba(255,255,255,0.04),0_4px_12px_rgba(0,0,0,0.1)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.04),0_4px_12px_rgba(0,0,0,0.2)] backdrop-blur-md"
           >
             {/* Collapsed header */}
             <button
               onClick={() => toggle(majorId)}
-              className="w-full flex items-center gap-2.5 p-3 text-left hover:bg-gray-800/20 transition-colors"
+              className="w-full flex items-center gap-2.5 p-3 text-left hover:bg-gray-100 dark:hover:bg-gray-800/20 transition-colors"
             >
               <ProgressRing percentage={pctWithPlanned} size={32} strokeWidth={3} />
 
               <div className="flex-1 min-w-0">
-                <div className="text-xs font-medium text-gray-200 truncate">
+                <div className="text-xs font-medium text-gray-800 dark:text-gray-200 truncate">
                   {MAJORS[majorId] ?? majorId}
                 </div>
-                <div className="flex items-center flex-wrap gap-x-2 gap-y-0.5 mt-0.5 text-[10px] text-gray-500">
+                <div className="flex items-center flex-wrap gap-x-2 gap-y-0.5 mt-0.5 text-[10px] text-gray-400 dark:text-gray-500">
                   <span>
-                    <span className="text-emerald-300 font-medium">
+                    <span className="text-emerald-600 dark:text-emerald-300 font-medium">
                       {pctCompleted.toFixed(0)}%
                     </span>
-                    <span className="text-gray-600 ml-0.5">done</span>
+                    <span className="text-gray-400 dark:text-gray-600 ml-0.5">done</span>
                   </span>
                   {trueInProgress.length > 0 && (
                     <span>
-                      <span className="text-blue-300 font-medium">
+                      <span className="text-blue-600 dark:text-blue-300 font-medium">
                         {pctWithIP.toFixed(0)}%
                       </span>
-                      <span className="text-gray-600 ml-0.5">w/ in-progress</span>
+                      <span className="text-gray-400 dark:text-gray-600 ml-0.5">w/ in-progress</span>
                     </span>
                   )}
                   {planned.length > 0 && (
                     <span>
-                      <span className="text-purple-300 font-medium">
+                      <span className="text-purple-600 dark:text-purple-300 font-medium">
                         {pctWithPlanned.toFixed(0)}%
                       </span>
-                      <span className="text-gray-600 ml-0.5">w/ planned</span>
+                      <span className="text-gray-400 dark:text-gray-600 ml-0.5">w/ planned</span>
                     </span>
                   )}
                 </div>
@@ -240,7 +240,7 @@ export default function SimulatorRequirementsBreakdown({
 
             {/* Progress bar (always visible) - three tiers */}
             <div className="px-3 pb-2.5 -mt-0.5">
-              <div className="w-full bg-gray-950/50 h-1.5 rounded-full overflow-hidden relative shadow-[inset_0_1px_2px_rgba(0,0,0,0.3)]">
+              <div className="w-full bg-gray-200 dark:bg-gray-950/50 h-1.5 rounded-full overflow-hidden relative shadow-[inset_0_1px_2px_rgba(0,0,0,0.1)] dark:shadow-[inset_0_1px_2px_rgba(0,0,0,0.3)]">
                 {/* Planned layer (purple, lightest) */}
                 <div
                   className="h-1.5 bg-gradient-to-r from-purple-400 to-purple-500 opacity-30 absolute top-0 left-0 rounded-full"
@@ -271,7 +271,7 @@ export default function SimulatorRequirementsBreakdown({
                   transition={{ duration: 0.2 }}
                   className="overflow-hidden"
                 >
-                  <div className="px-3 pb-3 space-y-3 border-t border-gray-800/40 pt-2.5">
+                  <div className="px-3 pb-3 space-y-3 border-t border-gray-200 dark:border-gray-800/40 pt-2.5">
                     {prog.completedRequirements.length > 0 && (
                       <ReqSection
                         title="Satisfied"
@@ -321,7 +321,7 @@ export default function SimulatorRequirementsBreakdown({
                       trueInProgress.length === 0 &&
                       planned.length === 0 &&
                       prog.remainingRequirements.length === 0 && (
-                        <p className="text-xs text-gray-500 text-center py-2">
+                        <p className="text-xs text-gray-400 dark:text-gray-500 text-center py-2">
                           No requirement data available.
                         </p>
                       )}
@@ -357,10 +357,10 @@ function ReqSection({
   showCombinedProgress?: boolean;
 }) {
   const titleColor: Record<typeof color, string> = {
-    green: "text-emerald-400",
-    blue: "text-blue-400",
-    amber: "text-amber-400",
-    red: "text-red-400/80",
+    green: "text-emerald-600 dark:text-emerald-400",
+    blue: "text-blue-600 dark:text-blue-400",
+    amber: "text-amber-600 dark:text-amber-400",
+    red: "text-red-600 dark:text-red-400/80",
   };
 
   return (
@@ -372,7 +372,7 @@ function ReqSection({
         >
           {title}
         </span>
-        <span className="text-[10px] text-gray-600">({reqs.length})</span>
+        <span className="text-[10px] text-gray-400 dark:text-gray-600">({reqs.length})</span>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
@@ -396,16 +396,16 @@ function ReqSection({
           return (
             <div
               key={req.name}
-              className={`px-2.5 py-1.5 rounded-lg bg-gray-800/30 border ${
-                isIncomplete ? "border-red-500/50" : "border-gray-800/40"
+              className={`px-2.5 py-1.5 rounded-lg bg-gray-50 dark:bg-gray-800/30 border ${
+                isIncomplete ? "border-red-500/50" : "border-gray-200 dark:border-gray-800/40"
               }`}
             >
               <div className="flex items-center justify-between mb-1">
-                <span className="text-xs text-gray-300 font-medium truncate mr-2">
+                <span className="text-xs text-gray-700 dark:text-gray-300 font-medium truncate mr-2">
                   {req.name}
                 </span>
                 <span className={`text-[10px] flex-shrink-0 ${
-                  isIncomplete ? "text-red-400 font-medium" : "text-gray-500"
+                  isIncomplete ? "text-red-400 font-medium" : "text-gray-400 dark:text-gray-500"
                 }`}>
                   {displayCredits}/{req.required}
                 </span>
@@ -473,7 +473,7 @@ function ReqSection({
 
                 {req.options.filter((opt) => opt.completed || opt.inProgress)
                   .length === 0 && (
-                    <span className="text-[10px] text-gray-600 italic">
+                    <span className="text-[10px] text-gray-400 dark:text-gray-600 italic">
                       none yet
                     </span>
                   )}

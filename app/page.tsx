@@ -783,7 +783,7 @@ export default function Home() {
 
   return (
     <main
-      className={`min-h-screen bg-gray-950 text-gray-100 font-louize overflow-hidden`}
+      className={`min-h-screen bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100 font-louize overflow-hidden`}
     >
       {/* {showBetaBanner && (
         <motion.div
@@ -869,11 +869,11 @@ export default function Home() {
 
       {/* Background elements */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute inset-0 bg-gradient-to-br from-gray-950 via-blue-950/20 to-purple-950/20"></div>
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-950 dark:via-blue-950/20 dark:to-purple-950/20"></div>
         {[...Array(12)].map((_, i) => (
           <motion.div
             key={i}
-            className="absolute rounded-full bg-white/5 backdrop-blur-sm"
+            className="absolute rounded-full bg-black/[0.04] dark:bg-white/5 backdrop-blur-sm"
             initial={{
               x: Math.random() * 100,
               y: Math.random() * 100,
@@ -911,7 +911,7 @@ export default function Home() {
             {/* Mobile hamburger menu */}
             <button
               onClick={() => setSidebarOpen(true)}
-              className="lg:hidden p-2 rounded-xl bg-white/[0.06] hover:bg-white/[0.1] border border-white/[0.08] text-gray-300 hover:text-white transition-all"
+              className="lg:hidden p-2 rounded-xl bg-black/[0.04] dark:bg-white/[0.06] hover:bg-black/[0.06] dark:hover:bg-white/[0.1] border border-black/[0.06] dark:border-white/[0.08] text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-all"
               aria-label="Open menu"
             >
               <FiMenu size={18} />
@@ -937,7 +937,7 @@ export default function Home() {
               href="https://youtu.be/5H1kjMWQfgs"
               target="_blank"
               rel="noopener noreferrer"
-              className="hidden lg:inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] rounded-full border border-emerald-800 bg-emerald-900/30 text-emerald-300 hover:bg-emerald-900/50 hover:border-emerald-700 transition-all cursor-pointer"
+              className="hidden lg:inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] rounded-full border border-emerald-300 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-100 dark:hover:bg-emerald-900/50 hover:border-emerald-400 dark:hover:border-emerald-700 transition-all cursor-pointer"
               title="Watch our launch video!"
             >
               <FaYoutube className="text-red-500" size={14} />
@@ -947,7 +947,7 @@ export default function Home() {
 
             <button
               onClick={() => setShowSettings(true)}
-              className="p-1.5 lg:p-2 rounded-xl hover:bg-white/[0.06] transition-all border border-white/[0.08] hover:border-white/[0.12] flex items-center gap-1"
+              className="p-1.5 lg:p-2 rounded-xl hover:bg-black/[0.04] dark:hover:bg-white/[0.06] transition-all border border-black/[0.06] dark:border-white/[0.08] hover:border-black/[0.09] dark:hover:border-white/[0.12] flex items-center gap-1"
               title="Settings"
             >
               <UserAvatar
@@ -956,7 +956,7 @@ export default function Home() {
                 email={user.email}
                 size={28}
               />
-              <FiChevronDown className="hidden lg:block text-gray-400 text-sm" />
+              <FiChevronDown className="hidden lg:block text-gray-500 dark:text-gray-400 text-sm" />
             </button>
           </div>
         </motion.header>
@@ -980,14 +980,14 @@ export default function Home() {
                   animate={{ x: 0 }}
                   exit={{ x: "-100%" }}
                   transition={{ type: "spring", damping: 25, stiffness: 300 }}
-                  className="fixed left-0 top-0 bottom-0 w-72 z-50 lg:hidden flex flex-col justify-between p-4 bg-gradient-to-br from-gray-900 via-gray-900 to-gray-950 border-r border-white/[0.08] shadow-[8px_0_32px_rgba(0,0,0,0.5)]"
+                  className="fixed left-0 top-0 bottom-0 w-72 z-50 lg:hidden flex flex-col justify-between p-4 bg-gradient-to-br from-white via-white to-gray-50 dark:from-gray-900 dark:via-gray-900 dark:to-gray-950 border-r border-black/[0.06] dark:border-white/[0.08] shadow-[8px_0_32px_rgba(0,0,0,0.5)]"
                 >
                   {/* Header with logo and close */}
-                  <div className="flex items-center justify-between mb-6 pb-4 border-b border-white/[0.06]">
+                  <div className="flex items-center justify-between mb-6 pb-4 border-b border-black/[0.06] dark:border-white/[0.06]">
                     <CompoundLogo size="sm" />
                     <button
                       onClick={() => setSidebarOpen(false)}
-                      className="p-2 rounded-xl bg-white/[0.06] hover:bg-white/[0.1] border border-white/[0.08] text-gray-300 hover:text-white transition-all"
+                      className="p-2 rounded-xl bg-black/[0.04] dark:bg-white/[0.06] hover:bg-black/[0.06] dark:hover:bg-white/[0.1] border border-black/[0.06] dark:border-white/[0.08] text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-all"
                     >
                       <FiX size={18} />
                     </button>
@@ -1009,8 +1009,8 @@ export default function Home() {
                           }}
                           className={`w-full flex items-center justify-between px-4 py-3 text-left rounded-2xl transition-all duration-300 ${
                             activeTab === item.id
-                              ? "bg-gradient-to-br from-white/[0.12] via-white/[0.06] to-transparent text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.15)]"
-                              : "text-gray-400 hover:text-white hover:bg-white/[0.04]"
+                              ? "bg-gradient-to-br from-black/[0.08] via-black/[0.04] to-transparent dark:from-white/[0.12] dark:via-white/[0.06] dark:to-transparent text-gray-900 dark:text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.15)]"
+                              : "text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-black/[0.03] dark:hover:bg-white/[0.04]"
                           }`}
                         >
                           <div className="flex items-center space-x-3">
@@ -1024,13 +1024,13 @@ export default function Home() {
                       ))}
                   </nav>
                   {/* Mobile bottom section */}
-                  <div className="pt-4 border-t border-white/[0.08] space-y-3">
+                  <div className="pt-4 border-t border-black/[0.06] dark:border-white/[0.08] space-y-3">
                     {/* Quick links */}
                     <div className="grid grid-cols-2 gap-2">
                       <Link
                         href="/mission"
                         onClick={() => setSidebarOpen(false)}
-                        className="flex items-center gap-2 p-2 rounded-lg hover:bg-white/[0.06] transition-all text-gray-400 hover:text-white"
+                        className="flex items-center gap-2 p-2 rounded-lg hover:bg-black/[0.04] dark:hover:bg-white/[0.06] transition-all text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
                       >
                         <FaHeart className="text-emerald-400" size={12} />
                         <span className="text-xs">Mission</span>
@@ -1038,14 +1038,14 @@ export default function Home() {
                       <Link
                         href="/terms"
                         onClick={() => setSidebarOpen(false)}
-                        className="flex items-center gap-2 p-2 rounded-lg hover:bg-white/[0.06] transition-all text-gray-400 hover:text-white"
+                        className="flex items-center gap-2 p-2 rounded-lg hover:bg-black/[0.04] dark:hover:bg-white/[0.06] transition-all text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
                       >
                         <FiBook className="text-blue-400" size={12} />
                         <span className="text-xs">Terms</span>
                       </Link>
                       <Link
                         href="mailto:filippo.fonseca@yale.edu,emir.ahmed@yale.edu"
-                        className="flex items-center gap-2 p-2 rounded-lg hover:bg-white/[0.06] transition-all text-gray-400 hover:text-white"
+                        className="flex items-center gap-2 p-2 rounded-lg hover:bg-black/[0.04] dark:hover:bg-white/[0.06] transition-all text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
                       >
                         <MessageCircleQuestionMark
                           className="text-purple-400"
@@ -1056,7 +1056,7 @@ export default function Home() {
                       <Link
                         href="https://coff.ee/filippofonseca"
                         target="_blank"
-                        className="flex items-center gap-2 p-2 rounded-lg hover:bg-white/[0.06] transition-all text-gray-400 hover:text-white"
+                        className="flex items-center gap-2 p-2 rounded-lg hover:bg-black/[0.04] dark:hover:bg-white/[0.06] transition-all text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
                       >
                         <FiCoffee className="text-amber-400" size={12} />
                         <span className="text-xs">Coffee</span>
@@ -1069,7 +1069,7 @@ export default function Home() {
                         setShowSettings(true);
                         setSidebarOpen(false);
                       }}
-                      className="w-full flex items-center gap-3 p-2.5 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.06] transition-all"
+                      className="w-full flex items-center gap-3 p-2.5 rounded-xl bg-black/[0.03] dark:bg-white/[0.04] hover:bg-black/[0.05] dark:hover:bg-white/[0.08] border border-black/[0.06] dark:border-white/[0.06] transition-all"
                     >
                       <UserAvatar
                         photoURL={user.photoURL}
@@ -1078,17 +1078,17 @@ export default function Home() {
                         size={32}
                       />
                       <div className="flex-1 text-left">
-                        <p className="text-sm text-white truncate">
+                        <p className="text-sm text-gray-900 dark:text-white truncate">
                           {user.displayName}
                         </p>
-                        <p className="text-xs text-gray-500 truncate">
+                        <p className="text-xs text-gray-400 dark:text-gray-500 truncate">
                           {user.email}
                         </p>
                       </div>
                     </button>
 
                     {/* Disclaimer */}
-                    <p className="text-[9px] text-gray-600 leading-tight px-1">
+                    <p className="text-[9px] text-gray-400 dark:text-gray-600 leading-tight px-1">
                       Student-built tool. Verify with your DUS. Not affiliated
                       with Yale.
                     </p>
@@ -1103,7 +1103,7 @@ export default function Home() {
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.2, duration: 0.5 }}
-            className="hidden lg:flex w-56 h-full flex-col justify-between p-4 rounded-3xl bg-gradient-to-br from-gray-900/70 via-gray-900/50 to-gray-950/70 backdrop-blur-xl border border-white/[0.08] shadow-[0_8px_32px_rgba(0,0,0,0.4),0_0_80px_rgba(59,130,246,0.06),inset_0_1px_0_rgba(255,255,255,0.1),inset_0_-1px_0_rgba(0,0,0,0.3)] ring-1 ring-white/[0.05] overflow-visible"
+            className="hidden lg:flex w-56 h-full flex-col justify-between p-4 rounded-3xl bg-gradient-to-br from-white/90 via-gray-50/80 to-white/70 dark:from-gray-900/70 dark:via-gray-900/50 dark:to-gray-950/70 backdrop-blur-xl border border-black/[0.06] dark:border-white/[0.08] shadow-[0_8px_32px_rgba(0,0,0,0.1),0_0_80px_rgba(59,130,246,0.04),inset_0_1px_0_rgba(255,255,255,0.8),inset_0_-1px_0_rgba(0,0,0,0.05)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.4),0_0_80px_rgba(59,130,246,0.06),inset_0_1px_0_rgba(255,255,255,0.1),inset_0_-1px_0_rgba(0,0,0,0.3)] ring-1 ring-black/[0.04] dark:ring-white/[0.05] overflow-visible"
           >
             {/* Navigation Items */}
             <nav className="space-y-1.5 flex-1 overflow-y-auto overflow-x-visible px-1">
@@ -1121,8 +1121,8 @@ export default function Home() {
                     }}
                     className={`w-full flex items-center justify-between px-4 py-3 text-left rounded-2xl transition-all duration-300 relative ${
                       activeTab === item.id
-                        ? "bg-gradient-to-br from-white/[0.12] via-white/[0.06] to-transparent text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.15),inset_0_-1px_0_rgba(0,0,0,0.2),0_4px_16px_rgba(0,0,0,0.3),0_0_0_1px_rgba(255,255,255,0.08)] backdrop-blur-sm border border-transparent"
-                        : "text-gray-400 hover:text-white hover:bg-white/[0.04] hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_4px_12px_rgba(0,0,0,0.15)]"
+                        ? "bg-gradient-to-br from-black/[0.08] via-black/[0.04] to-transparent dark:from-white/[0.12] dark:via-white/[0.06] dark:to-transparent text-gray-900 dark:text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.8),inset_0_-1px_0_rgba(0,0,0,0.05),0_4px_16px_rgba(0,0,0,0.08),0_0_0_1px_rgba(0,0,0,0.06)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.15),inset_0_-1px_0_rgba(0,0,0,0.2),0_4px_16px_rgba(0,0,0,0.3),0_0_0_1px_rgba(255,255,255,0.08)] backdrop-blur-sm border border-transparent"
+                        : "text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-black/[0.03] dark:hover:bg-white/[0.04] hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.6),0_4px_12px_rgba(0,0,0,0.06)] dark:hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_4px_12px_rgba(0,0,0,0.15)]"
                     }`}
                   >
                     <div className="flex items-center space-x-3">
@@ -1155,7 +1155,7 @@ export default function Home() {
                 .map((item) => (
                   <motion.button
                     key={item.id}
-                    className="w-full flex items-center justify-between px-4 py-3 text-left rounded-2xl transition-all duration-300 relative text-gray-600 cursor-not-allowed opacity-60"
+                    className="w-full flex items-center justify-between px-4 py-3 text-left rounded-2xl transition-all duration-300 relative text-gray-400 dark:text-gray-600 cursor-not-allowed opacity-60"
                     disabled
                   >
                     <div className="flex items-center space-x-3">
@@ -1174,7 +1174,7 @@ export default function Home() {
               {/* Subheader for disabled items (only shown when there are data-dependent disabled items) */}
               {navItems.some((item) => item.disabled && !item.comingSoon) && (
                 <div className="pt-3 pb-1 px-4">
-                  <p className="text-[9px] font-medium uppercase tracking-widest text-gray-600">
+                  <p className="text-[9px] font-medium uppercase tracking-widest text-gray-400 dark:text-gray-600">
                     After you upload courses:
                   </p>
                 </div>
@@ -1186,7 +1186,7 @@ export default function Home() {
                 .map((item) => (
                   <motion.button
                     key={item.id}
-                    className="w-full flex items-center justify-between px-4 py-3 text-left rounded-2xl transition-all duration-300 relative text-gray-600 cursor-not-allowed opacity-60"
+                    className="w-full flex items-center justify-between px-4 py-3 text-left rounded-2xl transition-all duration-300 relative text-gray-400 dark:text-gray-600 cursor-not-allowed opacity-60"
                     disabled
                   >
                     <div className="flex items-center space-x-3">
@@ -1207,13 +1207,13 @@ export default function Home() {
                 <motion.div
                   whileHover={{ y: -1, scale: 1.005 }}
                   whileTap={{ scale: 0.99 }}
-                  className="p-2 rounded-xl bg-gradient-to-br from-white/[0.08] via-transparent to-black/20 border border-white/[0.08] shadow-[0_8px_32px_rgba(0,0,0,0.4),0_0_60px_rgba(139,92,246,0.04),inset_0_1px_0_rgba(255,255,255,0.12),inset_0_-1px_0_rgba(0,0,0,0.3)] backdrop-blur-md"
+                  className="p-2 rounded-xl bg-gradient-to-br from-black/[0.04] via-transparent to-black/[0.06] dark:from-white/[0.08] dark:via-transparent dark:to-black/20 border border-black/[0.06] dark:border-white/[0.08] shadow-[0_8px_32px_rgba(0,0,0,0.06),0_0_60px_rgba(139,92,246,0.02),inset_0_1px_0_rgba(255,255,255,0.9),inset_0_-1px_0_rgba(0,0,0,0.04)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.4),0_0_60px_rgba(139,92,246,0.04),inset_0_1px_0_rgba(255,255,255,0.12),inset_0_-1px_0_rgba(0,0,0,0.3)] backdrop-blur-md"
                 >
                   <div className="flex flex-col space-y-1">
                     <Link
                       href="/mission"
                       target="_blank"
-                      className="w-full flex items-center space-x-2 p-1.5 rounded-lg hover:bg-white/[0.06] hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] transition-all duration-200 text-gray-400 hover:text-white"
+                      className="w-full flex items-center space-x-2 p-1.5 rounded-lg hover:bg-black/[0.04] dark:hover:bg-white/[0.06] hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.6)] dark:hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] transition-all duration-200 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
                     >
                       <div className="p-1 rounded-md bg-gradient-to-br from-emerald-500/20 to-emerald-900/30 border border-emerald-500/30 shadow-[inset_0_1px_0_rgba(255,255,255,0.1)] flex items-center justify-center">
                         <FaHeart
@@ -1226,7 +1226,7 @@ export default function Home() {
                     <Link
                       href="mailto:filippo.fonseca@yale.edu,emir.ahmed@yale.edu"
                       target="_blank"
-                      className="w-full flex items-center space-x-2 p-1.5 rounded-lg hover:bg-white/[0.06] hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] transition-all duration-200 text-gray-400 hover:text-white"
+                      className="w-full flex items-center space-x-2 p-1.5 rounded-lg hover:bg-black/[0.04] dark:hover:bg-white/[0.06] hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.6)] dark:hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] transition-all duration-200 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
                     >
                       <div className="p-1 rounded-md bg-gradient-to-br from-purple-500/20 to-purple-900/30 border border-purple-500/30 shadow-[inset_0_1px_0_rgba(255,255,255,0.1)] flex items-center justify-center">
                         <MessageCircleQuestionMark
@@ -1239,7 +1239,7 @@ export default function Home() {
                     <Link
                       href="/terms"
                       target="_blank"
-                      className="w-full flex items-center space-x-2 p-1.5 rounded-lg hover:bg-white/[0.06] hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] transition-all duration-200 text-gray-400 hover:text-white"
+                      className="w-full flex items-center space-x-2 p-1.5 rounded-lg hover:bg-black/[0.04] dark:hover:bg-white/[0.06] hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.6)] dark:hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] transition-all duration-200 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
                     >
                       <div className="p-1 rounded-md bg-gradient-to-br from-blue-500/20 to-blue-900/30 border border-blue-500/30 shadow-[inset_0_1px_0_rgba(255,255,255,0.1)] flex items-center justify-center">
                         <FiBook
@@ -1252,7 +1252,7 @@ export default function Home() {
                     <Link
                       href="https://coff.ee/filippofonseca"
                       target="_blank"
-                      className="w-full flex items-center space-x-2 p-1.5 rounded-lg hover:bg-white/[0.06] hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] transition-all duration-200 text-gray-400 hover:text-white"
+                      className="w-full flex items-center space-x-2 p-1.5 rounded-lg hover:bg-black/[0.04] dark:hover:bg-white/[0.06] hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.6)] dark:hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] transition-all duration-200 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
                     >
                       <div className="p-1 rounded-md bg-gradient-to-br from-amber-500/20 to-amber-900/30 border border-amber-500/30 shadow-[inset_0_1px_0_rgba(255,255,255,0.1)] flex items-center justify-center">
                         <FiCoffee
@@ -1267,7 +1267,7 @@ export default function Home() {
 
                 {/* Disclaimer Text */}
                 <div className="px-1 pb-1">
-                  <p className="text-[10px] text-gray-600 leading-tight text-justify">
+                  <p className="text-[10px] text-gray-400 dark:text-gray-600 leading-tight text-justify">
                     DegreeIntelligence is a student-built tool. Data may be
                     inaccurate. Verify with your DUS. NOT AFFILIATED AS A YALE
                     STUDENT GROUP.
@@ -1308,7 +1308,7 @@ export default function Home() {
                         <div className="flex items-center gap-2">
                           <button
                             onClick={() => setShowManualEntryModal(true)}
-                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gray-800/50 border border-gray-700/50 hover:border-pink-500/40 hover:bg-gray-800 text-gray-400 hover:text-pink-300 transition-all text-sm"
+                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gray-100 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700/50 hover:border-pink-500/40 hover:bg-gray-200 dark:hover:bg-gray-800 text-gray-500 dark:text-gray-400 hover:text-pink-600 dark:hover:text-pink-300 transition-all text-sm"
                             title="Add courses manually"
                           >
                             <FiPlus size={14} />
@@ -1316,7 +1316,7 @@ export default function Home() {
                           </button>
                           <button
                             onClick={() => setShowUpdateModal(true)}
-                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gray-800/50 border border-gray-700/50 hover:border-blue-500/40 hover:bg-gray-800 text-gray-400 hover:text-blue-300 transition-all text-sm"
+                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gray-100 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700/50 hover:border-blue-500/40 hover:bg-gray-200 dark:hover:bg-gray-800 text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-300 transition-all text-sm"
                           >
                             <FiRefreshCw size={14} />
                             <span className="hidden sm:inline">Re-upload</span>
@@ -1376,16 +1376,16 @@ export default function Home() {
                                   className="w-full flex items-center justify-between mb-3 group"
                                 >
                                   <div className="flex items-center gap-2">
-                                    <h3 className="text-base font-medium text-gray-700 dark:text-gray-300 group-hover:text-white transition-colors">
+                                    <h3 className="text-base font-medium text-gray-700 dark:text-gray-300 group-hover:text-gray-900 dark:group-hover:text-white transition-colors">
                                       {semester}
                                     </h3>
                                     {hasInProgress && (
-                                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-purple-500/20 border border-purple-500/30 text-purple-300">
+                                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-purple-500/20 border border-purple-500/30 text-purple-600 dark:text-purple-300">
                                         <span className="w-1 h-1 rounded-full bg-purple-400 animate-pulse" />
                                         In Progress
                                       </span>
                                     )}
-                                    <span className="text-xs text-gray-600">
+                                    <span className="text-xs text-gray-400 dark:text-gray-600">
                                       {semesterCourses.length} course
                                       {semesterCourses.length !== 1 ? "s" : ""}
                                     </span>
@@ -1393,7 +1393,7 @@ export default function Home() {
                                   <motion.div
                                     animate={{ rotate: isCollapsed ? 0 : 180 }}
                                     transition={{ duration: 0.2 }}
-                                    className="p-1 rounded-md text-gray-500 group-hover:text-gray-300 group-hover:bg-white/[0.05] transition-all"
+                                    className="p-1 rounded-md text-gray-500 group-hover:text-gray-700 dark:group-hover:text-gray-300 group-hover:bg-black/[0.04] dark:group-hover:bg-white/[0.05] transition-all"
                                   >
                                     <FiChevronDown size={16} />
                                   </motion.div>
@@ -1452,7 +1452,7 @@ export default function Home() {
                                                   <h4 className="font-medium text-gray-900 dark:text-white">
                                                     {course.code}
                                                     {course.skipped && (
-                                                      <span className="ml-2 text-xs text-gray-500">
+                                                      <span className="ml-2 text-xs text-gray-400 dark:text-gray-500">
                                                         (skipped)
                                                       </span>
                                                     )}
@@ -1489,7 +1489,7 @@ export default function Home() {
                                                           ? "In Progress"
                                                           : "Skipped"}
                                                     </span>
-                                                    <span className="text-xs text-gray-500">
+                                                    <span className="text-xs text-gray-400 dark:text-gray-500">
                                                       {course.credits} credit
                                                       {course.credits !== 1
                                                         ? "s"
@@ -1585,7 +1585,7 @@ export default function Home() {
                                                     >
                                                       <div className="mt-2 p-3 rounded-lg bg-gray-100 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700/50 space-y-2.5">
                                                         <div>
-                                                          <p className="text-[10px] text-gray-500 uppercase tracking-wider mb-1.5">
+                                                          <p className="text-[10px] text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-1.5">
                                                             Areas
                                                           </p>
                                                           <div className="flex flex-wrap gap-1.5">
@@ -1619,7 +1619,7 @@ export default function Home() {
                                                           </div>
                                                         </div>
                                                         <div>
-                                                          <p className="text-[10px] text-gray-500 uppercase tracking-wider mb-1.5">
+                                                          <p className="text-[10px] text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-1.5">
                                                             Skills
                                                           </p>
                                                           <div className="flex flex-wrap gap-1.5">
@@ -1653,7 +1653,7 @@ export default function Home() {
                                                           </div>
                                                         </div>
                                                         <div>
-                                                          <p className="text-[10px] text-gray-500 uppercase tracking-wider mb-1.5">
+                                                          <p className="text-[10px] text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-1.5">
                                                             Language
                                                           </p>
                                                           <div className="flex flex-wrap gap-1.5">
@@ -1716,7 +1716,7 @@ export default function Home() {
                                   ? "s"
                                   : ""}
                               </h3>
-                              <p className="text-sm text-gray-500">
+                              <p className="text-sm text-gray-400 dark:text-gray-500">
                                 You have indicated to us in the <i>My major</i>{" "}
                                 page that you qualify to "skip" these classes,
                                 which fulfill requirements.
@@ -1742,7 +1742,7 @@ export default function Home() {
                                           {getCourseNameFromCode(course.code)}
                                         </p>
                                         <div className="flex items-center mt-1 space-x-2">
-                                          <span className="text-xs text-gray-500">
+                                          <span className="text-xs text-gray-400 dark:text-gray-500">
                                             {course.credits} credit
                                             {course.credits !== 1 ? "s" : ""}
                                           </span>
@@ -1766,14 +1766,14 @@ export default function Home() {
                       </div>
 
                       {/* Data & Privacy Disclaimer */}
-                      <div className="mt-10 p-4 rounded-xl bg-gradient-to-br from-gray-900/40 via-gray-900/30 to-gray-950/40 border border-gray-800/50 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)]">
-                        <p className="text-[11px] text-gray-500 leading-relaxed">
-                          <span className="font-medium text-gray-400">
+                      <div className="mt-10 p-4 rounded-xl bg-gradient-to-br from-gray-100/80 via-gray-50/60 to-gray-100/80 dark:from-gray-900/40 dark:via-gray-900/30 dark:to-gray-950/40 border border-gray-200/80 dark:border-gray-800/50 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)]">
+                        <p className="text-[11px] text-gray-400 dark:text-gray-500 leading-relaxed">
+                          <span className="font-medium text-gray-600 dark:text-gray-400">
                             By using DegreeIntelligence, you voluntarily share
                             your grades.
                           </span>{" "}
                           Your transcript PDF is processed locally and is{" "}
-                          <span className="text-emerald-400/80">
+                          <span className="text-emerald-600 dark:text-emerald-400/80">
                             never stored
                           </span>{" "}
                           on our servers. However, we do store your course and
@@ -1786,13 +1786,13 @@ export default function Home() {
                           <Link
                             href="/terms"
                             target="_blank"
-                            className="text-blue-400 hover:text-blue-300 underline underline-offset-2"
+                            className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 underline underline-offset-2"
                           >
                             Read our full terms
                           </Link>
                           .
                         </p>
-                        <p className="text-[10px] text-gray-600 mt-2 leading-relaxed">
+                        <p className="text-[10px] text-gray-400 dark:text-gray-600 mt-2 leading-relaxed">
                           DegreeIntelligence is{" "}
                           <span className="font-medium">not affiliated</span> in
                           any way, shape, or form with Yale University, Yale
@@ -1810,7 +1810,7 @@ export default function Home() {
                         <h2 className="text-2xl font-medium text-gray-900 dark:text-white mb-2">
                           Let's get your courses loaded, {user?.displayName}.
                         </h2>
-                        <p className="text-gray-400 text-sm">
+                        <p className="text-gray-500 dark:text-gray-400 text-sm">
                           {isBrandNew
                             ? "After registration, we'll parse your classes and fill in grades when they post."
                             : "Upload your unofficial transcript to see your academic journey. We won't store the file."}
@@ -1819,8 +1819,8 @@ export default function Home() {
 
                       {/* Tutorial Steps */}
                       <div className="w-full max-w-xl mb-6">
-                        <div className="p-4 rounded-xl bg-gradient-to-br from-gray-900/60 via-gray-900/40 to-gray-950/60 backdrop-blur-md border border-gray-800/50 shadow-[inset_0_1px_0_rgba(255,255,255,0.04),0_4px_16px_rgba(0,0,0,0.25)]">
-                          <h3 className="text-sm font-medium text-gray-300 mb-3 flex items-center gap-2">
+                        <div className="p-4 rounded-xl bg-gradient-to-br from-gray-50/90 via-white/80 to-gray-100/90 dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 backdrop-blur-md border border-gray-200/80 dark:border-gray-800/50 shadow-[inset_0_1px_0_rgba(255,255,255,0.04),0_4px_16px_rgba(0,0,0,0.08)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.04),0_4px_16px_rgba(0,0,0,0.25)]">
+                          <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3 flex items-center gap-2">
                             <span className="p-1.5 rounded-lg bg-pink-500/10 border border-pink-500/20">
                               <Printer size={14} className="text-pink-400" />
                             </span>
@@ -1832,13 +1832,13 @@ export default function Home() {
                                 1
                               </div>
                               <div className="flex-1 pt-0.5">
-                                <p className="text-sm text-gray-300">
+                                <p className="text-sm text-gray-700 dark:text-gray-300">
                                   Go to{" "}
                                   <a
                                     href="https://yub.yale.edu"
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="text-pink-400 hover:text-pink-300 underline underline-offset-2"
+                                    className="text-pink-600 dark:text-pink-400 hover:text-pink-700 dark:hover:text-pink-300 underline underline-offset-2"
                                   >
                                     Yale Hub
                                   </a>{" "}
@@ -1851,13 +1851,13 @@ export default function Home() {
                                 2
                               </div>
                               <div className="flex-1 pt-0.5">
-                                <p className="text-sm text-gray-300">
+                                <p className="text-sm text-gray-700 dark:text-gray-300">
                                   Navigate to{" "}
-                                  <span className="px-1.5 py-0.5 rounded bg-gray-800/60 border border-gray-700/50 text-gray-200 font-mono text-xs">
+                                  <span className="px-1.5 py-0.5 rounded bg-gray-100 dark:bg-gray-800/60 border border-gray-300 dark:border-gray-700/50 text-gray-800 dark:text-gray-200 font-mono text-xs">
                                     Academics
                                   </span>{" "}
                                   →{" "}
-                                  <span className="px-1.5 py-0.5 rounded bg-gray-800/60 border border-gray-700/50 text-gray-200 font-mono text-xs">
+                                  <span className="px-1.5 py-0.5 rounded bg-gray-100 dark:bg-gray-800/60 border border-gray-300 dark:border-gray-700/50 text-gray-800 dark:text-gray-200 font-mono text-xs">
                                     Unofficial Transcript
                                   </span>
                                 </p>
@@ -1868,9 +1868,9 @@ export default function Home() {
                                 3
                               </div>
                               <div className="flex-1 pt-0.5">
-                                <p className="text-sm text-gray-300">
+                                <p className="text-sm text-gray-700 dark:text-gray-300">
                                   Click{" "}
-                                  <span className="px-1.5 py-0.5 rounded bg-blue-500/20 border border-blue-500/30 text-blue-300 font-medium text-xs">
+                                  <span className="px-1.5 py-0.5 rounded bg-blue-500/20 border border-blue-500/30 text-blue-600 dark:text-blue-300 font-medium text-xs">
                                     Print
                                   </span>{" "}
                                   and save as PDF. Then upload it here.
@@ -1884,7 +1884,7 @@ export default function Home() {
                       {/* Upload Area */}
                       <div
                         id="upload-transcript"
-                        className="w-full max-w-xl p-6 rounded-xl bg-gradient-to-br from-gray-900/60 via-gray-900/40 to-gray-950/60 backdrop-blur-md border border-gray-800/50 shadow-[inset_0_1px_0_rgba(255,255,255,0.04),0_4px_16px_rgba(0,0,0,0.25)]"
+                        className="w-full max-w-xl p-6 rounded-xl bg-gradient-to-br from-gray-50/90 via-white/80 to-gray-100/90 dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 backdrop-blur-md border border-gray-200/80 dark:border-gray-800/50 shadow-[inset_0_1px_0_rgba(255,255,255,0.04),0_4px_16px_rgba(0,0,0,0.08)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.04),0_4px_16px_rgba(0,0,0,0.25)]"
                       >
                         <FileUpload onSuccess={parseAndStoreCourses} />
                       </div>
@@ -1895,7 +1895,7 @@ export default function Home() {
                           Prefer to type in your courses manually?{" "}
                           <button
                             onClick={() => setShowManualEntryModal(true)}
-                            className="text-pink-400 hover:text-pink-300 underline underline-offset-2 transition-colors"
+                            className="text-pink-600 dark:text-pink-400 hover:text-pink-700 dark:hover:text-pink-300 underline underline-offset-2 transition-colors"
                           >
                             Click here
                           </button>
@@ -1904,7 +1904,7 @@ export default function Home() {
                       </div>
 
                       {/* Data & Privacy Disclaimer */}
-                      <div className="w-full max-w-xl mt-5 p-4 rounded-xl bg-gradient-to-br from-gray-900/40 via-gray-900/30 to-gray-950/40 border border-gray-800/50 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)]">
+                      <div className="w-full max-w-xl mt-5 p-4 rounded-xl bg-gradient-to-br from-gray-100/80 via-gray-50/60 to-gray-100/80 dark:from-gray-900/40 dark:via-gray-900/30 dark:to-gray-950/40 border border-gray-200/80 dark:border-gray-800/50 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)]">
                         <div className="flex items-start gap-3">
                           <div className="p-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20 shrink-0 mt-0.5">
                             <svg
@@ -1922,12 +1922,12 @@ export default function Home() {
                             </svg>
                           </div>
                           <div>
-                            <p className="text-[11px] text-gray-400 leading-relaxed">
-                              <span className="font-medium text-gray-300">
+                            <p className="text-[11px] text-gray-500 dark:text-gray-400 leading-relaxed">
+                              <span className="font-medium text-gray-700 dark:text-gray-300">
                                 By uploading, you voluntarily share your grades.
                               </span>{" "}
                               Your transcript PDF is processed locally and is{" "}
-                              <span className="text-emerald-400">
+                              <span className="text-emerald-600 dark:text-emerald-400">
                                 never stored
                               </span>{" "}
                               on our servers. However, we store your course and
@@ -1946,7 +1946,7 @@ export default function Home() {
                               </Link>
                               .
                             </p>
-                            <p className="text-[10px] text-gray-600 mt-2 leading-relaxed">
+                            <p className="text-[10px] text-gray-400 dark:text-gray-600 mt-2 leading-relaxed">
                               DegreeIntelligence is{" "}
                               <span className="font-medium">
                                 not affiliated
@@ -2085,7 +2085,7 @@ export default function Home() {
                               className={`px-3 py-1.5 rounded-xl text-sm transition-all duration-200 ${
                                 selectedMajor === major
                                   ? "bg-gradient-to-br from-blue-500/20 via-blue-600/15 to-purple-500/20 text-blue-200 border border-blue-500/40 shadow-[inset_0_1px_0_rgba(255,255,255,0.1),0_2px_8px_rgba(59,130,246,0.15)]"
-                                  : "bg-gray-900/40 text-gray-400 border border-gray-800/60 hover:border-gray-700 hover:bg-gray-800/50 hover:text-gray-300 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)]"
+                                  : "bg-gray-50 dark:bg-gray-900/40 text-gray-500 dark:text-gray-400 border border-gray-200 dark:border-gray-800/60 hover:border-gray-300 dark:hover:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800/50 hover:text-gray-700 dark:hover:text-gray-300 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)]"
                               }`}
                             >
                               {major} - {MAJORS[major] || major}
@@ -2112,8 +2112,8 @@ export default function Home() {
                                   }
                                   className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs transition-all duration-200 ${
                                     isWarning
-                                      ? "bg-amber-900/30 text-amber-300 border border-amber-600/40 hover:border-amber-500/60"
-                                      : "bg-emerald-900/30 text-emerald-300 border border-emerald-600/40 hover:border-emerald-500/60"
+                                      ? "bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 border border-amber-400/60 dark:border-amber-600/40 hover:border-amber-500/60"
+                                      : "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 border border-emerald-400/60 dark:border-emerald-600/40 hover:border-emerald-500/60"
                                   }`}
                                 >
                                   {isWarning ? (
@@ -2139,17 +2139,17 @@ export default function Home() {
                                       initial={{ opacity: 0, y: -5 }}
                                       animate={{ opacity: 1, y: 0 }}
                                       exit={{ opacity: 0, y: -5 }}
-                                      className="absolute top-full left-0 mt-2 z-50 w-80 max-h-80 overflow-y-auto rounded-xl bg-gray-900/95 backdrop-blur-xl border border-gray-700/50 shadow-[0_8px_32px_rgba(0,0,0,0.4)] p-3"
+                                      className="absolute top-full left-0 mt-2 z-50 w-80 max-h-80 overflow-y-auto rounded-xl bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl border border-gray-200 dark:border-gray-700/50 shadow-[0_8px_32px_rgba(0,0,0,0.15)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.4)] p-3"
                                     >
                                       <div className="flex items-center justify-between mb-2">
-                                        <h4 className="text-xs font-medium text-gray-300 uppercase tracking-wider">
+                                        <h4 className="text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider">
                                           Shared Courses
                                         </h4>
                                         <button
                                           onClick={() =>
                                             setShowSharedCoursesDropdown(false)
                                           }
-                                          className="text-gray-500 hover:text-gray-300"
+                                          className="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
                                         >
                                           <FiX size={14} />
                                         </button>
@@ -2158,13 +2158,13 @@ export default function Home() {
                                       {!hasShared ? (
                                         <div className="text-center py-4">
                                           <FiCheck
-                                            className="mx-auto text-emerald-400 mb-2"
+                                            className="mx-auto text-emerald-600 dark:text-emerald-400 mb-2"
                                             size={24}
                                           />
-                                          <p className="text-sm text-emerald-300 font-medium">
+                                          <p className="text-sm text-emerald-600 dark:text-emerald-300 font-medium">
                                             All clear!
                                           </p>
-                                          <p className="text-xs text-gray-500 mt-1">
+                                          <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
                                             No courses are counting toward
                                             multiple majors.
                                           </p>
@@ -2174,8 +2174,8 @@ export default function Home() {
                                           <div
                                             className={`text-xs mb-3 p-2 rounded-lg ${
                                               isWarning
-                                                ? "bg-amber-900/20 text-amber-300 border border-amber-700/30"
-                                                : "bg-emerald-900/20 text-emerald-300 border border-emerald-700/30"
+                                                ? "bg-amber-100 dark:bg-amber-900/20 text-amber-700 dark:text-amber-300 border border-amber-300 dark:border-amber-700/30"
+                                                : "bg-emerald-100 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-700/30"
                                             }`}
                                           >
                                             {isWarning ? (
@@ -2196,7 +2196,7 @@ export default function Home() {
                                               </>
                                             )}
                                           </div>
-                                          <p className="text-[10px] text-gray-600 mb-3 italic">
+                                          <p className="text-[10px] text-gray-400 dark:text-gray-600 mb-3 italic">
                                             Note: Pre-requisites don&apos;t
                                             count toward the 2-credit overlap
                                             limit. Check manually! We're just
@@ -2207,13 +2207,13 @@ export default function Home() {
                                             {sharedCourses.map((course) => (
                                               <div
                                                 key={course.code}
-                                                className="p-2 rounded-lg bg-gray-800/50 border border-gray-700/30"
+                                                className="p-2 rounded-lg bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700/30"
                                               >
                                                 <div className="flex items-center justify-between mb-1">
-                                                  <span className="text-sm font-medium text-gray-200">
+                                                  <span className="text-sm font-medium text-gray-800 dark:text-gray-200">
                                                     {course.code}
                                                   </span>
-                                                  <span className="text-[10px] text-gray-500">
+                                                  <span className="text-[10px] text-gray-400 dark:text-gray-500">
                                                     {course.credits} cr
                                                   </span>
                                                 </div>
@@ -2223,10 +2223,10 @@ export default function Home() {
                                                       key={m.majorId}
                                                       className="text-[11px]"
                                                     >
-                                                      <span className="text-purple-300">
+                                                      <span className="text-purple-600 dark:text-purple-300">
                                                         {m.majorName}:
                                                       </span>{" "}
-                                                      <span className="text-gray-400">
+                                                      <span className="text-gray-500 dark:text-gray-400">
                                                         {m.requirements.join(
                                                           ", ",
                                                         ) || "General"}
@@ -2257,7 +2257,7 @@ export default function Home() {
                     />
                   ) : (
                     <div className="flex flex-col items-center justify-center py-16 text-center">
-                      <p className="text-gray-400 text-lg">
+                      <p className="text-gray-500 dark:text-gray-400 text-lg">
                         {!selectedMajor
                           ? "Please select a major to view your progress."
                           : "Loading your major progress..."}

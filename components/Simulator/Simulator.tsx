@@ -138,6 +138,7 @@ export default function Simulator({
   >(null);
   const [hasChanges, setHasChanges] = useState(false);
   const [showPool, setShowPool] = useState(false);
+  const [showMajorPreview, setShowMajorPreview] = useState(true);
   // Plan selector modal shown on initial load
   const [showPlanSelector, setShowPlanSelector] = useState(false);
   const [plansLoaded, setPlansLoaded] = useState(false);
@@ -890,36 +891,64 @@ export default function Simulator({
 
       {/* Live Major Progress Preview */}
       <div className="space-y-3">
-        <div>
-          <h3 className="text-lg font-medium text-gray-900 dark:text-white">
-            Major progress
-          </h3>
-          <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
-            Live preview — reflects completed, in-progress, and courses placed
-            on the grid.
-          </p>
-        </div>
+        <button
+          onClick={() => setShowMajorPreview((v) => !v)}
+          className="w-full flex items-start justify-between text-left group"
+          aria-expanded={showMajorPreview}
+        >
+          <div>
+            <h3 className="text-lg font-medium text-gray-900 dark:text-white">
+              Progress toward {majorIds.length > 1 ? "majors" : "major"}
+            </h3>
+            <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
+              Live preview — reflects completed, in-progress, and courses placed
+              on the grid.
+            </p>
+          </div>
+          <FiChevronDown
+            className={`mt-1 shrink-0 text-gray-400 dark:text-gray-500 transition-transform ${
+              showMajorPreview ? "rotate-180" : ""
+            }`}
+            size={18}
+          />
+        </button>
 
-        {isPreviewLoading && (
-          <div className="text-sm text-gray-500 dark:text-gray-400">Updating preview…</div>
-        )}
-        {previewError && (
-          <div className="text-sm text-red-600 dark:text-red-300">{previewError}</div>
-        )}
+        <AnimatePresence initial={false}>
+          {showMajorPreview && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: "auto", opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.25, ease: "easeInOut" }}
+              className="overflow-hidden space-y-3"
+            >
+              {isPreviewLoading && (
+                <div className="text-sm text-gray-500 dark:text-gray-400">
+                  Updating preview…
+                </div>
+              )}
+              {previewError && (
+                <div className="text-sm text-red-600 dark:text-red-300">
+                  {previewError}
+                </div>
+              )}
 
-        <SimulatorRequirementsBreakdown
-          majorIds={majorIds}
-          previewProgress={previewProgress}
-          plannedCodes={plannedCodes}
-          simulatorManualReqs={simulatorManualReqs}
-          onRemoveManualReq={(code, requirement) => {
-            setSimulatorManualReqs((prev) =>
-              prev.filter(
-                (m) => !(m.code === code && m.requirement === requirement),
-              ),
-            );
-          }}
-        />
+              <SimulatorRequirementsBreakdown
+                majorIds={majorIds}
+                previewProgress={previewProgress}
+                plannedCodes={plannedCodes}
+                simulatorManualReqs={simulatorManualReqs}
+                onRemoveManualReq={(code, requirement) => {
+                  setSimulatorManualReqs((prev) =>
+                    prev.filter(
+                      (m) => !(m.code === code && m.requirement === requirement),
+                    ),
+                  );
+                }}
+              />
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
 
       {/* Available Courses Pool */}

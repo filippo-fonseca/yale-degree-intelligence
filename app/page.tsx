@@ -2350,15 +2350,29 @@ export default function Home() {
                                           )}
 
                                           <div className="space-y-2">
-                                            {sharedCourses.map((course) => (
-                                              <div
-                                                key={course.code}
-                                                className={`p-2 rounded-lg border transition-all ${
-                                                  course.isPrereqOverride
-                                                    ? "bg-emerald-50/60 dark:bg-emerald-900/10 border-emerald-300/60 dark:border-emerald-700/30"
-                                                    : "bg-gray-50 dark:bg-gray-800/50 border-gray-200 dark:border-gray-700/30"
-                                                }`}
-                                              >
+                                            {sharedCourses.map((course, idx) => {
+                                              const showPrereqHeader =
+                                                course.isPrereqOverride &&
+                                                (idx === 0 ||
+                                                  !sharedCourses[idx - 1]
+                                                    .isPrereqOverride);
+                                              return (
+                                                <div key={course.code}>
+                                                  {showPrereqHeader && (
+                                                    <div className="flex items-center gap-2 pt-1 pb-1.5">
+                                                      <span className="text-[10px] font-medium uppercase tracking-wider text-emerald-600 dark:text-emerald-400 whitespace-nowrap">
+                                                        Marked as prerequisites
+                                                      </span>
+                                                      <div className="flex-1 h-px bg-emerald-300/50 dark:bg-emerald-700/30" />
+                                                    </div>
+                                                  )}
+                                                  <div
+                                                    className={`p-2 rounded-lg border transition-all ${
+                                                      course.isPrereqOverride
+                                                        ? "bg-emerald-50/60 dark:bg-emerald-900/10 border-emerald-300/60 dark:border-emerald-700/30"
+                                                        : "bg-gray-50 dark:bg-gray-800/50 border-gray-200 dark:border-gray-700/30"
+                                                    }`}
+                                                  >
                                                 <div className="flex items-center justify-between mb-1">
                                                   <span
                                                     className={`text-sm font-medium ${
@@ -2414,8 +2428,10 @@ export default function Home() {
                                                     </>
                                                   )}
                                                 </button>
-                                              </div>
-                                            ))}
+                                                  </div>
+                                                </div>
+                                              );
+                                            })}
                                           </div>
                                         </>
                                       )}

@@ -531,7 +531,7 @@ export default function MajorSelectionFlow({
                   className="bg-white dark:bg-gray-900/80 border border-gray-300 dark:border-white/[0.08] hover:border-gray-400 dark:hover:border-white/[0.12] focus:border-pink-500/50 rounded-xl px-5 sm:px-6 py-3 sm:py-4 w-32 sm:w-36 text-center text-xl sm:text-2xl font-medium focus:outline-none focus:ring-1 focus:ring-pink-500/30 text-gray-900 dark:text-gray-100 transition-all shadow-[inset_0_2px_4px_rgba(0,0,0,0.3),0_4px_12px_rgba(0,0,0,0.2)] appearance-none cursor-pointer"
                   style={{ textAlignLast: "center" }}
                 >
-                  {[2026, 2027, 2028, 2029, 2030].map((year) => (
+                  {[2027, 2028, 2029, 2030, 2031].map((year) => (
                     <option key={year} value={year.toString()}>
                       {year}
                     </option>
@@ -542,11 +542,11 @@ export default function MajorSelectionFlow({
                 </div>
                 <div className="absolute -bottom-6 sm:-bottom-7 left-1/2 -translate-x-1/2">
                   <span className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 px-2 py-0.5 rounded-full bg-black/[0.04] dark:bg-white/[0.04] border border-black/[0.06] dark:border-white/[0.06] whitespace-nowrap">
-                    {parseInt(graduationYear) === 2029 && "Freshman"}
-                    {parseInt(graduationYear) === 2028 && "Sophomore"}
-                    {parseInt(graduationYear) === 2027 && "Junior"}
-                    {parseInt(graduationYear) === 2026 && "Senior"}
-                    {![2026, 2027, 2028, 2029].includes(
+                    {parseInt(graduationYear) === 2030 && "Freshman"}
+                    {parseInt(graduationYear) === 2029 && "Sophomore"}
+                    {parseInt(graduationYear) === 2028 && "Junior"}
+                    {parseInt(graduationYear) === 2027 && "Senior"}
+                    {![2027, 2028, 2029, 2030].includes(
                       parseInt(graduationYear),
                     ) && `Class of ${graduationYear}`}
                   </span>

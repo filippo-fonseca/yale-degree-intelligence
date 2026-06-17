@@ -97,7 +97,7 @@ export default function Home() {
   const [sidebarHovered, setSidebarHovered] = useState(false);
   const sidebarExpanded = sidebarPinned || sidebarHovered;
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
-  const isBrandNew = userProfile?.graduationYear === 2029;
+  const isBrandNew = userProfile?.graduationYear === 2030;
 
   // NEW: state for confirming deletion of an in-progress course
   const [confirmDelete, setConfirmDelete] = useState<{

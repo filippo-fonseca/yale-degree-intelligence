@@ -128,11 +128,11 @@ export default function UserSettingsModal({
 
   const getYearStatus = (graduationYear: number): string => {
     // Direct mapping based on graduation year
-    if (graduationYear >= 2030) return "High School";
-    if (graduationYear === 2029) return "Freshman";
-    if (graduationYear === 2028) return "Sophomore";
-    if (graduationYear === 2027) return "Junior";
-    if (graduationYear <= 2026) return "Senior";
+    if (graduationYear >= 2031) return "High School";
+    if (graduationYear === 2030) return "Freshman";
+    if (graduationYear === 2029) return "Sophomore";
+    if (graduationYear === 2028) return "Junior";
+    if (graduationYear <= 2027) return "Senior";
     return "Unknown";
   };
 
@@ -377,15 +377,15 @@ export default function UserSettingsModal({
                 aria-checked={isDark}
                 aria-label="Toggle dark mode"
                 onClick={toggleTheme}
-                className={`relative inline-flex w-9 h-5 rounded-full border transition-colors duration-200 ${
+                className={`relative inline-flex w-11 h-6 rounded-full transition-colors duration-200 ${
                   isDark
-                    ? "bg-gradient-to-r from-indigo-500 to-purple-600 border-white/[0.08]"
-                    : "bg-gray-300 border-black/[0.06]"
+                    ? "bg-gradient-to-r from-indigo-500 to-purple-600 shadow-[inset_0_1px_2px_rgba(0,0,0,0.35)]"
+                    : "bg-gray-300 shadow-[inset_0_1px_3px_rgba(0,0,0,0.22)]"
                 }`}
               >
                 <span
-                  className={`absolute top-[2px] left-[2px] h-4 w-4 rounded-full bg-gradient-to-br from-white to-gray-200 shadow-[0_1px_4px_rgba(0,0,0,0.3)] transition-transform duration-200 ${
-                    isDark ? "translate-x-4" : "translate-x-0"
+                  className={`absolute top-[3px] left-[3px] h-[18px] w-[18px] rounded-full bg-white shadow-[0_1px_3px_rgba(0,0,0,0.45)] transition-transform duration-200 ${
+                    isDark ? "translate-x-5" : "translate-x-0"
                   }`}
                 />
               </button>
@@ -422,7 +422,7 @@ export default function UserSettingsModal({
                   }}
                   className="sr-only peer"
                 />
-                <div className="w-9 h-5 bg-gray-300 dark:bg-gray-800/80 border border-black/[0.06] dark:border-white/[0.08] peer-focus:outline-none peer-focus:ring-1 peer-focus:ring-pink-500/50 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-gradient-to-br after:from-white after:to-gray-200 after:rounded-full after:h-4 after:w-4 after:transition-all after:shadow-[0_1px_4px_rgba(0,0,0,0.3)] peer-checked:bg-gradient-to-r peer-checked:from-pink-500 peer-checked:to-purple-600 peer-disabled:opacity-50 shadow-[inset_0_1px_2px_rgba(0,0,0,0.3)]"></div>
+                <div className="w-11 h-6 rounded-full peer transition-colors bg-gray-300 dark:bg-gray-600 shadow-[inset_0_1px_3px_rgba(0,0,0,0.22)] dark:shadow-[inset_0_1px_3px_rgba(0,0,0,0.5)] peer-focus:ring-2 peer-focus:ring-pink-500/40 peer-checked:bg-gradient-to-r peer-checked:from-pink-500 peer-checked:to-purple-600 peer-disabled:opacity-50 after:content-[''] after:absolute after:top-[3px] after:left-[3px] after:h-[18px] after:w-[18px] after:rounded-full after:bg-white after:shadow-[0_1px_3px_rgba(0,0,0,0.45)] after:transition-transform peer-checked:after:translate-x-5"></div>
               </label>
             </div>
             {friendsEnabled && (
@@ -571,7 +571,7 @@ export default function UserSettingsModal({
                 }
                 className="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-pink-500/40 focus:border-pink-500/50 text-gray-900 dark:text-gray-200 text-xs transition-all duration-200 appearance-none cursor-pointer"
               >
-                {[2026, 2027, 2028, 2029, 2030].map((year) => (
+                {[2027, 2028, 2029, 2030, 2031].map((year) => (
                   <option key={year} value={year}>
                     {year}
                   </option>

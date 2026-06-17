@@ -202,7 +202,7 @@ const DistributionalsView = ({ courses }: { courses: Course[] }) => {
             initial={{ width: 0 }}
             animate={{ width: `${(totalCompleted / 10) * 100}%` }}
             transition={{ duration: 0.8, ease: "easeOut" }}
-            className="h-full rounded-full bg-gradient-to-r from-blue-500 to-purple-500"
+            className="h-full rounded-full bg-gradient-to-r from-purple-500 to-purple-600"
           />
         </div>
       </div>

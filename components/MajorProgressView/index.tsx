@@ -712,7 +712,7 @@ export default function MajorProgressView({
               }%`,
             }}
             transition={{ duration: 1, ease: "easeOut" }}
-            className="h-1.5 rounded-full bg-gradient-to-r from-blue-400 to-purple-500 shadow-[0_0_8px_rgba(96,165,250,0.3)]"
+            className="h-1.5 rounded-full bg-gradient-to-r from-purple-500 to-purple-600 shadow-[0_0_8px_rgba(168,85,247,0.45)]"
           />
         </div>
 

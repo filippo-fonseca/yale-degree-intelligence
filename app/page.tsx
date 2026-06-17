@@ -1,6 +1,7 @@
 "use client";
 
 import { useAuth } from "@/context/AuthContext";
+import { useTheme } from "@/context/ThemeContext";
 import FileUpload from "@/components/file-upload";
 import { useEffect, useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -18,6 +19,8 @@ import {
   FiAlertTriangle,
   FiCheck,
   FiPlus,
+  FiSun,
+  FiMoon,
 } from "react-icons/fi";
 import {
   collection,
@@ -50,7 +53,7 @@ import { RiProgress3Fill } from "react-icons/ri";
 import CompoundLogo from "@/components/ui/CompoundLogo";
 import { getCourseNameFromCode } from "@/lib/courseCatalog";
 import DistributionalsView from "@/components/DistributionalProgress";
-import { FaBuildingCircleCheck, FaHeart, FaYoutube } from "react-icons/fa6";
+import { FaBuildingCircleCheck, FaHeart } from "react-icons/fa6";
 import CustomLoader from "@/components/ui/CustomLoader";
 import UserSettingsModal from "@/components/UserSettingsModal/UserSettingsModal";
 import Link from "next/link";
@@ -78,6 +81,7 @@ interface UserProfile {
 
 export default function Home() {
   const { user, loading, logout } = useAuth();
+  const { resolvedTheme, toggleTheme } = useTheme();
   const [courses, setCourses] = useState<Course[]>([]);
   const [hasData, setHasData] = useState(false);
   const [selectedMajor, setSelectedMajor] = useState<string>("");
@@ -203,7 +207,7 @@ export default function Home() {
     {
       id: "major",
       icon: RiProgress3Fill,
-      label: "My major",
+      label: (userProfile?.majors?.length ?? 0) > 1 ? "My majors" : "My major",
       // badge: "2029 can use!",
     },
     {
@@ -955,17 +959,22 @@ export default function Home() {
           </div>
 
           <div className="flex items-center gap-2 lg:gap-3">
-            <a
-              href="https://youtu.be/5H1kjMWQfgs"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hidden lg:inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] rounded-full border border-emerald-300 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-100 dark:hover:bg-emerald-900/50 hover:border-emerald-400 dark:hover:border-emerald-700 transition-all cursor-pointer"
-              title="Watch our launch video!"
+            <button
+              onClick={toggleTheme}
+              className="p-1.5 lg:p-2 rounded-xl hover:bg-black/[0.04] dark:hover:bg-white/[0.06] transition-all border border-black/[0.06] dark:border-white/[0.08] hover:border-black/[0.09] dark:hover:border-white/[0.12] text-gray-600 dark:text-gray-300"
+              title={
+                resolvedTheme === "dark"
+                  ? "Switch to light mode"
+                  : "Switch to dark mode"
+              }
+              aria-label="Toggle theme"
             >
-              <FaYoutube className="text-red-500" size={14} />
-              <strong>Feb 2026 - v2 LAUNCH VID:</strong> We&apos;ve made massive
-              updates!
-            </a>
+              {resolvedTheme === "dark" ? (
+                <FiSun size={16} />
+              ) : (
+                <FiMoon size={16} />
+              )}
+            </button>
 
             <button
               onClick={() => setShowSettings(true)}

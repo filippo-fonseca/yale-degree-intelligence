@@ -192,7 +192,7 @@ export default function SimulatorRequirementsBreakdown({
         return (
           <div
             key={majorId}
-            className="rounded-xl bg-white dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 border border-gray-200 dark:border-gray-800/50 overflow-hidden shadow-[inset_0_1px_0_rgba(255,255,255,0.04),0_4px_12px_rgba(0,0,0,0.1)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.04),0_4px_12px_rgba(0,0,0,0.2)] backdrop-blur-md"
+            className="rounded-xl bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 border border-gray-200 dark:border-gray-800/50 overflow-hidden shadow-[inset_0_1px_0_rgba(255,255,255,0.04),0_4px_12px_rgba(0,0,0,0.1)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.04),0_4px_12px_rgba(0,0,0,0.2)] backdrop-blur-md"
           >
             {/* Collapsed header */}
             <button
@@ -422,19 +422,19 @@ function ReqSection({
                     if (opt.completed && !opt.manual) {
                       // Completed from transcript (green)
                       pillCls =
-                        "bg-emerald-900/20 text-emerald-300 border-emerald-800/50";
+                        "bg-emerald-100 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-300 border-emerald-300 dark:border-emerald-800/50";
                     } else if (opt.completed && opt.manual) {
                       // Permanent manual from My Major (purple)
                       pillCls =
-                        "bg-purple-900/20 text-purple-300 border-purple-800/50";
+                        "bg-purple-100 dark:bg-purple-900/20 text-purple-700 dark:text-purple-300 border-purple-300 dark:border-purple-800/50";
                     } else if (planned) {
                       // Planned (amber) - includes simulator manuals
                       pillCls =
-                        "bg-amber-900/20 text-amber-300 border-amber-800/50";
+                        "bg-amber-100 dark:bg-amber-900/20 text-amber-700 dark:text-amber-300 border-amber-300 dark:border-amber-800/50";
                     } else {
                       // Real in-progress from transcript (blue)
                       pillCls =
-                        "bg-blue-900/20 text-blue-300 border-blue-800/50";
+                        "bg-blue-100 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 border-blue-300 dark:border-blue-800/50";
                     }
 
                     // Check if this is a simulator manual (so we can show remove button)

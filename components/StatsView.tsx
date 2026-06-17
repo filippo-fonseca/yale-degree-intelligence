@@ -476,7 +476,7 @@ function StatCard({
   return (
     <motion.div
       whileHover={{ y: -2 }}
-      className="p-4 rounded-2xl bg-white/60 dark:bg-white/[0.04] backdrop-blur-xl border border-black/[0.06] dark:border-white/[0.08] hover:border-black/[0.1] dark:hover:border-white/[0.14] ring-1 ring-black/[0.02] dark:ring-white/[0.04] shadow-[0_4px_24px_-10px_rgba(0,0,0,0.15)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.45)] transition-all"
+      className="p-4 rounded-xl bg-gray-100/50 dark:bg-gray-900/50 backdrop-blur-sm border border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700 transition-all shadow-sm dark:shadow-none"
     >
       <div className="flex items-center justify-between">
         <p className="text-xs text-gray-600 dark:text-gray-400">{label}</p>
@@ -524,7 +524,7 @@ function ChartBox({
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="p-4 rounded-2xl bg-white/60 dark:bg-white/[0.04] backdrop-blur-xl border border-black/[0.06] dark:border-white/[0.08] ring-1 ring-black/[0.02] dark:ring-white/[0.05] shadow-[0_4px_24px_-10px_rgba(0,0,0,0.12)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.4)]"
+      className="p-4 rounded-xl bg-gray-100/50 dark:bg-gray-900/50 backdrop-blur-sm border border-gray-200 dark:border-gray-800 shadow-sm dark:shadow-none"
     >
       <div className="flex items-start justify-between mb-3">
         <div>

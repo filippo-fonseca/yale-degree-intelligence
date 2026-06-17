@@ -209,7 +209,7 @@ export default function ManualCourseLookupModal({
                       </div>
                     </div>
                     <button
-                      className="flex items-center gap-1 px-3 py-1.5 bg-pink-900/60 text-pink-200 rounded-lg border border-pink-800 hover:bg-pink-800 hover:text-white transition"
+                      className="flex items-center gap-1 px-3 py-1.5 bg-pink-100 dark:bg-pink-900/60 text-pink-700 dark:text-pink-200 rounded-lg border border-pink-300 dark:border-pink-800 hover:bg-pink-200 dark:hover:bg-pink-800 hover:text-pink-900 dark:hover:text-white transition"
                       onClick={() => {
                         onSelect({
                           id: `${c.canonicalCode}-manual-${Date.now()}`,

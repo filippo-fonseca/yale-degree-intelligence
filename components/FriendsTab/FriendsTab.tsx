@@ -105,7 +105,7 @@ const Skeleton = ({ className = "" }: { className?: string }) => (
 );
 
 const FriendRowSkeleton = () => (
-  <div className="flex items-center justify-between p-3 rounded-xl bg-gray-50 dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 border border-gray-200 dark:border-gray-800/50">
+  <div className="flex items-center justify-between p-3 rounded-xl bg-gray-50 dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 border border-gray-200 dark:border-gray-800/50">
     <div className="flex gap-3">
       <Skeleton className="h-9 w-9 rounded-full" />
       <div className="space-y-1.5">
@@ -596,7 +596,7 @@ export default function FriendsTab({
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-6">
               {/* Incoming Requests */}
               {incomingRequests.length > 0 && (
-                <div className="p-3 rounded-xl bg-gray-50 dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 backdrop-blur-md border border-gray-200 dark:border-gray-800/50 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]">
+                <div className="p-3 rounded-xl bg-gray-50 dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 backdrop-blur-md border border-gray-200 dark:border-gray-800/50 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]">
                   <h3 className="text-xs font-medium text-gray-700 dark:text-gray-300 mb-2 flex items-center gap-1.5">
                     <FiMail size={12} /> Incoming Requests (
                     {incomingRequests.length})
@@ -646,7 +646,7 @@ export default function FriendsTab({
 
               {/* Sent Requests */}
               {sentRequests.length > 0 && (
-                <div className="p-3 rounded-xl bg-gray-50 dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 backdrop-blur-md border border-gray-200 dark:border-gray-800/50 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]">
+                <div className="p-3 rounded-xl bg-gray-50 dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 backdrop-blur-md border border-gray-200 dark:border-gray-800/50 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]">
                   <h3 className="text-xs font-medium text-gray-700 dark:text-gray-300 mb-2 flex items-center gap-1.5">
                     <FiUserCheck size={12} /> Sent Requests (
                     {sentRequests.length})
@@ -697,7 +697,7 @@ export default function FriendsTab({
                 exit={{ opacity: 0 }}
               >
                 <motion.div
-                  className="bg-white dark:bg-gradient-to-br dark:from-gray-900/95 dark:via-gray-900/90 dark:to-gray-950/95 backdrop-blur-md p-5 rounded-xl shadow-[0_8px_32px_rgba(0,0,0,0.4)] border border-gray-200 dark:border-gray-800/50 max-w-2xl w-full h-[380px] flex flex-col"
+                  className="bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/95 dark:via-gray-900/90 dark:to-gray-950/95 backdrop-blur-md p-5 rounded-xl shadow-[0_8px_32px_rgba(0,0,0,0.4)] border border-gray-200 dark:border-gray-800/50 max-w-2xl w-full h-[380px] flex flex-col"
                   initial={{ scale: 0.95, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
                   exit={{ scale: 0.95, opacity: 0 }}
@@ -793,7 +793,7 @@ export default function FriendsTab({
                 return (
                   <motion.div
                     key={f.uid}
-                    className="flex items-center justify-between p-3 rounded-xl bg-gray-50 dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 backdrop-blur-md border border-gray-200 dark:border-gray-800/50 hover:border-purple-600/40 transition-all shadow-[inset_0_1px_0_rgba(255,255,255,0.04),0_4px_12px_rgba(0,0,0,0.15)]"
+                    className="flex items-center justify-between p-3 rounded-xl bg-gray-50 dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 backdrop-blur-md border border-gray-200 dark:border-gray-800/50 hover:border-purple-600/40 transition-all shadow-[inset_0_1px_0_rgba(255,255,255,0.04),0_4px_12px_rgba(0,0,0,0.15)]"
                     whileHover={{ scale: 1.01 }}
                   >
                     <div className="flex gap-3">

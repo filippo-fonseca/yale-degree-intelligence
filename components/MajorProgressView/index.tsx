@@ -66,12 +66,12 @@ function getCourseStatusColor({
   grade?: string | null;
 }) {
   if (skipped)
-    return "bg-gray-200 dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-dashed border-gray-600";
+    return "bg-gray-200 dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-dashed border-gray-400 dark:border-gray-600";
   if (completed && grade && grade !== "In Progress")
-    return "bg-emerald-900/20 text-emerald-300 border border-emerald-700";
+    return "bg-emerald-100 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-700";
   if (inProgress || grade === "In Progress")
-    return "bg-blue-900/20 text-blue-300 border border-blue-700";
-  return "bg-red-900/20 text-red-300 border border-red-700";
+    return "bg-blue-100 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 border border-blue-300 dark:border-blue-700";
+  return "bg-red-100 dark:bg-red-900/20 text-red-700 dark:text-red-300 border border-red-300 dark:border-red-700";
 }
 
 function MajorStatCard({
@@ -88,7 +88,7 @@ function MajorStatCard({
   return (
     <motion.div
       whileHover={{ y: -1 }}
-      className="p-3 rounded-xl bg-white dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 backdrop-blur-md border border-gray-200 dark:border-gray-800/50 hover:border-gray-300 dark:hover:border-gray-700/60 transition-all relative shadow-[inset_0_1px_0_rgba(255,255,255,0.04),0_4px_12px_rgba(0,0,0,0.08)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.04),0_4px_12px_rgba(0,0,0,0.2)]"
+      className="p-3 rounded-xl bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 backdrop-blur-md border border-gray-200 dark:border-gray-800/50 hover:border-gray-300 dark:hover:border-gray-700/60 transition-all relative shadow-[inset_0_1px_0_rgba(255,255,255,0.04),0_4px_12px_rgba(0,0,0,0.08)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.04),0_4px_12px_rgba(0,0,0,0.2)]"
     >
       {infoTooltip && (
         <div className="absolute top-2 right-2 group">
@@ -154,10 +154,10 @@ const SectionGrid = React.memo(function SectionGrid({
                 initial={false}
                 className={`p-3 hover:scale-[0.98] rounded-xl backdrop-blur-md border transition-all relative cursor-pointer shadow-[inset_0_1px_0_rgba(255,255,255,0.03),0_4px_12px_rgba(0,0,0,0.08)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.03),0_4px_12px_rgba(0,0,0,0.15)] ${
                   reqInProgress > 0
-                    ? "bg-blue-50 dark:bg-gradient-to-br dark:from-blue-950/40 dark:via-gray-900/50 dark:to-gray-950/50 border-blue-200 dark:border-blue-800/30 hover:border-blue-300 dark:hover:border-blue-600/40"
+                    ? "bg-blue-50 dark:bg-transparent dark:bg-gradient-to-br dark:from-blue-950/40 dark:via-gray-900/50 dark:to-gray-950/50 border-blue-200 dark:border-blue-800/30 hover:border-blue-300 dark:hover:border-blue-600/40"
                     : notStarted
-                      ? "bg-red-50 dark:bg-gradient-to-br dark:from-red-950/30 dark:via-gray-900/50 dark:to-gray-950/50 border-red-200 dark:border-red-800/25 hover:border-red-300 dark:hover:border-red-600/35"
-                      : "bg-red-50 dark:bg-gradient-to-br dark:from-red-950/30 dark:via-gray-900/50 dark:to-gray-950/50 border-red-200 dark:border-red-800/25 hover:border-red-300 dark:hover:border-red-600/35"
+                      ? "bg-red-50 dark:bg-transparent dark:bg-gradient-to-br dark:from-red-950/30 dark:via-gray-900/50 dark:to-gray-950/50 border-red-200 dark:border-red-800/25 hover:border-red-300 dark:hover:border-red-600/35"
+                      : "bg-red-50 dark:bg-transparent dark:bg-gradient-to-br dark:from-red-950/30 dark:via-gray-900/50 dark:to-gray-950/50 border-red-200 dark:border-red-800/25 hover:border-red-300 dark:hover:border-red-600/35"
                 }`}
                 onClick={() => onOpenRequirement(req)}
                 onKeyDown={(e) => {
@@ -212,16 +212,16 @@ const SectionGrid = React.memo(function SectionGrid({
                       key={opt.code}
                       className={`relative px-2 py-0.5 rounded-full text-xs flex items-center transition-all duration-150 cursor-pointer hover:scale-[1.03] ${
                         opt.manual
-                          ? "bg-purple-900/20 text-purple-300 border border-purple-700"
+                          ? "bg-purple-100 dark:bg-purple-900/20 text-purple-700 dark:text-purple-300 border border-purple-300 dark:border-purple-700"
                           : opt.completed
-                            ? "bg-emerald-900/20 text-emerald-300 border border-emerald-700"
+                            ? "bg-emerald-100 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-700"
                             : opt.inProgress
-                              ? "bg-blue-900/20 text-blue-300 border border-blue-700"
+                              ? "bg-blue-100 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 border border-blue-300 dark:border-blue-700"
                               : opt.skipped
                                 ? "bg-gray-200 dark:bg-gray-900/20 text-gray-600 dark:text-gray-300 border border-dashed border-gray-400 dark:border-gray-600"
                                 : notStarted
-                                  ? "bg-red-900/20 text-red-300 border border-red-700"
-                                  : "bg-red-900/20 text-red-300 border border-red-700"
+                                  ? "bg-red-100 dark:bg-red-900/20 text-red-700 dark:text-red-300 border border-red-300 dark:border-red-700"
+                                  : "bg-red-100 dark:bg-red-900/20 text-red-700 dark:text-red-300 border border-red-300 dark:border-red-700"
                       }`}
                       onClick={(e) => {
                         e.stopPropagation(); // don't open the requirement modal
@@ -700,7 +700,7 @@ export default function MajorProgressView({
       </div>
 
       {/* Progress bar + Stats toggle - Compact neumorphic */}
-      <div className="p-3 rounded-xl bg-white dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 border border-gray-200 dark:border-gray-800/50 shadow-[inset_0_1px_0_rgba(255,255,255,0.04),0_4px_12px_rgba(0,0,0,0.08)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.04),0_4px_12px_rgba(0,0,0,0.2)]">
+      <div className="p-3 rounded-xl bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 border border-gray-200 dark:border-gray-800/50 shadow-[inset_0_1px_0_rgba(255,255,255,0.04),0_4px_12px_rgba(0,0,0,0.08)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.04),0_4px_12px_rgba(0,0,0,0.2)]">
         <div className="w-full bg-gray-200 dark:bg-gray-950/60 rounded-full h-1.5 shadow-[inset_0_1px_2px_rgba(0,0,0,0.1)] dark:shadow-[inset_0_1px_2px_rgba(0,0,0,0.3)]">
           <motion.div
             initial={{ width: 0 }}
@@ -839,8 +839,8 @@ export default function MajorProgressView({
                           initial={false}
                           className={`p-3 hover:scale-[0.98] transition-all rounded-xl border cursor-pointer backdrop-blur-md shadow-[inset_0_1px_0_rgba(255,255,255,0.03),0_4px_12px_rgba(0,0,0,0.08)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.03),0_4px_12px_rgba(0,0,0,0.15)] ${
                             isFullyCompleted
-                              ? "bg-emerald-50 dark:bg-gradient-to-br dark:from-emerald-950/30 dark:via-gray-900/50 dark:to-gray-950/50 border-emerald-200 dark:border-emerald-800/25 hover:border-emerald-300 dark:hover:border-emerald-600/35"
-                              : "bg-red-50 dark:bg-gradient-to-br dark:from-red-950/30 dark:via-gray-900/50 dark:to-gray-950/50 border-red-200 dark:border-red-800/25 hover:border-red-300 dark:hover:border-red-600/35"
+                              ? "bg-emerald-50 dark:bg-transparent dark:bg-gradient-to-br dark:from-emerald-950/30 dark:via-gray-900/50 dark:to-gray-950/50 border-emerald-200 dark:border-emerald-800/25 hover:border-emerald-300 dark:hover:border-emerald-600/35"
+                              : "bg-red-50 dark:bg-transparent dark:bg-gradient-to-br dark:from-red-950/30 dark:via-gray-900/50 dark:to-gray-950/50 border-red-200 dark:border-red-800/25 hover:border-red-300 dark:hover:border-red-600/35"
                           }`}
                           onClick={() =>
                             setReqModal({
@@ -896,9 +896,9 @@ export default function MajorProgressView({
                                   key={opt.code}
                                   className={`relative px-2 py-0.5 rounded-full text-xs flex items-center group ${
                                     opt.manual
-                                      ? "bg-purple-900/20 text-purple-300 border border-purple-700"
+                                      ? "bg-purple-100 dark:bg-purple-900/20 text-purple-700 dark:text-purple-300 border border-purple-300 dark:border-purple-700"
                                       : opt.completed
-                                        ? "bg-emerald-900/20 text-emerald-300 border border-emerald-700"
+                                        ? "bg-emerald-100 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-700"
                                         : "bg-gray-200 dark:bg-gray-900/20 text-gray-600 dark:text-gray-300 border border-dashed border-gray-400 dark:border-gray-600"
                                   }`}
                                   onClick={(e) => e.stopPropagation()} // don't open modal when clicking the pill

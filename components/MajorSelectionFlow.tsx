@@ -141,7 +141,7 @@ export default function MajorSelectionFlow({
         initial={{ opacity: 0, y: 20, scale: 0.98 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         transition={{ type: "spring", damping: 25, stiffness: 300 }}
-        className="relative w-full max-w-xl bg-white dark:bg-gradient-to-br dark:from-gray-900/80 dark:via-gray-900/70 dark:to-gray-950/80 rounded-2xl border border-gray-200 dark:border-white/[0.08] p-4 sm:p-6 shadow-[0_8px_32px_rgba(0,0,0,0.5),0_0_80px_rgba(139,92,246,0.08),inset_0_1px_0_rgba(255,255,255,0.1),inset_0_-1px_0_rgba(0,0,0,0.3)] backdrop-blur-2xl ring-1 ring-white/[0.05] max-h-[90vh] overflow-y-auto"
+        className="relative w-full max-w-xl bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/80 dark:via-gray-900/70 dark:to-gray-950/80 rounded-2xl border border-gray-200 dark:border-white/[0.08] p-4 sm:p-6 shadow-[0_8px_32px_rgba(0,0,0,0.5),0_0_80px_rgba(139,92,246,0.08),inset_0_1px_0_rgba(255,255,255,0.1),inset_0_-1px_0_rgba(0,0,0,0.3)] backdrop-blur-2xl ring-1 ring-white/[0.05] max-h-[90vh] overflow-y-auto"
       >
         {/* Step Progress Indicator (only show after welcome) */}
         {step !== "welcome" && (

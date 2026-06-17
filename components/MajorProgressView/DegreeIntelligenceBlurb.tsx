@@ -75,7 +75,7 @@ export default function DegreeIntelligence() {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="p-5 rounded-xl bg-gray-50 dark:bg-gradient-to-br dark:from-gray-800/50 dark:to-gray-900/50 border border-gray-200 dark:border-gray-700/50 shadow-neumorphic"
+        className="p-5 rounded-xl bg-gray-50 dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-800/50 dark:to-gray-900/50 border border-gray-200 dark:border-gray-700/50 shadow-neumorphic"
       >
         <div className="flex items-center gap-3">
           <div className="animate-pulse w-10 h-10 rounded-lg bg-gray-200 dark:bg-gray-700/50"></div>
@@ -109,7 +109,7 @@ export default function DegreeIntelligence() {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="p-5 rounded-xl bg-gray-50 dark:bg-gradient-to-br dark:from-gray-800/50 dark:to-gray-900/50 border border-gray-200 dark:border-gray-700/50 shadow-neumorphic"
+      className="p-5 rounded-xl bg-gray-50 dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-800/50 dark:to-gray-900/50 border border-gray-200 dark:border-gray-700/50 shadow-neumorphic"
     >
       <div className="flex items-start gap-5">
         <div className="flex-shrink-0">

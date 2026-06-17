@@ -46,7 +46,7 @@ export function InfoCard({
 
   return (
     <div
-      className={`flex flex-col gap-2 p-3 bg-white/60 dark:bg-white/[0.04] backdrop-blur-xl rounded-xl border border-black/[0.06] dark:border-white/[0.08] ring-1 ring-black/[0.02] dark:ring-white/[0.05] shadow-[0_4px_20px_-12px_rgba(0,0,0,0.15)] dark:shadow-none text-sm text-gray-700 dark:text-gray-300 ${className}`}
+      className={`flex flex-col gap-2 p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg border border-gray-200 dark:border-gray-700 text-sm text-gray-700 dark:text-gray-300 ${className}`}
     >
       {autoHide && (
         <div className="flex justify-between items-center">

@@ -173,14 +173,14 @@ export default function RequirementModal({
                   const base =
                     "relative px-3 py-1.5 rounded-full text-sm flex items-center gap-2 border transition-all";
                   const style = opt.manual
-                    ? "bg-purple-900/20 text-purple-300 border-purple-700"
+                    ? "bg-purple-100 dark:bg-purple-900/20 text-purple-700 dark:text-purple-300 border-purple-300 dark:border-purple-700"
                     : opt.completed
-                    ? "bg-emerald-900/20 text-emerald-300 border-emerald-700"
+                    ? "bg-emerald-100 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-300 border-emerald-300 dark:border-emerald-700"
                     : opt.inProgress
-                    ? "bg-blue-900/20 text-blue-300 border-blue-700"
+                    ? "bg-blue-100 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 border-blue-300 dark:border-blue-700"
                     : opt.skipped
                     ? "bg-gray-200 dark:bg-gray-900/20 text-gray-600 dark:text-gray-300 border-dashed border-gray-400 dark:border-gray-600"
-                    : "bg-red-900/20 text-red-300 border-red-700";
+                    : "bg-red-100 dark:bg-red-900/20 text-red-700 dark:text-red-300 border-red-300 dark:border-red-700";
 
                   const canExpand = !opt.completed && !opt.skipped;
 

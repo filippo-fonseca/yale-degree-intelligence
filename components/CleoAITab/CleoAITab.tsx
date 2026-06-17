@@ -279,7 +279,7 @@ What can I help you with? I can help plan your schedule, find courses that count
               className={`max-w-[85%] rounded-xl p-3 backdrop-blur-md shadow-[inset_0_1px_0_rgba(255,255,255,0.04),0_4px_12px_rgba(0,0,0,0.15)] ${
                 message.role === "user"
                   ? "bg-gradient-to-br from-blue-100 to-blue-50 dark:from-blue-900/40 dark:to-blue-950/40 text-blue-900 dark:text-blue-100 border border-blue-300/60 dark:border-blue-700/30"
-                  : "bg-white dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 text-gray-800 dark:text-gray-200 border border-gray-200 dark:border-gray-800/50"
+                  : "bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 text-gray-800 dark:text-gray-200 border border-gray-200 dark:border-gray-800/50"
               }`}
             >
               {message.role === "assistant" && (
@@ -296,7 +296,7 @@ What can I help you with? I can help plan your schedule, find courses that count
         ))}
         {isLoading && (
           <div className="flex justify-start">
-            <div className="rounded-xl p-3 bg-white dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 backdrop-blur-md border border-gray-200 dark:border-gray-800/50 shadow-[inset_0_1px_0_rgba(255,255,255,0.04),0_4px_12px_rgba(0,0,0,0.15)]">
+            <div className="rounded-xl p-3 bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 backdrop-blur-md border border-gray-200 dark:border-gray-800/50 shadow-[inset_0_1px_0_rgba(255,255,255,0.04),0_4px_12px_rgba(0,0,0,0.15)]">
               <div className="flex items-center gap-1.5">
                 <BulldogIcon className="w-3.5 h-3.5 text-blue-400" />
                 <span className="text-[10px] text-gray-400 dark:text-gray-500">Dan is sniffing around...</span>

@@ -46,6 +46,7 @@ type Plan = {
   semesters: Semester[];
   manualRequirements?: ManualRequirementEntry[];
   createdAt: string; // ISO
+  isDefault?: boolean;
 };
 
 type PreviewProgressMap = Record<string, MajorProgress>;
@@ -384,12 +385,37 @@ export default function Simulator({
         const data = docSnap.exists()
           ? (docSnap.data() as { savedPlans?: Plan[] })
           : null;
-        if (data?.savedPlans) {
-          setSavedPlans(data.savedPlans);
-          // Show plan selector on initial load if user has saved plans
-          if (data.savedPlans.length > 0) {
-            setShowPlanSelector(true);
+        let plans = data?.savedPlans ?? [];
+        if (plans.length > 0) {
+          // Migrate existing users: if no default is set, the newest becomes default.
+          if (!plans.some((p) => p.isDefault)) {
+            const newestName = [...plans].sort((a, b) =>
+              (b.createdAt || "").localeCompare(a.createdAt || ""),
+            )[0]?.name;
+            plans = plans.map((p) => ({
+              ...p,
+              isDefault: p.name === newestName,
+            }));
+            await setDoc(docRef, { savedPlans: plans }, { merge: true });
           }
+          setSavedPlans(plans);
+          // Auto-load the most-recently-viewed plan (localStorage), else default.
+          let recentName: string | null = null;
+          try {
+            recentName = window.localStorage.getItem(
+              `di-sim-recent-${user.uid}`,
+            );
+          } catch {
+            // ignore
+          }
+          const toLoad =
+            plans.find((p) => p.name === recentName) ||
+            plans.find((p) => p.isDefault) ||
+            plans[0];
+          if (toLoad) loadPlanData(toLoad);
+        } else {
+          // Brand-new user with no plans → show the welcome modal.
+          setShowPlanSelector(true);
         }
         setPlansLoaded(true);
       } catch (e) {
@@ -660,17 +686,29 @@ export default function Simulator({
 
     setCurrentPlanName(plan.name);
     setHasChanges(false);
+    try {
+      if (user)
+        window.localStorage.setItem(`di-sim-recent-${user.uid}`, plan.name);
+    } catch {
+      // ignore
+    }
   };
 
   const savePlan = async () => {
     if (!user || !planName.trim()) return;
     try {
       const savedName = planName.trim();
+      // First-ever plan auto-becomes the default; overwrites keep their flag.
+      const isDefault =
+        selectedPlanToOverwrite !== null
+          ? (savedPlans[selectedPlanToOverwrite]?.isDefault ?? false)
+          : savedPlans.length === 0;
       const newPlan: Plan = {
         name: savedName,
         semesters,
         manualRequirements: simulatorManualReqs,
         createdAt: new Date().toISOString(),
+        isDefault,
       };
 
       const updatedPlans: Plan[] =
@@ -705,6 +743,26 @@ export default function Simulator({
     const plan = savedPlans[planIndex];
     loadPlanData(plan);
     setShowPlansModal(false);
+  };
+
+  const setDefaultPlan = async (planIndex: number) => {
+    if (!user || planIndex < 0 || planIndex >= savedPlans.length) return;
+    try {
+      const updatedPlans = savedPlans.map((p, i) => ({
+        ...p,
+        isDefault: i === planIndex,
+      }));
+      await setDoc(
+        doc(db, "users", user.uid),
+        { savedPlans: updatedPlans },
+        { merge: true },
+      );
+      setSavedPlans(updatedPlans);
+      toast.success(`"${savedPlans[planIndex].name}" is now your default plan`);
+    } catch (error) {
+      console.error("Error setting default plan:", error);
+      toast.error("Failed to set default plan");
+    }
   };
 
   const deletePlan = async (planIndex: number) => {
@@ -1330,9 +1388,16 @@ export default function Simulator({
                       >
                         <div className="flex justify-between items-start mb-3">
                           <div>
-                            <h5 className="font-medium text-sm text-gray-700 dark:text-gray-200 group-hover:text-gray-900 dark:group-hover:text-white transition-colors">
-                              {plan.name}
-                            </h5>
+                            <div className="flex items-center gap-2">
+                              <h5 className="font-medium text-sm text-gray-700 dark:text-gray-200 group-hover:text-gray-900 dark:group-hover:text-white transition-colors">
+                                {plan.name}
+                              </h5>
+                              {plan.isDefault && (
+                                <span className="text-[9px] font-medium uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 border border-purple-300 dark:border-purple-700/40">
+                                  Default
+                                </span>
+                              )}
+                            </div>
                             <p className="text-[11px] text-gray-500 mt-0.5">
                               {plannedCount} planned course
                               {plannedCount !== 1 ? "s" : ""} ·{" "}
@@ -1347,24 +1412,36 @@ export default function Simulator({
                             </p>
                           </div>
                         </div>
-                        <div className="flex justify-end gap-2">
-                          <motion.button
-                            onClick={() => deletePlan(index)}
-                            whileHover={{ scale: 1.02 }}
-                            whileTap={{ scale: 0.98 }}
-                            className="px-3 py-1.5 text-xs rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20 hover:text-red-300 border border-red-500/20 transition-all flex items-center gap-1"
-                          >
-                            <FiTrash2 size={11} />
-                            Delete
-                          </motion.button>
-                          <motion.button
-                            onClick={() => loadPlan(index)}
-                            whileHover={{ scale: 1.02 }}
-                            whileTap={{ scale: 0.98 }}
-                            className="px-3 py-1.5 text-xs rounded-lg bg-gradient-to-r from-blue-500/20 to-purple-500/20 text-blue-300 hover:text-blue-200 border border-blue-500/30 hover:border-blue-400/40 transition-all shadow-[0_2px_8px_rgba(59,130,246,0.15),inset_0_1px_0_rgba(255,255,255,0.08)]"
-                          >
-                            Load Plan
-                          </motion.button>
+                        <div className="flex justify-between items-center gap-2">
+                          {!plan.isDefault ? (
+                            <button
+                              onClick={() => setDefaultPlan(index)}
+                              className="text-[11px] text-gray-500 dark:text-gray-400 hover:text-purple-600 dark:hover:text-purple-300 transition-colors"
+                            >
+                              Set as default
+                            </button>
+                          ) : (
+                            <span />
+                          )}
+                          <div className="flex gap-2">
+                            <motion.button
+                              onClick={() => deletePlan(index)}
+                              whileHover={{ scale: 1.02 }}
+                              whileTap={{ scale: 0.98 }}
+                              className="px-3 py-1.5 text-xs rounded-lg bg-red-100 dark:bg-red-500/10 text-red-600 dark:text-red-400 hover:bg-red-200 dark:hover:bg-red-500/20 hover:text-red-700 dark:hover:text-red-300 border border-red-300 dark:border-red-500/20 transition-all flex items-center gap-1"
+                            >
+                              <FiTrash2 size={11} />
+                              Delete
+                            </motion.button>
+                            <motion.button
+                              onClick={() => loadPlan(index)}
+                              whileHover={{ scale: 1.02 }}
+                              whileTap={{ scale: 0.98 }}
+                              className="px-3 py-1.5 text-xs rounded-lg bg-gradient-to-r from-blue-500/20 to-purple-500/20 text-blue-700 dark:text-blue-300 hover:text-blue-800 dark:hover:text-blue-200 border border-blue-400/40 dark:border-blue-500/30 hover:border-blue-500/50 dark:hover:border-blue-400/40 transition-all shadow-[0_2px_8px_rgba(59,130,246,0.15),inset_0_1px_0_rgba(255,255,255,0.08)]"
+                            >
+                              Load Plan
+                            </motion.button>
+                          </div>
                         </div>
                       </motion.div>
                     );
@@ -1456,11 +1533,14 @@ export default function Simulator({
                   Welcome to your Yale Simulator.
                 </h3>
                 <p className="text-sm text-gray-500 dark:text-gray-400">
-                  Pick up where you left off, or start fresh.
+                  {savedPlans.length > 0
+                    ? "Pick up where you left off, or start fresh."
+                    : "Drag and drop courses to map out the rest of your degree."}
                 </p>
               </div>
 
               {/* Saved Plans List */}
+              {savedPlans.length > 0 && (
               <div className="space-y-2 max-h-[280px] overflow-y-auto px-1 mb-4">
                 {savedPlans.map((plan, index) => {
                   const plannedCount = plan.semesters.reduce(
@@ -1507,15 +1587,18 @@ export default function Simulator({
                   );
                 })}
               </div>
+              )}
 
               {/* Divider */}
-              <div className="flex items-center gap-3 my-4">
-                <div className="flex-1 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
-                <span className="text-xs text-gray-400 dark:text-gray-500 uppercase tracking-wider">
-                  or
-                </span>
-                <div className="flex-1 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
-              </div>
+              {savedPlans.length > 0 && (
+                <div className="flex items-center gap-3 my-4">
+                  <div className="flex-1 h-px bg-gradient-to-r from-transparent via-black/10 dark:via-white/10 to-transparent" />
+                  <span className="text-xs text-gray-400 dark:text-gray-500 uppercase tracking-wider">
+                    or
+                  </span>
+                  <div className="flex-1 h-px bg-gradient-to-r from-transparent via-black/10 dark:via-white/10 to-transparent" />
+                </div>
+              )}
 
               {/* Start Fresh Button */}
               <motion.button

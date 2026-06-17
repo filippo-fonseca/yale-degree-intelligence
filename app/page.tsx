@@ -1144,19 +1144,29 @@ export default function Home() {
                 .map((item) => (
                   <motion.button
                     key={item.id}
-                    whileHover={{ scale: 1.02, x: 2 }}
                     whileTap={{ scale: 0.98 }}
                     onClick={() => {
                       handleTabChange(item.id);
                       void new Audio("/audio/pop.mp3").play().catch(() => null);
                     }}
-                    className={`w-full flex items-center justify-between px-4 py-3 text-left rounded-2xl transition-all duration-300 relative ${
+                    className={`relative w-full flex items-center justify-between px-4 py-3 text-left rounded-2xl transition-colors duration-200 ${
                       activeTab === item.id
-                        ? "bg-gradient-to-br from-black/[0.08] via-black/[0.04] to-transparent dark:from-white/[0.12] dark:via-white/[0.06] dark:to-transparent text-gray-900 dark:text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.8),inset_0_-1px_0_rgba(0,0,0,0.05),0_4px_16px_rgba(0,0,0,0.08),0_0_0_1px_rgba(0,0,0,0.06)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.15),inset_0_-1px_0_rgba(0,0,0,0.2),0_4px_16px_rgba(0,0,0,0.3),0_0_0_1px_rgba(255,255,255,0.08)] backdrop-blur-sm border border-transparent"
-                        : "text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-black/[0.03] dark:hover:bg-white/[0.04] hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.6),0_4px_12px_rgba(0,0,0,0.06)] dark:hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_4px_12px_rgba(0,0,0,0.15)]"
+                        ? "text-gray-900 dark:text-white"
+                        : "text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-black/[0.03] dark:hover:bg-white/[0.04]"
                     }`}
                   >
-                    <div className="flex items-center space-x-3">
+                    {activeTab === item.id && (
+                      <motion.div
+                        layoutId="sidebarActiveTab"
+                        transition={{
+                          type: "spring",
+                          stiffness: 480,
+                          damping: 40,
+                        }}
+                        className="absolute inset-0 rounded-2xl bg-gray-200/90 dark:bg-white/[0.08] shadow-[0_1px_2px_rgba(0,0,0,0.08),inset_0_1px_0_rgba(255,255,255,0.7)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.1),0_4px_12px_rgba(0,0,0,0.25)]"
+                      />
+                    )}
+                    <div className="relative z-10 flex items-center space-x-3">
                       <item.icon
                         size={item.id === "cleoai" ? 18 : 12}
                         opacity={
@@ -1169,13 +1179,7 @@ export default function Home() {
                     </div>
 
                     {activeTab === item.id && (
-                      <motion.div
-                        initial={{ opacity: 0, x: -10 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        className="text-blue-400"
-                      >
-                        <FiChevronRight />
-                      </motion.div>
+                      <FiChevronRight className="relative z-10 text-blue-500 dark:text-blue-400" />
                     )}
                   </motion.button>
                 ))}

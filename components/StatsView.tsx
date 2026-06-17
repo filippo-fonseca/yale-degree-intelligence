@@ -8,7 +8,6 @@ import {
   BookOpen,
   Award,
   Clock,
-  BarChart2,
   PieChart as PieChartIcon,
   Radar as RadarIcon,
 } from "lucide-react";
@@ -33,6 +32,64 @@ const seasonOrder: Record<string, number> = {
   Summer: 2,
   Fall: 3,
   Winter: 4,
+};
+
+const CHART_FONT =
+  "var(--font-sf), ui-sans-serif, system-ui, -apple-system, sans-serif";
+
+// Shared styling so every MUI x-chart matches our dark theme + app font.
+const lineChartSx = {
+  fontFamily: CHART_FONT,
+  [`.${axisClasses.left} .${axisClasses.label}`]: {
+    transform: "translate(-20px, 0)",
+    fill: "#9CA3AF",
+  },
+  [`.${axisClasses.bottom} .${axisClasses.label}`]: {
+    transform: "translate(0, 60px)",
+    fill: "#9CA3AF",
+  },
+  [`.${axisClasses.root} line`]: {
+    stroke: "#374151",
+    opacity: 0.3,
+  },
+  [`.${axisClasses.root} text`]: {
+    fill: "#9CA3AF",
+    fontFamily: CHART_FONT,
+  },
+  backgroundColor: "transparent",
+};
+
+// Tooltip styling. The `sx` lands directly on the tooltip Paper, so the
+// surface props go at the root; the cell colors need `!important` to beat
+// MUI's default (near-black) text on valueCell/labelCell in the light theme.
+const chartTooltipSlotProps = {
+  tooltip: {
+    sx: {
+      backgroundColor: "rgba(17, 24, 39, 0.97)",
+      backgroundImage: "none",
+      border: "1px solid rgba(255, 255, 255, 0.12)",
+      borderRadius: "0.6rem",
+      boxShadow: "0 12px 32px rgba(0, 0, 0, 0.55)",
+      color: "#F3F4F6",
+      fontFamily: CHART_FONT,
+      overflow: "hidden",
+      "& caption, & th, & td, & .MuiChartsTooltip-cell, & .MuiChartsTooltip-valueCell, & .MuiChartsTooltip-axisValueCell, & .MuiTypography-root":
+        {
+          color: "#F3F4F6 !important",
+          fontFamily: CHART_FONT,
+          fontSize: "0.78rem",
+        },
+      "& .MuiChartsTooltip-labelCell": {
+        color: "#D1D5DB !important",
+      },
+      "& caption": {
+        borderColor: "rgba(255, 255, 255, 0.12)",
+      },
+      "& .MuiChartsTooltip-mark": {
+        borderColor: "rgba(255, 255, 255, 0.25)",
+      },
+    },
+  },
 };
 
 export default function StatsView({ courses }: { courses: Course[] }) {
@@ -152,32 +209,36 @@ export default function StatsView({ courses }: { courses: Course[] }) {
     (g) => g.count > 0,
   );
 
-  const gradeChartData = {
-    labels: filteredGradeDistribution.map((g) => g.grade),
-    datasets: [
-      {
-        data: filteredGradeDistribution.map((g) => g.count),
-        backgroundColor: COLORS.slice(0, filteredGradeDistribution.length),
-        borderColor: "#1F2937",
-        borderWidth: 1,
-      },
-    ],
-  };
-
   const creditChartData = {
     labels: departmentData.map((d) => d.department),
     datasets: [
       {
         data: departmentData.map((d) => d.credits),
-        backgroundColor: COLORS,
-        borderColor: "#1F2937",
-        borderWidth: 1,
+        backgroundColor: departmentData.map(
+          (_, i) => COLORS[i % COLORS.length],
+        ),
+        borderColor: Array(departmentData.length).fill("#0B1120"),
+        borderWidth: 2,
+      },
+    ],
+  };
+
+  const gradePieData = {
+    labels: filteredGradeDistribution.map((g) => g.grade),
+    datasets: [
+      {
+        data: filteredGradeDistribution.map((g) => g.count),
+        backgroundColor: filteredGradeDistribution.map(
+          (_, i) => COLORS[i % COLORS.length],
+        ),
+        borderColor: Array(filteredGradeDistribution.length).fill("#0B1120"),
+        borderWidth: 2,
       },
     ],
   };
 
   return (
-    <div className={`space-y-8 font-louize text-gray-800 dark:text-gray-200`}>
+    <div className={`space-y-4 font-louize text-gray-800 dark:text-gray-200`}>
       {/* Summary Cards */}
       <InfoCard>
         We're actively working on new stats. Have any suggestions?{" "}
@@ -192,7 +253,7 @@ export default function StatsView({ courses }: { courses: Course[] }) {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4"
+        className="grid grid-cols-2 lg:grid-cols-4 gap-3"
       >
         <StatCard
           label="Cumulative GPA"
@@ -247,15 +308,15 @@ export default function StatsView({ courses }: { courses: Course[] }) {
         />
       </motion.div>
 
-      {/* GPA Charts Section */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      {/* Charts Grid (2 × 2) */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {/* Cumulative GPA Chart */}
         <ChartBox
           title="Cumulative GPA Progression"
-          icon={<GraduationCap className="h-5 w-5" />}
+          icon={<GraduationCap className="h-4 w-4" />}
           description="The overall progression of your cumulative GPA over time."
         >
-          <div className="h-[400px] w-full">
+          <div className="h-[230px] w-full">
             <LineChart
               xAxis={[
                 {
@@ -264,7 +325,7 @@ export default function StatsView({ courses }: { courses: Course[] }) {
                   tickLabelStyle: {
                     angle: 45,
                     textAnchor: "start",
-                    fontSize: 12,
+                    fontSize: 11,
                     fill: "#9CA3AF",
                   },
                 },
@@ -291,35 +352,9 @@ export default function StatsView({ courses }: { courses: Course[] }) {
                 },
               ]}
               grid={{ vertical: true, horizontal: true }}
-              margin={{ left: 70, right: 30, top: 30, bottom: 100 }}
-              sx={{
-                [`.${axisClasses.left} .${axisClasses.label}`]: {
-                  transform: "translate(-20px, 0)",
-                  fill: "#9CA3AF",
-                },
-                [`.${axisClasses.bottom} .${axisClasses.label}`]: {
-                  transform: "translate(0, 60px)",
-                  fill: "#9CA3AF",
-                },
-                [`.${axisClasses.root} line`]: {
-                  stroke: "#374151",
-                  opacity: 0.3,
-                },
-                [`.${axisClasses.root} text`]: {
-                  fill: "#9CA3AF",
-                },
-                backgroundColor: "transparent",
-              }}
-              slotProps={{
-                tooltip: {
-                  sx: {
-                    backgroundColor: "#1F2937",
-                    borderColor: "#374151",
-                    color: "#F3F4F6",
-                    borderRadius: "0.5rem",
-                  },
-                },
-              }}
+              margin={{ left: 55, right: 20, top: 16, bottom: 70 }}
+              sx={lineChartSx}
+              slotProps={chartTooltipSlotProps}
             />
           </div>
         </ChartBox>
@@ -327,10 +362,10 @@ export default function StatsView({ courses }: { courses: Course[] }) {
         {/* Semester GPA Chart */}
         <ChartBox
           title="Semester GPA Performance"
-          icon={<BookOpen className="h-5 w-5" />}
+          icon={<BookOpen className="h-4 w-4" />}
           description="Your GPA for each individual semester (in isolation)."
         >
-          <div className="h-[400px] w-full">
+          <div className="h-[230px] w-full">
             <LineChart
               xAxis={[
                 {
@@ -339,7 +374,7 @@ export default function StatsView({ courses }: { courses: Course[] }) {
                   tickLabelStyle: {
                     angle: 45,
                     textAnchor: "start",
-                    fontSize: 12,
+                    fontSize: 11,
                     fill: "#9CA3AF",
                   },
                 },
@@ -363,88 +398,39 @@ export default function StatsView({ courses }: { courses: Course[] }) {
                 },
               ]}
               grid={{ vertical: true, horizontal: true }}
-              margin={{ left: 70, right: 30, top: 30, bottom: 100 }}
-              sx={{
-                [`.${axisClasses.left} .${axisClasses.label}`]: {
-                  transform: "translate(-20px, 0)",
-                  fill: "#9CA3AF",
-                },
-                [`.${axisClasses.bottom} .${axisClasses.label}`]: {
-                  transform: "translate(0, 60px)",
-                  fill: "#9CA3AF",
-                },
-                [`.${axisClasses.root} line`]: {
-                  stroke: "#374151",
-                  opacity: 0.3,
-                },
-                [`.${axisClasses.root} text`]: {
-                  fill: "#9CA3AF",
-                },
-                backgroundColor: "transparent",
-              }}
-              slotProps={{
-                tooltip: {
-                  sx: {
-                    backgroundColor: "#1F2937",
-                    borderColor: "#374151",
-                    color: "#F3F4F6",
-                    borderRadius: "0.5rem",
-                  },
-                },
-              }}
+              margin={{ left: 55, right: 20, top: 16, bottom: 70 }}
+              sx={lineChartSx}
+              slotProps={chartTooltipSlotProps}
             />
           </div>
         </ChartBox>
-      </div>
 
-      {/* Additional Charts Grid - Temporarily disabled
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <ChartBox
-          title="Grade Distribution"
-          icon={<PieChartIcon className="h-5 w-5" />}
-          description="A breakdown of your grades across all courses."
-        >
-          <PieChartWrapper
-            data={{
-              labels: filteredGradeDistribution.map((g) => g.grade),
-              datasets: [
-                {
-                  data: filteredGradeDistribution.map((g) => g.count),
-                  backgroundColor: COLORS.slice(
-                    0,
-                    filteredGradeDistribution.length,
-                  ),
-                  borderColor: Array(filteredGradeDistribution.length).fill(
-                    "#1F2937",
-                  ),
-                  borderWidth: 1,
-                },
-              ],
-            }}
-            showLegend={true}
-          />
-        </ChartBox>
-
+        {/* Credit Distribution Pie */}
         {departmentData.length > 0 && (
           <ChartBox
-            title="Credit Allocation"
-            icon={<PieChartIcon className="h-5 w-5" />}
-            description="A fun way to visualize your degree of class variedness at Yale!"
+            title="Credit Distribution"
+            icon={<PieChartIcon className="h-4 w-4" />}
+            description="How your credits are spread across departments."
           >
-            <PieChartWrapper
-              data={{
-                ...creditChartData,
-                datasets: creditChartData.datasets.map((ds) => ({
-                  ...ds,
-                  borderColor: Array(ds.data.length).fill(ds.borderColor),
-                })),
-              }}
-              showLegend={true}
-            />
+            <div className="h-[230px] w-full">
+              <PieChartWrapper data={creditChartData} showLegend={true} />
+            </div>
+          </ChartBox>
+        )}
+
+        {/* Grade Distribution Pie */}
+        {filteredGradeDistribution.length > 0 && (
+          <ChartBox
+            title="Grade Distribution"
+            icon={<RadarIcon className="h-4 w-4" />}
+            description="A breakdown of the grades you've earned so far."
+          >
+            <div className="h-[230px] w-full">
+              <PieChartWrapper data={gradePieData} showLegend={true} />
+            </div>
           </ChartBox>
         )}
       </div>
-      */}
     </div>
   );
 }
@@ -469,14 +455,14 @@ function StatCard({
   return (
     <motion.div
       whileHover={{ y: -2 }}
-      className="p-6 rounded-xl bg-gray-100/50 dark:bg-gray-900/50 backdrop-blur-sm border border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700 transition-all shadow-sm dark:shadow-none"
+      className="p-4 rounded-xl bg-gray-100/50 dark:bg-gray-900/50 backdrop-blur-sm border border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700 transition-all shadow-sm dark:shadow-none"
     >
       <div className="flex items-center justify-between">
-        <p className="text-sm text-gray-600 dark:text-gray-400">{label}</p>
+        <p className="text-xs text-gray-600 dark:text-gray-400">{label}</p>
         {icon && <div className={`${color} opacity-80`}>{icon}</div>}
       </div>
-      <div className="flex items-end justify-between mt-2">
-        <p className={`text-3xl font-medium ${color}`}>{value}</p>
+      <div className="flex items-end justify-between mt-1">
+        <p className={`text-2xl font-medium ${color}`}>{value}</p>
       </div>
       {secondaryLabel && (
         <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
@@ -517,47 +503,27 @@ function ChartBox({
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="p-6 rounded-xl bg-gray-100/50 dark:bg-gray-900/50 backdrop-blur-sm border border-gray-200 dark:border-gray-800 shadow-sm dark:shadow-none"
+      className="p-4 rounded-xl bg-gray-100/50 dark:bg-gray-900/50 backdrop-blur-sm border border-gray-200 dark:border-gray-800 shadow-sm dark:shadow-none"
     >
-      <div className="flex items-start justify-between mb-4">
+      <div className="flex items-start justify-between mb-3">
         <div>
-          <h3 className="font-medium text-lg text-gray-900 dark:text-white">
+          <h3 className="font-medium text-base text-gray-900 dark:text-white">
             {title}
           </h3>
           {description && (
-            <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
+            <p className="text-[11px] leading-snug text-gray-600 dark:text-gray-400 mt-0.5">
               {description}
             </p>
           )}
         </div>
         {icon && (
-          <div className="p-2 rounded-full bg-gray-200/50 dark:bg-gray-800/50 text-blue-500 dark:text-blue-300">
+          <div className="p-1.5 rounded-full bg-gray-200/50 dark:bg-gray-800/50 text-blue-500 dark:text-blue-300">
             {icon}
           </div>
         )}
       </div>
       {children}
     </motion.div>
-  );
-}
-
-function AreaChartIcon(props: React.SVGProps<SVGSVGElement>) {
-  return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M3 3v18h18" />
-      <path d="M7 12v5h12V8l-5 5-4-4Z" />
-    </svg>
   );
 }
 

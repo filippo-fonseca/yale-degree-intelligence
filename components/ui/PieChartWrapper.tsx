@@ -6,6 +6,9 @@ import { useEffect, useState } from "react";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
+const CHART_FONT =
+  "var(--font-sf), ui-sans-serif, system-ui, -apple-system, sans-serif";
+
 interface PieChartWrapperProps {
   data: {
     labels: string[];
@@ -80,20 +83,30 @@ export default function PieChartWrapper({
                   color: "#9CA3AF",
                   font: {
                     size: 11,
+                    family: CHART_FONT,
                   },
-                  padding: 12,
+                  padding: 10,
                   usePointStyle: true,
                   pointStyle: "circle",
                 },
               },
               tooltip: {
-                backgroundColor: "rgba(17, 24, 39, 0.95)",
+                backgroundColor: "rgba(17, 24, 39, 0.97)",
                 titleColor: "#F3F4F6",
-                bodyColor: "#D1D5DB",
-                borderColor: "rgba(255, 255, 255, 0.1)",
+                bodyColor: "#E5E7EB",
+                borderColor: "rgba(255, 255, 255, 0.12)",
                 borderWidth: 1,
                 cornerRadius: 8,
                 padding: 10,
+                titleFont: {
+                  family: CHART_FONT,
+                  size: 12,
+                  weight: "bold",
+                },
+                bodyFont: {
+                  family: CHART_FONT,
+                  size: 12,
+                },
                 callbacks: {
                   label: (context) => {
                     const label = context.label || "";

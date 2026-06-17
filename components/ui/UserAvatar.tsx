@@ -50,7 +50,7 @@ export function UserAvatar({
         src={photoURL}
         alt={displayName || email || "User"}
         onError={() => setImageError(true)}
-        className={`rounded-full object-cover border-2 border-gray-700/50 ${className}`}
+        className={`rounded-full object-cover border-2 border-gray-300 dark:border-gray-700/50 ${className}`}
         style={{ width: size, height: size }}
       />
     );
@@ -58,7 +58,7 @@ export function UserAvatar({
 
   return (
     <div
-      className={`rounded-full bg-gradient-to-br from-pink-500 via-purple-500 to-violet-600 flex items-center justify-center text-white font-medium border-2 border-gray-700/50 shadow-[0_2px_8px_rgba(0,0,0,0.3)] ${className}`}
+      className={`rounded-full bg-gradient-to-br from-pink-500 via-purple-500 to-violet-600 flex items-center justify-center text-white font-medium border-2 border-gray-300 dark:border-gray-700/50 shadow-[0_2px_8px_rgba(0,0,0,0.3)] ${className}`}
       style={{ width: size, height: size, fontSize }}
     >
       {getInitials()}

@@ -44,7 +44,7 @@ const CustomLoader = ({ fullScreen = true }: CustomLoaderProps) => {
       <div
         className={`flex items-center justify-center ${
           fullScreen ? "min-h-screen" : "min-h-[200px]"
-        } bg-gray-950 overflow-hidden`}
+        } bg-white dark:bg-gray-950 overflow-hidden`}
       >
         <div className="relative w-72 h-72">
           <div className="absolute inset-0 flex items-center justify-center">
@@ -62,7 +62,7 @@ const CustomLoader = ({ fullScreen = true }: CustomLoaderProps) => {
     <div
       className={`flex items-center justify-center ${
         fullScreen ? "min-h-screen" : "min-h-[200px]"
-      } bg-gray-950 overflow-hidden`}
+      } bg-white dark:bg-gray-950 overflow-hidden`}
     >
       <div className="relative w-96 h-64">
         {/* The hole */}
@@ -141,7 +141,7 @@ const CustomLoader = ({ fullScreen = true }: CustomLoaderProps) => {
         </motion.div>
         {/* Text */}
         <motion.div
-          className={`absolute bottom-0 left-0 right-0 text-center text-sm text-gray-400`}
+          className={`absolute bottom-0 left-0 right-0 text-center text-sm text-gray-500 dark:text-gray-400`}
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5 }}

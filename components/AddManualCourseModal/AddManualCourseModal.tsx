@@ -83,17 +83,17 @@ export default function AddManualCourseModal({
             initial={{ scale: 0.9, y: 20 }}
             animate={{ scale: 1, y: 0 }}
             exit={{ scale: 0.9, y: 20 }}
-            className="bg-gray-900 rounded-xl border border-gray-800 max-w-md w-full p-6"
+            className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 max-w-md w-full p-6"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-medium">
+              <h3 className="text-lg font-medium text-gray-900 dark:text-white">
                 Add a course to fulfill the requirement:
                 <br /> <i>{requirement.split("|")[1]}</i>
               </h3>
               <button
                 onClick={onClose}
-                className="text-gray-400 hover:text-gray-200"
+                className="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
               >
                 <FiX size={20} />
               </button>
@@ -112,31 +112,31 @@ export default function AddManualCourseModal({
                     type="text"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full bg-gray-800 border border-gray-700 rounded-lg pl-10 pr-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-pink-500"
+                    className="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg pl-10 pr-4 py-2 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-pink-500"
                     placeholder="Search courses from your transcript..."
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm text-gray-400 mb-1">
+                <label className="block text-sm text-gray-500 dark:text-gray-400 mb-1">
                   Make sure you're ABSOLUTELY sure it's accepted by your DUS.
                 </label>
-                <div className="max-h-60 overflow-y-auto border border-gray-700 rounded-lg">
+                <div className="max-h-60 overflow-y-auto border border-gray-200 dark:border-gray-700 rounded-lg">
                   {filteredCourses.length > 0 ? (
                     filteredCourses.map((course) => (
                       <div
                         key={course.id}
                         onClick={() => setSelectedCourse(course)}
-                        className={`p-3 hover:bg-gray-800 cursor-pointer transition-colors ${
+                        className={`p-3 hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer transition-colors ${
                           selectedCourse?.id === course.id
-                            ? "bg-gray-800 border-l-4 border-pink-500"
+                            ? "bg-gray-50 dark:bg-gray-800 border-l-4 border-pink-500"
                             : "border-l-4 border-transparent"
                         }`}
                       >
                         <div className="flex justify-between items-center">
-                          <span className="font-medium">{course.code}</span>
-                          <span className="text-xs text-gray-400">
+                          <span className="font-medium text-gray-900 dark:text-white">{course.code}</span>
+                          <span className="text-xs text-gray-500 dark:text-gray-400">
                             {course.status === "in-progress"
                               ? "In Progress"
                               : course.status === "completed"
@@ -144,11 +144,11 @@ export default function AddManualCourseModal({
                               : "Not Taken"}
                           </span>
                         </div>
-                        <div className="text-sm text-gray-400 truncate">
+                        <div className="text-sm text-gray-500 dark:text-gray-400 truncate">
                           {getCourseNameFromCode(course.code)}
                         </div>
                         {course.grade && (
-                          <div className="text-xs text-gray-500 mt-1">
+                          <div className="text-xs text-gray-400 dark:text-gray-500 mt-1">
                             Grade: {course.grade} • {course.semester}{" "}
                             {course.year}
                           </div>
@@ -156,7 +156,7 @@ export default function AddManualCourseModal({
                       </div>
                     ))
                   ) : (
-                    <div className="p-4 text-center text-gray-400">
+                    <div className="p-4 text-center text-gray-500 dark:text-gray-400">
                       {searchQuery
                         ? "No courses match your search"
                         : "No courses available"}
@@ -170,7 +170,7 @@ export default function AddManualCourseModal({
               <div className="flex justify-end gap-2">
                 <button
                   onClick={onClose}
-                  className="px-4 py-2 rounded-lg bg-gray-800 text-gray-300 hover:bg-gray-700 transition-colors"
+                  className="px-4 py-2 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
                 >
                   Cancel
                 </button>

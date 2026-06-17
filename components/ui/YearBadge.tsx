@@ -49,7 +49,7 @@ export const YearBadge: React.FC<YearBadgeProps> = ({
         <span
           className={`w-1.5 h-1.5 rounded-full mr-1 ${getDotColor(yearStatus)}`}
         ></span>
-        <span className="text-gray-400">
+        <span className="text-gray-500 dark:text-gray-400">
           {yearStatus} • '{graduationYear.toString().slice(-2)}
         </span>
       </span>

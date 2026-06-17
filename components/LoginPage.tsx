@@ -42,7 +42,7 @@ export default function LoginPage({
   }, []);
 
   return (
-    <div className="relative flex flex-col items-center justify-center min-h-screen p-4 bg-gradient-to-br from-gray-950 via-gray-900 to-gray-900 overflow-hidden font-louize">
+    <div className="relative flex flex-col items-center justify-center min-h-screen p-4 bg-gradient-to-br from-gray-50 via-gray-100 to-white dark:from-gray-950 dark:via-gray-900 dark:to-gray-900 overflow-hidden font-louize">
       <CosmicBackground mode="stars" opacity={0.7} />
 
       {/* Ambient glow */}
@@ -57,7 +57,7 @@ export default function LoginPage({
         transition={{ duration: 0.5, ease: "easeOut" }}
         className="relative z-10 w-full max-w-md"
       >
-        <div className="p-6 rounded-2xl bg-gradient-to-br from-gray-900/80 via-gray-900/60 to-gray-950/80 backdrop-blur-2xl border border-white/[0.08] shadow-[0_8px_48px_rgba(0,0,0,0.5),0_0_100px_rgba(139,92,246,0.08),inset_0_1px_0_rgba(255,255,255,0.1)] ring-1 ring-white/[0.05]">
+        <div className="p-6 rounded-2xl bg-white/70 dark:bg-gradient-to-br dark:from-gray-900/80 dark:via-gray-900/60 dark:to-gray-950/80 backdrop-blur-2xl border border-black/[0.06] dark:border-white/[0.08] shadow-[0_8px_48px_rgba(0,0,0,0.5),0_0_100px_rgba(139,92,246,0.08),inset_0_1px_0_rgba(255,255,255,0.1)] ring-1 ring-black/[0.04] dark:ring-white/[0.05]">
           {/* Logo */}
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
@@ -87,7 +87,7 @@ export default function LoginPage({
             <h1 className="flex items-center justify-center mb-2">
               <CompoundLogo hideLogo animated size="lg" />
             </h1>
-            <p className="text-sm text-gray-400">
+            <p className="text-sm text-gray-500 dark:text-gray-400">
               Navigate your Yale journey with clarity.
             </p>
           </motion.div>
@@ -99,7 +99,7 @@ export default function LoginPage({
             transition={{ delay: 0.3 }}
             className="mb-5"
           >
-            <div className="h-[72px] flex items-center justify-center p-4 rounded-xl bg-gradient-to-br from-white/[0.04] to-transparent border border-white/[0.06] shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]">
+            <div className="h-[72px] flex items-center justify-center p-4 rounded-xl bg-gradient-to-br from-black/[0.03] to-transparent dark:from-white/[0.04] border border-black/[0.05] dark:border-white/[0.06] shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]">
               <AnimatePresence mode="wait">
                 <motion.div
                   key={activeFeature}
@@ -109,10 +109,10 @@ export default function LoginPage({
                   transition={{ duration: 0.3 }}
                   className="text-center"
                 >
-                  <h3 className="text-sm font-medium text-white mb-0.5">
+                  <h3 className="text-sm font-medium text-gray-900 dark:text-white mb-0.5">
                     {features[activeFeature].title}
                   </h3>
-                  <p className="text-xs text-gray-400">
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
                     {features[activeFeature].description}
                   </p>
                 </motion.div>
@@ -128,7 +128,7 @@ export default function LoginPage({
                   className={`h-1 rounded-full transition-all duration-300 ${
                     i === activeFeature
                       ? "w-4 bg-gradient-to-r from-blue-400 to-purple-400"
-                      : "w-1 bg-gray-600 hover:bg-gray-500"
+                      : "w-1 bg-gray-300 dark:bg-gray-600 hover:bg-gray-400 dark:hover:bg-gray-500"
                   }`}
                 />
               ))}
@@ -154,7 +154,7 @@ export default function LoginPage({
                 <motion.span
                   animate={{ opacity: [0.5, 1, 0.5] }}
                   transition={{ duration: 1.5, repeat: Infinity }}
-                  className="text-gray-300"
+                  className="text-gray-600 dark:text-gray-300"
                 >
                   Authenticating...
                 </motion.span>
@@ -179,7 +179,7 @@ export default function LoginPage({
             transition={{ delay: 0.5 }}
             className="mt-4 flex justify-center"
           >
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-medium tracking-wide uppercase bg-gradient-to-r from-blue-500/15 via-purple-500/15 to-pink-500/15 border border-white/[0.08] text-gray-400 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]">
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-medium tracking-wide uppercase bg-gradient-to-r from-blue-500/15 via-purple-500/15 to-pink-500/15 border border-black/[0.06] dark:border-white/[0.08] text-gray-500 dark:text-gray-400 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]">
               <span className="w-1 h-1 rounded-full bg-emerald-400 animate-pulse" />
               For Yalies, by Yalies
             </span>
@@ -194,7 +194,7 @@ export default function LoginPage({
           >
             <button
               onClick={onBackClick}
-              className="text-xs text-gray-500 hover:text-gray-300 transition-colors inline-flex items-center gap-1.5 group"
+              className="text-xs text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition-colors inline-flex items-center gap-1.5 group"
             >
               <FiArrowLeft
                 size={12}
@@ -213,17 +213,17 @@ export default function LoginPage({
         transition={{ delay: 0.8 }}
         className="absolute bottom-4 text-center"
       >
-        <p className="text-xs text-gray-500">
+        <p className="text-xs text-gray-400 dark:text-gray-500">
           Built by Yalies, for Yalies. NOT associated with Yale University in
           any way, shape, or form. Just a personal proj. ·{" "}
           <a
             href="mailto:filippo.fonseca@yale.edu,emir.ahmed@yale.edu"
-            className="text-gray-400 hover:text-white transition-colors"
+            className="text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
           >
             Feedback?
           </a>
         </p>
-        <p className="text-[10px] mt-0.5 text-gray-600">
+        <p className="text-[10px] mt-0.5 text-gray-400 dark:text-gray-600">
           v2.0 · Not affiliated with Yale University. Any data you upload is
           from your own volition and you agree to our storage practices. We will
           NOT store your transcript.

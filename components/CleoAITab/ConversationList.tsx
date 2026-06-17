@@ -18,9 +18,9 @@ export default function ConversationList({
   onDelete,
 }: ConversationListProps) {
   return (
-    <aside className="w-64 bg-gray-900 border-r border-gray-800 flex flex-col h-full">
+    <aside className="w-64 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 flex flex-col h-full">
       <div className="p-4 flex items-center justify-between">
-        <span className="font-bold text-lg text-white">Conversations</span>
+        <span className="font-bold text-lg text-gray-900 dark:text-white">Conversations</span>
         <button
           onClick={onNew}
           className="px-2 py-1 bg-purple-600 rounded text-white text-sm"
@@ -33,7 +33,7 @@ export default function ConversationList({
           <li
             key={c.id}
             className={`flex items-center justify-between px-4 py-3 cursor-pointer
-            ${activeId === c.id ? "bg-gray-800" : "hover:bg-gray-800/70"}
+            ${activeId === c.id ? "bg-gray-100 dark:bg-gray-800" : "hover:bg-gray-100/70 dark:hover:bg-gray-800/70"}
             `}
             onClick={() => onSelect(c.id)}
           >
@@ -43,7 +43,7 @@ export default function ConversationList({
                 e.stopPropagation();
                 onDelete(c.id);
               }}
-              className="ml-2 text-xs text-gray-500 hover:text-red-500"
+              className="ml-2 text-xs text-gray-400 dark:text-gray-500 hover:text-red-500"
             >
               ✕
             </button>

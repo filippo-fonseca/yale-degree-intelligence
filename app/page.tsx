@@ -2274,7 +2274,7 @@ export default function Home() {
                                     >
                                       <div className="flex items-center justify-between mb-2">
                                         <h4 className="text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider">
-                                          Major Conflict Manager
+                                          Double Major Conflict Manager
                                         </h4>
                                         <button
                                           onClick={() =>
@@ -2323,7 +2323,8 @@ export default function Home() {
                                                 </strong>{" "}
                                                 Having 1-2 shared credits
                                                 between majors is typically
-                                                allowed.
+                                                allowed. Do check with both
+                                                DUSs!
                                               </>
                                             )}
                                           </div>

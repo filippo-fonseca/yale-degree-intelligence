@@ -739,7 +739,7 @@ export default function MajorProgressView({
                     {col.label}
                   </h4>
                   <span className="text-[10px] text-gray-500 dark:text-gray-400">
-                    {col.items.length} · {col.credits} cr
+                    {col.items.length} reqs · {col.credits} cr
                   </span>
                 </div>
                 <div className="overflow-y-auto p-3 space-y-3">

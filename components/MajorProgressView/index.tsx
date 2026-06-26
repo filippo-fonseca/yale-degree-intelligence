@@ -568,18 +568,20 @@ export default function MajorProgressView({
 
       {/* Progress bar + Stats toggle - Compact neumorphic */}
       <div className="p-3 rounded-xl bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 border border-gray-200 dark:border-gray-800/50 shadow-neu">
-        <div className="w-full bg-gray-200 dark:bg-gray-950/60 rounded-full h-1.5 shadow-[inset_0_1px_2px_rgba(0,0,0,0.1)] dark:shadow-[inset_0_1px_2px_rgba(0,0,0,0.3)]">
+        <div className="relative w-full bg-gray-200 dark:bg-gray-800/70 rounded-full h-2 overflow-hidden shadow-[inset_0_1px_2px_rgba(0,0,0,0.08)] dark:shadow-[inset_0_1px_2px_rgba(0,0,0,0.3)]">
+          {showInProgressStats && (
+            <motion.div
+              initial={{ width: 0 }}
+              animate={{ width: `${withInProgressPercentage}%` }}
+              transition={{ duration: 1, ease: "easeOut" }}
+              className="absolute inset-y-0 left-0 rounded-full bg-purple-300 dark:bg-purple-500/40"
+            />
+          )}
           <motion.div
             initial={{ width: 0 }}
-            animate={{
-              width: `${
-                showInProgressStats
-                  ? withInProgressPercentage
-                  : completionPercentage
-              }%`,
-            }}
+            animate={{ width: `${completionPercentage}%` }}
             transition={{ duration: 1, ease: "easeOut" }}
-            className="h-1.5 rounded-full bg-gradient-to-r from-purple-500 to-purple-600 shadow-[0_0_8px_rgba(168,85,247,0.45)]"
+            className="absolute inset-y-0 left-0 rounded-full bg-gradient-to-r from-violet-500 to-fuchsia-500"
           />
         </div>
 

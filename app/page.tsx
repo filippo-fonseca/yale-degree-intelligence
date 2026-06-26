@@ -977,11 +977,13 @@ export default function Home() {
               }
               aria-label="Toggle theme"
             >
-              {resolvedTheme === "dark" ? (
-                <FiSun size={16} />
-              ) : (
-                <FiMoon size={16} />
-              )}
+              <span className="flex h-7 w-7 items-center justify-center">
+                {resolvedTheme === "dark" ? (
+                  <FiSun size={18} />
+                ) : (
+                  <FiMoon size={18} />
+                )}
+              </span>
             </button>
 
             <button

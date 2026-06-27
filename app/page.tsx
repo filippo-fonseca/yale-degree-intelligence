@@ -224,7 +224,13 @@ export default function Home() {
     });
   };
 
-  const navItems = [
+  const navItems: {
+    id: string;
+    icon: React.ComponentType<any>;
+    label: string;
+    disabled?: boolean;
+    comingSoon?: boolean;
+  }[] = [
     {
       id: "upload",
       icon: HiDocumentDuplicate,
@@ -259,7 +265,6 @@ export default function Home() {
       id: "cleoai",
       icon: LogoIcon,
       label: "Dan",
-      comingSoon: true,
     },
     {
       id: "distributionals",

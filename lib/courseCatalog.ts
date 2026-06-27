@@ -10,10 +10,13 @@ export type CourseInfo = {
   isSpring?: boolean;
 };
 
+// Full catalog as a flat array (for search/listing)
+export const ALL_COURSES: CourseInfo[] = courses as CourseInfo[];
+
 // Create a lookup map from all codes to their canonical course info
 const COURSE_CODE_MAP: Record<string, CourseInfo> = {};
 
-(courses as CourseInfo[]).forEach(course => {
+ALL_COURSES.forEach(course => {
   course.codes?.forEach(code => {
     COURSE_CODE_MAP[code] = course;
   });

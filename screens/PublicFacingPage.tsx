@@ -24,12 +24,13 @@ import {
   FiLayers,
 } from "react-icons/fi";
 import { HiSparkles } from "react-icons/hi2";
-import { GraduationCap } from "lucide-react";
+import { GraduationCap, Command } from "lucide-react";
 import Link from "next/link";
 import dynamic from "next/dynamic";
 import { useState, useRef, useEffect } from "react";
 import LoginPage from "@/components/LoginPage";
 import LogoIcon from "@/icons/LogoIcon";
+import CompoundLogo from "@/components/ui/CompoundLogo";
 
 // avoid SSR issues with charts (used in the stats section)
 const LineChart = dynamic(
@@ -534,14 +535,11 @@ function KeyboardGraphic() {
         <span className="rc-key flex h-11 w-16 items-center justify-center rounded-lg text-xs text-white/40">
           ⌥
         </span>
-        <span className="rc-key-lit flex h-11 w-44 items-center justify-center gap-2 rounded-lg text-sm font-semibold">
-          <GraduationCap size={15} /> CAS
-        </span>
         <span className="rc-key flex h-11 w-16 items-center justify-center rounded-lg text-xs text-white/40">
           ⌥
         </span>
-        <span className="rc-key flex h-11 w-16 items-center justify-center rounded-lg text-xs text-white/40">
-          ⌘
+        <span className="rc-key-lit flex h-11 w-44 items-center justify-center gap-2 rounded-lg text-sm font-semibold">
+          <Command size={15} /> K
         </span>
       </div>
     </motion.div>
@@ -720,11 +718,8 @@ function Navbar({ onLogin }: { onLogin: () => void }) {
       }`}
     >
       <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-6">
-        <Link href="#top" className="flex items-center gap-2">
-          <LogoIcon width={24} height={24} />
-          <span className="text-sm font-semibold tracking-tight text-white">
-            DegreeIntelligence
-          </span>
+        <Link href="#top" className="flex items-center">
+          <CompoundLogo animated size="sm" darkAlways />
         </Link>
 
         <div className="hidden items-center gap-7 md:flex">
@@ -807,12 +802,15 @@ export default function PublicFacingPage() {
             initial={{ opacity: 0, y: -8 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
-            className="group mb-7 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5 text-xs text-white/70 backdrop-blur-md transition-colors hover:border-pink-400/40 hover:text-white"
+            className="group mb-7 inline-flex items-center gap-2.5 rounded-full border border-white/10 bg-white/[0.04] py-1.5 pl-3 pr-3.5 text-xs text-white/70 backdrop-blur-md transition-colors hover:border-pink-400/40 hover:text-white"
           >
-            <span className="flex items-center gap-1 rounded-full bg-pink-500/15 px-2 py-0.5 font-semibold text-pink-200">
-              <HiSparkles size={11} /> New
+            <span className="text-[11px] uppercase tracking-[0.18em] text-white/45">
+              As featured in
             </span>
-            Featured in the Yale Daily News
+            <span className="h-3.5 w-px bg-white/15" />
+            <span className="font-louize text-sm font-medium tracking-tight text-white">
+              The Yale Daily News
+            </span>
             <FiArrowUpRight
               size={13}
               className="opacity-60 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
@@ -865,11 +863,39 @@ export default function PublicFacingPage() {
             </button>
           </motion.div>
 
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.32 }}
+            className="mt-8 flex flex-wrap items-center justify-center gap-x-3 gap-y-2"
+          >
+            <div className="flex -space-x-2.5">
+              {[
+                "from-pink-400 to-rose-500",
+                "from-violet-400 to-purple-500",
+                "from-sky-400 to-blue-500",
+                "from-fuchsia-400 to-pink-500",
+                "from-indigo-400 to-violet-500",
+              ].map((g, i) => (
+                <span
+                  key={i}
+                  className={`h-7 w-7 rounded-full bg-gradient-to-br ${g} ring-2 ring-[#08080a]`}
+                />
+              ))}
+            </div>
+            <p className="text-sm text-white/65">
+              Used by{" "}
+              <span className="font-semibold text-white">
+                1 in 6 Yale undergrads
+              </span>
+            </p>
+          </motion.div>
+
           <motion.p
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.8, delay: 0.4 }}
-            className="mt-5 text-xs text-white/35"
+            className="mt-4 text-xs text-white/35"
           >
             Free, always &nbsp;·&nbsp; Sign in with Yale CAS &nbsp;·&nbsp; v2
             launched Feb 2026
@@ -893,7 +919,9 @@ export default function PublicFacingPage() {
               1 in 6 undergrads
             </span>
             <span className="hidden h-4 w-px bg-white/10 sm:block" />
-            <span>Yale Daily News</span>
+            <span className="font-louize text-base text-white/65">
+              The Yale Daily News
+            </span>
             <span className="hidden h-4 w-px bg-white/10 sm:block" />
             <span>14 residential colleges</span>
             <span className="hidden h-4 w-px bg-white/10 sm:block" />
@@ -1157,6 +1185,10 @@ export default function PublicFacingPage() {
           <KeyboardGraphic />
           <Reveal>
             <div className="mt-10 text-center">
+              <span className="mb-5 inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-xs text-white/65 backdrop-blur-md">
+                <Command size={12} className="text-pink-300" /> K · Search your
+                entire degree
+              </span>
               <h2 className="text-balance text-4xl font-semibold tracking-tight text-white sm:text-5xl">
                 Take the short way.
               </h2>

@@ -18,12 +18,19 @@ import Link from "next/link";
 import { Info, Sun, Moon } from "lucide-react";
 import { UserAvatar } from "../ui/UserAvatar";
 import { useTheme } from "@/context/ThemeContext";
+import {
+  getDanKeyStatus,
+  saveDanKey,
+  deleteDanKey,
+  type DanKeyStatus,
+} from "@/lib/dan/client";
 
 interface UserProfile {
   majors: string[];
   graduationYear: number;
   bio?: string;
   updatedAt: Date;
+  danWriteActionsEnabled?: boolean;
 }
 
 interface UserSettingsModalProps {
@@ -74,6 +81,22 @@ export default function UserSettingsModal({
   const [showDisableFriendsConfirm, setShowDisableFriendsConfirm] =
     useState(false);
 
+  // Dan AI advisor — API key
+  const [danKeyStatus, setDanKeyStatus] = useState<DanKeyStatus>({
+    connected: false,
+  });
+  const [danKeyInput, setDanKeyInput] = useState("");
+  const [isDanConnecting, setIsDanConnecting] = useState(false);
+  const [danConnectError, setDanConnectError] = useState<string | null>(null);
+  const [danJustConnected, setDanJustConnected] = useState(false);
+  const [isDanRemoving, setIsDanRemoving] = useState(false);
+
+  // Dan AI advisor — write-actions toggle
+  const [danWriteActions, setDanWriteActions] = useState(
+    userProfile?.danWriteActionsEnabled ?? false,
+  );
+  const [isTogglingDanWrite, setIsTogglingDanWrite] = useState(false);
+
   const modalRef = useRef<HTMLDivElement>(null);
 
   const BIO_MAX = 200;
@@ -86,6 +109,11 @@ export default function UserSettingsModal({
       setBioCount((userProfile.bio || "").length);
     }
   }, [userProfile]);
+
+  // Fetch Dan key status on mount
+  useEffect(() => {
+    getDanKeyStatus().then(setDanKeyStatus).catch(() => {});
+  }, []);
 
   // Close modal when clicking outside (but ignore portaled dropdowns)
   useEffect(() => {
@@ -230,6 +258,49 @@ export default function UserSettingsModal({
       });
     } finally {
       setIsSaving(false);
+    }
+  };
+
+  const handleDanConnect = async () => {
+    const trimmed = danKeyInput.trim();
+    if (!trimmed) return;
+    setIsDanConnecting(true);
+    setDanConnectError(null);
+    try {
+      const result = await saveDanKey(trimmed);
+      if (result.ok) {
+        setDanKeyInput("");
+        setDanJustConnected(true);
+        setTimeout(() => setDanJustConnected(false), 2000);
+        const status = await getDanKeyStatus();
+        setDanKeyStatus(status);
+      } else {
+        setDanConnectError(result.error);
+      }
+    } finally {
+      setIsDanConnecting(false);
+    }
+  };
+
+  const handleDanRemove = async () => {
+    setIsDanRemoving(true);
+    try {
+      await deleteDanKey();
+      const status = await getDanKeyStatus();
+      setDanKeyStatus(status);
+    } finally {
+      setIsDanRemoving(false);
+    }
+  };
+
+  const handleToggleDanWrite = async () => {
+    const next = !danWriteActions;
+    setDanWriteActions(next);
+    setIsTogglingDanWrite(true);
+    try {
+      await onSave({ danWriteActionsEnabled: next });
+    } finally {
+      setIsTogglingDanWrite(false);
     }
   };
 
@@ -503,6 +574,116 @@ export default function UserSettingsModal({
               </motion.div>
             )}
           </AnimatePresence>
+
+          {/* Dan AI Advisor */}
+          <div className="mb-3 rounded-xl border border-black/[0.06] dark:border-white/[0.08] bg-gray-50 dark:bg-transparent dark:bg-gradient-to-br dark:from-white/[0.06] dark:via-transparent dark:to-black/10 shadow-sm dark:shadow-[0_2px_12px_rgba(0,0,0,0.2)] backdrop-blur-sm overflow-hidden">
+            <div className="flex items-center justify-between px-3 py-2 border-b border-black/[0.06] dark:border-white/[0.06]">
+              <span className="text-xs font-medium text-gray-800 dark:text-gray-200">
+                Dan AI advisor
+              </span>
+            </div>
+
+            {/* API key connection */}
+            <div className="px-3 py-2.5 border-b border-black/[0.06] dark:border-white/[0.06]">
+              {danKeyStatus.connected ? (
+                <div className="flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-1.5">
+                    <span className="inline-block h-1.5 w-1.5 rounded-full bg-emerald-500 shrink-0" />
+                    <span className="text-[11px] text-gray-700 dark:text-gray-300">
+                      Connected &bull; key ending ••••{danKeyStatus.last4}
+                    </span>
+                  </div>
+                  <button
+                    onClick={handleDanRemove}
+                    disabled={isDanRemoving}
+                    className="px-2 py-1 text-[11px] rounded-lg border border-black/[0.06] dark:border-white/[0.08] hover:border-red-400/50 hover:bg-red-500/[0.06] text-gray-500 dark:text-gray-400 hover:text-red-500 dark:hover:text-red-400 disabled:opacity-50 transition-all duration-200"
+                  >
+                    {isDanRemoving ? (
+                      <span className="flex items-center gap-1">
+                        <span className="animate-spin h-2.5 w-2.5 border-2 border-current/30 border-t-current rounded-full" />
+                        Removing…
+                      </span>
+                    ) : (
+                      "Remove"
+                    )}
+                  </button>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  <div className="flex items-center gap-1.5">
+                    <input
+                      type="password"
+                      value={danKeyInput}
+                      onChange={(e) => {
+                        setDanKeyInput(e.target.value);
+                        if (danConnectError) setDanConnectError(null);
+                        if (danJustConnected) setDanJustConnected(false);
+                      }}
+                      placeholder="sk-ant-..."
+                      className="flex-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg px-2.5 py-1.5 focus:outline-none focus:ring-1 focus:ring-pink-500/40 focus:border-pink-500/50 text-gray-900 dark:text-gray-200 placeholder:text-gray-400 dark:placeholder:text-gray-500 text-xs transition-all duration-200"
+                    />
+                    <button
+                      onClick={handleDanConnect}
+                      disabled={isDanConnecting || !danKeyInput.trim()}
+                      className={`px-2.5 py-1.5 text-[11px] rounded-lg text-white disabled:opacity-50 flex items-center gap-1 transition-all duration-200 ${
+                        danJustConnected
+                          ? "bg-gradient-to-r from-emerald-500 to-emerald-600"
+                          : "bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700"
+                      }`}
+                    >
+                      {isDanConnecting ? (
+                        <>
+                          <span className="animate-spin h-2.5 w-2.5 border-2 border-white/30 border-t-white rounded-full" />
+                          Connecting…
+                        </>
+                      ) : danJustConnected ? (
+                        "Connected"
+                      ) : (
+                        "Connect"
+                      )}
+                    </button>
+                  </div>
+                  {danConnectError && (
+                    <p className="text-[10px] text-red-400">{danConnectError}</p>
+                  )}
+                  <p className="text-[10px] text-gray-500 dark:text-gray-400 leading-snug">
+                    Dan runs on your own Anthropic key. Get one at{" "}
+                    <a
+                      href="https://console.anthropic.com"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="underline underline-offset-2 hover:text-gray-700 dark:hover:text-gray-200 transition-colors"
+                    >
+                      console.anthropic.com
+                    </a>
+                    .
+                  </p>
+                </div>
+              )}
+            </div>
+
+            {/* Write-actions toggle */}
+            <div className="flex items-center justify-between px-3 py-2.5">
+              <div className="flex-1 mr-2">
+                <span className="text-xs font-medium text-gray-800 dark:text-gray-200">
+                  Let Dan make changes
+                </span>
+                <p className="text-[10px] text-gray-500 dark:text-gray-400 mt-0.5">
+                  Off by default. When on, Dan can add or remove courses, and will always ask before each change.
+                </p>
+              </div>
+              <label className="relative inline-flex items-center cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={danWriteActions}
+                  disabled={isTogglingDanWrite}
+                  onChange={handleToggleDanWrite}
+                  className="sr-only peer"
+                />
+                <div className="w-11 h-6 rounded-full peer transition-colors bg-gray-300 dark:bg-gray-600 shadow-[inset_0_1px_3px_rgba(0,0,0,0.22)] dark:shadow-[inset_0_1px_3px_rgba(0,0,0,0.5)] peer-focus:ring-2 peer-focus:ring-pink-500/40 peer-checked:bg-gradient-to-r peer-checked:from-pink-500 peer-checked:to-purple-600 peer-disabled:opacity-50 after:content-[''] after:absolute after:top-[3px] after:left-[3px] after:h-[18px] after:w-[18px] after:rounded-full after:bg-white after:shadow-[0_1px_3px_rgba(0,0,0,0.45)] after:transition-transform peer-checked:after:translate-x-5"></div>
+              </label>
+            </div>
+          </div>
 
           {/* Majors */}
           <div className="mb-3">

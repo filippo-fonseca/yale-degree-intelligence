@@ -9,6 +9,11 @@ import {
   FiPlus,
   FiTrash2,
   FiRefreshCw,
+  FiBookOpen,
+  FiCalendar,
+  FiSave,
+  FiFolder,
+  FiCheckCircle,
 } from "react-icons/fi";
 import { Info } from "lucide-react";
 import { Course } from "@/lib/types";
@@ -110,6 +115,60 @@ function isPastSemester(semesterName: string) {
   if (sem === "Fall" && currentMonth > 11) return true; // > Dec (never true, handled by next year check)
   if (sem === "Spring" && currentMonth >= 5) return true; // June 1+ (Spring ended)
   return false;
+}
+
+// ----------------- Stat Card (mirrors MajorProgressView pattern) -----------------
+function SimStatCard({
+  label,
+  value,
+  color = "text-gray-900 dark:text-white",
+  icon,
+  sub,
+}: {
+  label: string;
+  value: string | number;
+  color?: string;
+  icon?: React.ReactNode;
+  sub?: string;
+}) {
+  return (
+    <motion.div
+      whileHover={{ y: -1 }}
+      className="p-3 rounded-xl bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 backdrop-blur-md border border-gray-200 dark:border-gray-800/50 hover:border-gray-300 dark:hover:border-gray-700/60 transition-all relative shadow-neu"
+    >
+      {icon && (
+        <div className="mb-1 text-gray-400 dark:text-gray-500">{icon}</div>
+      )}
+      <p className="text-xs text-gray-400 dark:text-gray-500">{label}</p>
+      <p className={`text-lg font-medium mt-0.5 ${color}`}>{value}</p>
+      {sub && <p className="text-[10px] text-gray-400 dark:text-gray-600 mt-0.5">{sub}</p>}
+    </motion.div>
+  );
+}
+
+// Skeleton pulse card
+function SkeletonStatCard() {
+  return (
+    <div className="p-3 rounded-xl border border-gray-200 dark:border-gray-800/50 shadow-neu bg-white dark:bg-gray-900/30 animate-pulse">
+      <div className="h-3 w-16 rounded bg-gray-200 dark:bg-gray-700/50 mb-2" />
+      <div className="h-5 w-12 rounded bg-gray-300 dark:bg-gray-600/50" />
+    </div>
+  );
+}
+
+function SkeletonSemester() {
+  return (
+    <div className="rounded-xl border border-gray-200 dark:border-gray-800/40 bg-white dark:bg-gray-900/20 p-3 min-h-[160px] animate-pulse">
+      <div className="flex justify-between mb-3">
+        <div className="h-3.5 w-20 rounded bg-gray-200 dark:bg-gray-700/50" />
+        <div className="h-3.5 w-10 rounded bg-gray-200 dark:bg-gray-700/50" />
+      </div>
+      <div className="space-y-2">
+        <div className="h-7 w-full rounded-lg bg-gray-100 dark:bg-gray-800/40" />
+        <div className="h-7 w-4/5 rounded-lg bg-gray-100 dark:bg-gray-800/40" />
+      </div>
+    </div>
+  );
 }
 
 // ----------------- Component -----------------
@@ -414,7 +473,7 @@ export default function Simulator({
             plans[0];
           if (toLoad) loadPlanData(toLoad);
         } else {
-          // Brand-new user with no plans → show the welcome modal.
+          // Brand-new user with no plans — show the welcome modal.
           setShowPlanSelector(true);
         }
         setPlansLoaded(true);
@@ -803,30 +862,103 @@ export default function Simulator({
   const hasInProgress = (semester: Semester) =>
     semester.courses.some((c) => c.status === "in-progress");
 
+  // ------------ Derived stats for header ------------
+  const totalPlannedCourses = useMemo(
+    () =>
+      semesters.reduce(
+        (acc, s) =>
+          acc + s.courses.filter((c) => c.status === "not-taken").length,
+        0,
+      ),
+    [semesters],
+  );
+
+  const totalPlannedCredits = useMemo(
+    () =>
+      semesters.reduce(
+        (acc, s) =>
+          acc +
+          s.courses
+            .filter((c) => c.status === "not-taken")
+            .reduce(
+              (sum, c) => sum + getCourseCredits(c as Course & MaybeCreditFields),
+              0,
+            ),
+        0,
+      ),
+    [semesters],
+  );
+
+  const futureSemesters = useMemo(
+    () => semesters.filter((s) => !isPastSemester(s.name)),
+    [semesters],
+  );
+
   // ----------------- Render -----------------
   return (
     <div
-      className="space-y-4 font-louize"
+      className="space-y-5 font-louize"
       onDragEnd={() => {
         setDraggedCourse(null);
         setDragSourceSemester(null);
         setHoveredSemester(null);
       }}
     >
-      {/* Header */}
-      <div className="mb-4">
+      {/* ======== Header ======== */}
+      <div className="mb-2">
         <h2 className="text-3xl font-medium text-gray-900 dark:text-white">
           Need to visualize? No problem.
         </h2>
-        <p className="text-gray-500 dark:text-gray-400">
-          Your interactive, tailor-made, drag-and-drop Yale degree simulator is
-          here.
+        <p className="text-gray-500 dark:text-gray-400 mt-0.5">
+          Your interactive, tailor-made, drag-and-drop Yale degree simulator.
         </p>
       </div>
 
-      {/* Sticky Toolbar */}
+      {/* ======== Summary Stat Cards ======== */}
+      {!plansLoaded ? (
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          <SkeletonStatCard />
+          <SkeletonStatCard />
+          <SkeletonStatCard />
+          <SkeletonStatCard />
+        </div>
+      ) : (
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          <SimStatCard
+            label="Planned Courses"
+            value={totalPlannedCourses}
+            color="text-violet-600 dark:text-violet-300"
+            icon={<FiBookOpen size={14} />}
+          />
+          <SimStatCard
+            label="Planned Credits"
+            value={
+              Number.isInteger(totalPlannedCredits)
+                ? totalPlannedCredits
+                : totalPlannedCredits.toFixed(1)
+            }
+            color="text-blue-600 dark:text-blue-300"
+            icon={<FiCheckCircle size={14} />}
+          />
+          <SimStatCard
+            label="Future Semesters"
+            value={futureSemesters.length}
+            color="text-emerald-600 dark:text-emerald-300"
+            icon={<FiCalendar size={14} />}
+          />
+          <SimStatCard
+            label="Saved Plans"
+            value={savedPlans.length}
+            color="text-amber-600 dark:text-amber-300"
+            icon={<FiFolder size={14} />}
+            sub={currentPlanName ? `Active: ${currentPlanName}` : "No plan loaded"}
+          />
+        </div>
+      )}
+
+      {/* ======== Sticky Toolbar ======== */}
       <div
-        className={`sticky top-0 z-30 -mx-4 px-6 py-3 mb-4 backdrop-blur-xl transition-all duration-200 ${
+        className={`sticky top-0 z-30 -mx-4 px-6 py-3 backdrop-blur-xl transition-all duration-200 ${
           isScrolled
             ? "bg-white/95 dark:bg-transparent dark:bg-gradient-to-r dark:from-gray-900/95 dark:via-gray-950/95 dark:to-gray-900/95 border-b border-gray-200 dark:border-white/[0.06] shadow-[0_4px_20px_rgba(0,0,0,0.08)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.3)]"
             : "bg-transparent border-b border-transparent"
@@ -834,21 +966,21 @@ export default function Simulator({
       >
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
           {/* Current Plan Status */}
-          <div className="flex items-center gap-3">
-            <span className="text-xs text-gray-400 dark:text-gray-500 uppercase tracking-wider">
+          <div className="flex items-center gap-2.5">
+            <span className="text-xs text-gray-400 dark:text-gray-500 uppercase tracking-wider shrink-0">
               Plan:
             </span>
-            <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-black/[0.04] dark:bg-white/[0.04] border border-black/[0.06] dark:border-white/[0.08]">
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-black/[0.04] dark:bg-white/[0.04] border border-black/[0.06] dark:border-white/[0.08]">
               {currentPlanName ? (
                 <>
                   <div
-                    className={`w-2.5 h-2.5 rounded-full ${hasChanges ? "bg-amber-400 animate-pulse" : "bg-emerald-400"}`}
+                    className={`w-2 h-2 rounded-full shrink-0 ${hasChanges ? "bg-amber-400 animate-pulse" : "bg-emerald-400"}`}
                   />
-                  <span className="text-base font-medium text-gray-800 dark:text-gray-200">
+                  <span className="text-sm font-medium text-gray-800 dark:text-gray-200 leading-none">
                     {currentPlanName}
                   </span>
                   {hasChanges && (
-                    <span className="text-xs text-amber-400 ml-1 px-2 py-0.5 rounded-full bg-amber-400/10 border border-amber-400/20">
+                    <span className="text-[10px] text-amber-500 dark:text-amber-400 px-1.5 py-0.5 rounded-full bg-amber-400/10 border border-amber-400/20 leading-none">
                       unsaved
                     </span>
                   )}
@@ -856,9 +988,9 @@ export default function Simulator({
               ) : (
                 <>
                   <div
-                    className={`w-2.5 h-2.5 rounded-full ${hasChanges ? "bg-blue-400 animate-pulse" : "bg-gray-500"}`}
+                    className={`w-2 h-2 rounded-full shrink-0 ${hasChanges ? "bg-blue-400 animate-pulse" : "bg-gray-400 dark:bg-gray-600"}`}
                   />
-                  <span className="text-sm text-gray-500 dark:text-gray-400">
+                  <span className="text-sm text-gray-500 dark:text-gray-400 leading-none">
                     {hasChanges ? "Unsaved new plan" : "No plan loaded"}
                   </span>
                 </>
@@ -870,104 +1002,101 @@ export default function Simulator({
           <div className="flex items-center gap-2 flex-wrap">
             <button
               onClick={() => setShowHelp((v) => !v)}
-              className="px-4 py-2 text-sm rounded-xl bg-black/[0.04] dark:bg-white/[0.04] backdrop-blur-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-black/[0.06] dark:hover:bg-white/[0.08] border border-black/[0.06] dark:border-white/[0.08] flex items-center gap-2 transition-all"
+              className="px-3 py-1.5 text-sm rounded-xl bg-black/[0.04] dark:bg-white/[0.04] backdrop-blur-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-black/[0.06] dark:hover:bg-white/[0.08] border border-black/[0.06] dark:border-white/[0.08] flex items-center gap-1.5 transition-all"
             >
-              <FiInfo size={14} />
+              <FiInfo size={13} />
               Help
             </button>
             {user && (
               <>
                 <button
                   onClick={() => setShowPlansModal(true)}
-                  className="px-4 py-2 text-sm rounded-xl bg-gradient-to-r from-blue-500/15 to-purple-500/15 backdrop-blur-sm text-blue-300 hover:text-blue-200 hover:from-blue-500/20 hover:to-purple-500/20 border border-blue-500/30 hover:border-blue-400/40 flex items-center gap-2 transition-all"
+                  className="px-3 py-1.5 text-sm rounded-xl bg-gradient-to-r from-blue-500/12 to-purple-500/12 dark:from-blue-500/15 dark:to-purple-500/15 backdrop-blur-sm text-blue-600 dark:text-blue-300 hover:text-blue-700 dark:hover:text-blue-200 hover:from-blue-500/18 hover:to-purple-500/18 dark:hover:from-blue-500/20 dark:hover:to-purple-500/20 border border-blue-400/30 dark:border-blue-500/30 hover:border-blue-500/40 dark:hover:border-blue-400/40 flex items-center gap-1.5 transition-all"
                 >
-                  <FiChevronDown size={14} />
-                  Load Plan
+                  <FiFolder size={13} />
+                  My Plans
                 </button>
                 <button
                   onClick={() => setShowSaveModal(true)}
-                  className={`px-4 py-2 text-sm rounded-xl backdrop-blur-sm transition-all flex items-center gap-2 ${
+                  disabled={!hasChanges}
+                  className={`px-3 py-1.5 text-sm rounded-xl backdrop-blur-sm transition-all flex items-center gap-1.5 ${
                     hasChanges
-                      ? "bg-gradient-to-r from-emerald-500/20 to-teal-500/20 text-emerald-300 hover:text-emerald-200 hover:from-emerald-500/25 hover:to-teal-500/25 border border-emerald-500/30 hover:border-emerald-400/40"
+                      ? "bg-gradient-to-r from-emerald-500/15 to-teal-500/15 text-emerald-600 dark:text-emerald-300 hover:text-emerald-700 dark:hover:text-emerald-200 hover:from-emerald-500/20 hover:to-teal-500/20 border border-emerald-400/30 dark:border-emerald-500/30 hover:border-emerald-500/40 dark:hover:border-emerald-400/40"
                       : "bg-black/[0.02] dark:bg-white/[0.02] text-gray-400 dark:text-gray-600 border border-black/[0.04] dark:border-white/[0.04] cursor-not-allowed"
                   }`}
-                  disabled={!hasChanges}
                 >
-                  <FiPlus size={14} />
-                  Save Current
+                  <FiSave size={13} />
+                  Save
                 </button>
               </>
             )}
             <button
               onClick={resetSimulator}
-              className="px-4 py-2 text-sm rounded-xl bg-red-500/10 backdrop-blur-sm text-red-400 hover:text-red-300 hover:bg-red-500/15 border border-red-500/20 hover:border-red-400/30 flex items-center gap-2 transition-all"
+              className="px-3 py-1.5 text-sm rounded-xl bg-red-500/8 dark:bg-red-500/10 backdrop-blur-sm text-red-500 dark:text-red-400 hover:text-red-600 dark:hover:text-red-300 hover:bg-red-500/12 dark:hover:bg-red-500/15 border border-red-400/20 dark:border-red-500/20 hover:border-red-400/30 dark:hover:border-red-400/30 flex items-center gap-1.5 transition-all"
             >
-              <FiRefreshCw size={14} />
-              Clear canvas
+              <FiRefreshCw size={13} />
+              Clear
             </button>
           </div>
         </div>
       </div>
 
-      {/* Help Panel */}
+      {/* ======== Help Panel ======== */}
       <AnimatePresence>
         {showHelp && (
           <motion.div
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
-            className="overflow-hidden bg-gray-50 dark:bg-transparent dark:bg-gradient-to-br dark:from-white/[0.03] dark:to-transparent backdrop-blur-xl rounded-xl border border-gray-200 dark:border-white/[0.06] p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_4px_20px_rgba(0,0,0,0.08)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_4px_20px_rgba(0,0,0,0.15)]"
+            className="overflow-hidden"
           >
-            <h4 className="font-medium text-sm text-gray-900 dark:text-white mb-2">
-              How to use the simulator
-            </h4>
-            <ul className="text-xs text-gray-500 dark:text-gray-400 space-y-1.5 list-disc list-inside">
-              <li>
-                Use this simulator to plan out your remaining semesters and see
-                fit.
-              </li>
-              <li>
-                The pool shows remaining courses in your major; you can also add
-                any course manually.
-              </li>
-              <li>
-                Drag/add courses into any semester (multiple courses per term
-                work fine).
-              </li>
-              <li>
-                Click the trash icon on a course to remove it (if it's not
-                completed/in-progress).
-              </li>
-              <li>
-                Completed/in-progress are pre-assigned and cannot be moved.
-              </li>
-              <li>Save or load plans to explore what-ifs and revisit later.</li>
-            </ul>
+            <div className="bg-gray-50 dark:bg-transparent dark:bg-gradient-to-br dark:from-white/[0.03] dark:to-transparent backdrop-blur-xl rounded-xl border border-gray-200 dark:border-white/[0.06] p-4 shadow-neu">
+              <h4 className="font-medium text-sm text-gray-900 dark:text-white mb-2">
+                How to use the Simulator
+              </h4>
+              <ul className="text-xs text-gray-500 dark:text-gray-400 space-y-1.5 list-disc list-inside">
+                <li>
+                  Use this simulator to plan out your remaining semesters and visualize degree fit.
+                </li>
+                <li>
+                  The course pool shows remaining courses in your major; you can also add any course manually.
+                </li>
+                <li>
+                  Drag or add courses into any future semester. Multiple courses per term work fine.
+                </li>
+                <li>
+                  Click the trash icon on a course chip to remove it (not available for completed or in-progress courses).
+                </li>
+                <li>
+                  Completed and in-progress courses are pre-assigned and cannot be moved.
+                </li>
+                <li>Save or load plans to explore what-ifs and revisit later.</li>
+              </ul>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* Live Major Progress Preview */}
-      <div className="space-y-3">
+      {/* ======== Major Progress Preview ======== */}
+      <div className="rounded-xl border border-gray-200 dark:border-gray-800/50 bg-white/40 dark:bg-gray-900/20 overflow-hidden shadow-neu">
         <button
           onClick={() => setShowMajorPreview((v) => !v)}
-          className="w-full flex items-start justify-between text-left group"
+          className="w-full flex items-center justify-between px-4 py-3 text-left hover:bg-gray-50 dark:hover:bg-gray-800/20 transition-colors"
           aria-expanded={showMajorPreview}
         >
           <div>
-            <h3 className="text-lg font-medium text-gray-900 dark:text-white">
+            <h3 className="text-sm font-medium text-gray-900 dark:text-white">
               Progress toward {majorIds.length > 1 ? "majors" : "major"}
             </h3>
-            <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
-              Live preview — reflects completed, in-progress, and courses placed
-              on the grid.
+            <p className="text-[11px] text-gray-400 dark:text-gray-500 mt-0.5">
+              Live preview — reflects completed, in-progress, and planned courses.
             </p>
           </div>
           <FiChevronDown
-            className={`mt-1 shrink-0 text-gray-400 dark:text-gray-500 transition-transform ${
+            className={`shrink-0 text-gray-400 dark:text-gray-500 transition-transform ${
               showMajorPreview ? "rotate-180" : ""
             }`}
-            size={18}
+            size={16}
           />
         </button>
 
@@ -977,60 +1106,70 @@ export default function Simulator({
               initial={{ height: 0, opacity: 0 }}
               animate={{ height: "auto", opacity: 1 }}
               exit={{ height: 0, opacity: 0 }}
-              transition={{ duration: 0.25, ease: "easeInOut" }}
-              className="overflow-hidden space-y-3"
+              transition={{ duration: 0.22, ease: "easeInOut" }}
+              className="overflow-hidden"
             >
-              {isPreviewLoading && (
-                <div className="text-sm text-gray-500 dark:text-gray-400">
-                  Updating preview…
-                </div>
-              )}
-              {previewError && (
-                <div className="text-sm text-red-600 dark:text-red-300">
-                  {previewError}
-                </div>
-              )}
-
-              <SimulatorRequirementsBreakdown
-                majorIds={majorIds}
-                previewProgress={previewProgress}
-                plannedCodes={plannedCodes}
-                simulatorManualReqs={simulatorManualReqs}
-                onRemoveManualReq={(code, requirement) => {
-                  setSimulatorManualReqs((prev) =>
-                    prev.filter(
-                      (m) => !(m.code === code && m.requirement === requirement),
-                    ),
-                  );
-                }}
-              />
+              <div className="px-4 pb-4 pt-1 space-y-3 border-t border-gray-100 dark:border-gray-800/40">
+                {isPreviewLoading && (
+                  <p className="text-xs text-gray-400 dark:text-gray-500 animate-pulse">
+                    Updating preview...
+                  </p>
+                )}
+                {previewError && (
+                  <p className="text-xs text-red-500 dark:text-red-400">
+                    {previewError}
+                  </p>
+                )}
+                <SimulatorRequirementsBreakdown
+                  majorIds={majorIds}
+                  previewProgress={previewProgress}
+                  plannedCodes={plannedCodes}
+                  simulatorManualReqs={simulatorManualReqs}
+                  onRemoveManualReq={(code, requirement) => {
+                    setSimulatorManualReqs((prev) =>
+                      prev.filter(
+                        (m) => !(m.code === code && m.requirement === requirement),
+                      ),
+                    );
+                  }}
+                />
+              </div>
             </motion.div>
           )}
         </AnimatePresence>
       </div>
 
-      {/* Available Courses Pool */}
-      <div className="sticky top-[72px] z-20 mb-2">
-        <div className="bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-pink-950/30 dark:via-gray-900/50 dark:to-gray-950/50 backdrop-blur-md rounded-xl border border-pink-200 dark:border-pink-800/30 shadow-[inset_0_1px_0_rgba(255,255,255,0.04),0_4px_16px_rgba(0,0,0,0.08)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.04),0_4px_16px_rgba(0,0,0,0.25)] overflow-hidden">
+      {/* ======== Course Pool ======== */}
+      <div className="sticky top-[62px] z-20">
+        <div className="bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-violet-950/30 dark:via-gray-900/50 dark:to-gray-950/50 backdrop-blur-md rounded-xl border border-violet-200 dark:border-violet-800/30 shadow-neu overflow-hidden">
           <button
             onClick={() => setShowPool(!showPool)}
-            className={`flex items-center justify-between w-full p-3 ${
-              showPool ? "border-b border-pink-200 dark:border-pink-800/30" : ""
-            } text-gray-700 dark:text-gray-300 hover:bg-pink-50 dark:hover:bg-pink-900/20 transition-colors`}
+            className={`flex items-center justify-between w-full px-4 py-3 ${
+              showPool ? "border-b border-violet-200 dark:border-violet-800/30" : ""
+            } text-gray-700 dark:text-gray-300 hover:bg-violet-50 dark:hover:bg-violet-900/15 transition-colors`}
           >
             <div className="flex items-center gap-2 font-medium text-sm">
-              <div>Quick-add: Pool of remaining courses from your major</div>
+              <FiBookOpen className="text-violet-500 dark:text-violet-400 shrink-0" size={14} />
+              <span>Course Pool</span>
+              <span className="text-[11px] font-normal text-gray-400 dark:text-gray-500">
+                — remaining major courses
+              </span>
               <div className="relative group">
-                <Info className="h-3.5 w-3.5 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition-colors cursor-pointer" />
-                <div className="absolute z-50 bottom-full mt-2 left-1/2 -translate-x-1/2 bg-white dark:bg-gray-900/95 backdrop-blur-sm text-gray-700 dark:text-gray-300 text-[10px] px-2 py-1 rounded-md border border-gray-200 dark:border-gray-800/50 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
-                  May not include all. Add manually if not.
+                <Info className="h-3.5 w-3.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors cursor-pointer" />
+                <div className="absolute z-50 bottom-full mb-1.5 left-1/2 -translate-x-1/2 bg-white dark:bg-gray-900/95 backdrop-blur-sm text-gray-700 dark:text-gray-300 text-[10px] px-2 py-1.5 rounded-lg border border-gray-200 dark:border-gray-800/50 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none shadow-lg">
+                  May not include all. Add manually if missing.
                 </div>
               </div>
+              {availableCourses.length > 0 && (
+                <span className="px-1.5 py-0.5 rounded-full text-[10px] font-medium bg-violet-100 dark:bg-violet-900/30 text-violet-600 dark:text-violet-300 border border-violet-300 dark:border-violet-700/40">
+                  {availableCourses.length}
+                </span>
+              )}
             </div>
             {showPool ? (
-              <FiChevronUp className="w-3.5 h-3.5 text-gray-500" />
+              <FiChevronUp className="w-3.5 h-3.5 text-gray-400 dark:text-gray-500 shrink-0" />
             ) : (
-              <FiChevronDown className="w-3.5 h-3.5 text-gray-500" />
+              <FiChevronDown className="w-3.5 h-3.5 text-gray-400 dark:text-gray-500 shrink-0" />
             )}
           </button>
 
@@ -1041,12 +1180,11 @@ export default function Simulator({
                 animate={{ opacity: 1, height: "auto" }}
                 exit={{ opacity: 0, height: 0 }}
                 transition={{ duration: 0.2 }}
-                className="p-3"
+                className="px-4 py-3"
               >
                 {availableCourses.length === 0 ? (
                   <p className="text-[11px] text-gray-400 dark:text-gray-500 italic">
-                    All available courses have been scheduled. Remove one from a
-                    semester to add it back.
+                    All available courses have been scheduled. Remove one from a semester to add it back.
                   </p>
                 ) : (
                   <div className="max-h-28 overflow-y-auto pr-1 flex flex-wrap gap-1.5">
@@ -1055,16 +1193,16 @@ export default function Simulator({
                         key={course.code}
                         draggable
                         onDragStart={() => handleDragStart(course)}
-                        whileHover={{ scale: 1.02 }}
-                        whileTap={{ scale: 0.98 }}
-                        className="px-2 py-1 rounded-lg bg-pink-100 dark:bg-pink-900/25 text-pink-700 dark:text-pink-300 border border-pink-300 dark:border-pink-700/40 text-xs cursor-grab active:cursor-grabbing select-none shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]"
+                        whileHover={{ scale: 1.03, y: -1 }}
+                        whileTap={{ scale: 0.97 }}
+                        className="px-2.5 py-1 rounded-lg bg-violet-100 dark:bg-violet-900/25 text-violet-700 dark:text-violet-300 border border-violet-300 dark:border-violet-700/40 text-xs cursor-grab active:cursor-grabbing select-none shadow-[inset_0_1px_0_rgba(255,255,255,0.12)] transition-colors hover:bg-violet-200 dark:hover:bg-violet-800/30"
                       >
-                        {course.code}
-                        <span className="text-[10px] text-pink-500/70 dark:text-pink-200/50 ml-1">
-                          {(getCourseNameFromCode(course.code) ?? "").length > 0
-                            ? ` ${getCourseNameFromCode(course.code)}`
-                            : ""}
-                        </span>
+                        <span className="font-medium">{course.code}</span>
+                        {(getCourseNameFromCode(course.code) ?? "").length > 0 && (
+                          <span className="text-[10px] text-violet-500/70 dark:text-violet-200/50 ml-1">
+                            {getCourseNameFromCode(course.code)}
+                          </span>
+                        )}
                       </motion.div>
                     ))}
                   </div>
@@ -1075,135 +1213,197 @@ export default function Simulator({
         </div>
       </div>
 
-      {/* Semesters Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-        {semesters.map((semester) => {
-          const semCredits = getSemesterCredits(semester);
-          const semCreditsLabel = Number.isInteger(semCredits)
-            ? String(semCredits)
-            : semCredits.toFixed(1);
+      {/* ======== Semesters Grid ======== */}
+      {!plansLoaded ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <SkeletonSemester key={i} />
+          ))}
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+          {semesters.map((semester) => {
+            const semCredits = getSemesterCredits(semester);
+            const semCreditsLabel = Number.isInteger(semCredits)
+              ? String(semCredits)
+              : semCredits.toFixed(1);
+            const isPast = isPastSemester(semester.name);
+            const isHovered =
+              hoveredSemester === semester.id &&
+              draggedCourse !== null &&
+              !isPast;
 
-          return (
-            <motion.div
-              key={semester.id}
-              onDragOver={(e) => {
-                e.preventDefault();
-                if (!isPastSemester(semester.name))
-                  setHoveredSemester(semester.id);
-              }}
-              onDragLeave={() => setHoveredSemester(null)}
-              onDrop={() => {
-                if (isPastSemester(semester.name)) return;
-                handleDrop(semester.id);
-                setHoveredSemester(null);
-              }}
-              className={`bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 backdrop-blur-md rounded-xl border p-3 min-h-[160px] flex flex-col transition-all shadow-[inset_0_1px_0_rgba(255,255,255,0.04),0_4px_12px_rgba(0,0,0,0.08)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.04),0_4px_12px_rgba(0,0,0,0.2)]
-                ${
-                  hasInProgress(semester)
-                    ? "border-blue-700/50 ring-1 ring-blue-500/30"
-                    : "border-gray-200 dark:border-gray-800/50"
-                }
-                ${
-                  hoveredSemester === semester.id &&
-                  draggedCourse &&
-                  !isPastSemester(semester.name)
-                    ? "ring-2 ring-pink-400/60 scale-[0.98] bg-gray-100 dark:bg-gray-800/60"
-                    : ""
-                }`}
-            >
-              <div className="flex justify-between items-center mb-2">
-                <h4 className="font-medium text-sm text-gray-700 dark:text-gray-300">
-                  {semester.name}
-                </h4>
-                <div className="flex items-center gap-1.5">
-                  <span
-                    className="px-1.5 py-0.5 rounded-md text-[10px] bg-gray-100 dark:bg-gray-800/60 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-700/40"
-                    title="Sum of credits in this semester"
-                  >
-                    {semCreditsLabel} cr
-                  </span>
-                  {!isPastSemester(semester.name) && (
-                    <button
-                      onClick={() => setLookupSemesterId(semester.id)}
-                      className="px-1.5 py-0.5 text-[10px] rounded-md bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 hover:bg-blue-200 dark:hover:bg-blue-800/40 border border-blue-300 dark:border-blue-800/40 transition-all"
-                      type="button"
+            // Semester type styling
+            const isFall = semester.name.startsWith("Fall");
+            const semHeaderAccent = isPast
+              ? "text-gray-500 dark:text-gray-500"
+              : isFall
+                ? "text-amber-700 dark:text-amber-300"
+                : "text-sky-700 dark:text-sky-300";
+
+            return (
+              <motion.div
+                key={semester.id}
+                onDragOver={(e) => {
+                  e.preventDefault();
+                  if (!isPast) setHoveredSemester(semester.id);
+                }}
+                onDragLeave={() => setHoveredSemester(null)}
+                onDrop={() => {
+                  if (isPast) return;
+                  handleDrop(semester.id);
+                  setHoveredSemester(null);
+                }}
+                className={`rounded-xl border flex flex-col min-h-[160px] transition-all overflow-hidden
+                  ${isPast
+                    ? "bg-gray-50 dark:bg-gray-900/10 border-gray-200/60 dark:border-gray-800/30 opacity-75"
+                    : "bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 backdrop-blur-md shadow-neu"
+                  }
+                  ${hasInProgress(semester) && !isPast
+                    ? "border-blue-300 dark:border-blue-700/50 ring-1 ring-blue-300/40 dark:ring-blue-500/25"
+                    : !isPast
+                      ? "border-gray-200 dark:border-gray-800/50 hover:border-gray-300 dark:hover:border-gray-700/60"
+                      : ""
+                  }
+                  ${isHovered ? "ring-2 ring-violet-400/50 dark:ring-violet-500/40 border-violet-300 dark:border-violet-700/50 scale-[0.99]" : ""}
+                `}
+              >
+                {/* Semester Header */}
+                <div className={`flex justify-between items-center px-3 py-2.5 border-b ${
+                  isPast
+                    ? "border-gray-200/60 dark:border-gray-800/30 bg-gray-100/60 dark:bg-gray-900/30"
+                    : isFall
+                      ? "border-amber-100 dark:border-amber-900/20 bg-amber-50/50 dark:bg-amber-950/15"
+                      : "border-sky-100 dark:border-sky-900/20 bg-sky-50/50 dark:bg-sky-950/15"
+                }`}>
+                  <h4 className={`font-medium text-sm ${semHeaderAccent}`}>
+                    {semester.name}
+                    {isPast && (
+                      <span className="ml-1.5 text-[10px] font-normal text-gray-400 dark:text-gray-600">
+                        (past)
+                      </span>
+                    )}
+                  </h4>
+                  <div className="flex items-center gap-1.5">
+                    <span
+                      className="px-1.5 py-0.5 rounded-md text-[10px] bg-white/70 dark:bg-gray-800/60 text-gray-500 dark:text-gray-400 border border-gray-200 dark:border-gray-700/40"
+                      title="Credits this semester"
                     >
-                      <FiPlus className="inline-block mr-0.5" size={10} />
-                      Add
-                    </button>
+                      {semCreditsLabel} cr
+                    </span>
+                    {!isPast && (
+                      <button
+                        onClick={() => setLookupSemesterId(semester.id)}
+                        className="p-1 rounded-md bg-white dark:bg-gray-800/50 text-gray-500 dark:text-gray-400 hover:text-violet-600 dark:hover:text-violet-300 hover:bg-violet-50 dark:hover:bg-violet-900/20 border border-gray-200 dark:border-gray-700/40 hover:border-violet-300 dark:hover:border-violet-700/40 transition-all"
+                        type="button"
+                        title="Add course manually"
+                      >
+                        <FiPlus size={11} />
+                      </button>
+                    )}
+                  </div>
+                </div>
+
+                {/* Courses */}
+                <div className="p-2.5 flex-1 flex flex-col gap-1.5">
+                  {semester.courses.length === 0 ? (
+                    <div
+                      className={`flex-1 flex items-center justify-center border border-dashed rounded-lg p-3 min-h-[56px] transition-all ${
+                        isHovered
+                          ? "border-violet-400/60 dark:border-violet-500/50 bg-violet-50 dark:bg-violet-900/15"
+                          : "border-gray-200 dark:border-gray-700/40"
+                      }`}
+                    >
+                      <p className="text-[11px] text-gray-400 dark:text-gray-500 text-center">
+                        {isPast
+                          ? "No courses recorded"
+                          : "Drag from pool or add"}
+                      </p>
+                    </div>
+                  ) : (
+                    <>
+                      {semester.courses.map((course) => (
+                        <motion.div
+                          key={`${semester.id}-${course.code}`}
+                          draggable={course.status === "not-taken"}
+                          onDragStart={
+                            course.status === "not-taken"
+                              ? () => handleDragStart(course, semester.id)
+                              : undefined
+                          }
+                          whileHover={
+                            course.status === "not-taken"
+                              ? { scale: 1.01 }
+                              : {}
+                          }
+                          whileTap={
+                            course.status === "not-taken"
+                              ? { scale: 0.99 }
+                              : {}
+                          }
+                          className={`flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs select-none transition-all border relative group
+                            ${
+                              course.status === "completed"
+                                ? "bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-700/35"
+                                : course.status === "in-progress"
+                                  ? "bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-700/35"
+                                  : "bg-violet-50 dark:bg-violet-900/15 text-violet-700 dark:text-violet-300 border-violet-200 dark:border-violet-700/35 hover:bg-violet-100 dark:hover:bg-violet-800/25 cursor-grab active:cursor-grabbing"
+                            }`}
+                        >
+                          <div className="flex items-baseline gap-1 min-w-0">
+                            <span className="font-medium shrink-0">{course.code}</span>
+                            {(getCourseNameFromCode(course.code) ?? "").length > 0 && (
+                              <span className="text-[10px] opacity-55 truncate">
+                                {getCourseNameFromCode(course.code)}
+                              </span>
+                            )}
+                          </div>
+                          {course.status === "not-taken" && (
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                removeCourseFromSemester(semester.id, course.code);
+                              }}
+                              className="ml-1.5 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity text-red-400 dark:text-red-400 hover:text-red-600 dark:hover:text-red-300"
+                            >
+                              <FiTrash2 className="h-3 w-3" />
+                            </button>
+                          )}
+                        </motion.div>
+                      ))}
+                      {/* Drop zone at bottom if sems has courses */}
+                      {!isPast && (
+                        <div
+                          className={`rounded-lg border border-dashed p-1.5 text-center text-[10px] transition-all ${
+                            isHovered
+                              ? "border-violet-400/60 dark:border-violet-500/50 bg-violet-50 dark:bg-violet-900/15 text-violet-500 dark:text-violet-400 opacity-100"
+                              : "border-gray-200/60 dark:border-gray-700/30 text-gray-300 dark:text-gray-700 opacity-60"
+                          }`}
+                        >
+                          {isHovered ? "Drop here" : "+ drop"}
+                        </div>
+                      )}
+                    </>
                   )}
                 </div>
-              </div>
+              </motion.div>
+            );
+          })}
+        </div>
+      )}
 
-              {semester.courses.length === 0 ? (
-                <div
-                  className={`flex-1 flex items-center justify-center border border-dashed rounded-lg p-3 min-h-[48px] transition-all
-                    ${
-                      hoveredSemester === semester.id &&
-                      draggedCourse &&
-                      !isPastSemester(semester.name)
-                        ? "border-pink-400/60 bg-pink-50 dark:bg-pink-900/15"
-                        : "border-gray-200 dark:border-gray-700/50"
-                    }`}
-                >
-                  <p className="text-[11px] text-gray-400 dark:text-gray-500 text-center opacity-70">
-                    Drag from pool or add manually
-                  </p>
-                </div>
-              ) : (
-                <div className="flex flex-wrap gap-1.5">
-                  {semester.courses.map((course) => (
-                    <motion.div
-                      key={`${semester.id}-${course.code}`}
-                      draggable={course.status === "not-taken"}
-                      onDragStart={
-                        course.status === "not-taken"
-                          ? () => handleDragStart(course, semester.id)
-                          : undefined
-                      }
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      className={`w-full flex items-center justify-between px-2 py-1 rounded-lg text-xs select-none transition-all border relative group shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]
-                        ${
-                          course.status === "completed"
-                            ? "bg-emerald-100 dark:bg-emerald-900/25 text-emerald-700 dark:text-emerald-300 border-emerald-300 dark:border-emerald-700/40"
-                            : course.status === "in-progress"
-                              ? "bg-blue-100 dark:bg-blue-900/25 text-blue-700 dark:text-blue-300 border-blue-300 dark:border-blue-700/40"
-                              : "bg-pink-100 dark:bg-pink-900/20 text-pink-700 dark:text-pink-300 border-pink-300 dark:border-pink-700/40 hover:bg-pink-200 dark:hover:bg-pink-800/30 cursor-grab active:cursor-grabbing"
-                        }`}
-                    >
-                      <div className="flex items-center justify-between w-full">
-                        <div>
-                          {course.code}
-                          <span className="text-[10px] opacity-60 ml-1">
-                            {getCourseNameFromCode(course.code) ?? ""}
-                          </span>
-                        </div>
-                        {course.status === "not-taken" && (
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              removeCourseFromSemester(
-                                semester.id,
-                                course.code,
-                              );
-                            }}
-                            className="ml-1.5 opacity-0 group-hover:opacity-100 transition-opacity text-red-300 hover:text-red-200"
-                          >
-                            <FiTrash2 className="h-3 w-3" />
-                          </button>
-                        )}
-                      </div>
-                    </motion.div>
-                  ))}
-                </div>
-              )}
-            </motion.div>
-          );
-        })}
-      </div>
+      {/* ======== Empty state when no semesters yet ======== */}
+      {plansLoaded && semesters.length === 0 && (
+        <div className="rounded-xl border border-dashed border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/20 p-12 text-center">
+          <FiCalendar className="mx-auto mb-3 text-gray-400 dark:text-gray-600" size={32} />
+          <p className="text-sm text-gray-500 dark:text-gray-400 font-medium">No semesters to show yet</p>
+          <p className="text-xs text-gray-400 dark:text-gray-600 mt-1">
+            Upload your transcript to get started.
+          </p>
+        </div>
+      )}
 
-      {/* Save Plan Modal */}
+      {/* ======== Save Plan Modal ======== */}
       <AnimatePresence>
         {showSaveModal && (
           <motion.div
@@ -1217,51 +1417,47 @@ export default function Simulator({
               initial={{ opacity: 0, scale: 0.95, y: 10 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 10 }}
-              transition={{ duration: 0.25, ease: "easeOut" }}
+              transition={{ duration: 0.22, ease: "easeOut" }}
               onClick={(e) => e.stopPropagation()}
-              className="w-full max-w-md p-6 rounded-2xl bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/95 dark:via-gray-900/90 dark:to-gray-950/95 backdrop-blur-2xl border border-gray-200 dark:border-white/[0.08] shadow-[0_8px_48px_rgba(0,0,0,0.15),0_0_80px_rgba(139,92,246,0.04),inset_0_1px_0_rgba(255,255,255,0.08)] dark:shadow-[0_8px_48px_rgba(0,0,0,0.5),0_0_80px_rgba(139,92,246,0.06),inset_0_1px_0_rgba(255,255,255,0.08)] ring-1 ring-black/[0.04] dark:ring-white/[0.05]"
+              className="w-full max-w-md p-6 rounded-2xl bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/95 dark:via-gray-900/90 dark:to-gray-950/95 backdrop-blur-2xl border border-gray-200 dark:border-white/[0.08] shadow-[0_8px_48px_rgba(0,0,0,0.15),inset_0_1px_0_rgba(255,255,255,0.08)] dark:shadow-[0_8px_48px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(255,255,255,0.06)]"
             >
-              {/* Header */}
               <div className="mb-5">
                 <h3 className="text-lg font-medium text-gray-900 dark:text-white">
-                  {selectedPlanToOverwrite !== null
-                    ? "Overwrite Plan"
-                    : "Save Your Plan"}
+                  {selectedPlanToOverwrite !== null ? "Overwrite Plan" : "Save Your Plan"}
                 </h3>
                 <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
                   Give your plan a name to save your progress.
                 </p>
               </div>
 
-              {/* Plan Name Input */}
               <div className="mb-4">
                 <input
                   type="text"
                   value={planName}
                   onChange={(e) => setPlanName(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && savePlan()}
                   placeholder="e.g., Senior Year Schedule, Plan B..."
-                  className="w-full px-4 py-3 text-sm bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-xl text-gray-900 dark:text-gray-200 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:border-purple-500/40 focus:ring-1 focus:ring-purple-500/20 transition-all shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]"
+                  className="w-full px-4 py-3 text-sm bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-xl text-gray-900 dark:text-gray-200 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:border-violet-500/40 focus:ring-1 focus:ring-violet-500/20 transition-all"
                   autoFocus
                 />
               </div>
 
-              {/* Overwrite existing plans */}
               {savedPlans.length > 0 && (
                 <div className="mb-5">
                   <div className="flex items-center gap-3 mb-3">
-                    <div className="flex-1 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
-                    <span className="text-xs text-gray-400 dark:text-gray-500 uppercase tracking-wider">
+                    <div className="flex-1 h-px bg-gray-200 dark:bg-white/[0.06]" />
+                    <span className="text-[10px] text-gray-400 dark:text-gray-500 uppercase tracking-wider">
                       or overwrite
                     </span>
-                    <div className="flex-1 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+                    <div className="flex-1 h-px bg-gray-200 dark:bg-white/[0.06]" />
                   </div>
-                  <div className="max-h-32 overflow-y-auto rounded-xl border border-gray-200 dark:border-white/[0.06] bg-gray-50/50 dark:bg-white/[0.02]">
+                  <div className="max-h-36 overflow-y-auto rounded-xl border border-gray-200 dark:border-white/[0.06] bg-gray-50/50 dark:bg-white/[0.02] divide-y divide-gray-100 dark:divide-white/[0.04]">
                     {savedPlans.map((plan, index) => (
                       <button
                         key={`${plan.createdAt}-${index}`}
-                        className={`w-full p-3 text-left border-b border-gray-100 dark:border-white/[0.04] last:border-b-0 hover:bg-gray-100 dark:hover:bg-white/[0.04] text-sm transition-all ${
+                        className={`w-full p-3 text-left hover:bg-gray-100 dark:hover:bg-white/[0.04] text-sm transition-all ${
                           selectedPlanToOverwrite === index
-                            ? "bg-purple-500/10 border-l-2 border-l-purple-500"
+                            ? "bg-violet-50 dark:bg-violet-900/20 border-l-2 border-l-violet-500"
                             : ""
                         }`}
                         onClick={() => {
@@ -1274,13 +1470,10 @@ export default function Simulator({
                             {plan.name}
                           </span>
                           <span className="text-[10px] text-gray-400 dark:text-gray-500">
-                            {new Date(plan.createdAt).toLocaleDateString(
-                              "en-US",
-                              {
-                                month: "short",
-                                day: "numeric",
-                              },
-                            )}
+                            {new Date(plan.createdAt).toLocaleDateString("en-US", {
+                              month: "short",
+                              day: "numeric",
+                            })}
                           </span>
                         </div>
                       </button>
@@ -1289,7 +1482,6 @@ export default function Simulator({
                 </div>
               )}
 
-              {/* Actions */}
               <div className="flex justify-end gap-2">
                 <motion.button
                   onClick={() => {
@@ -1299,23 +1491,19 @@ export default function Simulator({
                   }}
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
-                  className="px-4 py-2 text-sm rounded-xl bg-black/[0.04] dark:bg-white/[0.04] text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-black/[0.06] dark:hover:bg-white/[0.06] border border-black/[0.06] dark:border-white/[0.06] transition-all"
+                  className="px-4 py-2 text-sm rounded-xl bg-gray-100 dark:bg-white/[0.04] text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-200 dark:hover:bg-white/[0.06] border border-gray-200 dark:border-white/[0.06] transition-all"
                 >
                   Cancel
                 </motion.button>
                 <motion.button
                   onClick={savePlan}
                   disabled={!planName.trim() || !hasChanges}
-                  whileHover={
-                    planName.trim() && hasChanges ? { scale: 1.02 } : {}
-                  }
-                  whileTap={
-                    planName.trim() && hasChanges ? { scale: 0.98 } : {}
-                  }
+                  whileHover={planName.trim() && hasChanges ? { scale: 1.02 } : {}}
+                  whileTap={planName.trim() && hasChanges ? { scale: 0.98 } : {}}
                   className={`px-4 py-2 text-sm rounded-xl font-medium transition-all ${
                     planName.trim() && hasChanges
-                      ? "bg-gradient-to-r from-purple-500/30 to-blue-500/30 text-gray-900 dark:text-white border border-purple-500/30 hover:border-purple-400/40 shadow-[0_2px_12px_rgba(139,92,246,0.2),inset_0_1px_0_rgba(255,255,255,0.1)]"
-                      : "bg-black/[0.02] dark:bg-white/[0.02] text-gray-400 dark:text-gray-600 border border-black/[0.04] dark:border-white/[0.04] cursor-not-allowed"
+                      ? "bg-gradient-to-r from-violet-500/25 to-blue-500/25 text-gray-900 dark:text-white border border-violet-500/30 hover:border-violet-400/40 shadow-[0_2px_12px_rgba(139,92,246,0.18),inset_0_1px_0_rgba(255,255,255,0.08)]"
+                      : "bg-gray-100 dark:bg-white/[0.02] text-gray-400 dark:text-gray-600 border border-gray-200 dark:border-white/[0.04] cursor-not-allowed"
                   }`}
                 >
                   {selectedPlanToOverwrite !== null ? "Overwrite" : "Save Plan"}
@@ -1326,7 +1514,7 @@ export default function Simulator({
         )}
       </AnimatePresence>
 
-      {/* Load Plans Modal */}
+      {/* ======== My Plans Modal ======== */}
       <AnimatePresence>
         {showPlansModal && (
           <motion.div
@@ -1340,12 +1528,11 @@ export default function Simulator({
               initial={{ opacity: 0, scale: 0.95, y: 10 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 10 }}
-              transition={{ duration: 0.25, ease: "easeOut" }}
+              transition={{ duration: 0.22, ease: "easeOut" }}
               onClick={(e) => e.stopPropagation()}
-              className="w-full max-w-md p-6 rounded-2xl bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/95 dark:via-gray-900/90 dark:to-gray-950/95 backdrop-blur-2xl border border-gray-200 dark:border-white/[0.08] shadow-[0_8px_48px_rgba(0,0,0,0.1),0_0_80px_rgba(139,92,246,0.02)] dark:shadow-[0_8px_48px_rgba(0,0,0,0.5),0_0_80px_rgba(139,92,246,0.06),inset_0_1px_0_rgba(255,255,255,0.08)] ring-1 ring-black/[0.04] dark:ring-white/[0.05]"
+              className="w-full max-w-md p-6 rounded-2xl bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/95 dark:via-gray-900/90 dark:to-gray-950/95 backdrop-blur-2xl border border-gray-200 dark:border-white/[0.08] shadow-[0_8px_48px_rgba(0,0,0,0.12)] dark:shadow-[0_8px_48px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(255,255,255,0.06)]"
               style={{ maxHeight: "80vh" }}
             >
-              {/* Header */}
               <div className="mb-5">
                 <h3 className="text-lg font-medium text-gray-900 dark:text-white">
                   Your Saved Plans
@@ -1357,58 +1544,62 @@ export default function Simulator({
 
               {savedPlans.length === 0 ? (
                 <div className="py-12 text-center">
-                  <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-gray-100 dark:bg-transparent dark:bg-gradient-to-br dark:from-white/[0.04] dark:to-transparent border border-gray-200 dark:border-white/[0.06] flex items-center justify-center">
-                    <FiPlus className="w-5 h-5 text-gray-400 dark:text-gray-500" />
+                  <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-gray-100 dark:bg-white/[0.04] border border-gray-200 dark:border-white/[0.06] flex items-center justify-center">
+                    <FiFolder className="w-5 h-5 text-gray-400 dark:text-gray-500" />
                   </div>
-                  <p className="text-gray-500 dark:text-gray-500 text-sm">No saved plans yet</p>
-                  <p className="text-gray-400 dark:text-gray-600 text-xs mt-1">
+                  <p className="text-sm text-gray-500 dark:text-gray-400">No saved plans yet</p>
+                  <p className="text-xs text-gray-400 dark:text-gray-600 mt-1">
                     Make changes and save to create your first plan.
                   </p>
                 </div>
               ) : (
                 <div
                   className="space-y-2 overflow-y-auto pr-1"
-                  style={{ maxHeight: "calc(80vh - 180px)" }}
+                  style={{ maxHeight: "calc(80vh - 200px)" }}
                 >
                   {savedPlans.map((plan, index) => {
                     const plannedCount = plan.semesters.reduce(
                       (acc, sem) =>
-                        acc +
-                        sem.courses.filter((c) => c.status === "not-taken")
-                          .length,
+                        acc + sem.courses.filter((c) => c.status === "not-taken").length,
                       0,
                     );
+                    const isLoaded = plan.name === currentPlanName;
                     return (
                       <motion.div
                         key={`${plan.createdAt}-${index}`}
-                        initial={{ opacity: 0, y: 5 }}
+                        initial={{ opacity: 0, y: 4 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: index * 0.05 }}
-                        className="p-4 rounded-xl bg-gray-50 dark:bg-transparent dark:bg-gradient-to-br dark:from-white/[0.04] dark:to-transparent border border-gray-200 dark:border-white/[0.06] hover:border-gray-300 dark:hover:border-white/[0.1] transition-all group"
+                        transition={{ delay: index * 0.04 }}
+                        className={`p-4 rounded-xl border transition-all group ${
+                          isLoaded
+                            ? "bg-violet-50 dark:bg-violet-900/20 border-violet-200 dark:border-violet-700/40"
+                            : "bg-gray-50 dark:bg-white/[0.03] border-gray-200 dark:border-white/[0.06] hover:border-gray-300 dark:hover:border-white/[0.10]"
+                        }`}
                       >
                         <div className="flex justify-between items-start mb-3">
                           <div>
                             <div className="flex items-center gap-2">
-                              <h5 className="font-medium text-sm text-gray-700 dark:text-gray-200 group-hover:text-gray-900 dark:group-hover:text-white transition-colors">
+                              <h5 className="font-medium text-sm text-gray-800 dark:text-gray-200 group-hover:text-gray-900 dark:group-hover:text-white transition-colors">
                                 {plan.name}
                               </h5>
                               {plan.isDefault && (
-                                <span className="text-[9px] font-medium uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 border border-purple-300 dark:border-purple-700/40">
+                                <span className="text-[9px] font-semibold uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-violet-100 dark:bg-violet-900/30 text-violet-700 dark:text-violet-300 border border-violet-300 dark:border-violet-700/40">
                                   Default
                                 </span>
                               )}
-                            </div>
-                            <p className="text-[11px] text-gray-500 mt-0.5">
-                              {plannedCount} planned course
-                              {plannedCount !== 1 ? "s" : ""} ·{" "}
-                              {new Date(plan.createdAt).toLocaleDateString(
-                                "en-US",
-                                {
-                                  month: "short",
-                                  day: "numeric",
-                                  year: "numeric",
-                                },
+                              {isLoaded && (
+                                <span className="text-[9px] font-semibold uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-700/40">
+                                  Loaded
+                                </span>
                               )}
+                            </div>
+                            <p className="text-[11px] text-gray-400 dark:text-gray-500 mt-0.5">
+                              {plannedCount} planned course{plannedCount !== 1 ? "s" : ""} ·{" "}
+                              {new Date(plan.createdAt).toLocaleDateString("en-US", {
+                                month: "short",
+                                day: "numeric",
+                                year: "numeric",
+                              })}
                             </p>
                           </div>
                         </div>
@@ -1416,7 +1607,7 @@ export default function Simulator({
                           {!plan.isDefault ? (
                             <button
                               onClick={() => setDefaultPlan(index)}
-                              className="text-[11px] text-gray-500 dark:text-gray-400 hover:text-purple-600 dark:hover:text-purple-300 transition-colors"
+                              className="text-[11px] text-gray-400 dark:text-gray-500 hover:text-violet-600 dark:hover:text-violet-300 transition-colors"
                             >
                               Set as default
                             </button>
@@ -1428,7 +1619,7 @@ export default function Simulator({
                               onClick={() => deletePlan(index)}
                               whileHover={{ scale: 1.02 }}
                               whileTap={{ scale: 0.98 }}
-                              className="px-3 py-1.5 text-xs rounded-lg bg-red-100 dark:bg-red-500/10 text-red-600 dark:text-red-400 hover:bg-red-200 dark:hover:bg-red-500/20 hover:text-red-700 dark:hover:text-red-300 border border-red-300 dark:border-red-500/20 transition-all flex items-center gap-1"
+                              className="px-3 py-1.5 text-xs rounded-lg bg-red-50 dark:bg-red-500/10 text-red-500 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-500/20 hover:text-red-600 dark:hover:text-red-300 border border-red-200 dark:border-red-500/20 transition-all flex items-center gap-1"
                             >
                               <FiTrash2 size={11} />
                               Delete
@@ -1437,9 +1628,9 @@ export default function Simulator({
                               onClick={() => loadPlan(index)}
                               whileHover={{ scale: 1.02 }}
                               whileTap={{ scale: 0.98 }}
-                              className="px-3 py-1.5 text-xs rounded-lg bg-gradient-to-r from-blue-500/20 to-purple-500/20 text-blue-700 dark:text-blue-300 hover:text-blue-800 dark:hover:text-blue-200 border border-blue-400/40 dark:border-blue-500/30 hover:border-blue-500/50 dark:hover:border-blue-400/40 transition-all shadow-[0_2px_8px_rgba(59,130,246,0.15),inset_0_1px_0_rgba(255,255,255,0.08)]"
+                              className="px-3 py-1.5 text-xs rounded-lg bg-gradient-to-r from-blue-500/15 to-violet-500/15 text-blue-600 dark:text-blue-300 hover:text-blue-700 dark:hover:text-blue-200 border border-blue-300/40 dark:border-blue-500/30 hover:border-blue-400/50 dark:hover:border-blue-400/40 transition-all shadow-[0_1px_6px_rgba(59,130,246,0.12)]"
                             >
-                              Load Plan
+                              Load
                             </motion.button>
                           </div>
                         </div>
@@ -1449,13 +1640,12 @@ export default function Simulator({
                 </div>
               )}
 
-              {/* Close button */}
               <div className="mt-5 flex justify-end">
                 <motion.button
                   onClick={() => setShowPlansModal(false)}
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
-                  className="px-4 py-2 text-sm rounded-xl bg-black/[0.04] dark:bg-white/[0.04] text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-black/[0.06] dark:hover:bg-white/[0.06] border border-black/[0.06] dark:border-white/[0.06] transition-all"
+                  className="px-4 py-2 text-sm rounded-xl bg-gray-100 dark:bg-white/[0.04] text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-200 dark:hover:bg-white/[0.06] border border-gray-200 dark:border-white/[0.06] transition-all"
                 >
                   Close
                 </motion.button>
@@ -1465,7 +1655,7 @@ export default function Simulator({
         )}
       </AnimatePresence>
 
-      {/* Manual Course Lookup Modal */}
+      {/* ======== Manual Course Lookup Modal ======== */}
       <ManualCourseLookupModal
         isOpen={lookupSemesterId !== null}
         onClose={() => setLookupSemesterId(null)}
@@ -1495,7 +1685,7 @@ export default function Simulator({
         userId={user?.uid || ""}
       />
 
-      {/* Manual requirement assignment modal */}
+      {/* ======== Manual Requirement Assignment Modal ======== */}
       <SimulatorManualAssignModal
         isOpen={manualAssignPending !== null}
         course={manualAssignPending?.course ?? null}
@@ -1509,7 +1699,7 @@ export default function Simulator({
         onClose={() => setManualAssignPending(null)}
       />
 
-      {/* Plan Selector Modal - shown on initial load */}
+      {/* ======== Plan Selector Modal (initial load) ======== */}
       <AnimatePresence>
         {showPlanSelector && (
           <motion.div
@@ -1523,11 +1713,10 @@ export default function Simulator({
               initial={{ opacity: 0, scale: 0.95, y: 10 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 10 }}
-              transition={{ duration: 0.25, ease: "easeOut" }}
+              transition={{ duration: 0.22, ease: "easeOut" }}
               onClick={(e) => e.stopPropagation()}
-              className="w-full max-w-lg p-6 rounded-2xl bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/95 dark:via-gray-900/90 dark:to-gray-950/95 backdrop-blur-2xl border border-gray-200 dark:border-white/[0.08] shadow-[0_8px_48px_rgba(0,0,0,0.1)] dark:shadow-[0_8px_48px_rgba(0,0,0,0.5),0_0_80px_rgba(139,92,246,0.06),inset_0_1px_0_rgba(255,255,255,0.08)] ring-1 ring-black/[0.04] dark:ring-white/[0.05]"
+              className="w-full max-w-lg p-6 rounded-2xl bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/95 dark:via-gray-900/90 dark:to-gray-950/95 backdrop-blur-2xl border border-gray-200 dark:border-white/[0.08] shadow-[0_8px_48px_rgba(0,0,0,0.12)] dark:shadow-[0_8px_48px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(255,255,255,0.06)]"
             >
-              {/* Header */}
               <div className="text-center mb-6">
                 <h3 className="text-xl font-medium text-gray-900 dark:text-white mb-1">
                   Welcome to your Yale Simulator.
@@ -1539,82 +1728,74 @@ export default function Simulator({
                 </p>
               </div>
 
-              {/* Saved Plans List */}
               {savedPlans.length > 0 && (
-              <div className="space-y-2 max-h-[280px] overflow-y-auto px-1 mb-4">
-                {savedPlans.map((plan, index) => {
-                  const plannedCount = plan.semesters.reduce(
-                    (acc, sem) =>
-                      acc +
-                      sem.courses.filter((c) => c.status === "not-taken")
-                        .length,
-                    0,
-                  );
-                  return (
-                    <motion.button
-                      key={`${plan.createdAt}-${index}`}
-                      onClick={() => {
-                        loadPlan(index);
-                        setShowPlanSelector(false);
-                      }}
-                      whileHover={{ scale: 1.01 }}
-                      whileTap={{ scale: 0.99 }}
-                      className="w-full p-4 rounded-xl text-left bg-gray-50 dark:bg-transparent dark:bg-gradient-to-br dark:from-white/[0.04] dark:to-transparent border border-gray-200 dark:border-white/[0.06] hover:border-purple-500/30 hover:bg-purple-50 dark:hover:bg-white/[0.06] transition-all duration-200 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] group"
-                    >
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <h4 className="font-medium text-gray-700 dark:text-gray-200 group-hover:text-gray-900 dark:group-hover:text-white transition-colors">
-                            {plan.name}
-                          </h4>
-                          <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
-                            {plannedCount} planned course
-                            {plannedCount !== 1 ? "s" : ""} ·{" "}
-                            {new Date(plan.createdAt).toLocaleDateString(
-                              "en-US",
-                              {
+                <div className="space-y-2 max-h-[280px] overflow-y-auto px-0.5 mb-4">
+                  {savedPlans.map((plan, index) => {
+                    const plannedCount = plan.semesters.reduce(
+                      (acc, sem) =>
+                        acc + sem.courses.filter((c) => c.status === "not-taken").length,
+                      0,
+                    );
+                    return (
+                      <motion.button
+                        key={`${plan.createdAt}-${index}`}
+                        onClick={() => {
+                          loadPlan(index);
+                          setShowPlanSelector(false);
+                        }}
+                        whileHover={{ scale: 1.01 }}
+                        whileTap={{ scale: 0.99 }}
+                        className="w-full p-4 rounded-xl text-left bg-gray-50 dark:bg-white/[0.03] border border-gray-200 dark:border-white/[0.06] hover:border-violet-400/40 dark:hover:border-violet-500/30 hover:bg-violet-50 dark:hover:bg-white/[0.05] transition-all duration-200 group"
+                      >
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <h4 className="font-medium text-gray-700 dark:text-gray-200 group-hover:text-gray-900 dark:group-hover:text-white transition-colors">
+                              {plan.name}
+                            </h4>
+                            <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
+                              {plannedCount} planned course{plannedCount !== 1 ? "s" : ""} ·{" "}
+                              {new Date(plan.createdAt).toLocaleDateString("en-US", {
                                 month: "short",
                                 day: "numeric",
                                 year: "numeric",
-                              },
-                            )}
-                          </p>
+                              })}
+                            </p>
+                          </div>
+                          {plan.isDefault && (
+                            <span className="text-[9px] font-semibold uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-violet-100 dark:bg-violet-900/30 text-violet-700 dark:text-violet-300 border border-violet-300 dark:border-violet-700/40 shrink-0">
+                              Default
+                            </span>
+                          )}
                         </div>
-                        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-500/20 to-blue-500/20 border border-purple-500/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                          <FiChevronUp className="w-4 h-4 text-purple-300 rotate-90" />
-                        </div>
-                      </div>
-                    </motion.button>
-                  );
-                })}
-              </div>
-              )}
-
-              {/* Divider */}
-              {savedPlans.length > 0 && (
-                <div className="flex items-center gap-3 my-4">
-                  <div className="flex-1 h-px bg-gradient-to-r from-transparent via-black/10 dark:via-white/10 to-transparent" />
-                  <span className="text-xs text-gray-400 dark:text-gray-500 uppercase tracking-wider">
-                    or
-                  </span>
-                  <div className="flex-1 h-px bg-gradient-to-r from-transparent via-black/10 dark:via-white/10 to-transparent" />
+                      </motion.button>
+                    );
+                  })}
                 </div>
               )}
 
-              {/* Start Fresh Button */}
+              {savedPlans.length > 0 && (
+                <div className="flex items-center gap-3 my-4">
+                  <div className="flex-1 h-px bg-gray-200 dark:bg-white/[0.08]" />
+                  <span className="text-xs text-gray-400 dark:text-gray-500 uppercase tracking-wider">
+                    or
+                  </span>
+                  <div className="flex-1 h-px bg-gray-200 dark:bg-white/[0.08]" />
+                </div>
+              )}
+
               <motion.button
                 onClick={() => setShowPlanSelector(false)}
                 whileHover={{ scale: 1.01 }}
                 whileTap={{ scale: 0.99 }}
-                className="w-full py-3 px-4 rounded-xl font-medium text-sm text-gray-800 dark:text-white bg-gradient-to-r from-blue-500/20 via-purple-500/20 to-pink-500/20 hover:from-blue-500/30 hover:via-purple-500/30 hover:to-pink-500/30 border border-black/[0.08] dark:border-white/[0.08] shadow-[0_2px_12px_rgba(139,92,246,0.1),inset_0_1px_0_rgba(255,255,255,0.1)] transition-all duration-200 flex items-center justify-center gap-2"
+                className="w-full py-3 px-4 rounded-xl font-medium text-sm text-gray-800 dark:text-white bg-gradient-to-r from-blue-500/15 via-violet-500/15 to-pink-500/15 hover:from-blue-500/22 hover:via-violet-500/22 hover:to-pink-500/22 border border-black/[0.08] dark:border-white/[0.08] hover:border-violet-400/30 dark:hover:border-violet-500/30 transition-all duration-200 flex items-center justify-center gap-2"
               >
                 <FiPlus size={14} className="opacity-70" />
-                Start Fresh / Create New Plan
+                {savedPlans.length > 0 ? "Start Fresh / Create New Plan" : "Get Started"}
               </motion.button>
 
-              {/* Skip hint */}
               <p className="text-center text-[11px] text-gray-400 dark:text-gray-600 mt-4">
                 Press{" "}
-                <kbd className="px-1.5 py-0.5 rounded bg-black/[0.06] dark:bg-white/[0.06] border border-black/[0.08] dark:border-white/[0.08] text-gray-500 dark:text-gray-400">
+                <kbd className="px-1.5 py-0.5 rounded bg-gray-100 dark:bg-white/[0.06] border border-gray-200 dark:border-white/[0.08] text-gray-500 dark:text-gray-400">
                   Esc
                 </kbd>{" "}
                 or click outside to dismiss

@@ -498,6 +498,146 @@ function StatsMini() {
 }
 
 /* ----------------------------------------------------------- */
+/* Numbers / stats section                                     */
+/* ----------------------------------------------------------- */
+
+function NumbersSection() {
+  const ref = useRef<HTMLDivElement | null>(null);
+  const inView = useInView(ref, { once: true, amount: 0.3 });
+
+  const stats = [
+    { to: 16.7, dec: 1, suffix: "%", label: "of Yale undergrads on board" },
+    { to: 1000, dec: 0, suffix: "s", label: "of hours saved planning" },
+    { to: 60, dec: 0, suffix: "+", label: "majors & concentrations tracked" },
+    { to: 0, dec: 0, prefix: "$", label: "to use. Free, always." },
+  ];
+
+  const gpa = [3.79, 3.71, 3.8, 3.88];
+  const sems = ["Fall 23", "Spring 24", "Fall 24", "Spring 25"];
+  const min = 3.6;
+  const max = 3.95;
+  const pts = gpa.map((g, i) => {
+    const x = (i / (gpa.length - 1)) * 100;
+    const y = 100 - ((g - min) / (max - min)) * 100;
+    return [x, y] as const;
+  });
+  const line = pts.map((p) => `${p[0]},${p[1]}`).join(" ");
+  const area = `0,100 ${line} 100,100`;
+
+  const grades = [
+    { label: "A", count: 12.5, color: "#ec4899" },
+    { label: "B+", count: 4, color: "#a855f7" },
+    { label: "B", count: 1, color: "#6366f1" },
+    { label: "B-", count: 1, color: "#3b82f6" },
+  ];
+  const total = grades.reduce((s, g) => s + g.count, 0);
+  let acc = 0;
+  const donut = grades
+    .map((g) => {
+      const start = (acc / total) * 360;
+      acc += g.count;
+      const end = (acc / total) * 360;
+      return `${g.color} ${start}deg ${end}deg`;
+    })
+    .join(", ");
+
+  return (
+    <section id="numbers" ref={ref} className="relative px-4 py-28 sm:px-6">
+      <div className="mx-auto max-w-6xl">
+        <SectionHeader
+          eyebrow="By the numbers"
+          title={
+            <>
+              1 in 6 undergrads already use it.
+              <br className="hidden sm:block" /> Why don&apos;t you?
+            </>
+          }
+        />
+
+        <div className="mt-14 grid grid-cols-2 gap-4 lg:grid-cols-4">
+          {stats.map((s, i) => (
+            <Reveal key={s.label} delay={i * 0.06}>
+              <div className="rounded-2xl border border-white/[0.08] bg-white/[0.02] p-6 text-center">
+                <p className="text-4xl font-semibold tracking-tight text-white sm:text-5xl">
+                  {s.prefix}
+                  <CountUp to={s.to} inView={inView} decimals={s.dec} />
+                  <span className="rc-gradient-text">{s.suffix}</span>
+                </p>
+                <p className="mt-2 text-xs text-white/45">{s.label}</p>
+              </div>
+            </Reveal>
+          ))}
+        </div>
+
+        <div className="mt-4 grid gap-4 lg:grid-cols-3">
+          <Reveal className="lg:col-span-2">
+            <div className="rounded-2xl border border-white/[0.08] bg-white/[0.02] p-6">
+              <p className="mb-4 text-sm font-medium text-white/70">
+                Cumulative GPA trend
+              </p>
+              <div className="relative h-44 w-full">
+                <svg
+                  viewBox="0 0 100 100"
+                  preserveAspectRatio="none"
+                  className="h-full w-full"
+                >
+                  <defs>
+                    <linearGradient id="gpaFill" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="#ec4899" stopOpacity="0.4" />
+                      <stop offset="100%" stopColor="#ec4899" stopOpacity="0" />
+                    </linearGradient>
+                  </defs>
+                  <polygon points={area} fill="url(#gpaFill)" />
+                  <polyline
+                    points={line}
+                    fill="none"
+                    stroke="#ec4899"
+                    strokeWidth="1.5"
+                    vectorEffect="non-scaling-stroke"
+                  />
+                </svg>
+              </div>
+              <div className="mt-2 flex justify-between text-[10px] text-white/35">
+                {sems.map((s) => (
+                  <span key={s}>{s}</span>
+                ))}
+              </div>
+            </div>
+          </Reveal>
+          <Reveal delay={0.1}>
+            <div className="flex h-full flex-col items-center justify-center rounded-2xl border border-white/[0.08] bg-white/[0.02] p-6">
+              <p className="mb-4 self-start text-sm font-medium text-white/70">
+                Grade distribution
+              </p>
+              <div
+                className="relative h-32 w-32 rounded-full"
+                style={{ background: `conic-gradient(${donut})` }}
+              >
+                <div className="absolute inset-[22%] rounded-full bg-[#0c0c0f]" />
+              </div>
+              <div className="mt-4 flex flex-wrap justify-center gap-x-3 gap-y-1">
+                {grades.map((g) => (
+                  <span
+                    key={g.label}
+                    className="flex items-center gap-1 text-[11px] text-white/50"
+                  >
+                    <span
+                      className="h-2 w-2 rounded-full"
+                      style={{ background: g.color }}
+                    />
+                    {g.label}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </Reveal>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ----------------------------------------------------------- */
 /* Navbar                                                      */
 /* ----------------------------------------------------------- */
 
@@ -802,6 +942,159 @@ export default function PublicFacingPage() {
             >
               <StatsMini />
             </FeatureCard>
+          </div>
+        </div>
+      </section>
+
+      {/* ================= HOW IT WORKS ================= */}
+      <section id="how" className="relative px-4 py-28 sm:px-6">
+        <div className="mx-auto max-w-6xl">
+          <SectionHeader
+            eyebrow="How it works"
+            title="From transcript to plan in minutes."
+            sub="No setup, no spreadsheets. Sign in with CAS and your whole degree assembles itself."
+          />
+          <div className="mt-16 grid items-start gap-10 lg:grid-cols-2">
+            <div className="lg:sticky lg:top-28">
+              <div className="rc-window rounded-2xl">
+                <BrowserChrome url="degreeintelligence.app/simulator">
+                  <img
+                    src="/demo/simulator.gif"
+                    alt="DegreeIntelligence in action"
+                    className="block w-full"
+                  />
+                </BrowserChrome>
+              </div>
+            </div>
+            <div className="space-y-4">
+              {[
+                {
+                  n: "01",
+                  t: "Sign in with Yale CAS",
+                  d: "One click. We pull in your major, your courses, and your progress automatically.",
+                },
+                {
+                  n: "02",
+                  t: "Watch every requirement light up",
+                  d: "A live, color-coded view of what's done, what's in progress, and what's left for every major and concentration.",
+                },
+                {
+                  n: "03",
+                  t: "Simulate future semesters",
+                  d: "Drag courses around, catch conflicts early, and share your plan with friends and advisors.",
+                },
+              ].map((s, i) => (
+                <Reveal key={s.n} delay={i * 0.08}>
+                  <div className="rc-card-hover flex gap-4 rounded-2xl border border-white/[0.08] bg-white/[0.02] p-5">
+                    <span className="rc-gradient-text text-2xl font-semibold tabular-nums">
+                      {s.n}
+                    </span>
+                    <div>
+                      <h3 className="mb-1 text-lg font-semibold text-white">
+                        {s.t}
+                      </h3>
+                      <p className="text-sm leading-relaxed text-white/50">
+                        {s.d}
+                      </p>
+                    </div>
+                  </div>
+                </Reveal>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ================= BEFORE / AFTER ================= */}
+      <section className="relative px-4 py-20 sm:px-6">
+        <div className="mx-auto grid max-w-5xl gap-4 md:grid-cols-2">
+          <Reveal>
+            <div className="h-full rounded-2xl border border-white/[0.06] bg-white/[0.015] p-7">
+              <p className="mb-5 text-xs font-semibold uppercase tracking-[0.2em] text-white/30">
+                Before
+              </p>
+              <ul className="space-y-3">
+                {[
+                  "Scattered requirements across PDFs and websites",
+                  "Manual tracking in error-prone spreadsheets",
+                  "No centralized view of progress",
+                  "Planning nightmares, especially double majors",
+                ].map((x) => (
+                  <li
+                    key={x}
+                    className="flex items-start gap-2.5 text-sm text-white/45"
+                  >
+                    <FiX className="mt-0.5 shrink-0 text-white/30" /> {x}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </Reveal>
+          <Reveal delay={0.1}>
+            <div className="relative h-full overflow-hidden rounded-2xl border border-pink-400/20 bg-gradient-to-br from-pink-500/[0.1] via-purple-500/[0.04] to-transparent p-7">
+              <div className="pointer-events-none absolute -right-10 -top-10 h-40 w-40 rounded-full bg-pink-500/20 blur-3xl" />
+              <p className="mb-5 text-xs font-semibold uppercase tracking-[0.2em] text-pink-300/80">
+                With DegreeIntelligence
+              </p>
+              <ul className="space-y-3">
+                {[
+                  "Unified requirements database",
+                  "Real-time progress stats & visualization",
+                  "Intelligent course recommendations",
+                  "Clean, intuitive interface, free forever",
+                ].map((x) => (
+                  <li
+                    key={x}
+                    className="flex items-start gap-2.5 text-sm text-white/75"
+                  >
+                    <FiCheck className="mt-0.5 shrink-0 text-pink-400" /> {x}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </Reveal>
+        </div>
+      </section>
+
+      {/* ================= NUMBERS ================= */}
+      <NumbersSection />
+
+      {/* ================= TEAM ================= */}
+      <section id="team" className="relative px-4 py-28 sm:px-6">
+        <div className="mx-auto max-w-5xl">
+          <SectionHeader
+            eyebrow="Built by Yalies, for Yalies"
+            title="Born from our own frustration."
+            sub="We built the first version after one too many long sessions trying to plan courses. Rather than gatekeeping, we made it clean and published it."
+          />
+          <div className="mx-auto mt-14 grid max-w-3xl gap-4 sm:grid-cols-2">
+            {[
+              {
+                name: "Filippo Fonseca",
+                role: "Founder · Mechanical Engineering (ABET) & EECS '28",
+                bio: "Built the first version as a shell script after one too many long planning sessions. Talks too much.",
+                img: "/team/filippo.jpeg",
+              },
+              {
+                name: "Emir",
+                role: "Development · Electrical Engineering & CS (EECS) '28",
+                bio: "Joined forces to keep scaling the platform and make it more robust.",
+                img: "/team/emir.JPG",
+              },
+            ].map((p, i) => (
+              <Reveal key={p.name} delay={i * 0.1}>
+                <div className="rc-card-hover h-full rounded-2xl border border-white/[0.08] bg-white/[0.02] p-6">
+                  <img
+                    src={p.img}
+                    alt={p.name}
+                    className="mb-4 h-16 w-16 rounded-full object-cover ring-2 ring-pink-400/30"
+                  />
+                  <h3 className="text-lg font-semibold text-white">{p.name}</h3>
+                  <p className="mb-3 mt-0.5 text-xs text-pink-300/70">{p.role}</p>
+                  <p className="text-sm leading-relaxed text-white/50">{p.bio}</p>
+                </div>
+              </Reveal>
+            ))}
           </div>
         </div>
       </section>

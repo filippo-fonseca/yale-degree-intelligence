@@ -12,7 +12,15 @@ import {
 import Link from "next/link";
 import { Course } from "@/lib/types";
 import { gradePoints } from "@/lib/constants";
-import { getGPAColor } from "@/lib/utils/utils";
+import { getGPAColor as getLetterGradeColor } from "@/lib/utils/utils";
+
+/** Color class for a numeric GPA value (matches StatsView's logic). */
+function getNumericGPAColor(gpa: number): string {
+  if (gpa >= 3.7) return "text-emerald-600 dark:text-emerald-300";
+  if (gpa >= 3.3) return "text-blue-600 dark:text-blue-300";
+  if (gpa >= 2.9) return "text-amber-600 dark:text-amber-300";
+  return "text-red-600 dark:text-red-300";
+}
 import { getCourseNameFromCode } from "@/lib/courseCatalog";
 import { StatCard } from "./StatCard";
 import { CourseCard } from "./CourseCard";
@@ -394,7 +402,7 @@ export default function MyCoursesView({
           label="Cumulative GPA"
           value={gpaStr}
           color={
-            stats.gpa !== null ? getGPAColor(gpaStr) : "text-gray-400"
+            stats.gpa !== null ? getNumericGPAColor(stats.gpa) : "text-gray-400"
           }
           infoTooltip="Weighted GPA across all completed, graded courses — same math as the Academic Stats view."
         />
@@ -659,8 +667,19 @@ export default function MyCoursesView({
         isOpen={modalState.isOpen}
         course={modalState.course}
         onClose={() => setModalState({ isOpen: false, course: null })}
-        onSkip={async () => {}}
-        onRefresh={async () => {}}
+        allowSkip={false}
+        onToggleDistributional={async (courseId, dist) => {
+          await onToggleDistributional(courseId, dist);
+          // Sync modal state so the modal UI reflects the change immediately
+          setModalState((prev) => {
+            if (!prev.course || prev.course.id !== courseId) return prev;
+            const cur = prev.course.distributionals || [];
+            const next = cur.includes(dist)
+              ? cur.filter((d) => d !== dist)
+              : [...cur, dist];
+            return { ...prev, course: { ...prev.course, distributionals: next } };
+          });
+        }}
       />
 
       <ConfirmDeleteModal
@@ -684,7 +703,6 @@ function SkippedSection({
   courses: Course[];
   hasMultipleMajors: boolean;
 }) {
-  const { getGPAColor: _gc } = { getGPAColor };
 
   return (
     <motion.div
@@ -724,7 +742,7 @@ function SkippedSection({
               </div>
               {course.grade && (
                 <span
-                  className={`text-lg font-medium ${getGPAColor(course.grade)}`}
+                  className={`text-lg font-medium ${getLetterGradeColor(course.grade)}`}
                 >
                   {course.grade}
                 </span>

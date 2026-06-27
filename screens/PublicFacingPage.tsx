@@ -498,6 +498,57 @@ function StatsMini() {
 }
 
 /* ----------------------------------------------------------- */
+/* Glowing keyboard graphic (closing CTA)                      */
+/* ----------------------------------------------------------- */
+
+function KeyboardGraphic() {
+  const rows = [
+    ["Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P"],
+    ["A", "S", "D", "F", "G", "H", "J", "K", "L"],
+    ["Z", "X", "C", "V", "B", "N", "M"],
+  ];
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 30 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: 0.4 }}
+      transition={{ duration: 0.8 }}
+      className="mx-auto flex max-w-xl flex-col items-center gap-1.5 [mask-image:radial-gradient(80%_120%_at_50%_30%,#000,transparent)]"
+    >
+      {rows.map((row, ri) => (
+        <div key={ri} className="flex gap-1.5">
+          {row.map((k) => (
+            <span
+              key={k}
+              className="rc-key flex h-11 w-11 items-center justify-center rounded-lg text-sm font-medium text-white/40"
+            >
+              {k}
+            </span>
+          ))}
+        </div>
+      ))}
+      <div className="mt-0.5 flex gap-1.5">
+        <span className="rc-key flex h-11 w-16 items-center justify-center rounded-lg text-xs text-white/40">
+          ⌃
+        </span>
+        <span className="rc-key flex h-11 w-16 items-center justify-center rounded-lg text-xs text-white/40">
+          ⌥
+        </span>
+        <span className="rc-key-lit flex h-11 w-44 items-center justify-center gap-2 rounded-lg text-sm font-semibold">
+          <GraduationCap size={15} /> CAS
+        </span>
+        <span className="rc-key flex h-11 w-16 items-center justify-center rounded-lg text-xs text-white/40">
+          ⌥
+        </span>
+        <span className="rc-key flex h-11 w-16 items-center justify-center rounded-lg text-xs text-white/40">
+          ⌘
+        </span>
+      </div>
+    </motion.div>
+  );
+}
+
+/* ----------------------------------------------------------- */
 /* Numbers / stats section                                     */
 /* ----------------------------------------------------------- */
 
@@ -1099,9 +1150,124 @@ export default function PublicFacingPage() {
         </div>
       </section>
 
-      {/* ================= FOOTER (placeholder, rebuilt later) ================= */}
-      <footer className="border-t border-white/[0.06] py-10 text-center text-xs text-white/35">
-        Not affiliated with Yale University.
+      {/* ================= CLOSING CTA: GLOWING KEYBOARD ================= */}
+      <section className="relative overflow-hidden px-4 pb-24 pt-16 sm:px-6">
+        <div className="rc-bloom pointer-events-none absolute inset-x-0 bottom-0 h-[60%] opacity-50" />
+        <div className="relative mx-auto max-w-3xl">
+          <KeyboardGraphic />
+          <Reveal>
+            <div className="mt-10 text-center">
+              <h2 className="text-balance text-4xl font-semibold tracking-tight text-white sm:text-5xl">
+                Take the short way.
+              </h2>
+              <p className="mt-4 text-lg text-white/55">
+                Plan your entire Yale degree in one place.{" "}
+                <span className="rc-gradient-text font-medium">
+                  Free, always.
+                </span>
+              </p>
+              <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+                <button
+                  onClick={login}
+                  className="group flex items-center gap-2 rounded-xl bg-white px-5 py-3 text-sm font-semibold text-black transition-all hover:scale-[1.03]"
+                >
+                  <GraduationCap size={16} /> Log in with Yale CAS
+                  <FiArrowRight
+                    size={15}
+                    className="transition-transform group-hover:translate-x-0.5"
+                  />
+                </button>
+                <button
+                  onClick={() => setShowVideo(true)}
+                  className="flex items-center gap-2 rounded-xl border border-white/12 bg-white/[0.04] px-5 py-3 text-sm font-medium text-white/85 transition-all hover:border-white/25 hover:bg-white/[0.07]"
+                >
+                  <FiPlay size={14} className="text-pink-300" /> Watch the demo
+                </button>
+              </div>
+              <p className="mt-5 text-xs text-white/30">
+                v2 · Sign in with Yale CAS · 1 in 6 undergrads
+              </p>
+            </div>
+          </Reveal>
+        </div>
+      </section>
+
+      {/* ================= MEGA FOOTER ================= */}
+      <footer className="relative overflow-hidden border-t border-white/[0.06]">
+        <div className="rc-grid-lines pointer-events-none absolute inset-0 opacity-60" />
+        <div className="relative mx-auto max-w-6xl px-4 py-16 sm:px-6">
+          <div className="grid gap-10 md:grid-cols-[1.4fr_repeat(3,1fr)]">
+            <div>
+              <div className="mb-3 flex items-center gap-2">
+                <LogoIcon width={24} height={24} />
+                <span className="text-sm font-semibold text-white">
+                  DegreeIntelligence
+                </span>
+              </div>
+              <p className="max-w-xs text-sm leading-relaxed text-white/45">
+                Democratizing academic planning, stats, and insights at Yale.
+                Built by Yalies, for Yalies.
+              </p>
+            </div>
+            {[
+              {
+                h: "Product",
+                links: [
+                  ["Features", "#features"],
+                  ["How it works", "#how"],
+                  ["By the numbers", "#numbers"],
+                ],
+              },
+              {
+                h: "Company",
+                links: [
+                  ["Team", "#team"],
+                  ["Yale Daily News", YDN_URL],
+                ],
+              },
+              {
+                h: "Get started",
+                links: [["Log in with CAS", "#"]],
+              },
+            ].map((col) => (
+              <div key={col.h}>
+                <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-white/40">
+                  {col.h}
+                </p>
+                <ul className="space-y-2">
+                  {col.links.map(([label, href]) => (
+                    <li key={label}>
+                      <a
+                        href={href}
+                        onClick={
+                          label === "Log in with CAS"
+                            ? (e) => {
+                                e.preventDefault();
+                                login();
+                              }
+                            : undefined
+                        }
+                        className="text-sm text-white/50 transition-colors hover:text-white"
+                      >
+                        {label}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+          <div className="mt-12 flex flex-col items-center justify-between gap-3 border-t border-white/[0.06] pt-6 text-xs text-white/35 sm:flex-row">
+            <span>
+              © {new Date().getFullYear()} DegreeIntelligence. Not affiliated
+              with Yale University.
+            </span>
+            <span className="flex items-center gap-1.5">
+              Made with{" "}
+              <span className="text-pink-400">♥</span> in New Haven
+            </span>
+          </div>
+        </div>
       </footer>
 
       {/* ================= VIDEO MODAL ================= */}

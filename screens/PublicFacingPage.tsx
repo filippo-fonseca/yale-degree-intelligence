@@ -239,6 +239,265 @@ function ProductWindow() {
 }
 
 /* ----------------------------------------------------------- */
+/* Bento feature card + tints                                  */
+/* ----------------------------------------------------------- */
+
+type Tint = "pink" | "purple" | "blue" | "violet" | "rose" | "indigo";
+
+const TINTS: Record<
+  Tint,
+  { grad: string; chip: string; text: string; glow: string }
+> = {
+  pink: {
+    grad: "from-pink-500/[0.12]",
+    chip: "bg-pink-500/15 text-pink-300 ring-pink-400/30",
+    text: "text-pink-300",
+    glow: "bg-pink-500/20",
+  },
+  purple: {
+    grad: "from-purple-500/[0.12]",
+    chip: "bg-purple-500/15 text-purple-300 ring-purple-400/30",
+    text: "text-purple-300",
+    glow: "bg-purple-500/20",
+  },
+  blue: {
+    grad: "from-blue-500/[0.12]",
+    chip: "bg-blue-500/15 text-blue-300 ring-blue-400/30",
+    text: "text-blue-300",
+    glow: "bg-blue-500/20",
+  },
+  violet: {
+    grad: "from-violet-500/[0.12]",
+    chip: "bg-violet-500/15 text-violet-300 ring-violet-400/30",
+    text: "text-violet-300",
+    glow: "bg-violet-500/20",
+  },
+  rose: {
+    grad: "from-rose-500/[0.12]",
+    chip: "bg-rose-500/15 text-rose-300 ring-rose-400/30",
+    text: "text-rose-300",
+    glow: "bg-rose-500/20",
+  },
+  indigo: {
+    grad: "from-indigo-500/[0.12]",
+    chip: "bg-indigo-500/15 text-indigo-300 ring-indigo-400/30",
+    text: "text-indigo-300",
+    glow: "bg-indigo-500/20",
+  },
+};
+
+function FeatureCard({
+  tint,
+  icon,
+  title,
+  desc,
+  badge,
+  children,
+  className = "",
+}: {
+  tint: Tint;
+  icon: React.ReactNode;
+  title: string;
+  desc: string;
+  badge?: string;
+  children?: React.ReactNode;
+  className?: string;
+}) {
+  const t = TINTS[tint];
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 24 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: 0.2 }}
+      transition={{ duration: 0.6, ease: [0.21, 0.6, 0.2, 1] }}
+      className={`rc-card-hover group relative flex flex-col overflow-hidden rounded-2xl border border-white/[0.08] bg-gradient-to-br ${t.grad} via-white/[0.02] to-transparent p-5 ${className}`}
+    >
+      <div
+        className={`pointer-events-none absolute -right-16 -top-16 h-40 w-40 rounded-full ${t.glow} opacity-40 blur-3xl transition-opacity group-hover:opacity-70`}
+      />
+      <div className="relative mb-4 flex items-start justify-between">
+        <span
+          className={`flex h-10 w-10 items-center justify-center rounded-xl text-lg ring-1 ${t.chip}`}
+        >
+          {icon}
+        </span>
+        <FiArrowUpRight className="text-white/25 transition-all group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-white/60" />
+      </div>
+      <div className="relative mb-1 flex items-center gap-2">
+        <h3 className="text-lg font-semibold text-white">{title}</h3>
+        {badge && (
+          <span className="rounded-full border border-pink-400/30 bg-pink-500/15 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-pink-200">
+            {badge}
+          </span>
+        )}
+      </div>
+      <p className="relative mb-4 text-sm leading-relaxed text-white/50">
+        {desc}
+      </p>
+      {children && <div className="relative mt-auto">{children}</div>}
+    </motion.div>
+  );
+}
+
+/* --- Mini live-UI mocks --- */
+
+function HeatGrid() {
+  const cells = [
+    2, 3, 1, 3, 2, 0, 3, 2, 3, 1, 2, 3, 1, 2, 3, 3, 0, 2, 3, 1, 2, 3, 2, 1,
+  ];
+  const tones = [
+    "bg-white/5",
+    "bg-purple-500/25",
+    "bg-purple-500/50",
+    "bg-purple-400/80",
+  ];
+  return (
+    <div className="grid grid-cols-8 gap-1.5">
+      {cells.map((c, i) => (
+        <div key={i} className={`aspect-square rounded-[4px] ${tones[c]}`} />
+      ))}
+    </div>
+  );
+}
+
+function ReqChecklist() {
+  const rows = [
+    { label: "Intro sequence", pct: 100, done: true },
+    { label: "Core electives", pct: 66, done: false },
+    { label: "Senior project", pct: 20, done: false },
+  ];
+  return (
+    <div className="space-y-2.5">
+      {rows.map((r) => (
+        <div key={r.label} className="flex items-center gap-2.5">
+          <span
+            className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-full text-[9px] ${
+              r.done
+                ? "bg-pink-500 text-white"
+                : "border border-white/15 text-transparent"
+            }`}
+          >
+            <FiCheck />
+          </span>
+          <span className="w-24 shrink-0 truncate text-[11px] text-white/55">
+            {r.label}
+          </span>
+          <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-white/5">
+            <div
+              className="h-full rounded-full bg-gradient-to-r from-pink-500 to-purple-500"
+              style={{ width: `${r.pct}%` }}
+            />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function SuggestionChips() {
+  const chips = ["CPSC 223", "ECON 121", "ENGL 114", "MATH 230", "S&DS 230"];
+  return (
+    <div className="flex flex-wrap gap-2">
+      {chips.map((c, i) => (
+        <span
+          key={c}
+          className={`rounded-lg border px-2.5 py-1 text-[11px] ${
+            i === 0
+              ? "border-violet-400/40 bg-violet-500/20 text-violet-200"
+              : "border-white/10 bg-white/[0.03] text-white/55"
+          }`}
+        >
+          {i === 0 && <HiSparkles className="mr-1 inline" size={10} />}
+          {c}
+        </span>
+      ))}
+    </div>
+  );
+}
+
+function FriendsRows() {
+  const friends = ["EM", "FF", "AK", "JD"];
+  return (
+    <div className="space-y-2">
+      <div className="flex -space-x-2">
+        {friends.map((f, i) => (
+          <span
+            key={f}
+            className="flex h-7 w-7 items-center justify-center rounded-full border-2 border-[#0c0c0f] bg-gradient-to-br from-rose-500/60 to-pink-500/60 text-[9px] font-semibold text-white"
+            style={{ zIndex: friends.length - i }}
+          >
+            {f}
+          </span>
+        ))}
+        <span className="flex h-7 items-center rounded-full bg-white/[0.04] px-2 text-[10px] text-white/45">
+          +312 in your major
+        </span>
+      </div>
+      <div className="rounded-lg border border-white/[0.06] bg-white/[0.02] px-3 py-2 text-[11px] text-white/55">
+        <span className="text-rose-300">Emir</span> took{" "}
+        <span className="text-white/75">CPSC 323</span> in Fall &apos;25
+      </div>
+    </div>
+  );
+}
+
+function DoubleMajorMock() {
+  return (
+    <div className="grid grid-cols-2 gap-2">
+      {["EECS", "Mech. Eng."].map((m, i) => (
+        <div
+          key={m}
+          className="rounded-lg border border-white/[0.07] bg-white/[0.02] p-2.5"
+        >
+          <p className="mb-2 text-[11px] font-medium text-white/70">{m}</p>
+          <div className="space-y-1.5">
+            {[80, 55, 30].map((w, j) => (
+              <div
+                key={j}
+                className="h-1.5 overflow-hidden rounded-full bg-white/5"
+              >
+                <div
+                  className={`h-full rounded-full ${
+                    i === 0
+                      ? "bg-indigo-400/70"
+                      : "bg-gradient-to-r from-indigo-400/70 to-pink-400/70"
+                  }`}
+                  style={{ width: `${w}%` }}
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+      ))}
+      <div className="col-span-2 flex items-center gap-1.5 rounded-lg border border-pink-400/20 bg-pink-500/10 px-2.5 py-1.5 text-[10px] text-pink-200">
+        <FiCheck size={11} /> 3 courses count for both majors
+      </div>
+    </div>
+  );
+}
+
+function StatsMini() {
+  const bars = [60, 72, 68, 80, 76, 88];
+  return (
+    <div className="flex items-end gap-4">
+      <div>
+        <p className="text-3xl font-semibold text-white">3.88</p>
+        <p className="text-[11px] text-white/45">cumulative GPA</p>
+      </div>
+      <div className="flex h-14 flex-1 items-end gap-1.5">
+        {bars.map((b, i) => (
+          <div
+            key={i}
+            className="flex-1 rounded-t bg-gradient-to-t from-pink-500/30 to-pink-400/80"
+            style={{ height: `${b}%` }}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/* ----------------------------------------------------------- */
 /* Navbar                                                      */
 /* ----------------------------------------------------------- */
 
@@ -452,7 +711,100 @@ export default function PublicFacingPage() {
         </div>
       </section>
 
-      {/* SECTIONS INSERTED BELOW IN SUBSEQUENT COMMITS */}
+      {/* ================= BENTO FEATURES ================= */}
+      <section id="features" className="relative px-4 py-28 sm:px-6">
+        <div className="mx-auto max-w-6xl">
+          <SectionHeader
+            eyebrow="Everything, in one place"
+            title={
+              <>
+                There&apos;s a tool for every part
+                <br className="hidden sm:block" /> of your degree.
+              </>
+            }
+            sub="From the first requirement to your final semester, DegreeIntelligence replaces the spreadsheets, the PDFs, and the five poorly-organized websites you used to dig through."
+          />
+
+          <div className="mt-16 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-6">
+            <FeatureCard
+              className="lg:col-span-4"
+              tint="blue"
+              icon={<FiZap />}
+              title="Semester simulator"
+              desc="Drag courses into future semesters, check conflicts, and see your plan come together before you commit to a single class."
+            >
+              <div className="overflow-hidden rounded-lg border border-white/10">
+                <img
+                  src="/demo/simulator.gif"
+                  alt="Semester simulator"
+                  className="block w-full"
+                />
+              </div>
+            </FeatureCard>
+
+            <FeatureCard
+              className="lg:col-span-2"
+              tint="purple"
+              icon={<FiBarChart2 />}
+              title="Major progress"
+              badge="New"
+              desc="A live heat map of everything done and everything left."
+            >
+              <HeatGrid />
+            </FeatureCard>
+
+            <FeatureCard
+              className="lg:col-span-2"
+              tint="pink"
+              icon={<FiSearch />}
+              title="Requirements database"
+              desc="Every major and concentration requirement, parsed and tracked for you."
+            >
+              <ReqChecklist />
+            </FeatureCard>
+
+            <FeatureCard
+              className="lg:col-span-2"
+              tint="violet"
+              icon={<HiSparkles />}
+              title="Smart recommendations"
+              desc="Suggestion models surface courses that actually fit your plan."
+            >
+              <SuggestionChips />
+            </FeatureCard>
+
+            <FeatureCard
+              className="lg:col-span-2"
+              tint="rose"
+              icon={<FiUsers />}
+              title="Friends"
+              desc="See where friends and mentors slotted their courses."
+            >
+              <FriendsRows />
+            </FeatureCard>
+
+            <FeatureCard
+              className="lg:col-span-3"
+              tint="indigo"
+              icon={<FiLayers />}
+              title="Double-major manager"
+              desc="Juggle two majors without the chaos. Shared courses, conflicts, and overlap, made obvious."
+            >
+              <DoubleMajorMock />
+            </FeatureCard>
+
+            <FeatureCard
+              className="lg:col-span-3"
+              tint="pink"
+              icon={<FiTrendingUp />}
+              title="Stats & GPA"
+              desc="Track your GPA trend, credits, and grade distribution at a glance."
+            >
+              <StatsMini />
+            </FeatureCard>
+          </div>
+        </div>
+      </section>
 
       {/* ================= FOOTER (placeholder, rebuilt later) ================= */}
       <footer className="border-t border-white/[0.06] py-10 text-center text-xs text-white/35">

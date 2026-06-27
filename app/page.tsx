@@ -67,10 +67,16 @@ import ConfirmDeleteModal from "@/components/ConfirmDeleteModal/ConfirmDeleteMod
 import ManualCourseEntryModal from "@/components/ManualCourseEntryModal";
 import PublicFacingPage from "@/screens/PublicFacingPage";
 import FriendsTab from "@/components/FriendsTab/FriendsTab";
-import { MessageCircleQuestionMark, MonitorCog, Printer } from "lucide-react";
+import {
+  MessageCircleQuestionMark,
+  MonitorCog,
+  Printer,
+  Search,
+} from "lucide-react";
 import Simulator from "@/components/Simulator/Simulator";
 import CleoAITab from "@/components/CleoAITab/CleoAITab";
 import { UserAvatar } from "@/components/ui/UserAvatar";
+import CommandPalette from "@/components/CommandPalette/CommandPalette";
 
 interface UserProfile {
   majors: string[];
@@ -96,6 +102,7 @@ export default function Home() {
   );
   const [sidebarHovered, setSidebarHovered] = useState(false);
   const sidebarExpanded = sidebarPinned || sidebarHovered;
+  const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const isBrandNew = userProfile?.graduationYear === 2030;
 
@@ -153,6 +160,18 @@ export default function Home() {
       setActiveTab(newTab);
     }
   };
+
+  // Global ⌘K / Ctrl+K to open the command palette
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
+        e.preventDefault();
+        setCommandPaletteOpen((o) => !o);
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
 
   const [showUpdateModal, setShowUpdateModal] = useState(false);
   const [showManualEntryModal, setShowManualEntryModal] = useState(false);
@@ -968,6 +987,14 @@ export default function Home() {
 
           <div className="flex items-center gap-2 lg:gap-3">
             <button
+              onClick={() => setCommandPaletteOpen(true)}
+              className="lg:hidden p-1.5 rounded-xl hover:bg-black/[0.04] dark:hover:bg-white/[0.06] transition-all border border-black/[0.06] dark:border-white/[0.08] hover:border-black/[0.09] dark:hover:border-white/[0.12] text-gray-600 dark:text-gray-300"
+              title="Search (⌘K)"
+              aria-label="Open search"
+            >
+              <Search size={16} />
+            </button>
+            <button
               onClick={toggleTheme}
               className="p-1.5 lg:p-2 rounded-xl hover:bg-black/[0.04] dark:hover:bg-white/[0.06] transition-all border border-black/[0.06] dark:border-white/[0.08] hover:border-black/[0.09] dark:hover:border-white/[0.12] text-gray-600 dark:text-gray-300"
               title={
@@ -1164,6 +1191,32 @@ export default function Home() {
                   <FiChevronsRight size={16} />
                 )}
               </button>
+            </div>
+
+            {/* Global search trigger (⌘K) */}
+            <div className="px-1 mb-2">
+              <motion.button
+                whileTap={{ scale: 0.98 }}
+                onClick={() => setCommandPaletteOpen(true)}
+                title={sidebarExpanded ? undefined : "Search (⌘K)"}
+                className={`w-full flex items-center rounded-2xl border border-black/[0.06] dark:border-white/[0.08] bg-black/[0.02] dark:bg-white/[0.03] text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-black/[0.04] dark:hover:bg-white/[0.06] transition-colors ${
+                  sidebarExpanded
+                    ? "justify-between px-3 py-2.5"
+                    : "justify-center p-3"
+                }`}
+              >
+                <span className="flex items-center space-x-3">
+                  <Search size={14} />
+                  {sidebarExpanded && (
+                    <span className="text-sm whitespace-nowrap">Search</span>
+                  )}
+                </span>
+                {sidebarExpanded && (
+                  <kbd className="flex items-center gap-0.5 rounded-md border border-black/[0.08] dark:border-white/10 px-1.5 py-0.5 text-[10px] font-medium text-gray-400 dark:text-gray-500">
+                    ⌘K
+                  </kbd>
+                )}
+              </motion.button>
             </div>
 
             {/* Navigation Items */}
@@ -2641,6 +2694,21 @@ export default function Home() {
             };
           });
         }}
+      />
+
+      <CommandPalette
+        isOpen={commandPaletteOpen}
+        onClose={() => setCommandPaletteOpen(false)}
+        courses={courses}
+        selectedMajor={selectedMajor}
+        hasData={hasData}
+        onNavigate={handleTabChange}
+        onImportTranscript={() => {
+          handleTabChange("upload");
+          if (hasData) setShowUpdateModal(true);
+        }}
+        onManualAdd={() => setShowManualEntryModal(true)}
+        onToggleTheme={toggleTheme}
       />
     </main>
   );

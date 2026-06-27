@@ -265,6 +265,7 @@ export default function Home() {
       id: "cleoai",
       icon: LogoIcon,
       label: "Dan",
+      comingSoon: true,
     },
     {
       id: "distributionals",

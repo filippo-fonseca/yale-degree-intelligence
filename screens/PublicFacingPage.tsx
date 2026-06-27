@@ -535,11 +535,14 @@ function KeyboardGraphic() {
         <span className="rc-key flex h-11 w-16 items-center justify-center rounded-lg text-xs text-white/40">
           ⌥
         </span>
+        <span className="rc-key-lit flex h-11 w-44 items-center justify-center gap-2 rounded-lg text-sm font-semibold">
+          <Command size={15} /> K
+        </span>
         <span className="rc-key flex h-11 w-16 items-center justify-center rounded-lg text-xs text-white/40">
           ⌥
         </span>
-        <span className="rc-key-lit flex h-11 w-44 items-center justify-center gap-2 rounded-lg text-sm font-semibold">
-          <Command size={15} /> K
+        <span className="rc-key flex h-11 w-16 items-center justify-center rounded-lg text-xs text-white/40">
+          ⌃
         </span>
       </div>
     </motion.div>

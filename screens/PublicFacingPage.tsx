@@ -194,53 +194,6 @@ function BrowserChrome({
   );
 }
 
-/* Hero product window with subtle mouse-tilt */
-function ProductWindow() {
-  const ref = useRef<HTMLDivElement | null>(null);
-  const rx = useMotionValue(0);
-  const ry = useMotionValue(0);
-  const srx = useSpring(rx, { stiffness: 120, damping: 18 });
-  const sry = useSpring(ry, { stiffness: 120, damping: 18 });
-
-  const onMove = (e: React.MouseEvent) => {
-    const el = ref.current;
-    if (!el) return;
-    const r = el.getBoundingClientRect();
-    const px = (e.clientX - r.left) / r.width - 0.5;
-    const py = (e.clientY - r.top) / r.height - 0.5;
-    ry.set(px * 10);
-    rx.set(-py * 8);
-  };
-  const onLeave = () => {
-    rx.set(0);
-    ry.set(0);
-  };
-
-  return (
-    <motion.div
-      ref={ref}
-      onMouseMove={onMove}
-      onMouseLeave={onLeave}
-      style={{ rotateX: srx, rotateY: sry, transformPerspective: 1200 }}
-      initial={{ opacity: 0, y: 60, scale: 0.96 }}
-      animate={{ opacity: 1, y: 0, scale: 1 }}
-      transition={{ duration: 1, delay: 0.3, ease: [0.21, 0.6, 0.2, 1] }}
-      className="rc-window relative mx-auto max-w-5xl rounded-2xl"
-    >
-      <BrowserChrome url="degreeint.com/dashboard">
-        <img
-          src="/demo/simulator.gif"
-          alt="DegreeIntelligence semester simulator in action"
-          decoding="async"
-          className="block w-full"
-        />
-      </BrowserChrome>
-      {/* reflection */}
-      <div className="pointer-events-none absolute -bottom-24 left-1/2 h-32 w-[80%] -translate-x-1/2 rounded-[50%] bg-pink-500/20 blur-3xl" />
-    </motion.div>
-  );
-}
-
 /* ----------------------------------------------------------- */
 /* Bento feature card + tints                                  */
 /* ----------------------------------------------------------- */
@@ -948,11 +901,6 @@ export default function PublicFacingPage() {
               we just launched v2. Free. Always.
             </span>
           </motion.p>
-        </div>
-
-        {/* product window */}
-        <div className="relative mt-16 sm:mt-20">
-          <ProductWindow />
         </div>
       </header>
 

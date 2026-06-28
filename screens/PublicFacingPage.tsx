@@ -789,7 +789,7 @@ export default function PublicFacingPage() {
   return (
     <div
       id="top"
-      className="min-h-screen overflow-x-hidden bg-[#08080a] font-sf text-white antialiased"
+      className="min-h-screen overflow-x-hidden bg-[#08080a] font-louize text-white antialiased"
     >
       <Navbar onLogin={login} />
 

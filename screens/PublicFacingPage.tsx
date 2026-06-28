@@ -168,7 +168,7 @@ function HeroShards() {
 /* ----------------------------------------------------------- */
 
 function BrowserChrome({
-  url = "degreeintelligence.app",
+  url = "degreeint.com",
   children,
   className = "",
 }: {
@@ -227,7 +227,7 @@ function ProductWindow() {
       transition={{ duration: 1, delay: 0.3, ease: [0.21, 0.6, 0.2, 1] }}
       className="rc-window relative mx-auto max-w-5xl rounded-2xl"
     >
-      <BrowserChrome url="degreeintelligence.app/dashboard">
+      <BrowserChrome url="degreeint.com/dashboard">
         <img
           src="/demo/simulator.gif"
           alt="DegreeIntelligence semester simulator in action"
@@ -1086,7 +1086,7 @@ export default function PublicFacingPage() {
           <div className="mt-16 grid items-start gap-10 lg:grid-cols-2">
             <div className="lg:sticky lg:top-28">
               <div className="rc-window rounded-2xl">
-                <BrowserChrome url="degreeintelligence.app/simulator">
+                <BrowserChrome url="degreeint.com/simulator">
                   <img
                     src="/demo/simulator.gif"
                     alt="DegreeIntelligence in action"

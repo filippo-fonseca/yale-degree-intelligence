@@ -231,6 +231,7 @@ function ProductWindow() {
         <img
           src="/demo/simulator.gif"
           alt="DegreeIntelligence semester simulator in action"
+          decoding="async"
           className="block w-full"
         />
       </BrowserChrome>
@@ -971,6 +972,8 @@ export default function PublicFacingPage() {
                 <img
                   src="/demo/simulator.gif"
                   alt="Semester simulator"
+                  loading="lazy"
+                  decoding="async"
                   className="block w-full"
                 />
               </div>
@@ -1055,6 +1058,8 @@ export default function PublicFacingPage() {
                   <img
                     src="/demo/simulator.gif"
                     alt="DegreeIntelligence in action"
+                    loading="lazy"
+                    decoding="async"
                     className="block w-full"
                   />
                 </BrowserChrome>

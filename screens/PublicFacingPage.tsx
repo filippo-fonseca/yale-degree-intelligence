@@ -743,7 +743,7 @@ function Navbar({ onLogin }: { onLogin: () => void }) {
           <button
             onClick={toggleTheme}
             aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
-            className="flex h-8 w-8 items-center justify-center rounded-lg text-white/50 transition-colors hover:bg-white/[0.06] hover:text-white/80 dark:text-white/50 dark:hover:bg-white/[0.06] dark:hover:text-white/80 light:text-gray-500 light:hover:bg-black/[0.04] light:hover:text-gray-700"
+            className="flex h-8 w-8 items-center justify-center rounded-lg text-gray-500 transition-colors hover:bg-black/[0.05] hover:text-gray-700 dark:text-white/50 dark:hover:bg-white/[0.06] dark:hover:text-white/80"
           >
             {theme === "dark" ? <Sun size={16} /> : <Moon size={16} />}
           </button>

@@ -33,6 +33,20 @@
 
 ---
 
+### Post-redesign fixes (same branch)
+
+**Fix 1 — Dark-mode semester header color** (`components/Simulator/Simulator.tsx`, semester header `className`)
+
+The Fall-amber and Spring-sky header bands used `dark:bg-amber-950/15` and `dark:border-amber-900/20` (resp. sky equivalents), which were nearly invisible in dark mode. Bumped both to `/30` opacity (`dark:bg-amber-950/30 dark:border-amber-800/30`, `dark:bg-sky-950/30 dark:border-sky-800/30`) to match the subtle tinted-gradient pattern used by `requirementStatus.ts` STATUS_CLASSES. Light mode is unchanged.
+
+**Fix 2 — "Unsaved changes" shown on load** (`components/Simulator/Simulator.tsx`, `planEverLoadedRef` + initial-build effect guard + `loadPlanData`)
+
+Root cause: the initial-build `useEffect` (deps `[graduationYear, remainingCourses, completedCourses]`) was unconditionally writing `initialSemestersRef.current` with the bare completed-courses layout on every parent re-render, even after a plan was already loaded. This made the change-detection effect always see a difference, showing the "unsaved" badge immediately on load.
+
+Fix: added `planEverLoadedRef` (a `useRef(false)` set to `true` inside `loadPlanData`). The initial-build effect now only writes the snapshot if `!planEverLoadedRef.current`. Once a plan is loaded, `loadPlanData` exclusively owns the clean snapshot, and saving clears it via `setHasChanges(false)`.
+
+---
+
 ### Follow-ups (out of scope for this sprint)
 
 - Rename plans inline (currently requires overwrite flow).

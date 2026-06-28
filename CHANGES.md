@@ -33,8 +33,27 @@
 
 **Math preserved**: GPA, credit sums, semester grouping, cumulative trend, department breakdown, `progressToGraduation` — all unchanged.
 
+## Post-redesign fixes
+
+### Fix 1 — Dark-mode chart tooltip legibility (`components/StatsView.tsx` lines 75–130)
+`makeChartTooltipSlotProps` now uses a solid `#0f172a` dark surface with
+`!important` overrides on `backgroundColor` and `color`, a `& *` selector to
+force light text on every descendant, and an additional `popper` slot that
+injects styles onto `.MuiChartsTooltip-root` and `.MuiChartsTooltip-paper`.
+This prevents MUI's own Paper dark-mode override from winning and leaving the
+tooltip white-on-white. Light mode is unchanged.
+
+### Fix 2 — Semesters Completed excludes summer terms (`components/StatsView.tsx` line 600)
+The stat card value changed from `sortedSemData.length` (all semesters) to
+`nonSummerSems.length` (Fall + Spring only). A muted `sub` line "plus N
+summer(s)" appears below the number when the student has summer terms, using
+correct singular/plural. The subtext is omitted entirely when there are no
+summers.
+
 ## Commits
 
 | Hash | Message |
 |------|---------|
 | `0175436` | `feat(stats): redesign StatsView with MajorStatCard pattern + polished charts` |
+| `75fa43b` | `fix(stats): make chart tooltips legible in dark mode` |
+| `0b44b6d` | `fix(stats): exclude summers from Semesters Completed count` |

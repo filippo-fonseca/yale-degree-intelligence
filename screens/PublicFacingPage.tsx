@@ -849,8 +849,40 @@ export default function PublicFacingPage() {
           >
             Every requirement, every major, every plan in one fast, beautiful
             place. We&apos;re democratizing academic planning, stats, and
-            insights at Yale, together. For Yalies, by Yalies.
+            insights at Yale, together.
           </motion.p>
+
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.18 }}
+            className="mt-5 flex justify-center"
+          >
+            <Link
+              href="#team"
+              className="group inline-flex items-center gap-2.5 rounded-full border border-gray-200 bg-black/[0.03] py-1.5 pl-1.5 pr-4 text-sm text-gray-700 backdrop-blur-md transition-colors hover:border-pink-400/40 hover:text-gray-900 dark:border-white/10 dark:bg-white/[0.04] dark:text-white/70 dark:hover:text-white"
+            >
+              <span className="flex -space-x-2">
+                <img
+                  src="/team/filippo.jpeg"
+                  alt="Filippo Fonseca"
+                  loading="lazy"
+                  className="h-6 w-6 rounded-full object-cover ring-2 ring-white dark:ring-[#08080a]"
+                />
+                <img
+                  src="/team/emir.JPG"
+                  alt="Emir"
+                  loading="lazy"
+                  className="h-6 w-6 rounded-full object-cover ring-2 ring-white dark:ring-[#08080a]"
+                />
+              </span>
+              <span className="font-medium">For Yalies, by Yalies</span>
+              <FiArrowUpRight
+                size={13}
+                className="opacity-60 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+              />
+            </Link>
+          </motion.div>
 
           <motion.div
             initial={{ opacity: 0, y: 18 }}

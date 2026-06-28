@@ -73,37 +73,60 @@ const makeLineChartSx = (isDark: boolean) => {
 };
 
 const makeChartTooltipSlotProps = (isDark: boolean) => {
-  const surface = isDark
-    ? "rgba(17, 24, 39, 0.97)"
-    : "rgba(255, 255, 255, 0.98)";
+  const surface = isDark ? "#0f172a" : "rgba(255, 255, 255, 0.98)";
   const border = isDark ? "rgba(255, 255, 255, 0.12)" : "rgba(0, 0, 0, 0.08)";
   const primary = isDark ? "#F3F4F6" : "#111827";
   const secondary = isDark ? "#D1D5DB" : "#4B5563";
   const shadow = isDark
     ? "0 12px 32px rgba(0, 0, 0, 0.55)"
     : "0 12px 32px rgba(0, 0, 0, 0.18)";
-  return {
-    tooltip: {
-      sx: {
-        backgroundColor: surface,
-        backgroundImage: "none",
-        border: `1px solid ${border}`,
-        borderRadius: "0.6rem",
-        boxShadow: shadow,
-        color: primary,
+  const tooltipSx = {
+    // Target the Paper element that MUI x-charts renders inside the Popper
+    backgroundColor: `${surface} !important`,
+    backgroundImage: "none !important",
+    border: `1px solid ${border}`,
+    borderRadius: "0.6rem",
+    boxShadow: shadow,
+    color: `${primary} !important`,
+    fontFamily: CHART_FONT,
+    overflow: "hidden",
+    // Cover all text-bearing descendant elements
+    "& *": {
+      color: `${primary} !important`,
+      fontFamily: CHART_FONT,
+    },
+    "& caption, & th, & td, & .MuiChartsTooltip-cell, & .MuiChartsTooltip-valueCell, & .MuiChartsTooltip-axisValueCell, & .MuiTypography-root":
+      {
+        color: `${primary} !important`,
         fontFamily: CHART_FONT,
-        overflow: "hidden",
-        "& caption, & th, & td, & .MuiChartsTooltip-cell, & .MuiChartsTooltip-valueCell, & .MuiChartsTooltip-axisValueCell, & .MuiTypography-root":
-          {
-            color: `${primary} !important`,
-            fontFamily: CHART_FONT,
-            fontSize: "0.78rem",
-          },
-        "& .MuiChartsTooltip-labelCell": {
-          color: `${secondary} !important`,
+        fontSize: "0.78rem",
+        backgroundColor: "transparent !important",
+      },
+    "& .MuiChartsTooltip-labelCell": {
+      color: `${secondary} !important`,
+    },
+    "& caption": { borderColor: border },
+    "& .MuiChartsTooltip-mark": { borderColor: border },
+    // Ensure table rows/cells don't get their own background in dark mode
+    "& tr, & tbody": {
+      backgroundColor: "transparent !important",
+    },
+  };
+  return {
+    tooltip: { sx: tooltipSx },
+    // Also target the popper paper directly via the `paper` slot when available
+    popper: {
+      sx: {
+        "& .MuiChartsTooltip-root": {
+          backgroundColor: `${surface} !important`,
+          backgroundImage: "none !important",
+          color: `${primary} !important`,
         },
-        "& caption": { borderColor: border },
-        "& .MuiChartsTooltip-mark": { borderColor: border },
+        "& .MuiChartsTooltip-paper": {
+          backgroundColor: `${surface} !important`,
+          backgroundImage: "none !important",
+          color: `${primary} !important`,
+        },
       },
     },
   };

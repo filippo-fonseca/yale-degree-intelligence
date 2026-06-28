@@ -24,7 +24,8 @@ import {
   FiLayers,
 } from "react-icons/fi";
 import { HiSparkles } from "react-icons/hi2";
-import { GraduationCap, Command } from "lucide-react";
+import { GraduationCap, Command, Sun, Moon } from "lucide-react";
+import { useTheme } from "@/context/ThemeContext";
 import Link from "next/link";
 import dynamic from "next/dynamic";
 import { useState, useRef, useEffect } from "react";
@@ -108,11 +109,11 @@ function SectionHeader({
       <Reveal>
         <div className="mb-5 flex items-center justify-center gap-2">
           <span className="h-px w-8 bg-gradient-to-r from-transparent to-pink-500/60" />
-          <span className="text-[11px] font-semibold uppercase tracking-[0.2em] text-pink-300/80">
+          <span className="text-[11px] font-semibold uppercase tracking-[0.2em] text-pink-500/80 dark:text-pink-300/80">
             {eyebrow}
           </span>
           {badge && (
-            <span className="rounded-full border border-pink-400/30 bg-pink-500/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-pink-200">
+            <span className="rounded-full border border-pink-400/30 bg-pink-500/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-pink-600 dark:text-pink-200">
               {badge}
             </span>
           )}
@@ -120,13 +121,13 @@ function SectionHeader({
         </div>
       </Reveal>
       <Reveal delay={0.05}>
-        <h2 className="text-balance text-4xl font-semibold tracking-tight text-white sm:text-5xl">
+        <h2 className="text-balance text-4xl font-semibold tracking-tight text-gray-900 dark:text-white sm:text-5xl">
           {title}
         </h2>
       </Reveal>
       {sub && (
         <Reveal delay={0.1}>
-          <p className="mx-auto mt-5 max-w-2xl text-pretty text-base leading-relaxed text-white/55 sm:text-lg">
+          <p className="mx-auto mt-5 max-w-2xl text-pretty text-base leading-relaxed text-gray-500 dark:text-white/55 sm:text-lg">
             {sub}
           </p>
         </Reveal>
@@ -156,8 +157,8 @@ function HeroShards() {
         className="rc-shards-beams absolute left-1/2 top-[-20%] h-[90vh] w-[140%] -translate-x-1/2"
       />
       {/* vignette + fade into the page */}
-      <div className="absolute inset-0 bg-[radial-gradient(120%_80%_at_50%_-10%,transparent_30%,#08080a_82%)]" />
-      <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-b from-transparent to-[#08080a]" />
+      <div className="absolute inset-0 bg-[radial-gradient(120%_80%_at_50%_-10%,transparent_30%,#ffffff_82%)] dark:bg-[radial-gradient(120%_80%_at_50%_-10%,transparent_30%,#08080a_82%)]" />
+      <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-b from-transparent to-white dark:to-[#08080a]" />
     </div>
   );
 }
@@ -167,7 +168,7 @@ function HeroShards() {
 /* ----------------------------------------------------------- */
 
 function BrowserChrome({
-  url = "degreeintelligence.app",
+  url = "degreeint.com",
   children,
   className = "",
 }: {
@@ -177,65 +178,19 @@ function BrowserChrome({
 }) {
   return (
     <div
-      className={`overflow-hidden rounded-2xl border border-white/10 bg-[#0c0c0f] ${className}`}
+      className={`overflow-hidden rounded-2xl border border-gray-200 bg-gray-50 dark:border-white/10 dark:bg-[#0c0c0f] ${className}`}
     >
-      <div className="flex items-center gap-2 border-b border-white/[0.06] bg-white/[0.02] px-4 py-3">
+      <div className="flex items-center gap-2 border-b border-gray-200/80 bg-black/[0.02] px-4 py-3 dark:border-white/[0.06] dark:bg-white/[0.02]">
         <span className="h-3 w-3 rounded-full bg-[#ff5f57]" />
         <span className="h-3 w-3 rounded-full bg-[#febc2e]" />
         <span className="h-3 w-3 rounded-full bg-[#28c840]" />
-        <div className="mx-auto flex items-center gap-2 rounded-md bg-white/[0.04] px-3 py-1 text-[11px] text-white/40">
+        <div className="mx-auto flex items-center gap-2 rounded-md bg-black/[0.04] px-3 py-1 text-[11px] text-gray-500 dark:bg-white/[0.04] dark:text-white/40">
           <span className="h-1.5 w-1.5 rounded-full bg-emerald-400/80" />
           {url}
         </div>
       </div>
       {children}
     </div>
-  );
-}
-
-/* Hero product window with subtle mouse-tilt */
-function ProductWindow() {
-  const ref = useRef<HTMLDivElement | null>(null);
-  const rx = useMotionValue(0);
-  const ry = useMotionValue(0);
-  const srx = useSpring(rx, { stiffness: 120, damping: 18 });
-  const sry = useSpring(ry, { stiffness: 120, damping: 18 });
-
-  const onMove = (e: React.MouseEvent) => {
-    const el = ref.current;
-    if (!el) return;
-    const r = el.getBoundingClientRect();
-    const px = (e.clientX - r.left) / r.width - 0.5;
-    const py = (e.clientY - r.top) / r.height - 0.5;
-    ry.set(px * 10);
-    rx.set(-py * 8);
-  };
-  const onLeave = () => {
-    rx.set(0);
-    ry.set(0);
-  };
-
-  return (
-    <motion.div
-      ref={ref}
-      onMouseMove={onMove}
-      onMouseLeave={onLeave}
-      style={{ rotateX: srx, rotateY: sry, transformPerspective: 1200 }}
-      initial={{ opacity: 0, y: 60, scale: 0.96 }}
-      animate={{ opacity: 1, y: 0, scale: 1 }}
-      transition={{ duration: 1, delay: 0.3, ease: [0.21, 0.6, 0.2, 1] }}
-      className="rc-window relative mx-auto max-w-5xl rounded-2xl"
-    >
-      <BrowserChrome url="degreeintelligence.app/dashboard">
-        <img
-          src="/demo/simulator.gif"
-          alt="DegreeIntelligence semester simulator in action"
-          className="block w-full"
-        />
-      </BrowserChrome>
-      {/* reflection */}
-      <div className="pointer-events-none absolute -bottom-24 left-1/2 h-32 w-[80%] -translate-x-1/2 rounded-[50%] bg-pink-500/20 blur-3xl" />
-    </motion.div>
   );
 }
 
@@ -250,39 +205,39 @@ const TINTS: Record<
   { grad: string; chip: string; text: string; glow: string }
 > = {
   pink: {
-    grad: "from-pink-500/[0.12]",
-    chip: "bg-pink-500/15 text-pink-300 ring-pink-400/30",
-    text: "text-pink-300",
+    grad: "from-pink-500/[0.08] dark:from-pink-500/[0.12]",
+    chip: "bg-pink-500/15 text-pink-600 ring-pink-400/30 dark:text-pink-300",
+    text: "text-pink-600 dark:text-pink-300",
     glow: "bg-pink-500/20",
   },
   purple: {
-    grad: "from-purple-500/[0.12]",
-    chip: "bg-purple-500/15 text-purple-300 ring-purple-400/30",
-    text: "text-purple-300",
+    grad: "from-purple-500/[0.08] dark:from-purple-500/[0.12]",
+    chip: "bg-purple-500/15 text-purple-600 ring-purple-400/30 dark:text-purple-300",
+    text: "text-purple-600 dark:text-purple-300",
     glow: "bg-purple-500/20",
   },
   blue: {
-    grad: "from-blue-500/[0.12]",
-    chip: "bg-blue-500/15 text-blue-300 ring-blue-400/30",
-    text: "text-blue-300",
+    grad: "from-blue-500/[0.08] dark:from-blue-500/[0.12]",
+    chip: "bg-blue-500/15 text-blue-600 ring-blue-400/30 dark:text-blue-300",
+    text: "text-blue-600 dark:text-blue-300",
     glow: "bg-blue-500/20",
   },
   violet: {
-    grad: "from-violet-500/[0.12]",
-    chip: "bg-violet-500/15 text-violet-300 ring-violet-400/30",
-    text: "text-violet-300",
+    grad: "from-violet-500/[0.08] dark:from-violet-500/[0.12]",
+    chip: "bg-violet-500/15 text-violet-600 ring-violet-400/30 dark:text-violet-300",
+    text: "text-violet-600 dark:text-violet-300",
     glow: "bg-violet-500/20",
   },
   rose: {
-    grad: "from-rose-500/[0.12]",
-    chip: "bg-rose-500/15 text-rose-300 ring-rose-400/30",
-    text: "text-rose-300",
+    grad: "from-rose-500/[0.08] dark:from-rose-500/[0.12]",
+    chip: "bg-rose-500/15 text-rose-600 ring-rose-400/30 dark:text-rose-300",
+    text: "text-rose-600 dark:text-rose-300",
     glow: "bg-rose-500/20",
   },
   indigo: {
-    grad: "from-indigo-500/[0.12]",
-    chip: "bg-indigo-500/15 text-indigo-300 ring-indigo-400/30",
-    text: "text-indigo-300",
+    grad: "from-indigo-500/[0.08] dark:from-indigo-500/[0.12]",
+    chip: "bg-indigo-500/15 text-indigo-600 ring-indigo-400/30 dark:text-indigo-300",
+    text: "text-indigo-600 dark:text-indigo-300",
     glow: "bg-indigo-500/20",
   },
 };
@@ -311,7 +266,7 @@ function FeatureCard({
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, amount: 0.2 }}
       transition={{ duration: 0.6, ease: [0.21, 0.6, 0.2, 1] }}
-      className={`rc-card-hover group relative flex flex-col overflow-hidden rounded-2xl border border-white/[0.08] bg-gradient-to-br ${t.grad} via-white/[0.02] to-transparent p-5 ${className}`}
+      className={`rc-card-hover group relative flex flex-col overflow-hidden rounded-2xl border border-gray-200 bg-gradient-to-br dark:border-white/[0.08] ${t.grad} via-black/[0.01] dark:via-white/[0.02] to-transparent p-5 ${className}`}
     >
       <div
         className={`pointer-events-none absolute -right-16 -top-16 h-40 w-40 rounded-full ${t.glow} opacity-40 blur-3xl transition-opacity group-hover:opacity-70`}
@@ -322,17 +277,17 @@ function FeatureCard({
         >
           {icon}
         </span>
-        <FiArrowUpRight className="text-white/25 transition-all group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-white/60" />
+        <FiArrowUpRight className="text-gray-300 transition-all group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-gray-500 dark:text-white/25 dark:group-hover:text-white/60" />
       </div>
       <div className="relative mb-1 flex items-center gap-2">
-        <h3 className="text-lg font-semibold text-white">{title}</h3>
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{title}</h3>
         {badge && (
-          <span className="rounded-full border border-pink-400/30 bg-pink-500/15 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-pink-200">
+          <span className="rounded-full border border-pink-400/30 bg-pink-500/15 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-pink-600 dark:text-pink-200">
             {badge}
           </span>
         )}
       </div>
-      <p className="relative mb-4 text-sm leading-relaxed text-white/50">
+      <p className="relative mb-4 text-sm leading-relaxed text-gray-500 dark:text-white/50">
         {desc}
       </p>
       {children && <div className="relative mt-auto">{children}</div>}
@@ -347,7 +302,7 @@ function HeatGrid() {
     2, 3, 1, 3, 2, 0, 3, 2, 3, 1, 2, 3, 1, 2, 3, 3, 0, 2, 3, 1, 2, 3, 2, 1,
   ];
   const tones = [
-    "bg-white/5",
+    "bg-black/[0.04] dark:bg-white/5",
     "bg-purple-500/25",
     "bg-purple-500/50",
     "bg-purple-400/80",
@@ -375,15 +330,15 @@ function ReqChecklist() {
             className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-full text-[9px] ${
               r.done
                 ? "bg-pink-500 text-white"
-                : "border border-white/15 text-transparent"
+                : "border border-gray-300 text-transparent dark:border-white/15"
             }`}
           >
             <FiCheck />
           </span>
-          <span className="w-24 shrink-0 truncate text-[11px] text-white/55">
+          <span className="w-24 shrink-0 truncate text-[11px] text-gray-500 dark:text-white/55">
             {r.label}
           </span>
-          <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-white/5">
+          <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-black/[0.05] dark:bg-white/5">
             <div
               className="h-full rounded-full bg-gradient-to-r from-pink-500 to-purple-500"
               style={{ width: `${r.pct}%` }}
@@ -404,8 +359,8 @@ function SuggestionChips() {
           key={c}
           className={`rounded-lg border px-2.5 py-1 text-[11px] ${
             i === 0
-              ? "border-violet-400/40 bg-violet-500/20 text-violet-200"
-              : "border-white/10 bg-white/[0.03] text-white/55"
+              ? "border-violet-400/40 bg-violet-500/20 text-violet-700 dark:text-violet-200"
+              : "border-gray-200 bg-black/[0.03] text-gray-500 dark:border-white/10 dark:bg-white/[0.03] dark:text-white/55"
           }`}
         >
           {i === 0 && <HiSparkles className="mr-1 inline" size={10} />}
@@ -424,19 +379,19 @@ function FriendsRows() {
         {friends.map((f, i) => (
           <span
             key={f}
-            className="flex h-7 w-7 items-center justify-center rounded-full border-2 border-[#0c0c0f] bg-gradient-to-br from-rose-500/60 to-pink-500/60 text-[9px] font-semibold text-white"
+            className="flex h-7 w-7 items-center justify-center rounded-full border-2 border-gray-50 bg-gradient-to-br from-rose-500/60 to-pink-500/60 text-[9px] font-semibold text-white dark:border-[#0c0c0f]"
             style={{ zIndex: friends.length - i }}
           >
             {f}
           </span>
         ))}
-        <span className="flex h-7 items-center rounded-full bg-white/[0.04] px-2 text-[10px] text-white/45">
+        <span className="flex h-7 items-center rounded-full bg-black/[0.04] px-2 text-[10px] text-gray-500 dark:bg-white/[0.04] dark:text-white/45">
           +312 in your major
         </span>
       </div>
-      <div className="rounded-lg border border-white/[0.06] bg-white/[0.02] px-3 py-2 text-[11px] text-white/55">
-        <span className="text-rose-300">Emir</span> took{" "}
-        <span className="text-white/75">CPSC 323</span> in Fall &apos;25
+      <div className="rounded-lg border border-gray-200 bg-black/[0.02] px-3 py-2 text-[11px] text-gray-500 dark:border-white/[0.06] dark:bg-white/[0.02] dark:text-white/55">
+        <span className="text-rose-500 dark:text-rose-300">Emir</span> took{" "}
+        <span className="text-gray-700 dark:text-white/75">CPSC 323</span> in Fall &apos;25
       </div>
     </div>
   );
@@ -448,14 +403,14 @@ function DoubleMajorMock() {
       {["EECS", "Mech. Eng."].map((m, i) => (
         <div
           key={m}
-          className="rounded-lg border border-white/[0.07] bg-white/[0.02] p-2.5"
+          className="rounded-lg border border-gray-200 bg-black/[0.02] p-2.5 dark:border-white/[0.07] dark:bg-white/[0.02]"
         >
-          <p className="mb-2 text-[11px] font-medium text-white/70">{m}</p>
+          <p className="mb-2 text-[11px] font-medium text-gray-500 dark:text-white/70">{m}</p>
           <div className="space-y-1.5">
             {[80, 55, 30].map((w, j) => (
               <div
                 key={j}
-                className="h-1.5 overflow-hidden rounded-full bg-white/5"
+                className="h-1.5 overflow-hidden rounded-full bg-black/[0.05] dark:bg-white/5"
               >
                 <div
                   className={`h-full rounded-full ${
@@ -470,7 +425,7 @@ function DoubleMajorMock() {
           </div>
         </div>
       ))}
-      <div className="col-span-2 flex items-center gap-1.5 rounded-lg border border-pink-400/20 bg-pink-500/10 px-2.5 py-1.5 text-[10px] text-pink-200">
+      <div className="col-span-2 flex items-center gap-1.5 rounded-lg border border-pink-400/20 bg-pink-500/10 px-2.5 py-1.5 text-[10px] text-pink-700 dark:text-pink-200">
         <FiCheck size={11} /> 3 courses count for both majors
       </div>
     </div>
@@ -482,8 +437,8 @@ function StatsMini() {
   return (
     <div className="flex items-end gap-4">
       <div>
-        <p className="text-3xl font-semibold text-white">3.88</p>
-        <p className="text-[11px] text-white/45">cumulative GPA</p>
+        <p className="text-3xl font-semibold text-gray-900 dark:text-white">3.88</p>
+        <p className="text-[11px] text-gray-400 dark:text-white/45">cumulative GPA</p>
       </div>
       <div className="flex h-14 flex-1 items-end gap-1.5">
         {bars.map((b, i) => (
@@ -521,7 +476,7 @@ function KeyboardGraphic() {
           {row.map((k) => (
             <span
               key={k}
-              className="rc-key flex h-11 w-11 items-center justify-center rounded-lg text-sm font-medium text-white/40"
+              className="rc-key flex h-11 w-11 items-center justify-center rounded-lg text-sm font-medium text-gray-400 dark:text-white/40"
             >
               {k}
             </span>
@@ -529,19 +484,19 @@ function KeyboardGraphic() {
         </div>
       ))}
       <div className="mt-0.5 flex gap-1.5">
-        <span className="rc-key flex h-11 w-16 items-center justify-center rounded-lg text-xs text-white/40">
+        <span className="rc-key flex h-11 w-16 items-center justify-center rounded-lg text-xs text-gray-400 dark:text-white/40">
           ⌃
         </span>
-        <span className="rc-key flex h-11 w-16 items-center justify-center rounded-lg text-xs text-white/40">
+        <span className="rc-key flex h-11 w-16 items-center justify-center rounded-lg text-xs text-gray-400 dark:text-white/40">
           ⌥
         </span>
         <span className="rc-key-lit flex h-11 w-44 items-center justify-center gap-2 rounded-lg text-sm font-semibold">
           <Command size={15} /> K
         </span>
-        <span className="rc-key flex h-11 w-16 items-center justify-center rounded-lg text-xs text-white/40">
+        <span className="rc-key flex h-11 w-16 items-center justify-center rounded-lg text-xs text-gray-400 dark:text-white/40">
           ⌥
         </span>
-        <span className="rc-key flex h-11 w-16 items-center justify-center rounded-lg text-xs text-white/40">
+        <span className="rc-key flex h-11 w-16 items-center justify-center rounded-lg text-xs text-gray-400 dark:text-white/40">
           ⌃
         </span>
       </div>
@@ -609,13 +564,13 @@ function NumbersSection() {
         <div className="mt-14 grid grid-cols-2 gap-4 lg:grid-cols-4">
           {stats.map((s, i) => (
             <Reveal key={s.label} delay={i * 0.06}>
-              <div className="rounded-2xl border border-white/[0.08] bg-white/[0.02] p-6 text-center">
-                <p className="text-4xl font-semibold tracking-tight text-white sm:text-5xl">
+              <div className="rounded-2xl border border-gray-200 bg-black/[0.02] p-6 text-center dark:border-white/[0.08] dark:bg-white/[0.02]">
+                <p className="text-4xl font-semibold tracking-tight text-gray-900 dark:text-white sm:text-5xl">
                   {s.prefix}
                   <CountUp to={s.to} inView={inView} decimals={s.dec} />
                   <span className="rc-gradient-text">{s.suffix}</span>
                 </p>
-                <p className="mt-2 text-xs text-white/45">{s.label}</p>
+                <p className="mt-2 text-xs text-gray-400 dark:text-white/45">{s.label}</p>
               </div>
             </Reveal>
           ))}
@@ -623,8 +578,8 @@ function NumbersSection() {
 
         <div className="mt-4 grid gap-4 lg:grid-cols-3">
           <Reveal className="lg:col-span-2">
-            <div className="rounded-2xl border border-white/[0.08] bg-white/[0.02] p-6">
-              <p className="mb-4 text-sm font-medium text-white/70">
+            <div className="rounded-2xl border border-gray-200 bg-black/[0.02] p-6 dark:border-white/[0.08] dark:bg-white/[0.02]">
+              <p className="mb-4 text-sm font-medium text-gray-600 dark:text-white/70">
                 Cumulative GPA trend
               </p>
               <div className="relative h-44 w-full">
@@ -649,7 +604,7 @@ function NumbersSection() {
                   />
                 </svg>
               </div>
-              <div className="mt-2 flex justify-between text-[10px] text-white/35">
+              <div className="mt-2 flex justify-between text-[10px] text-gray-400 dark:text-white/35">
                 {sems.map((s) => (
                   <span key={s}>{s}</span>
                 ))}
@@ -657,21 +612,21 @@ function NumbersSection() {
             </div>
           </Reveal>
           <Reveal delay={0.1}>
-            <div className="flex h-full flex-col items-center justify-center rounded-2xl border border-white/[0.08] bg-white/[0.02] p-6">
-              <p className="mb-4 self-start text-sm font-medium text-white/70">
+            <div className="flex h-full flex-col items-center justify-center rounded-2xl border border-gray-200 bg-black/[0.02] p-6 dark:border-white/[0.08] dark:bg-white/[0.02]">
+              <p className="mb-4 self-start text-sm font-medium text-gray-600 dark:text-white/70">
                 Grade distribution
               </p>
               <div
                 className="relative h-32 w-32 rounded-full"
                 style={{ background: `conic-gradient(${donut})` }}
               >
-                <div className="absolute inset-[22%] rounded-full bg-[#0c0c0f]" />
+                <div className="absolute inset-[22%] rounded-full bg-gray-50 dark:bg-[#0c0c0f]" />
               </div>
               <div className="mt-4 flex flex-wrap justify-center gap-x-3 gap-y-1">
                 {grades.map((g) => (
                   <span
                     key={g.label}
-                    className="flex items-center gap-1 text-[11px] text-white/50"
+                    className="flex items-center gap-1 text-[11px] text-gray-500 dark:text-white/50"
                   >
                     <span
                       className="h-2 w-2 rounded-full"
@@ -702,6 +657,7 @@ const NAV_LINKS = [
 
 function Navbar({ onLogin }: { onLogin: () => void }) {
   const [scrolled, setScrolled] = useState(false);
+  const { theme, toggleTheme } = useTheme();
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 16);
     onScroll();
@@ -716,7 +672,7 @@ function Navbar({ onLogin }: { onLogin: () => void }) {
       transition={{ duration: 0.6 }}
       className={`fixed inset-x-0 top-0 z-50 transition-all duration-300 ${
         scrolled
-          ? "border-b border-white/[0.07] bg-[#08080a]/80 backdrop-blur-xl"
+          ? "border-b border-gray-200/60 bg-white/80 backdrop-blur-xl dark:border-white/[0.07] dark:bg-[#08080a]/80"
           : "border-b border-transparent"
       }`}
     >
@@ -730,7 +686,7 @@ function Navbar({ onLogin }: { onLogin: () => void }) {
             <a
               key={l.href}
               href={l.href}
-              className="text-sm text-white/55 transition-colors hover:text-white"
+              className="text-sm text-gray-500 transition-colors hover:text-gray-900 dark:text-white/55 dark:hover:text-white"
             >
               {l.label}
             </a>
@@ -739,14 +695,21 @@ function Navbar({ onLogin }: { onLogin: () => void }) {
 
         <div className="flex items-center gap-2">
           <button
+            onClick={toggleTheme}
+            aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+            className="flex h-8 w-8 items-center justify-center rounded-lg text-gray-500 transition-colors hover:bg-black/[0.05] hover:text-gray-700 dark:text-white/50 dark:hover:bg-white/[0.06] dark:hover:text-white/80"
+          >
+            {theme === "dark" ? <Sun size={16} /> : <Moon size={16} />}
+          </button>
+          <button
             onClick={onLogin}
-            className="hidden rounded-lg px-3 py-1.5 text-sm text-white/70 transition-colors hover:text-white sm:block"
+            className="hidden rounded-lg px-3 py-1.5 text-sm text-gray-600 transition-colors hover:text-gray-900 dark:text-white/70 dark:hover:text-white sm:block"
           >
             Log in
           </button>
           <button
             onClick={onLogin}
-            className="group flex items-center gap-1.5 rounded-lg bg-white px-3.5 py-1.5 text-sm font-medium text-black transition-all hover:bg-pink-50"
+            className="group flex items-center gap-1.5 rounded-lg bg-gray-900 px-3.5 py-1.5 text-sm font-medium text-white transition-all hover:bg-gray-700 dark:bg-white dark:text-black dark:hover:bg-pink-50"
           >
             Get started
             <FiArrowRight
@@ -789,7 +752,7 @@ export default function PublicFacingPage() {
   return (
     <div
       id="top"
-      className="min-h-screen overflow-x-hidden bg-[#08080a] font-sf text-white antialiased"
+      className="min-h-screen overflow-x-hidden bg-white font-louize text-gray-900 antialiased dark:bg-[#08080a] dark:text-white"
     >
       <Navbar onLogin={login} />
 
@@ -805,13 +768,13 @@ export default function PublicFacingPage() {
             initial={{ opacity: 0, y: -8 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
-            className="group mb-7 inline-flex items-center gap-2.5 rounded-full border border-white/10 bg-white/[0.04] py-1.5 pl-3 pr-3.5 text-xs text-white/70 backdrop-blur-md transition-colors hover:border-pink-400/40 hover:text-white"
+            className="group mb-7 inline-flex items-center gap-2.5 rounded-full border border-gray-200 bg-black/[0.03] py-1.5 pl-3 pr-3.5 text-xs text-gray-600 backdrop-blur-md transition-colors hover:border-pink-400/40 hover:text-gray-900 dark:border-white/10 dark:bg-white/[0.04] dark:text-white/70 dark:hover:text-white"
           >
-            <span className="text-[11px] uppercase tracking-[0.18em] text-white/45">
+            <span className="text-[11px] uppercase tracking-[0.18em] text-gray-400 dark:text-white/45">
               As featured in
             </span>
-            <span className="h-3.5 w-px bg-white/15" />
-            <span className="font-louize text-sm font-medium tracking-tight text-white">
+            <span className="h-3.5 w-px bg-gray-300 dark:bg-white/15" />
+            <span className="font-louize text-sm font-medium tracking-tight text-gray-900 dark:text-white">
               The Yale Daily News
             </span>
             <FiArrowUpRight
@@ -835,12 +798,44 @@ export default function PublicFacingPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.12 }}
-            className="mx-auto mt-6 max-w-xl text-pretty text-lg leading-relaxed text-white/60"
+            className="mx-auto mt-6 max-w-xl text-pretty text-lg leading-relaxed text-gray-600 dark:text-white/60"
           >
             Every requirement, every major, every plan in one fast, beautiful
-            place. Stop fighting spreadsheets and PDFs. Built by Yalies, for
-            Yalies.
+            place. We&apos;re democratizing academic planning, stats, and
+            insights at Yale, together.
           </motion.p>
+
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.18 }}
+            className="mt-5 flex justify-center"
+          >
+            <Link
+              href="#team"
+              className="group inline-flex items-center gap-2.5 rounded-full border border-gray-200 bg-black/[0.03] py-1.5 pl-1.5 pr-4 text-sm text-gray-700 backdrop-blur-md transition-colors hover:border-pink-400/40 hover:text-gray-900 dark:border-white/10 dark:bg-white/[0.04] dark:text-white/70 dark:hover:text-white"
+            >
+              <span className="flex -space-x-2">
+                <img
+                  src="/team/filippo.jpeg"
+                  alt="Filippo Fonseca"
+                  loading="lazy"
+                  className="relative z-10 h-6 w-6 rounded-full object-cover ring-2 ring-white dark:ring-[#08080a]"
+                />
+                <img
+                  src="/team/emir.JPG"
+                  alt="Emir"
+                  loading="lazy"
+                  className="h-6 w-6 rounded-full object-cover ring-2 ring-white dark:ring-[#08080a]"
+                />
+              </span>
+              <span className="font-medium">For Yalies, by Yalies</span>
+              <FiArrowUpRight
+                size={13}
+                className="opacity-60 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+              />
+            </Link>
+          </motion.div>
 
           <motion.div
             initial={{ opacity: 0, y: 18 }}
@@ -850,7 +845,7 @@ export default function PublicFacingPage() {
           >
             <button
               onClick={login}
-              className="group flex items-center gap-2 rounded-xl bg-white px-5 py-3 text-sm font-semibold text-black shadow-[0_8px_30px_-8px_rgba(255,255,255,0.4)] transition-all hover:scale-[1.03]"
+              className="group flex items-center gap-2 rounded-xl bg-gray-900 px-5 py-3 text-sm font-semibold text-white shadow-[0_8px_30px_-8px_rgba(0,0,0,0.3)] transition-all hover:scale-[1.03] dark:bg-white dark:text-black dark:shadow-[0_8px_30px_-8px_rgba(255,255,255,0.4)]"
             >
               <GraduationCap size={16} /> Log in with Yale CAS
               <FiArrowRight
@@ -860,7 +855,7 @@ export default function PublicFacingPage() {
             </button>
             <button
               onClick={() => setShowVideo(true)}
-              className="group flex items-center gap-2 rounded-xl border border-white/12 bg-white/[0.04] px-5 py-3 text-sm font-medium text-white/85 backdrop-blur-md transition-all hover:border-white/25 hover:bg-white/[0.07]"
+              className="group flex items-center gap-2 rounded-xl border border-gray-300 bg-black/[0.03] px-5 py-3 text-sm font-medium text-gray-700 backdrop-blur-md transition-all hover:border-gray-400 hover:bg-black/[0.05] dark:border-white/12 dark:bg-white/[0.04] dark:text-white/85 dark:hover:border-white/25 dark:hover:bg-white/[0.07]"
             >
               <FiPlay size={14} className="text-pink-300" /> Watch the v2 launch
             </button>
@@ -882,15 +877,16 @@ export default function PublicFacingPage() {
               ].map((g, i) => (
                 <span
                   key={i}
-                  className={`h-7 w-7 rounded-full bg-gradient-to-br ${g} ring-2 ring-[#08080a]`}
+                  className={`h-7 w-7 rounded-full bg-gradient-to-br ${g} ring-2 ring-white dark:ring-[#08080a]`}
                 />
               ))}
             </div>
-            <p className="text-sm text-white/65">
-              Used by{" "}
-              <span className="font-semibold text-white">
+            <p className="text-sm text-gray-600 dark:text-white/65">
+              Have you heard?{" "}
+              <span className="font-semibold text-gray-900 dark:text-white">
                 1 in 6 Yale undergrads
-              </span>
+              </span>{" "}
+              already use DegreeIntelligence.
             </p>
           </motion.div>
 
@@ -898,36 +894,33 @@ export default function PublicFacingPage() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.8, delay: 0.4 }}
-            className="mt-4 text-xs text-white/35"
+            className="mt-4 text-sm text-gray-400 dark:text-white/45"
           >
-            Free, always &nbsp;·&nbsp; Sign in with Yale CAS &nbsp;·&nbsp; v2
-            launched Feb 2026
+            Why don&apos;t you? Even if you do,{" "}
+            <span className="rc-gradient-text font-medium">
+              we just launched v2. Free. Always.
+            </span>
           </motion.p>
-        </div>
-
-        {/* product window */}
-        <div className="relative mt-16 sm:mt-20">
-          <ProductWindow />
         </div>
       </header>
 
       {/* ================= PRESS STRIP ================= */}
-      <section className="relative border-y border-white/[0.06] py-10">
+      <section className="relative border-y border-gray-200 py-10 dark:border-white/[0.06]">
         <div className="mx-auto max-w-5xl px-4 text-center sm:px-6">
-          <p className="text-xs uppercase tracking-[0.25em] text-white/30">
+          <p className="text-xs uppercase tracking-[0.25em] text-gray-400 dark:text-white/30">
             Trusted by Yale undergraduates across every residential college
           </p>
-          <div className="mt-6 flex flex-wrap items-center justify-center gap-x-10 gap-y-4 text-sm font-medium text-white/45">
-            <span className="text-base font-semibold text-white/70">
+          <div className="mt-6 flex flex-wrap items-center justify-center gap-x-10 gap-y-4 text-sm font-medium text-gray-500 dark:text-white/45">
+            <span className="text-base font-semibold text-gray-700 dark:text-white/70">
               1 in 6 undergrads
             </span>
-            <span className="hidden h-4 w-px bg-white/10 sm:block" />
-            <span className="font-louize text-base text-white/65">
+            <span className="hidden h-4 w-px bg-gray-200 dark:bg-white/10 sm:block" />
+            <span className="font-louize text-base text-gray-600 dark:text-white/65">
               The Yale Daily News
             </span>
-            <span className="hidden h-4 w-px bg-white/10 sm:block" />
+            <span className="hidden h-4 w-px bg-gray-200 dark:bg-white/10 sm:block" />
             <span>14 residential colleges</span>
-            <span className="hidden h-4 w-px bg-white/10 sm:block" />
+            <span className="hidden h-4 w-px bg-gray-200 dark:bg-white/10 sm:block" />
             <span>Every major &amp; concentration</span>
           </div>
         </div>
@@ -955,10 +948,12 @@ export default function PublicFacingPage() {
               title="Semester simulator"
               desc="Drag courses into future semesters, check conflicts, and see your plan come together before you commit to a single class."
             >
-              <div className="overflow-hidden rounded-lg border border-white/10">
+              <div className="overflow-hidden rounded-lg border border-gray-200 dark:border-white/10">
                 <img
                   src="/demo/simulator.gif"
                   alt="Semester simulator"
+                  loading="lazy"
+                  decoding="async"
                   className="block w-full"
                 />
               </div>
@@ -970,7 +965,7 @@ export default function PublicFacingPage() {
               icon={<FiBarChart2 />}
               title="Major progress"
               badge="New"
-              desc="A live heat map of everything done and everything left."
+              desc="A live heat map of everything done and everything left, with a built-in double-major conflict manager that flags overlaps and shared courses across both majors."
             >
               <HeatGrid />
             </FeatureCard>
@@ -1039,10 +1034,12 @@ export default function PublicFacingPage() {
           <div className="mt-16 grid items-start gap-10 lg:grid-cols-2">
             <div className="lg:sticky lg:top-28">
               <div className="rc-window rounded-2xl">
-                <BrowserChrome url="degreeintelligence.app/simulator">
+                <BrowserChrome url="degreeint.com/simulator">
                   <img
                     src="/demo/simulator.gif"
                     alt="DegreeIntelligence in action"
+                    loading="lazy"
+                    decoding="async"
                     className="block w-full"
                   />
                 </BrowserChrome>
@@ -1067,15 +1064,15 @@ export default function PublicFacingPage() {
                 },
               ].map((s, i) => (
                 <Reveal key={s.n} delay={i * 0.08}>
-                  <div className="rc-card-hover flex gap-4 rounded-2xl border border-white/[0.08] bg-white/[0.02] p-5">
+                  <div className="rc-card-hover flex gap-4 rounded-2xl border border-gray-200 bg-black/[0.02] p-5 dark:border-white/[0.08] dark:bg-white/[0.02]">
                     <span className="rc-gradient-text text-2xl font-semibold tabular-nums">
                       {s.n}
                     </span>
                     <div>
-                      <h3 className="mb-1 text-lg font-semibold text-white">
+                      <h3 className="mb-1 text-lg font-semibold text-gray-900 dark:text-white">
                         {s.t}
                       </h3>
-                      <p className="text-sm leading-relaxed text-white/50">
+                      <p className="text-sm leading-relaxed text-gray-500 dark:text-white/50">
                         {s.d}
                       </p>
                     </div>
@@ -1091,8 +1088,8 @@ export default function PublicFacingPage() {
       <section className="relative px-4 py-20 sm:px-6">
         <div className="mx-auto grid max-w-5xl gap-4 md:grid-cols-2">
           <Reveal>
-            <div className="h-full rounded-2xl border border-white/[0.06] bg-white/[0.015] p-7">
-              <p className="mb-5 text-xs font-semibold uppercase tracking-[0.2em] text-white/30">
+            <div className="h-full rounded-2xl border border-gray-200 bg-black/[0.015] p-7 dark:border-white/[0.06] dark:bg-white/[0.015]">
+              <p className="mb-5 text-xs font-semibold uppercase tracking-[0.2em] text-gray-400 dark:text-white/30">
                 Before
               </p>
               <ul className="space-y-3">
@@ -1104,9 +1101,9 @@ export default function PublicFacingPage() {
                 ].map((x) => (
                   <li
                     key={x}
-                    className="flex items-start gap-2.5 text-sm text-white/45"
+                    className="flex items-start gap-2.5 text-sm text-gray-500 dark:text-white/45"
                   >
-                    <FiX className="mt-0.5 shrink-0 text-white/30" /> {x}
+                    <FiX className="mt-0.5 shrink-0 text-gray-400 dark:text-white/30" /> {x}
                   </li>
                 ))}
               </ul>
@@ -1115,7 +1112,7 @@ export default function PublicFacingPage() {
           <Reveal delay={0.1}>
             <div className="relative h-full overflow-hidden rounded-2xl border border-pink-400/20 bg-gradient-to-br from-pink-500/[0.1] via-purple-500/[0.04] to-transparent p-7">
               <div className="pointer-events-none absolute -right-10 -top-10 h-40 w-40 rounded-full bg-pink-500/20 blur-3xl" />
-              <p className="mb-5 text-xs font-semibold uppercase tracking-[0.2em] text-pink-300/80">
+              <p className="mb-5 text-xs font-semibold uppercase tracking-[0.2em] text-pink-600/80 dark:text-pink-300/80">
                 With DegreeIntelligence
               </p>
               <ul className="space-y-3">
@@ -1127,7 +1124,7 @@ export default function PublicFacingPage() {
                 ].map((x) => (
                   <li
                     key={x}
-                    className="flex items-start gap-2.5 text-sm text-white/75"
+                    className="flex items-start gap-2.5 text-sm text-gray-800 dark:text-white/75"
                   >
                     <FiCheck className="mt-0.5 shrink-0 text-pink-400" /> {x}
                   </li>
@@ -1165,15 +1162,15 @@ export default function PublicFacingPage() {
               },
             ].map((p, i) => (
               <Reveal key={p.name} delay={i * 0.1}>
-                <div className="rc-card-hover h-full rounded-2xl border border-white/[0.08] bg-white/[0.02] p-6">
+                <div className="rc-card-hover h-full rounded-2xl border border-gray-200 bg-black/[0.02] p-6 dark:border-white/[0.08] dark:bg-white/[0.02]">
                   <img
                     src={p.img}
                     alt={p.name}
                     className="mb-4 h-16 w-16 rounded-full object-cover ring-2 ring-pink-400/30"
                   />
-                  <h3 className="text-lg font-semibold text-white">{p.name}</h3>
-                  <p className="mb-3 mt-0.5 text-xs text-pink-300/70">{p.role}</p>
-                  <p className="text-sm leading-relaxed text-white/50">{p.bio}</p>
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{p.name}</h3>
+                  <p className="mb-3 mt-0.5 text-xs text-pink-600/70 dark:text-pink-300/70">{p.role}</p>
+                  <p className="text-sm leading-relaxed text-gray-500 dark:text-white/50">{p.bio}</p>
                 </div>
               </Reveal>
             ))}
@@ -1188,14 +1185,14 @@ export default function PublicFacingPage() {
           <KeyboardGraphic />
           <Reveal>
             <div className="mt-10 text-center">
-              <span className="mb-5 inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-xs text-white/65 backdrop-blur-md">
-                <Command size={12} className="text-pink-300" /> K · Search your
+              <span className="mb-5 inline-flex items-center gap-1.5 rounded-full border border-gray-200 bg-black/[0.03] px-3 py-1 text-xs text-gray-600 backdrop-blur-md dark:border-white/10 dark:bg-white/[0.04] dark:text-white/65">
+                <Command size={12} className="text-pink-500 dark:text-pink-300" /> K · Search your
                 entire degree
               </span>
-              <h2 className="text-balance text-4xl font-semibold tracking-tight text-white sm:text-5xl">
+              <h2 className="text-balance text-4xl font-semibold tracking-tight text-gray-900 dark:text-white sm:text-5xl">
                 Take the short way.
               </h2>
-              <p className="mt-4 text-lg text-white/55">
+              <p className="mt-4 text-lg text-gray-500 dark:text-white/55">
                 Plan your entire Yale degree in one place.{" "}
                 <span className="rc-gradient-text font-medium">
                   Free, always.
@@ -1204,7 +1201,7 @@ export default function PublicFacingPage() {
               <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
                 <button
                   onClick={login}
-                  className="group flex items-center gap-2 rounded-xl bg-white px-5 py-3 text-sm font-semibold text-black transition-all hover:scale-[1.03]"
+                  className="group flex items-center gap-2 rounded-xl bg-gray-900 px-5 py-3 text-sm font-semibold text-white transition-all hover:scale-[1.03] dark:bg-white dark:text-black"
                 >
                   <GraduationCap size={16} /> Log in with Yale CAS
                   <FiArrowRight
@@ -1214,12 +1211,12 @@ export default function PublicFacingPage() {
                 </button>
                 <button
                   onClick={() => setShowVideo(true)}
-                  className="flex items-center gap-2 rounded-xl border border-white/12 bg-white/[0.04] px-5 py-3 text-sm font-medium text-white/85 transition-all hover:border-white/25 hover:bg-white/[0.07]"
+                  className="flex items-center gap-2 rounded-xl border border-gray-300 bg-black/[0.03] px-5 py-3 text-sm font-medium text-gray-700 transition-all hover:border-gray-400 hover:bg-black/[0.05] dark:border-white/12 dark:bg-white/[0.04] dark:text-white/85 dark:hover:border-white/25 dark:hover:bg-white/[0.07]"
                 >
-                  <FiPlay size={14} className="text-pink-300" /> Watch the demo
+                  <FiPlay size={14} className="text-pink-500 dark:text-pink-300" /> Watch the demo
                 </button>
               </div>
-              <p className="mt-5 text-xs text-white/30">
+              <p className="mt-5 text-xs text-gray-400 dark:text-white/30">
                 v2 · Sign in with Yale CAS · 1 in 6 undergrads
               </p>
             </div>
@@ -1228,18 +1225,18 @@ export default function PublicFacingPage() {
       </section>
 
       {/* ================= MEGA FOOTER ================= */}
-      <footer className="relative overflow-hidden border-t border-white/[0.06]">
+      <footer className="relative overflow-hidden border-t border-gray-200 dark:border-white/[0.06]">
         <div className="rc-grid-lines pointer-events-none absolute inset-0 opacity-60" />
         <div className="relative mx-auto max-w-6xl px-4 py-16 sm:px-6">
           <div className="grid gap-10 md:grid-cols-[1.4fr_repeat(3,1fr)]">
             <div>
               <div className="mb-3 flex items-center gap-2">
                 <LogoIcon width={24} height={24} />
-                <span className="text-sm font-semibold text-white">
+                <span className="text-sm font-semibold text-gray-900 dark:text-white">
                   DegreeIntelligence
                 </span>
               </div>
-              <p className="max-w-xs text-sm leading-relaxed text-white/45">
+              <p className="max-w-xs text-sm leading-relaxed text-gray-500 dark:text-white/45">
                 Democratizing academic planning, stats, and insights at Yale.
                 Built by Yalies, for Yalies.
               </p>
@@ -1266,7 +1263,7 @@ export default function PublicFacingPage() {
               },
             ].map((col) => (
               <div key={col.h}>
-                <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-white/40">
+                <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-gray-400 dark:text-white/40">
                   {col.h}
                 </p>
                 <ul className="space-y-2">
@@ -1282,7 +1279,7 @@ export default function PublicFacingPage() {
                               }
                             : undefined
                         }
-                        className="text-sm text-white/50 transition-colors hover:text-white"
+                        className="text-sm text-gray-500 transition-colors hover:text-gray-900 dark:text-white/50 dark:hover:text-white"
                       >
                         {label}
                       </a>
@@ -1292,7 +1289,7 @@ export default function PublicFacingPage() {
               </div>
             ))}
           </div>
-          <div className="mt-12 flex flex-col items-center justify-between gap-3 border-t border-white/[0.06] pt-6 text-xs text-white/35 sm:flex-row">
+          <div className="mt-12 flex flex-col items-center justify-between gap-3 border-t border-gray-200 pt-6 text-xs text-gray-400 dark:border-white/[0.06] dark:text-white/35 sm:flex-row">
             <span>
               © {new Date().getFullYear()} DegreeIntelligence. Not affiliated
               with Yale University.

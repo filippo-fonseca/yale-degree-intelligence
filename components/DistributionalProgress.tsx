@@ -585,7 +585,7 @@ const DistributionalsView = ({ courses }: { courses: Course[] }) => {
       {/* Summary stat cards (MajorStatCard pattern) */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         <DistStatCard
-          label="Requirements Met"
+          label="Total Requirements Completed"
           value={`${metCount}/5`}
           color="text-emerald-600 dark:text-emerald-300"
           infoTooltip="Areas (Hu, So, Sc) and skills (QR, WR) where you've reached at least 2 credits."

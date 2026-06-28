@@ -965,7 +965,7 @@ export default function PublicFacingPage() {
               icon={<FiBarChart2 />}
               title="Major progress"
               badge="New"
-              desc="A live heat map of everything done and everything left."
+              desc="A live heat map of everything done and everything left, with a built-in double-major conflict manager that flags overlaps and shared courses across both majors."
             >
               <HeatGrid />
             </FeatureCard>

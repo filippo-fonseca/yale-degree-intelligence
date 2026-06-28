@@ -867,7 +867,7 @@ export default function PublicFacingPage() {
                   src="/team/filippo.jpeg"
                   alt="Filippo Fonseca"
                   loading="lazy"
-                  className="h-6 w-6 rounded-full object-cover ring-2 ring-white dark:ring-[#08080a]"
+                  className="relative z-10 h-6 w-6 rounded-full object-cover ring-2 ring-white dark:ring-[#08080a]"
                 />
                 <img
                   src="/team/emir.JPG"

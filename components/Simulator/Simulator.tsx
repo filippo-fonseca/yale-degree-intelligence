@@ -227,6 +227,8 @@ export default function Simulator({
   // keep initial snapshot to detect changes
   const initialSemestersRef = useRef<Semester[]>([]);
   const initialManualReqsRef = useRef<ManualRequirementEntry[]>([]);
+  // Prevents the initial-build effect from clobbering the snapshot after a plan loads
+  const planEverLoadedRef = useRef(false);
 
   // majors to compute – only the user's declared majors
   const majorIds = useMemo<string[]>(() => userMajors, [userMajors]);
@@ -383,10 +385,16 @@ export default function Simulator({
     });
 
     setSemesters(semestersArr);
-    initialSemestersRef.current = JSON.parse(
-      JSON.stringify(semestersArr),
-    ) as Semester[];
-    initialManualReqsRef.current = [];
+    // Only reset the "clean" snapshot when no plan has been loaded yet.
+    // Once a plan is loaded, loadPlanData owns the snapshot; re-running this
+    // effect (e.g. on a parent re-render) must not clobber it and produce a
+    // false-positive dirty state.
+    if (!planEverLoadedRef.current) {
+      initialSemestersRef.current = JSON.parse(
+        JSON.stringify(semestersArr),
+      ) as Semester[];
+      initialManualReqsRef.current = [];
+    }
 
     // 3) Build pool of available (not-taken & not already taken)
     setAvailableCourses(
@@ -721,6 +729,7 @@ export default function Simulator({
 
   // Helper to load a plan from Plan object directly
   const loadPlanData = (plan: Plan) => {
+    planEverLoadedRef.current = true;
     setSemesters(plan.semesters);
     setSimulatorManualReqs(plan.manualRequirements ?? []);
     initialSemestersRef.current = JSON.parse(

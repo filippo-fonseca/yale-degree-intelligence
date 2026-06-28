@@ -1273,8 +1273,8 @@ export default function Simulator({
                   isPast
                     ? "border-gray-200/60 dark:border-gray-800/30 bg-gray-100/60 dark:bg-gray-900/30"
                     : isFall
-                      ? "border-amber-100 dark:border-amber-900/20 bg-amber-50/50 dark:bg-amber-950/15"
-                      : "border-sky-100 dark:border-sky-900/20 bg-sky-50/50 dark:bg-sky-950/15"
+                      ? "border-amber-100 dark:border-amber-800/30 bg-amber-50/50 dark:bg-amber-950/30"
+                      : "border-sky-100 dark:border-sky-800/30 bg-sky-50/50 dark:bg-sky-950/30"
                 }`}>
                   <h4 className={`font-medium text-sm ${semHeaderAccent}`}>
                     {semester.name}

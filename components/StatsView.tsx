@@ -597,10 +597,18 @@ export default function StatsView({ courses }: { courses: Course[] }) {
           />
           <StatCard
             label="Semesters Completed"
-            value={sortedSemData.length}
+            value={nonSummerSems.length}
             color="text-pink-600 dark:text-pink-400"
             icon={<TrendingUp className="h-3.5 w-3.5" />}
-            sub={`incl. ${sortedSemData.length - nonSummerSems.length} summer`}
+            sub={
+              sortedSemData.length - nonSummerSems.length > 0
+                ? `plus ${sortedSemData.length - nonSummerSems.length} ${
+                    sortedSemData.length - nonSummerSems.length === 1
+                      ? "summer"
+                      : "summers"
+                  }`
+                : undefined
+            }
           />
         </motion.div>
       )}

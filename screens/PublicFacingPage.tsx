@@ -24,7 +24,8 @@ import {
   FiLayers,
 } from "react-icons/fi";
 import { HiSparkles } from "react-icons/hi2";
-import { GraduationCap, Command } from "lucide-react";
+import { GraduationCap, Command, Sun, Moon } from "lucide-react";
+import { useTheme } from "@/context/ThemeContext";
 import Link from "next/link";
 import dynamic from "next/dynamic";
 import { useState, useRef, useEffect } from "react";
@@ -702,6 +703,7 @@ const NAV_LINKS = [
 
 function Navbar({ onLogin }: { onLogin: () => void }) {
   const [scrolled, setScrolled] = useState(false);
+  const { theme, toggleTheme } = useTheme();
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 16);
     onScroll();
@@ -716,7 +718,7 @@ function Navbar({ onLogin }: { onLogin: () => void }) {
       transition={{ duration: 0.6 }}
       className={`fixed inset-x-0 top-0 z-50 transition-all duration-300 ${
         scrolled
-          ? "border-b border-white/[0.07] bg-[#08080a]/80 backdrop-blur-xl"
+          ? "border-b border-gray-200/60 bg-white/80 backdrop-blur-xl dark:border-white/[0.07] dark:bg-[#08080a]/80"
           : "border-b border-transparent"
       }`}
     >
@@ -730,7 +732,7 @@ function Navbar({ onLogin }: { onLogin: () => void }) {
             <a
               key={l.href}
               href={l.href}
-              className="text-sm text-white/55 transition-colors hover:text-white"
+              className="text-sm text-gray-500 transition-colors hover:text-gray-900 dark:text-white/55 dark:hover:text-white"
             >
               {l.label}
             </a>
@@ -739,14 +741,21 @@ function Navbar({ onLogin }: { onLogin: () => void }) {
 
         <div className="flex items-center gap-2">
           <button
+            onClick={toggleTheme}
+            aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+            className="flex h-8 w-8 items-center justify-center rounded-lg text-white/50 transition-colors hover:bg-white/[0.06] hover:text-white/80 dark:text-white/50 dark:hover:bg-white/[0.06] dark:hover:text-white/80 light:text-gray-500 light:hover:bg-black/[0.04] light:hover:text-gray-700"
+          >
+            {theme === "dark" ? <Sun size={16} /> : <Moon size={16} />}
+          </button>
+          <button
             onClick={onLogin}
-            className="hidden rounded-lg px-3 py-1.5 text-sm text-white/70 transition-colors hover:text-white sm:block"
+            className="hidden rounded-lg px-3 py-1.5 text-sm text-gray-600 transition-colors hover:text-gray-900 dark:text-white/70 dark:hover:text-white sm:block"
           >
             Log in
           </button>
           <button
             onClick={onLogin}
-            className="group flex items-center gap-1.5 rounded-lg bg-white px-3.5 py-1.5 text-sm font-medium text-black transition-all hover:bg-pink-50"
+            className="group flex items-center gap-1.5 rounded-lg bg-gray-900 px-3.5 py-1.5 text-sm font-medium text-white transition-all hover:bg-gray-700 dark:bg-white dark:text-black dark:hover:bg-pink-50"
           >
             Get started
             <FiArrowRight

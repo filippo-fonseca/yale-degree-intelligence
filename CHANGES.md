@@ -39,6 +39,21 @@ Complete visual overhaul of `components/DistributionalProgress.tsx` to match the
 **Dark mode / light mode**
 - All surfaces verified for both modes using Tailwind dark: variants matching the rest of the app.
 
+## Follow-up changes (2026-06-27)
+
+### Change 1 — Stat card rename
+- `DistStatCard` labeled "Requirements Met" now reads "Total Requirements Completed". Label text only; no logic changed.
+
+### Change 2 — Distributional breakdown pie chart (`DistPieChart`)
+- New `DistPieChart` component added above the board/heat-map section.
+- Counts each distributional tag (Hu, So, Sc, QR, WR) and groups L1–L5 into a single "Language (L)" slice.
+- Rendered with `@mui/x-charts` `PieChart` (donut variant); slice colors match the per-distributional palette (Hu=purple, So=sky, Sc=emerald, QR=red, WR=orange, Language=teal).
+- Dark-mode-legible tooltip reuses the `makeChartTooltipSlotProps` pattern from `StatsView.tsx`.
+- Card surface matches existing design language (`rounded-xl shadow-neu` dark gradient).
+- Shows a centered empty-state message when the student has zero distributional tags.
+- `useTheme` from `@/context/ThemeContext` used for `isDark` detection.
+- `PieChart` imported from `@mui/x-charts/PieChart`.
+
 ## Files touched
 
 | File | Change |

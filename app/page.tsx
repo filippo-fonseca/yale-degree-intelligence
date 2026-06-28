@@ -47,37 +47,71 @@ import {
 import { gradePoints, getDistPillStyle } from "@/lib/constants";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
 import { calculateMajorProgress, MAJORS } from "@/lib/majors";
-import MajorProgressView from "@/components/MajorProgressView";
-import StatsView from "@/components/StatsView";
-import MajorSelectionFlow from "@/components/MajorSelectionFlow";
 import { HiDocumentDuplicate } from "react-icons/hi";
 import { RiProgress3Fill } from "react-icons/ri";
 import CompoundLogo from "@/components/ui/CompoundLogo";
 import { getCourseNameFromCode } from "@/lib/courseCatalog";
-import DistributionalsView from "@/components/DistributionalProgress";
 import { FaBuildingCircleCheck, FaHeart } from "react-icons/fa6";
 import CustomLoader from "@/components/ui/CustomLoader";
 import UserSettingsModal from "@/components/UserSettingsModal/UserSettingsModal";
 import Link from "next/link";
 import LogoIcon from "@/icons/LogoIcon";
 import CourseModal from "@/components/MajorProgressView/CourseModal";
-import MyCoursesView from "@/components/MyCoursesView";
 import { getGPAColor } from "@/lib/utils/utils";
 import { getSharedCourses } from "@/lib/utils/sharedCourses";
 import ConfirmDeleteModal from "@/components/ConfirmDeleteModal/ConfirmDeleteModal";
 import ManualCourseEntryModal from "@/components/ManualCourseEntryModal";
 import PublicFacingPage from "@/screens/PublicFacingPage";
-import FriendsTab from "@/components/FriendsTab/FriendsTab";
 import {
   MessageCircleQuestionMark,
   MonitorCog,
   Printer,
   Search,
 } from "lucide-react";
-import Simulator from "@/components/Simulator/Simulator";
-import CleoAITab from "@/components/CleoAITab/CleoAITab";
 import { UserAvatar } from "@/components/ui/UserAvatar";
 import CommandPalette from "@/components/CommandPalette/CommandPalette";
+import dynamic from "next/dynamic";
+
+// Heavy, tab-gated views are code-split so logged-out visitors and inactive
+// tabs don't pull this code into the initial bundle. They render client-side
+// only (the dashboard is already a client tree behind auth).
+const TabFallback = () => (
+  <div className="flex items-center justify-center py-24 text-sm text-gray-400 dark:text-gray-500">
+    Loading…
+  </div>
+);
+const MyCoursesView = dynamic(() => import("@/components/MyCoursesView"), {
+  ssr: false,
+  loading: TabFallback,
+});
+const StatsView = dynamic(() => import("@/components/StatsView"), {
+  ssr: false,
+  loading: TabFallback,
+});
+const MajorProgressView = dynamic(
+  () => import("@/components/MajorProgressView"),
+  { ssr: false, loading: TabFallback },
+);
+const DistributionalsView = dynamic(
+  () => import("@/components/DistributionalProgress"),
+  { ssr: false, loading: TabFallback },
+);
+const FriendsTab = dynamic(() => import("@/components/FriendsTab/FriendsTab"), {
+  ssr: false,
+  loading: TabFallback,
+});
+const Simulator = dynamic(() => import("@/components/Simulator/Simulator"), {
+  ssr: false,
+  loading: TabFallback,
+});
+const CleoAITab = dynamic(() => import("@/components/CleoAITab/CleoAITab"), {
+  ssr: false,
+  loading: TabFallback,
+});
+const MajorSelectionFlow = dynamic(
+  () => import("@/components/MajorSelectionFlow"),
+  { ssr: false },
+);
 
 interface UserProfile {
   majors: string[];

@@ -838,8 +838,8 @@ export default function PublicFacingPage() {
             className="mx-auto mt-6 max-w-xl text-pretty text-lg leading-relaxed text-white/60"
           >
             Every requirement, every major, every plan in one fast, beautiful
-            place. Stop fighting spreadsheets and PDFs. Built by Yalies, for
-            Yalies.
+            place. We&apos;re democratizing academic planning, stats, and
+            insights at Yale, together. For Yalies, by Yalies.
           </motion.p>
 
           <motion.div
@@ -887,10 +887,11 @@ export default function PublicFacingPage() {
               ))}
             </div>
             <p className="text-sm text-white/65">
-              Used by{" "}
+              Have you heard?{" "}
               <span className="font-semibold text-white">
                 1 in 6 Yale undergrads
-              </span>
+              </span>{" "}
+              already use DegreeIntelligence.
             </p>
           </motion.div>
 
@@ -898,10 +899,12 @@ export default function PublicFacingPage() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.8, delay: 0.4 }}
-            className="mt-4 text-xs text-white/35"
+            className="mt-4 text-sm text-white/45"
           >
-            Free, always &nbsp;·&nbsp; Sign in with Yale CAS &nbsp;·&nbsp; v2
-            launched Feb 2026
+            Why don&apos;t you? Even if you do,{" "}
+            <span className="rc-gradient-text font-medium">
+              we just launched v2. Free. Always.
+            </span>
           </motion.p>
         </div>
 

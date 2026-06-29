@@ -3,9 +3,16 @@
 import { Course } from "@/lib/types";
 import { getCourseNameFromCode } from "@/lib/courseCatalog";
 import { motion, AnimatePresence } from "framer-motion";
-import { useState } from "react";
-import { FiCheck, FiInfo, FiGrid, FiList } from "react-icons/fi";
+import { useState, useEffect } from "react";
+import { FiCheck, FiInfo, FiGrid, FiList, FiZap, FiSliders } from "react-icons/fi";
 import { getDistPillStyle } from "@/lib/constants";
+import { useAuth } from "@/context/AuthContext";
+import { db } from "@/config/firebase";
+import { doc, getDoc, setDoc } from "firebase/firestore";
+import {
+  allocateDistributionals,
+  type DistAllocation,
+} from "@/lib/distributionalAllocation";
 import {
   getReqStatus,
   getReqRatio,
@@ -322,12 +329,10 @@ const DIST_STATUS_LABEL: Record<string, string> = {
 };
 
 function DistHeatMap({
-  distMap,
+  getCount,
 }: {
-  distMap: Record<string, Course[]>;
+  getCount: (code: string) => number;
 }) {
-  const getCount = (code: string) => (distMap[code] || []).length;
-
   return (
     <div className="p-4 rounded-xl bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 backdrop-blur-md border border-gray-200 dark:border-gray-800/50 shadow-neu">
       {/* Legend */}
@@ -380,11 +385,17 @@ function DistReqCard({
   count,
   courses: coursesForReq,
   target = 2,
+  manual = false,
+  allocation,
+  onReassign,
 }: {
   req: { code: string; name: string; color: string };
   count: number;
   courses: Course[];
   target?: number;
+  manual?: boolean;
+  allocation?: DistAllocation;
+  onReassign?: (courseCode: string, reqCode: string) => void;
 }) {
   const fulfilled = count >= target;
   const progress = Math.min(count / target, 1);
@@ -447,16 +458,39 @@ function DistReqCard({
       {/* Course list */}
       {coursesForReq.length > 0 && (
         <div className="mt-3 pt-3 border-t border-gray-200/50 dark:border-gray-800/50 space-y-1.5">
-          {coursesForReq.map((course) => (
-            <div key={course.id} className="flex items-center justify-between">
-              <span className="text-xs text-gray-700 dark:text-gray-300 font-medium">
-                {course.code}
-              </span>
-              <span className="text-xs text-gray-400 dark:text-gray-500 truncate ml-2 max-w-[150px] text-right">
-                {getCourseNameFromCode(course.code)}
-              </span>
-            </div>
-          ))}
+          {coursesForReq.map((course) => {
+            const options =
+              allocation?.optionsByCourseKey[allocation.keyOf(course)] ?? [];
+            const canReassign = manual && options.length > 1 && onReassign;
+            return (
+              <div
+                key={course.id}
+                className="flex items-center justify-between gap-2"
+              >
+                <span className="text-xs text-gray-700 dark:text-gray-300 font-medium">
+                  {course.code}
+                </span>
+                {canReassign ? (
+                  <select
+                    value={req.code}
+                    onChange={(e) => onReassign!(course.code, e.target.value)}
+                    className="text-[11px] rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900/80 text-gray-700 dark:text-gray-200 px-1.5 py-0.5 focus:outline-none focus:ring-1 focus:ring-purple-500/50"
+                    title="Count this course toward a different requirement"
+                  >
+                    {options.map((opt) => (
+                      <option key={opt} value={opt}>
+                        {opt}
+                      </option>
+                    ))}
+                  </select>
+                ) : (
+                  <span className="text-xs text-gray-400 dark:text-gray-500 truncate ml-2 max-w-[150px] text-right">
+                    {getCourseNameFromCode(course.code)}
+                  </span>
+                )}
+              </div>
+            );
+          })}
         </div>
       )}
     </motion.div>
@@ -696,17 +730,128 @@ function EmptyState() {
   );
 }
 
+// ─── Allocation control ───────────────────────────────────────────────────────
+
+function AllocationControl({
+  auto,
+  onToggle,
+}: {
+  auto: boolean;
+  onToggle: (next: boolean) => void;
+}) {
+  return (
+    <div className="p-3 rounded-xl bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 border border-gray-200 dark:border-gray-800/50 shadow-neu flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+      <div className="flex items-start gap-2.5">
+        <FiInfo
+          className="text-purple-500 dark:text-purple-300 mt-0.5 flex-shrink-0"
+          size={15}
+        />
+        <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">
+          Some courses are tagged for more than one area or skill, but each
+          course can only count toward <span className="font-medium text-gray-700 dark:text-gray-300">one</span>.
+          {auto
+            ? " Auto-allocate picks the split that satisfies the most requirements."
+            : " Use the dropdowns below to choose where each course counts."}
+        </p>
+      </div>
+      <div className="inline-flex shrink-0 rounded-lg border border-gray-200 dark:border-gray-800/60 bg-gray-100 dark:bg-gray-900/50 p-0.5">
+        <button
+          type="button"
+          onClick={() => onToggle(true)}
+          className={`inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] rounded-md transition-all ${
+            auto
+              ? "bg-purple-500/15 text-purple-600 dark:text-purple-300 border border-purple-600/40"
+              : "text-gray-400 dark:text-gray-500 border border-transparent hover:text-gray-600 dark:hover:text-gray-400"
+          }`}
+        >
+          <FiZap size={11} />
+          Auto
+        </button>
+        <button
+          type="button"
+          onClick={() => onToggle(false)}
+          className={`inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] rounded-md transition-all ${
+            !auto
+              ? "bg-purple-500/15 text-purple-600 dark:text-purple-300 border border-purple-600/40"
+              : "text-gray-400 dark:text-gray-500 border border-transparent hover:text-gray-600 dark:hover:text-gray-400"
+          }`}
+        >
+          <FiSliders size={11} />
+          Manual
+        </button>
+      </div>
+    </div>
+  );
+}
+
 // ─── Main component ───────────────────────────────────────────────────────────
 
 const DistributionalsView = ({ courses }: { courses: Course[] }) => {
+  const { user } = useAuth();
   const [view, setView] = useState<"board" | "heatmap">("board");
+  const [autoAllocate, setAutoAllocate] = useState(true);
+  const [overrides, setOverrides] = useState<Record<string, string>>({});
+
+  // Load the user's saved allocation preferences once.
+  useEffect(() => {
+    if (!user) return;
+    let active = true;
+    (async () => {
+      try {
+        const snap = await getDoc(doc(db, "users", user.uid));
+        if (!active || !snap.exists()) return;
+        const data = snap.data() as {
+          distributionalAutoAllocate?: boolean;
+          distributionalAllocations?: Record<string, string>;
+        };
+        if (typeof data.distributionalAutoAllocate === "boolean")
+          setAutoAllocate(data.distributionalAutoAllocate);
+        if (data.distributionalAllocations)
+          setOverrides(data.distributionalAllocations);
+      } catch {
+        // non-fatal: fall back to auto allocation
+      }
+    })();
+    return () => {
+      active = false;
+    };
+  }, [user]);
+
+  const persist = (
+    nextAuto: boolean,
+    nextOverrides: Record<string, string>,
+  ) => {
+    if (!user) return;
+    setDoc(
+      doc(db, "users", user.uid),
+      {
+        distributionalAutoAllocate: nextAuto,
+        distributionalAllocations: nextOverrides,
+      },
+      { merge: true },
+    ).catch(() => {
+      // non-fatal: UI state is already updated optimistically
+    });
+  };
+
+  const setAuto = (next: boolean) => {
+    setAutoAllocate(next);
+    persist(next, overrides);
+  };
+
+  const reassign = (courseCode: string, reqCode: string) => {
+    const next = { ...overrides, [courseCode]: reqCode };
+    setOverrides(next);
+    persist(autoAllocate, next);
+  };
 
   // Data still resolving: render a polished skeleton instead of blank space.
   if (!courses) {
     return <DistributionalsLoadingSkeleton />;
   }
 
-  // Build distributional -> courses map
+  // Build raw distributional -> courses map (used for languages + the pie,
+  // which intentionally show every tag, not the single-counted allocation).
   const distMap: Record<string, Course[]> = {};
   courses.forEach((course) => {
     if (course.skipped) return;
@@ -719,19 +864,36 @@ const DistributionalsView = ({ courses }: { courses: Course[] }) => {
   const getCount = (code: string) => (distMap[code] || []).length;
   const getCoursesFor = (code: string): Course[] => distMap[code] || [];
 
+  // Single-allocation for the 5 area/skill requirements: each course counts once.
+  const allocation = allocateDistributionals(courses, {
+    auto: autoAllocate,
+    overrides,
+  });
+  const allocCount = (code: string) =>
+    (allocation.coursesByReq[code] || []).length;
+  const allocCoursesFor = (code: string): Course[] =>
+    allocation.coursesByReq[code] || [];
+
+  // A course is reassignable only if it is eligible for more than one req.
+  const hasMultiTagCourses = courses.some(
+    (c) =>
+      !c.skipped &&
+      (allocation.optionsByCourseKey[allocation.keyOf(c)]?.length ?? 0) > 1,
+  );
+
   const hasAnyDistributionals = courses.some(
     (c) => (c.distributionals || []).length > 0,
   );
 
-  // Summary stats
+  // Summary stats (based on the single-allocation, not raw tags)
   const metCount = [...AREA_REQS, ...SKILL_REQS].filter(
-    (r) => getCount(r.code) >= 2,
+    (r) => allocCount(r.code) >= 2,
   ).length;
   const inProgressCount = [...AREA_REQS, ...SKILL_REQS].filter(
-    (r) => getCount(r.code) > 0 && getCount(r.code) < 2,
+    (r) => allocCount(r.code) > 0 && allocCount(r.code) < 2,
   ).length;
   const remainingCount = [...AREA_REQS, ...SKILL_REQS].filter(
-    (r) => getCount(r.code) === 0,
+    (r) => allocCount(r.code) === 0,
   ).length;
 
   // Language progress for stat card
@@ -871,7 +1033,7 @@ const DistributionalsView = ({ courses }: { courses: Course[] }) => {
             exit={{ opacity: 0, y: -4 }}
             transition={{ duration: 0.2 }}
           >
-            <DistHeatMap distMap={distMap} />
+            <DistHeatMap getCount={allocCount} />
           </motion.div>
         ) : hasAnyDistributionals ? (
           <motion.div
@@ -882,6 +1044,14 @@ const DistributionalsView = ({ courses }: { courses: Course[] }) => {
             transition={{ duration: 0.2 }}
             className="space-y-8"
           >
+            {/* Allocation control */}
+            {hasMultiTagCourses && (
+              <AllocationControl
+                auto={autoAllocate}
+                onToggle={setAuto}
+              />
+            )}
+
             {/* Areas */}
             <div>
               <h3 className="text-sm font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-3">
@@ -892,8 +1062,11 @@ const DistributionalsView = ({ courses }: { courses: Course[] }) => {
                   <DistReqCard
                     key={req.code}
                     req={req}
-                    count={getCount(req.code)}
-                    courses={getCoursesFor(req.code)}
+                    count={allocCount(req.code)}
+                    courses={allocCoursesFor(req.code)}
+                    manual={!autoAllocate}
+                    allocation={allocation}
+                    onReassign={reassign}
                   />
                 ))}
               </div>
@@ -909,8 +1082,11 @@ const DistributionalsView = ({ courses }: { courses: Course[] }) => {
                   <DistReqCard
                     key={req.code}
                     req={req}
-                    count={getCount(req.code)}
-                    courses={getCoursesFor(req.code)}
+                    count={allocCount(req.code)}
+                    courses={allocCoursesFor(req.code)}
+                    manual={!autoAllocate}
+                    allocation={allocation}
+                    onReassign={reassign}
                   />
                 ))}
               </div>

@@ -9,13 +9,15 @@ import {
   FiTrash2,
   FiChevronDown,
   FiX,
+  FiSun,
+  FiMoon,
 } from "react-icons/fi";
 import { User } from "firebase/auth";
 import { MAJORS } from "@/lib/majors";
 import { MajorDropdown } from "../ui/MajorDropdown";
 import { YearBadge } from "../ui/YearBadge";
 import Link from "next/link";
-import { Info, Sun, Moon } from "lucide-react";
+import { Info } from "lucide-react";
 import { UserAvatar } from "../ui/UserAvatar";
 import { useTheme } from "@/context/ThemeContext";
 import {
@@ -313,7 +315,7 @@ export default function UserSettingsModal({
         initial={{ opacity: 0, y: 15, scale: 0.98 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         transition={{ type: "spring", damping: 25, stiffness: 300 }}
-        className="relative w-full max-w-md bg-white/95 dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/90 dark:via-gray-900/80 dark:to-gray-950/90 rounded-2xl border border-black/[0.06] dark:border-white/[0.08] shadow-[0_24px_80px_rgba(0,0,0,0.18)] dark:shadow-[0_24px_80px_rgba(0,0,0,0.5),0_0_120px_rgba(139,92,246,0.08),inset_0_1px_0_rgba(255,255,255,0.1),inset_0_-1px_0_rgba(0,0,0,0.3)] backdrop-blur-2xl ring-1 ring-black/[0.04] dark:ring-white/[0.05] overflow-visible"
+        className="relative w-full max-w-3xl bg-white/95 dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/90 dark:via-gray-900/80 dark:to-gray-950/90 rounded-2xl border border-black/[0.06] dark:border-white/[0.08] shadow-[0_24px_80px_rgba(0,0,0,0.18)] dark:shadow-[0_24px_80px_rgba(0,0,0,0.5),0_0_120px_rgba(139,92,246,0.08),inset_0_1px_0_rgba(255,255,255,0.1),inset_0_-1px_0_rgba(0,0,0,0.3)] backdrop-blur-2xl ring-1 ring-black/[0.04] dark:ring-white/[0.05] overflow-visible"
       >
         <button
           onClick={onClose}
@@ -322,33 +324,35 @@ export default function UserSettingsModal({
         >
           <FiX size={18} />
         </button>
-        <div className="p-4 max-h-[85vh] overflow-y-auto">
+        <div className="p-5 max-h-[85vh] overflow-y-auto">
           {/* Header */}
-          <div className="flex flex-col items-center mb-3">
-            <div className="relative mb-2">
-              <UserAvatar
-                photoURL={user.photoURL}
-                displayName={user.displayName}
-                email={user.email}
-                size={48}
-                className="shadow-[0_4px_16px_rgba(0,0,0,0.4)] ring-1 ring-purple-500/20 border-white/20"
-              />
-            </div>
-            <h2 className="text-base font-semibold text-center text-gray-900 dark:text-gray-100">
-              {user.displayName || "User"}
-            </h2>
-            <p className="text-gray-500 dark:text-gray-400 text-xs">
-              {user.email}
-            </p>
-            {localProfile.graduationYear && (
-              <div className="mt-1">
-                <YearBadge graduationYear={localProfile.graduationYear} />
+          <div className="flex items-center gap-3 mb-5">
+            <UserAvatar
+              photoURL={user.photoURL}
+              displayName={user.displayName}
+              email={user.email}
+              size={52}
+              className="shadow-[0_4px_16px_rgba(0,0,0,0.4)] ring-1 ring-purple-500/20 border-white/20 shrink-0"
+            />
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center gap-2 flex-wrap">
+                <h2 className="text-base font-semibold text-gray-900 dark:text-gray-100 truncate">
+                  {user.displayName || "User"}
+                </h2>
+                {localProfile.graduationYear && (
+                  <YearBadge graduationYear={localProfile.graduationYear} />
+                )}
               </div>
-            )}
+              <p className="text-gray-500 dark:text-gray-400 text-xs truncate">
+                {user.email}
+              </p>
+            </div>
           </div>
 
+          {/* Two-column section grid */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
           {/* Bio */}
-          <div className="mb-3 rounded-xl border border-black/[0.06] dark:border-white/[0.08] bg-gray-50 dark:bg-transparent dark:bg-gradient-to-br dark:from-white/[0.06] dark:via-transparent dark:to-black/10 shadow-sm dark:shadow-[0_2px_12px_rgba(0,0,0,0.2)] backdrop-blur-sm">
+          <div className="rounded-xl border border-black/[0.06] dark:border-white/[0.08] bg-gray-50 dark:bg-transparent dark:bg-gradient-to-br dark:from-white/[0.06] dark:via-transparent dark:to-black/10 shadow-sm dark:shadow-[0_2px_12px_rgba(0,0,0,0.2)] backdrop-blur-sm">
             <div className="flex items-center justify-between px-3 py-2 border-b border-black/[0.06] dark:border-white/[0.06]">
               <span className="text-xs font-medium text-gray-800 dark:text-gray-200">
                 Bio
@@ -420,45 +424,36 @@ export default function UserSettingsModal({
             )}
           </div>
 
-          {/* Appearance + Friends toggles (side by side) */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
-            {/* Appearance / Theme Toggle */}
+            {/* Appearance + Friends (stacked, paired against Bio) */}
+            <div className="flex flex-col gap-3">
+            {/* Appearance / Theme (icon button, matches app header) */}
             <div className="rounded-xl border border-black/[0.06] dark:border-white/[0.08] bg-gray-50 dark:bg-transparent dark:bg-gradient-to-br dark:from-white/[0.06] dark:via-transparent dark:to-black/10 shadow-sm dark:shadow-[0_2px_12px_rgba(0,0,0,0.2)] backdrop-blur-sm">
             <div className="flex items-center justify-between px-3 py-2.5">
-              <div className="flex items-center gap-2">
-                <div className="p-1.5 rounded-lg bg-black/[0.04] dark:bg-white/[0.06] text-amber-500 dark:text-amber-300">
-                  {isDark ? (
-                    <Moon className="h-3.5 w-3.5" />
-                  ) : (
-                    <Sun className="h-3.5 w-3.5" />
-                  )}
-                </div>
-                <div>
-                  <span className="text-xs font-medium text-gray-800 dark:text-gray-200">
-                    Appearance
-                  </span>
-                  <p className="text-[10px] text-gray-500 dark:text-gray-400 mt-0.5">
-                    {isDark ? "Dark mode" : "Light mode"}
-                  </p>
-                </div>
+              <div>
+                <span className="text-xs font-medium text-gray-800 dark:text-gray-200">
+                  Appearance
+                </span>
+                <p className="text-[10px] text-gray-500 dark:text-gray-400 mt-0.5">
+                  {isDark ? "Dark mode" : "Light mode"}
+                </p>
               </div>
               <button
-                type="button"
-                role="switch"
-                aria-checked={isDark}
-                aria-label="Toggle dark mode"
                 onClick={toggleTheme}
-                className={`relative inline-flex w-11 h-6 rounded-full transition-colors duration-200 ${
-                  isDark
-                    ? "bg-gradient-to-r from-indigo-500 to-purple-600 shadow-[inset_0_1px_2px_rgba(0,0,0,0.35)]"
-                    : "bg-gray-300 shadow-[inset_0_1px_3px_rgba(0,0,0,0.22)]"
-                }`}
+                title={
+                  resolvedTheme === "dark"
+                    ? "Switch to light mode"
+                    : "Switch to dark mode"
+                }
+                aria-label="Toggle theme"
+                className="p-1.5 lg:p-2 rounded-xl hover:bg-black/[0.04] dark:hover:bg-white/[0.06] transition-all border border-black/[0.06] dark:border-white/[0.08] hover:border-black/[0.09] dark:hover:border-white/[0.12] text-gray-600 dark:text-gray-300"
               >
-                <span
-                  className={`absolute top-[3px] left-[3px] h-[18px] w-[18px] rounded-full bg-white shadow-[0_1px_3px_rgba(0,0,0,0.45)] transition-transform duration-200 ${
-                    isDark ? "translate-x-5" : "translate-x-0"
-                  }`}
-                />
+                <span className="flex h-7 w-7 items-center justify-center">
+                  {resolvedTheme === "dark" ? (
+                    <FiSun size={18} />
+                  ) : (
+                    <FiMoon size={18} />
+                  )}
+                </span>
               </button>
             </div>
           </div>
@@ -504,7 +499,7 @@ export default function UserSettingsModal({
               </div>
             )}
             </div>
-          </div>
+            </div>
 
           {/* Disable Friends Confirmation Modal */}
           <AnimatePresence>
@@ -575,8 +570,8 @@ export default function UserSettingsModal({
             )}
           </AnimatePresence>
 
-          {/* Dan AI Advisor */}
-          <div className="mb-3 rounded-xl border border-black/[0.06] dark:border-white/[0.08] bg-gray-50 dark:bg-transparent dark:bg-gradient-to-br dark:from-white/[0.06] dark:via-transparent dark:to-black/10 shadow-sm dark:shadow-[0_2px_12px_rgba(0,0,0,0.2)] backdrop-blur-sm overflow-hidden">
+          {/* Dan AI Advisor (spans full width) */}
+          <div className="lg:col-span-2 rounded-xl border border-black/[0.06] dark:border-white/[0.08] bg-gray-50 dark:bg-transparent dark:bg-gradient-to-br dark:from-white/[0.06] dark:via-transparent dark:to-black/10 shadow-sm dark:shadow-[0_2px_12px_rgba(0,0,0,0.2)] backdrop-blur-sm overflow-hidden">
             <div className="flex items-center justify-between px-3 py-2 border-b border-black/[0.06] dark:border-white/[0.06]">
               <span className="text-xs font-medium text-gray-800 dark:text-gray-200">
                 Dan AI advisor
@@ -686,8 +681,8 @@ export default function UserSettingsModal({
           </div>
 
           {/* Majors */}
-          <div className="mb-3">
-            <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+          <div className="rounded-xl border border-black/[0.06] dark:border-white/[0.08] bg-gray-50 dark:bg-transparent dark:bg-gradient-to-br dark:from-white/[0.06] dark:via-transparent dark:to-black/10 shadow-sm dark:shadow-[0_2px_12px_rgba(0,0,0,0.2)] backdrop-blur-sm px-3 py-2.5">
+            <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">
               Majors
             </label>
             {duplicateMajorError && (
@@ -737,8 +732,8 @@ export default function UserSettingsModal({
           </div>
 
           {/* Year */}
-          <div className="mb-3">
-            <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+          <div className="rounded-xl border border-black/[0.06] dark:border-white/[0.08] bg-gray-50 dark:bg-transparent dark:bg-gradient-to-br dark:from-white/[0.06] dark:via-transparent dark:to-black/10 shadow-sm dark:shadow-[0_2px_12px_rgba(0,0,0,0.2)] backdrop-blur-sm px-3 py-2.5">
+            <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">
               Graduation Year
             </label>
             <div className="relative">
@@ -763,9 +758,11 @@ export default function UserSettingsModal({
               </div>
             </div>
           </div>
+          </div>
+          {/* end two-column section grid */}
 
           {/* Footer links */}
-          <div className="mt-2 flex items-center justify-center gap-1.5 relative">
+          <div className="mt-4 flex items-center justify-center gap-1.5 relative">
             <Link
               href={`/user/${user.uid}`}
               className="cursor-pointer text-[11px] px-3 py-1.5 rounded-lg border border-black/[0.06] dark:border-white/[0.08] hover:border-pink-500/50 hover:bg-black/[0.03] dark:hover:bg-white/[0.04] text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-all duration-200"

@@ -25,6 +25,7 @@ import { db } from "@/config/firebase";
 import ManualCourseLookupModal from "./ManualCourseLookupModal";
 import SimulatorManualAssignModal from "./SimulatorManualAssignModal";
 import SimulatorRequirementsBreakdown from "./SimulatorRequirementsBreakdown";
+import { Skeleton } from "@/components/ui/Skeleton";
 import {
   calculatePreviewMajorProgressByMajors,
   MajorProgress,
@@ -88,33 +89,30 @@ const getSemesterCredits = (sem: Semester): number =>
     0,
   );
 
-function compareSemesters(a: string, b: string) {
-  const [semA, yearA] = a.split(" ");
-  const [semB, yearB] = b.split(" ");
-  const yA = parseInt(yearA, 10);
-  const yB = parseInt(yearB, 10);
-  if (yA !== yB) return yA - yB;
-  const order: Record<"Spring" | "Fall", number> = { Spring: 0, Fall: 1 };
-  return order[semA as "Spring" | "Fall"] - order[semB as "Spring" | "Fall"];
+// Season ordering within a year: Spring < Summer < Fall.
+const SEASON_ORDER: Record<string, number> = { Spring: 0, Summer: 1, Fall: 2 };
+
+// The app's "today" term. Used as the anchor for past vs current/future.
+const CURRENT_TERM = { season: "Summer", year: 2026 } as const;
+
+// Sortable rank for a "Season Year" string. Higher = later in time.
+function semesterRank(semesterName: string): number {
+  const [season, yearStr] = semesterName.split(" ");
+  const year = parseInt(yearStr, 10);
+  const order = SEASON_ORDER[season] ?? 0;
+  return (Number.isFinite(year) ? year : 0) * 3 + order;
 }
 
+const CURRENT_TERM_RANK =
+  CURRENT_TERM.year * 3 + SEASON_ORDER[CURRENT_TERM.season];
+
+function compareSemesters(a: string, b: string) {
+  return semesterRank(a) - semesterRank(b);
+}
+
+// Past = strictly before the current term. Current term and later are not past.
 function isPastSemester(semesterName: string) {
-  const [sem, yearStr] = semesterName.split(" ");
-  const year = parseInt(yearStr, 10);
-  const now = new Date();
-  const currentYear = now.getFullYear();
-  const currentMonth = now.getMonth(); // 0 = Jan
-
-  if (year < currentYear) return true;
-  if (year > currentYear) return false;
-
-  // Coarse cutoffs so you can't alter clearly past terms:
-  // Fall of current year is editable until January of the next year
-  // (at which point year < currentYear catches it)
-  // Spring is past once it ends (June+)
-  if (sem === "Fall" && currentMonth > 11) return true; // > Dec (never true, handled by next year check)
-  if (sem === "Spring" && currentMonth >= 5) return true; // June 1+ (Spring ended)
-  return false;
+  return semesterRank(semesterName) < CURRENT_TERM_RANK;
 }
 
 // ----------------- Stat Card (mirrors MajorProgressView pattern) -----------------
@@ -146,26 +144,26 @@ function SimStatCard({
   );
 }
 
-// Skeleton pulse card
+// Loading skeletons built on the shared Skeleton primitive.
 function SkeletonStatCard() {
   return (
-    <div className="p-3 rounded-xl border border-gray-200 dark:border-gray-800/50 shadow-neu bg-white dark:bg-gray-900/30 animate-pulse">
-      <div className="h-3 w-16 rounded bg-gray-200 dark:bg-gray-700/50 mb-2" />
-      <div className="h-5 w-12 rounded bg-gray-300 dark:bg-gray-600/50" />
+    <div className="p-3 rounded-xl border border-gray-200 dark:border-gray-800/50 shadow-neu bg-white dark:bg-gray-900/30">
+      <Skeleton className="h-3 w-16 mb-2" rounded="rounded" />
+      <Skeleton className="h-5 w-12" rounded="rounded" />
     </div>
   );
 }
 
 function SkeletonSemester() {
   return (
-    <div className="rounded-xl border border-gray-200 dark:border-gray-800/40 bg-white dark:bg-gray-900/20 p-3 min-h-[160px] animate-pulse">
+    <div className="rounded-xl border border-gray-200 dark:border-gray-800/40 bg-white dark:bg-gray-900/20 p-3 min-h-[160px]">
       <div className="flex justify-between mb-3">
-        <div className="h-3.5 w-20 rounded bg-gray-200 dark:bg-gray-700/50" />
-        <div className="h-3.5 w-10 rounded bg-gray-200 dark:bg-gray-700/50" />
+        <Skeleton className="h-3.5 w-20" rounded="rounded" />
+        <Skeleton className="h-3.5 w-10" rounded="rounded" />
       </div>
       <div className="space-y-2">
-        <div className="h-7 w-full rounded-lg bg-gray-100 dark:bg-gray-800/40" />
-        <div className="h-7 w-4/5 rounded-lg bg-gray-100 dark:bg-gray-800/40" />
+        <Skeleton className="h-7 w-full" />
+        <Skeleton className="h-7 w-4/5" />
       </div>
     </div>
   );
@@ -197,6 +195,7 @@ export default function Simulator({
     number | null
   >(null);
   const [hasChanges, setHasChanges] = useState(false);
+  const [showPastSemesters, setShowPastSemesters] = useState(false);
   const [showPool, setShowPool] = useState(false);
   const [showMajorPreview, setShowMajorPreview] = useState(true);
   // Plan selector modal shown on initial load
@@ -903,6 +902,24 @@ export default function Simulator({
     [semesters],
   );
 
+  // Current/upcoming terms first, sorted chronologically ascending.
+  const upcomingSemesters = useMemo(
+    () =>
+      semesters
+        .filter((s) => !isPastSemester(s.name))
+        .sort((a, b) => compareSemesters(a.name, b.name)),
+    [semesters],
+  );
+
+  // Past (completed) terms, kept for GPA/credits/prereqs but hidden by default.
+  const pastSemesters = useMemo(
+    () =>
+      semesters
+        .filter((s) => isPastSemester(s.name))
+        .sort((a, b) => compareSemesters(a.name, b.name)),
+    [semesters],
+  );
+
   // ----------------- Render -----------------
   return (
     <div
@@ -1230,8 +1247,8 @@ export default function Simulator({
           ))}
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-          {semesters.map((semester) => {
+        (() => {
+          const renderSemesterCard = (semester: Semester) => {
             const semCredits = getSemesterCredits(semester);
             const semCreditsLabel = Number.isInteger(semCredits)
               ? String(semCredits)
@@ -1397,8 +1414,56 @@ export default function Simulator({
                 </div>
               </motion.div>
             );
-          })}
-        </div>
+          };
+
+          return (
+            <>
+              {/* Current and upcoming terms */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                {upcomingSemesters.map(renderSemesterCard)}
+              </div>
+
+              {/* Past semesters: hidden by default, kept in data for GPA/credits/prereqs */}
+              {pastSemesters.length > 0 && (
+                <div className="mt-4">
+                  <button
+                    type="button"
+                    onClick={() => setShowPastSemesters((v) => !v)}
+                    className="group flex items-center gap-2 w-full justify-center rounded-xl border border-gray-200 dark:border-white/[0.06] bg-white/70 dark:bg-white/[0.02] hover:bg-gray-50 dark:hover:bg-white/[0.04] px-4 py-2.5 text-xs font-medium text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-all"
+                  >
+                    <FiChevronDown
+                      size={14}
+                      className={`transition-transform duration-300 ${
+                        showPastSemesters ? "rotate-180" : ""
+                      }`}
+                    />
+                    {showPastSemesters ? "Hide" : "Show"} past semesters
+                    <span className="px-1.5 py-0.5 rounded-md text-[10px] bg-gray-100 dark:bg-white/[0.06] text-gray-400 dark:text-gray-500 border border-gray-200 dark:border-white/[0.06]">
+                      {pastSemesters.length}
+                    </span>
+                  </button>
+
+                  <AnimatePresence initial={false}>
+                    {showPastSemesters && (
+                      <motion.div
+                        key="past-semesters"
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: "auto", opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.3, ease: "easeInOut" }}
+                        className="overflow-hidden"
+                      >
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 pt-3">
+                          {pastSemesters.map(renderSemesterCard)}
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+              )}
+            </>
+          );
+        })()
       )}
 
       {/* ======== Empty state when no semesters yet ======== */}

@@ -6,6 +6,7 @@ import { FiX, FiPlus } from "react-icons/fi";
 
 import {
   getReqStatus,
+  getReqBreakdown,
   STATUS_CLASSES,
   type ReqStats,
 } from "./requirementStatus";
@@ -51,6 +52,9 @@ const RequirementCard = React.memo(function RequirementCard({
   const status = getReqStatus(reqCompleted, reqInProgress, req.required || 0);
   const isCompletedCard = status === "completed";
   const classes = STATUS_CLASSES[status];
+  const breakdown = isCompletedCard
+    ? null
+    : getReqBreakdown(reqCompleted, reqInProgress, req.required || 0);
 
   const {
     onOpenCourse,
@@ -93,13 +97,20 @@ const RequirementCard = React.memo(function RequirementCard({
     >
       <div className="flex justify-between items-start mb-1.5">
         <h5 className={`font-medium text-sm ${classes.title}`}>{req.name}</h5>
-        <span
-          className={`text-[10px] px-1.5 py-0.5 rounded-md ${classes.badge}`}
-        >
-          {isCompletedCard
-            ? "✓"
-            : `${reqInProgress + reqCompleted}/${req.required}`}
-        </span>
+        <div className="flex items-center gap-1.5 shrink-0">
+          <span
+            className={`text-[10px] px-1.5 py-0.5 rounded-md ${classes.badge}`}
+          >
+            {isCompletedCard
+              ? "✓"
+              : `${reqInProgress + reqCompleted}/${req.required}`}
+          </span>
+          {breakdown && (
+            <span className={`text-[10px] whitespace-nowrap ${classes.accent}`}>
+              {breakdown}
+            </span>
+          )}
+        </div>
       </div>
 
       {req.description && (

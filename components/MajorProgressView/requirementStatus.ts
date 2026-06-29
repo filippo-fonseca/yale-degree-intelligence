@@ -19,6 +19,33 @@ export function getReqStatus(
   return "notStarted";
 }
 
+/**
+ * Short human breakdown of a requirement's credit mix, e.g. "in progress",
+ * "1 completed, 1 not started", "1 in progress, 1 not started". Returns null
+ * when there's nothing useful to add (fully completed, or purely not started).
+ */
+export function getReqBreakdown(
+  reqCompleted: number,
+  reqInProgress: number,
+  required: number,
+): string | null {
+  const completed = reqCompleted;
+  const inProgress = reqInProgress;
+  const notStarted = Math.max(0, required - completed - inProgress);
+
+  // Everything left is in progress: reads cleaner without a number.
+  if (inProgress > 0 && completed === 0 && notStarted === 0) return "in progress";
+
+  const parts: string[] = [];
+  if (completed > 0) parts.push(`${completed} completed`);
+  if (inProgress > 0) parts.push(`${inProgress} in progress`);
+  if (notStarted > 0) parts.push(`${notStarted} not started`);
+
+  // A lone "n not started" just restates the x/y badge; skip it.
+  if (parts.length < 2) return null;
+  return parts.join(", ");
+}
+
 /** Fraction of the requirement satisfied by completed credits (0..1). */
 export function getReqRatio(reqCompleted: number, required: number): number {
   if (required <= 0) return reqCompleted > 0 ? 1 : 0;

@@ -680,6 +680,30 @@ function NumbersSection() {
     })
     .join(", ");
 
+  // Credits-to-degree ring
+  const creditsEarned = 108;
+  const creditsNeeded = 144;
+  const creditPct = Math.round((creditsEarned / creditsNeeded) * 100);
+  const ringR = 34;
+  const ringC = 2 * Math.PI * ringR;
+
+  // Requirement completion bars
+  const reqBars = [
+    { label: "Economics", pct: 82, cls: "from-violet-400 to-violet-500" },
+    { label: "Computer Science", pct: 64, cls: "from-blue-400 to-blue-500" },
+    { label: "Distributionals", pct: 90, cls: "from-emerald-400 to-emerald-500" },
+  ];
+
+  // Distributional coverage (Yale areas & skills)
+  const distros = [
+    { label: "Hu", done: 2, need: 2, color: "#a855f7" },
+    { label: "So", done: 2, need: 2, color: "#0ea5e9" },
+    { label: "Sc", done: 1, need: 2, color: "#10b981" },
+    { label: "QR", done: 2, need: 2, color: "#ef4444" },
+    { label: "WR", done: 2, need: 2, color: "#f97316" },
+    { label: "L", done: 3, need: 3, color: "#ec4899" },
+  ];
+
   return (
     <section id="numbers" ref={ref} className="relative px-4 py-28 sm:px-6">
       <div className="mx-auto max-w-6xl">
@@ -691,6 +715,7 @@ function NumbersSection() {
               <br className="hidden sm:block" /> Why don&apos;t you?
             </>
           }
+          sub="Every chart below is the real thing, live for your transcript the moment you sign in. This is the dashboard waiting on the other side."
         />
 
         <div className="mt-14 grid grid-cols-2 gap-4 lg:grid-cols-4">
@@ -708,69 +733,238 @@ function NumbersSection() {
           ))}
         </div>
 
-        <div className="mt-4 grid gap-4 lg:grid-cols-3">
-          <Reveal className="lg:col-span-2">
-            <div className="rounded-2xl border border-gray-200 bg-black/[0.02] p-6 dark:border-white/[0.08] dark:bg-white/[0.02]">
-              <p className="mb-4 text-sm font-medium text-gray-600 dark:text-white/70">
-                Cumulative GPA trend
-              </p>
-              <div className="relative h-44 w-full">
-                <svg
-                  viewBox="0 0 100 100"
-                  preserveAspectRatio="none"
-                  className="h-full w-full"
-                >
-                  <defs>
-                    <linearGradient id="gpaFill" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor="#ec4899" stopOpacity="0.4" />
-                      <stop offset="100%" stopColor="#ec4899" stopOpacity="0" />
-                    </linearGradient>
-                  </defs>
-                  <polygon points={area} fill="url(#gpaFill)" />
-                  <polyline
-                    points={line}
-                    fill="none"
-                    stroke="#ec4899"
-                    strokeWidth="1.5"
-                    vectorEffect="non-scaling-stroke"
-                  />
-                </svg>
+        <Reveal>
+          <div className="mt-10 overflow-hidden rounded-3xl border border-gray-200 bg-black/[0.02] shadow-[0_24px_80px_-40px_rgba(0,0,0,0.25)] dark:border-white/[0.08] dark:bg-white/[0.02] dark:shadow-[0_24px_80px_-40px_rgba(0,0,0,0.8)]">
+            {/* Window header */}
+            <div className="flex items-center justify-between gap-3 border-b border-gray-200 px-5 py-3 dark:border-white/[0.06]">
+              <div className="flex items-center gap-2">
+                <FiBarChart2 className="text-pink-500" size={14} />
+                <span className="text-xs font-semibold text-gray-700 dark:text-white/70">
+                  The dashboard you&apos;d unlock
+                </span>
               </div>
-              <div className="mt-2 flex justify-between text-[10px] text-gray-400 dark:text-white/35">
-                {sems.map((s) => (
-                  <span key={s}>{s}</span>
-                ))}
-              </div>
+              <span className="flex items-center gap-1 rounded-full border border-pink-400/30 bg-pink-500/10 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-pink-600 dark:text-pink-200">
+                <HiSparkles size={10} /> Sign in to see yours
+              </span>
             </div>
-          </Reveal>
-          <Reveal delay={0.1}>
-            <div className="flex h-full flex-col items-center justify-center rounded-2xl border border-gray-200 bg-black/[0.02] p-6 dark:border-white/[0.08] dark:bg-white/[0.02]">
-              <p className="mb-4 self-start text-sm font-medium text-gray-600 dark:text-white/70">
-                Grade distribution
-              </p>
-              <div
-                className="relative h-32 w-32 rounded-full"
-                style={{ background: `conic-gradient(${donut})` }}
-              >
-                <div className="absolute inset-[22%] rounded-full bg-gray-50 dark:bg-[#0c0c0f]" />
-              </div>
-              <div className="mt-4 flex flex-wrap justify-center gap-x-3 gap-y-1">
-                {grades.map((g) => (
-                  <span
-                    key={g.label}
-                    className="flex items-center gap-1 text-[11px] text-gray-500 dark:text-white/50"
-                  >
-                    <span
-                      className="h-2 w-2 rounded-full"
-                      style={{ background: g.color }}
-                    />
-                    {g.label}
+
+            {/* Body */}
+            <div className="grid gap-4 p-5 lg:grid-cols-12">
+              {/* GPA trend */}
+              <div className="rounded-2xl border border-gray-200 bg-white/40 p-5 dark:border-white/[0.06] dark:bg-white/[0.02] lg:col-span-7">
+                <div className="mb-4 flex items-end justify-between">
+                  <div>
+                    <p className="text-[11px] font-medium uppercase tracking-wider text-gray-400 dark:text-white/40">
+                      Cumulative GPA
+                    </p>
+                    <p className="mt-1 text-3xl font-semibold tracking-tight text-gray-900 dark:text-white">
+                      3.88
+                    </p>
+                  </div>
+                  <span className="flex items-center gap-1 rounded-full bg-emerald-500/10 px-2 py-1 text-[11px] font-semibold text-emerald-600 dark:text-emerald-300">
+                    <FiTrendingUp size={11} /> +0.17 this year
                   </span>
-                ))}
+                </div>
+                <div className="relative h-36 w-full">
+                  <svg
+                    viewBox="0 0 100 100"
+                    preserveAspectRatio="none"
+                    className="h-full w-full overflow-visible"
+                  >
+                    <defs>
+                      <linearGradient id="gpaFill" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor="#ec4899" stopOpacity="0.35" />
+                        <stop offset="100%" stopColor="#ec4899" stopOpacity="0" />
+                      </linearGradient>
+                      <linearGradient id="gpaLine" x1="0" y1="0" x2="1" y2="0">
+                        <stop offset="0%" stopColor="#6366f1" />
+                        <stop offset="60%" stopColor="#8b5cf6" />
+                        <stop offset="100%" stopColor="#ec4899" />
+                      </linearGradient>
+                    </defs>
+                    <motion.polygon
+                      points={area}
+                      fill="url(#gpaFill)"
+                      initial={{ opacity: 0 }}
+                      whileInView={{ opacity: 1 }}
+                      viewport={{ once: true }}
+                      transition={{ duration: 0.8, delay: 0.2 }}
+                    />
+                    <motion.polyline
+                      points={line}
+                      fill="none"
+                      stroke="url(#gpaLine)"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      vectorEffect="non-scaling-stroke"
+                      initial={{ pathLength: 0 }}
+                      whileInView={{ pathLength: 1 }}
+                      viewport={{ once: true }}
+                      transition={{ duration: 1, ease: "easeInOut" }}
+                    />
+                  </svg>
+                </div>
+                <div className="mt-2 flex justify-between text-[10px] text-gray-400 dark:text-white/35">
+                  {sems.map((s) => (
+                    <span key={s}>{s}</span>
+                  ))}
+                </div>
+              </div>
+
+              {/* Grade distribution */}
+              <div className="flex flex-col items-center justify-center rounded-2xl border border-gray-200 bg-white/40 p-5 dark:border-white/[0.06] dark:bg-white/[0.02] lg:col-span-5">
+                <p className="mb-4 self-start text-[11px] font-medium uppercase tracking-wider text-gray-400 dark:text-white/40">
+                  Grade distribution
+                </p>
+                <div
+                  className="relative h-32 w-32 rounded-full"
+                  style={{ background: `conic-gradient(${donut})` }}
+                >
+                  <div className="absolute inset-[20%] flex flex-col items-center justify-center rounded-full bg-gray-50 dark:bg-[#0c0c0f]">
+                    <span className="text-lg font-semibold leading-none text-gray-900 dark:text-white">
+                      27
+                    </span>
+                    <span className="text-[9px] text-gray-400 dark:text-white/40">
+                      courses
+                    </span>
+                  </div>
+                </div>
+                <div className="mt-4 flex flex-wrap justify-center gap-x-3 gap-y-1">
+                  {grades.map((g) => (
+                    <span
+                      key={g.label}
+                      className="flex items-center gap-1 text-[11px] text-gray-500 dark:text-white/50"
+                    >
+                      <span
+                        className="h-2 w-2 rounded-full"
+                        style={{ background: g.color }}
+                      />
+                      {g.label}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              {/* Credits to degree */}
+              <div className="flex flex-col items-center rounded-2xl border border-gray-200 bg-white/40 p-5 dark:border-white/[0.06] dark:bg-white/[0.02] lg:col-span-4">
+                <p className="mb-4 self-start text-[11px] font-medium uppercase tracking-wider text-gray-400 dark:text-white/40">
+                  Credits to degree
+                </p>
+                <div className="relative h-32 w-32">
+                  <svg viewBox="0 0 90 90" className="h-full w-full -rotate-90">
+                    <circle
+                      cx="45"
+                      cy="45"
+                      r={ringR}
+                      fill="none"
+                      strokeWidth="9"
+                      className="stroke-black/[0.06] dark:stroke-white/[0.08]"
+                    />
+                    <defs>
+                      <linearGradient id="creditRing" x1="0" y1="0" x2="1" y2="1">
+                        <stop offset="0%" stopColor="#6366f1" />
+                        <stop offset="100%" stopColor="#ec4899" />
+                      </linearGradient>
+                    </defs>
+                    <motion.circle
+                      cx="45"
+                      cy="45"
+                      r={ringR}
+                      fill="none"
+                      stroke="url(#creditRing)"
+                      strokeWidth="9"
+                      strokeLinecap="round"
+                      strokeDasharray={ringC}
+                      initial={{ strokeDashoffset: ringC }}
+                      whileInView={{
+                        strokeDashoffset: ringC * (1 - creditPct / 100),
+                      }}
+                      viewport={{ once: true }}
+                      transition={{ duration: 1.2, ease: "easeInOut" }}
+                    />
+                  </svg>
+                  <div className="absolute inset-0 flex flex-col items-center justify-center">
+                    <span className="text-xl font-semibold leading-none text-gray-900 dark:text-white">
+                      {creditPct}%
+                    </span>
+                    <span className="mt-1 text-[9px] text-gray-400 dark:text-white/40">
+                      {creditsEarned} / {creditsNeeded} cr
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Requirement progress */}
+              <div className="rounded-2xl border border-gray-200 bg-white/40 p-5 dark:border-white/[0.06] dark:bg-white/[0.02] lg:col-span-4">
+                <p className="mb-4 text-[11px] font-medium uppercase tracking-wider text-gray-400 dark:text-white/40">
+                  Requirement progress
+                </p>
+                <div className="space-y-3.5">
+                  {reqBars.map((r, i) => (
+                    <div key={r.label}>
+                      <div className="mb-1 flex items-center justify-between text-[11px]">
+                        <span className="text-gray-600 dark:text-white/60">
+                          {r.label}
+                        </span>
+                        <span className="font-semibold text-gray-900 dark:text-white/80">
+                          {r.pct}%
+                        </span>
+                      </div>
+                      <div className="h-2 w-full overflow-hidden rounded-full bg-black/[0.05] dark:bg-white/5">
+                        <motion.div
+                          className={`h-full rounded-full bg-gradient-to-r ${r.cls}`}
+                          initial={{ width: 0 }}
+                          whileInView={{ width: `${r.pct}%` }}
+                          viewport={{ once: true }}
+                          transition={{
+                            duration: 0.9,
+                            delay: 0.15 + i * 0.12,
+                            ease: "easeOut",
+                          }}
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Distributional coverage */}
+              <div className="rounded-2xl border border-gray-200 bg-white/40 p-5 dark:border-white/[0.06] dark:bg-white/[0.02] lg:col-span-4">
+                <p className="mb-4 text-[11px] font-medium uppercase tracking-wider text-gray-400 dark:text-white/40">
+                  Distributional coverage
+                </p>
+                <div className="grid grid-cols-3 gap-3">
+                  {distros.map((d) => {
+                    const met = d.done >= d.need;
+                    return (
+                      <div
+                        key={d.label}
+                        className="flex flex-col items-center gap-1.5 rounded-xl border border-gray-200/70 bg-black/[0.02] py-2.5 dark:border-white/[0.06] dark:bg-white/[0.02]"
+                      >
+                        <span
+                          className="flex h-7 w-7 items-center justify-center rounded-full text-[11px] font-bold text-white"
+                          style={{
+                            background: d.color,
+                            opacity: met ? 1 : 0.45,
+                          }}
+                        >
+                          {d.label}
+                        </span>
+                        <span className="flex items-center gap-0.5 text-[10px] font-medium text-gray-500 dark:text-white/45">
+                          {met ? (
+                            <FiCheck size={9} className="text-emerald-500" />
+                          ) : null}
+                          {d.done}/{d.need}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
             </div>
-          </Reveal>
-        </div>
+          </div>
+        </Reveal>
       </div>
     </section>
   );

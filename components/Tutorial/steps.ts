@@ -19,6 +19,12 @@ export interface TourStep {
   id: string;
   /** Optional app tab to switch to when this step is shown. */
   tabId?: string;
+  /**
+   * CSS selector for the real element this step points to. When set, the tour
+   * spotlights that element and anchors the tooltip beside it. When omitted,
+   * the tooltip is centered with a full dim (used for intro/outro/Cmd+K).
+   */
+  anchor?: string;
   /** Icon shown in the step header. */
   icon: ComponentType<{ className?: string }>;
   /** Short eyebrow label above the title. */
@@ -43,6 +49,7 @@ export const TOUR_STEPS: TourStep[] = [
   {
     id: "upload",
     tabId: "upload",
+    anchor: '[data-tour="nav-upload"]',
     icon: Upload,
     eyebrow: "My courses",
     title: "Bring in your courses",
@@ -53,6 +60,7 @@ export const TOUR_STEPS: TourStep[] = [
   {
     id: "major",
     tabId: "major",
+    anchor: '[data-tour="nav-major"]',
     icon: GraduationCap,
     eyebrow: "My major(s)",
     title: "Live major progress",
@@ -63,6 +71,7 @@ export const TOUR_STEPS: TourStep[] = [
   {
     id: "simulator",
     tabId: "simulator",
+    anchor: '[data-tour="nav-simulator"]',
     icon: MonitorCog,
     eyebrow: "Simulator",
     title: "Plan future semesters",
@@ -73,6 +82,7 @@ export const TOUR_STEPS: TourStep[] = [
   {
     id: "stats",
     tabId: "stats",
+    anchor: '[data-tour="nav-stats"]',
     icon: BarChart2,
     eyebrow: "Academic stats",
     title: "Understand your record",
@@ -83,6 +93,7 @@ export const TOUR_STEPS: TourStep[] = [
   {
     id: "distributionals",
     tabId: "distributionals",
+    anchor: '[data-tour="nav-distributionals"]',
     icon: Layers,
     eyebrow: "Distributionals",
     title: "Track distributional requirements",
@@ -93,6 +104,7 @@ export const TOUR_STEPS: TourStep[] = [
   {
     id: "friends",
     tabId: "friends",
+    anchor: '[data-tour="nav-friends"]',
     icon: Users,
     eyebrow: "Friends",
     title: "Compare with friends",
@@ -102,6 +114,7 @@ export const TOUR_STEPS: TourStep[] = [
   },
   {
     id: "command-palette",
+    anchor: '[data-tour="search"]',
     icon: Command,
     eyebrow: "Power user",
     title: "The command palette",
@@ -112,6 +125,7 @@ export const TOUR_STEPS: TourStep[] = [
   {
     id: "cleoai",
     tabId: "cleoai",
+    anchor: '[data-tour="nav-cleoai"]',
     icon: Bot,
     eyebrow: "Coming soon",
     title: "Meet Dan",

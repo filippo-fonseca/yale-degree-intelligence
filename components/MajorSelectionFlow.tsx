@@ -311,7 +311,7 @@ export default function MajorSelectionFlow({
                   animate={{ opacity: 1, height: "auto" }}
                   exit={{ opacity: 0, height: 0 }}
                   transition={{ duration: 0.25 }}
-                  className="mx-auto max-w-md rounded-xl border border-black/[0.06] dark:border-white/[0.06] bg-gradient-to-br from-gray-100/60 to-gray-50/60 dark:from-gray-800/40 dark:to-gray-900/40 backdrop-blur-sm text-gray-500 dark:text-gray-400 text-xs p-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]"
+                  className="mx-auto max-w-md rounded-2xl border border-black/[0.06] dark:border-white/[0.08] bg-gradient-to-br from-white/80 to-white/50 dark:from-white/[0.05] dark:to-white/[0.02] backdrop-blur-xl text-gray-600 dark:text-gray-300 text-xs p-3.5 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_8px_24px_-12px_rgba(0,0,0,0.12)] dark:shadow-[0_8px_24px_-12px_rgba(0,0,0,0.5)]"
                 >
                   <ul className="space-y-1.5">
                     <li className="flex items-start gap-2">

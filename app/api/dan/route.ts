@@ -2,12 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
 import { adminAuth, adminDb } from "@/config/firebaseAdmin";
 import { loadUserKey, touchKeyUsage } from "@/lib/dan/keyStore";
-import {
-  TOOL_DEFS,
-  executeTool,
-  type StudentData,
-} from "@/lib/dan/tools";
-import { getCourseNameFromCode } from "@/lib/courseCatalog";
+import { TOOL_DEFS, executeTool } from "@/lib/dan/tools";
+import { buildStudentData } from "@/lib/dan/studentData";
 
 export const runtime = "nodejs";
 
@@ -31,60 +27,6 @@ function toolsWithCache(): Anthropic.Tool[] {
     (tools[tools.length - 1] as any).cache_control = { type: "ephemeral" };
   }
   return tools;
-}
-
-async function buildStudentData(uid: string): Promise<{
-  student: StudentData;
-  snapshot: string;
-  name: string | null;
-}> {
-  const [coursesSnap, userSnap] = await Promise.all([
-    adminDb!.collection("courses").where("userId", "==", uid).get(),
-    adminDb!.collection("users").doc(uid).get(),
-  ]);
-
-  const profile = userSnap.exists ? userSnap.data()! : {};
-  const majors: string[] = profile.majors || [];
-
-  const courses = coursesSnap.docs.map((d) => {
-    const c = d.data();
-    return {
-      code: c.code as string,
-      name: getCourseNameFromCode(c.code) || c.code,
-      status: (c.status as string) || "completed",
-      credits: (c.credits as number) ?? 1,
-      distributionals: (c.distributionals as string[]) || [],
-      skipped: c.skipped === true || c.status === "skipped",
-    };
-  });
-
-  const completedCodes = courses.filter((c) => c.status === "completed").map((c) => c.code);
-  const inProgressCodes = courses.filter((c) => c.status === "in-progress").map((c) => c.code);
-  const skippedCodes = courses.filter((c) => c.skipped).map((c) => c.code);
-
-  const student: StudentData = {
-    majors,
-    completedCodes,
-    inProgressCodes,
-    skippedCodes,
-    courses: courses.map(({ code, name, status, credits, distributionals }) => ({
-      code,
-      name,
-      status,
-      credits,
-      distributionals,
-    })),
-  };
-
-  // Compact snapshot only: identity + counts. Detail comes from tools on demand.
-  const snapshot =
-    `Student majors: ${majors.length ? majors.join(" + ") : "Undeclared"}` +
-    `${majors.length > 1 ? " (double major)" : ""}. ` +
-    `Courses: ${completedCodes.length} completed, ${inProgressCodes.length} in-progress, ` +
-    `${skippedCodes.length} skipped. Grad year: ${profile.graduationYear || "unknown"}. ` +
-    `Use tools for any specifics.`;
-
-  return { student, snapshot, name: profile.name || null };
 }
 
 export async function POST(req: NextRequest) {

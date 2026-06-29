@@ -1221,7 +1221,13 @@ export default function Home() {
               className={`flex mb-1.5 ${sidebarExpanded ? "justify-end" : "justify-center"}`}
             >
               <button
-                onClick={() => setSidebarPinned(!sidebarPinned)}
+                onClick={() => {
+                  const next = !sidebarPinned;
+                  setSidebarPinned(next);
+                  // Clear hover so the sidebar retracts immediately on collapse,
+                  // instead of staying open because the cursor is still over it.
+                  if (!next) setSidebarHovered(false);
+                }}
                 title={sidebarPinned ? "Collapse sidebar" : "Keep sidebar open"}
                 aria-label={
                   sidebarPinned ? "Collapse sidebar" : "Keep sidebar open"

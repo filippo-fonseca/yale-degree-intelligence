@@ -16,6 +16,7 @@ import {
 import PieChartWrapper from "./ui/PieChartWrapper";
 import { LineChart } from "@mui/x-charts/LineChart";
 import { BarChart } from "@mui/x-charts/BarChart";
+import { PieChart } from "@mui/x-charts/PieChart";
 import { axisClasses } from "@mui/x-charts";
 import { useTheme } from "@/context/ThemeContext";
 import { Skeleton } from "@/components/ui/Skeleton";
@@ -303,6 +304,69 @@ function EmptyState() {
   );
 }
 
+/**
+ * Animated donut pie chart for credit distribution by department.
+ * Styled to match the DistPieChart on the distributionals page.
+ */
+function DeptCreditPieChart({
+  data,
+  isDark,
+  tooltipSlotProps,
+}: {
+  data: { id: number; value: number; label: string; color: string }[];
+  isDark: boolean;
+  tooltipSlotProps: ReturnType<typeof makeChartTooltipSlotProps>;
+}) {
+  const totalCredits = data.reduce((sum, d) => sum + d.value, 0);
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="relative w-full overflow-x-auto"
+    >
+      {/* Centered total label */}
+      <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center -ml-[120px]">
+        <span className="text-xl font-semibold text-gray-900 dark:text-white leading-none">
+          {totalCredits}
+        </span>
+        <span className="text-[10px] text-gray-500 dark:text-gray-400 mt-0.5">
+          credits
+        </span>
+      </div>
+      <PieChart
+        series={[
+          {
+            data,
+            innerRadius: 45,
+            outerRadius: 90,
+            paddingAngle: 3,
+            cornerRadius: 4,
+            highlightScope: { fade: "global", highlight: "item" },
+            faded: { innerRadius: 30, additionalRadius: -4, color: "gray" },
+          },
+        ]}
+        height={220}
+        margin={{ top: 8, right: 120, bottom: 8, left: 8 }}
+        slotProps={{
+          ...tooltipSlotProps,
+          legend: {
+            position: { vertical: "middle" as const, horizontal: "end" as const },
+          },
+        }}
+        sx={{
+          fontFamily: CHART_FONT,
+          "& .MuiChartsLegend-root text, & .MuiChartsLegend-series text, & .MuiChartsLegend-label, & .MuiChartsLegend-label text":
+            {
+              fontFamily: `${CHART_FONT} !important`,
+              fill: `${isDark ? "#D1D5DB" : "#4B5563"} !important`,
+            },
+        }}
+      />
+    </motion.div>
+  );
+}
+
 // ──────────────────────────────────────────────
 // GPA color (numeric)
 // ──────────────────────────────────────────────
@@ -462,18 +526,13 @@ export default function StatsView({ courses }: { courses: Course[] }) {
         cumulativeData[cumulativeData.length - 2].cumulativeGpa
       : 0;
 
-  // Pie data
-  const creditPieData = {
-    labels: departmentData.map((d) => d.department),
-    datasets: [
-      {
-        data: departmentData.map((d) => d.credits),
-        backgroundColor: departmentData.map((_, i) => DEPT_COLORS[i % DEPT_COLORS.length]),
-        borderColor: Array(departmentData.length).fill(pieBorderColor),
-        borderWidth: 2,
-      },
-    ],
-  };
+  // Pie data — MUI x-charts shape for the animated donut.
+  const creditPieData = departmentData.map((d, i) => ({
+    id: i,
+    value: d.credits,
+    label: d.department,
+    color: DEPT_COLORS[i % DEPT_COLORS.length],
+  }));
 
   const gradePieData = {
     labels: filteredGradeDistribution.map((g) => g.grade),
@@ -797,7 +856,11 @@ export default function StatsView({ courses }: { courses: Course[] }) {
             icon={<TrendingUp className="h-3.5 w-3.5" />}
           >
             <div className="h-[220px] w-full">
-              <PieChartWrapper data={creditPieData} showLegend />
+              <DeptCreditPieChart
+                data={creditPieData}
+                isDark={isDark}
+                tooltipSlotProps={chartTooltipSlotProps}
+              />
             </div>
           </ChartCard>
         )}

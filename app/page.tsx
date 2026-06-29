@@ -70,6 +70,9 @@ import {
 } from "lucide-react";
 import { UserAvatar } from "@/components/ui/UserAvatar";
 import CommandPalette from "@/components/CommandPalette/CommandPalette";
+import V3WelcomeModal from "@/components/V3Welcome/V3WelcomeModal";
+import AppTour from "@/components/Tutorial/AppTour";
+import { setUserFlag } from "@/lib/userFlags";
 import dynamic from "next/dynamic";
 
 // Heavy, tab-gated views are code-split so logged-out visitors and inactive
@@ -142,6 +145,9 @@ export default function Home() {
   const [sidebarHovered, setSidebarHovered] = useState(false);
   const sidebarExpanded = sidebarPinned || sidebarHovered;
   const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
+  const [welcomeOpen, setWelcomeOpen] = useState(false);
+  const [tourOpen, setTourOpen] = useState(false);
+  const [onboardChecked, setOnboardChecked] = useState(false);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const isBrandNew = userProfile?.graduationYear === 2030;
 
@@ -348,6 +354,18 @@ export default function Home() {
     );
     return () => unsub();
   }, [user]);
+
+  // One-time onboarding: show the v3 welcome (then the tour) to users who
+  // haven't seen them yet. Runs once per session after the profile loads.
+  useEffect(() => {
+    if (onboardChecked || !user || !userProfile) return;
+    setOnboardChecked(true);
+    if (!userProfile.hasSeenV3Welcome) {
+      setWelcomeOpen(true);
+    } else if (!userProfile.hasSeenTutorial) {
+      setTourOpen(true);
+    }
+  }, [user, userProfile, onboardChecked]);
 
   // Replace your current getMajorProgress with this:
   const getMajorProgress = () => {
@@ -942,6 +960,10 @@ export default function Home() {
           onClose={() => setShowSettings(false)}
           onSave={handleProfileUpdate}
           onToggleFriends={handleToggleFriends}
+          onReplayTour={() => {
+            setShowSettings(false);
+            setTourOpen(true);
+          }}
           onLogout={() => {
             setShowSettings(false);
             setActiveTab("upload");
@@ -2104,6 +2126,31 @@ export default function Home() {
         }}
         onManualAdd={() => setShowManualEntryModal(true)}
         onToggleTheme={toggleTheme}
+      />
+
+      <V3WelcomeModal
+        open={welcomeOpen}
+        onClose={() => {
+          setWelcomeOpen(false);
+          if (user) void setUserFlag(user.uid, "hasSeenV3Welcome");
+        }}
+        onStartTour={() => {
+          setWelcomeOpen(false);
+          if (user) void setUserFlag(user.uid, "hasSeenV3Welcome");
+          setTourOpen(true);
+        }}
+      />
+
+      <AppTour
+        open={tourOpen}
+        onClose={() => {
+          setTourOpen(false);
+          if (user) void setUserFlag(user.uid, "hasSeenTutorial");
+        }}
+        onComplete={() => {
+          if (user) void setUserFlag(user.uid, "hasSeenTutorial");
+        }}
+        onNavigate={(tabId) => handleTabChange(tabId)}
       />
     </main>
   );

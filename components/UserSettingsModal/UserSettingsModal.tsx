@@ -44,6 +44,7 @@ interface UserSettingsModalProps {
   onToggleFriends: (enabled: boolean) => Promise<void>;
   onLogout: () => void;
   onDeleteAccount: () => Promise<void>;
+  onReplayTour?: () => void;
 }
 
 export default function UserSettingsModal({
@@ -55,6 +56,7 @@ export default function UserSettingsModal({
   onToggleFriends,
   onLogout,
   onDeleteAccount,
+  onReplayTour,
 }: UserSettingsModalProps) {
   const { resolvedTheme, toggleTheme } = useTheme();
   const isDark = resolvedTheme === "dark";
@@ -769,6 +771,14 @@ export default function UserSettingsModal({
             >
               View public profile
             </Link>
+            {onReplayTour && (
+              <button
+                onClick={onReplayTour}
+                className="cursor-pointer text-[11px] px-3 py-1.5 rounded-lg border border-black/[0.06] dark:border-white/[0.08] hover:border-pink-500/50 hover:bg-black/[0.03] dark:hover:bg-white/[0.04] text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-all duration-200"
+              >
+                Replay tutorial
+              </button>
+            )}
             <div className="relative group">
               <Info className="h-3 w-3 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors cursor-pointer" />
               <div className="absolute top-full mt-1 left-1/2 -translate-x-1/2 bg-gray-900 dark:bg-gray-800 text-gray-100 text-[10px] px-1.5 py-0.5 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-[70] pointer-events-none border border-gray-700">

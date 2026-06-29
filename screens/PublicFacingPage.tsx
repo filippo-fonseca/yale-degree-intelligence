@@ -433,21 +433,153 @@ function DoubleMajorMock() {
 }
 
 function StatsMini() {
-  const bars = [60, 72, 68, 80, 76, 88];
+  // Representative sample data for the marketing preview.
+  const trend = [3.71, 3.79, 3.76, 3.84, 3.81, 3.88];
+  const tMin = 3.6;
+  const tMax = 3.95;
+  const linePts = trend.map((g, i) => {
+    const x = (i / (trend.length - 1)) * 100;
+    const y = 100 - ((g - tMin) / (tMax - tMin)) * 100;
+    return [x, y] as const;
+  });
+  const linePath = linePts.map((p) => `${p[0]},${p[1]}`).join(" ");
+  const areaPath = `0,100 ${linePath} 100,100`;
+  const last = linePts[linePts.length - 1];
+
+  const chips = [
+    {
+      value: "3.88",
+      label: "cumulative GPA",
+      cls: "text-violet-600 dark:text-violet-300",
+    },
+    {
+      value: "108",
+      label: "credits earned",
+      cls: "text-blue-600 dark:text-blue-300",
+    },
+    {
+      value: "27",
+      label: "courses done",
+      cls: "text-emerald-600 dark:text-emerald-300",
+    },
+  ];
+
+  const grades = [
+    { label: "A", pct: 64, cls: "from-emerald-400 to-emerald-500" },
+    { label: "A-", pct: 21, cls: "from-violet-400 to-violet-500" },
+    { label: "B+", pct: 11, cls: "from-blue-400 to-blue-500" },
+    { label: "B", pct: 4, cls: "from-pink-400 to-pink-500" },
+  ];
+
   return (
-    <div className="flex items-end gap-4">
-      <div>
-        <p className="text-3xl font-semibold text-gray-900 dark:text-white">3.88</p>
-        <p className="text-[11px] text-gray-400 dark:text-white/45">cumulative GPA</p>
-      </div>
-      <div className="flex h-14 flex-1 items-end gap-1.5">
-        {bars.map((b, i) => (
+    <div className="space-y-3">
+      {/* Stat chips */}
+      <div className="grid grid-cols-3 gap-1.5">
+        {chips.map((c) => (
           <div
-            key={i}
-            className="flex-1 rounded-t bg-gradient-to-t from-pink-500/30 to-pink-400/80"
-            style={{ height: `${b}%` }}
-          />
+            key={c.label}
+            className="rounded-lg border border-gray-200 bg-black/[0.02] px-2 py-1.5 dark:border-white/[0.07] dark:bg-white/[0.02]"
+          >
+            <p className={`text-base font-semibold leading-none ${c.cls}`}>{c.value}</p>
+            <p className="mt-1 text-[9px] leading-tight text-gray-400 dark:text-white/40">
+              {c.label}
+            </p>
+          </div>
         ))}
+      </div>
+
+      {/* GPA trend sparkline */}
+      <div className="relative overflow-hidden rounded-lg border border-gray-200 bg-black/[0.02] p-2.5 dark:border-white/[0.07] dark:bg-white/[0.02]">
+        <div className="mb-1.5 flex items-center justify-between">
+          <span className="text-[9px] font-medium uppercase tracking-wider text-gray-400 dark:text-white/40">
+            GPA trend
+          </span>
+          <span className="flex items-center gap-0.5 text-[9px] font-semibold text-emerald-500 dark:text-emerald-300">
+            <FiTrendingUp size={9} /> +0.17
+          </span>
+        </div>
+        <svg
+          viewBox="0 0 100 30"
+          preserveAspectRatio="none"
+          className="h-10 w-full overflow-visible"
+        >
+          <defs>
+            <linearGradient id="statsSparkFill" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="#8b5cf6" stopOpacity="0.35" />
+              <stop offset="100%" stopColor="#8b5cf6" stopOpacity="0" />
+            </linearGradient>
+            <linearGradient id="statsSparkLine" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0%" stopColor="#6366f1" />
+              <stop offset="60%" stopColor="#8b5cf6" />
+              <stop offset="100%" stopColor="#10b981" />
+            </linearGradient>
+          </defs>
+          {/* scale the 0..100 y-space into the 0..30 viewBox height */}
+          <g transform="scale(1, 0.3)">
+            <motion.polygon
+              points={areaPath}
+              fill="url(#statsSparkFill)"
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+            />
+            <motion.polyline
+              points={linePath}
+              fill="none"
+              stroke="url(#statsSparkLine)"
+              strokeWidth={2.5}
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              vectorEffect="non-scaling-stroke"
+              initial={{ pathLength: 0 }}
+              whileInView={{ pathLength: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 1, ease: "easeInOut" }}
+            />
+          </g>
+          <circle cx={last[0]} cy={last[1] * 0.3} r={2.2} fill="#10b981" />
+          <circle
+            cx={last[0]}
+            cy={last[1] * 0.3}
+            r={4}
+            fill="#10b981"
+            opacity={0.25}
+          />
+        </svg>
+      </div>
+
+      {/* Grade distribution mini bar */}
+      <div className="rounded-lg border border-gray-200 bg-black/[0.02] p-2.5 dark:border-white/[0.07] dark:bg-white/[0.02]">
+        <p className="mb-1.5 text-[9px] font-medium uppercase tracking-wider text-gray-400 dark:text-white/40">
+          Grade spread
+        </p>
+        <div className="flex h-2 w-full overflow-hidden rounded-full bg-black/[0.05] dark:bg-white/5">
+          {grades.map((g) => (
+            <motion.div
+              key={g.label}
+              className={`h-full bg-gradient-to-r ${g.cls}`}
+              initial={{ width: 0 }}
+              whileInView={{ width: `${g.pct}%` }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.7, ease: "easeOut" }}
+              style={{ width: `${g.pct}%` }}
+            />
+          ))}
+        </div>
+        <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1">
+          {grades.map((g) => (
+            <span
+              key={g.label}
+              className="flex items-center gap-1 text-[9px] text-gray-500 dark:text-white/45"
+            >
+              <span
+                className={`h-2 w-2 rounded-full bg-gradient-to-r ${g.cls}`}
+              />
+              {g.label} {g.pct}%
+            </span>
+          ))}
+        </div>
       </div>
     </div>
   );

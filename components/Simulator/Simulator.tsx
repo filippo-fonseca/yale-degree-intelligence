@@ -729,17 +729,39 @@ export default function Simulator({
   // Helper to load a plan from Plan object directly
   const loadPlanData = (plan: Plan) => {
     planEverLoadedRef.current = true;
-    setSemesters(plan.semesters);
+    // Reconcile each planned course against the live transcript so a plan saved
+    // earlier reflects the user's current reality (e.g. a course that was
+    // in-progress when saved now shows completed after a transcript update).
+    const liveByCode = new Map<string, Course>();
+    [...completedCourses, ...remainingCourses].forEach((c) => {
+      if (c?.code) liveByCode.set(c.code, c);
+    });
+    const reconciledSemesters: Semester[] = plan.semesters.map((sem) => ({
+      ...sem,
+      courses: sem.courses.map((course) => {
+        const live = liveByCode.get(course.code);
+        if (!live) return course;
+        return {
+          ...course,
+          status: live.status,
+          credits: live.credits ?? course.credits,
+          grade: live.grade ?? course.grade,
+          skipped: live.skipped ?? course.skipped,
+        };
+      }),
+    }));
+
+    setSemesters(reconciledSemesters);
     setSimulatorManualReqs(plan.manualRequirements ?? []);
     initialSemestersRef.current = JSON.parse(
-      JSON.stringify(plan.semesters),
+      JSON.stringify(reconciledSemesters),
     ) as Semester[];
     initialManualReqsRef.current = JSON.parse(
       JSON.stringify(plan.manualRequirements ?? []),
     ) as ManualRequirementEntry[];
 
     const usedCodes = new Set<string>();
-    plan.semesters.forEach((sem) =>
+    reconciledSemesters.forEach((sem) =>
       sem.courses.forEach((course) => usedCodes.add(course.code)),
     );
 

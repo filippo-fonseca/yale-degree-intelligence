@@ -18,6 +18,7 @@ import { LineChart } from "@mui/x-charts/LineChart";
 import { BarChart } from "@mui/x-charts/BarChart";
 import { axisClasses } from "@mui/x-charts";
 import { useTheme } from "@/context/ThemeContext";
+import { Skeleton } from "@/components/ui/Skeleton";
 import { FiInfo } from "react-icons/fi";
 
 // App palette aligned with emerald/blue/amber/red status colors
@@ -49,6 +50,7 @@ const CHART_FONT =
 // ──────────────────────────────────────────────
 const makeLineChartSx = (isDark: boolean) => {
   const axisText = isDark ? "#9CA3AF" : "#4B5563";
+  const legendText = isDark ? "#D1D5DB" : "#374151";
   const gridLine = isDark ? "#374151" : "#E5E7EB";
   return {
     fontFamily: CHART_FONT,
@@ -68,6 +70,14 @@ const makeLineChartSx = (isDark: boolean) => {
       fill: axisText,
       fontFamily: CHART_FONT,
     },
+    // Series legend (e.g. "Cumulative GPA") is HTML, not SVG, and inherits
+    // MUI's default light-theme text color, so it renders black in dark mode.
+    // Force a theme-aware color on the legend root and its label spans.
+    ".MuiChartsLegend-root, .MuiChartsLegend-series, .MuiChartsLegend-label, .MuiChartsLabel-root":
+      {
+        color: `${legendText} !important`,
+        fontFamily: CHART_FONT,
+      },
     backgroundColor: "transparent",
   };
 };
@@ -245,10 +255,10 @@ function ChartCard({
 /** Skeleton shimmer for a single stat card. */
 function StatCardSkeleton() {
   return (
-    <div className="p-3 rounded-xl bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 border border-gray-200 dark:border-gray-800/50 shadow-neu animate-pulse">
-      <div className="h-3 w-24 rounded bg-gray-200 dark:bg-gray-800 mb-2" />
-      <div className="h-6 w-16 rounded bg-gray-200 dark:bg-gray-800 mb-1.5" />
-      <div className="h-2.5 w-20 rounded bg-gray-100 dark:bg-gray-900" />
+    <div className="p-3 rounded-xl bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 border border-gray-200 dark:border-gray-800/50 shadow-neu">
+      <Skeleton className="h-3 w-24 mb-2" rounded="rounded" />
+      <Skeleton className="h-6 w-16 mb-1.5" rounded="rounded" />
+      <Skeleton className="h-2.5 w-20" rounded="rounded" />
     </div>
   );
 }
@@ -257,11 +267,11 @@ function StatCardSkeleton() {
 function ChartCardSkeleton({ className = "" }: { className?: string }) {
   return (
     <div
-      className={`p-4 rounded-xl bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 border border-gray-200 dark:border-gray-800/50 shadow-neu animate-pulse ${className}`}
+      className={`p-4 rounded-xl bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 border border-gray-200 dark:border-gray-800/50 shadow-neu ${className}`}
     >
-      <div className="h-4 w-40 rounded bg-gray-200 dark:bg-gray-800 mb-1" />
-      <div className="h-2.5 w-56 rounded bg-gray-100 dark:bg-gray-900 mb-4" />
-      <div className="h-[200px] rounded-lg bg-gray-100 dark:bg-gray-900" />
+      <Skeleton className="h-4 w-40 mb-1" rounded="rounded" />
+      <Skeleton className="h-2.5 w-56 mb-4" rounded="rounded" />
+      <Skeleton className="h-[200px] w-full" />
     </div>
   );
 }
@@ -480,9 +490,9 @@ export default function StatsView({ courses }: { courses: Course[] }) {
   // ── Early states ────────────────────────────────────────────────────────
 
   if (activeCourses.length === 0) {
-    // Show skeletons briefly (no loader flag needed; just show empty state when courses prop is populated but empty)
+    // No courses prop yet means data is still loading: show skeletons.
+    // A populated-but-ungraded course list means there is nothing to chart yet.
     if (courses.length === 0) {
-      // Genuinely loading — return loading skeletons
       return (
         <div className="space-y-4">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">

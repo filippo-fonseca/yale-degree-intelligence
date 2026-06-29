@@ -226,10 +226,11 @@ function DistPieChart({ distMap }: { distMap: Record<string, Course[]> }) {
             }}
             sx={{
               fontFamily: CHART_FONT,
-              "& .MuiChartsLegend-series text": {
-                fontFamily: `${CHART_FONT} !important`,
-                fill: `${isDark ? "#9CA3AF" : "#4B5563"} !important`,
-              },
+              "& .MuiChartsLegend-root text, & .MuiChartsLegend-series text, & .MuiChartsLegend-label, & .MuiChartsLegend-label text":
+                {
+                  fontFamily: `${CHART_FONT} !important`,
+                  fill: `${isDark ? "#D1D5DB" : "#4B5563"} !important`,
+                },
             }}
           />
         </div>
@@ -817,7 +818,7 @@ const DistributionalsView = ({ courses }: { courses: Course[] }) => {
             initial={{ width: 0 }}
             animate={{ width: `${(metCount / 5) * 100}%` }}
             transition={{ duration: 0.8, ease: "easeOut" }}
-            className="absolute inset-y-0 left-0 rounded-full bg-gradient-to-r from-violet-500 to-fuchsia-500"
+            className="absolute inset-y-0 left-0 rounded-full bg-gradient-to-r from-blue-500 via-violet-500 to-fuchsia-500 shadow-[0_0_10px_rgba(168,85,247,0.75)]"
           />
         </div>
       </div>

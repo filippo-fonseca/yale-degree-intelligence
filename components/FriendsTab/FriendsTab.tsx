@@ -37,6 +37,7 @@ import { Panda } from "lucide-react";
 import { YearBadge } from "../ui/YearBadge";
 import { InfoCard } from "../ui/InfoCard";
 import { UserAvatar } from "../ui/UserAvatar";
+import { Skeleton } from "../ui/Skeleton";
 
 type UserProfile = {
   uid: string;
@@ -106,35 +107,29 @@ function CopyButton() {
   );
 }
 
-/* ─── Skeleton primitives ─── */
-const Skeleton = ({ className = "" }: { className?: string }) => (
-  <div
-    className={`animate-pulse bg-gray-200/70 dark:bg-gray-800/60 rounded-xl ${className}`}
-  />
-);
-
+/* ─── Skeleton primitives (built on the shared shimmer primitive) ─── */
 const FriendCardSkeleton = () => (
-  <div className="flex items-center justify-between p-3 rounded-xl bg-white dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 border border-gray-200 dark:border-gray-800/50 shadow-neu">
+  <div className="flex items-center justify-between p-3 rounded-xl bg-white dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 border border-gray-200 dark:border-white/[0.06] shadow-neu">
     <div className="flex items-center gap-3">
-      <Skeleton className="h-9 w-9 rounded-full" />
+      <Skeleton className="h-9 w-9" rounded="rounded-full" />
       <div className="space-y-2">
         <Skeleton className="h-3.5 w-36" />
         <Skeleton className="h-2.5 w-24" />
       </div>
     </div>
-    <Skeleton className="h-7 w-24 rounded-lg" />
+    <Skeleton className="h-7 w-24" />
   </div>
 );
 
 const RequestCardSkeleton = () => (
-  <div className="flex items-center justify-between p-2.5 rounded-lg bg-gray-100/60 dark:bg-gray-800/30 border border-gray-200/60 dark:border-gray-800/40">
+  <div className="flex items-center justify-between p-2.5 rounded-lg bg-gray-100/60 dark:bg-white/[0.03] border border-gray-200/60 dark:border-white/[0.06]">
     <div className="flex items-center gap-2">
-      <Skeleton className="h-6 w-6 rounded-full" />
+      <Skeleton className="h-6 w-6" rounded="rounded-full" />
       <Skeleton className="h-3 w-28" />
     </div>
     <div className="flex gap-1.5">
-      <Skeleton className="h-6 w-6 rounded-md" />
-      <Skeleton className="h-6 w-6 rounded-md" />
+      <Skeleton className="h-6 w-6" rounded="rounded-md" />
+      <Skeleton className="h-6 w-6" rounded="rounded-md" />
     </div>
   </div>
 );
@@ -154,12 +149,12 @@ function FriendStatCard({
   return (
     <motion.div
       whileHover={{ y: -1 }}
-      className="p-3 rounded-xl bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 backdrop-blur-md border border-gray-200 dark:border-gray-800/50 hover:border-gray-300 dark:hover:border-gray-700/60 transition-all relative shadow-neu"
+      className="p-3 rounded-xl bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 backdrop-blur-md border border-gray-200 dark:border-white/[0.06] hover:border-gray-300 dark:hover:border-white/[0.12] transition-all relative shadow-neu"
     >
       {tooltip && (
         <div className="absolute top-2 right-2 group">
-          <FiInfo className="w-3.5 h-3.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-400" />
-          <div className="absolute z-10 right-0 w-44 p-2 text-[11px] text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-900/95 backdrop-blur-sm rounded-lg border border-gray-200 dark:border-gray-800/50 shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
+          <FiInfo className="w-3.5 h-3.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300" />
+          <div className="absolute z-10 right-0 w-44 p-2 text-[11px] text-gray-700 dark:text-gray-300 bg-white dark:bg-[#0c0c0e]/95 backdrop-blur-sm rounded-lg border border-gray-200 dark:border-white/[0.08] shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
             {tooltip}
           </div>
         </div>
@@ -189,7 +184,7 @@ function SectionHeading({
       {icon}
       {label}
       {count !== undefined && (
-        <span className="ml-1 px-1.5 py-0.5 rounded-full bg-gray-100 dark:bg-gray-800/60 text-gray-500 dark:text-gray-400 text-[10px] font-medium border border-gray-200 dark:border-gray-700/40">
+        <span className="ml-1 px-1.5 py-0.5 rounded-full bg-gray-100 dark:bg-white/[0.06] text-gray-500 dark:text-gray-400 text-[10px] font-medium border border-gray-200 dark:border-white/[0.08]">
           {count}
         </span>
       )}
@@ -464,7 +459,7 @@ export default function FriendsTab({
 
           {/* What's shared card */}
           <div className="w-full max-w-sm mb-6">
-            <div className="p-4 rounded-xl bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 backdrop-blur-md border border-gray-200 dark:border-gray-800/50 shadow-neu">
+            <div className="p-4 rounded-xl bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 backdrop-blur-md border border-gray-200 dark:border-white/[0.06] shadow-neu">
               <h4 className="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-3 flex items-center gap-2">
                 <span className="w-1.5 h-1.5 rounded-full bg-pink-400" />
                 Shared with friends
@@ -570,7 +565,7 @@ export default function FriendsTab({
             {[...Array(3)].map((_, i) => (
               <div
                 key={i}
-                className="p-3 rounded-xl border border-gray-200 dark:border-gray-800/50 bg-white dark:bg-gray-900/20 shadow-neu"
+                className="p-3 rounded-xl border border-gray-200 dark:border-white/[0.06] bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 shadow-neu"
               >
                 <Skeleton className="h-3 w-16 mb-2" />
                 <Skeleton className="h-6 w-10" />
@@ -580,14 +575,14 @@ export default function FriendsTab({
 
           {/* Request skeletons */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            <div className="p-3 rounded-xl border border-gray-200 dark:border-gray-800/50 bg-white dark:bg-gray-900/20">
+            <div className="p-3 rounded-xl border border-gray-200 dark:border-white/[0.06] bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 shadow-neu">
               <Skeleton className="h-3 w-36 mb-3" />
               <div className="space-y-2">
                 <RequestCardSkeleton />
                 <RequestCardSkeleton />
               </div>
             </div>
-            <div className="p-3 rounded-xl border border-gray-200 dark:border-gray-800/50 bg-white dark:bg-gray-900/20">
+            <div className="p-3 rounded-xl border border-gray-200 dark:border-white/[0.06] bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 shadow-neu">
               <Skeleton className="h-3 w-28 mb-3" />
               <div className="space-y-2">
                 <RequestCardSkeleton />
@@ -641,7 +636,7 @@ export default function FriendsTab({
               >
                 {/* Incoming */}
                 {incomingRequests.length > 0 && (
-                  <div className="p-3 rounded-xl bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 backdrop-blur-md border border-gray-200 dark:border-gray-800/50 shadow-neu">
+                  <div className="p-3 rounded-xl bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 backdrop-blur-md border border-gray-200 dark:border-white/[0.06] shadow-neu">
                     <SectionHeading
                       icon={<FiMail size={11} />}
                       label="Incoming Requests"
@@ -659,7 +654,7 @@ export default function FriendsTab({
                             initial={{ opacity: 0, x: -6 }}
                             animate={{ opacity: 1, x: 0 }}
                             exit={{ opacity: 0, x: -6 }}
-                            className="flex items-center justify-between p-2.5 rounded-lg bg-gray-50 dark:bg-gray-800/30 border border-gray-200/70 dark:border-gray-800/40 hover:border-emerald-300 dark:hover:border-emerald-700/40 transition-colors"
+                            className="flex items-center justify-between p-2.5 rounded-lg bg-gray-50 dark:bg-white/[0.03] border border-gray-200/70 dark:border-white/[0.06] hover:border-emerald-300 dark:hover:border-emerald-500/40 transition-colors"
                           >
                             <div className="flex items-center gap-2.5 min-w-0">
                               <UserAvatar
@@ -702,7 +697,7 @@ export default function FriendsTab({
 
                 {/* Sent */}
                 {sentRequests.length > 0 && (
-                  <div className="p-3 rounded-xl bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 backdrop-blur-md border border-gray-200 dark:border-gray-800/50 shadow-neu">
+                  <div className="p-3 rounded-xl bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 backdrop-blur-md border border-gray-200 dark:border-white/[0.06] shadow-neu">
                     <SectionHeading
                       icon={<FiUserCheck size={11} />}
                       label="Sent Requests"
@@ -720,7 +715,7 @@ export default function FriendsTab({
                             initial={{ opacity: 0, x: 6 }}
                             animate={{ opacity: 1, x: 0 }}
                             exit={{ opacity: 0, x: 6 }}
-                            className="flex items-center justify-between p-2.5 rounded-lg bg-gray-50 dark:bg-gray-800/30 border border-gray-200/70 dark:border-gray-800/40 hover:border-blue-300 dark:hover:border-blue-700/40 transition-colors"
+                            className="flex items-center justify-between p-2.5 rounded-lg bg-gray-50 dark:bg-white/[0.03] border border-gray-200/70 dark:border-white/[0.06] hover:border-blue-300 dark:hover:border-blue-500/40 transition-colors"
                           >
                             <div className="flex items-center gap-2.5 min-w-0">
                               <UserAvatar
@@ -739,7 +734,7 @@ export default function FriendsTab({
                               </div>
                             </div>
                             <button
-                              className="p-1.5 rounded-lg bg-gray-100 dark:bg-gray-700/40 text-gray-400 dark:text-gray-500 hover:bg-red-500/20 hover:text-red-400 transition border border-gray-200 dark:border-gray-700/40"
+                              className="p-1.5 rounded-lg bg-gray-100 dark:bg-white/[0.04] text-gray-400 dark:text-gray-500 hover:bg-red-500/20 hover:text-red-400 transition border border-gray-200 dark:border-white/[0.08]"
                               onClick={() => cancelSentRequest(req.id)}
                               title="Cancel request"
                             >
@@ -770,7 +765,7 @@ export default function FriendsTab({
                 exit={{ opacity: 0 }}
               >
                 <motion.div
-                  className="bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/95 dark:via-gray-900/90 dark:to-gray-950/95 backdrop-blur-md p-5 rounded-xl shadow-[0_8px_48px_rgba(0,0,0,0.5)] border border-gray-200 dark:border-gray-800/50 max-w-lg w-full h-[400px] flex flex-col"
+                  className="bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/95 dark:via-gray-900/90 dark:to-gray-950/95 backdrop-blur-2xl p-5 rounded-xl shadow-[0_8px_48px_rgba(0,0,0,0.5)] border border-gray-200 dark:border-white/[0.08] max-w-lg w-full h-[400px] flex flex-col"
                   initial={{ scale: 0.95, opacity: 0, y: 8 }}
                   animate={{ scale: 1, opacity: 1, y: 0 }}
                   exit={{ scale: 0.95, opacity: 0, y: 8 }}
@@ -804,7 +799,7 @@ export default function FriendsTab({
                       type="text"
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
-                      className="w-full pl-8 pr-3 py-2 bg-gray-50 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700/50 rounded-lg text-sm text-gray-900 dark:text-gray-200 focus:outline-none focus:ring-1 focus:ring-pink-500/50 focus:border-pink-500/50 placeholder:text-gray-400 dark:placeholder:text-gray-600"
+                      className="w-full pl-8 pr-3 py-2 bg-gray-50 dark:bg-white/[0.04] border border-gray-200 dark:border-white/[0.08] rounded-lg text-sm text-gray-900 dark:text-gray-200 focus:outline-none focus:ring-1 focus:ring-pink-500/50 focus:border-pink-500/50 placeholder:text-gray-400 dark:placeholder:text-gray-500"
                       placeholder="Your best friend, or that upperclassman..."
                       autoFocus
                     />
@@ -820,7 +815,7 @@ export default function FriendsTab({
                           key={u.uid}
                           initial={{ opacity: 0, y: 4 }}
                           animate={{ opacity: 1, y: 0 }}
-                          className="flex items-center justify-between p-2.5 rounded-lg bg-gray-50 dark:bg-gray-800/40 border border-gray-200 dark:border-gray-700/40 hover:border-pink-400/40 dark:hover:border-pink-600/40 transition-all"
+                          className="flex items-center justify-between p-2.5 rounded-lg bg-gray-50 dark:bg-white/[0.03] border border-gray-200 dark:border-white/[0.06] hover:border-pink-400/40 dark:hover:border-pink-500/40 transition-all"
                           whileHover={{ scale: 0.995 }}
                         >
                           <div className="flex items-center gap-3 min-w-0">
@@ -879,10 +874,10 @@ export default function FriendsTab({
               <motion.div
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="flex flex-col items-center justify-center gap-4 py-12 px-6 rounded-xl bg-white dark:bg-gradient-to-br dark:from-gray-900/40 dark:via-gray-900/30 dark:to-gray-950/40 border border-dashed border-gray-200 dark:border-gray-800/60 text-center"
+                className="flex flex-col items-center justify-center gap-4 py-12 px-6 rounded-xl bg-white dark:bg-gradient-to-br dark:from-gray-900/50 dark:via-gray-900/35 dark:to-gray-950/50 backdrop-blur-md border border-dashed border-gray-200 dark:border-white/[0.10] text-center"
               >
-                <div className="p-4 rounded-2xl bg-gray-100 dark:bg-gray-800/40 border border-gray-200 dark:border-gray-700/40">
-                  <FiUsers className="w-7 h-7 text-gray-300 dark:text-gray-600" />
+                <div className="p-4 rounded-2xl bg-gray-100 dark:bg-white/[0.04] border border-gray-200 dark:border-white/[0.08]">
+                  <FiUsers className="w-7 h-7 text-gray-300 dark:text-gray-500" />
                 </div>
                 <div>
                   <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -923,7 +918,7 @@ export default function FriendsTab({
                       exit={{ opacity: 0, y: -4, scale: 0.98 }}
                       transition={{ delay: idx * 0.04 }}
                       whileHover={{ y: -1 }}
-                      className="flex items-center justify-between p-3 rounded-xl bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 backdrop-blur-md border border-gray-200 dark:border-gray-800/50 hover:border-pink-300 dark:hover:border-pink-700/40 transition-all shadow-neu"
+                      className="flex items-center justify-between p-3 rounded-xl bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 backdrop-blur-md border border-gray-200 dark:border-white/[0.06] hover:border-pink-300 dark:hover:border-pink-500/40 transition-all shadow-neu"
                     >
                       <div className="flex items-center gap-3 min-w-0">
                         <UserAvatar
@@ -955,7 +950,7 @@ export default function FriendsTab({
                       <div className="flex items-center gap-1.5 shrink-0">
                         <Link
                           href={`/user/${f.uid}`}
-                          className="flex items-center gap-1 px-2.5 py-1.5 text-[11px] font-medium bg-gray-50 dark:bg-gray-800/50 text-gray-600 dark:text-gray-300 rounded-lg border border-gray-200 dark:border-gray-700/40 hover:bg-pink-50 dark:hover:bg-pink-600/20 hover:text-pink-600 dark:hover:text-pink-200 hover:border-pink-200 dark:hover:border-pink-600/40 transition-all"
+                          className="flex items-center gap-1 px-2.5 py-1.5 text-[11px] font-medium bg-gray-50 dark:bg-white/[0.04] text-gray-600 dark:text-gray-300 rounded-lg border border-gray-200 dark:border-white/[0.08] hover:bg-pink-50 dark:hover:bg-pink-500/20 hover:text-pink-600 dark:hover:text-pink-200 hover:border-pink-200 dark:hover:border-pink-500/40 transition-all"
                         >
                           <FiUser size={11} />
                           Profile
@@ -989,7 +984,7 @@ export default function FriendsTab({
               initial={{ opacity: 0, scale: 0.95, y: 8 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 8 }}
-              className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl p-5 max-w-sm w-full shadow-[0_8px_48px_rgba(0,0,0,0.4)]"
+              className="bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/95 dark:via-gray-900/90 dark:to-gray-950/95 backdrop-blur-2xl border border-gray-200 dark:border-white/[0.10] rounded-xl p-5 max-w-sm w-full shadow-[0_8px_48px_rgba(0,0,0,0.5)]"
             >
               <div className="flex items-center gap-3 mb-3">
                 <div className="p-2 bg-red-500/10 rounded-xl border border-red-500/20">
@@ -1011,7 +1006,7 @@ export default function FriendsTab({
                 <button
                   onClick={() => setShowDisableConfirm(false)}
                   disabled={isDisabling}
-                  className="px-3 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800/50 text-gray-700 dark:text-gray-300 text-sm disabled:opacity-50 transition"
+                  className="px-3 py-1.5 rounded-lg border border-gray-200 dark:border-white/[0.08] hover:bg-gray-100 dark:hover:bg-white/[0.06] text-gray-700 dark:text-gray-300 text-sm disabled:opacity-50 transition"
                 >
                   Cancel
                 </button>
@@ -1053,7 +1048,7 @@ export default function FriendsTab({
   function NoFriendsResult() {
     return (
       <div className="flex flex-col items-center justify-center gap-3.5 text-center py-8">
-        <div className="p-3 rounded-xl bg-gray-100 dark:bg-gray-800/40 border border-gray-200 dark:border-gray-700/40">
+        <div className="p-3 rounded-xl bg-gray-100 dark:bg-white/[0.04] border border-gray-200 dark:border-white/[0.08]">
           <Panda size={28} className="text-gray-400 dark:text-gray-500" />
         </div>
         <div className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">
@@ -1085,7 +1080,7 @@ export default function FriendsTab({
       <div className="relative" ref={dropdownRef}>
         <button
           onClick={() => setIsOpen(!isOpen)}
-          className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800/60 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition"
+          className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-white/[0.06] text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition"
           aria-label="More options"
         >
           <FiMoreVertical size={16} />
@@ -1097,14 +1092,14 @@ export default function FriendsTab({
               initial={{ opacity: 0, y: -6, scale: 0.97 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -6, scale: 0.97 }}
-              className="absolute left-0 bottom-full mb-2 w-52 bg-white dark:bg-gray-900 rounded-xl shadow-[0_4px_24px_rgba(0,0,0,0.2)] z-20 border border-gray-200 dark:border-gray-800 overflow-hidden"
+              className="absolute left-0 bottom-full mb-2 w-52 bg-white dark:bg-[#0c0c0e] backdrop-blur-2xl rounded-xl shadow-[0_4px_24px_rgba(0,0,0,0.2)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.6)] z-20 border border-gray-200 dark:border-white/[0.08] overflow-hidden"
             >
               <button
                 onClick={() => {
                   onDisable();
                   setIsOpen(false);
                 }}
-                className="flex items-center gap-2 w-full text-left px-4 py-2.5 text-sm text-red-500 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+                className="flex items-center gap-2 w-full text-left px-4 py-2.5 text-sm text-red-500 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/15 transition-colors"
               >
                 <FiToggleLeft size={14} />
                 Disable Friends Feature
@@ -1140,7 +1135,7 @@ export default function FriendsTab({
       <div className="relative" ref={dropdownRef}>
         <button
           onClick={() => setIsOpen(!isOpen)}
-          className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800/60 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition"
+          className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-white/[0.06] text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition"
           aria-label="Friend actions"
         >
           <FiMoreVertical size={14} />
@@ -1152,11 +1147,11 @@ export default function FriendsTab({
               initial={{ opacity: 0, y: -6, scale: 0.97 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -6, scale: 0.97 }}
-              className="absolute right-0 mt-1.5 w-48 bg-white dark:bg-gray-900 rounded-xl shadow-[0_4px_24px_rgba(0,0,0,0.2)] z-10 border border-gray-200 dark:border-gray-800 overflow-hidden"
+              className="absolute right-0 mt-1.5 w-48 bg-white dark:bg-[#0c0c0e] backdrop-blur-2xl rounded-xl shadow-[0_4px_24px_rgba(0,0,0,0.2)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.6)] z-10 border border-gray-200 dark:border-white/[0.08] overflow-hidden"
             >
               <Link
                 href={`/user/${profile.uid}`}
-                className="flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"
+                className="flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/[0.05] transition-colors"
                 onClick={() => setIsOpen(false)}
               >
                 <FiUser size={13} />
@@ -1167,7 +1162,7 @@ export default function FriendsTab({
                   if (friend.id) removeFriend(friend.id);
                   setIsOpen(false);
                 }}
-                className="flex items-center gap-2 w-full text-left px-4 py-2.5 text-sm text-red-500 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors border-t border-gray-100 dark:border-gray-800/60"
+                className="flex items-center gap-2 w-full text-left px-4 py-2.5 text-sm text-red-500 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/15 transition-colors border-t border-gray-100 dark:border-white/[0.06]"
               >
                 <FiX size={13} />
                 Remove Friend

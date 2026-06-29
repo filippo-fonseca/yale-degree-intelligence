@@ -86,10 +86,10 @@ const CustomLoader = ({ fullScreen = true }: CustomLoaderProps) => {
               rotate: 360,
             }}
             transition={{
-              delay: i * 0.15,
-              duration: 0.8,
+              delay: i * 0.09,
+              duration: 0.6,
               repeat: Infinity,
-              repeatDelay: 3,
+              repeatDelay: 0.8,
               ease: "easeInOut",
             }}
             style={{
@@ -115,10 +115,10 @@ const CustomLoader = ({ fullScreen = true }: CustomLoaderProps) => {
               y: 0,
             }}
             transition={{
-              delay: 0.5 + i * 0.1,
-              duration: 0.6,
+              delay: 0.3 + i * 0.07,
+              duration: 0.45,
               repeat: Infinity,
-              repeatDelay: 3,
+              repeatDelay: 0.8,
               ease: "anticipate",
             }}
           />
@@ -132,7 +132,7 @@ const CustomLoader = ({ fullScreen = true }: CustomLoaderProps) => {
             opacity: [0, 0.3, 0],
           }}
           transition={{
-            duration: 2,
+            duration: 1.4,
             repeat: Infinity,
             ease: "easeOut",
           }}

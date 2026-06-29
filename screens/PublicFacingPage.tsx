@@ -1060,7 +1060,7 @@ export default function PublicFacingPage() {
                 {
                   n: "03",
                   t: "Simulate future semesters",
-                  d: "Drag courses around, catch conflicts early, and share your plan with friends and advisors.",
+                  d: "Drag courses around, catch conflicts between your two majors early, and share your plan with friends and advisors.",
                 },
               ].map((s, i) => (
                 <Reveal key={s.n} delay={i * 0.08}>
@@ -1297,7 +1297,7 @@ export default function PublicFacingPage() {
             </span>
             <span className="flex items-center gap-1.5">
               Made with{" "}
-              <span className="text-pink-400">♥</span> in New Haven
+              <span className="text-pink-400">♥</span>
             </span>
           </div>
         </div>

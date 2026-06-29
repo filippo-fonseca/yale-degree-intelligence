@@ -14,6 +14,7 @@ import {
 } from "./MajorProgressView/requirementStatus";
 import { PieChart } from "@mui/x-charts/PieChart";
 import { useTheme } from "@/context/ThemeContext";
+import { Skeleton } from "@/components/ui/Skeleton";
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -273,13 +274,34 @@ function DistStatCard({
 
 function SkeletonCard() {
   return (
-    <div className="p-4 rounded-xl border border-gray-200 dark:border-gray-800/50 bg-white dark:bg-gray-900/20 animate-pulse">
+    <div className="p-4 rounded-xl border border-gray-200 dark:border-gray-800/50 bg-white dark:bg-gray-900/20">
       <div className="flex items-center justify-between mb-3">
-        <div className="h-5 w-16 rounded-lg bg-gray-200 dark:bg-gray-800" />
-        <div className="h-4 w-20 rounded bg-gray-200 dark:bg-gray-800" />
+        <Skeleton rounded="rounded-lg" className="h-5 w-16" />
+        <Skeleton className="h-4 w-20" />
       </div>
-      <div className="h-2 w-full rounded-full bg-gray-200 dark:bg-gray-800 mb-2" />
-      <div className="h-3 w-24 rounded bg-gray-200 dark:bg-gray-800" />
+      <Skeleton rounded="rounded-full" className="h-2 w-full mb-2" />
+      <Skeleton className="h-3 w-24" />
+    </div>
+  );
+}
+
+function DistributionalsLoadingSkeleton() {
+  return (
+    <div className="space-y-6">
+      {/* Stat cards */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        {Array.from({ length: 4 }).map((_, i) => (
+          <Skeleton key={i} rounded="rounded-xl" className="h-20" />
+        ))}
+      </div>
+      {/* View toggle */}
+      <Skeleton rounded="rounded-xl" className="h-9 w-48" />
+      {/* Requirement cards grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+        {Array.from({ length: 9 }).map((_, i) => (
+          <SkeletonCard key={i} />
+        ))}
+      </div>
     </div>
   );
 }
@@ -677,6 +699,11 @@ function EmptyState() {
 
 const DistributionalsView = ({ courses }: { courses: Course[] }) => {
   const [view, setView] = useState<"board" | "heatmap">("board");
+
+  // Data still resolving: render a polished skeleton instead of blank space.
+  if (!courses) {
+    return <DistributionalsLoadingSkeleton />;
+  }
 
   // Build distributional -> courses map
   const distMap: Record<string, Course[]> = {};

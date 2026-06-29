@@ -27,6 +27,47 @@ import MajorTipModal, {
   MajorTipHelpButton,
   resetMajorTipSeen,
 } from "./MajorTipModal";
+import { Skeleton } from "@/components/ui/Skeleton";
+
+function MajorProgressLoadingSkeleton() {
+  return (
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div className="space-y-2">
+          <Skeleton className="h-6 w-56" />
+          <Skeleton className="h-4 w-72" />
+        </div>
+        <Skeleton className="h-8 w-16" />
+      </div>
+      {/* Progress bar card */}
+      <div className="p-3 rounded-xl border border-gray-200 dark:border-gray-800/50 shadow-neu">
+        <Skeleton rounded="rounded-full" className="h-2 w-full" />
+        <Skeleton rounded="rounded-lg" className="h-6 w-44 mt-2" />
+      </div>
+      {/* Summary cards */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {Array.from({ length: 3 }).map((_, i) => (
+          <Skeleton key={i} rounded="rounded-xl" className="h-16" />
+        ))}
+      </div>
+      {/* Board columns */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {Array.from({ length: 3 }).map((_, c) => (
+          <div
+            key={c}
+            className="rounded-xl border border-gray-200 dark:border-gray-800/50 p-3 space-y-3"
+          >
+            <Skeleton rounded="rounded-lg" className="h-5 w-28" />
+            {Array.from({ length: 3 }).map((_, r) => (
+              <Skeleton key={r} rounded="rounded-xl" className="h-20" />
+            ))}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 /* =========================
    Requirement Modal (inline)
@@ -238,9 +279,13 @@ export default function MajorProgressView({
   const completedCredits = progress?.completedCredits;
   const inProgressCredits = progress?.inProgressCredits || 0;
   const totalCredits = progress?.totalCredits;
-  const completionPercentage = progress?.percentage;
-  const withInProgressPercentage =
-    progress?.inProgressPercentage || progress?.percentage;
+  // Clamp to 0-100 so the bar fill can never render empty (NaN) or overflow.
+  const clampPct = (n: number | undefined) =>
+    Math.min(100, Math.max(0, Number.isFinite(n) ? (n as number) : 0));
+  const completionPercentage = clampPct(progress?.percentage);
+  const withInProgressPercentage = clampPct(
+    progress?.inProgressPercentage ?? progress?.percentage,
+  );
 
   /* ---------------------------
      NORMALIZATION + DEDUPE (memoized)
@@ -544,6 +589,11 @@ export default function MajorProgressView({
     },
   ];
 
+  // Data not ready yet: show a skeleton instead of crashing on undefined stats.
+  if (!progress) {
+    return <MajorProgressLoadingSkeleton />;
+  }
+
   return (
     <div className="space-y-6 font-louize">
       {/* Header */}
@@ -569,15 +619,21 @@ export default function MajorProgressView({
       {/* Progress bar + Stats toggle - Compact neumorphic */}
       <div className="p-3 rounded-xl bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 border border-gray-200 dark:border-gray-800/50 shadow-neu">
         <div className="relative w-full bg-gray-200 dark:bg-gray-800/70 rounded-full h-2 overflow-hidden shadow-[inset_0_1px_2px_rgba(0,0,0,0.08)] dark:shadow-[inset_0_1px_2px_rgba(0,0,0,0.3)]">
+          {/* Lighter in-progress segment sits behind, only in the +In Progress view. */}
           {showInProgressStats && (
             <motion.div
+              key="inprogress-fill"
               initial={{ width: 0 }}
               animate={{ width: `${withInProgressPercentage}%` }}
               transition={{ duration: 1, ease: "easeOut" }}
               className="absolute inset-y-0 left-0 rounded-full bg-purple-300 dark:bg-purple-500/40"
             />
           )}
+          {/* Solid completed segment paints on top. Re-keyed per mode so it
+              always animates to the correct completed width, including the
+              Completed Only view where it is the only fill shown. */}
           <motion.div
+            key={showInProgressStats ? "completed-fill-ip" : "completed-fill-only"}
             initial={{ width: 0 }}
             animate={{ width: `${completionPercentage}%` }}
             transition={{ duration: 1, ease: "easeOut" }}

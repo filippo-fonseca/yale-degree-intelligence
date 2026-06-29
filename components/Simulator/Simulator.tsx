@@ -1041,6 +1041,11 @@ export default function Simulator({
                 >
                   <FiFolder size={13} />
                   My Plans
+                  {savedPlans.length > 0 && (
+                    <span className="ml-0.5 inline-flex items-center justify-center min-w-[1.1rem] h-[1.1rem] px-1 rounded-full text-[10px] font-semibold bg-blue-500/20 dark:bg-blue-400/20 text-blue-700 dark:text-blue-200 border border-blue-400/30 dark:border-blue-400/30">
+                      {savedPlans.length}
+                    </span>
+                  )}
                 </button>
                 <button
                   onClick={() => setShowSaveModal(true)}
@@ -1178,7 +1183,8 @@ export default function Simulator({
               <FiBookOpen className="text-violet-500 dark:text-violet-400 shrink-0" size={14} />
               <span>Course Pool</span>
               <span className="text-[11px] font-normal text-gray-400 dark:text-gray-500">
-                — remaining major courses
+                (quick add of courses relevant to your{" "}
+                {majorIds.length > 1 ? "majors" : "major"})
               </span>
               <div className="relative group">
                 <Info className="h-3.5 w-3.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors cursor-pointer" />
@@ -1370,10 +1376,10 @@ export default function Simulator({
                           className={`flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs select-none transition-all border relative group
                             ${
                               course.status === "completed"
-                                ? "bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-700/35"
+                                ? "bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-200 border-emerald-200 dark:border-emerald-700/50"
                                 : course.status === "in-progress"
-                                  ? "bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-700/35"
-                                  : "bg-violet-50 dark:bg-violet-900/15 text-violet-700 dark:text-violet-300 border-violet-200 dark:border-violet-700/35 hover:bg-violet-100 dark:hover:bg-violet-800/25 cursor-grab active:cursor-grabbing"
+                                  ? "bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-200 border-blue-200 dark:border-blue-700/50"
+                                  : "bg-violet-50 dark:bg-violet-950/60 text-violet-700 dark:text-violet-200 border-violet-200 dark:border-violet-700/50 hover:bg-violet-100 dark:hover:bg-violet-900/70 cursor-grab active:cursor-grabbing"
                             }`}
                         >
                           <div className="flex items-baseline gap-1 min-w-0">

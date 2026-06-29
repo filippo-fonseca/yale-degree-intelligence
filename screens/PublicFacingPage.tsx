@@ -1254,6 +1254,7 @@ export default function PublicFacingPage() {
                 h: "Company",
                 links: [
                   ["Team", "#team"],
+                  ["Changelog", "/changelog"],
                   ["Yale Daily News", YDN_URL],
                 ],
               },

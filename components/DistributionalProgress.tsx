@@ -1111,6 +1111,15 @@ const DistributionalsView = ({ courses }: { courses: Course[] }) => {
               <span className="text-gray-700 dark:text-gray-300 font-medium">Skills</span> require 2
               credits each in Quantitative Reasoning (QR) and Writing (WR).
             </p>
+            <p>
+              <span className="text-gray-700 dark:text-gray-300 font-medium">Single counting:</span>{" "}
+              a course tagged for more than one area or skill only counts toward{" "}
+              <span className="font-medium">one</span> of them.{" "}
+              <span className="font-medium text-purple-600 dark:text-purple-300">Auto</span> picks the
+              split that satisfies the most requirements; switch to{" "}
+              <span className="font-medium text-purple-600 dark:text-purple-300">Manual</span> to choose
+              each course's requirement yourself with the dropdowns on the cards.
+            </p>
             <p className="text-xs text-gray-400 dark:text-gray-500 mt-2">
               This data is based on your manual tagging. Always verify with your dean or DUS.
             </p>

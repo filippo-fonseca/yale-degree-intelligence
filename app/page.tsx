@@ -1273,6 +1273,7 @@ export default function Home() {
               <motion.button
                 whileTap={{ scale: 0.98 }}
                 onClick={() => setCommandPaletteOpen(true)}
+                data-tour="search"
                 title={sidebarExpanded ? undefined : "Search (⌘K)"}
                 className={`w-full flex items-center rounded-2xl border border-black/[0.06] dark:border-white/[0.08] bg-black/[0.02] dark:bg-white/[0.03] text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-black/[0.04] dark:hover:bg-white/[0.06] transition-colors ${
                   sidebarExpanded
@@ -1307,6 +1308,7 @@ export default function Home() {
                       handleTabChange(item.id);
                       void new Audio("/audio/pop.mp3").play().catch(() => null);
                     }}
+                    data-tour={`nav-${item.id}`}
                     title={sidebarExpanded ? undefined : item.label}
                     className={`relative w-full flex items-center px-3 py-3 text-left rounded-2xl transition-colors duration-200 ${
                       sidebarExpanded ? "justify-between" : "justify-center"
@@ -1353,6 +1355,7 @@ export default function Home() {
                 .map((item) => (
                   <motion.button
                     key={item.id}
+                    data-tour={`nav-${item.id}`}
                     title={sidebarExpanded ? undefined : item.label}
                     className={`w-full flex items-center px-3 py-3 text-left rounded-2xl transition-all duration-300 relative text-gray-400 dark:text-gray-600 cursor-not-allowed opacity-60 ${
                       sidebarExpanded ? "justify-between" : "justify-center"
@@ -1392,6 +1395,7 @@ export default function Home() {
                 .map((item) => (
                   <motion.button
                     key={item.id}
+                    data-tour={`nav-${item.id}`}
                     title={sidebarExpanded ? undefined : item.label}
                     className={`w-full flex items-center px-3 py-3 text-left rounded-2xl transition-all duration-300 relative text-gray-400 dark:text-gray-600 cursor-not-allowed opacity-60 ${
                       sidebarExpanded ? "justify-between" : "justify-center"

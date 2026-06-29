@@ -241,6 +241,16 @@ body {
   animation: border-spin 3s linear infinite;
 }
 
+@keyframes skeleton-shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.animate-skeleton-shimmer {
+  animation: skeleton-shimmer 1.4s ease-in-out infinite;
+}
+
 /* =========================================================
    Raycast-style landing ("rc-") — pink/magenta accent
    Light-mode base values + dark overrides. Scoped utilities

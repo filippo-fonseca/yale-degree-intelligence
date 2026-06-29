@@ -437,7 +437,7 @@ export default function FriendsTab({
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="flex flex-col items-center justify-center py-10 px-8 rounded-2xl bg-white dark:bg-gradient-to-br dark:from-gray-900/80 dark:via-gray-900/60 dark:to-gray-950/80 backdrop-blur-2xl border border-gray-200 dark:border-white/[0.08] shadow-[0_8px_48px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.08)] dark:ring-1 dark:ring-white/[0.05]"
+          className="flex flex-col items-center justify-center py-10 px-8 rounded-2xl bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/80 dark:via-gray-900/60 dark:to-gray-950/80 backdrop-blur-2xl border border-gray-200 dark:border-white/[0.08] shadow-[0_8px_48px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.08)] dark:ring-1 dark:ring-white/[0.05]"
         >
           {/* Icon */}
           <div className="relative mb-6">
@@ -874,7 +874,7 @@ export default function FriendsTab({
               <motion.div
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="flex flex-col items-center justify-center gap-4 py-12 px-6 rounded-xl bg-white dark:bg-gradient-to-br dark:from-gray-900/50 dark:via-gray-900/35 dark:to-gray-950/50 backdrop-blur-md border border-dashed border-gray-200 dark:border-white/[0.10] text-center"
+                className="flex flex-col items-center justify-center gap-4 py-12 px-6 rounded-xl bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/50 dark:via-gray-900/35 dark:to-gray-950/50 backdrop-blur-md border border-dashed border-gray-200 dark:border-white/[0.10] text-center"
               >
                 <div className="p-4 rounded-2xl bg-gray-100 dark:bg-white/[0.04] border border-gray-200 dark:border-white/[0.08]">
                   <FiUsers className="w-7 h-7 text-gray-300 dark:text-gray-500" />

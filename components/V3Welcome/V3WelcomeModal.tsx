@@ -12,6 +12,7 @@ import {
   Sparkles,
   ArrowRight,
 } from "lucide-react";
+import LogoIcon from "@/icons/LogoIcon";
 
 interface V3WelcomeModalProps {
   open: boolean;
@@ -136,9 +137,9 @@ export default function V3WelcomeModal({
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: 0.1, type: "spring", stiffness: 260 }}
-                className="mx-auto mb-4 inline-flex items-center justify-center h-12 w-12 rounded-2xl bg-gradient-to-br from-pink-500 via-purple-600 to-indigo-600 text-white shadow-[0_8px_28px_rgba(168,85,247,0.45)]"
+                className="mx-auto mb-4 inline-flex items-center justify-center h-14 w-14 rounded-2xl border border-black/[0.06] dark:border-white/[0.08] bg-gray-50 dark:bg-white/[0.06] shadow-[0_8px_28px_rgba(0,0,0,0.12)] dark:shadow-[0_8px_28px_rgba(0,0,0,0.4)]"
               >
-                <Sparkles className="h-6 w-6" />
+                <LogoIcon className="h-8 w-8" />
               </motion.div>
 
               <div className="flex items-center justify-center gap-2 flex-wrap">
@@ -151,8 +152,8 @@ export default function V3WelcomeModal({
               </div>
 
               <p className="mx-auto mt-2 max-w-md text-sm text-gray-500 dark:text-gray-400 leading-relaxed">
-                A big leap forward, faster, clearer, and more powerful. Here is
-                what is new.
+                A big leap forward. Faster, clearer, and more powerful. Here is
+                what is new:
               </p>
             </div>
 

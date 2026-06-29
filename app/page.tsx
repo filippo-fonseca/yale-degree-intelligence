@@ -149,6 +149,10 @@ export default function Home() {
   const [tourOpen, setTourOpen] = useState(false);
   const [onboardChecked, setOnboardChecked] = useState(false);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+  // Tracks whether the live profile subscription has resolved at least once.
+  // Kept separate from coursesLoading so we don't flash the new-user/empty
+  // state for returning users while their profile snapshot is still in-flight.
+  const [profileLoading, setProfileLoading] = useState(true);
   const isBrandNew = userProfile?.graduationYear === 2030;
 
   // NEW: state for confirming deletion of an in-progress course
@@ -165,6 +169,7 @@ export default function Home() {
   useEffect(() => {
     if (!user) {
       setCoursesLoading(false);
+      setProfileLoading(false);
       setCourses([]);
       setHasData(false);
       setFriendsEnabled(false);
@@ -324,6 +329,7 @@ export default function Home() {
   useEffect(() => {
     if (!user) return;
 
+    setProfileLoading(true);
     const unsub = onSnapshot(doc(db, "users", user.uid), (docSnap) => {
       if (docSnap.exists()) {
         const data = docSnap.data() as UserProfile;
@@ -334,6 +340,8 @@ export default function Home() {
         setUserProfile(null);
         setShowMajorSelection(true);
       }
+      // Profile snapshot has now resolved at least once.
+      setProfileLoading(false);
     });
     return () => unsub();
   }, [user]);
@@ -893,7 +901,8 @@ export default function Home() {
   //   void new Audio("/audio/pop.mp3").play().catch(() => null);
   // }, [activeTab, hasData]);
 
-  if (loading || (user && coursesLoading)) return <CustomLoader />;
+  if (loading || (user && (coursesLoading || profileLoading)))
+    return <CustomLoader />;
 
   if (!user) return <PublicFacingPage />;
 

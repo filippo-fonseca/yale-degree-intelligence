@@ -6,6 +6,7 @@ import { ThemeProvider } from "@/context/ThemeContext";
 import { Toaster } from "react-hot-toast";
 import Script from "next/script";
 import { Analytics } from "@vercel/analytics/next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 export const metadata: Metadata = {
   title: "Yale DegreeIntelligence",
@@ -139,6 +140,7 @@ export default function RootLayout({
               `}
             </Script>
             <Analytics />
+            <SpeedInsights />
           </body>
         </ThemeProvider>
       </AuthProvider>

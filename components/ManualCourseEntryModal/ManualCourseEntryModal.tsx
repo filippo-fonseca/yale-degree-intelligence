@@ -23,6 +23,26 @@ interface ManualCourseEntryModalProps {
   onClose: () => void;
   onSubmit: (courses: Omit<Course, "id">[]) => Promise<void>;
   userId: string;
+  /**
+   * Optional semester key (e.g. "Fall 2026") to preselect when opened from a
+   * specific semester header. When omitted, defaults to the current Fall term.
+   */
+  initialSemester?: string;
+}
+
+/** Split a "Fall 2026" style key into a valid {semester, year} default. */
+function parseInitialSemester(initialSemester?: string): {
+  semester: string;
+  year: number;
+} {
+  const fallback = { semester: "Fall", year: CURRENT_YEAR };
+  if (!initialSemester) return fallback;
+  const [sem, yearStr] = initialSemester.split(" ");
+  const year = parseInt(yearStr, 10);
+  return {
+    semester: SEMESTERS.includes(sem) ? sem : fallback.semester,
+    year: Number.isFinite(year) ? year : fallback.year,
+  };
 }
 
 const GRADES = [
@@ -40,6 +60,7 @@ export default function ManualCourseEntryModal({
   onClose,
   onSubmit,
   userId,
+  initialSemester,
 }: ManualCourseEntryModalProps) {
   const [entries, setEntries] = useState<ManualCourseEntry[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -80,14 +101,16 @@ export default function ManualCourseEntryModal({
 
   useEffect(() => {
     if (isOpen) {
-      // Start with one empty entry ready to go
+      // Start with one empty entry ready to go, preselecting the semester the
+      // add flow was launched from (if any).
+      const preselect = parseInitialSemester(initialSemester);
       const initialEntry: ManualCourseEntry = {
         id: `entry-${Date.now()}`,
         code: "",
         courseName: "",
         grade: "In Progress",
-        semester: "Fall",
-        year: CURRENT_YEAR,
+        semester: preselect.semester,
+        year: preselect.year,
         credits: 1,
         status: "in-progress",
         isCustom: false,
@@ -100,7 +123,7 @@ export default function ManualCourseEntryModal({
       setCustomCodeInput("");
       setCustomNameInput("");
     }
-  }, [isOpen]);
+  }, [isOpen, initialSemester]);
 
   useEffect(() => {
     if (searchingEntryId && searchInputRef.current) {

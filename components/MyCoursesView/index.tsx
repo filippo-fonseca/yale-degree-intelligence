@@ -60,7 +60,7 @@ export interface MyCoursesViewProps {
   } | null;
   isBrandNew: boolean;
   /** Handlers lifted from page.tsx */
-  onManualAdd: () => void;
+  onManualAdd: (semester?: string) => void;
   onReupload: () => void;
   onUploadSuccess: (text: string) => Promise<void>;
   onDeleteCourse: (course: Course) => Promise<void>;
@@ -83,6 +83,51 @@ function sortSemesters(a: string, b: string): number {
     (SEMESTER_ORDER[semA as keyof typeof SEMESTER_ORDER] ?? 99) -
     (SEMESTER_ORDER[semB as keyof typeof SEMESTER_ORDER] ?? 99)
   );
+}
+
+/**
+ * Theme-aware accent scheme for a semester header. Three visually distinct
+ * identities:
+ *   - in-progress  → violet/purple (matches --accent-purple), its own unmistakable accent
+ *   - Fall         → warm rust/orange (autumnal, deliberately NOT yellow)
+ *   - Spring       → fresh teal (new-growth), clearly distinct from both
+ * `season` is the leading token of the semester key (e.g. "Fall 2026").
+ */
+function getSemesterAccent(
+  season: string,
+  isInProgress: boolean,
+): {
+  bar: string;
+  title: string;
+  count: string;
+  chip: string;
+} {
+  if (isInProgress) {
+    return {
+      bar: "bg-violet-500 dark:bg-violet-400",
+      title:
+        "text-violet-700 dark:text-violet-200 group-hover:text-violet-800 dark:group-hover:text-violet-100",
+      count: "text-violet-400 dark:text-violet-500/70",
+      chip: "bg-violet-500/15 border-violet-500/30 text-violet-600 dark:text-violet-300 hover:border-violet-500/50 hover:text-violet-700 dark:hover:text-violet-200",
+    };
+  }
+  if (season === "Spring") {
+    return {
+      bar: "bg-teal-500 dark:bg-teal-400",
+      title:
+        "text-teal-700 dark:text-teal-200 group-hover:text-teal-800 dark:group-hover:text-teal-100",
+      count: "text-teal-500/70 dark:text-teal-500/60",
+      chip: "bg-teal-500/15 border-teal-500/30 text-teal-600 dark:text-teal-300 hover:border-teal-500/50 hover:text-teal-700 dark:hover:text-teal-200",
+    };
+  }
+  // Fall (and any non-Spring, non-in-progress term) → warm rust/orange, never yellow.
+  return {
+    bar: "bg-orange-600 dark:bg-orange-500",
+    title:
+      "text-orange-700 dark:text-orange-300 group-hover:text-orange-800 dark:group-hover:text-orange-200",
+    count: "text-orange-500/70 dark:text-orange-500/60",
+    chip: "bg-orange-600/15 border-orange-600/30 text-orange-700 dark:text-orange-300 hover:border-orange-600/50 hover:text-orange-800 dark:hover:text-orange-200",
+  };
 }
 
 function computeStats(courses: Course[]) {
@@ -357,7 +402,7 @@ export default function MyCoursesView({
         <div className="flex items-center gap-2 shrink-0">
           <motion.button
             whileHover={{ y: -1 }}
-            onClick={onManualAdd}
+            onClick={() => onManualAdd()}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gray-100 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700/50 hover:border-pink-500/40 hover:bg-gray-200 dark:hover:bg-gray-800 text-gray-500 dark:text-gray-400 hover:text-pink-600 dark:hover:text-pink-300 transition-all text-sm"
             title="Add courses manually"
           >
@@ -509,6 +554,8 @@ export default function MyCoursesView({
             {semesterGroups.map(([semester, semCourses]) => {
               const isCollapsed = collapsedSemesters.has(semester);
               const hasInProgress = semesterHasInProgress(semester);
+              const season = semester.split(" ")[0];
+              const accent = getSemesterAccent(season, hasInProgress);
 
               return (
                 <motion.div
@@ -517,33 +564,59 @@ export default function MyCoursesView({
                   animate={{ opacity: 1 }}
                   className="mb-6"
                 >
-                  <button
-                    onClick={() => toggleSemesterCollapse(semester)}
-                    className="w-full flex items-center justify-between mb-3 group"
-                  >
-                    <div className="flex items-center gap-2">
-                      <h3 className="text-base font-medium text-gray-700 dark:text-gray-300 group-hover:text-gray-900 dark:group-hover:text-white transition-colors">
-                        {semester}
-                      </h3>
-                      {hasInProgress && (
-                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-purple-500/20 border border-purple-500/30 text-purple-600 dark:text-purple-300">
-                          <span className="w-1 h-1 rounded-full bg-purple-400 animate-pulse" />
-                          In Progress
-                        </span>
-                      )}
-                      <span className="text-xs text-gray-400 dark:text-gray-600">
-                        {semCourses.length} course
-                        {semCourses.length !== 1 ? "s" : ""}
-                      </span>
-                    </div>
-                    <motion.div
-                      animate={{ rotate: isCollapsed ? 0 : 180 }}
-                      transition={{ duration: 0.2 }}
-                      className="p-1 rounded-md text-gray-500 group-hover:text-gray-700 dark:group-hover:text-gray-300 group-hover:bg-black/[0.04] dark:group-hover:bg-white/[0.05] transition-all"
+                  {/* Header row: collapse toggle + add-course button as siblings
+                      (never a button nested in a button). */}
+                  <div className="flex items-center justify-between mb-3 gap-2">
+                    <button
+                      onClick={() => toggleSemesterCollapse(semester)}
+                      className="flex-1 min-w-0 flex items-center justify-between group"
+                      aria-expanded={!isCollapsed}
+                      aria-label={`${isCollapsed ? "Expand" : "Collapse"} ${semester}`}
                     >
-                      <FiChevronDown size={16} />
-                    </motion.div>
-                  </button>
+                      <div className="flex items-center gap-2 min-w-0">
+                        <span
+                          className={`w-1 h-4 rounded-full shrink-0 ${accent.bar}`}
+                          aria-hidden="true"
+                        />
+                        <h3
+                          className={`text-base font-medium transition-colors ${accent.title}`}
+                        >
+                          {semester}
+                        </h3>
+                        {hasInProgress && (
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-violet-500/20 border border-violet-500/30 text-violet-600 dark:text-violet-300">
+                            <span className="w-1 h-1 rounded-full bg-violet-400 animate-pulse" />
+                            In Progress
+                          </span>
+                        )}
+                        <span className={`text-xs ${accent.count}`}>
+                          {semCourses.length} course
+                          {semCourses.length !== 1 ? "s" : ""}
+                        </span>
+                      </div>
+                      <motion.div
+                        animate={{ rotate: isCollapsed ? 0 : 180 }}
+                        transition={{ duration: 0.2 }}
+                        className="p-1 rounded-md text-gray-500 group-hover:text-gray-700 dark:group-hover:text-gray-300 group-hover:bg-black/[0.04] dark:group-hover:bg-white/[0.05] transition-all"
+                      >
+                        <FiChevronDown size={16} />
+                      </motion.div>
+                    </button>
+                    <motion.button
+                      whileHover={{ y: -1 }}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onManualAdd(semester);
+                      }}
+                      data-add-semester={semester}
+                      aria-label={`Add a course to ${semester}`}
+                      title={`Add a course to ${semester}`}
+                      className={`shrink-0 flex items-center gap-1 px-2 py-1 rounded-lg border bg-transparent transition-all text-xs ${accent.chip}`}
+                    >
+                      <FiPlus size={13} />
+                      <span className="hidden sm:inline">Add course</span>
+                    </motion.button>
+                  </div>
 
                   <AnimatePresence initial={false}>
                     {!isCollapsed && (

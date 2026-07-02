@@ -225,6 +225,14 @@ export default function Home() {
 
   const [showUpdateModal, setShowUpdateModal] = useState(false);
   const [showManualEntryModal, setShowManualEntryModal] = useState(false);
+  // When the manual-add flow is opened from a specific semester header, this
+  // holds that semester key (e.g. "Fall 2026") so the modal can preselect it.
+  const [manualEntryPreselectSemester, setManualEntryPreselectSemester] =
+    useState<string | undefined>(undefined);
+  const openManualEntry = (semester?: string) => {
+    setManualEntryPreselectSemester(semester);
+    setShowManualEntryModal(true);
+  };
   const [showSharedCoursesDropdown, setShowSharedCoursesDropdown] =
     useState(false);
   const sharedCoursesRef = useRef<HTMLDivElement>(null);
@@ -1527,7 +1535,7 @@ export default function Home() {
                     coursesLoading={coursesLoading}
                     user={user}
                     isBrandNew={isBrandNew}
-                    onManualAdd={() => setShowManualEntryModal(true)}
+                    onManualAdd={openManualEntry}
                     onReupload={() => setShowUpdateModal(true)}
                     onUploadSuccess={parseAndStoreCourses}
                     onDeleteCourse={async (course) => {
@@ -1629,9 +1637,13 @@ export default function Home() {
               {/* Manual Course Entry Modal */}
               <ManualCourseEntryModal
                 isOpen={showManualEntryModal}
-                onClose={() => setShowManualEntryModal(false)}
+                onClose={() => {
+                  setShowManualEntryModal(false);
+                  setManualEntryPreselectSemester(undefined);
+                }}
                 onSubmit={handleManualCourseEntry}
                 userId={user?.uid || ""}
+                initialSemester={manualEntryPreselectSemester}
               />
 
               {activeTab === "stats" && (

@@ -1357,7 +1357,7 @@ export default function PublicFacingPage() {
             title="From transcript to plan in minutes."
             sub="No setup, no spreadsheets. Sign in with CAS and your whole degree assembles itself."
           />
-          <div className="mt-16 grid items-start gap-10 lg:grid-cols-2">
+          <div className="mt-16 grid items-start gap-10 lg:grid-cols-2 lg:items-center">
             <div className="lg:sticky lg:top-28">
               <div className="rc-window rounded-2xl">
                 <BrowserChrome url="degreeint.com/simulator">

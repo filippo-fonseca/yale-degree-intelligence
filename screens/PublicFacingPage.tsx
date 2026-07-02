@@ -1004,7 +1004,7 @@ function Navbar({ onLogin }: { onLogin: () => void }) {
     >
       <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-6">
         <Link href="#top" className="flex items-center">
-          <CompoundLogo animated size="sm" darkAlways />
+          <CompoundLogo animated size="sm" />
         </Link>
 
         <div className="hidden items-center gap-7 md:flex">

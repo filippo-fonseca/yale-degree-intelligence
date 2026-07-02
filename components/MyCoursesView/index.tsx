@@ -60,7 +60,7 @@ export interface MyCoursesViewProps {
   } | null;
   isBrandNew: boolean;
   /** Handlers lifted from page.tsx */
-  onManualAdd: () => void;
+  onManualAdd: (semester?: string) => void;
   onReupload: () => void;
   onUploadSuccess: (text: string) => Promise<void>;
   onDeleteCourse: (course: Course) => Promise<void>;
@@ -357,7 +357,7 @@ export default function MyCoursesView({
         <div className="flex items-center gap-2 shrink-0">
           <motion.button
             whileHover={{ y: -1 }}
-            onClick={onManualAdd}
+            onClick={() => onManualAdd()}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gray-100 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700/50 hover:border-pink-500/40 hover:bg-gray-200 dark:hover:bg-gray-800 text-gray-500 dark:text-gray-400 hover:text-pink-600 dark:hover:text-pink-300 transition-all text-sm"
             title="Add courses manually"
           >
@@ -517,33 +517,53 @@ export default function MyCoursesView({
                   animate={{ opacity: 1 }}
                   className="mb-6"
                 >
-                  <button
-                    onClick={() => toggleSemesterCollapse(semester)}
-                    className="w-full flex items-center justify-between mb-3 group"
-                  >
-                    <div className="flex items-center gap-2">
-                      <h3 className="text-base font-medium text-gray-700 dark:text-gray-300 group-hover:text-gray-900 dark:group-hover:text-white transition-colors">
-                        {semester}
-                      </h3>
-                      {hasInProgress && (
-                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-purple-500/20 border border-purple-500/30 text-purple-600 dark:text-purple-300">
-                          <span className="w-1 h-1 rounded-full bg-purple-400 animate-pulse" />
-                          In Progress
-                        </span>
-                      )}
-                      <span className="text-xs text-gray-400 dark:text-gray-600">
-                        {semCourses.length} course
-                        {semCourses.length !== 1 ? "s" : ""}
-                      </span>
-                    </div>
-                    <motion.div
-                      animate={{ rotate: isCollapsed ? 0 : 180 }}
-                      transition={{ duration: 0.2 }}
-                      className="p-1 rounded-md text-gray-500 group-hover:text-gray-700 dark:group-hover:text-gray-300 group-hover:bg-black/[0.04] dark:group-hover:bg-white/[0.05] transition-all"
+                  {/* Header row: collapse toggle + add-course button as siblings
+                      (never a button nested in a button). */}
+                  <div className="flex items-center justify-between mb-3 gap-2">
+                    <button
+                      onClick={() => toggleSemesterCollapse(semester)}
+                      className="flex-1 min-w-0 flex items-center justify-between group"
+                      aria-expanded={!isCollapsed}
+                      aria-label={`${isCollapsed ? "Expand" : "Collapse"} ${semester}`}
                     >
-                      <FiChevronDown size={16} />
-                    </motion.div>
-                  </button>
+                      <div className="flex items-center gap-2 min-w-0">
+                        <h3 className="text-base font-medium text-gray-700 dark:text-gray-300 group-hover:text-gray-900 dark:group-hover:text-white transition-colors">
+                          {semester}
+                        </h3>
+                        {hasInProgress && (
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-purple-500/20 border border-purple-500/30 text-purple-600 dark:text-purple-300">
+                            <span className="w-1 h-1 rounded-full bg-purple-400 animate-pulse" />
+                            In Progress
+                          </span>
+                        )}
+                        <span className="text-xs text-gray-400 dark:text-gray-600">
+                          {semCourses.length} course
+                          {semCourses.length !== 1 ? "s" : ""}
+                        </span>
+                      </div>
+                      <motion.div
+                        animate={{ rotate: isCollapsed ? 0 : 180 }}
+                        transition={{ duration: 0.2 }}
+                        className="p-1 rounded-md text-gray-500 group-hover:text-gray-700 dark:group-hover:text-gray-300 group-hover:bg-black/[0.04] dark:group-hover:bg-white/[0.05] transition-all"
+                      >
+                        <FiChevronDown size={16} />
+                      </motion.div>
+                    </button>
+                    <motion.button
+                      whileHover={{ y: -1 }}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onManualAdd(semester);
+                      }}
+                      data-add-semester={semester}
+                      aria-label={`Add a course to ${semester}`}
+                      title={`Add a course to ${semester}`}
+                      className="shrink-0 flex items-center gap-1 px-2 py-1 rounded-lg border bg-transparent border-gray-200 dark:border-gray-700/50 text-gray-500 dark:text-gray-400 hover:border-pink-500/40 hover:text-pink-600 dark:hover:text-pink-300 transition-all text-xs"
+                    >
+                      <FiPlus size={13} />
+                      <span className="hidden sm:inline">Add course</span>
+                    </motion.button>
+                  </div>
 
                   <AnimatePresence initial={false}>
                     {!isCollapsed && (

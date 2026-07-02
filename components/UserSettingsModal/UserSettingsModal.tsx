@@ -54,6 +54,10 @@ interface UserSettingsModalProps {
   onLogout: () => void;
   onDeleteAccount: () => Promise<void>;
   onReplayTour?: () => void;
+  /** Dev-only: reset both onboarding flags and replay the new-user welcome. */
+  onReplayWelcome?: () => void;
+  /** Dev-only: reset the tutorial flag and replay the guided tour. */
+  onReplayTutorial?: () => void;
 }
 
 export default function UserSettingsModal({
@@ -66,9 +70,13 @@ export default function UserSettingsModal({
   onLogout,
   onDeleteAccount,
   onReplayTour,
+  onReplayWelcome,
+  onReplayTutorial,
 }: UserSettingsModalProps) {
   const { resolvedTheme, toggleTheme } = useTheme();
   const isDark = resolvedTheme === "dark";
+  // Owner-gated dev tools. Mirrors the exception in context/AuthContext.tsx.
+  const isOwner = user.email === "filifonsecacagnazzo@gmail.com";
   const [isHoveringLogout, setIsHoveringLogout] = useState(false);
   const [localProfile, setLocalProfile] = useState<UserProfile | null>(null);
   const [duplicateMajorError, setDuplicateMajorError] = useState<string | null>(
@@ -1051,6 +1059,43 @@ export default function UserSettingsModal({
               </div>
             </div>
           </div>
+
+          {/* Owner-only dev tools. Replays onboarding by flipping the two
+              boolean flags on users/{uid}. Does NOT delete plans or courses. */}
+          {isOwner && (onReplayWelcome || onReplayTutorial) && (
+            <div className="mt-4 rounded-xl border border-amber-400/30 bg-amber-50/60 dark:border-amber-400/20 dark:bg-amber-500/[0.06] px-3.5 py-3">
+              <div className="flex items-center gap-1.5">
+                <span className="text-[9px] font-semibold uppercase tracking-widest text-amber-600 dark:text-amber-400">
+                  Dev
+                </span>
+                <span className="text-[10px] font-medium text-amber-700/80 dark:text-amber-300/70">
+                  Onboarding replay
+                </span>
+              </div>
+              <div className="mt-2 flex flex-wrap gap-1.5">
+                {onReplayWelcome && (
+                  <button
+                    onClick={onReplayWelcome}
+                    className="cursor-pointer text-[11px] px-2.5 py-1.5 rounded-lg border border-amber-400/40 bg-white/70 dark:bg-white/[0.04] hover:border-amber-500/70 hover:bg-amber-100/60 dark:hover:bg-amber-500/10 text-amber-700 dark:text-amber-300 transition-all duration-200"
+                  >
+                    Replay welcome + tutorial (new-user v3)
+                  </button>
+                )}
+                {onReplayTutorial && (
+                  <button
+                    onClick={onReplayTutorial}
+                    className="cursor-pointer text-[11px] px-2.5 py-1.5 rounded-lg border border-amber-400/40 bg-white/70 dark:bg-white/[0.04] hover:border-amber-500/70 hover:bg-amber-100/60 dark:hover:bg-amber-500/10 text-amber-700 dark:text-amber-300 transition-all duration-200"
+                  >
+                    Replay tutorial only
+                  </button>
+                )}
+              </div>
+              <p className="mt-2 text-[10px] leading-relaxed text-amber-700/70 dark:text-amber-300/60">
+                Dev only. Resets onboarding flags. Does not delete plans or
+                courses.
+              </p>
+            </div>
+          )}
 
           {/* Actions */}
           <div className="flex justify-between mt-3">

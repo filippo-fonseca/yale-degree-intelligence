@@ -981,6 +981,25 @@ export default function Home() {
             setShowSettings(false);
             setTourOpen(true);
           }}
+          onReplayWelcome={() => {
+            // Dev-only: replay the full new-user v3 flow. Resets BOTH onboarding
+            // booleans on users/{uid} and re-opens the welcome modal immediately.
+            // This ONLY flips flags; it never touches plans or courses.
+            if (user) {
+              void setUserFlag(user.uid, "hasSeenV3Welcome", false);
+              void setUserFlag(user.uid, "hasSeenTutorial", false);
+            }
+            setShowSettings(false);
+            setTourOpen(false);
+            setWelcomeOpen(true);
+          }}
+          onReplayTutorial={() => {
+            // Dev-only: reset just the tutorial flag and re-open the tour.
+            if (user) void setUserFlag(user.uid, "hasSeenTutorial", false);
+            setShowSettings(false);
+            setWelcomeOpen(false);
+            setTourOpen(true);
+          }}
           onLogout={() => {
             setShowSettings(false);
             setActiveTab("upload");

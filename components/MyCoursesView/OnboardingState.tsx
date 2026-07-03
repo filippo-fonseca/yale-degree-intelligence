@@ -92,6 +92,7 @@ export function OnboardingState({
       {/* Upload Area */}
       <div
         id="upload-transcript"
+        data-tour="courses-upload-dropzone"
         className="w-full max-w-xl p-6 rounded-xl bg-gradient-to-br from-gray-50/90 via-white/80 to-gray-100/90 dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 backdrop-blur-md border border-gray-200/80 dark:border-gray-800/50 shadow-[inset_0_1px_0_rgba(255,255,255,0.04),0_4px_16px_rgba(0,0,0,0.08)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.04),0_4px_16px_rgba(0,0,0,0.25)]"
       >
         <FileUpload onSuccess={onUploadSuccess} />
@@ -103,6 +104,7 @@ export function OnboardingState({
           Prefer to type in your courses manually?{" "}
           <button
             onClick={onManualEntry}
+            data-tour="courses-empty-manual-add"
             className="text-pink-600 dark:text-pink-400 hover:text-pink-700 dark:hover:text-pink-300 underline underline-offset-2 transition-colors"
           >
             Click here

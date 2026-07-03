@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   FiPlus,
@@ -85,6 +85,23 @@ function sortSemesters(a: string, b: string): number {
   );
 }
 
+function getDefaultOpenSemesters(
+  semesterGroups: [string, Course[]][],
+): string[] {
+  const inProgressSemesters = semesterGroups
+    .filter(([, semCourses]) =>
+      semCourses.some((c) => c.status === "in-progress" && !c.skipped),
+    )
+    .map(([semester]) => semester);
+
+  if (inProgressSemesters.length > 0) {
+    return inProgressSemesters;
+  }
+
+  const mostRecent = semesterGroups[0]?.[0];
+  return mostRecent ? [mostRecent] : [];
+}
+
 /**
  * Theme-aware accent scheme for a semester header. Three visually distinct
  * identities:
@@ -167,6 +184,11 @@ function computeStats(courses: Course[]) {
 type SortKey = "semester" | "code" | "grade" | "credits";
 type StatusFilter = "all" | "completed" | "in-progress" | "skipped";
 
+interface SemesterOpenPrefs {
+  openSemesters: string[];
+  knownSemesters: string[];
+}
+
 /* ------------------------------------------------------------------ */
 /*  Main component                                                      */
 /* ------------------------------------------------------------------ */
@@ -205,6 +227,11 @@ export default function MyCoursesView({
   const [semesterFilter, setSemesterFilter] = useState<string>("all");
   const [sortKey, setSortKey] = useState<SortKey>("semester");
   const [sortAsc, setSortAsc] = useState(true);
+  const [loadedSemesterStorageKey, setLoadedSemesterStorageKey] = useState<
+    string | null
+  >(null);
+  const [activeSemester, setActiveSemester] = useState<string | null>(null);
+  const semesterSectionRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
   /* ---------- derived stats ---------- */
   const stats = useMemo(() => computeStats(courses), [courses]);
@@ -215,7 +242,7 @@ export default function MyCoursesView({
       new Set(
         courses.filter((c) => !c.skipped).map((c) => `${c.semester} ${c.year}`),
       ),
-    ).sort(sortSemesters);
+    ).sort((a, b) => sortSemesters(b, a));
     return keys;
   }, [courses]);
 
@@ -290,11 +317,120 @@ export default function MyCoursesView({
       map.get(key)!.push(c);
     }
 
-    const sorted = Array.from(map.entries()).sort(([a], [b]) =>
-      sortSemesters(a, b),
+    const sorted = Array.from(map.entries()).sort(
+      ([a], [b]) => sortSemesters(b, a),
     );
     return sorted;
   }, [filteredCourses, groupBySemester]);
+
+  const semesterStorageKey = useMemo(
+    () => `ydi:my-courses:open-semesters:${user?.uid ?? "anonymous"}`,
+    [user?.uid],
+  );
+
+  const defaultOpenSemesterSet = useMemo(
+    () => new Set(semesterGroups ? getDefaultOpenSemesters(semesterGroups) : []),
+    [semesterGroups],
+  );
+
+  const defaultActiveSemester = useMemo(() => {
+    if (!semesterGroups) return null;
+    return (
+      getDefaultOpenSemesters(semesterGroups)[0] ?? semesterGroups[0]?.[0] ?? null
+    );
+  }, [semesterGroups]);
+
+  useEffect(() => {
+    if (!semesterGroups) return;
+
+    const semesterKeys = semesterGroups.map(([semester]) => semester);
+    const semesterKeySet = new Set(semesterKeys);
+    let openSemesters: string[] | null = null;
+    let knownSemesters: string[] | null = null;
+
+    try {
+      const raw = window.localStorage.getItem(semesterStorageKey);
+      if (raw) {
+        const parsed = JSON.parse(raw) as SemesterOpenPrefs | string[];
+        if (Array.isArray(parsed)) {
+          openSemesters = parsed;
+        } else if (
+          parsed &&
+          Array.isArray(parsed.openSemesters) &&
+          Array.isArray(parsed.knownSemesters)
+        ) {
+          openSemesters = parsed.openSemesters;
+          knownSemesters = parsed.knownSemesters;
+        }
+      }
+    } catch {
+      openSemesters = null;
+      knownSemesters = null;
+    }
+
+    let nextOpen = new Set(
+      (openSemesters ?? getDefaultOpenSemesters(semesterGroups)).filter((key) =>
+        semesterKeySet.has(key),
+      ),
+    );
+
+    if (knownSemesters) {
+      const knownSet = new Set(knownSemesters);
+      for (const [semester, semCourses] of semesterGroups) {
+        if (
+          !knownSet.has(semester) &&
+          semCourses.some((c) => c.status === "in-progress" && !c.skipped)
+        ) {
+          nextOpen.add(semester);
+        }
+      }
+    }
+
+    setCollapsedSemesters(
+      new Set(semesterKeys.filter((semester) => !nextOpen.has(semester))),
+    );
+    setLoadedSemesterStorageKey(semesterStorageKey);
+  }, [semesterGroups, semesterStorageKey]);
+
+  useEffect(() => {
+    if (!semesterGroups || semesterGroups.length === 0) {
+      setActiveSemester(null);
+      return;
+    }
+
+    const visibleSemesters = new Set(
+      semesterGroups.map(([semester]) => semester),
+    );
+    if (!activeSemester || !visibleSemesters.has(activeSemester)) {
+      setActiveSemester(defaultActiveSemester);
+    }
+  }, [activeSemester, defaultActiveSemester, semesterGroups]);
+
+  useEffect(() => {
+    if (loadedSemesterStorageKey !== semesterStorageKey || !semesterGroups) {
+      return;
+    }
+
+    const semesterKeys = semesterGroups.map(([semester]) => semester);
+    const openSemesters = semesterKeys.filter(
+      (semester) => !collapsedSemesters.has(semester),
+    );
+    const prefs: SemesterOpenPrefs = {
+      openSemesters,
+      knownSemesters: semesterKeys,
+    };
+
+    try {
+      window.localStorage.setItem(semesterStorageKey, JSON.stringify(prefs));
+    } catch {
+      // Ignore storage failures; the UI should still work normally.
+    }
+  }, [
+    collapsedSemesters,
+    loadedSemesterStorageKey,
+    semesterGroups,
+    semesterStorageKey,
+  ]);
 
   const skippedCourses = useMemo(
     () =>
@@ -312,6 +448,23 @@ export default function MyCoursesView({
       const next = new Set(prev);
       next.has(key) ? next.delete(key) : next.add(key);
       return next;
+    });
+    setActiveSemester(key);
+  };
+
+  const jumpToSemester = (key: string) => {
+    setActiveSemester(key);
+    setCollapsedSemesters((prev) => {
+      const next = new Set(prev);
+      next.delete(key);
+      return next;
+    });
+
+    window.requestAnimationFrame(() => {
+      semesterSectionRefs.current[key]?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
     });
   };
 
@@ -403,6 +556,7 @@ export default function MyCoursesView({
           <motion.button
             whileHover={{ y: -1 }}
             onClick={() => onManualAdd()}
+            data-tour="courses-manual-add"
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gray-100 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700/50 hover:border-pink-500/40 hover:bg-gray-200 dark:hover:bg-gray-800 text-gray-500 dark:text-gray-400 hover:text-pink-600 dark:hover:text-pink-300 transition-all text-sm"
             title="Add courses manually"
           >
@@ -412,6 +566,7 @@ export default function MyCoursesView({
           <motion.button
             whileHover={{ y: -1 }}
             onClick={onReupload}
+            data-tour="courses-reupload"
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gray-100 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700/50 hover:border-blue-500/40 hover:bg-gray-200 dark:hover:bg-gray-800 text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-300 transition-all text-sm"
           >
             <FiRefreshCw size={14} />
@@ -550,115 +705,177 @@ export default function MyCoursesView({
       <div className="space-y-8">
         {groupBySemester && semesterGroups ? (
           /* Grouped by semester */
-          <>
-            {semesterGroups.map(([semester, semCourses]) => {
-              const isCollapsed = collapsedSemesters.has(semester);
-              const hasInProgress = semesterHasInProgress(semester);
-              const season = semester.split(" ")[0];
-              const accent = getSemesterAccent(season, hasInProgress);
+          <div className="grid gap-5 lg:grid-cols-[10rem_minmax(0,1fr)] items-start">
+            <aside className="lg:sticky lg:top-24 lg:self-start">
+              <div className="flex lg:block gap-2 overflow-x-auto lg:overflow-visible pb-2 lg:pb-0 -mx-1 px-1 lg:mx-0 lg:px-0">
+                {semesterGroups.map(([semester, semCourses]) => {
+                  const hasInProgress = semesterHasInProgress(semester);
+                  const season = semester.split(" ")[0];
+                  const accent = getSemesterAccent(season, hasInProgress);
+                  const isActive =
+                    (activeSemester ?? defaultActiveSemester) === semester;
 
-              return (
-                <motion.div
-                  key={semester}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  className="mb-6"
-                >
-                  {/* Header row: collapse toggle + add-course button as siblings
-                      (never a button nested in a button). */}
-                  <div className="flex items-center justify-between mb-3 gap-2">
+                  return (
                     <button
-                      onClick={() => toggleSemesterCollapse(semester)}
-                      className="flex-1 min-w-0 flex items-center justify-between group"
-                      aria-expanded={!isCollapsed}
-                      aria-label={`${isCollapsed ? "Expand" : "Collapse"} ${semester}`}
+                      key={semester}
+                      type="button"
+                      onClick={() => jumpToSemester(semester)}
+                      aria-current={isActive ? "true" : undefined}
+                      className={`group shrink-0 lg:w-full min-w-[8.75rem] lg:min-w-0 text-left px-3 py-2 rounded-lg border transition-all ${
+                        isActive
+                          ? "bg-white dark:bg-gray-900/70 border-pink-400/60 dark:border-pink-400/50 shadow-sm"
+                          : "bg-gray-50/70 dark:bg-gray-950/20 border-gray-200/70 dark:border-gray-800/50 hover:border-gray-300 dark:hover:border-gray-700"
+                      } ${semesterGroups.length > 1 ? "lg:mb-2" : ""}`}
                     >
                       <div className="flex items-center gap-2 min-w-0">
                         <span
-                          className={`w-1 h-4 rounded-full shrink-0 ${accent.bar}`}
+                          className={`w-1 h-5 rounded-full shrink-0 ${accent.bar}`}
                           aria-hidden="true"
                         />
-                        <h3
-                          className={`text-base font-medium transition-colors ${accent.title}`}
-                        >
-                          {semester}
-                        </h3>
-                        {hasInProgress && (
-                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-violet-500/20 border border-violet-500/30 text-violet-600 dark:text-violet-300">
-                            <span className="w-1 h-1 rounded-full bg-violet-400 animate-pulse" />
-                            In Progress
-                          </span>
-                        )}
-                        <span className={`text-xs ${accent.count}`}>
-                          {semCourses.length} course
-                          {semCourses.length !== 1 ? "s" : ""}
-                        </span>
-                      </div>
-                      <motion.div
-                        animate={{ rotate: isCollapsed ? 0 : 180 }}
-                        transition={{ duration: 0.2 }}
-                        className="p-1 rounded-md text-gray-500 group-hover:text-gray-700 dark:group-hover:text-gray-300 group-hover:bg-black/[0.04] dark:group-hover:bg-white/[0.05] transition-all"
-                      >
-                        <FiChevronDown size={16} />
-                      </motion.div>
-                    </button>
-                    <motion.button
-                      whileHover={{ y: -1 }}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onManualAdd(semester);
-                      }}
-                      data-add-semester={semester}
-                      aria-label={`Add a course to ${semester}`}
-                      title={`Add a course to ${semester}`}
-                      className={`shrink-0 flex items-center gap-1 px-2 py-1 rounded-lg border bg-transparent transition-all text-xs ${accent.chip}`}
-                    >
-                      <FiPlus size={13} />
-                      <span className="hidden sm:inline">Add course</span>
-                    </motion.button>
-                  </div>
-
-                  <AnimatePresence initial={false}>
-                    {!isCollapsed && (
-                      <motion.div
-                        initial={{ height: 0, opacity: 0 }}
-                        animate={{ height: "auto", opacity: 1 }}
-                        exit={{ height: 0, opacity: 0 }}
-                        transition={{ duration: 0.2, ease: "easeInOut" }}
-                        className="overflow-hidden"
-                      >
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                          {semCourses.map((course, idx) => (
-                            <CourseCard
-                              key={course.id || `${course.code}-${idx}`}
-                              course={course}
-                              distSelectorCourseId={distSelectorCourseId}
-                              onCardClick={openCourseModal}
-                              onDeleteClick={openDeleteConfirm}
-                              onDistSelectorToggle={(id) =>
-                                setDistSelectorCourseId((prev) =>
-                                  prev === id ? null : id,
-                                )
-                              }
-                              onToggleDistributional={onToggleDistributional}
-                            />
-                          ))}
+                        <div className="min-w-0">
+                          <p
+                            className={`truncate text-xs font-medium ${
+                              isActive
+                                ? "text-gray-900 dark:text-white"
+                                : "text-gray-600 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-gray-200"
+                            }`}
+                          >
+                            {semester}
+                          </p>
+                          <p className="text-[10px] text-gray-400 dark:text-gray-500">
+                            {semCourses.length} course
+                            {semCourses.length !== 1 ? "s" : ""}
+                          </p>
                         </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </motion.div>
-              );
-            })}
+                        {hasInProgress && (
+                          <span
+                            className="ml-auto w-1.5 h-1.5 rounded-full bg-violet-400 shrink-0"
+                            aria-label="In progress"
+                          />
+                        )}
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            </aside>
 
-            {/* Skipped courses section */}
-            {skippedCourses.length > 0 && (
-              <SkippedSection
-                courses={skippedCourses}
-                hasMultipleMajors={false}
-              />
-            )}
-          </>
+            <div className="min-w-0 space-y-6">
+              {semesterGroups.map(([semester, semCourses]) => {
+                const isCollapsed =
+                  loadedSemesterStorageKey === semesterStorageKey
+                    ? collapsedSemesters.has(semester)
+                    : !defaultOpenSemesterSet.has(semester);
+                const hasInProgress = semesterHasInProgress(semester);
+                const season = semester.split(" ")[0];
+                const accent = getSemesterAccent(season, hasInProgress);
+
+                return (
+                  <motion.div
+                    key={semester}
+                    ref={(node) => {
+                      semesterSectionRefs.current[semester] = node;
+                    }}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    className="scroll-mt-28"
+                  >
+                    {/* Header row: collapse toggle + add-course button as siblings
+                        (never a button nested in a button). */}
+                    <div className="flex items-center justify-between mb-3 gap-2">
+                      <button
+                        onClick={() => toggleSemesterCollapse(semester)}
+                        className="flex-1 min-w-0 flex items-center justify-between group"
+                        aria-expanded={!isCollapsed}
+                        aria-label={`${isCollapsed ? "Expand" : "Collapse"} ${semester}`}
+                      >
+                        <div className="flex items-center gap-2 min-w-0">
+                          <span
+                            className={`w-1 h-4 rounded-full shrink-0 ${accent.bar}`}
+                            aria-hidden="true"
+                          />
+                          <h3
+                            className={`text-base font-medium transition-colors ${accent.title}`}
+                          >
+                            {semester}
+                          </h3>
+                          {hasInProgress && (
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-violet-500/20 border border-violet-500/30 text-violet-600 dark:text-violet-300">
+                              <span className="w-1 h-1 rounded-full bg-violet-400 animate-pulse" />
+                              In Progress
+                            </span>
+                          )}
+                          <span className={`text-xs ${accent.count}`}>
+                            {semCourses.length} course
+                            {semCourses.length !== 1 ? "s" : ""}
+                          </span>
+                        </div>
+                        <motion.div
+                          animate={{ rotate: isCollapsed ? 0 : 180 }}
+                          transition={{ duration: 0.2 }}
+                          className="p-1 rounded-md text-gray-500 group-hover:text-gray-700 dark:group-hover:text-gray-300 group-hover:bg-black/[0.04] dark:group-hover:bg-white/[0.05] transition-all"
+                        >
+                          <FiChevronDown size={16} />
+                        </motion.div>
+                      </button>
+                      <motion.button
+                        whileHover={{ y: -1 }}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onManualAdd(semester);
+                        }}
+                        data-add-semester={semester}
+                        aria-label={`Add a course to ${semester}`}
+                        title={`Add a course to ${semester}`}
+                        className={`shrink-0 flex items-center gap-1 px-2 py-1 rounded-lg border bg-transparent transition-all text-xs ${accent.chip}`}
+                      >
+                        <FiPlus size={13} />
+                        <span className="hidden sm:inline">Add course</span>
+                      </motion.button>
+                    </div>
+
+                    <AnimatePresence initial={false}>
+                      {!isCollapsed && (
+                        <motion.div
+                          initial={{ height: 0, opacity: 0 }}
+                          animate={{ height: "auto", opacity: 1 }}
+                          exit={{ height: 0, opacity: 0 }}
+                          transition={{ duration: 0.2, ease: "easeInOut" }}
+                          className="overflow-hidden"
+                        >
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            {semCourses.map((course, idx) => (
+                              <CourseCard
+                                key={course.id || `${course.code}-${idx}`}
+                                course={course}
+                                distSelectorCourseId={distSelectorCourseId}
+                                onCardClick={openCourseModal}
+                                onDeleteClick={openDeleteConfirm}
+                                onDistSelectorToggle={(id) =>
+                                  setDistSelectorCourseId((prev) =>
+                                    prev === id ? null : id,
+                                  )
+                                }
+                                onToggleDistributional={onToggleDistributional}
+                              />
+                            ))}
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </motion.div>
+                );
+              })}
+
+              {/* Skipped courses section */}
+              {skippedCourses.length > 0 && (
+                <SkippedSection
+                  courses={skippedCourses}
+                  hasMultipleMajors={false}
+                />
+              )}
+            </div>
+          </div>
         ) : (
           /* Flat list (search active or non-semester sort) */
           <>

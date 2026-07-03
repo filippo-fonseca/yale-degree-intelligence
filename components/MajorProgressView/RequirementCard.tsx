@@ -84,6 +84,7 @@ const RequirementCard = React.memo(function RequirementCard({
     <motion.div
       layout
       initial={false}
+      data-tour="major-requirement-card"
       className={`p-3 hover:scale-[0.98] rounded-xl backdrop-blur-md border transition-all relative cursor-pointer shadow-neu-sm ${classes.card}`}
       onClick={openRequirement}
       onKeyDown={(e) => {
@@ -129,6 +130,7 @@ const RequirementCard = React.memo(function RequirementCard({
           return (
             <div
               key={opt.code}
+              data-tour={interactive ? "major-course-option-pill" : undefined}
               className={`relative px-2 py-0.5 rounded-full text-xs flex items-center transition-all duration-150 ${
                 interactive ? "cursor-pointer hover:scale-[1.03]" : ""
               } ${optionPillClasses(opt)}`}
@@ -174,6 +176,7 @@ const RequirementCard = React.memo(function RequirementCard({
         {!isCompletedCard && (
           <button
             type="button"
+            data-tour="major-fulfill-manual-button"
             onClick={(e) => {
               e.stopPropagation();
               onAddManual(req.name);

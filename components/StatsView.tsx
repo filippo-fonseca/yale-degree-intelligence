@@ -118,6 +118,11 @@ const makeChartTooltipSlotProps = (isDark: boolean) => {
     },
     "& caption": { borderColor: border },
     "& .MuiChartsTooltip-mark": { borderColor: border },
+    "& .MuiPaper-root, & .MuiChartsTooltip-paper, & .MuiChartsTooltip-table": {
+      backgroundColor: `${surface} !important`,
+      backgroundImage: "none !important",
+      color: `${primary} !important`,
+    },
     // Ensure table rows/cells don't get their own background in dark mode
     "& tr, & tbody": {
       backgroundColor: "transparent !important",
@@ -323,10 +328,10 @@ function DeptCreditPieChart({
     <motion.div
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
-      className="relative w-full overflow-x-auto"
+      className="relative h-full w-full overflow-x-auto overflow-y-hidden"
     >
       {/* Centered total label */}
-      <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center -ml-[120px]">
+      <div className="pointer-events-none absolute left-[92px] top-1/2 z-10 flex -translate-x-1/2 -translate-y-1/2 flex-col items-center justify-center">
         <span className="text-xl font-semibold text-gray-900 dark:text-white leading-none">
           {totalCredits}
         </span>
@@ -346,8 +351,9 @@ function DeptCreditPieChart({
             faded: { innerRadius: 30, additionalRadius: -4, color: "gray" },
           },
         ]}
+        width={340}
         height={220}
-        margin={{ top: 8, right: 120, bottom: 8, left: 8 }}
+        margin={{ top: 8, right: 112, bottom: 8, left: 0 }}
         slotProps={{
           ...tooltipSlotProps,
           legend: {
@@ -683,7 +689,7 @@ export default function StatsView({ courses }: { courses: Course[] }) {
       )}
 
       {/* ── Charts ─────────────────────────────────────────────────────── */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4" data-tour="stats-charts">
 
         {/* Cumulative GPA Trend */}
         <ChartCard

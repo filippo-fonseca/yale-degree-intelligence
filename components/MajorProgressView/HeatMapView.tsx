@@ -70,6 +70,7 @@ export default function HeatMapView({
             <div key={key} className="relative group">
               <button
                 type="button"
+                data-tour="major-heatmap-cell"
                 onClick={() =>
                   onOpenRequirement({
                     id: s.req.id,

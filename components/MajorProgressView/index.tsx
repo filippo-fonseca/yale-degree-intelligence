@@ -617,7 +617,10 @@ export default function MajorProgressView({
       </div>
 
       {/* Progress bar + Stats toggle - Compact neumorphic */}
-      <div className="p-3 rounded-xl bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 border border-gray-200 dark:border-gray-800/50 shadow-neu">
+      <div
+        data-tour="major-progress-bar"
+        className="p-3 rounded-xl bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 border border-gray-200 dark:border-gray-800/50 shadow-neu"
+      >
         <div className="relative w-full bg-gray-200 dark:bg-gray-800/70 rounded-full h-2 overflow-hidden shadow-[inset_0_1px_2px_rgba(0,0,0,0.08)] dark:shadow-[inset_0_1px_2px_rgba(0,0,0,0.3)]">
           {/* Lighter in-progress segment sits behind, only in the +In Progress view. */}
           {showInProgressStats && (
@@ -697,7 +700,7 @@ export default function MajorProgressView({
         />
       </div>
 
-      <div className="p-1">
+      <div className="p-1" data-tour="major-manual-tip">
         <InfoCard
           autoHide
           previewText="A few tips on how to navigate this page. It's complex at first, we get it!"
@@ -716,7 +719,10 @@ export default function MajorProgressView({
       </div>
 
       {/* View switcher (sticky) + tip help */}
-      <div className="sticky top-0 z-20 -mx-1 px-1 py-2 bg-gradient-to-b from-white via-white to-white/0 dark:from-gray-950 dark:via-gray-950 dark:to-gray-950/0 backdrop-blur-sm">
+      <div
+        data-tour="major-view-switcher"
+        className="sticky top-0 z-20 -mx-1 px-1 py-2 bg-gradient-to-b from-white via-white to-white/0 dark:from-gray-950 dark:via-gray-950 dark:to-gray-950/0 backdrop-blur-sm"
+      >
         <div className="flex items-center justify-between gap-3 flex-wrap">
           <div className="flex items-center gap-1.5">
             <span className="text-[10px] text-gray-400 dark:text-gray-500 uppercase tracking-wider">
@@ -725,6 +731,7 @@ export default function MajorProgressView({
             <button
               type="button"
               onClick={() => setView("board")}
+              data-tour="major-board-toggle"
               className={`px-2.5 py-1 text-[11px] rounded-lg transition-all duration-200 ${
                 view === "board"
                   ? "bg-purple-500/15 text-purple-600 dark:text-purple-300 border border-purple-600/40 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]"
@@ -736,6 +743,7 @@ export default function MajorProgressView({
             <button
               type="button"
               onClick={() => setView("heatmap")}
+              data-tour="major-heatmap-toggle"
               className={`inline-flex items-center px-2.5 py-1 text-[11px] rounded-lg transition-all duration-200 ${
                 view === "heatmap"
                   ? "bg-purple-500/15 text-purple-600 dark:text-purple-300 border border-purple-600/40 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]"
@@ -759,7 +767,7 @@ export default function MajorProgressView({
 
       <MajorTipModal
         storageKey="myMajorTipModalShown"
-        autoOpenOnMount
+        autoOpenOnMount={false}
         forceOpen={forceMajorTipOpen}
         onDismiss={() => setForceMajorTipOpen(false)}
       />
@@ -785,7 +793,7 @@ export default function MajorProgressView({
             ))}
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4" data-tour="major-requirements-board">
             {columns.map((col) => (
               <div
                 key={col.key}
@@ -826,7 +834,9 @@ export default function MajorProgressView({
 
       {/* Heat map view */}
       {view === "heatmap" && (
-        <HeatMapView cells={heatCells} onOpenRequirement={openRequirement} />
+        <div data-tour="major-heatmap-view">
+          <HeatMapView cells={heatCells} onOpenRequirement={openRequirement} />
+        </div>
       )}
 
       {/* Course Info Modal */}

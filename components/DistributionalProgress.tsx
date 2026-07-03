@@ -97,7 +97,7 @@ const DIST_PIE_COLORS: Record<string, string> = {
 };
 
 const makeChartTooltipSlotProps = (isDark: boolean) => {
-  const surface = isDark ? "rgba(17, 24, 39, 0.97)" : "rgba(255, 255, 255, 0.98)";
+  const surface = isDark ? "#0f172a" : "rgba(255, 255, 255, 0.98)";
   const border = isDark ? "rgba(255, 255, 255, 0.12)" : "rgba(0, 0, 0, 0.08)";
   const primary = isDark ? "#F3F4F6" : "#111827";
   const secondary = isDark ? "#D1D5DB" : "#4B5563";
@@ -107,19 +107,24 @@ const makeChartTooltipSlotProps = (isDark: boolean) => {
   return {
     tooltip: {
       sx: {
-        backgroundColor: surface,
-        backgroundImage: "none",
+        backgroundColor: `${surface} !important`,
+        backgroundImage: "none !important",
         border: `1px solid ${border}`,
         borderRadius: "0.6rem",
         boxShadow: shadow,
-        color: primary,
+        color: `${primary} !important`,
         fontFamily: CHART_FONT,
         overflow: "hidden",
+        "& *": {
+          color: `${primary} !important`,
+          fontFamily: CHART_FONT,
+        },
         "& caption, & th, & td, & .MuiChartsTooltip-cell, & .MuiChartsTooltip-valueCell, & .MuiChartsTooltip-axisValueCell, & .MuiTypography-root":
           {
             color: `${primary} !important`,
             fontFamily: CHART_FONT,
             fontSize: "0.78rem",
+            backgroundColor: "transparent !important",
           },
         "& .MuiChartsTooltip-labelCell": {
           color: `${secondary} !important`,
@@ -130,6 +135,24 @@ const makeChartTooltipSlotProps = (isDark: boolean) => {
         "& .MuiChartsTooltip-mark": {
           borderColor: border,
         },
+        "& .MuiPaper-root, & .MuiChartsTooltip-paper, & .MuiChartsTooltip-table": {
+          backgroundColor: `${surface} !important`,
+          backgroundImage: "none !important",
+          color: `${primary} !important`,
+        },
+        "& tr, & tbody": {
+          backgroundColor: "transparent !important",
+        },
+      },
+    },
+    popper: {
+      sx: {
+        "& .MuiChartsTooltip-root, & .MuiChartsTooltip-paper, & .MuiPaper-root":
+          {
+            backgroundColor: `${surface} !important`,
+            backgroundImage: "none !important",
+            color: `${primary} !important`,
+          },
       },
     },
   };
@@ -209,7 +232,7 @@ function DistPieChart({ distMap }: { distMap: Record<string, Course[]> }) {
           </p>
         </div>
       ) : (
-        <div className="w-full overflow-x-auto">
+        <div className="w-full overflow-x-auto overflow-y-hidden">
           <PieChart
             series={[
               {
@@ -222,9 +245,9 @@ function DistPieChart({ distMap }: { distMap: Record<string, Course[]> }) {
                 faded: { innerRadius: 30, additionalRadius: -4, color: "gray" },
               },
             ]}
-            width={380}
+            width={340}
             height={220}
-            margin={{ top: 8, right: 120, bottom: 8, left: 8 }}
+            margin={{ top: 8, right: 112, bottom: 8, left: 0 }}
             slotProps={{
               ...tooltipSlotProps,
               legend: {
@@ -986,7 +1009,9 @@ const DistributionalsView = ({ courses }: { courses: Course[] }) => {
       </div>
 
       {/* Distributional breakdown pie chart */}
-      <DistPieChart distMap={distMap} />
+      <div data-tour="distributionals-breakdown">
+        <DistPieChart distMap={distMap} />
+      </div>
 
       {/* Empty state */}
       {!hasAnyDistributionals && <EmptyState />}

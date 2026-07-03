@@ -1,6 +1,5 @@
 import type { ComponentType } from "react";
 import {
-  Sparkles,
   Upload,
   FilePlus,
   GraduationCap,
@@ -17,7 +16,6 @@ import {
   Layers,
   Users,
   Command,
-  Bot,
   PartyPopper,
 } from "lucide-react";
 
@@ -33,11 +31,12 @@ export interface TourStep {
    * spotlights that element and anchors the tooltip beside it. When omitted,
    * the tooltip is centered with a full dim (used for intro/outro/Cmd+K).
    *
-   * Feature-level steps that live inside a tab reuse the tab's `nav-{id}`
-   * anchor so the spotlight always lands on a mounted element. AppTour also
+   * Feature-level steps point to the relevant in-tab control or panel. AppTour
    * degrades gracefully to a centered card if an anchor is ever missing.
    */
-  anchor?: string;
+  anchor?: string | string[];
+  /** Optional selector to click before measuring, for stateful controls/tabs. */
+  activate?: string;
   /** Icon shown in the step header. */
   icon: ComponentType<{ className?: string }>;
   /** Short eyebrow label above the title. */
@@ -50,22 +49,15 @@ export interface TourStep {
 }
 
 export const TOUR_STEPS: TourStep[] = [
-  // ── Intro ──────────────────────────────────────────────────────────────
-  {
-    id: "welcome",
-    icon: Sparkles,
-    eyebrow: "Welcome",
-    title: "Let me show you around",
-    description:
-      "DegreeIntelligence keeps your whole Yale degree in one place. This quick tour walks through the sections you'll live in and the power features most people miss.",
-    accent: "purple",
-  },
-
   // ── My courses ─────────────────────────────────────────────────────────
   {
     id: "upload-transcript",
     tabId: "upload",
-    anchor: '[data-tour="nav-upload"]',
+    anchor: [
+      '[data-tour="courses-upload-dropzone"]',
+      '[data-tour="courses-reupload"]',
+      '[data-tour="nav-upload"]',
+    ],
     icon: Upload,
     eyebrow: "My courses",
     title: "Start with your transcript",
@@ -76,7 +68,11 @@ export const TOUR_STEPS: TourStep[] = [
   {
     id: "upload-add-course",
     tabId: "upload",
-    anchor: '[data-tour="nav-upload"]',
+    anchor: [
+      '[data-tour="courses-empty-manual-add"]',
+      '[data-tour="courses-manual-add"]',
+      '[data-tour="nav-upload"]',
+    ],
     icon: FilePlus,
     eyebrow: "My courses",
     title: "Add courses by hand, per semester",
@@ -89,29 +85,70 @@ export const TOUR_STEPS: TourStep[] = [
   {
     id: "major-progress",
     tabId: "major",
-    anchor: '[data-tour="nav-major"]',
+    anchor: ['[data-tour="major-progress-bar"]', '[data-tour="nav-major"]'],
+    activate: '[data-tour="major-board-toggle"]',
     icon: GraduationCap,
     eyebrow: "My major(s)",
-    title: "Your major, requirement by requirement",
+    title: "Your major progress at a glance",
     description:
-      "Every requirement becomes a card showing exactly what's done, in progress, and still open, computed from your real courses. No spreadsheets, no guessing what still counts.",
+      "This progress bar summarizes how much of your selected major is complete, with an option to include in-progress courses so you can see what this semester is doing for you.",
     accent: "pink",
   },
   {
-    id: "major-board-heatmap",
+    id: "major-board-view",
     tabId: "major",
-    anchor: '[data-tour="nav-major"]',
+    anchor: [
+      '[data-tour="major-requirement-card"]',
+      '[data-tour="major-requirements-board"]',
+      '[data-tour="nav-major"]',
+    ],
+    activate: '[data-tour="major-board-toggle"]',
     icon: LayoutGrid,
     eyebrow: "My major(s)",
-    title: "Board view vs. Heat map",
+    title: "Board view explains each requirement",
     description:
-      "Toggle between the Board, which lays out each requirement group, and the Heat map, which color-codes every requirement by how complete it is. The heat map is the fastest way to spot the gaps you need to close.",
+      "Board view is the default workspace. Each requirement is a card showing the credits, matching courses, and actions available for that specific requirement.",
+    accent: "pink",
+  },
+  {
+    id: "major-heatmap-toggle",
+    tabId: "major",
+    anchor: [
+      '[data-tour="major-heatmap-toggle"]',
+      '[data-tour="major-view-switcher"]',
+    ],
+    activate: '[data-tour="major-heatmap-toggle"]',
+    icon: LayoutGrid,
+    eyebrow: "My major(s)",
+    title: "Click into Heat map",
+    description:
+      "Use the Heat map toggle to replace the board with a compact scan of the whole major.",
+    accent: "pink",
+  },
+  {
+    id: "major-heatmap-view",
+    tabId: "major",
+    anchor: [
+      '[data-tour="major-heatmap-cell"]',
+      '[data-tour="major-heatmap-view"]',
+      '[data-tour="major-view-switcher"]',
+    ],
+    icon: LayoutGrid,
+    eyebrow: "My major(s)",
+    title: "Read the actual heat map",
+    description:
+      "Each square is a requirement. Its color shows whether that requirement is complete, in progress, partial, or untouched.",
     accent: "pink",
   },
   {
     id: "major-fulfill-manual",
     tabId: "major",
-    anchor: '[data-tour="nav-major"]',
+    anchor: [
+      '[data-tour="major-fulfill-manual-button"]',
+      '[data-tour="major-requirements-board"]',
+      '[data-tour="nav-major"]',
+    ],
+    activate: '[data-tour="major-board-toggle"]',
     icon: CheckCircle2,
     eyebrow: "My major(s)",
     title: "Fulfill manually when we miss one",
@@ -122,18 +159,24 @@ export const TOUR_STEPS: TourStep[] = [
   {
     id: "major-skip",
     tabId: "major",
-    anchor: '[data-tour="nav-major"]',
+    anchor: [
+      '[data-tour="major-requirement-card"]',
+      '[data-tour="major-requirements-board"]',
+      '[data-tour="nav-major"]',
+    ],
+    activate: '[data-tour="major-board-toggle"]',
     icon: SkipForward,
     eyebrow: "My major(s)",
     title: "Skip and unskip course options",
     description:
-      "For requirements that offer a choice, skip the options you'll never take so the view focuses on your real path. Changed your mind? Unskip to bring them back at any time.",
+      "Click into a requirement card to open its details. From there, you can mark listed options as skipped, or unskip them later if your plan changes.",
     accent: "pink",
   },
   {
     id: "major-double-conflict",
     tabId: "major",
-    anchor: '[data-tour="nav-major"]',
+    anchor: ['[data-tour="major-shared-courses"]', '[data-tour="nav-major"]'],
+    activate: '[data-tour="major-board-toggle"]',
     icon: GitMerge,
     eyebrow: "My major(s)",
     title: "Double majors, handled honestly",
@@ -146,7 +189,7 @@ export const TOUR_STEPS: TourStep[] = [
   {
     id: "sim-board",
     tabId: "simulator",
-    anchor: '[data-tour="nav-simulator"]',
+    anchor: ['[data-tour="simulator-board"]', '[data-tour="nav-simulator"]'],
     icon: MonitorCog,
     eyebrow: "Simulator",
     title: "Plan future semesters on a board",
@@ -157,7 +200,7 @@ export const TOUR_STEPS: TourStep[] = [
   {
     id: "sim-drag",
     tabId: "simulator",
-    anchor: '[data-tour="nav-simulator"]',
+    anchor: ['[data-tour="simulator-course-pool"]', '[data-tour="nav-simulator"]'],
     icon: Move,
     eyebrow: "Simulator",
     title: "Drag courses to rearrange",
@@ -168,7 +211,7 @@ export const TOUR_STEPS: TourStep[] = [
   {
     id: "sim-live-progress",
     tabId: "simulator",
-    anchor: '[data-tour="nav-simulator"]',
+    anchor: ['[data-tour="simulator-live-progress"]', '[data-tour="nav-simulator"]'],
     icon: Zap,
     eyebrow: "Simulator",
     title: "Requirements update live as you edit",
@@ -179,7 +222,7 @@ export const TOUR_STEPS: TourStep[] = [
   {
     id: "sim-heatmap",
     tabId: "simulator",
-    anchor: '[data-tour="nav-simulator"]',
+    anchor: ['[data-tour="simulator-live-progress"]', '[data-tour="nav-simulator"]'],
     icon: Flame,
     eyebrow: "Simulator",
     title: "Heat-map preview of your plan",
@@ -190,7 +233,7 @@ export const TOUR_STEPS: TourStep[] = [
   {
     id: "sim-skip-manual",
     tabId: "simulator",
-    anchor: '[data-tour="nav-simulator"]',
+    anchor: ['[data-tour="simulator-semester-add"]', '[data-tour="simulator-board"]'],
     icon: CheckCircle2,
     eyebrow: "Simulator",
     title: "Skip and manually fulfill here too",
@@ -201,7 +244,7 @@ export const TOUR_STEPS: TourStep[] = [
   {
     id: "sim-multiple-plans",
     tabId: "simulator",
-    anchor: '[data-tour="nav-simulator"]',
+    anchor: ['[data-tour="simulator-plan-actions"]', '[data-tour="nav-simulator"]'],
     icon: Star,
     eyebrow: "Simulator",
     title: "Save, switch, and compare plans",
@@ -214,7 +257,7 @@ export const TOUR_STEPS: TourStep[] = [
   {
     id: "stats",
     tabId: "stats",
-    anchor: '[data-tour="nav-stats"]',
+    anchor: ['[data-tour="stats-charts"]', '[data-tour="nav-stats"]'],
     icon: BarChart2,
     eyebrow: "Academic stats",
     title: "Understand your record",
@@ -225,7 +268,10 @@ export const TOUR_STEPS: TourStep[] = [
   {
     id: "distributionals",
     tabId: "distributionals",
-    anchor: '[data-tour="nav-distributionals"]',
+    anchor: [
+      '[data-tour="distributionals-breakdown"]',
+      '[data-tour="nav-distributionals"]',
+    ],
     icon: Layers,
     eyebrow: "Distributionals",
     title: "Track distributional requirements",
@@ -236,7 +282,11 @@ export const TOUR_STEPS: TourStep[] = [
   {
     id: "friends",
     tabId: "friends",
-    anchor: '[data-tour="nav-friends"]',
+    anchor: [
+      '[data-tour="friends-enable"]',
+      '[data-tour="friends-add"]',
+      '[data-tour="nav-friends"]',
+    ],
     icon: Users,
     eyebrow: "Friends",
     title: "Compare with friends",
@@ -255,17 +305,6 @@ export const TOUR_STEPS: TourStep[] = [
     description:
       "Press Cmd+K (or Ctrl+K) anywhere to navigate and run actions from the keyboard. It's the quickest way to move once you know your way around.",
     accent: "blue",
-  },
-  {
-    id: "cleoai",
-    tabId: "cleoai",
-    anchor: '[data-tour="nav-cleoai"]',
-    icon: Bot,
-    eyebrow: "Coming soon",
-    title: "Meet Dan",
-    description:
-      "Dan is an AI academic advisor that will answer questions and help you plan, grounded in your real degree data. It's on the way.",
-    accent: "pink",
   },
   {
     id: "done",

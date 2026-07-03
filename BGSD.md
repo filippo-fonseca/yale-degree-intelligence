@@ -67,7 +67,7 @@ Notes section and Kiwi will respect them.
 {
   "version": 1,
   "integration_branch": "dev",
-  "base_branch": null,
+  "base_branch": "dev",
   "git": {
     "sync_integration_from_base": true,
     "integration_to_main": "manual"
@@ -129,6 +129,8 @@ Notes section and Kiwi will respect them.
 ```
 
 ## Notes
+
+- ALWAYS start new feature work / bgsd seshs off of dev (never main, never next). dev is both the base branch to branch from AND the integration branch to merge back into; dev -> main is a separate deliberate human-only promotion.
 
 - dev is our staging/integration branch: every sesh/worktree branch merges into dev FIRST (never next, never main). dev -> main is a separate, deliberate, human-only promotion once absolutely ready. Prod on main has 1000+ users.
 

@@ -845,21 +845,24 @@ export default function Simulator({
       >
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
           {/* Current Plan Status */}
-          <div className="flex items-center gap-3">
-            <span className="text-xs text-gray-400 dark:text-gray-500 uppercase tracking-wider">
+          <div className="flex items-center gap-3 min-w-0 sm:flex-1">
+            <span className="text-xs text-gray-400 dark:text-gray-500 uppercase tracking-wider shrink-0">
               Plan:
             </span>
-            <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-black/[0.04] dark:bg-white/[0.04] border border-black/[0.06] dark:border-white/[0.08]">
+            <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-black/[0.04] dark:bg-white/[0.04] border border-black/[0.06] dark:border-white/[0.08] min-w-0 max-w-full">
               {currentPlanName ? (
                 <>
                   <div
-                    className={`w-2.5 h-2.5 rounded-full ${hasChanges ? "bg-amber-400 animate-pulse" : "bg-emerald-400"}`}
+                    className={`w-2.5 h-2.5 rounded-full shrink-0 ${hasChanges ? "bg-amber-400 animate-pulse" : "bg-emerald-400"}`}
                   />
-                  <span className="text-base font-medium text-gray-800 dark:text-gray-200">
+                  <span
+                    className="text-base font-medium text-gray-800 dark:text-gray-200 truncate"
+                    title={currentPlanName}
+                  >
                     {currentPlanName}
                   </span>
                   {hasChanges && (
-                    <span className="text-xs text-amber-400 ml-1 px-2 py-0.5 rounded-full bg-amber-400/10 border border-amber-400/20">
+                    <span className="text-xs text-amber-400 ml-1 px-2 py-0.5 rounded-full bg-amber-400/10 border border-amber-400/20 shrink-0">
                       unsaved
                     </span>
                   )}
@@ -878,7 +881,7 @@ export default function Simulator({
           </div>
 
           {/* Action Buttons */}
-          <div className="flex items-center gap-2 flex-wrap" data-tour="simulator-plan-actions">
+          <div className="flex items-center gap-2 flex-wrap shrink-0" data-tour="simulator-plan-actions">
             <button
               onClick={() => setShowHelp((v) => !v)}
               className="px-4 py-2 text-sm rounded-xl bg-black/[0.04] dark:bg-white/[0.04] backdrop-blur-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-black/[0.06] dark:hover:bg-white/[0.08] border border-black/[0.06] dark:border-white/[0.08] flex items-center gap-2 transition-all"

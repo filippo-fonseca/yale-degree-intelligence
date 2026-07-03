@@ -225,6 +225,14 @@ export default function Home() {
 
   const [showUpdateModal, setShowUpdateModal] = useState(false);
   const [showManualEntryModal, setShowManualEntryModal] = useState(false);
+  // When the manual-add flow is opened from a specific semester header, this
+  // holds that semester key (e.g. "Fall 2026") so the modal can preselect it.
+  const [manualEntryPreselectSemester, setManualEntryPreselectSemester] =
+    useState<string | undefined>(undefined);
+  const openManualEntry = (semester?: string) => {
+    setManualEntryPreselectSemester(semester);
+    setShowManualEntryModal(true);
+  };
   const [showSharedCoursesDropdown, setShowSharedCoursesDropdown] =
     useState(false);
   const sharedCoursesRef = useRef<HTMLDivElement>(null);
@@ -973,6 +981,25 @@ export default function Home() {
             setShowSettings(false);
             setTourOpen(true);
           }}
+          onReplayWelcome={() => {
+            // Dev-only: replay the full new-user v3 flow. Resets BOTH onboarding
+            // booleans on users/{uid} and re-opens the welcome modal immediately.
+            // This ONLY flips flags; it never touches plans or courses.
+            if (user) {
+              void setUserFlag(user.uid, "hasSeenV3Welcome", false);
+              void setUserFlag(user.uid, "hasSeenTutorial", false);
+            }
+            setShowSettings(false);
+            setTourOpen(false);
+            setWelcomeOpen(true);
+          }}
+          onReplayTutorial={() => {
+            // Dev-only: reset just the tutorial flag and re-open the tour.
+            if (user) void setUserFlag(user.uid, "hasSeenTutorial", false);
+            setShowSettings(false);
+            setWelcomeOpen(false);
+            setTourOpen(true);
+          }}
           onLogout={() => {
             setShowSettings(false);
             setActiveTab("upload");
@@ -1527,7 +1554,7 @@ export default function Home() {
                     coursesLoading={coursesLoading}
                     user={user}
                     isBrandNew={isBrandNew}
-                    onManualAdd={() => setShowManualEntryModal(true)}
+                    onManualAdd={openManualEntry}
                     onReupload={() => setShowUpdateModal(true)}
                     onUploadSuccess={parseAndStoreCourses}
                     onDeleteCourse={async (course) => {
@@ -1629,9 +1656,13 @@ export default function Home() {
               {/* Manual Course Entry Modal */}
               <ManualCourseEntryModal
                 isOpen={showManualEntryModal}
-                onClose={() => setShowManualEntryModal(false)}
+                onClose={() => {
+                  setShowManualEntryModal(false);
+                  setManualEntryPreselectSemester(undefined);
+                }}
                 onSubmit={handleManualCourseEntry}
                 userId={user?.uid || ""}
+                initialSemester={manualEntryPreselectSemester}
               />
 
               {activeTab === "stats" && (

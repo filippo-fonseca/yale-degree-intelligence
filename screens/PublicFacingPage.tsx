@@ -6,34 +6,68 @@ import {
   useMotionValue,
   useSpring,
   useTransform,
-  useScroll,
   AnimatePresence,
 } from "framer-motion";
 import {
   FiArrowRight,
-  FiArrowUpRight,
   FiGithub,
-  FiPlay,
-  FiSearch,
+  FiMail,
+  FiExternalLink,
+  FiChevronRight,
   FiUsers,
+  FiSearch,
+  FiSave,
+  FiShare2,
+  FiPlayCircle,
+  FiUserPlus,
+  FiCheck,
+  FiX,
+  FiUser,
+  FiAlertCircle,
   FiZap,
   FiTrendingUp,
   FiBarChart2,
-  FiX,
-  FiCheck,
-  FiLayers,
+  FiHeart,
 } from "react-icons/fi";
 import { HiSparkles } from "react-icons/hi2";
-import { GraduationCap, Command, Sun, Moon } from "lucide-react";
-import { useTheme } from "@/context/ThemeContext";
-import Link from "next/link";
-import dynamic from "next/dynamic";
-import { useState, useRef, useEffect } from "react";
-import LoginPage from "@/components/LoginPage";
 import LogoIcon from "@/icons/LogoIcon";
 import CompoundLogo from "@/components/ui/CompoundLogo";
+import Link from "next/link";
+import { useState, useRef, useEffect } from "react";
+import LoginPage from "@/components/LoginPage";
+import dynamic from "next/dynamic";
+import { GraduationCap, BookOpen, Award, Clock } from "lucide-react";
+import CosmicBackground from "@/components/CosmicBackground/page";
+import HeroConstellation from "@/components/landing/HeroConstellation";
 
-// avoid SSR issues with charts (used in the stats section)
+function CountUp({
+  to,
+  inView,
+  decimals = 0,
+  duration = 0.8,
+}: {
+  to: number;
+  inView: boolean;
+  decimals?: number;
+  duration?: number;
+}) {
+  const mv = useMotionValue(0);
+  const sp = useSpring(mv, { stiffness: 120, damping: 20, duration });
+  const rounded = useTransform(sp, (v) => v.toFixed(decimals));
+  // start when visible
+  if (inView) mv.set(to);
+  return <motion.span>{rounded as any}</motion.span>;
+}
+
+const statsMock = {
+  gpa: 3.88,
+  totalCredits: 18.5,
+  coursesCompleted: 16,
+  avgCreditsPerSem: 4.7,
+  progressToGradPct: 78, // optional subtitle for Total Credits
+};
+
+// avoid SSR issues with charts
 const LineChart = dynamic(
   () => import("@mui/x-charts/LineChart").then((m) => m.LineChart),
   { ssr: false },
@@ -43,1631 +77,1602 @@ const PieChartWrapper = dynamic(
   { ssr: false },
 );
 
-const YOUTUBE_ID = "5H1kjMWQfgs";
-const YDN_URL =
-  "https://yaledailynews.com/blog/2025/09/23/new-student-run-platform-aims-to-simplify-degree-planning/";
-
-/* ----------------------------------------------------------- */
-/* Small primitives                                            */
-/* ----------------------------------------------------------- */
-
-function CountUp({
-  to,
-  inView,
-  decimals = 0,
-  duration = 1.1,
-}: {
-  to: number;
-  inView: boolean;
-  decimals?: number;
-  duration?: number;
-}) {
-  const mv = useMotionValue(0);
-  const sp = useSpring(mv, { stiffness: 90, damping: 22, duration });
-  const rounded = useTransform(sp, (v) => v.toFixed(decimals));
-  if (inView) mv.set(to);
-  return <motion.span>{rounded as any}</motion.span>;
-}
-
-function Reveal({
-  children,
-  delay = 0,
-  y = 26,
-  className = "",
-}: {
-  children: React.ReactNode;
-  delay?: number;
-  y?: number;
-  className?: string;
-}) {
-  return (
-    <motion.div
-      initial={{ opacity: 0, y }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.3 }}
-      transition={{ duration: 0.7, delay, ease: [0.21, 0.6, 0.2, 1] }}
-      className={className}
-    >
-      {children}
-    </motion.div>
-  );
-}
-
-function SectionHeader({
-  eyebrow,
-  title,
-  sub,
-  badge,
-}: {
-  eyebrow: string;
-  title: React.ReactNode;
-  sub?: React.ReactNode;
-  badge?: string;
-}) {
-  return (
-    <div className="mx-auto max-w-3xl text-center">
-      <Reveal>
-        <div className="mb-5 flex items-center justify-center gap-2">
-          <span className="h-px w-8 bg-gradient-to-r from-transparent to-pink-500/60" />
-          <span className="text-[11px] font-semibold uppercase tracking-[0.2em] text-pink-500/80 dark:text-pink-300/80">
-            {eyebrow}
-          </span>
-          {badge && (
-            <span className="rounded-full border border-pink-400/30 bg-pink-500/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-pink-600 dark:text-pink-200">
-              {badge}
-            </span>
-          )}
-          <span className="h-px w-8 bg-gradient-to-l from-transparent to-pink-500/60" />
-        </div>
-      </Reveal>
-      <Reveal delay={0.05}>
-        <h2 className="text-balance text-4xl font-semibold tracking-tight text-gray-900 dark:text-white sm:text-5xl">
-          {title}
-        </h2>
-      </Reveal>
-      {sub && (
-        <Reveal delay={0.1}>
-          <p className="mx-auto mt-5 max-w-2xl text-pretty text-base leading-relaxed text-gray-500 dark:text-white/55 sm:text-lg">
-            {sub}
-          </p>
-        </Reveal>
-      )}
-    </div>
-  );
-}
-
-/* ----------------------------------------------------------- */
-/* Hero background: parallax pink/magenta light shards         */
-/* ----------------------------------------------------------- */
-
-function HeroShards() {
-  const { scrollY } = useScroll();
-  const y1 = useTransform(scrollY, [0, 800], [0, 160]);
-  const y2 = useTransform(scrollY, [0, 800], [0, 70]);
-  const opacity = useTransform(scrollY, [0, 600], [1, 0.25]);
-
-  return (
-    <div className="pointer-events-none absolute inset-0 overflow-hidden">
-      <motion.div
-        style={{ y: y1, opacity }}
-        className="rc-bloom rc-drift absolute left-1/2 top-[-12%] h-[70vh] w-[120%] -translate-x-1/2"
-      />
-      <motion.div
-        style={{ y: y2, opacity }}
-        className="rc-shards-beams absolute left-1/2 top-[-20%] h-[90vh] w-[140%] -translate-x-1/2"
-      />
-      {/* vignette + fade into the page */}
-      <div className="absolute inset-0 bg-[radial-gradient(120%_80%_at_50%_-10%,transparent_30%,#ffffff_82%)] dark:bg-[radial-gradient(120%_80%_at_50%_-10%,transparent_30%,#08080a_82%)]" />
-      <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-b from-transparent to-white dark:to-[#08080a]" />
-    </div>
-  );
-}
-
-/* ----------------------------------------------------------- */
-/* Browser-chrome window wrapper                               */
-/* ----------------------------------------------------------- */
-
-function BrowserChrome({
-  url = "degreeint.com",
-  children,
-  className = "",
-}: {
-  url?: string;
-  children: React.ReactNode;
-  className?: string;
-}) {
-  return (
-    <div
-      className={`overflow-hidden rounded-2xl border border-gray-200 bg-gray-50 dark:border-white/10 dark:bg-[#0c0c0f] ${className}`}
-    >
-      <div className="flex items-center gap-2 border-b border-gray-200/80 bg-black/[0.02] px-4 py-3 dark:border-white/[0.06] dark:bg-white/[0.02]">
-        <span className="h-3 w-3 rounded-full bg-[#ff5f57]" />
-        <span className="h-3 w-3 rounded-full bg-[#febc2e]" />
-        <span className="h-3 w-3 rounded-full bg-[#28c840]" />
-        <div className="mx-auto flex items-center gap-2 rounded-md bg-black/[0.04] px-3 py-1 text-[11px] text-gray-500 dark:bg-white/[0.04] dark:text-white/40">
-          <span className="h-1.5 w-1.5 rounded-full bg-emerald-400/80" />
-          {url}
-        </div>
-      </div>
-      {children}
-    </div>
-  );
-}
-
-/* ----------------------------------------------------------- */
-/* Bento feature card + tints                                  */
-/* ----------------------------------------------------------- */
-
-type Tint = "pink" | "purple" | "blue" | "violet" | "rose" | "indigo";
-
-const TINTS: Record<
-  Tint,
-  { grad: string; chip: string; text: string; glow: string }
-> = {
-  pink: {
-    grad: "from-pink-500/[0.08] dark:from-pink-500/[0.12]",
-    chip: "bg-pink-500/15 text-pink-600 ring-pink-400/30 dark:text-pink-300",
-    text: "text-pink-600 dark:text-pink-300",
-    glow: "bg-pink-500/20",
-  },
-  purple: {
-    grad: "from-purple-500/[0.08] dark:from-purple-500/[0.12]",
-    chip: "bg-purple-500/15 text-purple-600 ring-purple-400/30 dark:text-purple-300",
-    text: "text-purple-600 dark:text-purple-300",
-    glow: "bg-purple-500/20",
-  },
-  blue: {
-    grad: "from-blue-500/[0.08] dark:from-blue-500/[0.12]",
-    chip: "bg-blue-500/15 text-blue-600 ring-blue-400/30 dark:text-blue-300",
-    text: "text-blue-600 dark:text-blue-300",
-    glow: "bg-blue-500/20",
-  },
-  violet: {
-    grad: "from-violet-500/[0.08] dark:from-violet-500/[0.12]",
-    chip: "bg-violet-500/15 text-violet-600 ring-violet-400/30 dark:text-violet-300",
-    text: "text-violet-600 dark:text-violet-300",
-    glow: "bg-violet-500/20",
-  },
-  rose: {
-    grad: "from-rose-500/[0.08] dark:from-rose-500/[0.12]",
-    chip: "bg-rose-500/15 text-rose-600 ring-rose-400/30 dark:text-rose-300",
-    text: "text-rose-600 dark:text-rose-300",
-    glow: "bg-rose-500/20",
-  },
-  indigo: {
-    grad: "from-indigo-500/[0.08] dark:from-indigo-500/[0.12]",
-    chip: "bg-indigo-500/15 text-indigo-600 ring-indigo-400/30 dark:text-indigo-300",
-    text: "text-indigo-600 dark:text-indigo-300",
-    glow: "bg-indigo-500/20",
-  },
+// --- Stats demo data (public page) ---
+const statsDemo = {
+  semesters: ["Fall 23", "Spring 24", "Fall 24", "Spring 25"],
+  cumulativeGpa: [3.79, 3.71, 3.8, 3.88], // smooth upward trend
+  gradeDistribution: [
+    { label: "A", count: 12.5 },
+    { label: "B+", count: 4 },
+    { label: "B", count: 1 },
+    { label: "B-", count: 1 },
+  ],
 };
 
-function FeatureCard({
-  tint,
-  icon,
-  title,
-  desc,
-  badge,
-  children,
-  className = "",
-}: {
-  tint: Tint;
-  icon: React.ReactNode;
-  title: string;
-  desc: string;
-  badge?: string;
-  children?: React.ReactNode;
-  className?: string;
-}) {
-  const t = TINTS[tint];
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 24 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.2 }}
-      transition={{ duration: 0.6, ease: [0.21, 0.6, 0.2, 1] }}
-      className={`rc-card-hover group relative flex flex-col overflow-hidden rounded-2xl border border-gray-200 bg-gradient-to-br dark:border-white/[0.08] ${t.grad} via-black/[0.01] dark:via-white/[0.02] to-transparent p-5 ${className}`}
-    >
-      <div
-        className={`pointer-events-none absolute -right-16 -top-16 h-40 w-40 rounded-full ${t.glow} opacity-40 blur-3xl transition-opacity group-hover:opacity-70`}
-      />
-      <div className="relative mb-4 flex items-start justify-between">
-        <span
-          className={`flex h-10 w-10 items-center justify-center rounded-xl text-lg ring-1 ${t.chip}`}
-        >
-          {icon}
-        </span>
-        <FiArrowUpRight className="text-gray-300 transition-all group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-gray-500 dark:text-white/25 dark:group-hover:text-white/60" />
-      </div>
-      <div className="relative mb-1 flex items-center gap-2">
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{title}</h3>
-        {badge && (
-          <span className="rounded-full border border-pink-400/30 bg-pink-500/15 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-pink-600 dark:text-pink-200">
-            {badge}
-          </span>
-        )}
-      </div>
-      <p className="relative mb-4 text-sm leading-relaxed text-gray-500 dark:text-white/50">
-        {desc}
-      </p>
-      {children && <div className="relative mt-auto">{children}</div>}
-    </motion.div>
-  );
-}
-
-/* --- Mini live-UI mocks --- */
-
-function HeatGrid() {
-  const cells = [
-    2, 3, 1, 3, 2, 0, 3, 2, 3, 1, 2, 3, 1, 2, 3, 3, 0, 2, 3, 1, 2, 3, 2, 1,
-  ];
-  const tones = [
-    "bg-black/[0.04] dark:bg-white/5",
-    "bg-purple-500/25",
-    "bg-purple-500/50",
-    "bg-purple-400/80",
-  ];
-  return (
-    <div className="grid grid-cols-8 gap-1.5">
-      {cells.map((c, i) => (
-        <div key={i} className={`aspect-square rounded-[4px] ${tones[c]}`} />
-      ))}
-    </div>
-  );
-}
-
-function ReqChecklist() {
-  const rows = [
-    { label: "Intro sequence", pct: 100, done: true },
-    { label: "Core electives", pct: 66, done: false },
-    { label: "Senior project", pct: 20, done: false },
-  ];
-  return (
-    <div className="space-y-2.5">
-      {rows.map((r) => (
-        <div key={r.label} className="flex items-center gap-2.5">
-          <span
-            className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-full text-[9px] ${
-              r.done
-                ? "bg-pink-500 text-white"
-                : "border border-gray-300 text-transparent dark:border-white/15"
-            }`}
-          >
-            <FiCheck />
-          </span>
-          <span className="w-24 shrink-0 truncate text-[11px] text-gray-500 dark:text-white/55">
-            {r.label}
-          </span>
-          <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-black/[0.05] dark:bg-white/5">
-            <div
-              className="h-full rounded-full bg-gradient-to-r from-pink-500 to-purple-500"
-              style={{ width: `${r.pct}%` }}
-            />
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-}
-
-function SuggestionChips() {
-  const chips = ["CPSC 223", "ECON 121", "ENGL 114", "MATH 230", "S&DS 230"];
-  return (
-    <div className="flex flex-wrap gap-2">
-      {chips.map((c, i) => (
-        <span
-          key={c}
-          className={`rounded-lg border px-2.5 py-1 text-[11px] ${
-            i === 0
-              ? "border-violet-400/40 bg-violet-500/20 text-violet-700 dark:text-violet-200"
-              : "border-gray-200 bg-black/[0.03] text-gray-500 dark:border-white/10 dark:bg-white/[0.03] dark:text-white/55"
-          }`}
-        >
-          {i === 0 && <HiSparkles className="mr-1 inline" size={10} />}
-          {c}
-        </span>
-      ))}
-    </div>
-  );
-}
-
-function FriendsRows() {
-  const friends = ["EM", "FF", "AK", "JD"];
-  return (
-    <div className="space-y-2">
-      <div className="flex -space-x-2">
-        {friends.map((f, i) => (
-          <span
-            key={f}
-            className="flex h-7 w-7 items-center justify-center rounded-full border-2 border-gray-50 bg-gradient-to-br from-rose-500/60 to-pink-500/60 text-[9px] font-semibold text-white dark:border-[#0c0c0f]"
-            style={{ zIndex: friends.length - i }}
-          >
-            {f}
-          </span>
-        ))}
-        <span className="flex h-7 items-center rounded-full bg-black/[0.04] px-2 text-[10px] text-gray-500 dark:bg-white/[0.04] dark:text-white/45">
-          +312 in your major
-        </span>
-      </div>
-      <div className="rounded-lg border border-gray-200 bg-black/[0.02] px-3 py-2 text-[11px] text-gray-500 dark:border-white/[0.06] dark:bg-white/[0.02] dark:text-white/55">
-        <span className="text-rose-500 dark:text-rose-300">Emir</span> took{" "}
-        <span className="text-gray-700 dark:text-white/75">CPSC 323</span> in Fall &apos;25
-      </div>
-    </div>
-  );
-}
-
-function DoubleMajorMock() {
-  return (
-    <div className="grid grid-cols-2 gap-2">
-      {["EECS", "Mech. Eng."].map((m, i) => (
-        <div
-          key={m}
-          className="rounded-lg border border-gray-200 bg-black/[0.02] p-2.5 dark:border-white/[0.07] dark:bg-white/[0.02]"
-        >
-          <p className="mb-2 text-[11px] font-medium text-gray-500 dark:text-white/70">{m}</p>
-          <div className="space-y-1.5">
-            {[80, 55, 30].map((w, j) => (
-              <div
-                key={j}
-                className="h-1.5 overflow-hidden rounded-full bg-black/[0.05] dark:bg-white/5"
-              >
-                <div
-                  className={`h-full rounded-full ${
-                    i === 0
-                      ? "bg-indigo-400/70"
-                      : "bg-gradient-to-r from-indigo-400/70 to-pink-400/70"
-                  }`}
-                  style={{ width: `${w}%` }}
-                />
-              </div>
-            ))}
-          </div>
-        </div>
-      ))}
-      <div className="col-span-2 flex items-center gap-1.5 rounded-lg border border-pink-400/20 bg-pink-500/10 px-2.5 py-1.5 text-[10px] text-pink-700 dark:text-pink-200">
-        <FiCheck size={11} /> 3 courses count for both majors
-      </div>
-    </div>
-  );
-}
-
-function StatsMini() {
-  // Representative sample data for the marketing preview.
-  const trend = [3.71, 3.79, 3.76, 3.84, 3.81, 3.88];
-  const tMin = 3.6;
-  const tMax = 3.95;
-  const linePts = trend.map((g, i) => {
-    const x = (i / (trend.length - 1)) * 100;
-    const y = 100 - ((g - tMin) / (tMax - tMin)) * 100;
-    return [x, y] as const;
-  });
-  const linePath = linePts.map((p) => `${p[0]},${p[1]}`).join(" ");
-  const areaPath = `0,100 ${linePath} 100,100`;
-  const last = linePts[linePts.length - 1];
-
-  const chips = [
-    {
-      value: "3.88",
-      label: "cumulative GPA",
-      cls: "text-violet-600 dark:text-violet-300",
-    },
-    {
-      value: "108",
-      label: "credits earned",
-      cls: "text-blue-600 dark:text-blue-300",
-    },
-    {
-      value: "27",
-      label: "courses done",
-      cls: "text-emerald-600 dark:text-emerald-300",
-    },
-  ];
-
-  const grades = [
-    { label: "A", pct: 64, cls: "from-emerald-400 to-emerald-500" },
-    { label: "A-", pct: 21, cls: "from-violet-400 to-violet-500" },
-    { label: "B+", pct: 11, cls: "from-blue-400 to-blue-500" },
-    { label: "B", pct: 4, cls: "from-pink-400 to-pink-500" },
-  ];
-
-  return (
-    <div className="space-y-3">
-      {/* Stat chips */}
-      <div className="grid grid-cols-3 gap-1.5">
-        {chips.map((c) => (
-          <div
-            key={c.label}
-            className="rounded-lg border border-gray-200 bg-black/[0.02] px-2 py-1.5 dark:border-white/[0.07] dark:bg-white/[0.02]"
-          >
-            <p className={`text-base font-semibold leading-none ${c.cls}`}>{c.value}</p>
-            <p className="mt-1 text-[9px] leading-tight text-gray-400 dark:text-white/40">
-              {c.label}
-            </p>
-          </div>
-        ))}
-      </div>
-
-      {/* GPA trend sparkline */}
-      <div className="relative overflow-hidden rounded-lg border border-gray-200 bg-black/[0.02] p-2.5 dark:border-white/[0.07] dark:bg-white/[0.02]">
-        <div className="mb-1.5 flex items-center justify-between">
-          <span className="text-[9px] font-medium uppercase tracking-wider text-gray-400 dark:text-white/40">
-            GPA trend
-          </span>
-          <span className="flex items-center gap-0.5 text-[9px] font-semibold text-emerald-500 dark:text-emerald-300">
-            <FiTrendingUp size={9} /> +0.17
-          </span>
-        </div>
-        <svg
-          viewBox="0 0 100 30"
-          preserveAspectRatio="none"
-          className="h-10 w-full overflow-visible"
-        >
-          <defs>
-            <linearGradient id="statsSparkFill" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#8b5cf6" stopOpacity="0.35" />
-              <stop offset="100%" stopColor="#8b5cf6" stopOpacity="0" />
-            </linearGradient>
-            <linearGradient id="statsSparkLine" x1="0" y1="0" x2="1" y2="0">
-              <stop offset="0%" stopColor="#6366f1" />
-              <stop offset="60%" stopColor="#8b5cf6" />
-              <stop offset="100%" stopColor="#10b981" />
-            </linearGradient>
-          </defs>
-          {/* scale the 0..100 y-space into the 0..30 viewBox height */}
-          <g transform="scale(1, 0.3)">
-            <motion.polygon
-              points={areaPath}
-              fill="url(#statsSparkFill)"
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.8, delay: 0.2 }}
-            />
-            <motion.polyline
-              points={linePath}
-              fill="none"
-              stroke="url(#statsSparkLine)"
-              strokeWidth={2.5}
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              vectorEffect="non-scaling-stroke"
-              initial={{ pathLength: 0 }}
-              whileInView={{ pathLength: 1 }}
-              viewport={{ once: true }}
-              transition={{ duration: 1, ease: "easeInOut" }}
-            />
-          </g>
-          <circle cx={last[0]} cy={last[1] * 0.3} r={2.2} fill="#10b981" />
-          <circle
-            cx={last[0]}
-            cy={last[1] * 0.3}
-            r={4}
-            fill="#10b981"
-            opacity={0.25}
-          />
-        </svg>
-      </div>
-
-      {/* Grade distribution mini bar */}
-      <div className="rounded-lg border border-gray-200 bg-black/[0.02] p-2.5 dark:border-white/[0.07] dark:bg-white/[0.02]">
-        <p className="mb-1.5 text-[9px] font-medium uppercase tracking-wider text-gray-400 dark:text-white/40">
-          Grade spread
-        </p>
-        <div className="flex h-2 w-full overflow-hidden rounded-full bg-black/[0.05] dark:bg-white/5">
-          {grades.map((g) => (
-            <motion.div
-              key={g.label}
-              className={`h-full bg-gradient-to-r ${g.cls}`}
-              initial={{ width: 0 }}
-              whileInView={{ width: `${g.pct}%` }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.7, ease: "easeOut" }}
-              style={{ width: `${g.pct}%` }}
-            />
-          ))}
-        </div>
-        <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1">
-          {grades.map((g) => (
-            <span
-              key={g.label}
-              className="flex items-center gap-1 text-[9px] text-gray-500 dark:text-white/45"
-            >
-              <span
-                className={`h-2 w-2 rounded-full bg-gradient-to-r ${g.cls}`}
-              />
-              {g.label} {g.pct}%
-            </span>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-/* ----------------------------------------------------------- */
-/* Glowing keyboard graphic (closing CTA)                      */
-/* ----------------------------------------------------------- */
-
-function KeyboardGraphic() {
-  const rows = [
-    ["Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P"],
-    ["A", "S", "D", "F", "G", "H", "J", "K", "L"],
-    ["Z", "X", "C", "V", "B", "N", "M"],
-  ];
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 30 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.4 }}
-      transition={{ duration: 0.8 }}
-      className="mx-auto flex max-w-xl flex-col items-center gap-1.5 [mask-image:radial-gradient(80%_120%_at_50%_30%,#000,transparent)]"
-    >
-      {rows.map((row, ri) => (
-        <div key={ri} className="flex gap-1.5">
-          {row.map((k) => (
-            <span
-              key={k}
-              className="rc-key flex h-11 w-11 items-center justify-center rounded-lg text-sm font-medium text-gray-400 dark:text-white/40"
-            >
-              {k}
-            </span>
-          ))}
-        </div>
-      ))}
-      <div className="mt-0.5 flex gap-1.5">
-        <span className="rc-key flex h-11 w-16 items-center justify-center rounded-lg text-xs text-gray-400 dark:text-white/40">
-          ⌃
-        </span>
-        <span className="rc-key flex h-11 w-16 items-center justify-center rounded-lg text-xs text-gray-400 dark:text-white/40">
-          ⌥
-        </span>
-        <span className="rc-key-lit flex h-11 w-44 items-center justify-center gap-2 rounded-lg text-sm font-semibold">
-          <Command size={15} /> K
-        </span>
-        <span className="rc-key flex h-11 w-16 items-center justify-center rounded-lg text-xs text-gray-400 dark:text-white/40">
-          ⌥
-        </span>
-        <span className="rc-key flex h-11 w-16 items-center justify-center rounded-lg text-xs text-gray-400 dark:text-white/40">
-          ⌃
-        </span>
-      </div>
-    </motion.div>
-  );
-}
-
-/* ----------------------------------------------------------- */
-/* Numbers / stats section                                     */
-/* ----------------------------------------------------------- */
-
-function NumbersSection() {
-  const ref = useRef<HTMLDivElement | null>(null);
-  const inView = useInView(ref, { once: true, amount: 0.3 });
-
-  const stats = [
-    { to: 16.7, dec: 1, suffix: "%", label: "of Yale undergrads on board" },
-    { to: 1000, dec: 0, suffix: "s", label: "of hours saved planning" },
-    { to: 60, dec: 0, suffix: "+", label: "majors & concentrations tracked" },
-    { to: 0, dec: 0, prefix: "$", label: "to use. Free, always." },
-  ];
-
-  const gpa = [3.79, 3.71, 3.8, 3.88];
-  const sems = ["Fall 23", "Spring 24", "Fall 24", "Spring 25"];
-  const min = 3.6;
-  const max = 3.95;
-  const pts = gpa.map((g, i) => {
-    const x = (i / (gpa.length - 1)) * 100;
-    const y = 100 - ((g - min) / (max - min)) * 100;
-    return [x, y] as const;
-  });
-  const line = pts.map((p) => `${p[0]},${p[1]}`).join(" ");
-  const area = `0,100 ${line} 100,100`;
-
-  const grades = [
-    { label: "A", count: 12.5, color: "#ec4899" },
-    { label: "B+", count: 4, color: "#a855f7" },
-    { label: "B", count: 1, color: "#6366f1" },
-    { label: "B-", count: 1, color: "#3b82f6" },
-  ];
-  const total = grades.reduce((s, g) => s + g.count, 0);
-  let acc = 0;
-  const donut = grades
-    .map((g) => {
-      const start = (acc / total) * 360;
-      acc += g.count;
-      const end = (acc / total) * 360;
-      return `${g.color} ${start}deg ${end}deg`;
-    })
-    .join(", ");
-
-  // Credits-to-degree ring
-  const creditsEarned = 108;
-  const creditsNeeded = 144;
-  const creditPct = Math.round((creditsEarned / creditsNeeded) * 100);
-  const ringR = 34;
-  const ringC = 2 * Math.PI * ringR;
-
-  // Requirement completion bars
-  const reqBars = [
-    { label: "Economics", pct: 82, cls: "from-violet-400 to-violet-500" },
-    { label: "Computer Science", pct: 64, cls: "from-blue-400 to-blue-500" },
-    { label: "Distributionals", pct: 90, cls: "from-emerald-400 to-emerald-500" },
-  ];
-
-  // Distributional coverage (Yale areas & skills)
-  const distros = [
-    { label: "Hu", done: 2, need: 2, color: "#a855f7" },
-    { label: "So", done: 2, need: 2, color: "#0ea5e9" },
-    { label: "Sc", done: 1, need: 2, color: "#10b981" },
-    { label: "QR", done: 2, need: 2, color: "#ef4444" },
-    { label: "WR", done: 2, need: 2, color: "#f97316" },
-    { label: "L", done: 3, need: 3, color: "#ec4899" },
-  ];
-
-  return (
-    <section id="numbers" ref={ref} className="relative px-4 py-28 sm:px-6">
-      <div className="mx-auto max-w-6xl">
-        <SectionHeader
-          eyebrow="By the numbers"
-          title={
-            <>
-              1 in 6 undergrads already use it.
-              <br className="hidden sm:block" /> Why don&apos;t you?
-            </>
-          }
-          sub="Every chart below is the real thing, live for your transcript the moment you sign in. This is the dashboard waiting on the other side."
-        />
-
-        <div className="mt-14 grid grid-cols-2 gap-4 lg:grid-cols-4">
-          {stats.map((s, i) => (
-            <Reveal key={s.label} delay={i * 0.06}>
-              <div className="rounded-2xl border border-gray-200 bg-black/[0.02] p-6 text-center dark:border-white/[0.08] dark:bg-white/[0.02]">
-                <p className="text-4xl font-semibold tracking-tight text-gray-900 dark:text-white sm:text-5xl">
-                  {s.prefix}
-                  <CountUp to={s.to} inView={inView} decimals={s.dec} />
-                  <span className="rc-gradient-text">{s.suffix}</span>
-                </p>
-                <p className="mt-2 text-xs text-gray-400 dark:text-white/45">{s.label}</p>
-              </div>
-            </Reveal>
-          ))}
-        </div>
-
-        <Reveal>
-          <div className="mt-10 overflow-hidden rounded-3xl border border-gray-200 bg-black/[0.02] shadow-[0_24px_80px_-40px_rgba(0,0,0,0.25)] dark:border-white/[0.08] dark:bg-white/[0.02] dark:shadow-[0_24px_80px_-40px_rgba(0,0,0,0.8)]">
-            {/* Window header */}
-            <div className="flex items-center justify-between gap-3 border-b border-gray-200 px-5 py-3 dark:border-white/[0.06]">
-              <div className="flex items-center gap-2">
-                <FiBarChart2 className="text-pink-500" size={14} />
-                <span className="text-xs font-semibold text-gray-700 dark:text-white/70">
-                  The dashboard you&apos;d unlock
-                </span>
-              </div>
-              <span className="flex items-center gap-1 rounded-full border border-pink-400/30 bg-pink-500/10 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-pink-600 dark:text-pink-200">
-                <HiSparkles size={10} /> Sign in to see yours
-              </span>
-            </div>
-
-            {/* Body */}
-            <div className="grid gap-4 p-5 lg:grid-cols-12">
-              {/* GPA trend */}
-              <div className="rounded-2xl border border-gray-200 bg-white/40 p-5 dark:border-white/[0.06] dark:bg-white/[0.02] lg:col-span-7">
-                <div className="mb-4 flex items-end justify-between">
-                  <div>
-                    <p className="text-[11px] font-medium uppercase tracking-wider text-gray-400 dark:text-white/40">
-                      Cumulative GPA
-                    </p>
-                    <p className="mt-1 text-3xl font-semibold tracking-tight text-gray-900 dark:text-white">
-                      3.88
-                    </p>
-                  </div>
-                  <span className="flex items-center gap-1 rounded-full bg-emerald-500/10 px-2 py-1 text-[11px] font-semibold text-emerald-600 dark:text-emerald-300">
-                    <FiTrendingUp size={11} /> +0.17 this year
-                  </span>
-                </div>
-                <div className="relative h-36 w-full">
-                  <svg
-                    viewBox="0 0 100 100"
-                    preserveAspectRatio="none"
-                    className="h-full w-full overflow-visible"
-                  >
-                    <defs>
-                      <linearGradient id="gpaFill" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stopColor="#ec4899" stopOpacity="0.35" />
-                        <stop offset="100%" stopColor="#ec4899" stopOpacity="0" />
-                      </linearGradient>
-                      <linearGradient id="gpaLine" x1="0" y1="0" x2="1" y2="0">
-                        <stop offset="0%" stopColor="#6366f1" />
-                        <stop offset="60%" stopColor="#8b5cf6" />
-                        <stop offset="100%" stopColor="#ec4899" />
-                      </linearGradient>
-                    </defs>
-                    <motion.polygon
-                      points={area}
-                      fill="url(#gpaFill)"
-                      initial={{ opacity: 0 }}
-                      whileInView={{ opacity: 1 }}
-                      viewport={{ once: true }}
-                      transition={{ duration: 0.8, delay: 0.2 }}
-                    />
-                    <motion.polyline
-                      points={line}
-                      fill="none"
-                      stroke="url(#gpaLine)"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      vectorEffect="non-scaling-stroke"
-                      initial={{ pathLength: 0 }}
-                      whileInView={{ pathLength: 1 }}
-                      viewport={{ once: true }}
-                      transition={{ duration: 1, ease: "easeInOut" }}
-                    />
-                  </svg>
-                </div>
-                <div className="mt-2 flex justify-between text-[10px] text-gray-400 dark:text-white/35">
-                  {sems.map((s) => (
-                    <span key={s}>{s}</span>
-                  ))}
-                </div>
-              </div>
-
-              {/* Grade distribution */}
-              <div className="flex flex-col items-center justify-center rounded-2xl border border-gray-200 bg-white/40 p-5 dark:border-white/[0.06] dark:bg-white/[0.02] lg:col-span-5">
-                <p className="mb-4 self-start text-[11px] font-medium uppercase tracking-wider text-gray-400 dark:text-white/40">
-                  Grade distribution
-                </p>
-                <div
-                  className="relative h-32 w-32 rounded-full"
-                  style={{ background: `conic-gradient(${donut})` }}
-                >
-                  <div className="absolute inset-[20%] flex flex-col items-center justify-center rounded-full bg-gray-50 dark:bg-[#0c0c0f]">
-                    <span className="text-lg font-semibold leading-none text-gray-900 dark:text-white">
-                      27
-                    </span>
-                    <span className="text-[9px] text-gray-400 dark:text-white/40">
-                      courses
-                    </span>
-                  </div>
-                </div>
-                <div className="mt-4 flex flex-wrap justify-center gap-x-3 gap-y-1">
-                  {grades.map((g) => (
-                    <span
-                      key={g.label}
-                      className="flex items-center gap-1 text-[11px] text-gray-500 dark:text-white/50"
-                    >
-                      <span
-                        className="h-2 w-2 rounded-full"
-                        style={{ background: g.color }}
-                      />
-                      {g.label}
-                    </span>
-                  ))}
-                </div>
-              </div>
-
-              {/* Credits to degree */}
-              <div className="flex flex-col items-center rounded-2xl border border-gray-200 bg-white/40 p-5 dark:border-white/[0.06] dark:bg-white/[0.02] lg:col-span-4">
-                <p className="mb-4 self-start text-[11px] font-medium uppercase tracking-wider text-gray-400 dark:text-white/40">
-                  Credits to degree
-                </p>
-                <div className="relative h-32 w-32">
-                  <svg viewBox="0 0 90 90" className="h-full w-full -rotate-90">
-                    <circle
-                      cx="45"
-                      cy="45"
-                      r={ringR}
-                      fill="none"
-                      strokeWidth="9"
-                      className="stroke-black/[0.06] dark:stroke-white/[0.08]"
-                    />
-                    <defs>
-                      <linearGradient id="creditRing" x1="0" y1="0" x2="1" y2="1">
-                        <stop offset="0%" stopColor="#6366f1" />
-                        <stop offset="100%" stopColor="#ec4899" />
-                      </linearGradient>
-                    </defs>
-                    <motion.circle
-                      cx="45"
-                      cy="45"
-                      r={ringR}
-                      fill="none"
-                      stroke="url(#creditRing)"
-                      strokeWidth="9"
-                      strokeLinecap="round"
-                      strokeDasharray={ringC}
-                      initial={{ strokeDashoffset: ringC }}
-                      whileInView={{
-                        strokeDashoffset: ringC * (1 - creditPct / 100),
-                      }}
-                      viewport={{ once: true }}
-                      transition={{ duration: 1.2, ease: "easeInOut" }}
-                    />
-                  </svg>
-                  <div className="absolute inset-0 flex flex-col items-center justify-center">
-                    <span className="text-xl font-semibold leading-none text-gray-900 dark:text-white">
-                      {creditPct}%
-                    </span>
-                    <span className="mt-1 text-[9px] text-gray-400 dark:text-white/40">
-                      {creditsEarned} / {creditsNeeded} cr
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Requirement progress */}
-              <div className="rounded-2xl border border-gray-200 bg-white/40 p-5 dark:border-white/[0.06] dark:bg-white/[0.02] lg:col-span-4">
-                <p className="mb-4 text-[11px] font-medium uppercase tracking-wider text-gray-400 dark:text-white/40">
-                  Requirement progress
-                </p>
-                <div className="space-y-3.5">
-                  {reqBars.map((r, i) => (
-                    <div key={r.label}>
-                      <div className="mb-1 flex items-center justify-between text-[11px]">
-                        <span className="text-gray-600 dark:text-white/60">
-                          {r.label}
-                        </span>
-                        <span className="font-semibold text-gray-900 dark:text-white/80">
-                          {r.pct}%
-                        </span>
-                      </div>
-                      <div className="h-2 w-full overflow-hidden rounded-full bg-black/[0.05] dark:bg-white/5">
-                        <motion.div
-                          className={`h-full rounded-full bg-gradient-to-r ${r.cls}`}
-                          initial={{ width: 0 }}
-                          whileInView={{ width: `${r.pct}%` }}
-                          viewport={{ once: true }}
-                          transition={{
-                            duration: 0.9,
-                            delay: 0.15 + i * 0.12,
-                            ease: "easeOut",
-                          }}
-                        />
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Distributional coverage */}
-              <div className="rounded-2xl border border-gray-200 bg-white/40 p-5 dark:border-white/[0.06] dark:bg-white/[0.02] lg:col-span-4">
-                <p className="mb-4 text-[11px] font-medium uppercase tracking-wider text-gray-400 dark:text-white/40">
-                  Distributional coverage
-                </p>
-                <div className="grid grid-cols-3 gap-3">
-                  {distros.map((d) => {
-                    const met = d.done >= d.need;
-                    return (
-                      <div
-                        key={d.label}
-                        className="flex flex-col items-center gap-1.5 rounded-xl border border-gray-200/70 bg-black/[0.02] py-2.5 dark:border-white/[0.06] dark:bg-white/[0.02]"
-                      >
-                        <span
-                          className="flex h-7 w-7 items-center justify-center rounded-full text-[11px] font-bold text-white"
-                          style={{
-                            background: d.color,
-                            opacity: met ? 1 : 0.45,
-                          }}
-                        >
-                          {d.label}
-                        </span>
-                        <span className="flex items-center gap-0.5 text-[10px] font-medium text-gray-500 dark:text-white/45">
-                          {met ? (
-                            <FiCheck size={9} className="text-emerald-500" />
-                          ) : null}
-                          {d.done}/{d.need}
-                        </span>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            </div>
-          </div>
-        </Reveal>
-      </div>
-    </section>
-  );
-}
-
-/* ----------------------------------------------------------- */
-/* Navbar                                                      */
-/* ----------------------------------------------------------- */
-
-const NAV_LINKS = [
-  { label: "Features", href: "#features" },
-  { label: "How it works", href: "#how" },
-  { label: "Numbers", href: "#numbers" },
-  { label: "Team", href: "#team" },
+const CHART_COLORS = [
+  "#8B5CF6", // purple
+  "#3B82F6", // blue
+  "#10B981", // emerald
+  "#F59E0B", // amber
+  "#EC4899", // pink
+  "#6366F1", // indigo
+  "#F97316", // orange
+  "#14B8A6", // teal
 ];
 
-function Navbar({ onLogin }: { onLogin: () => void }) {
-  const [scrolled, setScrolled] = useState(false);
-  const { theme, toggleTheme } = useTheme();
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 16);
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
-
+function MajorProgressBar({ percent }: { percent: number }) {
   return (
-    <motion.nav
-      initial={{ y: -24, opacity: 0 }}
-      animate={{ y: 0, opacity: 1 }}
-      transition={{ duration: 0.6 }}
-      className={`fixed inset-x-0 top-0 z-50 transition-all duration-300 ${
-        scrolled
-          ? "border-b border-gray-200/60 bg-white/80 backdrop-blur-xl dark:border-white/[0.07] dark:bg-[#08080a]/80"
-          : "border-b border-transparent"
-      }`}
-    >
-      <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-6">
-        <Link href="#top" className="flex items-center">
-          <CompoundLogo animated size="sm" darkAlways />
-        </Link>
-
-        <div className="hidden items-center gap-7 md:flex">
-          {NAV_LINKS.map((l) => (
-            <a
-              key={l.href}
-              href={l.href}
-              className="text-sm text-gray-500 transition-colors hover:text-gray-900 dark:text-white/55 dark:hover:text-white"
-            >
-              {l.label}
-            </a>
-          ))}
-        </div>
-
-        <div className="flex items-center gap-2">
-          <button
-            onClick={toggleTheme}
-            aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
-            className="flex h-8 w-8 items-center justify-center rounded-lg text-gray-500 transition-colors hover:bg-black/[0.05] hover:text-gray-700 dark:text-white/50 dark:hover:bg-white/[0.06] dark:hover:text-white/80"
-          >
-            {theme === "dark" ? <Sun size={16} /> : <Moon size={16} />}
-          </button>
-          <button
-            onClick={onLogin}
-            className="hidden rounded-lg px-3 py-1.5 text-sm text-gray-600 transition-colors hover:text-gray-900 dark:text-white/70 dark:hover:text-white sm:block"
-          >
-            Log in
-          </button>
-          <button
-            onClick={onLogin}
-            className="group flex items-center gap-1.5 rounded-lg bg-gray-900 px-3.5 py-1.5 text-sm font-medium text-white transition-all hover:bg-gray-700 dark:bg-white dark:text-black dark:hover:bg-pink-50"
-          >
-            Get started
-            <FiArrowRight
-              size={14}
-              className="transition-transform group-hover:translate-x-0.5"
-            />
-          </button>
-        </div>
-      </div>
-    </motion.nav>
+    <div className="w-full bg-gray-100 dark:bg-gray-900/80 rounded-full h-3 overflow-hidden border border-black/[0.05] dark:border-white/[0.05] shadow-[inset_0_2px_4px_rgba(0,0,0,0.3)]">
+      <motion.div
+        initial={{ width: 0 }}
+        whileInView={{ width: `${Math.min(Math.max(percent, 0), 100)}%` }}
+        viewport={{ once: true, amount: 0.4 }}
+        transition={{ duration: 1, ease: "easeOut" }}
+        className="h-3 rounded-full bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 shadow-[0_0_12px_rgba(139,92,246,0.4),inset_0_1px_0_rgba(255,255,255,0.3)]"
+      />
+    </div>
   );
 }
 
-/* ----------------------------------------------------------- */
-/* Page                                                         */
-/* ----------------------------------------------------------- */
-
-export default function PublicFacingPage() {
+export default function AboutPage() {
   const [logInFlow, setLogInFlow] = useState(false);
-  const [showVideo, setShowVideo] = useState(false);
+  const [showVideoModal, setShowVideoModal] = useState(false);
 
+  // Close modal on ESC key
   useEffect(() => {
-    const onEsc = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setShowVideo(false);
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setShowVideoModal(false);
     };
-    if (showVideo) {
-      document.addEventListener("keydown", onEsc);
+    if (showVideoModal) {
+      document.addEventListener("keydown", handleEsc);
       document.body.style.overflow = "hidden";
     }
     return () => {
-      document.removeEventListener("keydown", onEsc);
+      document.removeEventListener("keydown", handleEsc);
       document.body.style.overflow = "";
     };
-  }, [showVideo]);
+  }, [showVideoModal]);
 
-  const login = () => setLogInFlow(true);
+  const lineRef = useRef<HTMLDivElement | null>(null);
+  const lineInView = useInView(lineRef, { once: true, amount: 0.35 });
+  const pieRef = useRef<HTMLDivElement | null>(null);
+  const pieInView = useInView(pieRef, { once: true, amount: 0.35 });
+  const cardsRef = useRef<HTMLDivElement | null>(null);
+  const cardsInView = useInView(cardsRef, { once: true, amount: 0.35 });
+
+  const features = [
+    {
+      title: "No more spreadsheet nightmares.",
+      description:
+        "We automated the tedious parts of academic planning so you don't have to maintain those fragile Google Sheets formulas.",
+      icon: <FiBarChart2 className="w-5 h-5" />,
+    },
+    {
+      title: "Major (and even concentration) reqs at a glance.",
+      description:
+        "See exactly what you've completed and what remains for your major—no more digging through PDF requirements or five different poorly organized websites 4 clicks deep.",
+      icon: <FiSearch className="w-5 h-5" />,
+    },
+    {
+      title: "Built by Yalies, for Yalies.",
+      description:
+        "Born from our own frustrations with double major planning. We're solving the problems we actually faced. Rather than gatekeeping, we decided to make it clean and publish it.",
+      icon: <GraduationCap className="w-5 h-5" />,
+    },
+  ];
+
+  // --- mock for public preview ---
+  const demoTotals = { completed: 5, inProgress: 3, total: 12 };
+
+  const demoStrictPct = Math.round(
+    (demoTotals.completed / demoTotals.total) * 100,
+  );
+  const demoWithIPPct = Math.round(
+    ((demoTotals.completed + demoTotals.inProgress) / demoTotals.total) * 100,
+  );
+
+  // Mock requirement cards mirroring the real MajorProgressView layout:
+  // status-colored card + n/N badge + course pills (emerald=complete,
+  // blue=in progress, red=not taken). Marketing preview only, no fetching.
+  type DemoPill = {
+    code: string;
+    cr: number;
+    status: "complete" | "in-progress" | "not-taken";
+  };
+  type DemoReq = {
+    name: string;
+    have: number;
+    required: number;
+    status: "in-progress" | "not-started";
+    desc: string;
+    pills: DemoPill[];
+  };
+  const demoReqs: DemoReq[] = [
+    {
+      name: "Introductory Sequence",
+      have: 2,
+      required: 2,
+      status: "in-progress",
+      desc: "Two foundational courses.",
+      pills: [
+        { code: "CPSC 201", cr: 1, status: "complete" },
+        { code: "CPSC 202", cr: 1, status: "complete" },
+      ],
+    },
+    {
+      name: "Core Systems",
+      have: 1,
+      required: 3,
+      status: "in-progress",
+      desc: "Three systems-level courses.",
+      pills: [
+        { code: "CPSC 223", cr: 1, status: "complete" },
+        { code: "CPSC 323", cr: 1, status: "in-progress" },
+        { code: "CPSC 365", cr: 1, status: "not-taken" },
+      ],
+    },
+    {
+      name: "Mathematics",
+      have: 0,
+      required: 2,
+      status: "not-started",
+      desc: "Two math electives.",
+      pills: [
+        { code: "MATH 222", cr: 1, status: "not-taken" },
+        { code: "MATH 241", cr: 1, status: "not-taken" },
+      ],
+    },
+  ];
+
+  // Mock heat-map grid: each cell is a requirement's fulfilment state.
+  const demoHeat: Array<"complete" | "in-progress" | "not-taken"> = [
+    "complete",
+    "complete",
+    "complete",
+    "in-progress",
+    "complete",
+    "in-progress",
+    "in-progress",
+    "not-taken",
+    "complete",
+    "not-taken",
+    "not-taken",
+    "not-taken",
+  ];
 
   if (logInFlow) return <LoginPage onBackClick={() => setLogInFlow(false)} />;
 
   return (
-    <div
-      id="top"
-      className="min-h-screen overflow-x-hidden bg-white font-louize text-gray-900 antialiased dark:bg-[#08080a] dark:text-white"
-    >
-      <Navbar onLogin={login} />
-
-      {/* ================= HERO ================= */}
-      <header className="relative isolate px-4 pb-24 pt-36 sm:px-6 sm:pt-44">
-        <HeroShards />
-
-        <div className="relative mx-auto max-w-4xl text-center">
-          <motion.a
-            href={YDN_URL}
-            target="_blank"
-            rel="noreferrer"
-            initial={{ opacity: 0, y: -8 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="group mb-7 inline-flex items-center gap-2.5 rounded-full border border-gray-200 bg-black/[0.03] py-1.5 pl-3 pr-3.5 text-xs text-gray-600 backdrop-blur-md transition-colors hover:border-pink-400/40 hover:text-gray-900 dark:border-white/10 dark:bg-white/[0.04] dark:text-white/70 dark:hover:text-white"
-          >
-            <span className="text-[11px] uppercase tracking-[0.18em] text-gray-400 dark:text-white/45">
-              As featured in
-            </span>
-            <span className="h-3.5 w-px bg-gray-300 dark:bg-white/15" />
-            <span className="font-louize text-sm font-medium tracking-tight text-gray-900 dark:text-white">
-              The Yale Daily News
-            </span>
-            <FiArrowUpRight
-              size={13}
-              className="opacity-60 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
-            />
-          </motion.a>
-
-          <motion.h1
-            initial={{ opacity: 0, y: 24 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, ease: [0.21, 0.6, 0.2, 1] }}
-            className="text-balance text-5xl font-semibold leading-[0.98] tracking-tight sm:text-7xl"
-          >
-            The shortcut to your
-            <br />
-            <span className="rc-gradient-text">Yale degree.</span>
-          </motion.h1>
-
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.12 }}
-            className="mx-auto mt-6 max-w-xl text-pretty text-lg leading-relaxed text-gray-600 dark:text-white/60"
-          >
-            Every requirement, every major, every plan in one fast, beautiful
-            place. We&apos;re democratizing academic planning, stats, and
-            insights at Yale, together.
-          </motion.p>
-
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.18 }}
-            className="mt-5 flex justify-center"
-          >
-            <Link
-              href="#team"
-              className="group inline-flex items-center gap-2.5 rounded-full border border-gray-200 bg-black/[0.03] py-1.5 pl-1.5 pr-4 text-sm text-gray-700 backdrop-blur-md transition-colors hover:border-pink-400/40 hover:text-gray-900 dark:border-white/10 dark:bg-white/[0.04] dark:text-white/70 dark:hover:text-white"
+    <div className="min-h-screen pt-2 bg-gradient-to-br from-gray-50 via-gray-100 to-white dark:from-gray-950 dark:via-gray-900 dark:to-gray-900 font-louize overflow-x-hidden">
+      <CosmicBackground mode="stars" opacity={0.9} />
+      {/* Welcome Banner */}
+      <div className="relative mb-8 mt-14 z-30 bg-gradient-to-r from-emerald-900/20 via-blue-900/20 to-purple-900/20 backdrop-blur-xl border-b border-white/[0.08] shadow-[0_8px_32px_rgba(0,0,0,0.3),inset_0_1px_0_rgba(255,255,255,0.1)]">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-2.5 flex items-center justify-center gap-2">
+          <span className="px-2.5 py-1 text-[10px] sm:text-xs font-semibold rounded-full bg-gradient-to-r from-emerald-500/20 to-emerald-600/20 border border-emerald-500/30 text-emerald-300 shadow-[inset_0_1px_0_rgba(255,255,255,0.1),0_2px_8px_rgba(52,211,153,0.2)] flex items-center gap-1 shrink-0">
+            <HiSparkles className="w-3 h-3" />{" "}
+            <span className="hidden sm:inline">News</span>
+          </span>
+          <p className="text-[11px] sm:text-sm text-emerald-100">
+            <span className="sm:hidden">The YDN featured us.</span>
+            <span className="hidden sm:inline">
+              The Yale Daily News featured us.
+            </span>{" "}
+            <a
+              href="https://yaledailynews.com/blog/2025/09/23/new-student-run-platform-aims-to-simplify-degree-planning/"
+              target="_blank"
+              className="text-blue-600 dark:text-blue-300 font-medium hover:text-gray-900 dark:hover:text-white hover:underline transition-colors"
             >
-              <span className="flex -space-x-2">
-                <img
-                  src="/team/filippo.jpeg"
-                  alt="Filippo Fonseca"
-                  loading="lazy"
-                  className="relative z-10 h-6 w-6 rounded-full object-cover ring-2 ring-white dark:ring-[#08080a]"
-                />
-                <img
-                  src="/team/emir.JPG"
-                  alt="Emir"
-                  loading="lazy"
-                  className="h-6 w-6 rounded-full object-cover ring-2 ring-white dark:ring-[#08080a]"
-                />
-              </span>
-              <span className="font-medium">For Yalies, by Yalies</span>
-              <FiArrowUpRight
-                size={13}
-                className="opacity-60 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
-              />
-            </Link>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 18 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.22 }}
-            className="mt-9 flex flex-wrap items-center justify-center gap-3"
-          >
-            <button
-              onClick={login}
-              className="group flex items-center gap-2 rounded-xl bg-gray-900 px-5 py-3 text-sm font-semibold text-white shadow-[0_8px_30px_-8px_rgba(0,0,0,0.3)] transition-all hover:scale-[1.03] dark:bg-white dark:text-black dark:shadow-[0_8px_30px_-8px_rgba(255,255,255,0.4)]"
-            >
-              <GraduationCap size={16} /> Log in with Yale CAS
-              <FiArrowRight
-                size={15}
-                className="transition-transform group-hover:translate-x-0.5"
-              />
-            </button>
-            <button
-              onClick={() => setShowVideo(true)}
-              className="group flex items-center gap-2 rounded-xl border border-gray-300 bg-black/[0.03] px-5 py-3 text-sm font-medium text-gray-700 backdrop-blur-md transition-all hover:border-gray-400 hover:bg-black/[0.05] dark:border-white/12 dark:bg-white/[0.04] dark:text-white/85 dark:hover:border-white/25 dark:hover:bg-white/[0.07]"
-            >
-              <FiPlay size={14} className="text-pink-300" /> Watch the v2 launch
-            </button>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.32 }}
-            className="mt-8 flex flex-wrap items-center justify-center gap-x-3 gap-y-2"
-          >
-            <div className="flex -space-x-2.5">
-              {[
-                "from-pink-400 to-rose-500",
-                "from-violet-400 to-purple-500",
-                "from-sky-400 to-blue-500",
-                "from-fuchsia-400 to-pink-500",
-                "from-indigo-400 to-violet-500",
-              ].map((g, i) => (
-                <span
-                  key={i}
-                  className={`h-7 w-7 rounded-full bg-gradient-to-br ${g} ring-2 ring-white dark:ring-[#08080a]`}
-                />
-              ))}
-            </div>
-            <p className="text-sm text-gray-600 dark:text-white/65">
-              Have you heard?{" "}
-              <span className="font-semibold text-gray-900 dark:text-white">
-                1 in 6 Yale undergrads
-              </span>{" "}
-              already use DegreeIntelligence.
-            </p>
-          </motion.div>
-
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.8, delay: 0.4 }}
-            className="mt-4 text-sm text-gray-400 dark:text-white/45"
-          >
-            Why don&apos;t you? Even if you do,{" "}
-            <span className="rc-gradient-text font-medium">
-              we just launched v2. Free. Always.
-            </span>
-          </motion.p>
-        </div>
-      </header>
-
-      {/* ================= PRESS STRIP ================= */}
-      <section className="relative border-y border-gray-200 py-10 dark:border-white/[0.06]">
-        <div className="mx-auto max-w-5xl px-4 text-center sm:px-6">
-          <p className="text-xs uppercase tracking-[0.25em] text-gray-400 dark:text-white/30">
-            Trusted by Yale undergraduates across every residential college
+              Read it!
+            </a>
           </p>
-          <div className="mt-6 flex flex-wrap items-center justify-center gap-x-10 gap-y-4 text-sm font-medium text-gray-500 dark:text-white/45">
-            <span className="text-base font-semibold text-gray-700 dark:text-white/70">
-              1 in 6 undergrads
-            </span>
-            <span className="hidden h-4 w-px bg-gray-200 dark:bg-white/10 sm:block" />
-            <span className="font-louize text-base text-gray-600 dark:text-white/65">
-              The Yale Daily News
-            </span>
-            <span className="hidden h-4 w-px bg-gray-200 dark:bg-white/10 sm:block" />
-            <span>14 residential colleges</span>
-            <span className="hidden h-4 w-px bg-gray-200 dark:bg-white/10 sm:block" />
-            <span>Every major &amp; concentration</span>
-          </div>
         </div>
-      </section>
+      </div>
 
-      {/* ================= BENTO FEATURES ================= */}
-      <section id="features" className="relative px-4 py-28 sm:px-6">
-        <div className="mx-auto max-w-6xl">
-          <SectionHeader
-            eyebrow="Everything, in one place"
-            title={
-              <>
-                There&apos;s a tool for every part
-                <br className="hidden sm:block" /> of your degree.
-              </>
-            }
-            sub="From the first requirement to your final semester, DegreeIntelligence replaces the spreadsheets, the PDFs, and the five poorly-organized websites you used to dig through."
-          />
+      {/* Sticky Navbar */}
+      <motion.nav
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="fixed top-0 left-0 right-0 z-50 bg-white/80 dark:bg-gray-950/80 backdrop-blur-xl border-b border-black/[0.06] dark:border-white/[0.06] shadow-[0_4px_24px_rgba(0,0,0,0.3)]"
+      >
+        <div className="max-w-6xl mx-auto px-3 sm:px-6 lg:px-8 py-2.5 sm:py-3 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <LogoIcon width={22} height={22} className="sm:w-6 sm:h-6" />
+            <span className="text-sm font-medium text-gray-800 dark:text-gray-200 hidden sm:inline">
+              DegreeIntelligence
+            </span>
+          </div>
+          <motion.button
+            className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm bg-gradient-to-r from-pink-500/20 via-purple-500/20 to-blue-500/20 hover:from-pink-500/30 hover:via-purple-500/30 hover:to-blue-500/30 backdrop-blur-xl rounded-lg sm:rounded-xl text-gray-900 dark:text-white font-medium transition-all shadow-[0_4px_20px_rgba(139,92,246,0.2),inset_0_1px_0_rgba(255,255,255,0.1)] border border-black/[0.08] dark:border-white/[0.1]"
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            onClick={() => setLogInFlow(true)}
+          >
+            <span className="sm:hidden">Log in</span>
+            <span className="hidden sm:inline">Log in with CAS</span>
+            <FiArrowRight size={14} className="opacity-70" />
+          </motion.button>
+        </div>
+      </motion.nav>
 
-          <div className="mt-16 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-6">
-            <FeatureCard
-              className="lg:col-span-4"
-              tint="blue"
-              icon={<FiZap />}
-              title="Semester simulator"
-              desc="Drag courses into future semesters, check conflicts, and see your plan come together before you commit to a single class."
+      {/* Hero Section */}
+      <div className="relative pt-6 sm:pt-8l">
+        {/* Cursor-adaptive constellation background (sits behind hero content) */}
+        <HeroConstellation />
+        {/* increased top padding to fix logo spacing */}
+        <div className="max-w-6xl mx-auto px-4 pb-3 sm:px-6 lg:px-8 relative z-10">
+          <motion.div
+            initial={{ opacity: 1, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            className="text-center p-6 sm:p-8 rounded-2xl bg-white/70 dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 backdrop-blur-xl border border-black/[0.06] dark:border-white/[0.08] shadow-[0_8px_48px_rgba(0,0,0,0.4),0_0_100px_rgba(139,92,246,0.08),inset_0_1px_0_rgba(255,255,255,0.1)] ring-1 ring-black/[0.04] dark:ring-white/[0.05]"
+          >
+            {/* Version Badge */}
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              className="mb-4 flex justify-center"
             >
-              <div className="overflow-hidden rounded-lg border border-gray-200 dark:border-white/10">
-                <img
-                  src="/demo/simulator.gif"
-                  alt="Semester simulator"
-                  loading="lazy"
-                  decoding="async"
-                  className="block w-full"
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase bg-gradient-to-r from-blue-500/20 via-purple-500/20 to-pink-500/20 border border-white/[0.15] shadow-[0_4px_20px_rgba(139,92,246,0.25),inset_0_1px_0_rgba(255,255,255,0.15)] backdrop-blur-xl">
+                <span className="w-1.5 h-1.5 rounded-full bg-gradient-to-r from-emerald-400 to-emerald-500 animate-pulse shadow-[0_0_8px_rgba(52,211,153,0.6)]"></span>
+                <span className="bg-gradient-to-r from-blue-300 via-purple-300 to-pink-300 bg-clip-text text-transparent">
+                  Introducing DegreeIntelligence v2
+                </span>
+              </span>
+            </motion.div>
+
+            <div className="flex justify-center mb-5">
+              {/* more space under logo */}
+              <div className="relative w-20 h-20">
+                <motion.div
+                  animate={{ rotate: 360 }}
+                  transition={{
+                    duration: 20,
+                    repeat: Infinity,
+                    ease: "linear",
+                  }}
+                  className="absolute inset-0 rounded-full border-2 border-transparent border-t-blue-400/30 border-r-purple-400/30"
                 />
-              </div>
-            </FeatureCard>
-
-            <FeatureCard
-              className="lg:col-span-2"
-              tint="purple"
-              icon={<FiBarChart2 />}
-              title="Major progress"
-              badge="New"
-              desc="A live heat map of everything done and everything left, with a built-in double-major conflict manager that flags overlaps and shared courses across both majors."
-            >
-              <HeatGrid />
-            </FeatureCard>
-
-            <FeatureCard
-              className="lg:col-span-2"
-              tint="pink"
-              icon={<FiSearch />}
-              title="Requirements database"
-              desc="Every major and concentration requirement, parsed and tracked for you."
-            >
-              <ReqChecklist />
-            </FeatureCard>
-
-            <FeatureCard
-              className="lg:col-span-2"
-              tint="violet"
-              icon={<HiSparkles />}
-              title="Smart recommendations"
-              desc="Suggestion models surface courses that actually fit your plan."
-            >
-              <SuggestionChips />
-            </FeatureCard>
-
-            <FeatureCard
-              className="lg:col-span-2"
-              tint="rose"
-              icon={<FiUsers />}
-              title="Friends"
-              desc="See where friends and mentors slotted their courses."
-            >
-              <FriendsRows />
-            </FeatureCard>
-
-            <FeatureCard
-              className="lg:col-span-3"
-              tint="indigo"
-              icon={<FiLayers />}
-              title="Double-major manager"
-              desc="Juggle two majors without the chaos. Shared courses, conflicts, and overlap, made obvious."
-            >
-              <DoubleMajorMock />
-            </FeatureCard>
-
-            <FeatureCard
-              className="lg:col-span-3"
-              tint="pink"
-              icon={<FiTrendingUp />}
-              title="Stats & GPA"
-              desc="Track your GPA trend, credits, and grade distribution at a glance."
-            >
-              <StatsMini />
-            </FeatureCard>
-          </div>
-        </div>
-      </section>
-
-      {/* ================= HOW IT WORKS ================= */}
-      <section id="how" className="relative px-4 py-28 sm:px-6">
-        <div className="mx-auto max-w-6xl">
-          <SectionHeader
-            eyebrow="How it works"
-            title="From transcript to plan in minutes."
-            sub="No setup, no spreadsheets. Sign in with CAS and your whole degree assembles itself."
-          />
-          <div className="mt-16 grid items-start gap-10 lg:grid-cols-2">
-            <div className="lg:sticky lg:top-28">
-              <div className="rc-window rounded-2xl">
-                <BrowserChrome url="degreeint.com/simulator">
-                  <img
-                    src="/demo/simulator.gif"
-                    alt="DegreeIntelligence in action"
-                    loading="lazy"
-                    decoding="async"
-                    className="block w-full"
-                  />
-                </BrowserChrome>
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <LogoIcon width={40} height={40} />
+                </div>
               </div>
             </div>
-            <div className="space-y-4">
-              {[
-                {
-                  n: "01",
-                  t: "Sign in with Yale CAS",
-                  d: "One click. We pull in your major, your courses, and your progress automatically.",
-                },
-                {
-                  n: "02",
-                  t: "Watch every requirement light up",
-                  d: "A live, color-coded view of what's done, what's in progress, and what's left for every major and concentration.",
-                },
-                {
-                  n: "03",
-                  t: "Simulate future semesters",
-                  d: "Drag courses around, catch conflicts between your two majors early, and share your plan with friends and advisors.",
-                },
-              ].map((s, i) => (
-                <Reveal key={s.n} delay={i * 0.08}>
-                  <div className="rc-card-hover flex gap-4 rounded-2xl border border-gray-200 bg-black/[0.02] p-5 dark:border-white/[0.08] dark:bg-white/[0.02]">
-                    <span className="rc-gradient-text text-2xl font-semibold tabular-nums">
-                      {s.n}
+
+            <h1 className="flex items-center justify-center text-4xl font-bold tracking-tight text-gray-900 dark:text-white mb-3">
+              <CompoundLogo hideLogo animated size="lg" />
+            </h1>
+            {/* Welcome Badge */}
+            <div className="mb-3 flex justify-center">
+              <div className="relative p-[1px] rounded-xl bg-gradient-to-r from-pink-500/40 via-purple-500/40 to-blue-500/40">
+                <span className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-medium bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/90 dark:via-gray-900/80 dark:to-gray-950/90 text-pink-600 dark:text-pink-200 shadow-[0_8px_32px_rgba(236,72,153,0.2),inset_0_1px_0_rgba(255,255,255,0.1),inset_0_-1px_0_rgba(0,0,0,0.2)] backdrop-blur-xl">
+                  <FiHeart className="w-3 h-3 text-blue-400" /> We're so glad
+                  you're here. We think you'll love this.
+                </span>
+              </div>
+            </div>
+
+            <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-4">
+              Your Yale Degree,
+              <br className="sm:hidden" />
+              <span className="hidden sm:inline"> </span>
+              <span className="text-blue-600 dark:text-blue-300">made easy.</span>
+            </h2>
+
+            <p className="text-base text-gray-700 dark:text-gray-300 max-w-2xl mx-auto mb-5">
+              Let's democratize academic planning, stats, & insights at Yale,
+              together.{" "}
+              <Link
+                href="#team"
+                className="inline-flex items-center gap-1.5 text-transparent bg-clip-text bg-gradient-to-r from-blue-300 to-purple-300 hover:from-blue-200 hover:to-purple-200 font-medium transition-all group"
+              >
+                For Yalies, by Yalies
+                <span className="text-purple-400 text-sm opacity-70 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all">
+                  ↓
+                </span>
+              </Link>
+            </p>
+
+            <motion.div className="flex flex-wrap justify-center gap-3">
+              <motion.button
+                className="px-5 py-2.5 text-sm bg-gradient-to-br from-black/[0.04] to-transparent dark:from-white/[0.06] hover:from-black/[0.08] dark:hover:from-white/[0.1] backdrop-blur-xl rounded-xl text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white font-medium flex items-center gap-2 transition-all shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] border border-black/[0.06] dark:border-white/[0.08] hover:border-black/[0.12] dark:hover:border-white/[0.15]"
+                whileHover={{ scale: 1.03, y: -2 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={() => setShowVideoModal(true)}
+              >
+                See v2 launch vid
+                <FiPlayCircle className="opacity-70" size={14} />
+              </motion.button>
+              <motion.button
+                className="group relative px-5 py-2.5 text-sm rounded-xl text-white font-medium flex items-center gap-2 transition-all overflow-hidden"
+                whileHover={{ scale: 1.03, y: -2 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={() => setLogInFlow(true)}
+              >
+                {/* Animated gradient border */}
+                <span
+                  className="absolute inset-0 rounded-xl bg-[conic-gradient(from_var(--angle),#06b6d4,#8b5cf6,#ec4899,#f97316,#06b6d4)] p-[2px] animate-border-spin"
+                  style={{ "--angle": "0deg" } as React.CSSProperties}
+                >
+                  <span className="flex h-full w-full rounded-[10px] bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl" />
+                </span>
+                {/* Glow effect */}
+                <span
+                  className="absolute inset-0 rounded-xl opacity-50 blur-md bg-[conic-gradient(from_var(--angle),#06b6d4,#8b5cf6,#ec4899,#f97316,#06b6d4)] animate-border-spin"
+                  style={{ "--angle": "0deg" } as React.CSSProperties}
+                />
+                {/* Button content */}
+                <span className="relative z-10 flex items-center gap-2">
+                  Log in with CAS
+                  <FiArrowRight
+                    className="opacity-80 group-hover:translate-x-0.5 transition-transform"
+                    size={14}
+                  />
+                </span>
+              </motion.button>
+            </motion.div>
+
+            {/* Social Proof */}
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.3 }}
+              className="mt-8 pt-6 border-t border-white/[0.08]"
+            >
+              <p className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-blue-200 via-purple-200 to-pink-200 bg-clip-text text-transparent leading-relaxed">
+                Have you heard? 1 in 6 Yale undergrads already use DegreeIntelligence.
+              </p>
+              <p className="text-base text-gray-500 dark:text-gray-400 mt-2">
+                Why don't you? Even if you do...{" "}
+                <span className="text-purple-600 dark:text-purple-300 font-medium">
+                  We just launched v2. Free. Always.
+                </span>
+              </p>
+
+              {/* V2 Launch Video */}
+              <motion.div
+                initial={{ opacity: 0, y: 15 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.5 }}
+                className="mt-8"
+              >
+                {/* Caption */}
+                <div className="mb-4 text-center">
+                  <p className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed">
+                    <span className="font-semibold bg-gradient-to-r from-pink-300 via-purple-300 to-blue-300 bg-clip-text text-transparent">
+                      OUR V2 LAUNCH — FEB 2026.
                     </span>
-                    <div>
-                      <h3 className="mb-1 text-lg font-semibold text-gray-900 dark:text-white">
-                        {s.t}
-                      </h3>
-                      <p className="text-sm leading-relaxed text-gray-500 dark:text-white/50">
-                        {s.d}
-                      </p>
+                    <br />
+                    <span className="text-gray-400 dark:text-gray-500">
+                      it's prettier. it's faster. it's better. you should
+                      probably check it out idk
+                    </span>
+                  </p>
+                </div>
+
+                {/* Video Container */}
+                <div className="relative mx-auto max-w-2xl">
+                  {/* Glow effect */}
+                  <div className="absolute -inset-1 bg-gradient-to-r from-pink-500/20 via-purple-500/20 to-blue-500/20 rounded-2xl blur-xl opacity-60" />
+
+                  {/* Video wrapper */}
+                  <div className="relative rounded-2xl overflow-hidden border-2 border-black/[0.08] dark:border-white/[0.1] shadow-[0_8px_48px_rgba(0,0,0,0.5),0_0_60px_rgba(139,92,246,0.15),inset_0_1px_0_rgba(255,255,255,0.1)] bg-white/80 dark:bg-gray-950/80 backdrop-blur-xl">
+                    {/* Decorative top bar */}
+                    <div className="flex items-center gap-1.5 px-4 py-2.5 bg-gradient-to-r from-gray-100/80 to-gray-50/80 dark:from-gray-900/80 dark:to-gray-950/80 border-b border-black/[0.05] dark:border-white/[0.06]">
+                      <div className="w-2.5 h-2.5 rounded-full bg-red-500/80" />
+                      <div className="w-2.5 h-2.5 rounded-full bg-yellow-500/80" />
+                      <div className="w-2.5 h-2.5 rounded-full bg-green-500/80" />
+                      <span className="ml-3 text-[10px] text-gray-400 dark:text-gray-500 font-medium tracking-wide">
+                        v2-launch-vid.mp4
+                      </span>
+                    </div>
+
+                    {/* Video embed */}
+                    <div className="aspect-video">
+                      <iframe
+                        width="560"
+                        height="315"
+                        src="https://www.youtube.com/embed/5H1kjMWQfgs?si=F9mSXs1G_Wy1Fkx-"
+                        title="YouTube video player"
+                        frameBorder="0"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                        referrerPolicy="strict-origin-when-cross-origin"
+                        allowFullScreen
+                        className="w-full h-full"
+                      ></iframe>
                     </div>
                   </div>
-                </Reveal>
-              ))}
-            </div>
-          </div>
+                </div>
+              </motion.div>
+            </motion.div>
+          </motion.div>
         </div>
-      </section>
 
-      {/* ================= BEFORE / AFTER ================= */}
-      <section className="relative px-4 py-20 sm:px-6">
-        <div className="mx-auto grid max-w-5xl gap-4 md:grid-cols-2">
-          <Reveal>
-            <div className="h-full rounded-2xl border border-gray-200 bg-black/[0.015] p-7 dark:border-white/[0.06] dark:bg-white/[0.015]">
-              <p className="mb-5 text-xs font-semibold uppercase tracking-[0.2em] text-gray-400 dark:text-white/30">
-                Before
-              </p>
-              <ul className="space-y-3">
+        {/* subtle splash gradient */}
+        <div className="pointer-events-none absolute inset-0 -z-10">
+          <div className="absolute left-1/2 top-10 -translate-x-1/2 h-72 w-[36rem] rounded-full bg-gradient-to-r from-blue-600/20 to-purple-600/20 blur-3xl" />
+        </div>
+      </div>
+
+      {/* Blueprint Section */}
+      <div className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="bg-white/70 dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/70 dark:via-gray-900/50 dark:to-gray-950/70 backdrop-blur-2xl rounded-2xl p-6 border border-black/[0.06] dark:border-white/[0.08] shadow-[0_8px_48px_rgba(0,0,0,0.4),0_0_80px_rgba(139,92,246,0.08),inset_0_1px_0_rgba(255,255,255,0.1)] ring-1 ring-white/[0.05]">
+          <div className="text-center mb-8">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">
+              Our blueprint, broken down.
+            </h2>
+            <p className="text-sm text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+              How we believe we transformed frustration into an elegant solution
+              for academic planning and visualization at Yale.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {/* Problem */}
+            <Card fade>
+              <CardHeader
+                icon={<FiAlertCircle className="w-4 h-4" />}
+                title="The Problem"
+                color="red"
+              />
+              <ul className="space-y-2 text-gray-700 dark:text-gray-300 text-sm">
                 {[
                   "Scattered requirements across PDFs and websites",
                   "Manual tracking in error-prone spreadsheets",
                   "No centralized view of progress",
-                  "Planning nightmares, especially double majors",
-                ].map((x) => (
-                  <li
-                    key={x}
-                    className="flex items-start gap-2.5 text-sm text-gray-500 dark:text-white/45"
-                  >
-                    <FiX className="mt-0.5 shrink-0 text-gray-400 dark:text-white/30" /> {x}
+                  "Planning nightmares (esp. double majors)",
+                ].map((t) => (
+                  <li key={t} className="flex items-start gap-2">
+                    <FiChevronRight className="text-red-400 mt-1" />
+                    <span>{t}</span>
                   </li>
                 ))}
               </ul>
-            </div>
-          </Reveal>
-          <Reveal delay={0.1}>
-            <div className="relative h-full overflow-hidden rounded-2xl border border-pink-400/20 bg-gradient-to-br from-pink-500/[0.1] via-purple-500/[0.04] to-transparent p-7">
-              <div className="pointer-events-none absolute -right-10 -top-10 h-40 w-40 rounded-full bg-pink-500/20 blur-3xl" />
-              <p className="mb-5 text-xs font-semibold uppercase tracking-[0.2em] text-pink-600/80 dark:text-pink-300/80">
-                With DegreeIntelligence
-              </p>
-              <ul className="space-y-3">
+            </Card>
+
+            {/* Solution */}
+            <Card fade delay={0.1}>
+              <CardHeader
+                icon={<FiZap className="w-4 h-4" />}
+                title="Our Solution"
+                color="blue"
+              />
+              <ul className="space-y-2 text-gray-700 dark:text-gray-300 text-sm">
                 {[
                   "Unified requirements database",
-                  "Real-time progress stats & visualization",
+                  "Real-time progress stats + visualization",
                   "Intelligent course recommendations",
-                  "Clean, intuitive interface, free forever",
-                ].map((x) => (
-                  <li
-                    key={x}
-                    className="flex items-start gap-2.5 text-sm text-gray-800 dark:text-white/75"
-                  >
-                    <FiCheck className="mt-0.5 shrink-0 text-pink-400" /> {x}
+                  "Clean, intuitive interface",
+                ].map((t) => (
+                  <li key={t} className="flex items-start gap-2">
+                    <FiChevronRight className="text-blue-400 mt-1" />
+                    <span>{t}</span>
                   </li>
                 ))}
               </ul>
+            </Card>
+
+            {/* Impact */}
+            <Card fade>
+              <CardHeader
+                icon={<FiTrendingUp className="w-4 h-4" />}
+                title="The Impact"
+                color="green"
+              />
+              <ul className="space-y-2 text-gray-700 dark:text-gray-300 text-sm">
+                {[
+                  "Hours saved on academic planning",
+                  "Reduced errors in requirement tracking",
+                  "Empowered students can make space for fun classes",
+                  "Democratized access to academic insights",
+                ].map((t) => (
+                  <li key={t} className="flex items-start gap-2">
+                    <FiChevronRight className="text-green-400 mt-1" />
+                    <span>{t}</span>
+                  </li>
+                ))}
+              </ul>
+            </Card>
+          </div>
+        </div>
+      </div>
+
+      {/* NEW: Simulator Section */}
+      <section
+        id="simulator"
+        className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8"
+      >
+        <div className="bg-white/70 dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/70 dark:via-gray-900/50 dark:to-gray-950/70 backdrop-blur-2xl rounded-2xl p-6 border border-black/[0.06] dark:border-white/[0.08] shadow-[0_8px_48px_rgba(0,0,0,0.4),0_0_100px_rgba(6,182,212,0.1),inset_0_1px_0_rgba(255,255,255,0.1)] ring-1 ring-cyan-500/20 overflow-hidden">
+          <div className="absolute -right-24 -top-24 h-64 w-64 rounded-full bg-cyan-500/10 blur-3xl" />
+          <div className="absolute -left-24 -bottom-24 h-64 w-64 rounded-full bg-purple-500/10 blur-3xl" />
+
+          <div className="flex flex-col lg:flex-row gap-6 items-center">
+            {/* Left: copy + bullets */}
+            <div className="flex-1 min-w-0">
+              <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+                Simulator: drag, drop, done.
+              </h3>
+              <p className="text-gray-700 dark:text-gray-300 text-sm mb-4 max-w-xl">
+                Build a semester-by-semester plan by dragging courses from your
+                major (or search <em>every</em> course at Yale). Save multiple
+                plans, load them later, and see how fun classes and
+                distributional requirements fit without breaking anything.
+              </p>
+
+              <div className="grid sm:grid-cols-2 gap-2">
+                {[
+                  {
+                    icon: <FiSearch size={14} />,
+                    text: "Search the full catalog + your major",
+                  },
+                  {
+                    icon: <FiSave size={14} />,
+                    text: "Save and duplicate plans instantly",
+                  },
+                  {
+                    icon: <FiShare2 size={14} />,
+                    text: "Share with friends / mentors",
+                  },
+                  {
+                    icon: <FiUsers size={14} />,
+                    text: "See where friends slotted courses",
+                  },
+                ].map((b) => (
+                  <div
+                    key={b.text}
+                    className="flex items-center gap-2 text-gray-700 dark:text-gray-200 bg-gradient-to-br from-black/[0.04] to-transparent dark:from-white/[0.06] border border-black/[0.06] dark:border-white/[0.08] rounded-lg px-3 py-2 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur-sm"
+                  >
+                    <span className="shrink-0 text-cyan-400 drop-shadow-[0_0_6px_rgba(6,182,212,0.5)]">
+                      {b.icon}
+                    </span>
+                    <span className="text-xs">{b.text}</span>
+                  </div>
+                ))}
+              </div>
+
+              <div className="mt-4 flex gap-2">
+                <button
+                  className="px-4 py-2 text-sm rounded-xl bg-gradient-to-r from-cyan-500/30 to-cyan-600/30 hover:from-cyan-500/40 hover:to-cyan-600/40 text-white border border-white/[0.1] shadow-[0_4px_16px_rgba(6,182,212,0.3),inset_0_1px_0_rgba(255,255,255,0.15)] transition-all duration-200"
+                  onClick={() => setLogInFlow(true)}
+                >
+                  Try Simulator
+                </button>
+                <button
+                  className="px-4 py-2 text-sm rounded-xl bg-gradient-to-br from-black/[0.04] to-transparent dark:from-white/[0.06] hover:from-black/[0.08] dark:hover:from-white/[0.1] text-gray-900 dark:text-white border border-black/[0.06] dark:border-white/[0.08] shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] transition-all duration-200"
+                  onClick={() => setShowVideoModal(true)}
+                >
+                  Watch Demo
+                </button>
+              </div>
             </div>
-          </Reveal>
+
+            {/* Right: GIF/video placeholder */}
+            <div className="flex-1 w-full px-4">
+              <div className="relative rounded-xl border-2 border-pink-500 bg-black/40 overflow-hidden shadow-2xl">
+                <img
+                  src="/demo/simulator.gif"
+                  alt="Simulator demo"
+                  className="w-[80%] h-[80%] object-cover aspect-video"
+                />
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
-      {/* ================= NUMBERS ================= */}
-      <NumbersSection />
+      {/* NEW: Stats Preview (public) */}
+      <section
+        id="stats"
+        className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8"
+      >
+        <div className="bg-white/70 dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/70 dark:via-gray-900/50 dark:to-gray-950/70 backdrop-blur-2xl rounded-2xl p-6 border border-black/[0.06] dark:border-white/[0.08] shadow-[0_8px_48px_rgba(0,0,0,0.4),0_0_100px_rgba(139,92,246,0.1),inset_0_1px_0_rgba(255,255,255,0.1)] ring-1 ring-purple-500/20 overflow-hidden">
+          <div className="absolute -right-24 -top-24 h-64 w-64 rounded-full bg-purple-500/10 blur-3xl" />
+          <div className="absolute -left-24 -bottom-24 h-64 w-64 rounded-full bg-blue-500/10 blur-3xl" />
 
-      {/* ================= TEAM ================= */}
-      <section id="team" className="relative px-4 py-28 sm:px-6">
-        <div className="mx-auto max-w-5xl">
-          <SectionHeader
-            eyebrow="Built by Yalies, for Yalies"
-            title="Born from our own frustration."
-            sub="We built the first version after one too many long sessions trying to plan courses. Rather than gatekeeping, we made it clean and published it."
-          />
-          <div className="mx-auto mt-14 grid max-w-3xl gap-4 sm:grid-cols-2">
-            {[
-              {
-                name: "Filippo Fonseca",
-                role: "Founder · Mechanical Engineering (ABET) & EECS '28",
-                bio: "Built the first version as a shell script after one too many long planning sessions. Talks too much.",
-                img: "/team/filippo.jpeg",
-              },
-              {
-                name: "Emir",
-                role: "Development · Electrical Engineering & CS (EECS) '28",
-                bio: "Joined forces to keep scaling the platform and make it more robust.",
-                img: "/team/emir.JPG",
-              },
-            ].map((p, i) => (
-              <Reveal key={p.name} delay={i * 0.1}>
-                <div className="rc-card-hover h-full rounded-2xl border border-gray-200 bg-black/[0.02] p-6 dark:border-white/[0.08] dark:bg-white/[0.02]">
-                  <img
-                    src={p.img}
-                    alt={p.name}
-                    className="mb-4 h-16 w-16 rounded-full object-cover ring-2 ring-pink-400/30"
-                  />
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{p.name}</h3>
-                  <p className="mb-3 mt-0.5 text-xs text-pink-600/70 dark:text-pink-300/70">{p.role}</p>
-                  <p className="text-sm leading-relaxed text-gray-500 dark:text-white/50">{p.bio}</p>
+          <div className="mb-4">
+            <h3 className="text-2xl font-bold text-gray-900 dark:text-white">
+              Contextual stats that actually help.
+            </h3>
+            <p className="text-gray-700 dark:text-gray-300 text-sm mt-1">
+              See your progress and trajectory in context so you know where to
+              improve, not just your grades in isolation. This is just a preview
+              of all that we have; log in to see it!
+            </p>
+          </div>
+          <div ref={cardsRef} className="mb-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+              {/* Cumulative GPA */}
+              <motion.div
+                initial={{ opacity: 0, y: 16 }}
+                animate={cardsInView ? { opacity: 1, y: 0 } : {}}
+                transition={{ duration: 0.5 }}
+                className="p-4 rounded-xl bg-gradient-to-br from-white/[0.06] via-transparent to-black/10 backdrop-blur-sm border border-white/[0.08] shadow-[0_4px_24px_rgba(0,0,0,0.2),inset_0_1px_0_rgba(255,255,255,0.1)]"
+              >
+                <div className="flex items-center justify-between">
+                  <p className="text-xs text-gray-500 dark:text-gray-400">Cumulative GPA</p>
+                  <div className="text-emerald-400 drop-shadow-[0_0_8px_rgba(52,211,153,0.5)]">
+                    <GraduationCap className="h-4 w-4" />
+                  </div>
                 </div>
-              </Reveal>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ================= CLOSING CTA: GLOWING KEYBOARD ================= */}
-      <section className="relative overflow-hidden px-4 pb-24 pt-16 sm:px-6">
-        <div className="rc-bloom pointer-events-none absolute inset-x-0 bottom-0 h-[60%] opacity-50" />
-        <div className="relative mx-auto max-w-3xl">
-          <KeyboardGraphic />
-          <Reveal>
-            <div className="mt-10 text-center">
-              <span className="mb-5 inline-flex items-center gap-1.5 rounded-full border border-gray-200 bg-black/[0.03] px-3 py-1 text-xs text-gray-600 backdrop-blur-md dark:border-white/10 dark:bg-white/[0.04] dark:text-white/65">
-                <Command size={12} className="text-pink-500 dark:text-pink-300" /> K · Search your
-                entire degree
-              </span>
-              <h2 className="text-balance text-4xl font-semibold tracking-tight text-gray-900 dark:text-white sm:text-5xl">
-                Take the short way.
-              </h2>
-              <p className="mt-4 text-lg text-gray-500 dark:text-white/55">
-                Plan your entire Yale degree in one place.{" "}
-                <span className="rc-gradient-text font-medium">
-                  Free, always.
-                </span>
-              </p>
-              <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
-                <button
-                  onClick={login}
-                  className="group flex items-center gap-2 rounded-xl bg-gray-900 px-5 py-3 text-sm font-semibold text-white transition-all hover:scale-[1.03] dark:bg-white dark:text-black"
-                >
-                  <GraduationCap size={16} /> Log in with Yale CAS
-                  <FiArrowRight
-                    size={15}
-                    className="transition-transform group-hover:translate-x-0.5"
+                <p className="text-2xl font-medium text-emerald-400 mt-1.5 drop-shadow-[0_0_12px_rgba(52,211,153,0.3)]">
+                  <CountUp
+                    to={statsMock.gpa}
+                    inView={cardsInView}
+                    decimals={2}
                   />
-                </button>
-                <button
-                  onClick={() => setShowVideo(true)}
-                  className="flex items-center gap-2 rounded-xl border border-gray-300 bg-black/[0.03] px-5 py-3 text-sm font-medium text-gray-700 transition-all hover:border-gray-400 hover:bg-black/[0.05] dark:border-white/12 dark:bg-white/[0.04] dark:text-white/85 dark:hover:border-white/25 dark:hover:bg-white/[0.07]"
-                >
-                  <FiPlay size={14} className="text-pink-500 dark:text-pink-300" /> Watch the demo
-                </button>
-              </div>
-              <p className="mt-5 text-xs text-gray-400 dark:text-white/30">
-                v2 · Sign in with Yale CAS · 1 in 6 undergrads
-              </p>
+                </p>
+              </motion.div>
+
+              {/* Total Credits */}
+              <motion.div
+                initial={{ opacity: 0, y: 16 }}
+                animate={cardsInView ? { opacity: 1, y: 0 } : {}}
+                transition={{ duration: 0.5, delay: 0.05 }}
+                className="p-4 rounded-xl bg-gradient-to-br from-white/[0.06] via-transparent to-black/10 backdrop-blur-sm border border-white/[0.08] shadow-[0_4px_24px_rgba(0,0,0,0.2),inset_0_1px_0_rgba(255,255,255,0.1)]"
+              >
+                <div className="flex items-center justify-between">
+                  <p className="text-xs text-gray-500 dark:text-gray-400">Total Credits</p>
+                  <div className="text-blue-400 drop-shadow-[0_0_8px_rgba(59,130,246,0.5)]">
+                    <BookOpen className="h-4 w-4" />
+                  </div>
+                </div>
+                <p className="text-2xl font-medium text-blue-400 mt-1.5 drop-shadow-[0_0_12px_rgba(59,130,246,0.3)]">
+                  <CountUp to={statsMock.totalCredits} inView={cardsInView} />
+                </p>
+                <p className="text-[10px] text-gray-500 dark:text-gray-400 mt-0.5">
+                  {statsMock.progressToGradPct}% to graduation
+                </p>
+              </motion.div>
+
+              {/* Courses Completed */}
+              <motion.div
+                initial={{ opacity: 0, y: 16 }}
+                animate={cardsInView ? { opacity: 1, y: 0 } : {}}
+                transition={{ duration: 0.5, delay: 0.1 }}
+                className="p-4 rounded-xl bg-gradient-to-br from-white/[0.06] via-transparent to-black/10 backdrop-blur-sm border border-white/[0.08] shadow-[0_4px_24px_rgba(0,0,0,0.2),inset_0_1px_0_rgba(255,255,255,0.1)]"
+              >
+                <div className="flex items-center justify-between">
+                  <p className="text-xs text-gray-500 dark:text-gray-400">Courses Completed</p>
+                  <div className="text-purple-600 dark:text-purple-300 drop-shadow-[0_0_8px_rgba(216,180,254,0.5)]">
+                    <Award className="h-4 w-4" />
+                  </div>
+                </div>
+                <p className="text-2xl font-medium text-purple-600 dark:text-purple-300 mt-1.5 drop-shadow-[0_0_12px_rgba(216,180,254,0.3)]">
+                  <CountUp
+                    to={statsMock.coursesCompleted}
+                    inView={cardsInView}
+                  />
+                </p>
+                <p className="text-[10px] text-gray-500 dark:text-gray-400 mt-0.5">
+                  & 5 courses in progress right now
+                </p>
+              </motion.div>
+
+              {/* Average Credits / Semester */}
+              <motion.div
+                initial={{ opacity: 0, y: 16 }}
+                animate={cardsInView ? { opacity: 1, y: 0 } : {}}
+                transition={{ duration: 0.5, delay: 0.15 }}
+                className="p-4 rounded-xl bg-gradient-to-br from-white/[0.06] via-transparent to-black/10 backdrop-blur-sm border border-white/[0.08] shadow-[0_4px_24px_rgba(0,0,0,0.2),inset_0_1px_0_rgba(255,255,255,0.1)]"
+              >
+                <div className="flex items-center justify-between">
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                    Average Credits/Semester
+                  </p>
+                  <div className="text-blue-600 dark:text-blue-300 drop-shadow-[0_0_8px_rgba(147,197,253,0.5)]">
+                    <Clock className="h-4 w-4" />
+                  </div>
+                </div>
+                <p className="text-2xl font-medium text-blue-600 dark:text-blue-300 mt-1.5 drop-shadow-[0_0_12px_rgba(147,197,253,0.3)]">
+                  <CountUp
+                    to={statsMock.avgCreditsPerSem}
+                    inView={cardsInView}
+                    decimals={1}
+                  />
+                </p>
+                <p className="text-[10px] text-gray-500 dark:text-gray-400 mt-0.5">
+                  across 6 semesters
+                </p>
+              </motion.div>
             </div>
-          </Reveal>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            {/* Cumulative GPA */}
+            <motion.div
+              initial={{ opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.35 }}
+              transition={{ duration: 0.6 }}
+              className="p-4 rounded-xl bg-gradient-to-br from-white/[0.06] via-transparent to-black/10 backdrop-blur-sm border border-white/[0.08] shadow-[0_4px_24px_rgba(0,0,0,0.2),inset_0_1px_0_rgba(255,255,255,0.1)]"
+            >
+              <div className="flex items-start justify-between mb-3">
+                <div>
+                  <h4 className="font-medium text-base text-gray-900 dark:text-white">
+                    Cumulative GPA
+                  </h4>
+                  <p className="text-[10px] text-gray-500 dark:text-gray-400 mt-0.5">
+                    Watch your GPA evolve semester by semester.
+                  </p>
+                </div>
+                <div className="p-1.5 rounded-full bg-gray-100 dark:bg-gray-800/50 text-purple-600 dark:text-purple-300">
+                  {/* icon-ish sparkline */}
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                    <path
+                      d="M3 20L9 12l4 3 8-9"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                    />
+                  </svg>
+                </div>
+              </div>
+              <div className="h-[280px] w-full">
+                <div ref={lineRef} className="relative">
+                  {/* Wipe reveal overlay */}
+                  <motion.div
+                    initial={{ x: 0 }}
+                    animate={lineInView ? { x: "100%" } : {}}
+                    transition={{ duration: 0.9, ease: "easeOut", delay: 0.15 }}
+                    className="pointer-events-none absolute inset-0 bg-white/50 dark:bg-gray-900/50"
+                    style={{ mixBlendMode: "multiply" }}
+                  />
+                  {lineInView && (
+                    <LineChart
+                      key="cum-line-mounted"
+                      height={280}
+                      xAxis={[
+                        {
+                          scaleType: "point",
+                          data: statsDemo.semesters,
+                          tickLabelStyle: {
+                            angle: 45,
+                            textAnchor: "start",
+                            fontSize: 12,
+                            fill: "#9CA3AF",
+                          },
+                        },
+                      ]}
+                      yAxis={[
+                        {
+                          label: "GPA",
+                          min: Math.max(
+                            0,
+                            Math.floor(
+                              Math.min(...statsDemo.cumulativeGpa) * 2,
+                            ) / 2,
+                          ),
+                          max: 4,
+                        },
+                      ]}
+                      series={[
+                        {
+                          data: statsDemo.cumulativeGpa,
+                          showMark: true,
+                          color: "#ed64a6",
+                          area: true,
+                          curve: "natural",
+                        },
+                      ]}
+                      grid={{ vertical: true, horizontal: true }}
+                      margin={{ left: 60, right: 20, top: 20, bottom: 80 }}
+                      slotProps={{
+                        tooltip: {
+                          sx: {
+                            backgroundColor: "#1F2937",
+                            borderColor: "#374151",
+                            color: "#F3F4F6",
+                            borderRadius: "0.5rem",
+                          },
+                        },
+                      }}
+                      sx={{
+                        "& .MuiChartsAxis-left .MuiChartsAxis-tickLabel": {
+                          fill: "#9CA3AF",
+                        },
+                        "& .MuiChartsAxis-bottom .MuiChartsAxis-tickLabel": {
+                          fill: "#9CA3AF",
+                        },
+                        "& .MuiChartsAxis-left .MuiChartsAxis-label": {
+                          fill: "#9CA3AF",
+                        },
+                        "& .MuiChartsAxis-left .MuiChartsAxis-line, & .MuiChartsAxis-bottom .MuiChartsAxis-line":
+                          {
+                            stroke: "#374151",
+                            opacity: 0.4,
+                          },
+                      }}
+                    />
+                  )}
+                </div>
+              </div>
+            </motion.div>
+
+            {/* Grade Distribution (Pie) */}
+            <motion.div
+              initial={{ opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.35 }}
+              transition={{ duration: 0.6, delay: 0.05 }}
+              className="p-4 rounded-xl bg-gradient-to-br from-white/[0.06] via-transparent to-black/10 backdrop-blur-sm border border-white/[0.08] shadow-[0_4px_24px_rgba(0,0,0,0.2),inset_0_1px_0_rgba(255,255,255,0.1)]"
+            >
+              <div className="flex items-start justify-between mb-3">
+                <div>
+                  <h4 className="font-medium text-base text-gray-900 dark:text-white">
+                    Grade distribution
+                  </h4>
+                  <p className="text-[10px] text-gray-500 dark:text-gray-400 mt-0.5">
+                    Your percentage mix of A's, A-'s, B+'s, and beyond.
+                  </p>
+                </div>
+                <div className="p-1.5 rounded-full bg-gray-100 dark:bg-gray-800/50 text-blue-600 dark:text-blue-300">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                    <path
+                      d="M11 2a10 10 0 1 0 10 10h-10V2Z"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                    />
+                  </svg>
+                </div>
+              </div>
+
+              <div ref={pieRef} className="h-[260px] w-full">
+                <motion.div
+                  initial={{ scale: 0.9, opacity: 0 }}
+                  animate={pieInView ? { scale: 1, opacity: 1 } : {}}
+                  transition={{ duration: 0.5, ease: "easeOut" }}
+                  className="w-full h-full"
+                >
+                  {pieInView && (
+                    <PieChartWrapper
+                      key="pie-mounted"
+                      data={{
+                        labels: statsDemo.gradeDistribution.map((g) => g.label),
+                        datasets: [
+                          {
+                            data: statsDemo.gradeDistribution.map(
+                              (g) => g.count,
+                            ),
+                            backgroundColor: CHART_COLORS.slice(
+                              0,
+                              statsDemo.gradeDistribution.length,
+                            ),
+                            borderColor: Array(
+                              statsDemo.gradeDistribution.length,
+                            ).fill("#1F2937"),
+                            borderWidth: 1,
+                          },
+                        ],
+                      }}
+                      showLegend={true}
+                    />
+                  )}
+                </motion.div>
+              </div>
+            </motion.div>
+          </div>
+
+          <div className="mt-4">
+            <button
+              className="px-4 py-2 text-sm rounded-xl bg-gradient-to-r from-purple-500/30 to-purple-600/30 hover:from-purple-500/40 hover:to-purple-600/40 text-white border border-white/[0.1] shadow-[0_4px_16px_rgba(139,92,246,0.3),inset_0_1px_0_rgba(255,255,255,0.15)] transition-all duration-200"
+              onClick={() => setLogInFlow(true)}
+            >
+              See my full stats
+            </button>
+          </div>
         </div>
       </section>
 
-      {/* ================= MEGA FOOTER ================= */}
-      <footer className="relative overflow-hidden border-t border-gray-200 dark:border-white/[0.06]">
-        <div className="rc-grid-lines pointer-events-none absolute inset-0 opacity-60" />
-        <div className="relative mx-auto max-w-6xl px-4 py-16 sm:px-6">
-          <div className="grid gap-10 md:grid-cols-[1.4fr_repeat(3,1fr)]">
+      {/* NEW: Major Progress — compact bar only */}
+      <section
+        id="major-progress"
+        className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8"
+      >
+        <div className="bg-white/70 dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/70 dark:via-gray-900/50 dark:to-gray-950/70 backdrop-blur-2xl rounded-2xl p-6 border border-black/[0.06] dark:border-white/[0.08] shadow-[0_8px_48px_rgba(0,0,0,0.4),0_0_100px_rgba(59,130,246,0.1),inset_0_1px_0_rgba(255,255,255,0.1)] ring-1 ring-blue-500/20">
+          <div className="mb-3">
+            <h3 className="text-xl font-bold text-gray-900 dark:text-white">
+              Your <i>Major</i> progress, visualized.
+            </h3>
+            <p className="text-gray-700 dark:text-gray-300 text-sm mt-1">
+              Track your journey at a glance, complete with a clean progress bar
+              and a full grid of requirements, each showing the courses you’ve
+              taken and smart recommendations for what to take next from us or
+              your DUS. We have it all.
+            </p>
+          </div>
+
+          <div className="space-y-4">
+            {/* Strict (completed only) */}
             <div>
-              <div className="mb-3 flex items-center gap-2">
-                <LogoIcon width={24} height={24} />
-                <span className="text-sm font-semibold text-gray-900 dark:text-white">
-                  DegreeIntelligence
+              <div className="flex items-center justify-between text-xs mb-1.5">
+                <span className="text-gray-500 dark:text-gray-400">Completed only</span>
+                <span className="text-blue-600 dark:text-blue-300 font-medium">
+                  {demoStrictPct}%
                 </span>
               </div>
-              <p className="max-w-xs text-sm leading-relaxed text-gray-500 dark:text-white/45">
-                Democratizing academic planning, stats, and insights at Yale.
-                Built by Yalies, for Yalies.
-              </p>
-            </div>
-            {[
-              {
-                h: "Product",
-                links: [
-                  ["Features", "#features"],
-                  ["How it works", "#how"],
-                  ["By the numbers", "#numbers"],
-                ],
-              },
-              {
-                h: "Company",
-                links: [
-                  ["Team", "#team"],
-                  ["Changelog", "/changelog"],
-                  ["Yale Daily News", YDN_URL],
-                ],
-              },
-              {
-                h: "Get started",
-                links: [["Log in with CAS", "#"]],
-              },
-            ].map((col) => (
-              <div key={col.h}>
-                <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-gray-400 dark:text-white/40">
-                  {col.h}
-                </p>
-                <ul className="space-y-2">
-                  {col.links.map(([label, href]) => (
-                    <li key={label}>
-                      <a
-                        href={href}
-                        onClick={
-                          label === "Log in with CAS"
-                            ? (e) => {
-                                e.preventDefault();
-                                login();
-                              }
-                            : undefined
-                        }
-                        className="text-sm text-gray-500 transition-colors hover:text-gray-900 dark:text-white/50 dark:hover:text-white"
-                      >
-                        {label}
-                      </a>
-                    </li>
-                  ))}
-                </ul>
+              <MajorProgressBar percent={demoStrictPct} />
+              <div className="text-[10px] text-gray-500 dark:text-gray-400 mt-1.5">
+                {demoTotals.completed}/{demoTotals.total} credits
               </div>
-            ))}
+            </div>
+
+            {/* Including in-progress */}
+            <div>
+              <div className="flex items-center justify-between text-xs mb-1.5">
+                <span className="text-gray-500 dark:text-gray-400">Including in-progress</span>
+                <span className="text-purple-600 dark:text-purple-300 font-medium">
+                  {demoWithIPPct}%
+                </span>
+              </div>
+              <MajorProgressBar percent={demoWithIPPct} />
+              <div className="text-[10px] text-gray-500 dark:text-gray-400 mt-1.5">
+                {demoTotals.completed + demoTotals.inProgress}/
+                {demoTotals.total} credits
+              </div>
+            </div>
           </div>
-          <div className="mt-12 flex flex-col items-center justify-between gap-3 border-t border-gray-200 pt-6 text-xs text-gray-400 dark:border-white/[0.06] dark:text-white/35 sm:flex-row">
-            <span>
-              © {new Date().getFullYear()} DegreeIntelligence. Not affiliated
-              with Yale University.
-            </span>
-            <span className="flex items-center gap-1.5">
-              Made with{" "}
-              <span className="text-pink-400">♥</span>
-            </span>
+
+          {/* Requirement cards — mirrors the real MajorProgressView grid */}
+          <div className="mt-6">
+            <div className="flex items-center justify-between mb-2.5">
+              <h4 className="text-sm font-medium text-gray-900 dark:text-white">
+                Requirements
+              </h4>
+              <div className="flex items-center gap-2.5 text-[10px] text-gray-500 dark:text-gray-400">
+                <span className="flex items-center gap-1">
+                  <span className="w-2 h-2 rounded-full bg-emerald-400" /> Complete
+                </span>
+                <span className="flex items-center gap-1">
+                  <span className="w-2 h-2 rounded-full bg-blue-400" /> In progress
+                </span>
+                <span className="flex items-center gap-1">
+                  <span className="w-2 h-2 rounded-full bg-red-400" /> Not taken
+                </span>
+              </div>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+              {demoReqs.map((req, i) => {
+                const inProgress = req.status === "in-progress";
+                return (
+                  <motion.div
+                    key={req.name}
+                    initial={{ opacity: 0, y: 12 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, amount: 0.4 }}
+                    transition={{ duration: 0.45, delay: i * 0.08 }}
+                    className={`p-3 rounded-xl backdrop-blur-md border transition-all relative shadow-neu-sm ${
+                      inProgress
+                        ? "bg-blue-50 dark:bg-transparent dark:bg-gradient-to-br dark:from-blue-950/40 dark:via-gray-900/50 dark:to-gray-950/50 border-blue-200 dark:border-blue-800/30"
+                        : "bg-red-50 dark:bg-transparent dark:bg-gradient-to-br dark:from-red-950/30 dark:via-gray-900/50 dark:to-gray-950/50 border-red-200 dark:border-red-800/25"
+                    }`}
+                  >
+                    <div className="flex justify-between items-start mb-1.5">
+                      <h5
+                        className={`font-medium text-sm ${
+                          inProgress
+                            ? "text-blue-600 dark:text-blue-300"
+                            : "text-red-600 dark:text-red-300"
+                        }`}
+                      >
+                        {req.name}
+                      </h5>
+                      <span
+                        className={`text-[10px] px-1.5 py-0.5 rounded-md ${
+                          inProgress
+                            ? "bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-300 border border-blue-300 dark:border-blue-700/30"
+                            : "bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-300 border border-red-300 dark:border-red-700/30"
+                        }`}
+                      >
+                        {req.have}/{req.required}
+                      </span>
+                    </div>
+                    <p
+                      className={`text-[11px] mb-2 ${
+                        inProgress
+                          ? "text-blue-500 dark:text-blue-300/70"
+                          : "text-red-500 dark:text-red-300/70"
+                      }`}
+                    >
+                      {req.desc}
+                    </p>
+                    <div className="flex flex-wrap gap-1.5">
+                      {req.pills.map((opt) => (
+                        <div
+                          key={opt.code}
+                          className={`relative px-2 py-0.5 rounded-full text-xs flex items-center ${
+                            opt.status === "complete"
+                              ? "bg-emerald-100 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-700"
+                              : opt.status === "in-progress"
+                                ? "bg-blue-100 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 border border-blue-300 dark:border-blue-700"
+                                : "bg-red-100 dark:bg-red-900/20 text-red-700 dark:text-red-300 border border-red-300 dark:border-red-700"
+                          }`}
+                        >
+                          {opt.code}
+                          <span className="ml-1 text-[0.65rem]">
+                            ({opt.cr}cr
+                            {opt.status === "in-progress"
+                              ? ", in progress"
+                              : opt.status === "complete"
+                                ? ", complete"
+                                : ""}
+                            )
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </motion.div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Requirement heat map — color-coded fulfilment grid */}
+          <div className="mt-6">
+            <h4 className="text-sm font-medium text-gray-900 dark:text-white mb-2.5">
+              Requirement heat map
+            </h4>
+            <div className="grid grid-cols-6 sm:grid-cols-12 gap-1.5">
+              {demoHeat.map((cell, i) => (
+                <motion.div
+                  key={i}
+                  initial={{ opacity: 0, scale: 0.6 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  viewport={{ once: true, amount: 0.4 }}
+                  transition={{ duration: 0.3, delay: i * 0.03 }}
+                  title={
+                    cell === "complete"
+                      ? "Complete"
+                      : cell === "in-progress"
+                        ? "In progress"
+                        : "Not taken"
+                  }
+                  className={`aspect-square rounded-md border ${
+                    cell === "complete"
+                      ? "bg-emerald-500/20 border-emerald-500/40 dark:bg-emerald-500/15"
+                      : cell === "in-progress"
+                        ? "bg-blue-500/20 border-blue-500/40 dark:bg-blue-500/15"
+                        : "bg-red-500/15 border-red-500/30 dark:bg-red-500/10"
+                  }`}
+                />
+              ))}
+            </div>
+          </div>
+
+          <div className="mt-6">
+            <button
+              className="px-4 py-2 text-sm rounded-xl bg-gradient-to-r from-pink-500/30 to-blue-500/30 hover:from-pink-500/40 hover:to-blue-500/40 text-white border border-white/[0.1] shadow-[0_4px_16px_rgba(236,72,153,0.25),inset_0_1px_0_rgba(255,255,255,0.15)] transition-all duration-200"
+              onClick={() => setLogInFlow(true)}
+            >
+              Let's do this
+            </button>
           </div>
         </div>
-      </footer>
+      </section>
 
-      {/* ================= VIDEO MODAL ================= */}
+      {/* NEW: Public Profiles & Friends */}
+      <section className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="bg-white/70 dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/70 dark:via-gray-900/50 dark:to-gray-950/70 backdrop-blur-2xl rounded-2xl p-6 border border-black/[0.06] dark:border-white/[0.08] shadow-[0_8px_48px_rgba(0,0,0,0.4),0_0_100px_rgba(236,72,153,0.08),inset_0_1px_0_rgba(255,255,255,0.1)] ring-1 ring-pink-500/20">
+          <div className="text-center mb-8 flex flex-col gap-2">
+            <h2 className="text-2xl font-medium text-gray-900 dark:text-white">
+              Friends & Connections
+            </h2>
+            <p className="text-gray-700 dark:text-gray-300 text-sm max-w-2xl mx-auto">
+              Add friends and mutually see each other's academic journeys. Learn
+              from upperclassmen who've walked your path.
+            </p>
+          </div>
+
+          {/* Mock Friends UI */}
+          <div className="max-w-xl mx-auto">
+            {/* Add Friend Button */}
+            <div className="flex items-center justify-between mb-5">
+              <h3 className="text-base font-medium text-pink-600 dark:text-pink-200 flex items-center gap-2">
+                <FiUsers
+                  size={14}
+                  className="drop-shadow-[0_0_6px_rgba(236,72,153,0.5)]"
+                />{" "}
+                Your Friends (3)
+              </h3>
+              <button
+                className="px-3 py-1.5 bg-gradient-to-r from-pink-500/30 to-pink-600/30 hover:from-pink-500/40 hover:to-pink-600/40 text-white rounded-lg transition flex items-center gap-1.5 text-xs font-medium border border-white/[0.1] shadow-[0_4px_16px_rgba(236,72,153,0.25),inset_0_1px_0_rgba(255,255,255,0.15)]"
+                onClick={() => setLogInFlow(true)}
+              >
+                <FiUserPlus size={12} /> Add Friend
+              </button>
+            </div>
+
+            {/* Mock Friend Cards */}
+            <div className="space-y-4">
+              {[
+                {
+                  name: "Sarah Chen",
+                  major: "CPSC & MATH",
+                  year: "2026",
+                  initials: "SC",
+                  gradient: "from-pink-500 to-purple-600",
+                },
+                {
+                  name: "Alex Rivera",
+                  major: "ECON & S&DS",
+                  year: "2027",
+                  initials: "AR",
+                  gradient: "from-blue-500 to-cyan-600",
+                },
+                {
+                  name: "Jordan Kim",
+                  major: "MCDB",
+                  year: "2025",
+                  initials: "JK",
+                  gradient: "from-emerald-500 to-teal-600",
+                },
+              ].map((friend, i) => (
+                <motion.div
+                  key={friend.name}
+                  initial={{ opacity: 0, y: 10 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.4, delay: i * 0.1 }}
+                  className="flex items-center justify-between p-5 rounded-2xl bg-gradient-to-br from-white/[0.06] via-transparent to-black/10 border border-white/[0.08] hover:border-pink-500/30 transition-all duration-300 shadow-[0_4px_24px_rgba(0,0,0,0.2),inset_0_1px_0_rgba(255,255,255,0.1)] group"
+                >
+                  <div className="flex items-center gap-4">
+                    <div
+                      className={`w-10 h-10 rounded-full bg-gradient-to-br ${friend.gradient} flex items-center justify-center text-white font-medium text-sm border-2 border-gray-300 dark:border-gray-700/50 shadow-[0_4px_12px_rgba(0,0,0,0.3)]`}
+                    >
+                      {friend.initials}
+                    </div>
+                    <div>
+                      <div className="font-medium text-pink-600 dark:text-pink-200 group-hover:text-pink-700 dark:group-hover:text-pink-100 transition-colors">
+                        {friend.name}
+                      </div>
+                      <div className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-2">
+                        {friend.major}
+                        <span className="px-1.5 py-0.5 rounded-full text-[10px] bg-gradient-to-r from-purple-500/20 to-pink-500/20 border border-purple-500/30 text-purple-200">
+                          '{friend.year.slice(-2)}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => setLogInFlow(true)}
+                      className="flex items-center gap-1.5 px-4 py-2 bg-gradient-to-br from-black/[0.04] to-transparent dark:from-white/[0.06] text-gray-600 dark:text-gray-300 rounded-xl border border-black/[0.06] dark:border-white/[0.08] hover:bg-pink-500/20 hover:text-gray-900 dark:hover:text-white hover:border-pink-500/30 transition-all text-sm shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]"
+                    >
+                      <FiUser className="inline-block" size={14} />
+                      Profile
+                    </button>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+
+            {/* Info Box */}
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.3 }}
+              className="mt-8 p-5 rounded-2xl bg-gradient-to-br from-pink-500/10 via-transparent to-purple-500/10 border border-pink-500/20 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]"
+            >
+              <h4 className="text-sm font-medium text-pink-600 dark:text-pink-200 mb-3">
+                What gets shared:
+              </h4>
+              <ul className="text-sm text-gray-500 dark:text-gray-400 space-y-2">
+                <li className="flex items-center gap-2.5">
+                  <FiCheck className="text-emerald-400 shrink-0" size={14} />{" "}
+                  Course codes, semesters, and credits
+                </li>
+                <li className="flex items-center gap-2.5">
+                  <FiCheck className="text-emerald-400 shrink-0" size={14} />{" "}
+                  Major and graduation year
+                </li>
+                <li className="flex items-center gap-2.5">
+                  <FiX className="text-red-400 shrink-0" size={14} /> Grades and
+                  GPA are <strong className="text-red-300">NEVER</strong> shared
+                </li>
+              </ul>
+            </motion.div>
+
+            <div className="mt-8 text-center">
+              <button
+                className="px-6 py-3 rounded-2xl bg-gradient-to-r from-pink-500/30 via-purple-500/30 to-blue-500/30 hover:from-pink-500/40 hover:via-purple-500/40 hover:to-blue-500/40 text-white border border-white/[0.1] shadow-[0_4px_16px_rgba(236,72,153,0.25),inset_0_1px_0_rgba(255,255,255,0.15)] transition-all duration-200 font-medium"
+                onClick={() => setLogInFlow(true)}
+              >
+                Enable Friends Feature
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Mission Section */}
+      <div className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <motion.div
+          viewport={{ once: true }}
+          transition={{ duration: 0.8 }}
+          className="bg-white/70 dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/70 dark:via-gray-900/50 dark:to-gray-950/70 backdrop-blur-2xl rounded-2xl p-6 border border-black/[0.06] dark:border-white/[0.08] shadow-[0_8px_48px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.1)] ring-1 ring-white/[0.05]"
+        >
+          <div className="text-center mb-8">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">
+              What it is and why we built this.
+            </h2>
+            <p className="text-sm text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+              Trying to plan our majors, we kept running into the same problem:
+              Yale's requirements are complex, scattered across PDFs and
+              websites, and nearly impossible to track manually. So we built the
+              tool we wish we had. We sincerely hope it helps :)
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-4">
+            {features.map((feature, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: i * 0.1 }}
+                className="bg-gradient-to-br from-white/[0.08] via-transparent to-black/10 p-4 rounded-xl border border-white/[0.08] hover:border-white/[0.15] transition-all duration-300 hover:scale-[1.02] shadow-[0_4px_24px_rgba(0,0,0,0.2),inset_0_1px_0_rgba(255,255,255,0.1)] backdrop-blur-sm hover:shadow-[0_8px_32px_rgba(0,0,0,0.3),inset_0_1px_0_rgba(255,255,255,0.12)]"
+              >
+                <div className="p-2.5 rounded-xl bg-gradient-to-br from-black/[0.04] via-transparent to-black/10 dark:from-white/[0.08] border border-black/[0.06] dark:border-white/[0.08] text-blue-600 dark:text-blue-300 mb-3 w-fit shadow-[inset_0_1px_0_rgba(255,255,255,0.1)]">
+                  {feature.icon}
+                </div>
+                <h3 className="text-base font-medium text-blue-700 dark:text-blue-200 mb-1.5">
+                  {feature.title}
+                </h3>
+                <p className="text-gray-700 dark:text-gray-300 text-sm">{feature.description}</p>
+              </motion.div>
+            ))}
+          </div>
+        </motion.div>
+      </div>
+
+      {/* Team Section */}
+      <div
+        id="team"
+        className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 scroll-mt-20"
+      >
+        <div className="text-center mb-8">
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">
+            It's nice to meet you!
+          </h2>
+          <p className="text-sm text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+            We're just two Yale students who got tired of spreadsheet hell and
+            decided to do something about it.
+          </p>
+        </div>
+
+        <div className="flex flex-col md:flex-row justify-center gap-4">
+          {[
+            {
+              name: "Filippo Fonseca",
+              role: "Founder | Mechanical Engineering (ABET) & EECS '28",
+              bio: "Built the first version as a shell script after one too many long sessions trying to plan courses. Talks too much.",
+              contact: "filippo.fonseca@yale.edu",
+              photoRoute: "/team/filippo.jpeg",
+              github: "https://github.com/filippo-fonseca",
+              website: "https://filippofonseca.com",
+            },
+            {
+              name: "Emir Ahmed",
+              role: "Development | Electrical Engineering & CS (EECS) '28",
+              bio: "Joined forces to continue scaling the platform and make it more robust.",
+              contact: "emir.ahmed@yale.edu",
+              photoRoute: "/team/emir.JPG",
+              github: "https://github.com/EmirataG",
+              website: "",
+            },
+          ].map((person, i) => (
+            <motion.div
+              key={i}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: i * 0.1 }}
+              className="bg-gradient-to-br from-white/[0.08] via-transparent to-black/10 backdrop-blur-xl p-4 rounded-xl border border-white/[0.08] hover:border-white/[0.15] flex-1 max-w-sm hover:scale-[1.02] transition-all duration-300 shadow-[0_4px_24px_rgba(0,0,0,0.2),inset_0_1px_0_rgba(255,255,255,0.1)] hover:shadow-[0_8px_32px_rgba(0,0,0,0.3),inset_0_1px_0_rgba(255,255,255,0.12)]"
+            >
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-11 h-11 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center shadow-[0_4px_16px_rgba(139,92,246,0.3)]">
+                  <img
+                    src={person.photoRoute}
+                    alt={person.name}
+                    className="w-full h-full rounded-full object-cover border-2 border-pink-500/50 shadow-[0_0_20px_rgba(236,72,153,0.3)]"
+                  />
+                </div>
+                <div>
+                  <h3 className="text-base font-medium text-gray-900 dark:text-white">
+                    {person.name}
+                  </h3>
+                  <p className="text-xs text-blue-600 dark:text-blue-300">{person.role}</p>
+                </div>
+              </div>
+              <p className="text-gray-700 dark:text-gray-300 text-sm mb-3">{person.bio}</p>
+              <div className="flex flex-wrap gap-2">
+                <a
+                  href={`mailto:${person.contact}`}
+                  className="px-2.5 py-1 rounded-lg bg-gradient-to-br from-black/[0.04] to-transparent dark:from-white/[0.06] border border-black/[0.06] dark:border-white/[0.08] text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:border-blue-400/50 dark:hover:border-blue-500/30 text-xs flex items-center gap-1.5 transition-all shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]"
+                >
+                  <FiMail size={12} /> Email
+                </a>
+                <a
+                  href={person.github}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-2.5 py-1 rounded-lg bg-gradient-to-br from-black/[0.04] to-transparent dark:from-white/[0.06] border border-black/[0.06] dark:border-white/[0.08] text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:border-blue-400/50 dark:hover:border-blue-500/30 text-xs flex items-center gap-1.5 transition-all shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]"
+                >
+                  <FiGithub size={12} /> GitHub
+                </a>
+                {person.website && (
+                  <a
+                    href={person.website}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-2.5 py-1 rounded-lg bg-gradient-to-br from-black/[0.04] to-transparent dark:from-white/[0.06] border border-black/[0.06] dark:border-white/[0.08] text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:border-blue-400/50 dark:hover:border-blue-500/30 text-xs flex items-center gap-1.5 transition-all shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]"
+                  >
+                    <FiExternalLink size={12} /> Website
+                  </a>
+                )}
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+      {/* Wait... Are You Trying to Replace CourseTable? */}
+      {/* <section className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="bg-gray-900/80 backdrop-blur-lg rounded-2xl p-8 border border-gray-800/50 shadow-xl">
+          <div className="text-center mb-8">
+            <h2 className="text-3xl font-bold text-white">
+              Wait, wait wait... are you trying to replace{" "}
+              <span className="text-blue-300">CourseTable</span>?
+            </h2>
+          </div>
+          <div className="text-gray-300 max-w-4xl mx-auto space-y-4 text-lg leading-relaxed">
+            <p>
+              <strong>No. Not at all.</strong> We <em>love</em> CourseTable 💙.
+              Heck, our founder,{" "}
+              <span className="text-white-300 font-medium">Filippo</span>, is
+              literally on the{" "}
+              <Link
+                href="https://coursetable.com/about"
+                target="_blank"
+                className="text-blue-300"
+              >
+                CourseTable team
+              </Link>
+              .
+            </p>
+            <p>
+              This fulfills{" "}
+              <span className="text-white-300">
+                a completely different need
+              </span>{" "}
+              — one that CourseTable doesn’t aim to cover by design, as we are
+              different products entirely. We’re here for:
+            </p>
+            <ul className="list-disc list-inside space-y-1 text-gray-400">
+              <li>
+                Visualizing your grades and stats in beautiful, digestible ways
+              </li>
+              <li>Planning out your progress toward your degree</li>
+              <li>Getting real-time analysis from our suggestion models</li>
+              <li>Seeing what upperclassmen have done in previous years</li>
+              <li>
+                Exploring different majors and mapping out “what if” scenarios
+              </li>
+            </ul>
+            <p>
+              That’s <strong>not</strong> what CourseTable does — and that’s the
+              point. They help you <em>choose</em> courses, see course reviews,
+              and see friend's worksheets. We don't (and never will) do that. We
+              instead help you <em>make sense of the journey</em> and
+              democratize the complex planning process at Yale with regard to,
+              in particular, your major.
+            </p>
+          </div>
+        </div>
+      </section> */}
+
+      {/* CTA Section */}
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <motion.div
+          initial={{ opacity: 0.75 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8 }}
+          className="bg-gradient-to-br from-blue-900/30 via-purple-900/20 to-pink-900/30 backdrop-blur-2xl rounded-2xl p-6 border border-white/[0.1] shadow-[0_8px_48px_rgba(0,0,0,0.4),0_0_100px_rgba(139,92,246,0.1),inset_0_1px_0_rgba(255,255,255,0.1)] ring-1 ring-purple-500/20 text-center"
+        >
+          <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-3">
+            Want to contribute?
+          </h2>
+          <p className="text-gray-700 dark:text-gray-300 text-sm max-w-xl mx-auto mb-4">
+            This is a project by and for the Yale community. We'd love your
+            feedback and bug reports! Reach out anytime. Also... if you wish you
+            join the team, we're always looking for fellow Yale students to
+            join.
+          </p>
+          <div className="flex justify-center">
+            <a
+              href="mailto:filippo.fonseca@yale.edu,emir.ahmed@yale.edu"
+              className="px-4 py-2 text-sm bg-gradient-to-r from-blue-500/30 via-purple-500/30 to-pink-500/30 hover:from-blue-500/40 hover:via-purple-500/40 hover:to-pink-500/40 rounded-xl text-white flex items-center gap-2 transition-all hover:scale-105 border border-white/[0.1] shadow-[0_4px_16px_rgba(139,92,246,0.25),inset_0_1px_0_rgba(255,255,255,0.15)]"
+            >
+              <FiMail size={14} /> Email Us
+            </a>
+          </div>
+        </motion.div>
+      </div>
+
+      {/* Footer */}
+      <div className="py-6 px-4 text-center text-gray-500 dark:text-gray-400 text-xs border-t border-black/[0.06] dark:border-white/[0.05]">
+        <p className="flex flex-wrap items-center justify-center gap-1.5 max-w-md mx-auto leading-relaxed">
+          <span className="inline-flex items-center gap-1">
+            Made with <FiHeart className="w-3 h-3 text-blue-400" />
+          </span>
+          <span className="hidden sm:inline">|</span>
+          <span>Not affiliated with Yale University.</span>
+        </p>
+        <p className="mt-2 text-gray-400 dark:text-gray-500 flex flex-wrap items-center justify-center gap-1.5">
+          <span className="px-1.5 py-0.5 rounded-full text-[10px] bg-gradient-to-r from-purple-500/20 to-pink-500/20 border border-purple-500/30 text-purple-300">
+            v2.0
+          </span>
+          <span>© {new Date().getFullYear()} DegreeIntelligence</span>
+        </p>
+      </div>
+
+      {/* Video Modal */}
       <AnimatePresence>
-        {showVideo && (
+        {showVideoModal && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            onClick={() => setShowVideo(false)}
-            className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 p-4 backdrop-blur-md"
+            transition={{ duration: 0.2 }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4"
+            onClick={() => setShowVideoModal(false)}
           >
+            {/* Backdrop */}
+            <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" />
+
+            {/* Modal */}
             <motion.div
-              initial={{ scale: 0.94, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.94, opacity: 0 }}
-              transition={{ duration: 0.25 }}
-              onClick={(e) => e.stopPropagation()}
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              transition={{ duration: 0.3, ease: "easeOut" }}
               className="relative w-full max-w-4xl"
+              onClick={(e) => e.stopPropagation()}
             >
-              <button
-                onClick={() => setShowVideo(false)}
-                className="absolute -top-10 right-0 flex items-center gap-1 text-sm text-white/70 hover:text-white"
-              >
-                Close <FiX size={16} />
-              </button>
-              <BrowserChrome url="v2-launch.mp4" className="rc-window">
-                <div className="aspect-video">
+              <div className="rounded-2xl bg-white/90 dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/95 dark:via-gray-900/90 dark:to-gray-950/95 backdrop-blur-2xl border border-black/[0.06] dark:border-white/[0.1] shadow-[0_8px_64px_rgba(0,0,0,0.6),0_0_100px_rgba(139,92,246,0.1),inset_0_1px_0_rgba(255,255,255,0.1)] ring-1 ring-black/[0.04] dark:ring-white/[0.05] overflow-hidden">
+                {/* Header */}
+                <div className="flex items-center justify-between px-5 py-3 border-b border-black/[0.06] dark:border-white/[0.08]">
+                  <div className="flex items-center gap-2">
+                    <FiPlayCircle className="text-purple-400" size={16} />
+                    <span className="text-sm font-medium text-gray-900 dark:text-white">
+                      v2 Launch Video
+                    </span>
+                  </div>
+                  <button
+                    onClick={() => setShowVideoModal(false)}
+                    className="p-1.5 rounded-lg bg-black/[0.04] dark:bg-white/[0.05] hover:bg-black/[0.08] dark:hover:bg-white/[0.1] border border-black/[0.06] dark:border-white/[0.08] text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-all"
+                  >
+                    <FiX size={16} />
+                  </button>
+                </div>
+
+                {/* Video embed */}
+                <div className="aspect-video bg-black/50">
                   <iframe
-                    src={`https://www.youtube.com/embed/${YOUTUBE_ID}?autoplay=1`}
-                    title="DegreeIntelligence v2 launch"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    src="https://youtu.be/5H1kjMWQfgs"
+                    title="DegreeIntelligence v2 Launch"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                     allowFullScreen
-                    className="h-full w-full"
+                    className="w-full h-full"
                   />
                 </div>
-              </BrowserChrome>
+
+                {/* Footer */}
+                <div className="px-5 py-3 border-t border-black/[0.06] dark:border-white/[0.08] flex items-center justify-between">
+                  <p className="text-xs text-gray-400 dark:text-gray-500">
+                    Press{" "}
+                    <kbd className="px-1.5 py-0.5 rounded bg-black/[0.06] dark:bg-white/[0.08] border border-black/[0.08] dark:border-white/[0.1] text-gray-500 dark:text-gray-400 text-[10px]">
+                      ESC
+                    </kbd>{" "}
+                    or click outside to close
+                  </p>
+                  <button
+                    onClick={() => setShowVideoModal(false)}
+                    className="px-3 py-1.5 text-xs rounded-lg bg-gradient-to-br from-black/[0.04] to-transparent dark:from-white/[0.06] hover:from-black/[0.08] dark:hover:from-white/[0.1] border border-black/[0.06] dark:border-white/[0.08] text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-all"
+                  >
+                    Close
+                  </button>
+                </div>
+              </div>
             </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Shared components */}
+      <style jsx global>{`
+        .hide-scrollbar::-webkit-scrollbar {
+          display: none;
+        }
+        .hide-scrollbar {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+        }
+
+        @property --angle {
+          syntax: "<angle>";
+          initial-value: 0deg;
+          inherits: false;
+        }
+
+        @keyframes border-spin {
+          from {
+            --angle: 0deg;
+          }
+          to {
+            --angle: 360deg;
+          }
+        }
+
+        .animate-border-spin {
+          animation: border-spin 3s linear infinite;
+        }
+      `}</style>
+    </div>
+  );
+}
+
+function Card({
+  children,
+  fade,
+  delay = 0,
+}: {
+  children: React.ReactNode;
+  fade?: boolean;
+  delay?: number;
+}) {
+  const cardClass =
+    "bg-gradient-to-br from-white/[0.08] via-transparent to-black/10 p-4 rounded-xl border border-white/[0.08] hover:border-white/[0.15] transition-all duration-300 shadow-[0_4px_24px_rgba(0,0,0,0.2),inset_0_1px_0_rgba(255,255,255,0.1)] backdrop-blur-sm hover:shadow-[0_8px_32px_rgba(0,0,0,0.3),inset_0_1px_0_rgba(255,255,255,0.12)]";
+
+  if (!fade) return <div className={cardClass}>{children}</div>;
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.6, delay }}
+      className={cardClass}
+    >
+      {children}
+    </motion.div>
+  );
+}
+
+function CardHeader({
+  icon,
+  title,
+  color = "blue",
+}: {
+  icon: React.ReactNode;
+  title: string;
+  color?: "red" | "blue" | "green";
+}) {
+  const colorMap: Record<string, string> = {
+    red: "text-red-400 bg-gradient-to-br from-red-500/25 to-red-600/15 border-red-500/30 shadow-[inset_0_1px_0_rgba(255,255,255,0.1),0_4px_12px_rgba(239,68,68,0.2)]",
+    blue: "text-blue-400 bg-gradient-to-br from-blue-500/25 to-blue-600/15 border-blue-500/30 shadow-[inset_0_1px_0_rgba(255,255,255,0.1),0_4px_12px_rgba(59,130,246,0.2)]",
+    green:
+      "text-green-400 bg-gradient-to-br from-green-500/25 to-green-600/15 border-green-500/30 shadow-[inset_0_1px_0_rgba(255,255,255,0.1),0_4px_12px_rgba(34,197,94,0.2)]",
+  };
+  return (
+    <div className="flex items-center gap-2 mb-3">
+      <div
+        className={`w-9 h-9 rounded-lg flex items-center justify-center border ${colorMap[color]}`}
+      >
+        {icon}
+      </div>
+      <h3 className="text-base font-medium text-gray-900 dark:text-white">{title}</h3>
     </div>
   );
 }

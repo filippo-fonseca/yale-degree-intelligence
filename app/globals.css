@@ -131,35 +131,49 @@
   box-shadow: var(--neumorphic-shadow-inset);
 }
 
-/* Custom scrollbar - Light mode */
+/* Custom scrollbar - accent (cool purple -> blue), theme-aware */
 ::-webkit-scrollbar {
-  width: 8px;
+  width: 10px;
+  height: 10px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #f3f4f6;
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #d1d5db;
-  border-radius: 4px;
+  border-radius: 9999px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+  background-color: rgba(var(--accent-purple), 0.55);
+  background-image: linear-gradient(
+    180deg,
+    rgba(var(--accent-purple), 0.85),
+    rgba(var(--accent-blue), 0.85)
+  );
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #9ca3af;
+  background-image: linear-gradient(
+    180deg,
+    rgb(var(--accent-purple)),
+    rgb(var(--accent-blue))
+  );
 }
 
-/* Custom scrollbar - Dark mode */
-.dark ::-webkit-scrollbar-track {
-  background: #1F2937;
-}
-
+/* Dark mode keeps the accent but brightens the gradient for contrast */
 .dark ::-webkit-scrollbar-thumb {
-  background: #4B5563;
+  background-image: linear-gradient(
+    180deg,
+    rgba(var(--accent-purple), 0.9),
+    rgba(var(--accent-blue), 0.9)
+  );
 }
 
-.dark ::-webkit-scrollbar-thumb:hover {
-  background: #6B7280;
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgb(var(--accent-purple)) transparent;
 }
 
 .shadow-neumorph {

@@ -608,8 +608,8 @@ export default function MyCoursesView({
         />
       </div>
 
-      {/* ---- Search + filter + sort controls ---- */}
-      <div className="p-3 rounded-xl bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 backdrop-blur-md border border-gray-200 dark:border-gray-800/50 shadow-neu">
+      {/* ---- Search + filter + sort controls (sticky while scrolling semesters) ---- */}
+      <div className="sticky top-0 z-20 p-3 rounded-xl bg-white/95 dark:bg-gray-950/80 dark:bg-gradient-to-br dark:from-gray-900/80 dark:via-gray-900/70 dark:to-gray-950/80 backdrop-blur-xl border border-gray-200 dark:border-gray-800/50 shadow-neu">
         <div className="flex flex-col sm:flex-row gap-2">
           {/* Search */}
           <div className="relative flex-1 min-w-0">

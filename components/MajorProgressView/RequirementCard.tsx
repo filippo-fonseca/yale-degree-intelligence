@@ -85,7 +85,7 @@ const RequirementCard = React.memo(function RequirementCard({
       layout
       initial={false}
       data-tour="major-requirement-card"
-      className={`p-3 hover:scale-[0.98] rounded-xl backdrop-blur-md border transition-all relative cursor-pointer shadow-neu-sm ${classes.card}`}
+      className={`p-3 hover:-translate-y-0.5 rounded-xl backdrop-blur-md border transition-all relative cursor-pointer shadow-neu-sm ${classes.card}`}
       onClick={openRequirement}
       onKeyDown={(e) => {
         if (e.key === "Enter" || e.key === " ") {
@@ -100,7 +100,7 @@ const RequirementCard = React.memo(function RequirementCard({
         <h5 className={`font-medium text-sm ${classes.title}`}>{req.name}</h5>
         <div className="flex items-center gap-1.5 shrink-0">
           <span
-            className={`text-[10px] px-1.5 py-0.5 rounded-md ${classes.badge}`}
+            className={`text-[10px] px-1.5 py-0.5 rounded-md shadow-neu-sm ${classes.badge}`}
           >
             {isCompletedCard
               ? "✓"
@@ -181,7 +181,7 @@ const RequirementCard = React.memo(function RequirementCard({
               e.stopPropagation();
               onAddManual(req.name);
             }}
-            className="px-2 py-0.5 rounded-full text-xs flex items-center gap-1 bg-pink-100 dark:bg-pink-900/20 text-pink-600 dark:text-pink-300 hover:bg-pink-200 dark:hover:bg-pink-800/30 transition-colors"
+            className="px-2 py-0.5 rounded-full text-xs flex items-center gap-1 neu-control text-pink-600 dark:text-pink-300 transition-colors"
             title="Add a course manually for this requirement"
           >
             <FiPlus size={12} />

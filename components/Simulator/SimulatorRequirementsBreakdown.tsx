@@ -192,12 +192,12 @@ export default function SimulatorRequirementsBreakdown({
         return (
           <div
             key={majorId}
-            className="rounded-xl bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 border border-gray-200 dark:border-gray-800/50 overflow-hidden shadow-[inset_0_1px_0_rgba(255,255,255,0.04),0_4px_12px_rgba(0,0,0,0.1)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.04),0_4px_12px_rgba(0,0,0,0.2)] backdrop-blur-md"
+            className="rounded-xl neu-surface-sm overflow-hidden backdrop-blur-md"
           >
             {/* Collapsed header */}
             <button
               onClick={() => toggle(majorId)}
-              className="w-full flex items-center gap-2.5 p-3 text-left hover:bg-gray-100 dark:hover:bg-gray-800/20 transition-colors"
+              className="w-full flex items-center gap-2.5 p-3 text-left hover:bg-black/[0.03] dark:hover:bg-white/[0.04] transition-colors"
             >
               <ProgressRing percentage={pctWithPlanned} size={32} strokeWidth={3} />
 
@@ -240,7 +240,7 @@ export default function SimulatorRequirementsBreakdown({
 
             {/* Progress bar (always visible) - three tiers */}
             <div className="px-3 pb-2.5 -mt-0.5">
-              <div className="w-full bg-gray-200 dark:bg-gray-950/50 h-1.5 rounded-full overflow-hidden relative shadow-[inset_0_1px_2px_rgba(0,0,0,0.1)] dark:shadow-[inset_0_1px_2px_rgba(0,0,0,0.3)]">
+              <div className="w-full neu-inset h-1.5 rounded-full overflow-hidden relative">
                 {/* Planned layer (purple, lightest) */}
                 <div
                   className="h-1.5 bg-gradient-to-r from-purple-400 to-purple-500 opacity-30 absolute top-0 left-0 rounded-full"

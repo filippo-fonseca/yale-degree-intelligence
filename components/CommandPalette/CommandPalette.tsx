@@ -370,10 +370,10 @@ export default function CommandPalette({
             transition={{ type: "spring", stiffness: 460, damping: 34 }}
             onClick={(e) => e.stopPropagation()}
             onKeyDown={onKeyDown}
-            className="w-full max-w-2xl overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-2xl ring-1 ring-black/5 dark:border-white/10 dark:bg-[#0c0c0e] dark:ring-white/5"
+            className="w-full max-w-2xl overflow-hidden rounded-2xl neu-surface ring-1 ring-black/5 dark:ring-white/5"
           >
             {/* Search row */}
-            <div className="flex items-center gap-3 border-b border-gray-100 px-4 dark:border-white/[0.06]">
+            <div className="flex items-center gap-3 border-b border-gray-100 px-4 dark:border-white/[0.06] neu-inset">
               <Search
                 size={18}
                 className="shrink-0 text-gray-400 dark:text-gray-500"
@@ -429,15 +429,15 @@ export default function CommandPalette({
                           onClick={() => it.onRun()}
                           className={`mx-2 flex w-[calc(100%-1rem)] items-center gap-3 rounded-xl px-3 py-2.5 text-left transition-colors ${
                             active
-                              ? "bg-pink-50 dark:bg-pink-500/10"
+                              ? "neu-control-active"
                               : "hover:bg-gray-50 dark:hover:bg-white/[0.04]"
                           }`}
                         >
                           <span
                             className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border ${
                               active
-                                ? "border-pink-200 bg-white text-pink-600 dark:border-pink-500/30 dark:bg-pink-500/15 dark:text-pink-300"
-                                : "border-gray-200 bg-gray-50 text-gray-500 dark:border-white/10 dark:bg-white/[0.04] dark:text-gray-400"
+                                ? "neu-control-active text-pink-600 dark:text-pink-300"
+                                : "neu-control text-gray-500 dark:text-gray-400"
                             }`}
                           >
                             {it.icon}
@@ -453,7 +453,7 @@ export default function CommandPalette({
                             )}
                           </span>
                           {it.badge && (
-                            <span className="shrink-0 rounded-md border border-gray-200 px-1.5 py-0.5 text-[10px] font-medium text-gray-500 dark:border-white/10 dark:text-gray-400">
+                            <span className="shrink-0 rounded-md neu-inset px-1.5 py-0.5 text-[10px] font-medium text-gray-500 dark:text-gray-400">
                               {it.badge}
                             </span>
                           )}

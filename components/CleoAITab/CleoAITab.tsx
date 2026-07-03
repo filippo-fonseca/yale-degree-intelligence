@@ -274,7 +274,7 @@ What can I help you with? I can help plan your schedule, find courses that count
         </div>
         <button
           onClick={resetConversation}
-          className="p-1.5 rounded-lg bg-black/[0.04] dark:bg-gray-800/40 hover:bg-black/[0.08] dark:hover:bg-gray-700/50 text-gray-500 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 border border-black/[0.06] dark:border-gray-700/40 transition-all shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]"
+          className="p-1.5 rounded-lg neu-control text-gray-500 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition-all"
           title="Reset conversation"
         >
           <FiRefreshCw size={14} />
@@ -304,7 +304,7 @@ What can I help you with? I can help plan your schedule, find courses that count
                 className={`max-w-[85%] rounded-xl p-3 backdrop-blur-md shadow-[inset_0_1px_0_rgba(255,255,255,0.04),0_4px_12px_rgba(0,0,0,0.15)] ${
                   message.role === "user"
                     ? "bg-gradient-to-br from-blue-100 to-blue-50 dark:from-blue-900/40 dark:to-blue-950/40 text-blue-900 dark:text-blue-100 border border-blue-300/60 dark:border-blue-700/30"
-                    : "bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 text-gray-800 dark:text-gray-200 border border-gray-200 dark:border-gray-800/50"
+                    : "neu-surface-sm text-gray-800 dark:text-gray-200"
                 }`}
               >
                 {message.role === "assistant" && (
@@ -360,7 +360,7 @@ What can I help you with? I can help plan your schedule, find courses that count
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder="Ask Dan about requirements, courses, planning..."
-            className="w-full px-3 py-2.5 pr-11 text-sm bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-xl text-gray-900 dark:text-gray-200 focus:outline-none focus:ring-1 focus:ring-purple-500/40 focus:border-purple-600/50 resize-none placeholder:text-gray-400 dark:placeholder:text-gray-500 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]"
+            className="w-full px-3 py-2.5 pr-11 text-sm neu-inset rounded-xl text-gray-900 dark:text-gray-200 focus:outline-none focus:ring-1 focus:ring-purple-500/40 resize-none placeholder:text-gray-400 dark:placeholder:text-gray-500"
             rows={2}
             disabled={isLoading}
           />
@@ -370,7 +370,7 @@ What can I help you with? I can help plan your schedule, find courses that count
             className={`absolute right-2.5 bottom-2.5 p-1.5 rounded-lg transition-all ${
               input.trim()
                 ? "bg-gradient-to-br from-purple-600 to-purple-700 text-white hover:from-purple-500 hover:to-purple-600 shadow-[0_2px_8px_rgba(147,51,234,0.3)]"
-                : "bg-black/[0.06] dark:bg-gray-800/60 text-gray-400 dark:text-gray-500 cursor-not-allowed border border-black/[0.06] dark:border-gray-700/40"
+                : "neu-inset text-gray-400 dark:text-gray-500 cursor-not-allowed"
             }`}
           >
             <FiSend size={14} />

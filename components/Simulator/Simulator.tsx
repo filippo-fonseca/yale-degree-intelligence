@@ -849,7 +849,7 @@ export default function Simulator({
             <span className="text-xs text-gray-400 dark:text-gray-500 uppercase tracking-wider">
               Plan:
             </span>
-            <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-black/[0.04] dark:bg-white/[0.04] border border-black/[0.06] dark:border-white/[0.08]">
+            <div className="flex items-center gap-2 px-3 py-2 rounded-xl neu-inset">
               {currentPlanName ? (
                 <>
                   <div
@@ -881,7 +881,7 @@ export default function Simulator({
           <div className="flex items-center gap-2 flex-wrap" data-tour="simulator-plan-actions">
             <button
               onClick={() => setShowHelp((v) => !v)}
-              className="px-4 py-2 text-sm rounded-xl bg-black/[0.04] dark:bg-white/[0.04] backdrop-blur-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-black/[0.06] dark:hover:bg-white/[0.08] border border-black/[0.06] dark:border-white/[0.08] flex items-center gap-2 transition-all"
+              className="px-4 py-2 text-sm rounded-xl neu-control backdrop-blur-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 flex items-center gap-2 transition-all"
             >
               <FiInfo size={14} />
               Help
@@ -890,7 +890,7 @@ export default function Simulator({
               <>
                 <button
                   onClick={() => setShowPlansModal(true)}
-                  className="px-4 py-2 text-sm rounded-xl bg-gradient-to-r from-blue-500/15 to-purple-500/15 backdrop-blur-sm text-blue-300 hover:text-blue-200 hover:from-blue-500/20 hover:to-purple-500/20 border border-blue-500/30 hover:border-blue-400/40 flex items-center gap-2 transition-all"
+                  className="px-4 py-2 text-sm rounded-xl neu-control backdrop-blur-sm text-blue-600 dark:text-blue-300 hover:text-blue-700 dark:hover:text-blue-200 flex items-center gap-2 transition-all"
                 >
                   <FiChevronDown size={14} />
                   Load Plan
@@ -899,8 +899,8 @@ export default function Simulator({
                   onClick={() => setShowSaveModal(true)}
                   className={`px-4 py-2 text-sm rounded-xl backdrop-blur-sm transition-all flex items-center gap-2 ${
                     hasChanges
-                      ? "bg-gradient-to-r from-emerald-500/20 to-teal-500/20 text-emerald-300 hover:text-emerald-200 hover:from-emerald-500/25 hover:to-teal-500/25 border border-emerald-500/30 hover:border-emerald-400/40"
-                      : "bg-black/[0.02] dark:bg-white/[0.02] text-gray-400 dark:text-gray-600 border border-black/[0.04] dark:border-white/[0.04] cursor-not-allowed"
+                      ? "neu-control text-emerald-600 dark:text-emerald-300 hover:text-emerald-700 dark:hover:text-emerald-200"
+                      : "neu-inset text-gray-400 dark:text-gray-600 cursor-not-allowed"
                   }`}
                   disabled={!hasChanges}
                 >
@@ -911,7 +911,7 @@ export default function Simulator({
             )}
             <button
               onClick={resetSimulator}
-              className="px-4 py-2 text-sm rounded-xl bg-red-500/10 backdrop-blur-sm text-red-400 hover:text-red-300 hover:bg-red-500/15 border border-red-500/20 hover:border-red-400/30 flex items-center gap-2 transition-all"
+              className="px-4 py-2 text-sm rounded-xl neu-control backdrop-blur-sm text-red-500 dark:text-red-400 hover:text-red-600 dark:hover:text-red-300 flex items-center gap-2 transition-all"
             >
               <FiRefreshCw size={14} />
               Clear canvas
@@ -927,7 +927,7 @@ export default function Simulator({
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
-            className="overflow-hidden bg-gray-50 dark:bg-transparent dark:bg-gradient-to-br dark:from-white/[0.03] dark:to-transparent backdrop-blur-xl rounded-xl border border-gray-200 dark:border-white/[0.06] p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_4px_20px_rgba(0,0,0,0.08)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_4px_20px_rgba(0,0,0,0.15)]"
+            className="overflow-hidden neu-surface-sm backdrop-blur-xl rounded-xl p-4"
           >
             <h4 className="font-medium text-sm text-gray-900 dark:text-white mb-2">
               How to use the simulator
@@ -1022,7 +1022,7 @@ export default function Simulator({
 
       {/* Available Courses Pool */}
       <div className="sticky top-[72px] z-20 mb-2" data-tour="simulator-course-pool">
-        <div className="bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-pink-950/30 dark:via-gray-900/50 dark:to-gray-950/50 backdrop-blur-md rounded-xl border border-pink-200 dark:border-pink-800/30 shadow-[inset_0_1px_0_rgba(255,255,255,0.04),0_4px_16px_rgba(0,0,0,0.08)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.04),0_4px_16px_rgba(0,0,0,0.25)] overflow-hidden">
+        <div className="neu-surface backdrop-blur-md rounded-xl overflow-hidden">
           <button
             onClick={() => setShowPool(!showPool)}
             className={`flex items-center justify-between w-full p-3 ${
@@ -1033,7 +1033,7 @@ export default function Simulator({
               <div>Quick-add: Pool of remaining courses from your major</div>
               <div className="relative group">
                 <Info className="h-3.5 w-3.5 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition-colors cursor-pointer" />
-                <div className="absolute z-50 bottom-full mt-2 left-1/2 -translate-x-1/2 bg-white dark:bg-gray-900/95 backdrop-blur-sm text-gray-700 dark:text-gray-300 text-[10px] px-2 py-1 rounded-md border border-gray-200 dark:border-gray-800/50 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+                <div className="absolute z-50 bottom-full mt-2 left-1/2 -translate-x-1/2 neu-surface-sm backdrop-blur-sm text-gray-700 dark:text-gray-300 text-[10px] px-2 py-1 rounded-md opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
                   May not include all. Add manually if not.
                 </div>
               </div>
@@ -1068,7 +1068,7 @@ export default function Simulator({
                         onDragStart={() => handleDragStart(course)}
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.98 }}
-                        className="px-2 py-1 rounded-lg bg-pink-100 dark:bg-pink-900/25 text-pink-700 dark:text-pink-300 border border-pink-300 dark:border-pink-700/40 text-xs cursor-grab active:cursor-grabbing select-none shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]"
+                        className="px-2 py-1 rounded-lg neu-control text-pink-700 dark:text-pink-300 text-xs cursor-grab active:cursor-grabbing select-none"
                       >
                         {course.code}
                         <span className="text-[10px] text-pink-500/70 dark:text-pink-200/50 ml-1">
@@ -1108,11 +1108,11 @@ export default function Simulator({
                 handleDrop(semester.id);
                 setHoveredSemester(null);
               }}
-              className={`bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 backdrop-blur-md rounded-xl border p-3 min-h-[160px] flex flex-col transition-all shadow-[inset_0_1px_0_rgba(255,255,255,0.04),0_4px_12px_rgba(0,0,0,0.08)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.04),0_4px_12px_rgba(0,0,0,0.2)]
+              className={`neu-surface-sm backdrop-blur-md rounded-xl p-3 min-h-[160px] flex flex-col transition-all
                 ${
                   hasInProgress(semester)
-                    ? "border-blue-700/50 ring-1 ring-blue-500/30"
-                    : "border-gray-200 dark:border-gray-800/50"
+                    ? "ring-1 ring-blue-500/30"
+                    : ""
                 }
                 ${
                   hoveredSemester === semester.id &&
@@ -1128,7 +1128,7 @@ export default function Simulator({
                 </h4>
                 <div className="flex items-center gap-1.5">
                   <span
-                    className="px-1.5 py-0.5 rounded-md text-[10px] bg-gray-100 dark:bg-gray-800/60 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-700/40"
+                    className="px-1.5 py-0.5 rounded-md text-[10px] neu-inset text-gray-600 dark:text-gray-300"
                     title="Sum of credits in this semester"
                   >
                     {semCreditsLabel} cr
@@ -1137,7 +1137,7 @@ export default function Simulator({
                     <button
                       onClick={() => setLookupSemesterId(semester.id)}
                       data-tour="simulator-semester-add"
-                      className="px-1.5 py-0.5 text-[10px] rounded-md bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 hover:bg-blue-200 dark:hover:bg-blue-800/40 border border-blue-300 dark:border-blue-800/40 transition-all"
+                      className="px-1.5 py-0.5 text-[10px] rounded-md neu-control text-blue-700 dark:text-blue-300 transition-all"
                       type="button"
                     >
                       <FiPlus className="inline-block mr-0.5" size={10} />
@@ -1155,7 +1155,7 @@ export default function Simulator({
                       draggedCourse &&
                       !isPastSemester(semester.name)
                         ? "border-pink-400/60 bg-pink-50 dark:bg-pink-900/15"
-                        : "border-gray-200 dark:border-gray-700/50"
+                        : "neu-inset"
                     }`}
                 >
                   <p className="text-[11px] text-gray-400 dark:text-gray-500 text-center opacity-70">

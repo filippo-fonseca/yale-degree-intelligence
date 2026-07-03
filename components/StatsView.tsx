@@ -175,12 +175,12 @@ function StatCard({
   return (
     <motion.div
       whileHover={{ y: -1 }}
-      className="p-3 rounded-xl bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 backdrop-blur-md border border-gray-200 dark:border-gray-800/50 hover:border-gray-300 dark:hover:border-gray-700/60 transition-all relative shadow-neu"
+      className="p-3 rounded-xl neu-surface-sm backdrop-blur-md hover:-translate-y-0.5 transition-all relative"
     >
       {tooltip && (
         <div className="absolute top-2 right-2 group">
           <FiInfo className="w-3.5 h-3.5 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-400" />
-          <div className="absolute z-10 right-0 w-44 p-2 text-[11px] text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-900/95 backdrop-blur-sm rounded-lg border border-gray-200 dark:border-gray-800/50 shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
+          <div className="absolute z-10 right-0 w-44 p-2 text-[11px] text-gray-700 dark:text-gray-300 neu-surface-sm backdrop-blur-sm rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
             {tooltip}
           </div>
         </div>
@@ -234,7 +234,7 @@ function ChartCard({
     <motion.div
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
-      className={`p-4 rounded-xl bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 backdrop-blur-md border border-gray-200 dark:border-gray-800/50 shadow-neu ${className}`}
+      className={`p-4 rounded-xl neu-surface backdrop-blur-md ${className}`}
     >
       <div className="flex items-start justify-between mb-3">
         <div>
@@ -248,7 +248,7 @@ function ChartCard({
           )}
         </div>
         {icon && (
-          <div className="p-1.5 rounded-lg bg-gray-100 dark:bg-gray-800/60 text-gray-500 dark:text-gray-400 shrink-0 ml-2">
+          <div className="p-1.5 rounded-lg neu-control text-gray-500 dark:text-gray-400 shrink-0 ml-2">
             {icon}
           </div>
         )}
@@ -261,7 +261,7 @@ function ChartCard({
 /** Skeleton shimmer for a single stat card. */
 function StatCardSkeleton() {
   return (
-    <div className="p-3 rounded-xl bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 border border-gray-200 dark:border-gray-800/50 shadow-neu">
+    <div className="p-3 rounded-xl neu-surface-sm">
       <Skeleton className="h-3 w-24 mb-2" rounded="rounded" />
       <Skeleton className="h-6 w-16 mb-1.5" rounded="rounded" />
       <Skeleton className="h-2.5 w-20" rounded="rounded" />
@@ -273,7 +273,7 @@ function StatCardSkeleton() {
 function ChartCardSkeleton({ className = "" }: { className?: string }) {
   return (
     <div
-      className={`p-4 rounded-xl bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 border border-gray-200 dark:border-gray-800/50 shadow-neu ${className}`}
+      className={`p-4 rounded-xl neu-surface ${className}`}
     >
       <Skeleton className="h-4 w-40 mb-1" rounded="rounded" />
       <Skeleton className="h-2.5 w-56 mb-4" rounded="rounded" />

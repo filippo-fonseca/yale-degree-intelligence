@@ -204,7 +204,7 @@ function DistPieChart({ distMap }: { distMap: Record<string, Course[]> }) {
     <motion.div
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
-      className="p-4 rounded-xl bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 backdrop-blur-md border border-gray-200 dark:border-gray-800/50 shadow-neu"
+      className="p-4 rounded-xl neu-surface backdrop-blur-md"
     >
       <div className="flex items-center justify-between mb-4">
         <div>
@@ -216,7 +216,7 @@ function DistPieChart({ distMap }: { distMap: Record<string, Course[]> }) {
           </p>
         </div>
         {totalTags > 0 && (
-          <span className="text-xs px-2 py-0.5 rounded-md bg-gray-100 dark:bg-gray-800/60 text-gray-500 dark:text-gray-400 border border-gray-200 dark:border-gray-700/50">
+          <span className="text-xs px-2 py-0.5 rounded-md neu-inset text-gray-500 dark:text-gray-400">
             {totalTags} total tags
           </span>
         )}
@@ -285,12 +285,12 @@ function DistStatCard({
   return (
     <motion.div
       whileHover={{ y: -1 }}
-      className="p-3 rounded-xl bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 backdrop-blur-md border border-gray-200 dark:border-gray-800/50 hover:border-gray-300 dark:hover:border-gray-700/60 transition-all relative shadow-neu"
+      className="p-3 rounded-xl neu-surface-sm backdrop-blur-md hover:-translate-y-0.5 transition-all relative"
     >
       {infoTooltip && (
         <div className="absolute top-2 right-2 group">
           <FiInfo className="w-3.5 h-3.5 text-gray-500 hover:text-gray-700 dark:hover:text-gray-400" />
-          <div className="absolute z-10 right-0 w-44 p-2 text-[11px] text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-900/95 backdrop-blur-sm rounded-lg border border-gray-200 dark:border-gray-800/50 shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
+          <div className="absolute z-10 right-0 w-44 p-2 text-[11px] text-gray-700 dark:text-gray-300 neu-surface-sm backdrop-blur-sm rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
             {infoTooltip}
           </div>
         </div>
@@ -305,7 +305,7 @@ function DistStatCard({
 
 function SkeletonCard() {
   return (
-    <div className="p-4 rounded-xl border border-gray-200 dark:border-gray-800/50 bg-white dark:bg-gray-900/20">
+    <div className="p-4 rounded-xl neu-surface-sm">
       <div className="flex items-center justify-between mb-3">
         <Skeleton rounded="rounded-lg" className="h-5 w-16" />
         <Skeleton className="h-4 w-20" />
@@ -357,7 +357,7 @@ function DistHeatMap({
   getCount: (code: string) => number;
 }) {
   return (
-    <div className="p-4 rounded-xl bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 backdrop-blur-md border border-gray-200 dark:border-gray-800/50 shadow-neu">
+    <div className="p-4 rounded-xl neu-surface backdrop-blur-md">
       {/* Legend */}
       <div className="flex flex-wrap items-center gap-3 mb-4">
         {[
@@ -389,7 +389,7 @@ function DistHeatMap({
                 <span className="text-[10px] opacity-80 mt-0.5">{Math.min(count, item.target)}/{item.target}</span>
               </div>
               {/* Tooltip */}
-              <div className="opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none absolute z-20 bottom-full mb-1 left-1/2 -translate-x-1/2 bg-white dark:bg-gray-900/95 backdrop-blur-sm border border-gray-200 dark:border-gray-800/50 rounded-lg shadow-lg text-gray-700 dark:text-gray-200 p-2 whitespace-nowrap">
+              <div className="opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none absolute z-20 bottom-full mb-1 left-1/2 -translate-x-1/2 neu-surface-sm backdrop-blur-sm rounded-lg text-gray-700 dark:text-gray-200 p-2 whitespace-nowrap">
                 <p className="text-[11px] font-bold">{item.name}</p>
                 <p className="text-[10px] opacity-75 mt-0.5">{DIST_STATUS_LABEL[status]} · {count}/{item.target} credits</p>
               </div>
@@ -456,7 +456,7 @@ function DistReqCard({
       </div>
 
       {/* Progress bar */}
-      <div className="w-full h-2 bg-gray-200 dark:bg-gray-800 rounded-full overflow-hidden mb-2">
+      <div className="w-full h-2 neu-inset rounded-full overflow-hidden mb-2">
         <motion.div
           initial={{ width: 0 }}
           animate={{ width: `${progress * 100}%` }}
@@ -594,7 +594,7 @@ function LanguageSection({
         )}
 
         {placementLevel !== null && (
-          <div className="w-full h-2 bg-gray-200 dark:bg-gray-800 rounded-full overflow-hidden mb-4">
+          <div className="w-full h-2 neu-inset rounded-full overflow-hidden mb-4">
             <motion.div
               initial={{ width: 0 }}
               animate={{ width: `${progress * 100}%` }}
@@ -763,7 +763,7 @@ function AllocationControl({
   onToggle: (next: boolean) => void;
 }) {
   return (
-    <div className="p-3 rounded-xl bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 border border-gray-200 dark:border-gray-800/50 shadow-neu flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+    <div className="p-3 rounded-xl neu-surface flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
       <div className="flex items-start gap-2.5">
         <FiInfo
           className="text-purple-500 dark:text-purple-300 mt-0.5 flex-shrink-0"
@@ -777,7 +777,7 @@ function AllocationControl({
             : " Use the dropdowns below to choose where each course counts."}
         </p>
       </div>
-      <div className="inline-flex shrink-0 rounded-lg border border-gray-200 dark:border-gray-800/60 bg-gray-100 dark:bg-gray-900/50 p-0.5">
+      <div className="inline-flex shrink-0 rounded-lg neu-inset p-0.5">
         <button
           type="button"
           onClick={() => onToggle(true)}
@@ -989,7 +989,7 @@ const DistributionalsView = ({ courses }: { courses: Course[] }) => {
       </div>
 
       {/* Overall progress bar */}
-      <div className="p-3 rounded-xl bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 border border-gray-200 dark:border-gray-800/50 shadow-neu">
+      <div className="p-3 rounded-xl neu-surface">
         <div className="flex items-center justify-between mb-2">
           <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">
             Areas & Skills Overall

@@ -91,7 +91,7 @@ export default function HeatMapView({
               </button>
 
               {/* Tooltip */}
-              <div className="opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity pointer-events-none absolute z-20 bottom-full mb-1 left-1/2 -translate-x-1/2 max-w-[12rem] bg-white dark:bg-gray-900/95 backdrop-blur-sm border border-gray-200 dark:border-gray-800/50 rounded-lg shadow-lg text-gray-700 dark:text-gray-200 p-2">
+              <div className="opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity pointer-events-none absolute z-20 bottom-full mb-1 left-1/2 -translate-x-1/2 max-w-[12rem] neu-surface-sm backdrop-blur-sm rounded-lg text-gray-700 dark:text-gray-200 p-2">
                 <p className="text-[11px] font-bold leading-snug whitespace-normal">
                   {s.req.name}
                 </p>

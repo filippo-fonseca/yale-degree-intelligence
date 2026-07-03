@@ -53,13 +53,8 @@ export default function LoginPage({
   }, []);
 
   return (
-    <div className="relative flex flex-col items-center justify-center min-h-screen p-4 bg-gradient-to-br from-gray-50 via-gray-100 to-white dark:from-gray-950 dark:via-gray-900 dark:to-gray-900 overflow-hidden font-louize">
+    <div className="relative flex flex-col items-center justify-center min-h-screen p-4 neu-page overflow-hidden font-louize">
       <CosmicBackground mode="stars" opacity={0.7} />
-
-      {/* Ambient glow */}
-      <div className="pointer-events-none absolute inset-0 -z-10">
-        <div className="absolute left-1/2 top-1/3 -translate-x-1/2 -translate-y-1/2 h-[500px] w-[600px] rounded-full bg-gradient-to-r from-blue-600/15 via-purple-600/15 to-pink-600/15 blur-3xl" />
-      </div>
 
       {/* Main card */}
       <motion.div
@@ -68,7 +63,7 @@ export default function LoginPage({
         transition={{ duration: 0.5, ease: "easeOut" }}
         className="relative z-10 w-full max-w-md"
       >
-        <div className="p-6 rounded-2xl bg-white/70 dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/80 dark:via-gray-900/60 dark:to-gray-950/80 backdrop-blur-2xl border border-black/[0.06] dark:border-white/[0.08] shadow-[0_8px_48px_rgba(0,0,0,0.5),0_0_100px_rgba(139,92,246,0.08),inset_0_1px_0_rgba(255,255,255,0.1)] ring-1 ring-black/[0.04] dark:ring-white/[0.05]">
+        <div className="p-6 rounded-2xl neu-surface backdrop-blur-2xl ring-1 ring-black/[0.03] dark:ring-white/[0.05]">
           {/* Logo */}
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
@@ -110,7 +105,7 @@ export default function LoginPage({
             transition={{ delay: 0.3 }}
             className="mb-5"
           >
-            <div className="h-[80px] flex items-center justify-center px-4 py-3 rounded-xl bg-gradient-to-br from-black/[0.03] to-transparent dark:from-white/[0.04] border border-black/[0.05] dark:border-white/[0.06] shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]">
+            <div className="h-[80px] flex items-center justify-center px-4 py-3 rounded-xl neu-inset">
               <AnimatePresence mode="wait">
                 <motion.div
                   key={activeFeature}
@@ -126,7 +121,7 @@ export default function LoginPage({
                     return (
                       <>
                         <div
-                          className={`shrink-0 w-9 h-9 rounded-lg bg-gradient-to-br ${f.gradient} ${f.shadow} flex items-center justify-center`}
+                          className={`shrink-0 w-9 h-9 rounded-lg bg-gradient-to-br ${f.gradient} ${f.shadow} flex items-center justify-center shadow-neu-sm`}
                         >
                           <Icon size={16} className="text-white" />
                         </div>
@@ -174,7 +169,7 @@ export default function LoginPage({
               onHoverEnd={() => setIsHovering(false)}
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              className="w-full py-3 px-4 rounded-xl font-medium text-sm text-white bg-gradient-to-r from-blue-500/30 via-purple-500/30 to-pink-500/30 hover:from-blue-500/40 hover:via-purple-500/40 hover:to-pink-500/40 border border-white/[0.1] shadow-[0_4px_20px_rgba(139,92,246,0.25),inset_0_1px_0_rgba(255,255,255,0.15),inset_0_-1px_0_rgba(0,0,0,0.2)] transition-all duration-300 flex items-center justify-center gap-2"
+              className="w-full py-3 px-4 rounded-xl font-medium text-sm text-gray-900 dark:text-white neu-control hover:-translate-y-0.5 transition-all duration-300 flex items-center justify-center gap-2"
             >
               {loading ? (
                 <motion.span
@@ -205,7 +200,7 @@ export default function LoginPage({
             transition={{ delay: 0.5 }}
             className="mt-4 flex justify-center"
           >
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-medium tracking-wide uppercase bg-gradient-to-r from-blue-500/15 via-purple-500/15 to-pink-500/15 border border-black/[0.06] dark:border-white/[0.08] text-gray-500 dark:text-gray-400 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]">
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-medium tracking-wide uppercase neu-control text-gray-500 dark:text-gray-400">
               <span className="w-1 h-1 rounded-full bg-emerald-400 animate-pulse" />
               For Yalies, by Yalies
             </span>

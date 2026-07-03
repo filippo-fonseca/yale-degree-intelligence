@@ -41,7 +41,7 @@ function MajorProgressLoadingSkeleton() {
         <Skeleton className="h-8 w-16" />
       </div>
       {/* Progress bar card */}
-      <div className="p-3 rounded-xl border border-gray-200 dark:border-gray-800/50 shadow-neu">
+      <div className="p-3 rounded-xl neu-surface">
         <Skeleton rounded="rounded-full" className="h-2 w-full" />
         <Skeleton rounded="rounded-lg" className="h-6 w-44 mt-2" />
       </div>
@@ -56,7 +56,7 @@ function MajorProgressLoadingSkeleton() {
         {Array.from({ length: 3 }).map((_, c) => (
           <div
             key={c}
-            className="rounded-xl border border-gray-200 dark:border-gray-800/50 p-3 space-y-3"
+            className="rounded-xl neu-inset p-3 space-y-3"
           >
             <Skeleton rounded="rounded-lg" className="h-5 w-28" />
             {Array.from({ length: 3 }).map((_, r) => (
@@ -104,12 +104,12 @@ function MajorStatCard({
   return (
     <motion.div
       whileHover={{ y: -1 }}
-      className="p-3 rounded-xl bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 backdrop-blur-md border border-gray-200 dark:border-gray-800/50 hover:border-gray-300 dark:hover:border-gray-700/60 transition-all relative shadow-neu"
+      className="p-3 rounded-xl neu-surface-sm backdrop-blur-md hover:-translate-y-0.5 transition-all relative"
     >
       {infoTooltip && (
         <div className="absolute top-2 right-2 group">
           <FiInfo className="w-3.5 h-3.5 text-gray-500 hover:text-gray-700 dark:hover:text-gray-400" />
-          <div className="absolute z-10 right-0 w-44 p-2 text-[11px] text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-900/95 backdrop-blur-sm rounded-lg border border-gray-200 dark:border-gray-800/50 shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
+          <div className="absolute z-10 right-0 w-44 p-2 text-[11px] text-gray-700 dark:text-gray-300 neu-surface-sm backdrop-blur-sm rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
             {infoTooltip}
           </div>
         </div>
@@ -619,7 +619,7 @@ export default function MajorProgressView({
       {/* Progress bar + Stats toggle - Compact neumorphic */}
       <div
         data-tour="major-progress-bar"
-        className="p-3 rounded-xl bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 border border-gray-200 dark:border-gray-800/50 shadow-neu"
+        className="p-3 rounded-xl neu-surface"
       >
         <div className="relative w-full bg-gray-200 dark:bg-gray-800/70 rounded-full h-2 overflow-hidden shadow-[inset_0_1px_2px_rgba(0,0,0,0.08)] dark:shadow-[inset_0_1px_2px_rgba(0,0,0,0.3)]">
           {/* Lighter in-progress segment sits behind, only in the +In Progress view. */}
@@ -733,9 +733,9 @@ export default function MajorProgressView({
               onClick={() => setView("board")}
               data-tour="major-board-toggle"
               className={`px-2.5 py-1 text-[11px] rounded-lg transition-all duration-200 ${
-                view === "board"
-                  ? "bg-purple-500/15 text-purple-600 dark:text-purple-300 border border-purple-600/40 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]"
-                  : "bg-gray-100 dark:bg-gray-900/50 text-gray-400 dark:text-gray-500 border border-gray-200 dark:border-gray-800/50 hover:text-gray-600 dark:hover:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-800/50"
+              view === "board"
+                  ? "neu-control-active text-purple-600 dark:text-purple-300"
+                  : "neu-control text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-400"
               }`}
             >
               Board
@@ -745,9 +745,9 @@ export default function MajorProgressView({
               onClick={() => setView("heatmap")}
               data-tour="major-heatmap-toggle"
               className={`inline-flex items-center px-2.5 py-1 text-[11px] rounded-lg transition-all duration-200 ${
-                view === "heatmap"
-                  ? "bg-purple-500/15 text-purple-600 dark:text-purple-300 border border-purple-600/40 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]"
-                  : "bg-gray-100 dark:bg-gray-900/50 text-gray-400 dark:text-gray-500 border border-gray-200 dark:border-gray-800/50 hover:text-gray-600 dark:hover:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-800/50"
+              view === "heatmap"
+                  ? "neu-control-active text-purple-600 dark:text-purple-300"
+                  : "neu-control text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-400"
               }`}
             >
               Heat map
@@ -799,9 +799,9 @@ export default function MajorProgressView({
                 key={col.key}
                 className={`${
                   mobileColumn === col.key ? "flex" : "hidden"
-                } md:flex flex-col rounded-xl border border-gray-200 dark:border-gray-800/50 bg-white/40 dark:bg-gray-900/20 max-h-[70vh]`}
+                } md:flex flex-col rounded-xl neu-surface-sm max-h-[70vh]`}
               >
-                <div className="sticky top-0 z-10 flex items-center justify-between px-3 py-2.5 rounded-t-xl border-b border-gray-200 dark:border-gray-800/50 bg-white/80 dark:bg-gray-900/70 backdrop-blur-md">
+                <div className="sticky top-0 z-10 flex items-center justify-between px-3 py-2.5 rounded-t-xl neu-inset backdrop-blur-md">
                   <h4
                     className={`font-medium text-sm ${STATUS_CLASSES[col.status].accent}`}
                   >

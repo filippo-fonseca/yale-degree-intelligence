@@ -64,7 +64,7 @@ export function MajorDropdown({
       {/* Dropdown trigger */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full text-left p-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800/50 text-gray-900 dark:text-white flex justify-between items-center"
+        className="w-full text-left p-3 rounded-lg neu-control hover:-translate-y-0.5 text-gray-900 dark:text-white flex justify-between items-center transition-all"
       >
         <div className="flex items-center">
           {value ? (
@@ -97,7 +97,7 @@ export function MajorDropdown({
 
       {/* Dropdown content */}
       {isOpen && (
-        <div className="absolute z-10 mt-1 w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg overflow-hidden">
+        <div className="absolute z-10 mt-1 w-full neu-surface rounded-lg overflow-hidden">
           {/* Search bar */}
           <div className="p-2 border-b border-gray-200 dark:border-gray-700">
             <div className="relative">
@@ -107,7 +107,7 @@ export function MajorDropdown({
                 placeholder="Search majors & concentrations..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-200 placeholder-gray-400 dark:placeholder-gray-500 px-3 py-2 pl-8 rounded-md border border-gray-300 dark:border-gray-700 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="w-full neu-inset text-gray-900 dark:text-gray-200 placeholder-gray-400 dark:placeholder-gray-500 px-3 py-2 pl-8 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
               />
               <svg
                 className="absolute left-2 top-2.5 h-4 w-4 text-gray-500 dark:text-gray-400"
@@ -137,8 +137,8 @@ export function MajorDropdown({
                     setIsOpen(false);
                   }}
                   disabled={disabledOptions.includes(code)}
-                  className={`w-full text-left p-3 hover:bg-gray-100 dark:hover:bg-gray-700/50 text-gray-900 dark:text-white ${
-                    value === code ? "bg-blue-900/20" : ""
+                  className={`w-full text-left p-3 hover:bg-black/[0.04] dark:hover:bg-white/[0.05] text-gray-900 dark:text-white ${
+                    value === code ? "neu-control-active" : ""
                   } ${
                     disabledOptions.includes(code)
                       ? "opacity-50 cursor-not-allowed"

@@ -456,7 +456,7 @@ function DistReqCard({
       </div>
 
       {/* Progress bar */}
-      <div className="w-full h-2 bg-gray-200 dark:bg-gray-800 rounded-full overflow-hidden mb-2">
+      <div className="w-full h-3 bg-gray-200 dark:bg-gray-800 rounded-full overflow-hidden mb-2">
         <motion.div
           initial={{ width: 0 }}
           animate={{ width: `${progress * 100}%` }}
@@ -594,7 +594,7 @@ function LanguageSection({
         )}
 
         {placementLevel !== null && (
-          <div className="w-full h-2 bg-gray-200 dark:bg-gray-800 rounded-full overflow-hidden mb-4">
+          <div className="w-full h-3 bg-gray-200 dark:bg-gray-800 rounded-full overflow-hidden mb-4">
             <motion.div
               initial={{ width: 0 }}
               animate={{ width: `${progress * 100}%` }}

@@ -621,7 +621,7 @@ export default function MajorProgressView({
         data-tour="major-progress-bar"
         className="p-3 rounded-xl bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 border border-gray-200 dark:border-gray-800/50 shadow-neu"
       >
-        <div className="relative w-full bg-gray-200 dark:bg-gray-800/70 rounded-full h-2 overflow-hidden shadow-[inset_0_1px_2px_rgba(0,0,0,0.08)] dark:shadow-[inset_0_1px_2px_rgba(0,0,0,0.3)]">
+        <div className="relative w-full bg-gray-200 dark:bg-gray-800 rounded-full h-3 overflow-hidden shadow-[inset_0_1px_2px_rgba(0,0,0,0.08)] dark:shadow-[inset_0_1px_2px_rgba(0,0,0,0.3)]">
           {/* Lighter in-progress segment sits behind, only in the +In Progress view. */}
           {showInProgressStats && (
             <motion.div
@@ -629,7 +629,7 @@ export default function MajorProgressView({
               initial={{ width: 0 }}
               animate={{ width: `${withInProgressPercentage}%` }}
               transition={{ duration: 1, ease: "easeOut" }}
-              className="absolute inset-y-0 left-0 rounded-full bg-purple-300 dark:bg-purple-500/40"
+              className="absolute inset-y-0 left-0 rounded-full bg-purple-400 dark:bg-purple-500/70"
             />
           )}
           {/* Solid completed segment paints on top. Re-keyed per mode so it

@@ -328,7 +328,7 @@ function DeptCreditPieChart({
     <motion.div
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
-      className="relative h-full w-full overflow-hidden"
+      className="relative mx-auto h-full w-full max-w-[380px] overflow-hidden"
     >
       {/* Centered total label — anchored over the donut region (left of the legend) */}
       <div className="pointer-events-none absolute inset-y-0 left-0 right-[112px] z-10 flex flex-col items-center justify-center">

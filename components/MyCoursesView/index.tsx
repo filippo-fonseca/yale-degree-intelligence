@@ -609,7 +609,7 @@ export default function MyCoursesView({
       </div>
 
       {/* ---- Search + filter + sort controls ---- */}
-      <div className="p-3 rounded-xl bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 backdrop-blur-md border border-gray-200 dark:border-gray-800/50 shadow-neu">
+      <div className="p-3 rounded-xl neu-surface backdrop-blur-md">
         <div className="flex flex-col sm:flex-row gap-2">
           {/* Search */}
           <div className="relative flex-1 min-w-0">
@@ -619,7 +619,7 @@ export default function MyCoursesView({
               placeholder="Search by code or name…"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-8 pr-7 py-1.5 text-sm rounded-lg bg-gray-100 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-800/50 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-600 focus:outline-none focus:ring-1 focus:ring-blue-500/50 transition-all"
+              className="w-full pl-8 pr-7 py-1.5 text-sm rounded-lg neu-inset text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-600 focus:outline-none focus:ring-1 focus:ring-blue-500/50 transition-all"
             />
             {searchQuery && (
               <button
@@ -635,7 +635,7 @@ export default function MyCoursesView({
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value as StatusFilter)}
-            className="py-1.5 px-2 text-sm rounded-lg bg-gray-100 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-800/50 text-gray-700 dark:text-gray-300 focus:outline-none focus:ring-1 focus:ring-blue-500/50 transition-all"
+            className="py-1.5 px-2 text-sm rounded-lg neu-inset text-gray-700 dark:text-gray-300 focus:outline-none focus:ring-1 focus:ring-blue-500/50 transition-all"
           >
             <option value="all">All statuses</option>
             <option value="completed">Completed</option>
@@ -647,7 +647,7 @@ export default function MyCoursesView({
           <select
             value={semesterFilter}
             onChange={(e) => setSemesterFilter(e.target.value)}
-            className="py-1.5 px-2 text-sm rounded-lg bg-gray-100 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-800/50 text-gray-700 dark:text-gray-300 focus:outline-none focus:ring-1 focus:ring-blue-500/50 transition-all"
+            className="py-1.5 px-2 text-sm rounded-lg neu-inset text-gray-700 dark:text-gray-300 focus:outline-none focus:ring-1 focus:ring-blue-500/50 transition-all"
           >
             <option value="all">All semesters</option>
             {allSemesters.map((s) => (
@@ -662,7 +662,7 @@ export default function MyCoursesView({
             <select
               value={sortKey}
               onChange={(e) => setSortKey(e.target.value as SortKey)}
-              className="py-1.5 px-2 text-sm rounded-lg bg-gray-100 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-800/50 text-gray-700 dark:text-gray-300 focus:outline-none focus:ring-1 focus:ring-blue-500/50 transition-all"
+              className="py-1.5 px-2 text-sm rounded-lg neu-inset text-gray-700 dark:text-gray-300 focus:outline-none focus:ring-1 focus:ring-blue-500/50 transition-all"
             >
               <option value="semester">By semester</option>
               <option value="code">By code</option>
@@ -671,7 +671,7 @@ export default function MyCoursesView({
             </select>
             <button
               onClick={() => setSortAsc((v) => !v)}
-              className="px-2 py-1.5 text-xs rounded-lg bg-gray-100 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-800/50 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 transition-all"
+              className="px-2 py-1.5 text-xs rounded-lg neu-control text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 transition-all"
               title={sortAsc ? "Ascending" : "Descending"}
             >
               {sortAsc ? "↑" : "↓"}
@@ -721,10 +721,10 @@ export default function MyCoursesView({
                       type="button"
                       onClick={() => jumpToSemester(semester)}
                       aria-current={isActive ? "true" : undefined}
-                      className={`group shrink-0 lg:w-full min-w-[8.75rem] lg:min-w-0 text-left px-3 py-2 rounded-lg border transition-all ${
+                      className={`group shrink-0 lg:w-full min-w-[8.75rem] lg:min-w-0 text-left px-3 py-2 rounded-lg transition-all ${
                         isActive
-                          ? "bg-white dark:bg-gray-900/70 border-pink-400/60 dark:border-pink-400/50 shadow-sm"
-                          : "bg-gray-50/70 dark:bg-gray-950/20 border-gray-200/70 dark:border-gray-800/50 hover:border-gray-300 dark:hover:border-gray-700"
+                          ? "neu-control-active text-gray-900 dark:text-white"
+                          : "neu-control hover:-translate-y-0.5"
                       } ${semesterGroups.length > 1 ? "lg:mb-2" : ""}`}
                     >
                       <div className="flex items-center gap-2 min-w-0">
@@ -919,7 +919,7 @@ export default function MyCoursesView({
       </div>
 
       {/* ---- Privacy disclaimer ---- */}
-      <div className="mt-10 p-4 rounded-xl bg-gradient-to-br from-gray-100/80 via-gray-50/60 to-gray-100/80 dark:from-gray-900/40 dark:via-gray-900/30 dark:to-gray-950/40 border border-gray-200/80 dark:border-gray-800/50 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)]">
+      <div className="mt-10 p-4 rounded-xl neu-inset">
         <p className="text-[11px] text-gray-400 dark:text-gray-500 leading-relaxed">
           <span className="font-medium text-gray-600 dark:text-gray-400">
             By using DegreeIntelligence, you voluntarily share your grades.

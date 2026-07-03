@@ -88,7 +88,7 @@ export function CourseCard({
       whileHover={{ y: -1 }}
       whileTap={{ scale: 0.99 }}
       transition={{ duration: 0.12 }}
-      className={`relative p-4 cursor-pointer rounded-xl backdrop-blur-sm border transition-all shadow-sm dark:shadow-none ${card}`}
+      className={`relative p-4 cursor-pointer rounded-xl backdrop-blur-sm border transition-all shadow-neu-sm hover:shadow-neu ${card}`}
       onClick={() => onCardClick(course)}
     >
       {/* Top row */}
@@ -125,7 +125,7 @@ export function CourseCard({
         {!course.skipped && (
           <button
             aria-label="Delete course"
-            className="absolute top-3 right-3 p-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 text-gray-400 dark:text-gray-500 hover:border-red-400 dark:hover:border-red-800 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-500 dark:hover:text-red-400 transition-all"
+            className="absolute top-3 right-3 p-1.5 rounded-lg neu-control text-gray-400 dark:text-gray-500 hover:text-red-500 dark:hover:text-red-400 transition-all"
             onClick={(e) => {
               e.stopPropagation();
               onDeleteClick(course);
@@ -154,14 +154,14 @@ export function CourseCard({
           {distributionals.length === 0 ? (
             <button
               onClick={() => onDistSelectorToggle(course.id)}
-              className="text-[10px] px-2 py-0.5 rounded-full bg-gradient-to-r from-purple-500/20 via-pink-500/20 to-blue-500/20 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white border border-purple-500/50 hover:border-purple-400/70 transition-all"
+              className="text-[10px] px-2 py-0.5 rounded-full neu-control text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-all"
             >
               + assign distributional
             </button>
           ) : (
             <button
               onClick={() => onDistSelectorToggle(course.id)}
-              className="text-[10px] px-2 py-0.5 rounded-full bg-gray-100 dark:bg-gray-800/50 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700/50 border border-dashed border-gray-300 dark:border-gray-700/50 transition-all"
+              className="text-[10px] px-2 py-0.5 rounded-full neu-control text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition-all"
             >
               edit distribs.
             </button>
@@ -176,7 +176,7 @@ export function CourseCard({
               exit={{ opacity: 0, height: 0 }}
               className="overflow-hidden"
             >
-              <div className="mt-2 p-3 rounded-lg bg-gray-100 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700/50 space-y-2.5">
+              <div className="mt-2 p-3 rounded-lg neu-inset space-y-2.5">
                 <DistSection
                   label="Areas"
                   items={[...DIST_AREAS]}
@@ -233,7 +233,7 @@ function DistSection({
             className={`text-xs px-2.5 py-1 rounded-full border font-medium transition-all ${
               selected.includes(d)
                 ? getDistPillStyle(d)
-                : "bg-white dark:bg-gray-800/50 text-gray-500 border-gray-300 dark:border-gray-700 hover:border-gray-400 dark:hover:border-gray-600"
+                : "neu-control text-gray-500 hover:text-gray-800 dark:hover:text-gray-200"
             }`}
           >
             {d}

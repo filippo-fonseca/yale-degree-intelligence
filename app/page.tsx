@@ -916,7 +916,7 @@ export default function Home() {
 
   return (
     <main
-      className={`min-h-screen bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100 font-louize overflow-hidden`}
+      className={`min-h-screen neu-page text-gray-900 dark:text-gray-100 font-louize overflow-hidden`}
     >
       {/* {showBetaBanner && (
         <motion.div
@@ -1091,7 +1091,7 @@ export default function Home() {
           <div className="flex items-center gap-2 lg:gap-3">
             <button
               onClick={() => setCommandPaletteOpen(true)}
-              className="lg:hidden p-1.5 rounded-xl hover:bg-black/[0.04] dark:hover:bg-white/[0.06] transition-all border border-black/[0.06] dark:border-white/[0.08] hover:border-black/[0.09] dark:hover:border-white/[0.12] text-gray-600 dark:text-gray-300"
+              className="lg:hidden p-1.5 rounded-xl neu-control hover:-translate-y-0.5 transition-all text-gray-600 dark:text-gray-300"
               title="Search (⌘K)"
               aria-label="Open search"
             >
@@ -1099,7 +1099,7 @@ export default function Home() {
             </button>
             <button
               onClick={toggleTheme}
-              className="p-1.5 lg:p-2 rounded-xl hover:bg-black/[0.04] dark:hover:bg-white/[0.06] transition-all border border-black/[0.06] dark:border-white/[0.08] hover:border-black/[0.09] dark:hover:border-white/[0.12] text-gray-600 dark:text-gray-300"
+              className="p-1.5 lg:p-2 rounded-xl neu-control hover:-translate-y-0.5 transition-all text-gray-600 dark:text-gray-300"
               title={
                 resolvedTheme === "dark"
                   ? "Switch to light mode"
@@ -1118,7 +1118,7 @@ export default function Home() {
 
             <button
               onClick={() => setShowSettings(true)}
-              className="p-1.5 lg:p-2 rounded-xl hover:bg-black/[0.04] dark:hover:bg-white/[0.06] transition-all border border-black/[0.06] dark:border-white/[0.08] hover:border-black/[0.09] dark:hover:border-white/[0.12] flex items-center gap-1"
+              className="p-1.5 lg:p-2 rounded-xl neu-control hover:-translate-y-0.5 transition-all flex items-center gap-1"
               title="Settings"
             >
               <UserAvatar
@@ -1151,7 +1151,7 @@ export default function Home() {
                   animate={{ x: 0 }}
                   exit={{ x: "-100%" }}
                   transition={{ type: "spring", damping: 25, stiffness: 300 }}
-                  className="fixed left-0 top-0 bottom-0 w-72 z-50 lg:hidden flex flex-col justify-between p-4 bg-gradient-to-br from-white via-white to-gray-50 dark:from-gray-900 dark:via-gray-900 dark:to-gray-950 border-r border-black/[0.06] dark:border-white/[0.08] shadow-[8px_0_32px_rgba(0,0,0,0.5)]"
+                  className="fixed left-0 top-0 bottom-0 w-72 z-50 lg:hidden flex flex-col justify-between p-4 neu-surface border-r border-black/[0.06] dark:border-white/[0.08]"
                 >
                   {/* Header with logo and close */}
                   <div className="flex items-center justify-between mb-6 pb-4 border-b border-black/[0.06] dark:border-white/[0.06]">
@@ -1180,7 +1180,7 @@ export default function Home() {
                           }}
                           className={`w-full flex items-center justify-between px-4 py-3 text-left rounded-2xl transition-all duration-300 ${
                             activeTab === item.id
-                              ? "bg-gradient-to-br from-black/[0.08] via-black/[0.04] to-transparent dark:from-white/[0.12] dark:via-white/[0.06] dark:to-transparent text-gray-900 dark:text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.15)]"
+                              ? "neu-control-active text-gray-900 dark:text-white"
                               : "text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-black/[0.03] dark:hover:bg-white/[0.04]"
                           }`}
                         >
@@ -1276,7 +1276,7 @@ export default function Home() {
             transition={{ width: { type: "spring", stiffness: 380, damping: 38 } }}
             onMouseEnter={() => setSidebarHovered(true)}
             onMouseLeave={() => setSidebarHovered(false)}
-            className="hidden lg:flex h-full flex-col justify-between p-3 rounded-3xl bg-gradient-to-br from-white/90 via-gray-50/80 to-white/70 dark:from-gray-900/70 dark:via-gray-900/50 dark:to-gray-950/70 backdrop-blur-xl border border-black/[0.06] dark:border-white/[0.08] shadow-[0_8px_32px_rgba(0,0,0,0.1),0_0_80px_rgba(59,130,246,0.04),inset_0_1px_0_rgba(255,255,255,0.8),inset_0_-1px_0_rgba(0,0,0,0.05)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.4),0_0_80px_rgba(59,130,246,0.06),inset_0_1px_0_rgba(255,255,255,0.1),inset_0_-1px_0_rgba(0,0,0,0.3)] ring-1 ring-black/[0.04] dark:ring-white/[0.05] overflow-visible"
+            className="hidden lg:flex h-full flex-col justify-between p-3 rounded-3xl neu-surface backdrop-blur-xl ring-1 ring-black/[0.03] dark:ring-white/[0.05] overflow-visible"
           >
             {/* Pin / collapse toggle */}
             <div
@@ -1362,7 +1362,7 @@ export default function Home() {
                           stiffness: 480,
                           damping: 40,
                         }}
-                        className="absolute inset-0 rounded-2xl bg-gray-200/90 dark:bg-white/[0.08] shadow-[0_1px_2px_rgba(0,0,0,0.08),inset_0_1px_0_rgba(255,255,255,0.7)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.1),0_4px_12px_rgba(0,0,0,0.25)]"
+                        className="absolute inset-0 rounded-2xl neu-control-active"
                       />
                     )}
                     <div className="relative z-10 flex items-center space-x-3">
@@ -1462,7 +1462,7 @@ export default function Home() {
                 <motion.div
                   whileHover={{ y: -1, scale: 1.005 }}
                   whileTap={{ scale: 0.99 }}
-                  className="p-2 rounded-xl bg-gradient-to-br from-black/[0.04] via-transparent to-black/[0.06] dark:from-white/[0.08] dark:via-transparent dark:to-black/20 border border-black/[0.06] dark:border-white/[0.08] shadow-[0_8px_32px_rgba(0,0,0,0.06),0_0_60px_rgba(139,92,246,0.02),inset_0_1px_0_rgba(255,255,255,0.9),inset_0_-1px_0_rgba(0,0,0,0.04)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.4),0_0_60px_rgba(139,92,246,0.04),inset_0_1px_0_rgba(255,255,255,0.12),inset_0_-1px_0_rgba(0,0,0,0.3)] backdrop-blur-md"
+                  className="p-2 rounded-xl neu-surface-sm backdrop-blur-md"
                 >
                   <div className="flex flex-col space-y-1">
                     <Link
@@ -1583,7 +1583,7 @@ export default function Home() {
                     initial={{ scale: 0.9, y: 20 }}
                     animate={{ scale: 1, y: 0 }}
                     onClick={(e) => e.stopPropagation()}
-                    className="w-full max-w-lg bg-white dark:bg-gray-900/90 backdrop-blur-sm p-8 rounded-xl border border-gray-200 dark:border-gray-800 relative shadow-xl dark:shadow-none"
+                    className="w-full max-w-lg neu-surface backdrop-blur-sm p-8 rounded-2xl relative"
                   >
                     <button
                       onClick={() => setShowUpdateModal(false)}
@@ -1612,7 +1612,7 @@ export default function Home() {
                       We'll only add new courses that aren't already in your
                       record.
                     </p>
-                    <div className="mb-5 p-3 rounded-xl bg-gray-50 dark:bg-gray-800/40 border border-gray-200 dark:border-gray-700/50">
+                    <div className="mb-5 p-3 rounded-xl neu-inset">
                       <p className="text-[11px] font-medium text-gray-500 dark:text-gray-400 mb-2 uppercase tracking-wider">
                         How to get your transcript
                       </p>

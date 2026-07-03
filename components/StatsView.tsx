@@ -328,10 +328,10 @@ function DeptCreditPieChart({
     <motion.div
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
-      className="relative h-full w-full overflow-x-auto overflow-y-hidden"
+      className="relative h-full w-full overflow-hidden"
     >
-      {/* Centered total label */}
-      <div className="pointer-events-none absolute left-[92px] top-1/2 z-10 flex -translate-x-1/2 -translate-y-1/2 flex-col items-center justify-center">
+      {/* Centered total label — anchored over the donut region (left of the legend) */}
+      <div className="pointer-events-none absolute inset-y-0 left-0 right-[112px] z-10 flex flex-col items-center justify-center">
         <span className="text-xl font-semibold text-gray-900 dark:text-white leading-none">
           {totalCredits}
         </span>
@@ -351,7 +351,6 @@ function DeptCreditPieChart({
             faded: { innerRadius: 30, additionalRadius: -4, color: "gray" },
           },
         ]}
-        width={340}
         height={220}
         margin={{ top: 8, right: 112, bottom: 8, left: 0 }}
         slotProps={{

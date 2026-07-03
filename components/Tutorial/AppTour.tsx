@@ -301,7 +301,7 @@ export default function AppTour({
 
           <div className="flex shrink-0 flex-wrap items-center justify-between gap-3 border-t border-gray-200/70 dark:border-white/10 px-5 py-3.5 sm:px-6">
             <div className="flex min-w-0 items-center gap-2.5">
-              <div className="flex items-center gap-1.5">
+              <div className="flex min-w-0 flex-wrap items-center gap-1.5">
                 {TOUR_STEPS.map((s, i) => (
                   <span
                     key={s.id}
@@ -318,7 +318,7 @@ export default function AppTour({
               </span>
             </div>
 
-            <div className="flex shrink-0 items-center gap-1.5">
+            <div className="flex shrink-0 flex-wrap items-center justify-end gap-1.5">
               {!isFirst && (
                 <button
                   onClick={goBack}

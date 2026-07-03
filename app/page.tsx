@@ -1746,6 +1746,7 @@ export default function Home() {
                             return (
                               <div
                                 ref={sharedCoursesRef}
+                                data-tour="major-shared-courses"
                                 className="relative ml-2"
                               >
                                 <button

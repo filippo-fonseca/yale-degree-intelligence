@@ -35,6 +35,7 @@ import {
   revokeMcpToken,
   type McpTokenStatus,
 } from "@/lib/mcp/client";
+import { ADMIN_EMAIL } from "@/lib/admin";
 
 interface UserProfile {
   majors: string[];
@@ -76,7 +77,7 @@ export default function UserSettingsModal({
   const { resolvedTheme, toggleTheme } = useTheme();
   const isDark = resolvedTheme === "dark";
   // Owner-gated dev tools. Mirrors the exception in context/AuthContext.tsx.
-  const isOwner = user.email === "filifonsecacagnazzo@gmail.com";
+  const isOwner = user.email === ADMIN_EMAIL;
   const [isHoveringLogout, setIsHoveringLogout] = useState(false);
   const [localProfile, setLocalProfile] = useState<UserProfile | null>(null);
   const [duplicateMajorError, setDuplicateMajorError] = useState<string | null>(
@@ -485,10 +486,10 @@ export default function UserSettingsModal({
                   <button
                     onClick={handleSaveBio}
                     disabled={isSavingBio}
-                    className={`px-2 py-1 text-[11px] rounded-lg text-white disabled:opacity-70 transition-all duration-200 ${
+                    className={`px-2.5 py-1 text-[11px] font-semibold rounded-lg border shadow-sm disabled:opacity-70 transition-all duration-200 ${
                       bioJustSaved
-                        ? "bg-gradient-to-r from-emerald-500 to-emerald-600"
-                        : "bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700"
+                        ? "border-emerald-500 bg-emerald-600 text-white shadow-emerald-500/20"
+                        : "border-pink-600 bg-pink-600 text-white shadow-pink-500/20 hover:bg-pink-700 hover:border-pink-700 dark:border-pink-500 dark:bg-gradient-to-r dark:from-pink-500 dark:to-purple-600 dark:hover:from-pink-600 dark:hover:to-purple-700"
                     }`}
                   >
                     {isSavingBio ? "..." : bioJustSaved ? "Saved" : "Save"}

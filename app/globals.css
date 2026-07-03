@@ -235,6 +235,31 @@ body {
   @apply bg-white dark:bg-black text-gray-900 dark:text-white transition-colors duration-300;
 }
 
+/* MUI x-charts tooltips are portaled outside component containers, so local
+   sx rules can miss dark-mode backgrounds and text color inheritance. */
+.dark .MuiChartsTooltip-root,
+.dark .MuiChartsTooltip-paper,
+.dark .MuiChartsTooltip-table,
+.dark .MuiChartsTooltip-cell,
+.dark .MuiChartsTooltip-labelCell,
+.dark .MuiChartsTooltip-valueCell,
+.dark .MuiChartsTooltip-axisValueCell {
+  background-color: #0f172a !important;
+  background-image: none !important;
+  color: #f3f4f6 !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
+}
+
+.dark .MuiChartsTooltip-root *,
+.dark .MuiChartsTooltip-paper *,
+.dark .MuiChartsTooltip-table * {
+  color: #f3f4f6 !important;
+}
+
+.dark .MuiChartsTooltip-labelCell {
+  color: #d1d5db !important;
+}
+
 /* Animated gradient border */
 @property --angle {
   syntax: "<angle>";

@@ -480,6 +480,7 @@ export default function FriendsTab({
           </div>
 
           <motion.button
+            data-tour="friends-enable"
             onClick={async () => {
               setIsEnabling(true);
               try {
@@ -528,6 +529,7 @@ export default function FriendsTab({
         <motion.button
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
+          data-tour="friends-add"
           className="px-3 py-1.5 bg-gradient-to-br from-pink-600 to-pink-700 hover:from-pink-500 hover:to-pink-600 text-white rounded-lg transition-all flex items-center gap-1.5 text-xs font-medium shadow-[0_2px_8px_rgba(236,72,153,0.25)]"
           onClick={() => setShowSearchModal(true)}
         >

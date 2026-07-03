@@ -878,7 +878,7 @@ export default function Simulator({
           </div>
 
           {/* Action Buttons */}
-          <div className="flex items-center gap-2 flex-wrap">
+          <div className="flex items-center gap-2 flex-wrap" data-tour="simulator-plan-actions">
             <button
               onClick={() => setShowHelp((v) => !v)}
               className="px-4 py-2 text-sm rounded-xl bg-black/[0.04] dark:bg-white/[0.04] backdrop-blur-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-black/[0.06] dark:hover:bg-white/[0.08] border border-black/[0.06] dark:border-white/[0.08] flex items-center gap-2 transition-all"
@@ -959,7 +959,7 @@ export default function Simulator({
       </AnimatePresence>
 
       {/* Live Major Progress Preview */}
-      <div className="space-y-3">
+      <div className="space-y-3" data-tour="simulator-live-progress">
         <button
           onClick={() => setShowMajorPreview((v) => !v)}
           className="w-full flex items-start justify-between text-left group"
@@ -1021,7 +1021,7 @@ export default function Simulator({
       </div>
 
       {/* Available Courses Pool */}
-      <div className="sticky top-[72px] z-20 mb-2">
+      <div className="sticky top-[72px] z-20 mb-2" data-tour="simulator-course-pool">
         <div className="bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-pink-950/30 dark:via-gray-900/50 dark:to-gray-950/50 backdrop-blur-md rounded-xl border border-pink-200 dark:border-pink-800/30 shadow-[inset_0_1px_0_rgba(255,255,255,0.04),0_4px_16px_rgba(0,0,0,0.08)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.04),0_4px_16px_rgba(0,0,0,0.25)] overflow-hidden">
           <button
             onClick={() => setShowPool(!showPool)}
@@ -1087,7 +1087,7 @@ export default function Simulator({
       </div>
 
       {/* Semesters Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3" data-tour="simulator-board">
         {semesters.map((semester) => {
           const semCredits = getSemesterCredits(semester);
           const semCreditsLabel = Number.isInteger(semCredits)
@@ -1136,6 +1136,7 @@ export default function Simulator({
                   {!isPastSemester(semester.name) && (
                     <button
                       onClick={() => setLookupSemesterId(semester.id)}
+                      data-tour="simulator-semester-add"
                       className="px-1.5 py-0.5 text-[10px] rounded-md bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 hover:bg-blue-200 dark:hover:bg-blue-800/40 border border-blue-300 dark:border-blue-800/40 transition-all"
                       type="button"
                     >

@@ -14,24 +14,21 @@ interface AppTourProps {
 
 const ACCENTS: Record<
   TourAccent,
-  { chip: string; ring: string; dot: string }
+  { chip: string; dot: string }
 > = {
   pink: {
     chip:
       "bg-pink-100 text-pink-600 dark:bg-pink-500/15 dark:text-pink-300 border-pink-200 dark:border-pink-500/30",
-    ring: "ring-pink-400/70 dark:ring-pink-400/60",
     dot: "bg-pink-500 dark:bg-pink-400",
   },
   blue: {
     chip:
       "bg-blue-100 text-blue-600 dark:bg-blue-500/15 dark:text-blue-300 border-blue-200 dark:border-blue-500/30",
-    ring: "ring-blue-400/70 dark:ring-blue-400/60",
     dot: "bg-blue-500 dark:bg-blue-400",
   },
   purple: {
     chip:
       "bg-purple-100 text-purple-600 dark:bg-purple-500/15 dark:text-purple-300 border-purple-200 dark:border-purple-500/30",
-    ring: "ring-purple-400/70 dark:ring-purple-400/60",
     dot: "bg-purple-500 dark:bg-purple-400",
   },
 };
@@ -40,7 +37,7 @@ type Rect = { top: number; left: number; width: number; height: number };
 
 const PAD = 8;
 const TOOLTIP_W = 360;
-const TOOLTIP_H = 250;
+const TOOLTIP_H = 340;
 const GAP = 16;
 
 function computeTooltip(rect: Rect | null): {
@@ -53,36 +50,38 @@ function computeTooltip(rect: Rect | null): {
   }
   const vw = window.innerWidth;
   const vh = window.innerHeight;
+  const tooltipW = Math.min(TOOLTIP_W, vw - GAP * 2);
+  const tooltipH = Math.min(TOOLTIP_H, vh - GAP * 2);
   const clampLeft = (l: number) =>
-    Math.max(GAP, Math.min(l, vw - TOOLTIP_W - GAP));
+    Math.max(GAP, Math.min(l, vw - tooltipW - GAP));
   const clampTop = (t: number) =>
-    Math.max(GAP, Math.min(t, vh - TOOLTIP_H - GAP));
+    Math.max(GAP, Math.min(t, vh - tooltipH - GAP));
 
   // Sidebar targets sit on the left: prefer placing the card to their right.
-  if (rect.left + rect.width + GAP + TOOLTIP_W <= vw - GAP) {
+  if (rect.left + rect.width + GAP + tooltipW <= vw - GAP) {
     return {
-      top: clampTop(rect.top + rect.height / 2 - TOOLTIP_H / 2),
+      top: clampTop(rect.top + rect.height / 2 - tooltipH / 2),
       left: rect.left + rect.width + GAP,
       placement: "right",
     };
   }
-  if (rect.left - GAP - TOOLTIP_W >= GAP) {
+  if (rect.left - GAP - tooltipW >= GAP) {
     return {
-      top: clampTop(rect.top + rect.height / 2 - TOOLTIP_H / 2),
-      left: rect.left - GAP - TOOLTIP_W,
+      top: clampTop(rect.top + rect.height / 2 - tooltipH / 2),
+      left: rect.left - GAP - tooltipW,
       placement: "left",
     };
   }
-  if (rect.top + rect.height + GAP + TOOLTIP_H <= vh - GAP) {
+  if (rect.top + rect.height + GAP + tooltipH <= vh - GAP) {
     return {
       top: rect.top + rect.height + GAP,
-      left: clampLeft(rect.left + rect.width / 2 - TOOLTIP_W / 2),
+      left: clampLeft(rect.left + rect.width / 2 - tooltipW / 2),
       placement: "bottom",
     };
   }
   return {
-    top: clampTop(rect.top - GAP - TOOLTIP_H),
-    left: clampLeft(rect.left + rect.width / 2 - TOOLTIP_W / 2),
+    top: clampTop(rect.top - GAP - tooltipH),
+    left: clampLeft(rect.left + rect.width / 2 - tooltipW / 2),
     placement: "top",
   };
 }
@@ -96,6 +95,7 @@ export default function AppTour({
   const [index, setIndex] = useState(0);
   const [rect, setRect] = useState<Rect | null>(null);
   const rafRef = useRef<number | null>(null);
+  const activatedStepRef = useRef<string | null>(null);
 
   const total = TOUR_STEPS.length;
   const step = TOUR_STEPS[index];
@@ -130,17 +130,37 @@ export default function AppTour({
       setRect(null);
       return true;
     }
-    const el = document.querySelector(step.anchor) as HTMLElement | null;
+    if (step.activate && activatedStepRef.current !== step.id) {
+      const target = document.querySelector(step.activate) as HTMLElement | null;
+      target?.click();
+      activatedStepRef.current = step.id;
+      return false;
+    }
+    const anchors = Array.isArray(step.anchor) ? step.anchor : [step.anchor];
+    const el = anchors
+      .filter(Boolean)
+      .map((selector) => document.querySelector(selector as string) as HTMLElement | null)
+      .find((candidate) => {
+        if (!candidate) return false;
+        const candidateRect = candidate.getBoundingClientRect();
+        return candidateRect.width > 0 && candidateRect.height > 0;
+      });
     if (!el) return false;
-    const r = el.getBoundingClientRect();
+    let r = el.getBoundingClientRect();
     if (r.width === 0 && r.height === 0) return false;
+    const margin = 96;
+    if (r.top < margin || r.bottom > window.innerHeight - margin) {
+      el.scrollIntoView({ block: "center", inline: "nearest" });
+      r = el.getBoundingClientRect();
+    }
     setRect({ top: r.top, left: r.left, width: r.width, height: r.height });
     return true;
-  }, [step?.anchor]);
+  }, [step?.activate, step?.anchor, step?.id]);
 
   useLayoutEffect(() => {
     if (!open) return;
     setRect(null);
+    activatedStepRef.current = null;
     let frames = 0;
     const tick = () => {
       if (measure() || frames > 40) return;
@@ -206,7 +226,7 @@ export default function AppTour({
           a target exists, otherwise this layer provides the full dim. */}
       <div
         className={`absolute inset-0 ${
-          centered ? "bg-gray-900/55 dark:bg-black/70 backdrop-blur-sm" : ""
+          centered ? "bg-gray-950/45 dark:bg-black/55 backdrop-blur-[2px]" : ""
         }`}
         onClick={onClose}
       />
@@ -226,9 +246,10 @@ export default function AppTour({
             }}
             exit={{ opacity: 0 }}
             transition={{ type: "spring", stiffness: 360, damping: 32 }}
-            className={`pointer-events-none absolute rounded-2xl ring-2 ${accent.ring}`}
+            className="pointer-events-none absolute rounded-2xl border-2 border-pink-400 ring-4 ring-pink-500/45"
             style={{
-              boxShadow: "0 0 0 9999px rgba(17, 24, 39, 0.62)",
+              boxShadow:
+                "0 0 0 9999px rgba(3, 7, 18, 0.56), 0 0 0 1px rgba(255,255,255,0.78), 0 0 34px rgba(236,72,153,0.9)",
             }}
           />
         )}
@@ -242,7 +263,7 @@ export default function AppTour({
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.97, y: 6 }}
           transition={{ type: "spring", stiffness: 340, damping: 28 }}
-          className="absolute w-[360px] max-w-[calc(100vw-2rem)] overflow-hidden rounded-3xl border border-gray-200 dark:border-white/10 bg-white/95 dark:bg-gray-900/90 backdrop-blur-xl shadow-2xl shadow-gray-400/30 dark:shadow-black/60"
+          className="absolute flex max-h-[calc(100dvh-2rem)] w-[360px] max-w-[calc(100vw-2rem)] flex-col overflow-hidden rounded-3xl border border-gray-200 dark:border-white/10 bg-white/95 dark:bg-gray-900/90 backdrop-blur-xl shadow-2xl shadow-gray-400/30 dark:shadow-black/60"
           style={
             centered
               ? {
@@ -261,7 +282,7 @@ export default function AppTour({
             <FiX className="h-4 w-4" />
           </button>
 
-          <div className="px-6 pt-6 pb-5">
+          <div className="min-h-0 overflow-y-auto px-6 pt-6 pb-5">
             <div
               className={`mb-4 inline-flex h-11 w-11 items-center justify-center rounded-2xl border ${accent.chip}`}
             >
@@ -278,8 +299,8 @@ export default function AppTour({
             </p>
           </div>
 
-          <div className="flex items-center justify-between gap-3 border-t border-gray-200/70 dark:border-white/10 px-6 py-3.5">
-            <div className="flex items-center gap-2.5">
+          <div className="flex shrink-0 flex-wrap items-center justify-between gap-3 border-t border-gray-200/70 dark:border-white/10 px-5 py-3.5 sm:px-6">
+            <div className="flex min-w-0 items-center gap-2.5">
               <div className="flex items-center gap-1.5">
                 {TOUR_STEPS.map((s, i) => (
                   <span
@@ -297,7 +318,7 @@ export default function AppTour({
               </span>
             </div>
 
-            <div className="flex items-center gap-1.5">
+            <div className="flex shrink-0 items-center gap-1.5">
               {!isFirst && (
                 <button
                   onClick={goBack}

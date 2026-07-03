@@ -298,6 +298,7 @@ export default function RequirementModal({
                   fulfilling this requirement. Make sure your DUS agrees!
                 </p>
                 <button
+                  data-tour="major-fulfill-manual-button"
                   onClick={(e) => {
                     e.stopPropagation();
                     onAddManual(requirement.name);

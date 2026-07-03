@@ -66,7 +66,7 @@ Notes section and Kiwi will respect them.
 ```json bgsd-settings
 {
   "version": 1,
-  "integration_branch": "next",
+  "integration_branch": "dev",
   "base_branch": null,
   "git": {
     "sync_integration_from_base": true,
@@ -106,7 +106,7 @@ Notes section and Kiwi will respect them.
   },
   "verification": {
     "usage_testing": true,
-    "headless": false
+    "headless": true
   },
   "modes": {
     "pipeline": "adaptive",
@@ -129,6 +129,8 @@ Notes section and Kiwi will respect them.
 ```
 
 ## Notes
+
+- dev is our staging/integration branch: every sesh/worktree branch merges into dev FIRST (never next, never main). dev -> main is a separate, deliberate, human-only promotion once absolutely ready. Prod on main has 1000+ users.
 
 <!-- Free-form preferences for Kiwi. Examples:
 - Never use haiku for verification.

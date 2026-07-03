@@ -35,7 +35,7 @@ import {
   revokeMcpToken,
   type McpTokenStatus,
 } from "@/lib/mcp/client";
-import { ADMIN_EMAIL } from "@/lib/admin";
+import { isAdminEmail } from "@/lib/admin";
 
 interface UserProfile {
   majors: string[];
@@ -77,7 +77,7 @@ export default function UserSettingsModal({
   const { resolvedTheme, toggleTheme } = useTheme();
   const isDark = resolvedTheme === "dark";
   // Owner-gated dev tools. Mirrors the exception in context/AuthContext.tsx.
-  const isOwner = user.email === ADMIN_EMAIL;
+  const isOwner = isAdminEmail(user.email);
   const [isHoveringLogout, setIsHoveringLogout] = useState(false);
   const [localProfile, setLocalProfile] = useState<UserProfile | null>(null);
   const [duplicateMajorError, setDuplicateMajorError] = useState<string | null>(

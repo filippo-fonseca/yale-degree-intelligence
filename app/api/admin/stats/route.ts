@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { adminAuth, adminDb } from "@/config/firebaseAdmin";
-import { ADMIN_EMAIL } from "@/lib/admin";
+import { isAdminEmail } from "@/lib/admin";
 import { gradePoints } from "@/lib/constants";
 
 type AnyRecord = Record<string, any>;
@@ -33,10 +33,10 @@ async function requireAdmin(req: NextRequest) {
 
   try {
     const decoded = await adminAuth.verifyIdToken(authHeader.split("Bearer ")[1]);
-    if (decoded.email === ADMIN_EMAIL) return decoded;
+    if (isAdminEmail(decoded.email)) return decoded;
 
     const user = await adminAuth.getUser(decoded.uid);
-    return user.email === ADMIN_EMAIL ? decoded : null;
+    return isAdminEmail(user.email) ? decoded : null;
   } catch {
     return null;
   }

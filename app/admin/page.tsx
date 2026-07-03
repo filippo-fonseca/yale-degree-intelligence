@@ -5,7 +5,7 @@ import type { ReactNode } from "react";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
 import { useTheme } from "@/context/ThemeContext";
-import { ADMIN_EMAIL } from "@/lib/admin";
+import { isAdminEmail } from "@/lib/admin";
 import {
   BarChart3,
   BookOpen,
@@ -140,7 +140,7 @@ export default function AdminPage() {
   const [loadingStats, setLoadingStats] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const isAdmin = user?.email === ADMIN_EMAIL;
+  const isAdmin = isAdminEmail(user?.email);
 
   const loadStats = async () => {
     if (!user || !isAdmin) return;

@@ -9,21 +9,40 @@ import {
   FiTrash2,
   FiChevronDown,
   FiX,
+  FiSun,
+  FiMoon,
+  FiCopy,
+  FiCheck,
+  FiRefreshCw,
 } from "react-icons/fi";
 import { User } from "firebase/auth";
 import { MAJORS } from "@/lib/majors";
 import { MajorDropdown } from "../ui/MajorDropdown";
 import { YearBadge } from "../ui/YearBadge";
 import Link from "next/link";
-import { Info, Sun, Moon } from "lucide-react";
+import { Info } from "lucide-react";
 import { UserAvatar } from "../ui/UserAvatar";
 import { useTheme } from "@/context/ThemeContext";
+import {
+  getDanKeyStatus,
+  saveDanKey,
+  deleteDanKey,
+  type DanKeyStatus,
+} from "@/lib/dan/client";
+import {
+  getMcpStatus,
+  generateMcpToken,
+  revokeMcpToken,
+  type McpTokenStatus,
+} from "@/lib/mcp/client";
+import { isAdminEmail } from "@/lib/admin";
 
 interface UserProfile {
   majors: string[];
   graduationYear: number;
   bio?: string;
   updatedAt: Date;
+  danWriteActionsEnabled?: boolean;
 }
 
 interface UserSettingsModalProps {
@@ -35,6 +54,11 @@ interface UserSettingsModalProps {
   onToggleFriends: (enabled: boolean) => Promise<void>;
   onLogout: () => void;
   onDeleteAccount: () => Promise<void>;
+  onReplayTour?: () => void;
+  /** Dev-only: reset both onboarding flags and replay the new-user welcome. */
+  onReplayWelcome?: () => void;
+  /** Dev-only: reset the tutorial flag and replay the guided tour. */
+  onReplayTutorial?: () => void;
 }
 
 export default function UserSettingsModal({
@@ -46,9 +70,14 @@ export default function UserSettingsModal({
   onToggleFriends,
   onLogout,
   onDeleteAccount,
+  onReplayTour,
+  onReplayWelcome,
+  onReplayTutorial,
 }: UserSettingsModalProps) {
   const { resolvedTheme, toggleTheme } = useTheme();
   const isDark = resolvedTheme === "dark";
+  // Owner-gated dev tools. Mirrors the exception in context/AuthContext.tsx.
+  const isOwner = isAdminEmail(user.email);
   const [isHoveringLogout, setIsHoveringLogout] = useState(false);
   const [localProfile, setLocalProfile] = useState<UserProfile | null>(null);
   const [duplicateMajorError, setDuplicateMajorError] = useState<string | null>(
@@ -74,6 +103,37 @@ export default function UserSettingsModal({
   const [showDisableFriendsConfirm, setShowDisableFriendsConfirm] =
     useState(false);
 
+  // Dan AI advisor — API key
+  const [danKeyStatus, setDanKeyStatus] = useState<DanKeyStatus>({
+    connected: false,
+  });
+  const [danKeyInput, setDanKeyInput] = useState("");
+  const [isDanConnecting, setIsDanConnecting] = useState(false);
+  const [danConnectError, setDanConnectError] = useState<string | null>(null);
+  const [danJustConnected, setDanJustConnected] = useState(false);
+  const [isDanRemoving, setIsDanRemoving] = useState(false);
+
+  // Dan AI advisor — write-actions toggle
+  const [danWriteActions, setDanWriteActions] = useState(
+    userProfile?.danWriteActionsEnabled ?? false,
+  );
+  const [isTogglingDanWrite, setIsTogglingDanWrite] = useState(false);
+
+  // MCP server — per-user token management
+  const [mcpStatus, setMcpStatus] = useState<McpTokenStatus>({
+    connected: false,
+  });
+  const [mcpToken, setMcpToken] = useState<string | null>(null);
+  const [isMcpGenerating, setIsMcpGenerating] = useState(false);
+  const [isMcpRevoking, setIsMcpRevoking] = useState(false);
+  const [mcpCopiedField, setMcpCopiedField] = useState<string | null>(null);
+  const [showMcpInstructions, setShowMcpInstructions] = useState(false);
+
+  const mcpEndpoint =
+    typeof window !== "undefined"
+      ? `${window.location.origin}/api/mcp`
+      : "/api/mcp";
+
   const modalRef = useRef<HTMLDivElement>(null);
 
   const BIO_MAX = 200;
@@ -86,6 +146,16 @@ export default function UserSettingsModal({
       setBioCount((userProfile.bio || "").length);
     }
   }, [userProfile]);
+
+  // Fetch Dan key status on mount
+  useEffect(() => {
+    getDanKeyStatus().then(setDanKeyStatus).catch(() => {});
+  }, []);
+
+  // Fetch MCP token status on mount
+  useEffect(() => {
+    getMcpStatus().then(setMcpStatus).catch(() => {});
+  }, []);
 
   // Close modal when clicking outside (but ignore portaled dropdowns)
   useEffect(() => {
@@ -145,6 +215,9 @@ export default function UserSettingsModal({
       userProfile.graduationYear !== localProfile.graduationYear
     );
   };
+
+  // Derived dirty state: current editable fields vs. last-saved profile.
+  const isDirty = hasChanges();
 
   const hasDuplicateMajors = () => {
     if (!localProfile) return false;
@@ -233,6 +306,81 @@ export default function UserSettingsModal({
     }
   };
 
+  const handleDanConnect = async () => {
+    const trimmed = danKeyInput.trim();
+    if (!trimmed) return;
+    setIsDanConnecting(true);
+    setDanConnectError(null);
+    try {
+      const result = await saveDanKey(trimmed);
+      if (result.ok) {
+        setDanKeyInput("");
+        setDanJustConnected(true);
+        setTimeout(() => setDanJustConnected(false), 2000);
+        const status = await getDanKeyStatus();
+        setDanKeyStatus(status);
+      } else {
+        setDanConnectError(result.error);
+      }
+    } finally {
+      setIsDanConnecting(false);
+    }
+  };
+
+  const handleDanRemove = async () => {
+    setIsDanRemoving(true);
+    try {
+      await deleteDanKey();
+      const status = await getDanKeyStatus();
+      setDanKeyStatus(status);
+    } finally {
+      setIsDanRemoving(false);
+    }
+  };
+
+  const handleMcpGenerate = async () => {
+    setIsMcpGenerating(true);
+    try {
+      const token = await generateMcpToken();
+      setMcpToken(token);
+      setShowMcpInstructions(true);
+      setMcpStatus(await getMcpStatus());
+    } catch (e) {
+      console.error("Failed to generate MCP token:", e);
+    } finally {
+      setIsMcpGenerating(false);
+    }
+  };
+
+  const handleMcpRevoke = async () => {
+    setIsMcpRevoking(true);
+    try {
+      await revokeMcpToken();
+      setMcpToken(null);
+      setShowMcpInstructions(false);
+      setMcpStatus({ connected: false });
+    } finally {
+      setIsMcpRevoking(false);
+    }
+  };
+
+  const copyMcp = (field: string, text: string) => {
+    navigator.clipboard?.writeText(text);
+    setMcpCopiedField(field);
+    setTimeout(() => setMcpCopiedField(null), 1500);
+  };
+
+  const handleToggleDanWrite = async () => {
+    const next = !danWriteActions;
+    setDanWriteActions(next);
+    setIsTogglingDanWrite(true);
+    try {
+      await onSave({ danWriteActionsEnabled: next });
+    } finally {
+      setIsTogglingDanWrite(false);
+    }
+  };
+
   if (!localProfile) return null;
 
   return (
@@ -242,7 +390,7 @@ export default function UserSettingsModal({
         initial={{ opacity: 0, y: 15, scale: 0.98 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         transition={{ type: "spring", damping: 25, stiffness: 300 }}
-        className="relative w-full max-w-md bg-white/95 dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/90 dark:via-gray-900/80 dark:to-gray-950/90 rounded-2xl border border-black/[0.06] dark:border-white/[0.08] shadow-[0_24px_80px_rgba(0,0,0,0.18)] dark:shadow-[0_24px_80px_rgba(0,0,0,0.5),0_0_120px_rgba(139,92,246,0.08),inset_0_1px_0_rgba(255,255,255,0.1),inset_0_-1px_0_rgba(0,0,0,0.3)] backdrop-blur-2xl ring-1 ring-black/[0.04] dark:ring-white/[0.05] overflow-visible"
+        className="relative w-full max-w-3xl bg-white/95 dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/90 dark:via-gray-900/80 dark:to-gray-950/90 rounded-2xl border border-black/[0.06] dark:border-white/[0.08] shadow-[0_24px_80px_rgba(0,0,0,0.18)] dark:shadow-[0_24px_80px_rgba(0,0,0,0.5),0_0_120px_rgba(139,92,246,0.08),inset_0_1px_0_rgba(255,255,255,0.1),inset_0_-1px_0_rgba(0,0,0,0.3)] backdrop-blur-2xl ring-1 ring-black/[0.04] dark:ring-white/[0.05] overflow-visible"
       >
         <button
           onClick={onClose}
@@ -251,33 +399,35 @@ export default function UserSettingsModal({
         >
           <FiX size={18} />
         </button>
-        <div className="p-4 max-h-[85vh] overflow-y-auto">
+        <div className="p-5 max-h-[85vh] overflow-y-auto">
           {/* Header */}
-          <div className="flex flex-col items-center mb-3">
-            <div className="relative mb-2">
-              <UserAvatar
-                photoURL={user.photoURL}
-                displayName={user.displayName}
-                email={user.email}
-                size={48}
-                className="shadow-[0_4px_16px_rgba(0,0,0,0.4)] ring-1 ring-purple-500/20 border-white/20"
-              />
-            </div>
-            <h2 className="text-base font-semibold text-center text-gray-900 dark:text-gray-100">
-              {user.displayName || "User"}
-            </h2>
-            <p className="text-gray-500 dark:text-gray-400 text-xs">
-              {user.email}
-            </p>
-            {localProfile.graduationYear && (
-              <div className="mt-1">
-                <YearBadge graduationYear={localProfile.graduationYear} />
+          <div className="flex items-center gap-3 mb-5">
+            <UserAvatar
+              photoURL={user.photoURL}
+              displayName={user.displayName}
+              email={user.email}
+              size={52}
+              className="shadow-[0_4px_16px_rgba(0,0,0,0.4)] ring-1 ring-purple-500/20 border-white/20 shrink-0"
+            />
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center gap-2 flex-wrap">
+                <h2 className="text-base font-semibold text-gray-900 dark:text-gray-100 truncate">
+                  {user.displayName || "User"}
+                </h2>
+                {localProfile.graduationYear && (
+                  <YearBadge graduationYear={localProfile.graduationYear} />
+                )}
               </div>
-            )}
+              <p className="text-gray-500 dark:text-gray-400 text-xs truncate">
+                {user.email}
+              </p>
+            </div>
           </div>
 
+          {/* Two-column section grid */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
           {/* Bio */}
-          <div className="mb-3 rounded-xl border border-black/[0.06] dark:border-white/[0.08] bg-gray-50 dark:bg-transparent dark:bg-gradient-to-br dark:from-white/[0.06] dark:via-transparent dark:to-black/10 shadow-sm dark:shadow-[0_2px_12px_rgba(0,0,0,0.2)] backdrop-blur-sm">
+          <div className="rounded-xl border border-black/[0.06] dark:border-white/[0.08] bg-gray-50 dark:bg-transparent dark:bg-gradient-to-br dark:from-white/[0.06] dark:via-transparent dark:to-black/10 shadow-sm dark:shadow-[0_2px_12px_rgba(0,0,0,0.2)] backdrop-blur-sm">
             <div className="flex items-center justify-between px-3 py-2 border-b border-black/[0.06] dark:border-white/[0.06]">
               <span className="text-xs font-medium text-gray-800 dark:text-gray-200">
                 Bio
@@ -336,10 +486,10 @@ export default function UserSettingsModal({
                   <button
                     onClick={handleSaveBio}
                     disabled={isSavingBio}
-                    className={`px-2 py-1 text-[11px] rounded-lg text-white disabled:opacity-70 transition-all duration-200 ${
+                    className={`px-2.5 py-1 text-[11px] font-semibold rounded-lg border shadow-sm disabled:opacity-70 transition-all duration-200 ${
                       bioJustSaved
-                        ? "bg-gradient-to-r from-emerald-500 to-emerald-600"
-                        : "bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700"
+                        ? "border-emerald-500 bg-emerald-600 text-white shadow-emerald-500/20"
+                        : "border-pink-600 bg-pink-600 text-white shadow-pink-500/20 hover:bg-pink-700 hover:border-pink-700 dark:border-pink-500 dark:bg-gradient-to-r dark:from-pink-500 dark:to-purple-600 dark:hover:from-pink-600 dark:hover:to-purple-700"
                     }`}
                   >
                     {isSavingBio ? "..." : bioJustSaved ? "Saved" : "Save"}
@@ -349,45 +499,36 @@ export default function UserSettingsModal({
             )}
           </div>
 
-          {/* Appearance + Friends toggles (side by side) */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
-            {/* Appearance / Theme Toggle */}
+            {/* Appearance + Friends (stacked, paired against Bio) */}
+            <div className="flex flex-col gap-3">
+            {/* Appearance / Theme (icon button, matches app header) */}
             <div className="rounded-xl border border-black/[0.06] dark:border-white/[0.08] bg-gray-50 dark:bg-transparent dark:bg-gradient-to-br dark:from-white/[0.06] dark:via-transparent dark:to-black/10 shadow-sm dark:shadow-[0_2px_12px_rgba(0,0,0,0.2)] backdrop-blur-sm">
             <div className="flex items-center justify-between px-3 py-2.5">
-              <div className="flex items-center gap-2">
-                <div className="p-1.5 rounded-lg bg-black/[0.04] dark:bg-white/[0.06] text-amber-500 dark:text-amber-300">
-                  {isDark ? (
-                    <Moon className="h-3.5 w-3.5" />
-                  ) : (
-                    <Sun className="h-3.5 w-3.5" />
-                  )}
-                </div>
-                <div>
-                  <span className="text-xs font-medium text-gray-800 dark:text-gray-200">
-                    Appearance
-                  </span>
-                  <p className="text-[10px] text-gray-500 dark:text-gray-400 mt-0.5">
-                    {isDark ? "Dark mode" : "Light mode"}
-                  </p>
-                </div>
+              <div>
+                <span className="text-xs font-medium text-gray-800 dark:text-gray-200">
+                  Appearance
+                </span>
+                <p className="text-[10px] text-gray-500 dark:text-gray-400 mt-0.5">
+                  {isDark ? "Dark mode" : "Light mode"}
+                </p>
               </div>
               <button
-                type="button"
-                role="switch"
-                aria-checked={isDark}
-                aria-label="Toggle dark mode"
                 onClick={toggleTheme}
-                className={`relative inline-flex w-11 h-6 rounded-full transition-colors duration-200 ${
-                  isDark
-                    ? "bg-gradient-to-r from-indigo-500 to-purple-600 shadow-[inset_0_1px_2px_rgba(0,0,0,0.35)]"
-                    : "bg-gray-300 shadow-[inset_0_1px_3px_rgba(0,0,0,0.22)]"
-                }`}
+                title={
+                  resolvedTheme === "dark"
+                    ? "Switch to light mode"
+                    : "Switch to dark mode"
+                }
+                aria-label="Toggle theme"
+                className="p-1.5 lg:p-2 rounded-xl hover:bg-black/[0.04] dark:hover:bg-white/[0.06] transition-all border border-black/[0.06] dark:border-white/[0.08] hover:border-black/[0.09] dark:hover:border-white/[0.12] text-gray-600 dark:text-gray-300"
               >
-                <span
-                  className={`absolute top-[3px] left-[3px] h-[18px] w-[18px] rounded-full bg-white shadow-[0_1px_3px_rgba(0,0,0,0.45)] transition-transform duration-200 ${
-                    isDark ? "translate-x-5" : "translate-x-0"
-                  }`}
-                />
+                <span className="flex h-7 w-7 items-center justify-center">
+                  {resolvedTheme === "dark" ? (
+                    <FiSun size={18} />
+                  ) : (
+                    <FiMoon size={18} />
+                  )}
+                </span>
               </button>
             </div>
           </div>
@@ -433,7 +574,7 @@ export default function UserSettingsModal({
               </div>
             )}
             </div>
-          </div>
+            </div>
 
           {/* Disable Friends Confirmation Modal */}
           <AnimatePresence>
@@ -504,9 +645,320 @@ export default function UserSettingsModal({
             )}
           </AnimatePresence>
 
+          {/* Dan AI Advisor (spans full width) */}
+          <div className="lg:col-span-2 rounded-xl border border-black/[0.06] dark:border-white/[0.08] bg-gray-50 dark:bg-transparent dark:bg-gradient-to-br dark:from-white/[0.06] dark:via-transparent dark:to-black/10 shadow-sm dark:shadow-[0_2px_12px_rgba(0,0,0,0.2)] backdrop-blur-sm overflow-hidden">
+            <div className="flex items-center justify-between px-3 py-2 border-b border-black/[0.06] dark:border-white/[0.06]">
+              <span className="text-xs font-medium text-gray-800 dark:text-gray-200">
+                Dan AI advisor
+              </span>
+            </div>
+
+            {/* API key connection */}
+            <div className="px-3 py-2.5 border-b border-black/[0.06] dark:border-white/[0.06]">
+              {danKeyStatus.connected ? (
+                <div className="flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-1.5">
+                    <span className="inline-block h-1.5 w-1.5 rounded-full bg-emerald-500 shrink-0" />
+                    <span className="text-[11px] text-gray-700 dark:text-gray-300">
+                      Connected &bull; key ending ••••{danKeyStatus.last4}
+                    </span>
+                  </div>
+                  <button
+                    onClick={handleDanRemove}
+                    disabled={isDanRemoving}
+                    className="px-2 py-1 text-[11px] rounded-lg border border-black/[0.06] dark:border-white/[0.08] hover:border-red-400/50 hover:bg-red-500/[0.06] text-gray-500 dark:text-gray-400 hover:text-red-500 dark:hover:text-red-400 disabled:opacity-50 transition-all duration-200"
+                  >
+                    {isDanRemoving ? (
+                      <span className="flex items-center gap-1">
+                        <span className="animate-spin h-2.5 w-2.5 border-2 border-current/30 border-t-current rounded-full" />
+                        Removing…
+                      </span>
+                    ) : (
+                      "Remove"
+                    )}
+                  </button>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  <div className="flex items-center gap-1.5">
+                    <input
+                      type="password"
+                      value={danKeyInput}
+                      onChange={(e) => {
+                        setDanKeyInput(e.target.value);
+                        if (danConnectError) setDanConnectError(null);
+                        if (danJustConnected) setDanJustConnected(false);
+                      }}
+                      placeholder="sk-ant-..."
+                      className="flex-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg px-2.5 py-1.5 focus:outline-none focus:ring-1 focus:ring-pink-500/40 focus:border-pink-500/50 text-gray-900 dark:text-gray-200 placeholder:text-gray-400 dark:placeholder:text-gray-500 text-xs transition-all duration-200"
+                    />
+                    <button
+                      onClick={handleDanConnect}
+                      disabled={isDanConnecting || !danKeyInput.trim()}
+                      className={`px-2.5 py-1.5 text-[11px] rounded-lg text-white disabled:opacity-50 flex items-center gap-1 transition-all duration-200 ${
+                        danJustConnected
+                          ? "bg-gradient-to-r from-emerald-500 to-emerald-600"
+                          : "bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700"
+                      }`}
+                    >
+                      {isDanConnecting ? (
+                        <>
+                          <span className="animate-spin h-2.5 w-2.5 border-2 border-white/30 border-t-white rounded-full" />
+                          Connecting…
+                        </>
+                      ) : danJustConnected ? (
+                        "Connected"
+                      ) : (
+                        "Connect"
+                      )}
+                    </button>
+                  </div>
+                  {danConnectError && (
+                    <p className="text-[10px] text-red-400">{danConnectError}</p>
+                  )}
+                  <p className="text-[10px] text-gray-500 dark:text-gray-400 leading-snug">
+                    Dan runs on your own Anthropic key. Get one at{" "}
+                    <a
+                      href="https://console.anthropic.com"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="underline underline-offset-2 hover:text-gray-700 dark:hover:text-gray-200 transition-colors"
+                    >
+                      console.anthropic.com
+                    </a>
+                    .
+                  </p>
+                </div>
+              )}
+            </div>
+
+            {/* Write-actions toggle */}
+            <div className="flex items-center justify-between px-3 py-2.5">
+              <div className="flex-1 mr-2">
+                <span className="text-xs font-medium text-gray-800 dark:text-gray-200">
+                  Let Dan make changes
+                </span>
+                <p className="text-[10px] text-gray-500 dark:text-gray-400 mt-0.5">
+                  Off by default. When on, Dan can add or remove courses, and will always ask before each change.
+                </p>
+              </div>
+              <label className="relative inline-flex items-center cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={danWriteActions}
+                  disabled={isTogglingDanWrite}
+                  onChange={handleToggleDanWrite}
+                  className="sr-only peer"
+                />
+                <div className="w-11 h-6 rounded-full peer transition-colors bg-gray-300 dark:bg-gray-600 shadow-[inset_0_1px_3px_rgba(0,0,0,0.22)] dark:shadow-[inset_0_1px_3px_rgba(0,0,0,0.5)] peer-focus:ring-2 peer-focus:ring-pink-500/40 peer-checked:bg-gradient-to-r peer-checked:from-pink-500 peer-checked:to-purple-600 peer-disabled:opacity-50 after:content-[''] after:absolute after:top-[3px] after:left-[3px] after:h-[18px] after:w-[18px] after:rounded-full after:bg-white after:shadow-[0_1px_3px_rgba(0,0,0,0.45)] after:transition-transform peer-checked:after:translate-x-5"></div>
+              </label>
+            </div>
+          </div>
+
+          {/* MCP server (spans full width) */}
+          <div className="lg:col-span-2 rounded-xl border border-black/[0.06] dark:border-white/[0.08] bg-gray-50 dark:bg-transparent dark:bg-gradient-to-br dark:from-white/[0.06] dark:via-transparent dark:to-black/10 shadow-sm dark:shadow-[0_2px_12px_rgba(0,0,0,0.2)] backdrop-blur-sm overflow-hidden">
+            <div className="flex items-center justify-between px-3 py-2 border-b border-black/[0.06] dark:border-white/[0.06]">
+              <span className="text-xs font-medium text-gray-800 dark:text-gray-200">
+                MCP server
+              </span>
+              <span className="text-[10px] px-1.5 py-0.5 rounded-md bg-gradient-to-r from-pink-500/15 to-purple-600/15 text-purple-600 dark:text-purple-300 border border-purple-500/20">
+                Beta
+              </span>
+            </div>
+
+            <div className="px-3 py-2.5 space-y-2.5">
+              <p className="text-[10px] text-gray-500 dark:text-gray-400 leading-snug">
+                Connect Claude (or any MCP client) to your DegreeIntelligence
+                account. Generate a token, add it to your client, and Claude can
+                read your majors, courses, requirement progress, and the catalog
+                to plan with you. Read-only and scoped to your account.
+              </p>
+
+              {/* Status row */}
+              {mcpStatus.connected ? (
+                <div className="flex items-center justify-between gap-2 flex-wrap">
+                  <div className="flex items-center gap-1.5">
+                    <span className="inline-block h-1.5 w-1.5 rounded-full bg-emerald-500 shrink-0" />
+                    <span className="text-[11px] text-gray-700 dark:text-gray-300">
+                      Token active{" "}
+                      {mcpStatus.last4 && (
+                        <span className="text-gray-400 dark:text-gray-500">
+                          (••••{mcpStatus.last4})
+                        </span>
+                      )}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <button
+                      onClick={handleMcpGenerate}
+                      disabled={isMcpGenerating}
+                      className="inline-flex items-center gap-1 px-2 py-1 text-[11px] rounded-lg border border-black/[0.06] dark:border-white/[0.08] hover:border-pink-500/50 hover:bg-black/[0.03] dark:hover:bg-white/[0.04] text-gray-600 dark:text-gray-300 disabled:opacity-50 transition-all duration-200"
+                    >
+                      <FiRefreshCw
+                        size={11}
+                        className={isMcpGenerating ? "animate-spin" : ""}
+                      />
+                      {isMcpGenerating ? "Rotating…" : "Rotate"}
+                    </button>
+                    <button
+                      onClick={handleMcpRevoke}
+                      disabled={isMcpRevoking}
+                      className="px-2 py-1 text-[11px] rounded-lg border border-black/[0.06] dark:border-white/[0.08] hover:border-red-400/50 hover:bg-red-500/[0.06] text-gray-500 dark:text-gray-400 hover:text-red-500 dark:hover:text-red-400 disabled:opacity-50 transition-all duration-200"
+                    >
+                      {isMcpRevoking ? "Revoking…" : "Revoke"}
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <button
+                  onClick={handleMcpGenerate}
+                  disabled={isMcpGenerating}
+                  className="px-2.5 py-1.5 text-[11px] rounded-lg text-white bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 disabled:opacity-50 flex items-center gap-1 transition-all duration-200"
+                >
+                  {isMcpGenerating ? (
+                    <>
+                      <span className="animate-spin h-2.5 w-2.5 border-2 border-white/30 border-t-white rounded-full" />
+                      Generating…
+                    </>
+                  ) : (
+                    "Generate token"
+                  )}
+                </button>
+              )}
+
+              {/* One-time token reveal */}
+              {mcpToken && (
+                <div className="rounded-lg border border-amber-500/30 bg-amber-500/[0.06] px-2.5 py-2 space-y-1.5">
+                  <p className="text-[10px] text-amber-700 dark:text-amber-400 leading-snug">
+                    Copy this token now. For your security it won't be shown
+                    again. You can rotate it anytime.
+                  </p>
+                  <div className="flex items-center gap-1.5">
+                    <code className="flex-1 min-w-0 truncate text-[10px] font-mono bg-white dark:bg-gray-900/60 border border-gray-200 dark:border-white/[0.08] rounded-md px-2 py-1.5 text-gray-800 dark:text-gray-200">
+                      {mcpToken}
+                    </code>
+                    <button
+                      onClick={() => copyMcp("token", mcpToken)}
+                      className="shrink-0 inline-flex items-center gap-1 px-2 py-1.5 text-[11px] rounded-md border border-black/[0.06] dark:border-white/[0.08] hover:border-pink-500/50 hover:bg-black/[0.03] dark:hover:bg-white/[0.04] text-gray-600 dark:text-gray-300 transition-all duration-200"
+                    >
+                      {mcpCopiedField === "token" ? (
+                        <FiCheck size={11} className="text-emerald-500" />
+                      ) : (
+                        <FiCopy size={11} />
+                      )}
+                      {mcpCopiedField === "token" ? "Copied" : "Copy"}
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* Connection instructions */}
+              {mcpStatus.connected && (
+                <div>
+                  <button
+                    onClick={() => setShowMcpInstructions((v) => !v)}
+                    className="text-[10px] text-pink-500 hover:text-pink-400 dark:text-pink-400 dark:hover:text-pink-300 transition-colors"
+                  >
+                    {showMcpInstructions ? "Hide" : "Show"} connection
+                    instructions
+                  </button>
+
+                  {showMcpInstructions && (
+                    <div className="mt-2 space-y-2">
+                      <div className="space-y-1">
+                        <span className="text-[10px] font-medium text-gray-600 dark:text-gray-400">
+                          Endpoint
+                        </span>
+                        <div className="flex items-center gap-1.5">
+                          <code className="flex-1 min-w-0 truncate text-[10px] font-mono bg-white dark:bg-gray-900/60 border border-gray-200 dark:border-white/[0.08] rounded-md px-2 py-1.5 text-gray-800 dark:text-gray-200">
+                            {mcpEndpoint}
+                          </code>
+                          <button
+                            onClick={() => copyMcp("endpoint", mcpEndpoint)}
+                            className="shrink-0 inline-flex items-center gap-1 px-2 py-1.5 text-[11px] rounded-md border border-black/[0.06] dark:border-white/[0.08] hover:border-pink-500/50 hover:bg-black/[0.03] dark:hover:bg-white/[0.04] text-gray-600 dark:text-gray-300 transition-all duration-200"
+                          >
+                            {mcpCopiedField === "endpoint" ? (
+                              <FiCheck size={11} className="text-emerald-500" />
+                            ) : (
+                              <FiCopy size={11} />
+                            )}
+                          </button>
+                        </div>
+                      </div>
+
+                      <div className="space-y-1">
+                        <span className="text-[10px] font-medium text-gray-600 dark:text-gray-400">
+                          Claude Code (CLI)
+                        </span>
+                        <div className="flex items-start gap-1.5">
+                          <code className="flex-1 min-w-0 text-[10px] font-mono whitespace-pre-wrap break-all bg-white dark:bg-gray-900/60 border border-gray-200 dark:border-white/[0.08] rounded-md px-2 py-1.5 text-gray-800 dark:text-gray-200">
+                            {`claude mcp add --transport http degree-intelligence ${mcpEndpoint} --header "Authorization: Bearer YOUR_TOKEN"`}
+                          </code>
+                          <button
+                            onClick={() =>
+                              copyMcp(
+                                "cli",
+                                `claude mcp add --transport http degree-intelligence ${mcpEndpoint} --header "Authorization: Bearer YOUR_TOKEN"`,
+                              )
+                            }
+                            className="shrink-0 inline-flex items-center gap-1 px-2 py-1.5 text-[11px] rounded-md border border-black/[0.06] dark:border-white/[0.08] hover:border-pink-500/50 hover:bg-black/[0.03] dark:hover:bg-white/[0.04] text-gray-600 dark:text-gray-300 transition-all duration-200"
+                          >
+                            {mcpCopiedField === "cli" ? (
+                              <FiCheck size={11} className="text-emerald-500" />
+                            ) : (
+                              <FiCopy size={11} />
+                            )}
+                          </button>
+                        </div>
+                      </div>
+
+                      <div className="space-y-1">
+                        <span className="text-[10px] font-medium text-gray-600 dark:text-gray-400">
+                          Claude Desktop (config)
+                        </span>
+                        <div className="flex items-start gap-1.5">
+                          <code className="flex-1 min-w-0 text-[10px] font-mono whitespace-pre-wrap break-all bg-white dark:bg-gray-900/60 border border-gray-200 dark:border-white/[0.08] rounded-md px-2 py-1.5 text-gray-800 dark:text-gray-200">
+                            {`{
+  "mcpServers": {
+    "degree-intelligence": {
+      "command": "npx",
+      "args": ["mcp-remote", "${mcpEndpoint}", "--header", "Authorization: Bearer YOUR_TOKEN"]
+    }
+  }
+}`}
+                          </code>
+                          <button
+                            onClick={() =>
+                              copyMcp(
+                                "desktop",
+                                `{\n  "mcpServers": {\n    "degree-intelligence": {\n      "command": "npx",\n      "args": ["mcp-remote", "${mcpEndpoint}", "--header", "Authorization: Bearer YOUR_TOKEN"]\n    }\n  }\n}`,
+                              )
+                            }
+                            className="shrink-0 inline-flex items-center gap-1 px-2 py-1.5 text-[11px] rounded-md border border-black/[0.06] dark:border-white/[0.08] hover:border-pink-500/50 hover:bg-black/[0.03] dark:hover:bg-white/[0.04] text-gray-600 dark:text-gray-300 transition-all duration-200"
+                          >
+                            {mcpCopiedField === "desktop" ? (
+                              <FiCheck size={11} className="text-emerald-500" />
+                            ) : (
+                              <FiCopy size={11} />
+                            )}
+                          </button>
+                        </div>
+                      </div>
+
+                      <p className="text-[10px] text-gray-400 dark:text-gray-500 leading-snug">
+                        Replace YOUR_TOKEN with the token above. Keep it secret:
+                        anyone with it can read your degree data.
+                      </p>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+
           {/* Majors */}
-          <div className="mb-3">
-            <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+          <div className="rounded-xl border border-black/[0.06] dark:border-white/[0.08] bg-gray-50 dark:bg-transparent dark:bg-gradient-to-br dark:from-white/[0.06] dark:via-transparent dark:to-black/10 shadow-sm dark:shadow-[0_2px_12px_rgba(0,0,0,0.2)] backdrop-blur-sm px-3 py-2.5">
+            <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">
               Majors
             </label>
             {duplicateMajorError && (
@@ -556,8 +1008,8 @@ export default function UserSettingsModal({
           </div>
 
           {/* Year */}
-          <div className="mb-3">
-            <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+          <div className="rounded-xl border border-black/[0.06] dark:border-white/[0.08] bg-gray-50 dark:bg-transparent dark:bg-gradient-to-br dark:from-white/[0.06] dark:via-transparent dark:to-black/10 shadow-sm dark:shadow-[0_2px_12px_rgba(0,0,0,0.2)] backdrop-blur-sm px-3 py-2.5">
+            <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">
               Graduation Year
             </label>
             <div className="relative">
@@ -582,15 +1034,25 @@ export default function UserSettingsModal({
               </div>
             </div>
           </div>
+          </div>
+          {/* end two-column section grid */}
 
           {/* Footer links */}
-          <div className="mt-2 flex items-center justify-center gap-1.5 relative">
+          <div className="mt-4 flex items-center justify-center gap-1.5 relative">
             <Link
               href={`/user/${user.uid}`}
               className="cursor-pointer text-[11px] px-3 py-1.5 rounded-lg border border-black/[0.06] dark:border-white/[0.08] hover:border-pink-500/50 hover:bg-black/[0.03] dark:hover:bg-white/[0.04] text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-all duration-200"
             >
               View public profile
             </Link>
+            {onReplayTour && (
+              <button
+                onClick={onReplayTour}
+                className="cursor-pointer text-[11px] px-3 py-1.5 rounded-lg border border-black/[0.06] dark:border-white/[0.08] hover:border-pink-500/50 hover:bg-black/[0.03] dark:hover:bg-white/[0.04] text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-all duration-200"
+              >
+                Replay tutorial
+              </button>
+            )}
             <div className="relative group">
               <Info className="h-3 w-3 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors cursor-pointer" />
               <div className="absolute top-full mt-1 left-1/2 -translate-x-1/2 bg-gray-900 dark:bg-gray-800 text-gray-100 text-[10px] px-1.5 py-0.5 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-[70] pointer-events-none border border-gray-700">
@@ -598,6 +1060,43 @@ export default function UserSettingsModal({
               </div>
             </div>
           </div>
+
+          {/* Owner-only dev tools. Replays onboarding by flipping the two
+              boolean flags on users/{uid}. Does NOT delete plans or courses. */}
+          {isOwner && (onReplayWelcome || onReplayTutorial) && (
+            <div className="mt-4 rounded-xl border border-amber-400/30 bg-amber-50/60 dark:border-amber-400/20 dark:bg-amber-500/[0.06] px-3.5 py-3">
+              <div className="flex items-center gap-1.5">
+                <span className="text-[9px] font-semibold uppercase tracking-widest text-amber-600 dark:text-amber-400">
+                  Dev
+                </span>
+                <span className="text-[10px] font-medium text-amber-700/80 dark:text-amber-300/70">
+                  Onboarding replay
+                </span>
+              </div>
+              <div className="mt-2 flex flex-wrap gap-1.5">
+                {onReplayWelcome && (
+                  <button
+                    onClick={onReplayWelcome}
+                    className="cursor-pointer text-[11px] px-2.5 py-1.5 rounded-lg border border-amber-400/40 bg-white/70 dark:bg-white/[0.04] hover:border-amber-500/70 hover:bg-amber-100/60 dark:hover:bg-amber-500/10 text-amber-700 dark:text-amber-300 transition-all duration-200"
+                  >
+                    Replay welcome + tutorial (new-user v3)
+                  </button>
+                )}
+                {onReplayTutorial && (
+                  <button
+                    onClick={onReplayTutorial}
+                    className="cursor-pointer text-[11px] px-2.5 py-1.5 rounded-lg border border-amber-400/40 bg-white/70 dark:bg-white/[0.04] hover:border-amber-500/70 hover:bg-amber-100/60 dark:hover:bg-amber-500/10 text-amber-700 dark:text-amber-300 transition-all duration-200"
+                  >
+                    Replay tutorial only
+                  </button>
+                )}
+              </div>
+              <p className="mt-2 text-[10px] leading-relaxed text-amber-700/70 dark:text-amber-300/60">
+                Dev only. Resets onboarding flags. Does not delete plans or
+                courses.
+              </p>
+            </div>
+          )}
 
           {/* Actions */}
           <div className="flex justify-between mt-3">
@@ -650,7 +1149,13 @@ export default function UserSettingsModal({
                 </AnimatePresence>
               </div>
             </div>
-            <div className="flex gap-1.5">
+            <div className="flex items-center gap-1.5">
+              {isDirty && (
+                <span className="hidden sm:flex items-center gap-1.5 text-[11px] text-amber-600 dark:text-amber-400">
+                  <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
+                  Unsaved changes
+                </span>
+              )}
               <button
                 onClick={onClose}
                 className="px-3 py-1.5 rounded-lg border border-black/[0.06] dark:border-white/[0.08] hover:border-gray-300 dark:hover:border-white/[0.15] hover:bg-black/[0.03] dark:hover:bg-white/[0.04] text-gray-600 dark:text-gray-300 text-xs transition-all duration-200"
@@ -659,10 +1164,10 @@ export default function UserSettingsModal({
               </button>
               <button
                 onClick={handleSave}
-                disabled={isSaving || !hasChanges() || hasDuplicateMajors()}
-                className={`px-3 py-1.5 rounded-lg text-xs transition-all duration-200 ${
-                  hasChanges() && !hasDuplicateMajors() && !isSaving
-                    ? "bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white"
+                disabled={isSaving || !isDirty || hasDuplicateMajors()}
+                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 ${
+                  isDirty && !hasDuplicateMajors() && !isSaving
+                    ? "bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white shadow-[0_4px_16px_rgba(168,85,247,0.35)] ring-1 ring-purple-400/40 animate-pulse"
                     : "bg-gray-100 dark:bg-gray-800/50 text-gray-400 dark:text-gray-500 cursor-not-allowed border border-black/[0.05] dark:border-white/[0.05]"
                 }`}
               >

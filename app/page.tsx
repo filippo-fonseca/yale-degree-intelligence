@@ -47,14 +47,10 @@ import {
 import { gradePoints, getDistPillStyle } from "@/lib/constants";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
 import { calculateMajorProgress, MAJORS } from "@/lib/majors";
-import MajorProgressView from "@/components/MajorProgressView";
-import StatsView from "@/components/StatsView";
-import MajorSelectionFlow from "@/components/MajorSelectionFlow";
 import { HiDocumentDuplicate } from "react-icons/hi";
 import { RiProgress3Fill } from "react-icons/ri";
 import CompoundLogo from "@/components/ui/CompoundLogo";
 import { getCourseNameFromCode } from "@/lib/courseCatalog";
-import DistributionalsView from "@/components/DistributionalProgress";
 import { FaBuildingCircleCheck, FaHeart } from "react-icons/fa6";
 import CustomLoader from "@/components/ui/CustomLoader";
 import UserSettingsModal from "@/components/UserSettingsModal/UserSettingsModal";
@@ -66,11 +62,59 @@ import { getSharedCourses } from "@/lib/utils/sharedCourses";
 import ConfirmDeleteModal from "@/components/ConfirmDeleteModal/ConfirmDeleteModal";
 import ManualCourseEntryModal from "@/components/ManualCourseEntryModal";
 import PublicFacingPage from "@/screens/PublicFacingPage";
-import FriendsTab from "@/components/FriendsTab/FriendsTab";
-import { MessageCircleQuestionMark, MonitorCog, Printer } from "lucide-react";
-import Simulator from "@/components/Simulator/Simulator";
-import CleoAITab from "@/components/CleoAITab/CleoAITab";
+import {
+  MessageCircleQuestionMark,
+  MonitorCog,
+  Printer,
+  Search,
+} from "lucide-react";
 import { UserAvatar } from "@/components/ui/UserAvatar";
+import CommandPalette from "@/components/CommandPalette/CommandPalette";
+import V3WelcomeModal from "@/components/V3Welcome/V3WelcomeModal";
+import AppTour from "@/components/Tutorial/AppTour";
+import { setUserFlag } from "@/lib/userFlags";
+import dynamic from "next/dynamic";
+
+// Heavy, tab-gated views are code-split so logged-out visitors and inactive
+// tabs don't pull this code into the initial bundle. They render client-side
+// only (the dashboard is already a client tree behind auth).
+const TabFallback = () => (
+  <div className="flex items-center justify-center py-24 text-sm text-gray-400 dark:text-gray-500">
+    Loading…
+  </div>
+);
+const MyCoursesView = dynamic(() => import("@/components/MyCoursesView"), {
+  ssr: false,
+  loading: TabFallback,
+});
+const StatsView = dynamic(() => import("@/components/StatsView"), {
+  ssr: false,
+  loading: TabFallback,
+});
+const MajorProgressView = dynamic(
+  () => import("@/components/MajorProgressView"),
+  { ssr: false, loading: TabFallback },
+);
+const DistributionalsView = dynamic(
+  () => import("@/components/DistributionalProgress"),
+  { ssr: false, loading: TabFallback },
+);
+const FriendsTab = dynamic(() => import("@/components/FriendsTab/FriendsTab"), {
+  ssr: false,
+  loading: TabFallback,
+});
+const Simulator = dynamic(() => import("@/components/Simulator/Simulator"), {
+  ssr: false,
+  loading: TabFallback,
+});
+const CleoAITab = dynamic(() => import("@/components/CleoAITab/CleoAITab"), {
+  ssr: false,
+  loading: TabFallback,
+});
+const MajorSelectionFlow = dynamic(
+  () => import("@/components/MajorSelectionFlow"),
+  { ssr: false },
+);
 
 interface UserProfile {
   majors: string[];
@@ -79,6 +123,10 @@ interface UserProfile {
   // Shared courses the user has manually marked as prerequisites, which are
   // exempt from the cross-major overlap warning (Yale's prereq data is spotty).
   prereqOverrides?: string[];
+  // Onboarding flags: whether the user has seen the guided tour and the v3
+  // welcome modal. Persisted so we don't re-show them on every visit.
+  hasSeenTutorial?: boolean;
+  hasSeenV3Welcome?: boolean;
 }
 
 export default function Home() {
@@ -96,7 +144,15 @@ export default function Home() {
   );
   const [sidebarHovered, setSidebarHovered] = useState(false);
   const sidebarExpanded = sidebarPinned || sidebarHovered;
+  const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
+  const [welcomeOpen, setWelcomeOpen] = useState(false);
+  const [tourOpen, setTourOpen] = useState(false);
+  const [onboardChecked, setOnboardChecked] = useState(false);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+  // Tracks whether the live profile subscription has resolved at least once.
+  // Kept separate from coursesLoading so we don't flash the new-user/empty
+  // state for returning users while their profile snapshot is still in-flight.
+  const [profileLoading, setProfileLoading] = useState(true);
   const isBrandNew = userProfile?.graduationYear === 2030;
 
   // NEW: state for confirming deletion of an in-progress course
@@ -113,6 +169,7 @@ export default function Home() {
   useEffect(() => {
     if (!user) {
       setCoursesLoading(false);
+      setProfileLoading(false);
       setCourses([]);
       setHasData(false);
       setFriendsEnabled(false);
@@ -154,8 +211,28 @@ export default function Home() {
     }
   };
 
+  // Global ⌘K / Ctrl+K to open the command palette
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
+        e.preventDefault();
+        setCommandPaletteOpen((o) => !o);
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
+
   const [showUpdateModal, setShowUpdateModal] = useState(false);
   const [showManualEntryModal, setShowManualEntryModal] = useState(false);
+  // When the manual-add flow is opened from a specific semester header, this
+  // holds that semester key (e.g. "Fall 2026") so the modal can preselect it.
+  const [manualEntryPreselectSemester, setManualEntryPreselectSemester] =
+    useState<string | undefined>(undefined);
+  const openManualEntry = (semester?: string) => {
+    setManualEntryPreselectSemester(semester);
+    setShowManualEntryModal(true);
+  };
   const [showSharedCoursesDropdown, setShowSharedCoursesDropdown] =
     useState(false);
   const sharedCoursesRef = useRef<HTMLDivElement>(null);
@@ -205,7 +282,13 @@ export default function Home() {
     });
   };
 
-  const navItems = [
+  const navItems: {
+    id: string;
+    icon: React.ComponentType<any>;
+    label: string;
+    disabled?: boolean;
+    comingSoon?: boolean;
+  }[] = [
     {
       id: "upload",
       icon: HiDocumentDuplicate,
@@ -254,6 +337,7 @@ export default function Home() {
   useEffect(() => {
     if (!user) return;
 
+    setProfileLoading(true);
     const unsub = onSnapshot(doc(db, "users", user.uid), (docSnap) => {
       if (docSnap.exists()) {
         const data = docSnap.data() as UserProfile;
@@ -264,6 +348,8 @@ export default function Home() {
         setUserProfile(null);
         setShowMajorSelection(true);
       }
+      // Profile snapshot has now resolved at least once.
+      setProfileLoading(false);
     });
     return () => unsub();
   }, [user]);
@@ -284,6 +370,18 @@ export default function Home() {
     );
     return () => unsub();
   }, [user]);
+
+  // One-time onboarding: show the v3 welcome (then the tour) to users who
+  // haven't seen them yet. Runs once per session after the profile loads.
+  useEffect(() => {
+    if (onboardChecked || !user || !userProfile) return;
+    setOnboardChecked(true);
+    if (!userProfile.hasSeenV3Welcome) {
+      setWelcomeOpen(true);
+    } else if (!userProfile.hasSeenTutorial) {
+      setTourOpen(true);
+    }
+  }, [user, userProfile, onboardChecked]);
 
   // Replace your current getMajorProgress with this:
   const getMajorProgress = () => {
@@ -811,7 +909,8 @@ export default function Home() {
   //   void new Audio("/audio/pop.mp3").play().catch(() => null);
   // }, [activeTab, hasData]);
 
-  if (loading || (user && coursesLoading)) return <CustomLoader />;
+  if (loading || (user && (coursesLoading || profileLoading)))
+    return <CustomLoader />;
 
   if (!user) return <PublicFacingPage />;
 
@@ -878,6 +977,29 @@ export default function Home() {
           onClose={() => setShowSettings(false)}
           onSave={handleProfileUpdate}
           onToggleFriends={handleToggleFriends}
+          onReplayTour={() => {
+            setShowSettings(false);
+            setTourOpen(true);
+          }}
+          onReplayWelcome={() => {
+            // Dev-only: replay the full new-user v3 flow. Resets BOTH onboarding
+            // booleans on users/{uid} and re-opens the welcome modal immediately.
+            // This ONLY flips flags; it never touches plans or courses.
+            if (user) {
+              void setUserFlag(user.uid, "hasSeenV3Welcome", false);
+              void setUserFlag(user.uid, "hasSeenTutorial", false);
+            }
+            setShowSettings(false);
+            setTourOpen(false);
+            setWelcomeOpen(true);
+          }}
+          onReplayTutorial={() => {
+            // Dev-only: reset just the tutorial flag and re-open the tour.
+            if (user) void setUserFlag(user.uid, "hasSeenTutorial", false);
+            setShowSettings(false);
+            setWelcomeOpen(false);
+            setTourOpen(true);
+          }}
           onLogout={() => {
             setShowSettings(false);
             setActiveTab("upload");
@@ -968,6 +1090,14 @@ export default function Home() {
 
           <div className="flex items-center gap-2 lg:gap-3">
             <button
+              onClick={() => setCommandPaletteOpen(true)}
+              className="lg:hidden p-1.5 rounded-xl hover:bg-black/[0.04] dark:hover:bg-white/[0.06] transition-all border border-black/[0.06] dark:border-white/[0.08] hover:border-black/[0.09] dark:hover:border-white/[0.12] text-gray-600 dark:text-gray-300"
+              title="Search (⌘K)"
+              aria-label="Open search"
+            >
+              <Search size={16} />
+            </button>
+            <button
               onClick={toggleTheme}
               className="p-1.5 lg:p-2 rounded-xl hover:bg-black/[0.04] dark:hover:bg-white/[0.06] transition-all border border-black/[0.06] dark:border-white/[0.08] hover:border-black/[0.09] dark:hover:border-white/[0.12] text-gray-600 dark:text-gray-300"
               title={
@@ -977,11 +1107,13 @@ export default function Home() {
               }
               aria-label="Toggle theme"
             >
-              {resolvedTheme === "dark" ? (
-                <FiSun size={16} />
-              ) : (
-                <FiMoon size={16} />
-              )}
+              <span className="flex h-7 w-7 items-center justify-center">
+                {resolvedTheme === "dark" ? (
+                  <FiSun size={18} />
+                ) : (
+                  <FiMoon size={18} />
+                )}
+              </span>
             </button>
 
             <button
@@ -1151,7 +1283,13 @@ export default function Home() {
               className={`flex mb-1.5 ${sidebarExpanded ? "justify-end" : "justify-center"}`}
             >
               <button
-                onClick={() => setSidebarPinned(!sidebarPinned)}
+                onClick={() => {
+                  const next = !sidebarPinned;
+                  setSidebarPinned(next);
+                  // Clear hover so the sidebar retracts immediately on collapse,
+                  // instead of staying open because the cursor is still over it.
+                  if (!next) setSidebarHovered(false);
+                }}
                 title={sidebarPinned ? "Collapse sidebar" : "Keep sidebar open"}
                 aria-label={
                   sidebarPinned ? "Collapse sidebar" : "Keep sidebar open"
@@ -1164,6 +1302,33 @@ export default function Home() {
                   <FiChevronsRight size={16} />
                 )}
               </button>
+            </div>
+
+            {/* Global search trigger (⌘K) */}
+            <div className="px-1 mb-2">
+              <motion.button
+                whileTap={{ scale: 0.98 }}
+                onClick={() => setCommandPaletteOpen(true)}
+                data-tour="search"
+                title={sidebarExpanded ? undefined : "Search (⌘K)"}
+                className={`w-full flex items-center rounded-2xl border border-black/[0.06] dark:border-white/[0.08] bg-black/[0.02] dark:bg-white/[0.03] text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-black/[0.04] dark:hover:bg-white/[0.06] transition-colors ${
+                  sidebarExpanded
+                    ? "justify-between px-3 py-2.5"
+                    : "justify-center p-3"
+                }`}
+              >
+                <span className="flex items-center space-x-3">
+                  <Search size={14} />
+                  {sidebarExpanded && (
+                    <span className="text-sm whitespace-nowrap">Search</span>
+                  )}
+                </span>
+                {sidebarExpanded && (
+                  <kbd className="flex items-center gap-0.5 rounded-md border border-black/[0.08] dark:border-white/10 px-1.5 py-0.5 text-[10px] font-medium text-gray-400 dark:text-gray-500">
+                    ⌘K
+                  </kbd>
+                )}
+              </motion.button>
             </div>
 
             {/* Navigation Items */}
@@ -1179,6 +1344,7 @@ export default function Home() {
                       handleTabChange(item.id);
                       void new Audio("/audio/pop.mp3").play().catch(() => null);
                     }}
+                    data-tour={`nav-${item.id}`}
                     title={sidebarExpanded ? undefined : item.label}
                     className={`relative w-full flex items-center px-3 py-3 text-left rounded-2xl transition-colors duration-200 ${
                       sidebarExpanded ? "justify-between" : "justify-center"
@@ -1225,6 +1391,7 @@ export default function Home() {
                 .map((item) => (
                   <motion.button
                     key={item.id}
+                    data-tour={`nav-${item.id}`}
                     title={sidebarExpanded ? undefined : item.label}
                     className={`w-full flex items-center px-3 py-3 text-left rounded-2xl transition-all duration-300 relative text-gray-400 dark:text-gray-600 cursor-not-allowed opacity-60 ${
                       sidebarExpanded ? "justify-between" : "justify-center"
@@ -1264,6 +1431,7 @@ export default function Home() {
                 .map((item) => (
                   <motion.button
                     key={item.id}
+                    data-tour={`nav-${item.id}`}
                     title={sidebarExpanded ? undefined : item.label}
                     className={`w-full flex items-center px-3 py-3 text-left rounded-2xl transition-all duration-300 relative text-gray-400 dark:text-gray-600 cursor-not-allowed opacity-60 ${
                       sidebarExpanded ? "justify-between" : "justify-center"
@@ -1380,685 +1548,26 @@ export default function Home() {
                   exit={{ opacity: 0 }}
                   transition={{ duration: 0.3 }}
                 >
-                  {hasData ? (
-                    <div>
-                      <div className="mb-4 lg:mb-6 flex flex-col sm:flex-row justify-between items-start gap-3">
-                        <div>
-                          <h2 className="text-xl sm:text-2xl lg:text-3xl font-medium text-gray-900 dark:text-white">
-                            Your academic journey at Yale,{" "}
-                            {user?.displayName?.split(" ")[0]}.
-                          </h2>
-                          <p className="text-sm lg:text-base text-gray-600 dark:text-gray-300 mt-1">
-                            All your classes, grades, and in-progress courses.
-                          </p>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <button
-                            onClick={() => setShowManualEntryModal(true)}
-                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gray-100 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700/50 hover:border-pink-500/40 hover:bg-gray-200 dark:hover:bg-gray-800 text-gray-500 dark:text-gray-400 hover:text-pink-600 dark:hover:text-pink-300 transition-all text-sm"
-                            title="Add courses manually"
-                          >
-                            <FiPlus size={14} />
-                            <span className="hidden sm:inline">Manual add</span>
-                          </button>
-                          <button
-                            onClick={() => setShowUpdateModal(true)}
-                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gray-100 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700/50 hover:border-blue-500/40 hover:bg-gray-200 dark:hover:bg-gray-800 text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-300 transition-all text-sm"
-                          >
-                            <FiRefreshCw size={14} />
-                            <span className="hidden sm:inline">
-                              Re-upload transcript
-                            </span>
-                          </button>
-                        </div>
-                      </div>
-
-                      <div className="space-y-8">
-                        {Array.from(
-                          new Set(
-                            courses
-                              .filter((course) => !course.skipped)
-                              .map((c) => `${c.semester} ${c.year}`),
-                          ),
-                        )
-                          .sort((a, b) => {
-                            const semesterOrder = {
-                              Spring: 0,
-                              Summer: 1,
-                              Fall: 2,
-                            } as const;
-                            const [semesterA, yearA] = a.split(" ");
-                            const [semesterB, yearB] = b.split(" ");
-                            const yA = parseInt(yearA);
-                            const yB = parseInt(yearB);
-                            if (yA !== yB) return yA - yB;
-                            return (
-                              semesterOrder[
-                                semesterA as keyof typeof semesterOrder
-                              ] -
-                              semesterOrder[
-                                semesterB as keyof typeof semesterOrder
-                              ]
-                            );
-                          })
-                          .map((semester) => {
-                            const isCollapsed =
-                              collapsedSemesters.has(semester);
-                            const hasInProgress =
-                              semesterHasInProgress(semester);
-                            const semesterCourses = courses.filter(
-                              (c) => `${c.semester} ${c.year}` === semester,
-                            );
-
-                            return (
-                              <motion.div
-                                key={semester}
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: 1 }}
-                                className="mb-6"
-                              >
-                                {/* Semester Header */}
-                                <button
-                                  onClick={() =>
-                                    toggleSemesterCollapse(semester)
-                                  }
-                                  className="w-full flex items-center justify-between mb-3 group"
-                                >
-                                  <div className="flex items-center gap-2">
-                                    <h3 className="text-base font-medium text-gray-700 dark:text-gray-300 group-hover:text-gray-900 dark:group-hover:text-white transition-colors">
-                                      {semester}
-                                    </h3>
-                                    {hasInProgress && (
-                                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-purple-500/20 border border-purple-500/30 text-purple-600 dark:text-purple-300">
-                                        <span className="w-1 h-1 rounded-full bg-purple-400 animate-pulse" />
-                                        In Progress
-                                      </span>
-                                    )}
-                                    <span className="text-xs text-gray-400 dark:text-gray-600">
-                                      {semesterCourses.length} course
-                                      {semesterCourses.length !== 1 ? "s" : ""}
-                                    </span>
-                                  </div>
-                                  <motion.div
-                                    animate={{ rotate: isCollapsed ? 0 : 180 }}
-                                    transition={{ duration: 0.2 }}
-                                    className="p-1 rounded-md text-gray-500 group-hover:text-gray-700 dark:group-hover:text-gray-300 group-hover:bg-black/[0.04] dark:group-hover:bg-white/[0.05] transition-all"
-                                  >
-                                    <FiChevronDown size={16} />
-                                  </motion.div>
-                                </button>
-
-                                {/* Collapsible Courses Grid */}
-                                <AnimatePresence initial={false}>
-                                  {!isCollapsed && (
-                                    <motion.div
-                                      initial={{ height: 0, opacity: 0 }}
-                                      animate={{ height: "auto", opacity: 1 }}
-                                      exit={{ height: 0, opacity: 0 }}
-                                      transition={{
-                                        duration: 0.2,
-                                        ease: "easeInOut",
-                                      }}
-                                      className="overflow-hidden"
-                                    >
-                                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                        {courses
-                                          .filter(
-                                            (c) =>
-                                              `${c.semester} ${c.year}` ===
-                                              semester,
-                                          )
-                                          .map((course, idx) => (
-                                            <motion.div
-                                              key={course.id || `${course.code}-${idx}`}
-                                              whileHover={{ scale: 0.98 }}
-                                              whileTap={{ scale: 0.96 }}
-                                              transition={{ duration: 0.1 }}
-                                              className={`relative p-4 cursor-pointer rounded-xl bg-white dark:bg-gray-900/50 backdrop-blur-sm border border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700 transition-all shadow-sm dark:shadow-none`}
-                                              onClick={() => {
-                                                setModalOpen({
-                                                  isOpen: true,
-                                                  course: {
-                                                    id: course.id,
-                                                    code: course.code,
-                                                    name:
-                                                      getCourseNameFromCode(
-                                                        course.code,
-                                                      ) ?? "Course",
-                                                    status: course.status,
-                                                    skipped:
-                                                      course.skipped || false,
-                                                    distributionals:
-                                                      course.distributionals ||
-                                                      [],
-                                                  },
-                                                });
-                                              }}
-                                            >
-                                              {/* TOP ROW */}
-                                              <div className="flex justify-between items-start">
-                                                <div className="pr-8">
-                                                  <h4 className="font-medium text-gray-900 dark:text-white">
-                                                    {course.code}
-                                                    {course.skipped && (
-                                                      <span className="ml-2 text-xs text-gray-400 dark:text-gray-500">
-                                                        (skipped)
-                                                      </span>
-                                                    )}
-                                                  </h4>
-                                                  <p className="text-sm text-gray-500 dark:text-gray-400">
-                                                    {getCourseNameFromCode(
-                                                      course.code,
-                                                    )}
-                                                  </p>
-                                                  <div className="flex items-center mt-1 space-x-2">
-                                                    <span
-                                                      className={`text-xs px-2 py-1 rounded-full ${
-                                                        course.status ===
-                                                          "completed" &&
-                                                        !course.skipped
-                                                          ? getGPAColor(
-                                                              course.grade ||
-                                                                "",
-                                                            ) +
-                                                            " bg-emerald-100 dark:bg-emerald-900/20"
-                                                          : course.status ===
-                                                              "in-progress"
-                                                            ? "text-purple-600 dark:text-purple-300 bg-purple-100 dark:bg-purple-900/20"
-                                                            : "text-gray-600 dark:text-gray-300 bg-gray-100 dark:bg-gray-800/20"
-                                                      }`}
-                                                    >
-                                                      {course.status ===
-                                                        "completed" &&
-                                                      !course.skipped
-                                                        ? course.grade ||
-                                                          "Completed"
-                                                        : course.status ===
-                                                            "in-progress"
-                                                          ? "In Progress"
-                                                          : "Skipped"}
-                                                    </span>
-                                                    <span className="text-xs text-gray-400 dark:text-gray-500">
-                                                      {course.credits} credit
-                                                      {course.credits !== 1
-                                                        ? "s"
-                                                        : ""}
-                                                    </span>
-                                                  </div>
-                                                </div>
-
-                                                {/* Trash button for any course (except skipped) */}
-                                                {!course.skipped && (
-                                                  <button
-                                                    aria-label="Delete course"
-                                                    className="absolute top-3 right-3 p-1.5 rounded-lg border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 text-gray-400 dark:text-gray-500 hover:border-red-400 dark:hover:border-red-800 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-500 dark:hover:text-red-400 transition-all"
-                                                    onClick={(e) => {
-                                                      e.stopPropagation();
-                                                      openDeleteConfirm(course);
-                                                    }}
-                                                    title="Delete course"
-                                                  >
-                                                    <FiTrash2 className="w-3.5 h-3.5" />
-                                                  </button>
-                                                )}
-                                              </div>
-                                              {/* Distributional tags */}
-                                              <div
-                                                className="mt-2"
-                                                onClick={(e) =>
-                                                  e.stopPropagation()
-                                                }
-                                              >
-                                                <div className="flex flex-wrap items-center gap-1.5">
-                                                  {(
-                                                    course.distributionals || []
-                                                  ).map((d, dIdx) => (
-                                                    <span
-                                                      key={`${d}-${dIdx}`}
-                                                      className={`text-[10px] px-2 py-0.5 rounded-full border font-medium ${getDistPillStyle(d)}`}
-                                                    >
-                                                      {d}
-                                                    </span>
-                                                  ))}
-                                                  {(
-                                                    course.distributionals || []
-                                                  ).length === 0 ? (
-                                                    // Gradient border when no distributionals assigned
-                                                    <button
-                                                      onClick={() =>
-                                                        setDistSelectorCourseId(
-                                                          distSelectorCourseId ===
-                                                            course.id
-                                                            ? null
-                                                            : course.id,
-                                                        )
-                                                      }
-                                                      className="text-[10px] px-2 py-0.5 rounded-full bg-gradient-to-r from-purple-500/20 via-pink-500/20 to-blue-500/20 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white border border-purple-500/50 hover:border-purple-400/70 transition-all"
-                                                    >
-                                                      + assign distributional
-                                                      req.
-                                                    </button>
-                                                  ) : (
-                                                    <button
-                                                      onClick={() =>
-                                                        setDistSelectorCourseId(
-                                                          distSelectorCourseId ===
-                                                            course.id
-                                                            ? null
-                                                            : course.id,
-                                                        )
-                                                      }
-                                                      className="text-[10px] px-2 py-0.5 rounded-full bg-gray-100 dark:bg-gray-800/50 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700/50 border border-dashed border-gray-300 dark:border-gray-700/50 transition-all"
-                                                    >
-                                                      edit distribs.
-                                                    </button>
-                                                  )}
-                                                </div>
-                                                <AnimatePresence>
-                                                  {distSelectorCourseId ===
-                                                    course.id && (
-                                                    <motion.div
-                                                      initial={{
-                                                        opacity: 0,
-                                                        height: 0,
-                                                      }}
-                                                      animate={{
-                                                        opacity: 1,
-                                                        height: "auto",
-                                                      }}
-                                                      exit={{
-                                                        opacity: 0,
-                                                        height: 0,
-                                                      }}
-                                                      className="overflow-hidden"
-                                                    >
-                                                      <div className="mt-2 p-3 rounded-lg bg-gray-100 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700/50 space-y-2.5">
-                                                        <div>
-                                                          <p className="text-[10px] text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-1.5">
-                                                            Areas
-                                                          </p>
-                                                          <div className="flex flex-wrap gap-1.5">
-                                                            {[
-                                                              "Hu",
-                                                              "So",
-                                                              "Sc",
-                                                            ].map((d) => (
-                                                              <button
-                                                                key={d}
-                                                                onClick={() =>
-                                                                  toggleDistributional(
-                                                                    course.id,
-                                                                    d,
-                                                                  )
-                                                                }
-                                                                className={`text-xs px-2.5 py-1 rounded-full border font-medium transition-all ${
-                                                                  (
-                                                                    course.distributionals ||
-                                                                    []
-                                                                  ).includes(d)
-                                                                    ? getDistPillStyle(
-                                                                        d,
-                                                                      )
-                                                                    : "bg-white dark:bg-gray-800/50 text-gray-500 border-gray-300 dark:border-gray-700 hover:border-gray-400 dark:hover:border-gray-600"
-                                                                }`}
-                                                              >
-                                                                {d}
-                                                              </button>
-                                                            ))}
-                                                          </div>
-                                                        </div>
-                                                        <div>
-                                                          <p className="text-[10px] text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-1.5">
-                                                            Skills
-                                                          </p>
-                                                          <div className="flex flex-wrap gap-1.5">
-                                                            {["QR", "WR"].map(
-                                                              (d) => (
-                                                                <button
-                                                                  key={d}
-                                                                  onClick={() =>
-                                                                    toggleDistributional(
-                                                                      course.id,
-                                                                      d,
-                                                                    )
-                                                                  }
-                                                                  className={`text-xs px-2.5 py-1 rounded-full border font-medium transition-all ${
-                                                                    (
-                                                                      course.distributionals ||
-                                                                      []
-                                                                    ).includes(
-                                                                      d,
-                                                                    )
-                                                                      ? getDistPillStyle(
-                                                                          d,
-                                                                        )
-                                                                      : "bg-white dark:bg-gray-800/50 text-gray-500 border-gray-300 dark:border-gray-700 hover:border-gray-400 dark:hover:border-gray-600"
-                                                                  }`}
-                                                                >
-                                                                  {d}
-                                                                </button>
-                                                              ),
-                                                            )}
-                                                          </div>
-                                                        </div>
-                                                        <div>
-                                                          <p className="text-[10px] text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-1.5">
-                                                            Language
-                                                          </p>
-                                                          <div className="flex flex-wrap gap-1.5">
-                                                            {[
-                                                              "L1",
-                                                              "L2",
-                                                              "L3",
-                                                              "L4",
-                                                              "L5",
-                                                            ].map((d) => (
-                                                              <button
-                                                                key={d}
-                                                                onClick={() =>
-                                                                  toggleDistributional(
-                                                                    course.id,
-                                                                    d,
-                                                                  )
-                                                                }
-                                                                className={`text-xs px-2.5 py-1 rounded-full border font-medium transition-all ${
-                                                                  (
-                                                                    course.distributionals ||
-                                                                    []
-                                                                  ).includes(d)
-                                                                    ? getDistPillStyle(
-                                                                        d,
-                                                                      )
-                                                                    : "bg-white dark:bg-gray-800/50 text-gray-500 border-gray-300 dark:border-gray-700 hover:border-gray-400 dark:hover:border-gray-600"
-                                                                }`}
-                                                              >
-                                                                {d}
-                                                              </button>
-                                                            ))}
-                                                          </div>
-                                                        </div>
-                                                      </div>
-                                                    </motion.div>
-                                                  )}
-                                                </AnimatePresence>
-                                              </div>
-                                            </motion.div>
-                                          ))}
-                                      </div>
-                                    </motion.div>
-                                  )}
-                                </AnimatePresence>
-                              </motion.div>
-                            );
-                          })}
-
-                        {courses.some((c) => c.skipped) && (
-                          <motion.div
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            className="mb-8"
-                          >
-                            <div className="mb-4">
-                              <h3 className="text-lg font-medium text-gray-700 dark:text-gray-300">
-                                "Skipped" Courses for your major
-                                {userProfile && userProfile?.majors.length > 0
-                                  ? "s"
-                                  : ""}
-                              </h3>
-                              <p className="text-sm text-gray-400 dark:text-gray-500">
-                                You have indicated to us in the <i>My major</i>{" "}
-                                page that you qualify to "skip" these classes,
-                                which fulfill requirements.
-                              </p>
-                            </div>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                              {courses
-                                .filter((c) => c.skipped)
-                                .map((course, idx) => (
-                                  <motion.div
-                                    key={course.id || `skipped-${course.code}-${idx}`}
-                                    whileHover={{ scale: 0.98 }}
-                                    whileTap={{ scale: 0.96 }}
-                                    transition={{ duration: 0.1 }}
-                                    className="p-4 rounded-xl bg-white dark:bg-gray-900/50 backdrop-blur-sm border border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700 transition-all border-l-2 shadow-sm dark:shadow-none"
-                                  >
-                                    <div className="flex justify-between items-start">
-                                      <div>
-                                        <h4 className="font-medium text-gray-900 dark:text-white">
-                                          {course.code}
-                                        </h4>
-                                        <p className="text-sm text-gray-500 dark:text-gray-400">
-                                          {getCourseNameFromCode(course.code)}
-                                        </p>
-                                        <div className="flex items-center mt-1 space-x-2">
-                                          <span className="text-xs text-gray-400 dark:text-gray-500">
-                                            {course.credits} credit
-                                            {course.credits !== 1 ? "s" : ""}
-                                          </span>
-                                        </div>
-                                      </div>
-                                      {course.grade && (
-                                        <span
-                                          className={`text-lg font-medium ${getGPAColor(
-                                            course.grade,
-                                          )}`}
-                                        >
-                                          {course.grade}
-                                        </span>
-                                      )}
-                                    </div>
-                                  </motion.div>
-                                ))}
-                            </div>
-                          </motion.div>
-                        )}
-                      </div>
-
-                      {/* Data & Privacy Disclaimer */}
-                      <div className="mt-10 p-4 rounded-xl bg-gradient-to-br from-gray-100/80 via-gray-50/60 to-gray-100/80 dark:from-gray-900/40 dark:via-gray-900/30 dark:to-gray-950/40 border border-gray-200/80 dark:border-gray-800/50 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)]">
-                        <p className="text-[11px] text-gray-400 dark:text-gray-500 leading-relaxed">
-                          <span className="font-medium text-gray-600 dark:text-gray-400">
-                            By using DegreeIntelligence, you voluntarily share
-                            your grades.
-                          </span>{" "}
-                          Your transcript PDF is processed locally and is{" "}
-                          <span className="text-emerald-600 dark:text-emerald-400/80">
-                            never stored
-                          </span>{" "}
-                          on our servers. However, we do store your course and
-                          grade data in our database (private only to your
-                          profile) to provide you with insights, progress
-                          tracking, and recommendations for your major. By
-                          uploading academic information, you confirm that you
-                          are providing your own data and consent to its storage
-                          and processing for academic planning purposes.{" "}
-                          <Link
-                            href="/terms"
-                            target="_blank"
-                            className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 underline underline-offset-2"
-                          >
-                            Read our full terms
-                          </Link>
-                          .
-                        </p>
-                        <p className="text-[10px] text-gray-400 dark:text-gray-600 mt-2 leading-relaxed">
-                          DegreeIntelligence is{" "}
-                          <span className="font-medium">not affiliated</span> in
-                          any way, shape, or form with Yale University, Yale
-                          College, or DegreeAudit. We are simply a free,
-                          student-built personal project that we wanted to share
-                          with the community because we genuinely found it
-                          helpful for ourselves.
-                        </p>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="flex flex-col items-center justify-center py-8">
-                      {/* Header */}
-                      <div className="text-center mb-6">
-                        <h2 className="text-2xl font-medium text-gray-900 dark:text-white mb-2">
-                          Let's get your courses loaded, {user?.displayName}.
-                        </h2>
-                        <p className="text-gray-500 dark:text-gray-400 text-sm">
-                          {isBrandNew
-                            ? "After registration, we'll parse your classes and fill in grades when they post."
-                            : "Upload your unofficial transcript to see your academic journey. We won't store the file."}
-                        </p>
-                      </div>
-
-                      {/* Tutorial Steps */}
-                      <div className="w-full max-w-xl mb-6">
-                        <div className="p-4 rounded-xl bg-gradient-to-br from-gray-50/90 via-white/80 to-gray-100/90 dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 backdrop-blur-md border border-gray-200/80 dark:border-gray-800/50 shadow-[inset_0_1px_0_rgba(255,255,255,0.04),0_4px_16px_rgba(0,0,0,0.08)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.04),0_4px_16px_rgba(0,0,0,0.25)]">
-                          <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3 flex items-center gap-2">
-                            <span className="p-1.5 rounded-lg bg-pink-500/10 border border-pink-500/20">
-                              <Printer size={14} className="text-pink-400" />
-                            </span>
-                            How to get your transcript
-                          </h3>
-                          <div className="space-y-3">
-                            <div className="flex items-start gap-3">
-                              <div className="flex-shrink-0 w-6 h-6 rounded-full bg-gradient-to-br from-pink-500 to-purple-600 flex items-center justify-center text-white text-xs font-medium shadow-[0_2px_8px_rgba(236,72,153,0.3)]">
-                                1
-                              </div>
-                              <div className="flex-1 pt-0.5">
-                                <p className="text-sm text-gray-700 dark:text-gray-300">
-                                  Go to{" "}
-                                  <a
-                                    href="https://yub.yale.edu"
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="text-pink-600 dark:text-pink-400 hover:text-pink-700 dark:hover:text-pink-300 underline underline-offset-2"
-                                  >
-                                    Yale Hub
-                                  </a>{" "}
-                                  and sign in
-                                </p>
-                              </div>
-                            </div>
-                            <div className="flex items-start gap-3">
-                              <div className="flex-shrink-0 w-6 h-6 rounded-full bg-gradient-to-br from-pink-500 to-purple-600 flex items-center justify-center text-white text-xs font-medium shadow-[0_2px_8px_rgba(236,72,153,0.3)]">
-                                2
-                              </div>
-                              <div className="flex-1 pt-0.5">
-                                <p className="text-sm text-gray-700 dark:text-gray-300">
-                                  Navigate to{" "}
-                                  <span className="px-1.5 py-0.5 rounded bg-gray-100 dark:bg-gray-800/60 border border-gray-300 dark:border-gray-700/50 text-gray-800 dark:text-gray-200 font-mono text-xs">
-                                    Academics
-                                  </span>{" "}
-                                  →{" "}
-                                  <span className="px-1.5 py-0.5 rounded bg-gray-100 dark:bg-gray-800/60 border border-gray-300 dark:border-gray-700/50 text-gray-800 dark:text-gray-200 font-mono text-xs">
-                                    Unofficial Transcript
-                                  </span>
-                                </p>
-                              </div>
-                            </div>
-                            <div className="flex items-start gap-3">
-                              <div className="flex-shrink-0 w-6 h-6 rounded-full bg-gradient-to-br from-pink-500 to-purple-600 flex items-center justify-center text-white text-xs font-medium shadow-[0_2px_8px_rgba(236,72,153,0.3)]">
-                                3
-                              </div>
-                              <div className="flex-1 pt-0.5">
-                                <p className="text-sm text-gray-700 dark:text-gray-300">
-                                  Click{" "}
-                                  <span className="px-1.5 py-0.5 rounded bg-blue-500/20 border border-blue-500/30 text-blue-600 dark:text-blue-300 font-medium text-xs">
-                                    Print
-                                  </span>{" "}
-                                  and save as PDF. Then upload it here.
-                                </p>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Upload Area */}
-                      <div
-                        id="upload-transcript"
-                        className="w-full max-w-xl p-6 rounded-xl bg-gradient-to-br from-gray-50/90 via-white/80 to-gray-100/90 dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 backdrop-blur-md border border-gray-200/80 dark:border-gray-800/50 shadow-[inset_0_1px_0_rgba(255,255,255,0.04),0_4px_16px_rgba(0,0,0,0.08)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.04),0_4px_16px_rgba(0,0,0,0.25)]"
-                      >
-                        <FileUpload onSuccess={parseAndStoreCourses} />
-                      </div>
-
-                      {/* Manual Entry Option */}
-                      <div className="w-full max-w-xl mt-3 text-center">
-                        <p className="text-sm text-gray-500 dark:text-gray-400">
-                          Prefer to type in your courses manually?{" "}
-                          <button
-                            onClick={() => setShowManualEntryModal(true)}
-                            className="text-pink-600 dark:text-pink-400 hover:text-pink-700 dark:hover:text-pink-300 underline underline-offset-2 transition-colors"
-                          >
-                            Click here
-                          </button>
-                          .
-                        </p>
-                      </div>
-
-                      {/* Data & Privacy Disclaimer */}
-                      <div className="w-full max-w-xl mt-5 p-4 rounded-xl bg-gradient-to-br from-gray-100/80 via-gray-50/60 to-gray-100/80 dark:from-gray-900/40 dark:via-gray-900/30 dark:to-gray-950/40 border border-gray-200/80 dark:border-gray-800/50 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)]">
-                        <div className="flex items-start gap-3">
-                          <div className="p-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20 shrink-0 mt-0.5">
-                            <svg
-                              className="w-3.5 h-3.5 text-emerald-400"
-                              fill="none"
-                              viewBox="0 0 24 24"
-                              stroke="currentColor"
-                              strokeWidth={2}
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
-                              />
-                            </svg>
-                          </div>
-                          <div>
-                            <p className="text-[11px] text-gray-500 dark:text-gray-400 leading-relaxed">
-                              <span className="font-medium text-gray-700 dark:text-gray-300">
-                                By uploading, you voluntarily share your grades.
-                              </span>{" "}
-                              Your transcript PDF is processed locally and is{" "}
-                              <span className="text-emerald-600 dark:text-emerald-400">
-                                never stored
-                              </span>{" "}
-                              on our servers. However, we store your course and
-                              grade data in our database (private only to your
-                              profile) to provide insights and recommendations
-                              for your major. By uploading academic information,
-                              you confirm that you are providing your own data
-                              and consent to its storage and processing for
-                              academic planning purposes.{" "}
-                              <Link
-                                href="/terms"
-                                target="_blank"
-                                className="text-blue-400 hover:text-blue-300 underline underline-offset-2"
-                              >
-                                Read our full terms
-                              </Link>
-                              .
-                            </p>
-                            <p className="text-[10px] text-gray-400 dark:text-gray-600 mt-2 leading-relaxed">
-                              DegreeIntelligence is{" "}
-                              <span className="font-medium">
-                                not affiliated
-                              </span>{" "}
-                              in any way, shape, or form with Yale University,
-                              Yale College, or DegreeAudit. We are simply a
-                              free, student-built personal project that we
-                              wanted to share with the community because we
-                              genuinely found it helpful for ourselves.
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* NEW: confirmation modal */}
-                  <ConfirmDeleteModal
-                    isOpen={confirmDelete.open}
-                    course={confirmDelete.course}
-                    onCancel={closeDeleteConfirm}
-                    onConfirm={handleDeleteInProgress}
+                  <MyCoursesView
+                    courses={courses}
+                    hasData={hasData}
+                    coursesLoading={coursesLoading}
+                    user={user}
+                    isBrandNew={isBrandNew}
+                    onManualAdd={openManualEntry}
+                    onReupload={() => setShowUpdateModal(true)}
+                    onUploadSuccess={parseAndStoreCourses}
+                    onDeleteCourse={async (course) => {
+                      if (!user || !course?.id) return;
+                      await deleteDoc(doc(db, "courses", course.id));
+                      await fetchCourses();
+                    }}
+                    onToggleDistributional={async (courseId, dist) => {
+                      await toggleDistributional(courseId, dist);
+                    }}
                   />
+
+
                 </motion.div>
               )}
 
@@ -2147,9 +1656,13 @@ export default function Home() {
               {/* Manual Course Entry Modal */}
               <ManualCourseEntryModal
                 isOpen={showManualEntryModal}
-                onClose={() => setShowManualEntryModal(false)}
+                onClose={() => {
+                  setShowManualEntryModal(false);
+                  setManualEntryPreselectSemester(undefined);
+                }}
                 onSubmit={handleManualCourseEntry}
                 userId={user?.uid || ""}
+                initialSemester={manualEntryPreselectSemester}
               />
 
               {activeTab === "stats" && (
@@ -2233,6 +1746,7 @@ export default function Home() {
                             return (
                               <div
                                 ref={sharedCoursesRef}
+                                data-tour="major-shared-courses"
                                 className="relative ml-2"
                               >
                                 <button
@@ -2274,7 +1788,7 @@ export default function Home() {
                                     >
                                       <div className="flex items-center justify-between mb-2">
                                         <h4 className="text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider">
-                                          Major Conflict Manager
+                                          Double Major Conflict Manager
                                         </h4>
                                         <button
                                           onClick={() =>
@@ -2323,7 +1837,8 @@ export default function Home() {
                                                 </strong>{" "}
                                                 Having 1-2 shared credits
                                                 between majors is typically
-                                                allowed.
+                                                allowed. Do check with both
+                                                DUSs!
                                               </>
                                             )}
                                           </div>
@@ -2641,6 +2156,46 @@ export default function Home() {
             };
           });
         }}
+      />
+
+      <CommandPalette
+        isOpen={commandPaletteOpen}
+        onClose={() => setCommandPaletteOpen(false)}
+        courses={courses}
+        selectedMajor={selectedMajor}
+        hasData={hasData}
+        onNavigate={handleTabChange}
+        onImportTranscript={() => {
+          handleTabChange("upload");
+          if (hasData) setShowUpdateModal(true);
+        }}
+        onManualAdd={() => setShowManualEntryModal(true)}
+        onToggleTheme={toggleTheme}
+      />
+
+      <V3WelcomeModal
+        open={welcomeOpen}
+        onClose={() => {
+          setWelcomeOpen(false);
+          if (user) void setUserFlag(user.uid, "hasSeenV3Welcome");
+        }}
+        onStartTour={() => {
+          setWelcomeOpen(false);
+          if (user) void setUserFlag(user.uid, "hasSeenV3Welcome");
+          setTourOpen(true);
+        }}
+      />
+
+      <AppTour
+        open={tourOpen}
+        onClose={() => {
+          setTourOpen(false);
+          if (user) void setUserFlag(user.uid, "hasSeenTutorial");
+        }}
+        onComplete={() => {
+          if (user) void setUserFlag(user.uid, "hasSeenTutorial");
+        }}
+        onNavigate={(tabId) => handleTabChange(tabId)}
       />
     </main>
   );

@@ -1,25 +1,21 @@
 "use client";
 
-import React, {
-  useEffect,
-  useRef,
-  useState,
-  useMemo,
-  useCallback,
-} from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { FiX, FiChevronDown, FiInfo, FiPlus } from "react-icons/fi";
+import { useEffect, useState, useMemo, useCallback } from "react";
+import { motion } from "framer-motion";
+import { FiInfo } from "react-icons/fi";
 
 import {
-  getFullMajorNameById,
   getMajorDescriptionById,
+  getReqsForMajor,
   MajorProgress,
 } from "@/lib/majors";
 import { MAJORS } from "@/lib/majors";
 import { useAuth } from "@/context/AuthContext";
 import { skipCourse, unskipCourse } from "@/lib/utils/courseOperations";
 import CourseModal from "./CourseModal";
-import DegreeIntelligenceBlurb from "./DegreeIntelligenceBlurb";
+import RequirementCard from "./RequirementCard";
+import HeatMapView from "./HeatMapView";
+import { STATUS_CLASSES, type ReqStats } from "./requirementStatus";
 import AddManualCourseModal from "../AddManualCourseModal/AddManualCourseModal";
 import { Course } from "@/lib/types";
 import { db } from "@/config/firebase";
@@ -31,6 +27,47 @@ import MajorTipModal, {
   MajorTipHelpButton,
   resetMajorTipSeen,
 } from "./MajorTipModal";
+import { Skeleton } from "@/components/ui/Skeleton";
+
+function MajorProgressLoadingSkeleton() {
+  return (
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div className="space-y-2">
+          <Skeleton className="h-6 w-56" />
+          <Skeleton className="h-4 w-72" />
+        </div>
+        <Skeleton className="h-8 w-16" />
+      </div>
+      {/* Progress bar card */}
+      <div className="p-3 rounded-xl border border-gray-200 dark:border-gray-800/50 shadow-neu">
+        <Skeleton rounded="rounded-full" className="h-2 w-full" />
+        <Skeleton rounded="rounded-lg" className="h-6 w-44 mt-2" />
+      </div>
+      {/* Summary cards */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {Array.from({ length: 3 }).map((_, i) => (
+          <Skeleton key={i} rounded="rounded-xl" className="h-16" />
+        ))}
+      </div>
+      {/* Board columns */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {Array.from({ length: 3 }).map((_, c) => (
+          <div
+            key={c}
+            className="rounded-xl border border-gray-200 dark:border-gray-800/50 p-3 space-y-3"
+          >
+            <Skeleton rounded="rounded-lg" className="h-5 w-28" />
+            {Array.from({ length: 3 }).map((_, r) => (
+              <Skeleton key={r} rounded="rounded-xl" className="h-20" />
+            ))}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 /* =========================
    Requirement Modal (inline)
@@ -52,27 +89,6 @@ type Requirement = {
   required?: number; // credits or count, depending on schema
   options: ReqOption[];
 };
-
-// Status color mapping for course pills (kept in case other parts use it)
-function getCourseStatusColor({
-  completed,
-  inProgress,
-  skipped,
-  grade,
-}: {
-  completed: boolean;
-  inProgress: boolean;
-  skipped?: boolean;
-  grade?: string | null;
-}) {
-  if (skipped)
-    return "bg-gray-200 dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-dashed border-gray-400 dark:border-gray-600";
-  if (completed && grade && grade !== "In Progress")
-    return "bg-emerald-100 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-700";
-  if (inProgress || grade === "In Progress")
-    return "bg-blue-100 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 border border-blue-300 dark:border-blue-700";
-  return "bg-red-100 dark:bg-red-900/20 text-red-700 dark:text-red-300 border border-red-300 dark:border-red-700";
-}
 
 function MajorStatCard({
   label,
@@ -104,191 +120,6 @@ function MajorStatCard({
   );
 }
 
-/* ---------- Stable subgrid to prevent flicker ---------- */
-const SectionGrid = React.memo(function SectionGrid({
-  title,
-  subtitleClass,
-  items,
-  onOpenCourse,
-  onUnskip,
-  onRemoveManual,
-  onAddManual,
-  onOpenRequirement,
-}: {
-  title: string;
-  subtitleClass: string;
-  items: {
-    req: any;
-    reqCompleted: number;
-    reqInProgress: number;
-    notStarted: boolean;
-  }[];
-  onOpenCourse: (opt: any, reqName: string) => void;
-  onUnskip: (code: string) => void;
-  onRemoveManual: (code: string, reqName: string) => void;
-  onAddManual: (reqName: string) => void;
-  onOpenRequirement: (req: any) => void;
-}) {
-  return (
-    <div className="space-y-3">
-      <div className={`text-sm font-medium ${subtitleClass}`}>
-        {title}{" "}
-        <span className="text-gray-600 dark:text-gray-400 font-normal">
-          ({items.length})
-        </span>
-      </div>
-      {items.length === 0 ? (
-        <div className="text-xs text-gray-500 dark:text-gray-500">
-          Nothing here yet! Whenever you are able to download an Unofficial
-          Transcript from the Acadeics tab on YHub, upload it on the "My
-          courses" page and come back here!
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-          {items.map(({ req, reqCompleted, reqInProgress, notStarted }) => {
-            const reqKey = req.id ?? req.name;
-            return (
-              <motion.div
-                key={reqKey}
-                layout
-                initial={false}
-                className={`p-3 hover:scale-[0.98] rounded-xl backdrop-blur-md border transition-all relative cursor-pointer shadow-neu-sm ${
-                  reqInProgress > 0
-                    ? "bg-blue-50 dark:bg-transparent dark:bg-gradient-to-br dark:from-blue-950/40 dark:via-gray-900/50 dark:to-gray-950/50 border-blue-200 dark:border-blue-800/30 hover:border-blue-300 dark:hover:border-blue-600/40"
-                    : notStarted
-                      ? "bg-red-50 dark:bg-transparent dark:bg-gradient-to-br dark:from-red-950/30 dark:via-gray-900/50 dark:to-gray-950/50 border-red-200 dark:border-red-800/25 hover:border-red-300 dark:hover:border-red-600/35"
-                      : "bg-red-50 dark:bg-transparent dark:bg-gradient-to-br dark:from-red-950/30 dark:via-gray-900/50 dark:to-gray-950/50 border-red-200 dark:border-red-800/25 hover:border-red-300 dark:hover:border-red-600/35"
-                }`}
-                onClick={() => onOpenRequirement(req)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" || e.key === " ")
-                    onOpenRequirement(req);
-                }}
-                role="button"
-                tabIndex={0}
-              >
-                <div className="flex justify-between items-start mb-1.5">
-                  <h5
-                    className={`font-medium text-sm ${
-                      reqInProgress > 0
-                        ? "text-blue-600 dark:text-blue-300"
-                        : notStarted
-                          ? "text-red-600 dark:text-red-300"
-                          : "text-red-600 dark:text-red-300"
-                    }`}
-                  >
-                    {req.name}
-                  </h5>
-                  <span
-                    className={`text-[10px] px-1.5 py-0.5 rounded-md ${
-                      reqInProgress > 0
-                        ? "bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-300 border border-blue-300 dark:border-blue-700/30"
-                        : notStarted
-                          ? "bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-300 border border-red-300 dark:border-red-700/30"
-                          : "bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-300 border border-red-300 dark:border-red-700/30"
-                    }`}
-                  >
-                    {reqInProgress + reqCompleted}/{req.required}
-                  </span>
-                </div>
-
-                {req.description && (
-                  <p
-                    className={`text-[11px] mb-2 ${
-                      reqInProgress > 0
-                        ? "text-blue-500 dark:text-blue-300/70"
-                        : notStarted
-                          ? "text-red-500 dark:text-red-300/70"
-                          : "text-red-500 dark:text-red-300/70"
-                    }`}
-                  >
-                    {req.description}
-                  </p>
-                )}
-
-                <div className="flex flex-wrap gap-1.5">
-                  {req.options.map((opt: any) => (
-                    <div
-                      key={opt.code}
-                      className={`relative px-2 py-0.5 rounded-full text-xs flex items-center transition-all duration-150 cursor-pointer hover:scale-[1.03] ${
-                        opt.manual
-                          ? "bg-purple-100 dark:bg-purple-900/20 text-purple-700 dark:text-purple-300 border border-purple-300 dark:border-purple-700"
-                          : opt.completed
-                            ? "bg-emerald-100 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-700"
-                            : opt.inProgress
-                              ? "bg-blue-100 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 border border-blue-300 dark:border-blue-700"
-                              : opt.skipped
-                                ? "bg-gray-200 dark:bg-gray-900/20 text-gray-600 dark:text-gray-300 border border-dashed border-gray-400 dark:border-gray-600"
-                                : notStarted
-                                  ? "bg-red-100 dark:bg-red-900/20 text-red-700 dark:text-red-300 border border-red-300 dark:border-red-700"
-                                  : "bg-red-100 dark:bg-red-900/20 text-red-700 dark:text-red-300 border border-red-300 dark:border-red-700"
-                      }`}
-                      onClick={(e) => {
-                        e.stopPropagation(); // don't open the requirement modal
-                        if (!opt.completed && !opt.skipped) {
-                          onOpenCourse(opt, req.name);
-                        }
-                      }}
-                    >
-                      {opt.code}
-                      <span className="ml-1 text-[0.65rem]">
-                        ({opt.credits}cr
-                        {opt.manual
-                          ? ", manual"
-                          : opt.skipped
-                            ? ", skipped"
-                            : opt.inProgress
-                              ? ", in progress"
-                              : opt.completed
-                                ? ", complete"
-                                : ""}
-                        )
-                      </span>
-                      {(opt.skipped || opt.manual) && (
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            if (opt.skipped) onUnskip(opt.code);
-                            else if (opt.manual)
-                              onRemoveManual(opt.code, req.name);
-                          }}
-                          className="ml-1 text-[0.65rem] text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
-                          title={
-                            opt.manual
-                              ? "Remove manual course"
-                              : "Unskip this course"
-                          }
-                        >
-                          <FiX size={10} />
-                        </button>
-                      )}
-                    </div>
-                  ))}
-
-                  {/* Add manual course button */}
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onAddManual(req.name);
-                    }}
-                    className={`px-2 py-0.5 rounded-full text-xs flex items-center gap-1
-                    bg-pink-100 dark:bg-pink-900/20 text-pink-600 dark:text-pink-300 hover:bg-pink-200 dark:hover:bg-pink-800/30
-                     transition-colors`}
-                    title="Add a course manually for this requirement"
-                  >
-                    <FiPlus size={12} />
-                    Fulfill manually
-                  </button>
-                </div>
-              </motion.div>
-            );
-          })}
-        </div>
-      )}
-    </div>
-  );
-});
-
 export default function MajorProgressView({
   selectedMajor,
   progress,
@@ -301,13 +132,21 @@ export default function MajorProgressView({
   courses: Course[];
 }) {
   const { user } = useAuth();
-  const [dropdownOpen, setDropdownOpen] = useState<string | null>(null);
-  const [expandedSections, setExpandedSections] = useState({
-    completed: true,
-    remaining: true,
-  });
   const [showInProgressStats, setShowInProgressStats] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement | null>(null);
+  const [view, setView] = useState<"board" | "heatmap">("board");
+  const [mobileColumn, setMobileColumn] = useState<
+    "remaining" | "inProgress" | "completed"
+  >("remaining");
+
+  // Restore the saved view on mount (client-only to avoid hydration mismatch).
+  useEffect(() => {
+    const saved = window.localStorage.getItem("myMajorView");
+    if (saved === "board" || saved === "heatmap") setView(saved);
+  }, []);
+
+  useEffect(() => {
+    window.localStorage.setItem("myMajorView", view);
+  }, [view]);
 
   //help button
   const [forceMajorTipOpen, setForceMajorTipOpen] = useState(false);
@@ -352,34 +191,6 @@ export default function MajorProgressView({
     } catch (error) {
       console.error("Error unskipping course:", error);
     }
-  };
-
-  useEffect(() => {
-    if (!dropdownOpen) return;
-    const handleClick = (e: MouseEvent) => {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(e.target as Node)
-      ) {
-        setDropdownOpen(null);
-      }
-    };
-    document.addEventListener("mousedown", handleClick);
-    return () => {
-      document.removeEventListener("mousedown", handleClick);
-    };
-  }, [dropdownOpen]);
-
-  const toggleDropdown = (reqKey: string, optCode: string) => {
-    const key = `${reqKey}-${optCode}`;
-    setDropdownOpen(dropdownOpen === key ? null : key);
-  };
-
-  const toggleSection = (section: keyof typeof expandedSections) => {
-    setExpandedSections((prev) => ({
-      ...prev,
-      [section]: !prev[section],
-    }));
   };
 
   const handleRemoveManualCourse = async (
@@ -468,9 +279,13 @@ export default function MajorProgressView({
   const completedCredits = progress?.completedCredits;
   const inProgressCredits = progress?.inProgressCredits || 0;
   const totalCredits = progress?.totalCredits;
-  const completionPercentage = progress?.percentage;
-  const withInProgressPercentage =
-    progress?.inProgressPercentage || progress?.percentage;
+  // Clamp to 0-100 so the bar fill can never render empty (NaN) or overflow.
+  const clampPct = (n: number | undefined) =>
+    Math.min(100, Math.max(0, Number.isFinite(n) ? (n as number) : 0));
+  const completionPercentage = clampPct(progress?.percentage);
+  const withInProgressPercentage = clampPct(
+    progress?.inProgressPercentage ?? progress?.percentage,
+  );
 
   /* ---------------------------
      NORMALIZATION + DEDUPE (memoized)
@@ -677,6 +492,108 @@ export default function MajorProgressView({
     [selectedMajor],
   );
 
+  // Completed requirements wrapped in the shared ReqStats shape
+  const completedStats: ReqStats[] = useMemo(
+    () =>
+      strictCompletedReqs.map((req: any) => {
+        const reqCompleted = req.options
+          .filter((o: any) => o.completed)
+          .reduce((s: number, o: any) => s + (o.credits || 0), 0);
+        const reqInProgress = req.options
+          .filter((o: any) => o.inProgress)
+          .reduce((s: number, o: any) => s + (o.credits || 0), 0);
+        return { req, reqCompleted, reqInProgress, notStarted: false };
+      }),
+    [strictCompletedReqs],
+  );
+
+  // Heat-map cells: every requirement, ordered by the major catalog
+  const heatCells: ReqStats[] = useMemo(() => {
+    const byName = new Map<string, ReqStats>();
+    for (const s of completedStats) byName.set(s.req.name, s);
+    for (const s of withStats) if (!byName.has(s.req.name)) byName.set(s.req.name, s);
+
+    const catalog = getReqsForMajor(selectedMajor);
+    if (!catalog) return Array.from(byName.values());
+
+    const ordered: ReqStats[] = [];
+    const seen = new Set<string>();
+    for (const r of catalog.requirements) {
+      const s = byName.get(r.name);
+      if (s) {
+        ordered.push(s);
+        seen.add(r.name);
+      }
+    }
+    for (const s of Array.from(byName.values()))
+      if (!seen.has(s.req.name)) ordered.push(s);
+    return ordered;
+  }, [completedStats, withStats, selectedMajor]);
+
+  const openRequirement = useCallback(
+    (req: any) =>
+      setReqModal({
+        isOpen: true,
+        req: {
+          id: req.id,
+          name: req.name,
+          description: req.description,
+          required: req.required,
+          options: req.options,
+        },
+      }),
+    [],
+  );
+
+  const cardHandlers = {
+    onOpenCourse: handleOpenCourse,
+    onUnskip: handleUnskip,
+    onRemoveManual: handleRemoveManualCourse,
+    onAddManual: handleAddManual,
+    onOpenRequirement: openRequirement,
+    onExcludeFromRequirement: handleExcludeFromRequirement,
+  };
+
+  const columns: {
+    key: "remaining" | "inProgress" | "completed";
+    label: string;
+    status: "notStarted" | "inProgress" | "completed";
+    items: ReqStats[];
+    credits: number;
+    emptyText: string;
+  }[] = [
+    {
+      key: "remaining",
+      label: "Remaining",
+      status: "notStarted",
+      items: idleReqs,
+      credits: progress.remainingCredits || 0,
+      emptyText: "Nothing left here. Nice work!",
+    },
+    {
+      key: "inProgress",
+      label: "In progress",
+      status: "inProgress",
+      items: inProgressReqs,
+      credits: inProgressCredits,
+      emptyText: "No requirements currently in progress.",
+    },
+    {
+      key: "completed",
+      label: "Completed",
+      status: "completed",
+      items: completedStats,
+      credits: completedCredits || 0,
+      emptyText:
+        "Nothing here yet! Upload your transcript on the My courses page to get started.",
+    },
+  ];
+
+  // Data not ready yet: show a skeleton instead of crashing on undefined stats.
+  if (!progress) {
+    return <MajorProgressLoadingSkeleton />;
+  }
+
   return (
     <div className="space-y-6 font-louize">
       {/* Header */}
@@ -700,19 +617,30 @@ export default function MajorProgressView({
       </div>
 
       {/* Progress bar + Stats toggle - Compact neumorphic */}
-      <div className="p-3 rounded-xl bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 border border-gray-200 dark:border-gray-800/50 shadow-neu">
-        <div className="w-full bg-gray-200 dark:bg-gray-950/60 rounded-full h-1.5 shadow-[inset_0_1px_2px_rgba(0,0,0,0.1)] dark:shadow-[inset_0_1px_2px_rgba(0,0,0,0.3)]">
+      <div
+        data-tour="major-progress-bar"
+        className="p-3 rounded-xl bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 border border-gray-200 dark:border-gray-800/50 shadow-neu"
+      >
+        <div className="relative w-full bg-gray-200 dark:bg-gray-800 rounded-full h-3 overflow-hidden shadow-[inset_0_1px_2px_rgba(0,0,0,0.08)] dark:shadow-[inset_0_1px_2px_rgba(0,0,0,0.3)]">
+          {/* Lighter in-progress segment sits behind, only in the +In Progress view. */}
+          {showInProgressStats && (
+            <motion.div
+              key="inprogress-fill"
+              initial={{ width: 0 }}
+              animate={{ width: `${withInProgressPercentage}%` }}
+              transition={{ duration: 1, ease: "easeOut" }}
+              className="absolute inset-y-0 left-0 rounded-full bg-purple-400 dark:bg-purple-500/70"
+            />
+          )}
+          {/* Solid completed segment paints on top. Re-keyed per mode so it
+              always animates to the correct completed width, including the
+              Completed Only view where it is the only fill shown. */}
           <motion.div
+            key={showInProgressStats ? "completed-fill-ip" : "completed-fill-only"}
             initial={{ width: 0 }}
-            animate={{
-              width: `${
-                showInProgressStats
-                  ? withInProgressPercentage
-                  : completionPercentage
-              }%`,
-            }}
+            animate={{ width: `${completionPercentage}%` }}
             transition={{ duration: 1, ease: "easeOut" }}
-            className="h-1.5 rounded-full bg-gradient-to-r from-purple-500 to-purple-600 shadow-[0_0_8px_rgba(168,85,247,0.45)]"
+            className="absolute inset-y-0 left-0 rounded-full bg-violet-500 shadow-[0_0_10px_rgba(139,92,246,0.6)]"
           />
         </div>
 
@@ -764,10 +692,15 @@ export default function MajorProgressView({
           ).toFixed(0)}%`}
           color="text-emerald-600 dark:text-emerald-300"
         />
+        <MajorStatCard
+          label="In-progress Credits"
+          value={`${inProgressCredits}`}
+          color="text-blue-600 dark:text-blue-300"
+          infoTooltip="Credits from courses you're currently taking that count toward this major but aren't finished yet."
+        />
       </div>
 
-      {/* <DegreeIntelligenceBlurb /> */}
-      <div className="p-1">
+      <div className="p-1" data-tour="major-manual-tip">
         <InfoCard
           autoHide
           previewText="A few tips on how to navigate this page. It's complex at first, we get it!"
@@ -779,265 +712,132 @@ export default function MajorProgressView({
           the "Fulfill manually" button for that requirement and add a course
           from your transcript; we'll automatically count it towards your major
           progress and requirements stats. This also applies, for example, for
-          interdepartmental courses and/or excpetions that your DUS has perhaps
+          interdepartmental courses and/or exceptions that your DUS has perhaps
           given you permission to use for a certain requirement, etc. Our
           platform is modular!
         </InfoCard>
       </div>
 
-      {/* Requirements Sections */}
-      <div className="space-y-6">
-        {/* Completed Requirements (STRICT after normalization) */}
-        {strictCompletedReqs.length > 0 && (
-          <div className="space-y-4">
+      {/* View switcher (sticky) + tip help */}
+      <div
+        data-tour="major-view-switcher"
+        className="sticky top-0 z-20 -mx-1 px-1 py-2 bg-gradient-to-b from-white via-white to-white/0 dark:from-gray-950 dark:via-gray-950 dark:to-gray-950/0 backdrop-blur-sm"
+      >
+        <div className="flex items-center justify-between gap-3 flex-wrap">
+          <div className="flex items-center gap-1.5">
+            <span className="text-[10px] text-gray-400 dark:text-gray-500 uppercase tracking-wider">
+              View:
+            </span>
             <button
-              onClick={() => toggleSection("completed")}
-              className="flex items-center gap-2 text-emerald-600 dark:text-emerald-300 hover:text-emerald-700 dark:hover:text-emerald-200 transition-colors"
+              type="button"
+              onClick={() => setView("board")}
+              data-tour="major-board-toggle"
+              className={`px-2.5 py-1 text-[11px] rounded-lg transition-all duration-200 ${
+                view === "board"
+                  ? "bg-purple-500/15 text-purple-600 dark:text-purple-300 border border-purple-600/40 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]"
+                  : "bg-gray-100 dark:bg-gray-900/50 text-gray-400 dark:text-gray-500 border border-gray-200 dark:border-gray-800/50 hover:text-gray-600 dark:hover:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-800/50"
+              }`}
             >
-              <motion.div
-                animate={{ rotate: expandedSections.completed ? 0 : -90 }}
-              >
-                <FiChevronDown />
-              </motion.div>
-              <h4 className="font-medium">
-                Completed ({progress.completedCredits}/{progress.totalCredits}{" "}
-                credits)
-              </h4>
+              Board
             </button>
-            <div className="p-1">
-              <MajorTipHelpButton
-                onClick={() => {
-                  resetMajorTipSeen("myMajorTipModalShown"); // optional: keep the "seen" logic in sync
-                  setForceMajorTipOpen(true); // opens instantly
-                }}
-                className="mt-2"
-              />
-            </div>
-            <MajorTipModal
-              storageKey="myMajorTipModalShown"
-              autoOpenOnMount
-              forceOpen={forceMajorTipOpen}
-              onDismiss={() => setForceMajorTipOpen(false)}
-            />
-            <AnimatePresence initial={false}>
-              {expandedSections.completed && (
-                <motion.div
-                  initial={false}
-                  layout
-                  exit={{ opacity: 0, height: 0 }}
-                  className="overflow-hidden"
-                >
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                    {strictCompletedReqs.map((req: any) => {
-                      const reqKey = req.id ?? req.name;
-                      const isFullyCompleted = true; // by construction
-
-                      return (
-                        <motion.div
-                          key={reqKey}
-                          layout
-                          initial={false}
-                          className={`p-3 hover:scale-[0.98] transition-all rounded-xl border cursor-pointer backdrop-blur-md shadow-neu-sm ${
-                            isFullyCompleted
-                              ? "bg-emerald-50 dark:bg-transparent dark:bg-gradient-to-br dark:from-emerald-950/30 dark:via-gray-900/50 dark:to-gray-950/50 border-emerald-200 dark:border-emerald-800/25 hover:border-emerald-300 dark:hover:border-emerald-600/35"
-                              : "bg-red-50 dark:bg-transparent dark:bg-gradient-to-br dark:from-red-950/30 dark:via-gray-900/50 dark:to-gray-950/50 border-red-200 dark:border-red-800/25 hover:border-red-300 dark:hover:border-red-600/35"
-                          }`}
-                          onClick={() =>
-                            setReqModal({
-                              isOpen: true,
-                              req: {
-                                id: req.id,
-                                name: req.name,
-                                description: req.description,
-                                required: req.required,
-                                options: req.options,
-                              },
-                            })
-                          }
-                          role="button"
-                          tabIndex={0}
-                          onKeyDown={(e) => {
-                            if (e.key === "Enter" || e.key === " ")
-                              setReqModal({
-                                isOpen: true,
-                                req: {
-                                  id: req.id,
-                                  name: req.name,
-                                  description: req.description,
-                                  required: req.required,
-                                  options: req.options,
-                                },
-                              });
-                          }}
-                        >
-                          <div className="flex justify-between items-start mb-1.5">
-                            <h5 className="font-medium text-sm text-emerald-700 dark:text-emerald-300">
-                              {req.name}
-                            </h5>
-                            <div className="flex items-center gap-2">
-                              <span className="text-[10px] bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 px-1.5 py-0.5 rounded-md border border-emerald-300 dark:border-emerald-700/30">
-                                ✓
-                              </span>
-                            </div>
-                          </div>
-                          {req.description && (
-                            <p className="text-[11px] mb-2 text-emerald-600 dark:text-emerald-300/70">
-                              {req.description}
-                            </p>
-                          )}
-                          <div className="flex flex-wrap gap-1.5">
-                            {req.options
-                              .filter(
-                                (opt: any) =>
-                                  opt.completed || opt.manual || opt.skipped,
-                              )
-                              .map((opt: any) => (
-                                <div
-                                  key={opt.code}
-                                  className={`relative px-2 py-0.5 rounded-full text-xs flex items-center group ${
-                                    opt.manual
-                                      ? "bg-purple-100 dark:bg-purple-900/20 text-purple-700 dark:text-purple-300 border border-purple-300 dark:border-purple-700"
-                                      : opt.completed
-                                        ? "bg-emerald-100 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-700"
-                                        : "bg-gray-200 dark:bg-gray-900/20 text-gray-600 dark:text-gray-300 border border-dashed border-gray-400 dark:border-gray-600"
-                                  }`}
-                                  onClick={(e) => e.stopPropagation()} // don't open modal when clicking the pill
-                                >
-                                  {opt.code}
-                                  <span className="ml-1 text-[0.65rem]">
-                                    ({opt.credits}cr
-                                    {opt.manual && ", manual"}
-                                    {opt.skipped && ", skipped"})
-                                  </span>
-                                  {/* X button for all fulfilled courses */}
-                                  <button
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      if (opt.skipped) {
-                                        handleUnskip(opt.code);
-                                      } else if (opt.manual) {
-                                        handleRemoveManualCourse(
-                                          opt.code,
-                                          req.name,
-                                        );
-                                      } else if (opt.completed) {
-                                        handleExcludeFromRequirement(
-                                          opt.code,
-                                          req.name,
-                                        );
-                                      }
-                                    }}
-                                    className={`ml-1 text-[0.65rem] transition-colors ${
-                                      opt.skipped || opt.manual
-                                        ? "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
-                                        : "text-emerald-600/60 dark:text-emerald-500/40 hover:text-red-500 dark:hover:text-red-400"
-                                    }`}
-                                    title={
-                                      opt.manual
-                                        ? "Remove manual course"
-                                        : opt.skipped
-                                          ? "Unskip this course"
-                                          : "Remove from this requirement"
-                                    }
-                                  >
-                                    <FiX size={10} />
-                                  </button>
-                                </div>
-                              ))}
-                          </div>
-                        </motion.div>
-                      );
-                    })}
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
-        )}
-
-        {/* Remaining Requirements (normalized + deduped + demoted) */}
-        {remainingForUI.length > 0 && (
-          <div className="space-y-4">
             <button
-              onClick={() => toggleSection("remaining")}
-              className="flex items-center gap-2 text-red-600 dark:text-red-300 hover:text-red-700 dark:hover:text-red-200 transition-colors"
+              type="button"
+              onClick={() => setView("heatmap")}
+              data-tour="major-heatmap-toggle"
+              className={`inline-flex items-center px-2.5 py-1 text-[11px] rounded-lg transition-all duration-200 ${
+                view === "heatmap"
+                  ? "bg-purple-500/15 text-purple-600 dark:text-purple-300 border border-purple-600/40 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]"
+                  : "bg-gray-100 dark:bg-gray-900/50 text-gray-400 dark:text-gray-500 border border-gray-200 dark:border-gray-800/50 hover:text-gray-600 dark:hover:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-800/50"
+              }`}
             >
-              <motion.div
-                animate={{ rotate: expandedSections.remaining ? 0 : -90 }}
-              >
-                <FiChevronDown />
-              </motion.div>
-              <h4 className="font-medium">
-                Remaining (
-                {remainingForUI.reduce(
-                  (total: number, req: any) => total + (req.required || 0),
-                  0,
-                )}{" "}
-                credits)
-              </h4>
+              Heat map
+              <span className="ml-1 px-1 py-0.5 rounded text-[8px] font-semibold uppercase tracking-wide bg-fuchsia-500/20 text-fuchsia-600 dark:text-fuchsia-300 border border-fuchsia-500/40">
+                New
+              </span>
             </button>
-
-            <AnimatePresence initial={false}>
-              {expandedSections.remaining && (
-                <motion.div
-                  initial={false}
-                  layout
-                  exit={{ opacity: 0, height: 0 }}
-                  className="overflow-hidden"
-                >
-                  <div className="space-y-6">
-                    {/* Subsection: In Progress */}
-                    <SectionGrid
-                      title="Currently in progress"
-                      subtitleClass="text-blue-600 dark:text-blue-300"
-                      items={inProgressReqs}
-                      onOpenCourse={handleOpenCourse}
-                      onUnskip={handleUnskip}
-                      onRemoveManual={handleRemoveManualCourse}
-                      onAddManual={(reqName) => handleAddManual(reqName)}
-                      onOpenRequirement={(req) =>
-                        setReqModal({
-                          isOpen: true,
-                          req: {
-                            id: req.id,
-                            name: req.name,
-                            description: req.description,
-                            required: req.required,
-                            options: req.options,
-                          },
-                        })
-                      }
-                    />
-
-                    {/* Subsection: Not started / No current progress */}
-                    <SectionGrid
-                      title="Not started / no current progress"
-                      subtitleClass="text-red-600 dark:text-red-300"
-                      items={idleReqs}
-                      onOpenCourse={handleOpenCourse}
-                      onUnskip={handleUnskip}
-                      onRemoveManual={handleRemoveManualCourse}
-                      onAddManual={(reqName) => handleAddManual(reqName)}
-                      onOpenRequirement={(req) =>
-                        setReqModal({
-                          isOpen: true,
-                          req: {
-                            id: req.id,
-                            name: req.name,
-                            description: req.description,
-                            required: req.required,
-                            options: req.options,
-                          },
-                        })
-                      }
-                    />
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
           </div>
-        )}
+          <MajorTipHelpButton
+            onClick={() => {
+              resetMajorTipSeen("myMajorTipModalShown");
+              setForceMajorTipOpen(true);
+            }}
+          />
+        </div>
       </div>
+
+      <MajorTipModal
+        storageKey="myMajorTipModalShown"
+        autoOpenOnMount={false}
+        forceOpen={forceMajorTipOpen}
+        onDismiss={() => setForceMajorTipOpen(false)}
+      />
+
+      {/* Board view: Remaining · In progress · Completed columns */}
+      {view === "board" && (
+        <div>
+          {/* Mobile column selector */}
+          <div className="md:hidden flex items-center gap-1.5 mb-3">
+            {columns.map((col) => (
+              <button
+                key={col.key}
+                type="button"
+                onClick={() => setMobileColumn(col.key)}
+                className={`flex-1 px-2 py-1.5 text-[11px] rounded-lg transition-all duration-200 border ${
+                  mobileColumn === col.key
+                    ? "bg-gray-100 dark:bg-gray-800/60 border-gray-300 dark:border-gray-700 text-gray-900 dark:text-white"
+                    : "bg-transparent border-gray-200 dark:border-gray-800/50 text-gray-400 dark:text-gray-500"
+                }`}
+              >
+                {col.label} ({col.items.length})
+              </button>
+            ))}
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4" data-tour="major-requirements-board">
+            {columns.map((col) => (
+              <div
+                key={col.key}
+                className={`${
+                  mobileColumn === col.key ? "flex" : "hidden"
+                } md:flex flex-col rounded-xl border border-gray-200 dark:border-gray-800/50 bg-white/40 dark:bg-gray-900/20 max-h-[70vh]`}
+              >
+                <div className="sticky top-0 z-10 flex items-center justify-between px-3 py-2.5 rounded-t-xl border-b border-gray-200 dark:border-gray-800/50 bg-white/80 dark:bg-gray-900/70 backdrop-blur-md">
+                  <h4
+                    className={`font-medium text-sm ${STATUS_CLASSES[col.status].accent}`}
+                  >
+                    {col.label}
+                  </h4>
+                  <span className="text-[10px] text-gray-500 dark:text-gray-400">
+                    {col.items.length} reqs · {col.credits} cr
+                  </span>
+                </div>
+                <div className="overflow-y-auto p-3 space-y-3">
+                  {col.items.length === 0 ? (
+                    <p className="text-xs text-gray-500 dark:text-gray-500">
+                      {col.emptyText}
+                    </p>
+                  ) : (
+                    col.items.map((stats) => (
+                      <RequirementCard
+                        key={stats.req.id ?? stats.req.name}
+                        stats={stats}
+                        handlers={cardHandlers}
+                      />
+                    ))
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Heat map view */}
+      {view === "heatmap" && (
+        <div data-tour="major-heatmap-view">
+          <HeatMapView cells={heatCells} onOpenRequirement={openRequirement} />
+        </div>
+      )}
 
       {/* Course Info Modal */}
       <CourseModal

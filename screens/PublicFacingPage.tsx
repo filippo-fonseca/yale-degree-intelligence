@@ -38,6 +38,7 @@ import LoginPage from "@/components/LoginPage";
 import dynamic from "next/dynamic";
 import { GraduationCap, BookOpen, Award, Clock } from "lucide-react";
 import CosmicBackground from "@/components/CosmicBackground/page";
+import HeroConstellation from "@/components/landing/HeroConstellation";
 
 function CountUp({
   to,
@@ -170,6 +171,75 @@ export default function AboutPage() {
     ((demoTotals.completed + demoTotals.inProgress) / demoTotals.total) * 100,
   );
 
+  // Mock requirement cards mirroring the real MajorProgressView layout:
+  // status-colored card + n/N badge + course pills (emerald=complete,
+  // blue=in progress, red=not taken). Marketing preview only, no fetching.
+  type DemoPill = {
+    code: string;
+    cr: number;
+    status: "complete" | "in-progress" | "not-taken";
+  };
+  type DemoReq = {
+    name: string;
+    have: number;
+    required: number;
+    status: "in-progress" | "not-started";
+    desc: string;
+    pills: DemoPill[];
+  };
+  const demoReqs: DemoReq[] = [
+    {
+      name: "Introductory Sequence",
+      have: 2,
+      required: 2,
+      status: "in-progress",
+      desc: "Two foundational courses.",
+      pills: [
+        { code: "CPSC 201", cr: 1, status: "complete" },
+        { code: "CPSC 202", cr: 1, status: "complete" },
+      ],
+    },
+    {
+      name: "Core Systems",
+      have: 1,
+      required: 3,
+      status: "in-progress",
+      desc: "Three systems-level courses.",
+      pills: [
+        { code: "CPSC 223", cr: 1, status: "complete" },
+        { code: "CPSC 323", cr: 1, status: "in-progress" },
+        { code: "CPSC 365", cr: 1, status: "not-taken" },
+      ],
+    },
+    {
+      name: "Mathematics",
+      have: 0,
+      required: 2,
+      status: "not-started",
+      desc: "Two math electives.",
+      pills: [
+        { code: "MATH 222", cr: 1, status: "not-taken" },
+        { code: "MATH 241", cr: 1, status: "not-taken" },
+      ],
+    },
+  ];
+
+  // Mock heat-map grid: each cell is a requirement's fulfilment state.
+  const demoHeat: Array<"complete" | "in-progress" | "not-taken"> = [
+    "complete",
+    "complete",
+    "complete",
+    "in-progress",
+    "complete",
+    "in-progress",
+    "in-progress",
+    "not-taken",
+    "complete",
+    "not-taken",
+    "not-taken",
+    "not-taken",
+  ];
+
   if (logInFlow) return <LoginPage onBackClick={() => setLogInFlow(false)} />;
 
   return (
@@ -227,6 +297,8 @@ export default function AboutPage() {
 
       {/* Hero Section */}
       <div className="relative pt-6 sm:pt-8l">
+        {/* Cursor-adaptive constellation background (sits behind hero content) */}
+        <HeroConstellation />
         {/* increased top padding to fix logo spacing */}
         <div className="max-w-6xl mx-auto px-4 pb-3 sm:px-6 lg:px-8 relative z-10">
           <motion.div
@@ -941,7 +1013,133 @@ export default function AboutPage() {
             </div>
           </div>
 
-          <div className="mt-4">
+          {/* Requirement cards — mirrors the real MajorProgressView grid */}
+          <div className="mt-6">
+            <div className="flex items-center justify-between mb-2.5">
+              <h4 className="text-sm font-medium text-gray-900 dark:text-white">
+                Requirements
+              </h4>
+              <div className="flex items-center gap-2.5 text-[10px] text-gray-500 dark:text-gray-400">
+                <span className="flex items-center gap-1">
+                  <span className="w-2 h-2 rounded-full bg-emerald-400" /> Complete
+                </span>
+                <span className="flex items-center gap-1">
+                  <span className="w-2 h-2 rounded-full bg-blue-400" /> In progress
+                </span>
+                <span className="flex items-center gap-1">
+                  <span className="w-2 h-2 rounded-full bg-red-400" /> Not taken
+                </span>
+              </div>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+              {demoReqs.map((req, i) => {
+                const inProgress = req.status === "in-progress";
+                return (
+                  <motion.div
+                    key={req.name}
+                    initial={{ opacity: 0, y: 12 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, amount: 0.4 }}
+                    transition={{ duration: 0.45, delay: i * 0.08 }}
+                    className={`p-3 rounded-xl backdrop-blur-md border transition-all relative shadow-neu-sm ${
+                      inProgress
+                        ? "bg-blue-50 dark:bg-transparent dark:bg-gradient-to-br dark:from-blue-950/40 dark:via-gray-900/50 dark:to-gray-950/50 border-blue-200 dark:border-blue-800/30"
+                        : "bg-red-50 dark:bg-transparent dark:bg-gradient-to-br dark:from-red-950/30 dark:via-gray-900/50 dark:to-gray-950/50 border-red-200 dark:border-red-800/25"
+                    }`}
+                  >
+                    <div className="flex justify-between items-start mb-1.5">
+                      <h5
+                        className={`font-medium text-sm ${
+                          inProgress
+                            ? "text-blue-600 dark:text-blue-300"
+                            : "text-red-600 dark:text-red-300"
+                        }`}
+                      >
+                        {req.name}
+                      </h5>
+                      <span
+                        className={`text-[10px] px-1.5 py-0.5 rounded-md ${
+                          inProgress
+                            ? "bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-300 border border-blue-300 dark:border-blue-700/30"
+                            : "bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-300 border border-red-300 dark:border-red-700/30"
+                        }`}
+                      >
+                        {req.have}/{req.required}
+                      </span>
+                    </div>
+                    <p
+                      className={`text-[11px] mb-2 ${
+                        inProgress
+                          ? "text-blue-500 dark:text-blue-300/70"
+                          : "text-red-500 dark:text-red-300/70"
+                      }`}
+                    >
+                      {req.desc}
+                    </p>
+                    <div className="flex flex-wrap gap-1.5">
+                      {req.pills.map((opt) => (
+                        <div
+                          key={opt.code}
+                          className={`relative px-2 py-0.5 rounded-full text-xs flex items-center ${
+                            opt.status === "complete"
+                              ? "bg-emerald-100 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-700"
+                              : opt.status === "in-progress"
+                                ? "bg-blue-100 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 border border-blue-300 dark:border-blue-700"
+                                : "bg-red-100 dark:bg-red-900/20 text-red-700 dark:text-red-300 border border-red-300 dark:border-red-700"
+                          }`}
+                        >
+                          {opt.code}
+                          <span className="ml-1 text-[0.65rem]">
+                            ({opt.cr}cr
+                            {opt.status === "in-progress"
+                              ? ", in progress"
+                              : opt.status === "complete"
+                                ? ", complete"
+                                : ""}
+                            )
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </motion.div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Requirement heat map — color-coded fulfilment grid */}
+          <div className="mt-6">
+            <h4 className="text-sm font-medium text-gray-900 dark:text-white mb-2.5">
+              Requirement heat map
+            </h4>
+            <div className="grid grid-cols-6 sm:grid-cols-12 gap-1.5">
+              {demoHeat.map((cell, i) => (
+                <motion.div
+                  key={i}
+                  initial={{ opacity: 0, scale: 0.6 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  viewport={{ once: true, amount: 0.4 }}
+                  transition={{ duration: 0.3, delay: i * 0.03 }}
+                  title={
+                    cell === "complete"
+                      ? "Complete"
+                      : cell === "in-progress"
+                        ? "In progress"
+                        : "Not taken"
+                  }
+                  className={`aspect-square rounded-md border ${
+                    cell === "complete"
+                      ? "bg-emerald-500/20 border-emerald-500/40 dark:bg-emerald-500/15"
+                      : cell === "in-progress"
+                        ? "bg-blue-500/20 border-blue-500/40 dark:bg-blue-500/15"
+                        : "bg-red-500/15 border-red-500/30 dark:bg-red-500/10"
+                  }`}
+                />
+              ))}
+            </div>
+          </div>
+
+          <div className="mt-6">
             <button
               className="px-4 py-2 text-sm rounded-xl bg-gradient-to-r from-pink-500/30 to-blue-500/30 hover:from-pink-500/40 hover:to-blue-500/40 text-white border border-white/[0.1] shadow-[0_4px_16px_rgba(236,72,153,0.25),inset_0_1px_0_rgba(255,255,255,0.15)] transition-all duration-200"
               onClick={() => setLogInFlow(true)}

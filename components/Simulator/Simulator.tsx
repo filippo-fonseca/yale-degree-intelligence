@@ -112,6 +112,16 @@ function isPastSemester(semesterName: string) {
   return false;
 }
 
+// The active term today, using the same June 1 cutoff as isPastSemester:
+// Jan–May → Spring, June–Dec → Fall.
+function isCurrentSemester(semesterName: string) {
+  const [sem, yearStr] = semesterName.split(" ");
+  const now = new Date();
+  if (parseInt(yearStr, 10) !== now.getFullYear()) return false;
+  const currentSem = now.getMonth() < 5 ? "Spring" : "Fall";
+  return sem === currentSem;
+}
+
 // ----------------- Component -----------------
 export default function Simulator({
   remainingCourses,
@@ -168,6 +178,9 @@ export default function Simulator({
   // keep initial snapshot to detect changes
   const initialSemestersRef = useRef<Semester[]>([]);
   const initialManualReqsRef = useRef<ManualRequirementEntry[]>([]);
+  // True once a saved plan has been loaded, so the blank-grid rebuild effect
+  // does not clobber the loaded plan when remaining/completed courses change.
+  const planLoadedRef = useRef(false);
 
   // majors to compute – only the user's declared majors
   const majorIds = useMemo<string[]>(() => userMajors, [userMajors]);
@@ -275,6 +288,9 @@ export default function Simulator({
 
   // ------------ Build initial semesters & pools ------------
   useEffect(() => {
+    // Once a saved plan is loaded, don't rebuild the blank grid on top of it
+    // (remaining/completed courses can settle after the plan loads).
+    if (planLoadedRef.current) return;
     // 1) Build semester list starting from earliest known term or grad - 4y
     let semestersArr: Semester[] = [];
     let startYear = graduationYear - 4;
@@ -408,10 +424,13 @@ export default function Simulator({
           } catch {
             // ignore
           }
+          const newest = [...plans].sort((a, b) =>
+            (b.createdAt || "").localeCompare(a.createdAt || ""),
+          )[0];
           const toLoad =
             plans.find((p) => p.name === recentName) ||
             plans.find((p) => p.isDefault) ||
-            plans[0];
+            newest;
           if (toLoad) loadPlanData(toLoad);
         } else {
           // Brand-new user with no plans → show the welcome modal.
@@ -662,6 +681,8 @@ export default function Simulator({
 
   // Helper to load a plan from Plan object directly
   const loadPlanData = (plan: Plan) => {
+    // Mark that a plan is loaded so the blank-grid rebuild effect won't clobber it.
+    planLoadedRef.current = true;
     setSemesters(plan.semesters);
     setSimulatorManualReqs(plan.manualRequirements ?? []);
     initialSemestersRef.current = JSON.parse(
@@ -800,9 +821,6 @@ export default function Simulator({
     setCurrentPlanName(null);
   };
 
-  const hasInProgress = (semester: Semester) =>
-    semester.courses.some((c) => c.status === "in-progress");
-
   // ----------------- Render -----------------
   return (
     <div
@@ -834,21 +852,24 @@ export default function Simulator({
       >
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
           {/* Current Plan Status */}
-          <div className="flex items-center gap-3">
-            <span className="text-xs text-gray-400 dark:text-gray-500 uppercase tracking-wider">
+          <div className="flex items-center gap-3 min-w-0 sm:flex-1">
+            <span className="text-xs text-gray-400 dark:text-gray-500 uppercase tracking-wider shrink-0">
               Plan:
             </span>
-            <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-black/[0.04] dark:bg-white/[0.04] border border-black/[0.06] dark:border-white/[0.08]">
+            <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-black/[0.04] dark:bg-white/[0.04] border border-black/[0.06] dark:border-white/[0.08] min-w-0 max-w-full">
               {currentPlanName ? (
                 <>
                   <div
-                    className={`w-2.5 h-2.5 rounded-full ${hasChanges ? "bg-amber-400 animate-pulse" : "bg-emerald-400"}`}
+                    className={`w-2.5 h-2.5 rounded-full shrink-0 ${hasChanges ? "bg-amber-400 animate-pulse" : "bg-emerald-400"}`}
                   />
-                  <span className="text-base font-medium text-gray-800 dark:text-gray-200">
+                  <span
+                    className="text-base font-medium text-gray-800 dark:text-gray-200 truncate"
+                    title={currentPlanName}
+                  >
                     {currentPlanName}
                   </span>
                   {hasChanges && (
-                    <span className="text-xs text-amber-400 ml-1 px-2 py-0.5 rounded-full bg-amber-400/10 border border-amber-400/20">
+                    <span className="text-xs text-amber-400 ml-1 px-2 py-0.5 rounded-full bg-amber-400/10 border border-amber-400/20 shrink-0">
                       unsaved
                     </span>
                   )}
@@ -867,7 +888,7 @@ export default function Simulator({
           </div>
 
           {/* Action Buttons */}
-          <div className="flex items-center gap-2 flex-wrap">
+          <div className="flex items-center gap-2 flex-wrap shrink-0" data-tour="simulator-plan-actions">
             <button
               onClick={() => setShowHelp((v) => !v)}
               className="px-4 py-2 text-sm rounded-xl bg-black/[0.04] dark:bg-white/[0.04] backdrop-blur-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-black/[0.06] dark:hover:bg-white/[0.08] border border-black/[0.06] dark:border-white/[0.08] flex items-center gap-2 transition-all"
@@ -948,7 +969,7 @@ export default function Simulator({
       </AnimatePresence>
 
       {/* Live Major Progress Preview */}
-      <div className="space-y-3">
+      <div className="space-y-3" data-tour="simulator-live-progress">
         <button
           onClick={() => setShowMajorPreview((v) => !v)}
           className="w-full flex items-start justify-between text-left group"
@@ -1010,13 +1031,13 @@ export default function Simulator({
       </div>
 
       {/* Available Courses Pool */}
-      <div className="sticky top-[72px] z-20 mb-2">
+      <div className="sticky top-[72px] z-20 mb-2" data-tour="simulator-course-pool">
         <div className="bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-pink-950/30 dark:via-gray-900/50 dark:to-gray-950/50 backdrop-blur-md rounded-xl border border-pink-200 dark:border-pink-800/30 shadow-[inset_0_1px_0_rgba(255,255,255,0.04),0_4px_16px_rgba(0,0,0,0.08)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.04),0_4px_16px_rgba(0,0,0,0.25)] overflow-hidden">
           <button
             onClick={() => setShowPool(!showPool)}
             className={`flex items-center justify-between w-full p-3 ${
               showPool ? "border-b border-pink-200 dark:border-pink-800/30" : ""
-            } text-gray-700 dark:text-gray-300 hover:bg-pink-50 dark:hover:bg-pink-900/20 transition-colors`}
+            } text-gray-700 dark:text-gray-300 hover:bg-black/[0.04] dark:hover:bg-white/[0.06] transition-colors`}
           >
             <div className="flex items-center gap-2 font-medium text-sm">
               <div>Quick-add: Pool of remaining courses from your major</div>
@@ -1076,7 +1097,7 @@ export default function Simulator({
       </div>
 
       {/* Semesters Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3" data-tour="simulator-board">
         {semesters.map((semester) => {
           const semCredits = getSemesterCredits(semester);
           const semCreditsLabel = Number.isInteger(semCredits)
@@ -1099,7 +1120,7 @@ export default function Simulator({
               }}
               className={`bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 backdrop-blur-md rounded-xl border p-3 min-h-[160px] flex flex-col transition-all shadow-[inset_0_1px_0_rgba(255,255,255,0.04),0_4px_12px_rgba(0,0,0,0.08)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.04),0_4px_12px_rgba(0,0,0,0.2)]
                 ${
-                  hasInProgress(semester)
+                  isCurrentSemester(semester.name)
                     ? "border-blue-700/50 ring-1 ring-blue-500/30"
                     : "border-gray-200 dark:border-gray-800/50"
                 }
@@ -1125,6 +1146,7 @@ export default function Simulator({
                   {!isPastSemester(semester.name) && (
                     <button
                       onClick={() => setLookupSemesterId(semester.id)}
+                      data-tour="simulator-semester-add"
                       className="px-1.5 py-0.5 text-[10px] rounded-md bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 hover:bg-blue-200 dark:hover:bg-blue-800/40 border border-blue-300 dark:border-blue-800/40 transition-all"
                       type="button"
                     >

@@ -6,11 +6,11 @@ import { FiSend, FiRefreshCw } from "react-icons/fi";
 import { useAuth } from "@/context/AuthContext";
 import { Course, Message } from "@/lib/types";
 import { calculateMajorProgress } from "@/lib/majors";
-import { getCourseNameFromCode } from "@/lib/courseCatalog";
 import BulldogIcon from "@/icons/BulldogIcon";
 import { db } from "@/config/firebase";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import ReactMarkdown from "react-markdown";
+import { streamDan, DanMessage } from "@/lib/dan/client";
 
 interface CleoAITabProps {
   courses: Course[];
@@ -31,6 +31,8 @@ export default function CleoAITab({
   const [isLoading, setIsLoading] = useState(false);
   const [isInitialized, setIsInitialized] = useState(false);
   const [contextHash, setContextHash] = useState("");
+  const [thinkingChip, setThinkingChip] = useState<string | null>(null);
+  const [noKeyError, setNoKeyError] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Calculate progress for ALL majors (for double majors)
@@ -144,8 +146,19 @@ What can I help you with? I can help plan your schedule, find courses that count
     }
   }, [user, isInitialized]);
 
+  const toolLabels: Record<string, string> = {
+    get_major_progress: "Checking your major progress…",
+    preview_plan: "Simulating that plan…",
+    search_catalog: "Searching the course catalog…",
+    get_course: "Looking up that course…",
+    list_my_courses: "Reviewing your courses…",
+    get_distributional_progress: "Checking your distributionals…",
+  };
+
   const handleSendMessage = async () => {
     if (!input.trim() || isLoading || !user) return;
+
+    setNoKeyError(false);
 
     const userMessage: Message = {
       id: Date.now().toString(),
@@ -154,83 +167,85 @@ What can I help you with? I can help plan your schedule, find courses that count
       timestamp: new Date().toISOString(),
     };
 
-    const updatedMessages = [...messages, userMessage];
+    // Build the messages array including history + new user message.
+    // Map Message (role: "system"|"user"|"assistant") to DanMessage (role: "user"|"assistant").
+    // System-role messages from the app's own welcome/history are omitted since Dan's backend
+    // handles system context itself; only user/assistant turns are forwarded.
+    const historyForDan: DanMessage[] = messages
+      .filter((m) => m.role === "user" || m.role === "assistant")
+      .map((m) => ({ role: m.role as "user" | "assistant", content: m.content }));
+
+    const danMessages: DanMessage[] = [
+      ...historyForDan,
+      { role: "user", content: input },
+    ];
+
+    // Add user message and a blank in-progress assistant message to state.
+    const assistantPlaceholderId = (Date.now() + 1).toString();
+    const updatedMessages: Message[] = [
+      ...messages,
+      userMessage,
+      {
+        id: assistantPlaceholderId,
+        content: "",
+        role: "assistant",
+        timestamp: new Date().toISOString(),
+      },
+    ];
     setMessages(updatedMessages);
     setInput("");
     setIsLoading(true);
 
-    try {
-      const context = {
-        user: {
-          name: user.displayName,
-          email: user.email,
-          graduationYear: userProfile?.graduationYear,
-          majors: userProfile?.majors,
-        },
-        academicData: {
-          courses: courses.map((c) => ({
-            code: c.code,
-            name: getCourseNameFromCode(c.code),
-            semester: c.semester,
-            year: c.year,
-            grade: c.grade,
-            credits: c.credits,
-            status: c.status,
-            skipped: c.skipped,
-          })),
-          stats: {
-            gpa: stats?.gpa,
-            totalCredits: stats?.totalCredits,
-            completedCourses: stats?.completedCourses,
-            inProgressCourses: stats?.inProgressCourses,
-          },
-          majorProgress,
-          allMajorProgress, // Progress for ALL majors (double major support)
-        },
-        lastContextHash: contextHash,
-        // Send last 20 messages for good conversation memory
-        conversationHistory: messages.slice(-20).map((m) => ({
-          role: m.role,
-          content: m.content,
-        })),
-      };
-
-      const response = await fetch("/api/cleoai", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          prompt: input,
-          context: JSON.stringify(context),
-        }),
-      });
-
-      const data = await response.json();
-
-      if (data.error) throw new Error(data.error);
-
-      const aiMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        content: data.response,
-        role: "assistant",
-        timestamp: new Date().toISOString(),
-      };
-
-      const finalMessages = [...updatedMessages, aiMessage];
-      setMessages(finalMessages);
-      setContextHash(currentHash);
-      await saveConversation(finalMessages, currentHash);
-    } catch (error) {
-      console.error("Error:", error);
-      const errorMsg: Message = {
-        id: (Date.now() + 1).toString(),
-        content: "Sorry, something went wrong. Please try again.",
-        role: "assistant",
-        timestamp: new Date().toISOString(),
-      };
-      setMessages([...updatedMessages, errorMsg]);
-    } finally {
-      setIsLoading(false);
-    }
+    await streamDan(danMessages, {
+      onText: (delta: string) => {
+        // Clear thinking chip as soon as text arrives.
+        setThinkingChip(null);
+        // Append delta to the last assistant message in state.
+        setMessages((prev) => {
+          const copy = [...prev];
+          const lastIdx = copy.length - 1;
+          if (copy[lastIdx]?.role === "assistant") {
+            copy[lastIdx] = { ...copy[lastIdx], content: copy[lastIdx].content + delta };
+          }
+          return copy;
+        });
+      },
+      onTool: (name: string) => {
+        setThinkingChip(toolLabels[name] ?? "Thinking…");
+      },
+      onDone: () => {
+        setThinkingChip(null);
+        setIsLoading(false);
+        // Persist the final messages array to Firestore.
+        setMessages((prev) => {
+          saveConversation(prev, currentHash);
+          return prev;
+        });
+        setContextHash(currentHash);
+      },
+      onError: (error: string) => {
+        setThinkingChip(null);
+        setIsLoading(false);
+        if (error === "NO_KEY") {
+          setNoKeyError(true);
+          // Remove the blank assistant placeholder since we won't stream into it.
+          setMessages((prev) => prev.filter((m) => m.id !== assistantPlaceholderId));
+        } else {
+          // Replace blank placeholder with an error bubble.
+          setMessages((prev) => {
+            const copy = [...prev];
+            const lastIdx = copy.length - 1;
+            if (copy[lastIdx]?.id === assistantPlaceholderId) {
+              copy[lastIdx] = {
+                ...copy[lastIdx],
+                content: error || "Sorry, something went wrong. Please try again.",
+              };
+            }
+            return copy;
+          });
+        }
+      },
+    });
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -266,49 +281,74 @@ What can I help you with? I can help plan your schedule, find courses that count
         </button>
       </div>
 
+      {/* NO_KEY banner */}
+      {noKeyError && (
+        <div className="mb-3 px-3 py-2.5 rounded-xl bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/40 text-amber-800 dark:text-amber-300 text-xs">
+          Connect your Anthropic API key in Settings to chat with Dan.
+        </div>
+      )}
+
       {/* Messages */}
       <div className="flex-1 overflow-y-auto space-y-3 mb-3">
-        {messages.map((message) => (
-          <motion.div
-            key={message.id}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}
-          >
-            <div
-              className={`max-w-[85%] rounded-xl p-3 backdrop-blur-md shadow-[inset_0_1px_0_rgba(255,255,255,0.04),0_4px_12px_rgba(0,0,0,0.15)] ${
-                message.role === "user"
-                  ? "bg-gradient-to-br from-blue-100 to-blue-50 dark:from-blue-900/40 dark:to-blue-950/40 text-blue-900 dark:text-blue-100 border border-blue-300/60 dark:border-blue-700/30"
-                  : "bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 text-gray-800 dark:text-gray-200 border border-gray-200 dark:border-gray-800/50"
-              }`}
+        {messages.map((message, idx) => {
+          const isLastAssistant =
+            message.role === "assistant" && idx === messages.length - 1 && isLoading;
+          return (
+            <motion.div
+              key={message.id}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}
             >
-              {message.role === "assistant" && (
-                <div className="flex items-center gap-1.5 mb-1.5">
-                  <BulldogIcon className="w-3.5 h-3.5 text-blue-400" />
-                  <span className="text-[10px] font-medium text-gray-400 dark:text-gray-500">Dan</span>
-                </div>
-              )}
-              <div className="prose prose-sm dark:prose-invert max-w-none prose-p:my-1 prose-ul:my-1 prose-li:my-0 text-sm">
-                <ReactMarkdown>{message.content}</ReactMarkdown>
+              <div
+                className={`max-w-[85%] rounded-xl p-3 backdrop-blur-md shadow-[inset_0_1px_0_rgba(255,255,255,0.04),0_4px_12px_rgba(0,0,0,0.15)] ${
+                  message.role === "user"
+                    ? "bg-gradient-to-br from-blue-100 to-blue-50 dark:from-blue-900/40 dark:to-blue-950/40 text-blue-900 dark:text-blue-100 border border-blue-300/60 dark:border-blue-700/30"
+                    : "bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 text-gray-800 dark:text-gray-200 border border-gray-200 dark:border-gray-800/50"
+                }`}
+              >
+                {message.role === "assistant" && (
+                  <div className="flex items-center gap-1.5 mb-1.5">
+                    <BulldogIcon className="w-3.5 h-3.5 text-blue-400" />
+                    <span className="text-[10px] font-medium text-gray-400 dark:text-gray-500">Dan</span>
+                  </div>
+                )}
+                {/* Thinking chip: shown inside the in-progress assistant bubble */}
+                {isLastAssistant && thinkingChip && message.content === "" && (
+                  <div className="flex items-center gap-1.5 animate-pulse">
+                    <div className="w-1.5 h-1.5 rounded-full bg-blue-400" />
+                    <span className="text-[10px] text-gray-400 dark:text-gray-500 italic">{thinkingChip}</span>
+                  </div>
+                )}
+                {/* Show bouncing dots when loading but no tool chip and no content yet */}
+                {isLastAssistant && !thinkingChip && message.content === "" && (
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-[10px] text-gray-400 dark:text-gray-500">Dan is sniffing around...</span>
+                    <div className="flex space-x-1 ml-0.5">
+                      <div className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-bounce" />
+                      <div className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-bounce" style={{ animationDelay: "0.1s" }} />
+                      <div className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-bounce" style={{ animationDelay: "0.2s" }} />
+                    </div>
+                  </div>
+                )}
+                {message.content && (
+                  <>
+                    <div className="prose prose-sm dark:prose-invert max-w-none prose-p:my-1 prose-ul:my-1 prose-li:my-0 text-sm">
+                      <ReactMarkdown>{message.content}</ReactMarkdown>
+                    </div>
+                    {/* Thinking chip shown alongside streaming content */}
+                    {isLastAssistant && thinkingChip && (
+                      <div className="flex items-center gap-1.5 mt-1.5 animate-pulse">
+                        <div className="w-1.5 h-1.5 rounded-full bg-blue-400" />
+                        <span className="text-[10px] text-gray-400 dark:text-gray-500 italic">{thinkingChip}</span>
+                      </div>
+                    )}
+                  </>
+                )}
               </div>
-            </div>
-          </motion.div>
-        ))}
-        {isLoading && (
-          <div className="flex justify-start">
-            <div className="rounded-xl p-3 bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 backdrop-blur-md border border-gray-200 dark:border-gray-800/50 shadow-[inset_0_1px_0_rgba(255,255,255,0.04),0_4px_12px_rgba(0,0,0,0.15)]">
-              <div className="flex items-center gap-1.5">
-                <BulldogIcon className="w-3.5 h-3.5 text-blue-400" />
-                <span className="text-[10px] text-gray-400 dark:text-gray-500">Dan is sniffing around...</span>
-              </div>
-              <div className="flex space-x-1 mt-1.5">
-                <div className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-bounce" />
-                <div className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-bounce" style={{ animationDelay: "0.1s" }} />
-                <div className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-bounce" style={{ animationDelay: "0.2s" }} />
-              </div>
-            </div>
-          </div>
-        )}
+            </motion.div>
+          );
+        })}
         <div ref={messagesEndRef} />
       </div>
 

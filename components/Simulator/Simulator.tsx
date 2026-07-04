@@ -112,6 +112,16 @@ function isPastSemester(semesterName: string) {
   return false;
 }
 
+// The active term today, using the same June 1 cutoff as isPastSemester:
+// Jan–May → Spring, June–Dec → Fall.
+function isCurrentSemester(semesterName: string) {
+  const [sem, yearStr] = semesterName.split(" ");
+  const now = new Date();
+  if (parseInt(yearStr, 10) !== now.getFullYear()) return false;
+  const currentSem = now.getMonth() < 5 ? "Spring" : "Fall";
+  return sem === currentSem;
+}
+
 // ----------------- Component -----------------
 export default function Simulator({
   remainingCourses,
@@ -811,9 +821,6 @@ export default function Simulator({
     setCurrentPlanName(null);
   };
 
-  const hasInProgress = (semester: Semester) =>
-    semester.courses.some((c) => c.status === "in-progress");
-
   // ----------------- Render -----------------
   return (
     <div
@@ -1113,7 +1120,7 @@ export default function Simulator({
               }}
               className={`bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 backdrop-blur-md rounded-xl border p-3 min-h-[160px] flex flex-col transition-all shadow-[inset_0_1px_0_rgba(255,255,255,0.04),0_4px_12px_rgba(0,0,0,0.08)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.04),0_4px_12px_rgba(0,0,0,0.2)]
                 ${
-                  hasInProgress(semester)
+                  isCurrentSemester(semester.name)
                     ? "border-blue-700/50 ring-1 ring-blue-500/30"
                     : "border-gray-200 dark:border-gray-800/50"
                 }

@@ -8,8 +8,10 @@ import { useTheme } from "@/context/ThemeContext";
 import { ADMIN_EMAIL } from "@/lib/admin";
 import {
   Area,
-  AreaChart,
+  Bar,
   CartesianGrid,
+  ComposedChart,
+  Legend,
   ResponsiveContainer,
   Tooltip,
   XAxis,
@@ -32,7 +34,7 @@ import {
 } from "lucide-react";
 
 type Entry = { label: string; value: number };
-type UsersOverTimePoint = { month: string; count: number; cumulative: number };
+type UsersOverTimePoint = { weekStart: string; count: number; cumulative: number };
 type AdminStats = {
   generatedAt: string;
   overview: Record<string, number>;
@@ -145,12 +147,67 @@ function BarList({
   );
 }
 
-const formatMonthLabel = (month: string) => {
-  const [year, m] = month.split("-");
-  if (!year || !m) return month;
-  const date = new Date(Number(year), Number(m) - 1, 1);
-  return date.toLocaleDateString(undefined, { month: "short", year: "2-digit" });
+// Short "Mar 3" axis label for a week-start ISO date ("YYYY-MM-DD", UTC).
+const formatWeekLabel = (weekStart: string) => {
+  const [y, m, d] = weekStart.split("-").map(Number);
+  if (!y || !m || !d) return weekStart;
+  const date = new Date(Date.UTC(y, m - 1, d));
+  return date.toLocaleDateString(undefined, {
+    month: "short",
+    day: "numeric",
+    timeZone: "UTC",
+  });
 };
+
+// Longer "Week of Mar 3, 2025" label for the tooltip header.
+const formatWeekTooltip = (weekStart: string) => {
+  const [y, m, d] = weekStart.split("-").map(Number);
+  if (!y || !m || !d) return weekStart;
+  const date = new Date(Date.UTC(y, m - 1, d));
+  return `Week of ${date.toLocaleDateString(undefined, {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+    timeZone: "UTC",
+  })}`;
+};
+
+// Styled, dark-mode-aware tooltip showing the week plus both series values.
+function UsersOverTimeTooltip({
+  active,
+  payload,
+  label,
+  isDark,
+}: {
+  active?: boolean;
+  payload?: { dataKey?: string | number; value?: number }[];
+  label?: string | number;
+  isDark: boolean;
+}) {
+  if (!active || !payload || payload.length === 0) return null;
+  const byKey = (key: string) =>
+    payload.find((p) => p.dataKey === key)?.value ?? 0;
+  return (
+    <div
+      className="rounded-xl border px-3 py-2 text-xs shadow-lg"
+      style={{
+        border: isDark ? "1px solid rgba(255,255,255,0.08)" : "1px solid rgba(0,0,0,0.08)",
+        background: isDark ? "#0a0a0a" : "#ffffff",
+        color: isDark ? "#f9fafb" : "#111827",
+      }}
+    >
+      <p className="mb-1 font-semibold">{formatWeekTooltip(String(label))}</p>
+      <p className="flex items-center gap-1.5">
+        <span className="inline-block h-2 w-2 rounded-full" style={{ background: "#7c3aed" }} />
+        Total users: <span className="font-semibold">{formatNumber(byKey("cumulative"))}</span>
+      </p>
+      <p className="flex items-center gap-1.5">
+        <span className="inline-block h-2 w-2 rounded-sm" style={{ background: "#ec4899" }} />
+        New signups: <span className="font-semibold">{formatNumber(byKey("count"))}</span>
+      </p>
+    </div>
+  );
+}
 
 function UsersOverTimeChart({
   data,
@@ -161,7 +218,11 @@ function UsersOverTimeChart({
 }) {
   const axisColor = isDark ? "#9ca3af" : "#6b7280";
   const gridColor = isDark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.06)";
-  const accent = "#7c3aed";
+  const cumulativeColor = "#7c3aed"; // violet — running total
+  const newUsersColor = "#ec4899"; // pink — weekly new signups
+
+  // Keep X labels legible when there are many weeks: aim for ~10 ticks.
+  const xInterval = data.length > 12 ? Math.ceil(data.length / 10) - 1 : 0;
 
   return (
     <section className="rounded-xl border border-gray-200 bg-white p-4 shadow-neu dark:border-gray-800/60 dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/70 dark:via-gray-900/50 dark:to-gray-950/70">
@@ -170,61 +231,95 @@ function UsersOverTimeChart({
         <h2 className="text-sm font-semibold text-gray-900 dark:text-white">
           User growth over time
         </h2>
+        <span className="ml-auto text-[11px] font-medium text-gray-400">
+          Weekly
+        </span>
       </div>
       {data.length < 2 ? (
         <p className="py-16 text-center text-sm text-gray-400">
           Not enough signup history yet.
         </p>
       ) : (
-        <div className="h-64 w-full">
+        <div className="h-72 w-full">
           <ResponsiveContainer width="100%" height="100%">
-            <AreaChart data={data} margin={{ top: 4, right: 8, bottom: 0, left: -12 }}>
+            <ComposedChart data={data} margin={{ top: 8, right: 12, bottom: 4, left: -4 }}>
               <defs>
                 <linearGradient id="adminUsersArea" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor={accent} stopOpacity={0.35} />
-                  <stop offset="100%" stopColor={accent} stopOpacity={0.02} />
+                  <stop offset="0%" stopColor={cumulativeColor} stopOpacity={0.35} />
+                  <stop offset="100%" stopColor={cumulativeColor} stopOpacity={0.02} />
                 </linearGradient>
               </defs>
               <CartesianGrid strokeDasharray="3 3" stroke={gridColor} vertical={false} />
               <XAxis
-                dataKey="month"
-                tickFormatter={formatMonthLabel}
+                dataKey="weekStart"
+                tickFormatter={formatWeekLabel}
                 tick={{ fill: axisColor, fontSize: 11 }}
                 tickLine={false}
                 axisLine={{ stroke: gridColor }}
+                interval={xInterval}
                 minTickGap={16}
               />
               <YAxis
+                yAxisId="left"
                 allowDecimals={false}
-                width={44}
+                width={48}
                 tick={{ fill: axisColor, fontSize: 11 }}
                 tickLine={false}
                 axisLine={false}
+                label={{
+                  value: "Total users",
+                  angle: -90,
+                  position: "insideLeft",
+                  style: { fill: axisColor, fontSize: 11, textAnchor: "middle" },
+                }}
+              />
+              <YAxis
+                yAxisId="right"
+                orientation="right"
+                allowDecimals={false}
+                width={40}
+                tick={{ fill: axisColor, fontSize: 11 }}
+                tickLine={false}
+                axisLine={false}
+                label={{
+                  value: "New / week",
+                  angle: 90,
+                  position: "insideRight",
+                  style: { fill: axisColor, fontSize: 11, textAnchor: "middle" },
+                }}
               />
               <Tooltip
-                contentStyle={{
-                  borderRadius: 12,
-                  border: `1px solid ${gridColor}`,
-                  background: isDark ? "#0a0a0a" : "#ffffff",
-                  color: isDark ? "#f9fafb" : "#111827",
-                  fontSize: 12,
-                }}
-                labelFormatter={(label) => formatMonthLabel(String(label))}
-                formatter={(value: number, name: string) => [
-                  formatNumber(value),
-                  name === "cumulative" ? "Total users" : "New signups",
-                ]}
+                cursor={{ fill: isDark ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.04)" }}
+                content={<UsersOverTimeTooltip isDark={isDark} />}
+              />
+              <Legend
+                iconType="circle"
+                wrapperStyle={{ fontSize: 12, paddingTop: 8 }}
+                formatter={(value) =>
+                  value === "cumulative" ? "Total users" : "New signups / week"
+                }
+              />
+              <Bar
+                yAxisId="right"
+                dataKey="count"
+                name="count"
+                fill={newUsersColor}
+                fillOpacity={0.7}
+                radius={[3, 3, 0, 0]}
+                maxBarSize={18}
               />
               <Area
+                yAxisId="left"
                 type="monotone"
                 dataKey="cumulative"
-                stroke={accent}
+                name="cumulative"
+                stroke={cumulativeColor}
                 strokeWidth={2}
                 fill="url(#adminUsersArea)"
                 dot={false}
                 activeDot={{ r: 4 }}
               />
-            </AreaChart>
+            </ComposedChart>
           </ResponsiveContainer>
         </div>
       )}

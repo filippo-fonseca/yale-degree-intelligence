@@ -232,6 +232,9 @@ export default function MyCoursesView({
   >(null);
   const [activeSemester, setActiveSemester] = useState<string | null>(null);
   const semesterSectionRefs = useRef<Record<string, HTMLDivElement | null>>({});
+  /** The inner scroll container (flex-1 min-h-0 overflow-y-auto). Scrollspy is
+   *  rooted here, since scrolling no longer happens on the window. */
+  const scrollContainerRef = useRef<HTMLDivElement | null>(null);
 
   /* ---------- derived stats ---------- */
   const stats = useMemo(() => computeStats(courses), [courses]);
@@ -405,6 +408,51 @@ export default function MyCoursesView({
       setActiveSemester(defaultActiveSemester);
     }
   }, [activeSemester, defaultActiveSemester, semesterGroups]);
+
+  /* ---------- scrollspy: track the active semester against the INNER
+       scroll container (not the window). The section whose top has just
+       passed (or sits closest to) the top of the container is "active". */
+  useEffect(() => {
+    const container = scrollContainerRef.current;
+    if (!container || !semesterGroups || semesterGroups.length === 0) return;
+
+    const semesterKeys = semesterGroups.map(([semester]) => semester);
+
+    const computeActive = () => {
+      const containerTop = container.getBoundingClientRect().top;
+      // Small bias so a section counts as "active" once its header nears the
+      // top of the container rather than only once it's fully past it.
+      const threshold = containerTop + 24;
+
+      let current: string | null = null;
+      for (const key of semesterKeys) {
+        const node = semesterSectionRefs.current[key];
+        if (!node) continue;
+        const top = node.getBoundingClientRect().top;
+        if (top <= threshold) {
+          current = key;
+        } else {
+          break;
+        }
+      }
+
+      // Before the first section crosses the threshold, keep the first one lit.
+      if (!current) current = semesterKeys[0] ?? null;
+
+      if (current) {
+        setActiveSemester((prev) => (prev === current ? prev : current));
+      }
+    };
+
+    computeActive();
+    container.addEventListener("scroll", computeActive, { passive: true });
+    window.addEventListener("resize", computeActive);
+
+    return () => {
+      container.removeEventListener("scroll", computeActive);
+      window.removeEventListener("resize", computeActive);
+    };
+  }, [semesterGroups]);
 
   useEffect(() => {
     if (loadedSemesterStorageKey !== semesterStorageKey || !semesterGroups) {
@@ -702,7 +750,10 @@ export default function MyCoursesView({
       </div>
 
       {/* ---- Scrollable region: ONLY the course list + disclaimer scroll ---- */}
-      <div className="flex-1 min-h-0 overflow-y-auto overflow-x-clip -mx-1 px-1">
+      <div
+        ref={scrollContainerRef}
+        className="flex-1 min-h-0 overflow-y-auto overflow-x-clip -mx-1 px-1"
+      >
       {/* ---- Course list ---- */}
       <div className="space-y-8">
         {groupBySemester && semesterGroups ? (

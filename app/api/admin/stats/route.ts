@@ -80,6 +80,27 @@ export async function GET(req: NextRequest) {
   const friendsPublic = friendsPublicSnap.docs.map((doc) => doc.data() as AnyRecord);
   const conversations = conversationsSnap.docs.map((doc) => doc.data() as AnyRecord);
 
+  // The true user total lives in Firebase Auth, not the Firestore `users`
+  // collection (many auth users never create a profile doc). Count ALL auth
+  // users via listUsers, which caps at 1000 per page, so loop on the page
+  // token until it's exhausted. If listUsers fails for any reason, degrade
+  // gracefully to the Firestore profile count rather than 500-ing the endpoint.
+  const profilesCreated = users.length;
+  let authUserCount = profilesCreated;
+  try {
+    let count = 0;
+    let pageToken: string | undefined = undefined;
+    do {
+      const result = await adminAuth.listUsers(1000, pageToken);
+      count += result.users.length;
+      pageToken = result.pageToken;
+    } while (pageToken);
+    authUserCount = count;
+  } catch (error) {
+    console.error("Failed to list Firebase Auth users; falling back to Firestore profile count:", error);
+    authUserCount = profilesCreated;
+  }
+
   const coursesByUser: Record<string, AnyRecord[]> = {};
   const courseStatusCounts: Record<string, number> = {};
   const departmentCounts: Record<string, number> = {};
@@ -152,7 +173,10 @@ export async function GET(req: NextRequest) {
 
   const coursesPerUser = Object.values(coursesByUser).map((items) => items.length);
   const usersWithCourses = coursesPerUser.length;
-  const totalUsers = users.length;
+  // Headline user total is the true Firebase Auth count; per-user aggregations
+  // below stay driven by the Firestore `users` docs (profilesCreated), since
+  // those are the only users we have profile/course data for.
+  const totalUsers = authUserCount;
   const totalMajorSlots = majorSlotsByUser.reduce((sum, count) => sum + count, 0);
   const friendsEnabledUsers = friendsPublic.filter((doc) => doc.enabled).length;
   const totalMessages = conversations.reduce(
@@ -197,8 +221,9 @@ export async function GET(req: NextRequest) {
     generatedAt: new Date().toISOString(),
     overview: {
       totalUsers,
+      profilesCreated,
       usersWithCourses,
-      usersWithoutCourses: Math.max(totalUsers - usersWithCourses, 0),
+      usersWithoutCourses: Math.max(profilesCreated - usersWithCourses, 0),
       totalCourses: courses.length,
       completedCourses,
       inProgressCourses,
@@ -206,14 +231,14 @@ export async function GET(req: NextRequest) {
       gradedCourses,
       totalCredits: round(totalCredits, 1),
       totalMajorSlots,
-      averageCoursesPerUser: round(courses.length / Math.max(totalUsers, 1), 1),
+      averageCoursesPerUser: round(courses.length / Math.max(profilesCreated, 1), 1),
       averageCoursesPerActiveUser: round(courses.length / Math.max(usersWithCourses, 1), 1),
-      averageMajorsPerUser: round(totalMajorSlots / Math.max(totalUsers, 1), 2),
+      averageMajorsPerUser: round(totalMajorSlots / Math.max(profilesCreated, 1), 2),
       averageCreditsPerActiveUser: round(totalCredits / Math.max(usersWithCourses, 1), 1),
       averageGpaAcrossGradedCourses: round(totalGradePoints / Math.max(gradedCredits, 1), 2),
-      profileCompletionRate: round((profileCompleteUsers / Math.max(totalUsers, 1)) * 100, 1),
+      profileCompletionRate: round((profileCompleteUsers / Math.max(profilesCreated, 1)) * 100, 1),
       friendsEnabledUsers,
-      friendsEnabledRate: round((friendsEnabledUsers / Math.max(totalUsers, 1)) * 100, 1),
+      friendsEnabledRate: round((friendsEnabledUsers / Math.max(profilesCreated, 1)) * 100, 1),
       friendshipCount: friendsSnap.size,
       conversationCount: conversationsSnap.size,
       averageMessagesPerConversation: round(totalMessages / Math.max(conversationsSnap.size, 1), 1),

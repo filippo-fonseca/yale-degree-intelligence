@@ -78,12 +78,6 @@ type AdminStats = {
       courseCount: number;
       updatedAt: string | null;
     }[];
-    heaviestCourseLoads: {
-      id: string;
-      displayName: string;
-      email: string | null;
-      courseCount: number;
-    }[];
   };
 };
 
@@ -129,13 +123,11 @@ function BarList({
   subtitle,
   data,
   valueSuffix = "",
-  ranked = false,
 }: {
   title: string;
   subtitle?: string;
   data: Entry[];
   valueSuffix?: string;
-  ranked?: boolean;
 }) {
   const max = useMemo(
     () => Math.max(...data.map((entry) => entry.value), 1),
@@ -159,15 +151,10 @@ function BarList({
         {data.length === 0 ? (
           <p className="py-6 text-center text-sm text-gray-400">No data yet.</p>
         ) : (
-          data.map((entry, i) => (
+          data.map((entry) => (
             <div key={entry.label}>
               <div className="mb-1 flex items-center justify-between gap-3 text-xs">
                 <span className="flex min-w-0 items-center gap-2">
-                  {ranked && (
-                    <span className="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-gray-100 text-[10px] font-semibold tabular-nums text-gray-500 dark:bg-white/[0.06] dark:text-gray-400">
-                      {i + 1}
-                    </span>
-                  )}
                   <span className="truncate font-medium text-gray-700 dark:text-gray-300">
                     {entry.label}
                   </span>
@@ -744,12 +731,6 @@ export default function AdminPage() {
                   subtitle={stats.distributions.departmentsByCredits.length > 12 ? "Top 12" : undefined}
                   data={stats.distributions.departmentsByCredits.slice(0, 12)}
                   valueSuffix=" cr"
-                />
-                <BarList
-                  title="Heaviest course loads"
-                  subtitle="Leaderboard"
-                  ranked
-                  data={stats.users.heaviestCourseLoads.map((u) => ({ label: u.displayName, value: u.courseCount }))}
                 />
               </div>
             </section>

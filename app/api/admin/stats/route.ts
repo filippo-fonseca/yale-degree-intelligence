@@ -80,6 +80,27 @@ export async function GET(req: NextRequest) {
   const friendsPublic = friendsPublicSnap.docs.map((doc) => doc.data() as AnyRecord);
   const conversations = conversationsSnap.docs.map((doc) => doc.data() as AnyRecord);
 
+  // The true user total lives in Firebase Auth, not the Firestore `users`
+  // collection (many auth users never create a profile doc). Count ALL auth
+  // users via listUsers, which caps at 1000 per page, so loop on the page
+  // token until it's exhausted. If listUsers fails for any reason, degrade
+  // gracefully to the Firestore profile count rather than 500-ing the endpoint.
+  const profilesCreated = users.length;
+  let authUserCount = profilesCreated;
+  try {
+    let count = 0;
+    let pageToken: string | undefined = undefined;
+    do {
+      const result = await adminAuth.listUsers(1000, pageToken);
+      count += result.users.length;
+      pageToken = result.pageToken;
+    } while (pageToken);
+    authUserCount = count;
+  } catch (error) {
+    console.error("Failed to list Firebase Auth users; falling back to Firestore profile count:", error);
+    authUserCount = profilesCreated;
+  }
+
   const coursesByUser: Record<string, AnyRecord[]> = {};
   const courseStatusCounts: Record<string, number> = {};
   const departmentCounts: Record<string, number> = {};
@@ -136,8 +157,14 @@ export async function GET(req: NextRequest) {
   for (const user of users) {
     const majors = Array.isArray(user.majors) ? user.majors : [];
     majorSlotsByUser.push(majors.length);
-    if (majors.length > 0 && user.graduationYear) profileCompleteUsers += 1;
-    if (typeof user.bio === "string" && user.bio.trim()) usersWithBio += 1;
+    const hasBio = typeof user.bio === "string" && user.bio.trim().length > 0;
+    // "Profile complete" is a single coherent completeness measure: the user
+    // has at least one major AND a graduation year AND a non-empty bio. The
+    // resulting profileCompletionRate below is this count over profilesCreated
+    // (you can't have a complete Firestore profile without a doc), so the
+    // number and its subtext are self-consistent.
+    if (majors.length > 0 && user.graduationYear && hasBio) profileCompleteUsers += 1;
+    if (hasBio) usersWithBio += 1;
     if (user.hasSeenTutorial) tutorialSeen += 1;
     if (user.hasSeenV3Welcome) welcomeSeen += 1;
     if (user.danWriteActionsEnabled) danWriteEnabled += 1;
@@ -152,7 +179,10 @@ export async function GET(req: NextRequest) {
 
   const coursesPerUser = Object.values(coursesByUser).map((items) => items.length);
   const usersWithCourses = coursesPerUser.length;
-  const totalUsers = users.length;
+  // Headline user total is the true Firebase Auth count; per-user aggregations
+  // below stay driven by the Firestore `users` docs (profilesCreated), since
+  // those are the only users we have profile/course data for.
+  const totalUsers = authUserCount;
   const totalMajorSlots = majorSlotsByUser.reduce((sum, count) => sum + count, 0);
   const friendsEnabledUsers = friendsPublic.filter((doc) => doc.enabled).length;
   const totalMessages = conversations.reduce(
@@ -193,12 +223,65 @@ export async function GET(req: NextRequest) {
     .sort((a, b) => b.courseCount - a.courseCount)
     .slice(0, 8);
 
+  // Signups bucketed by ISO week (Monday start, UTC) for a users-over-time
+  // chart. Prefer createdAt; fall back to updatedAt for legacy docs written
+  // before createdAt existed. Docs with no usable timestamp are skipped. The
+  // timeline is densified so every week between the first and last populated
+  // week is emitted (count 0 for empty weeks) for an evenly-spaced time axis;
+  // the span is clamped to avoid emitting an absurd number of weeks if legacy
+  // timestamps are wildly out of range.
+  const MS_PER_WEEK = 7 * 24 * 60 * 60 * 1000;
+  const MAX_WEEKS = 260; // ~5 years of weekly points; clamp densification here.
+
+  // Monday-00:00:00 UTC of the week containing `date`, as ms since epoch.
+  const weekStartUtcMs = (date: Date): number => {
+    const d = new Date(
+      Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()),
+    );
+    const dow = d.getUTCDay(); // 0=Sun..6=Sat
+    const diffToMonday = (dow + 6) % 7; // days since Monday
+    return d.getTime() - diffToMonday * 24 * 60 * 60 * 1000;
+  };
+  const isoWeekKey = (ms: number): string =>
+    new Date(ms).toISOString().slice(0, 10); // "YYYY-MM-DD"
+
+  const weeklyNewUsers = new Map<number, number>();
+  for (const user of users) {
+    const stamp = toDateValue(user.createdAt) || toDateValue(user.updatedAt);
+    if (!stamp) continue;
+    const ms = weekStartUtcMs(stamp);
+    weeklyNewUsers.set(ms, (weeklyNewUsers.get(ms) || 0) + 1);
+  }
+
+  let usersOverTime: { weekStart: string; count: number; cumulative: number }[] = [];
+  if (weeklyNewUsers.size > 0) {
+    const populated = Array.from(weeklyNewUsers.keys()).sort((a, b) => a - b);
+    let firstWeek = populated[0];
+    const lastWeek = populated[populated.length - 1];
+    // Clamp the densified range so we never emit more than MAX_WEEKS points.
+    if ((lastWeek - firstWeek) / MS_PER_WEEK + 1 > MAX_WEEKS) {
+      firstWeek = lastWeek - (MAX_WEEKS - 1) * MS_PER_WEEK;
+    }
+    let cumulativeUsers = 0;
+    // Users that fall before the clamped window still count toward cumulative.
+    for (const ms of populated) {
+      if (ms < firstWeek) cumulativeUsers += weeklyNewUsers.get(ms) || 0;
+    }
+    for (let ms = firstWeek; ms <= lastWeek; ms += MS_PER_WEEK) {
+      const count = weeklyNewUsers.get(ms) || 0;
+      cumulativeUsers += count;
+      usersOverTime.push({ weekStart: isoWeekKey(ms), count, cumulative: cumulativeUsers });
+    }
+  }
+
   return NextResponse.json({
     generatedAt: new Date().toISOString(),
     overview: {
       totalUsers,
+      profilesCreated,
       usersWithCourses,
-      usersWithoutCourses: Math.max(totalUsers - usersWithCourses, 0),
+      importedCoursesRate: round((usersWithCourses / Math.max(profilesCreated, 1)) * 100, 1),
+      usersWithoutCourses: Math.max(profilesCreated - usersWithCourses, 0),
       totalCourses: courses.length,
       completedCourses,
       inProgressCourses,
@@ -206,14 +289,14 @@ export async function GET(req: NextRequest) {
       gradedCourses,
       totalCredits: round(totalCredits, 1),
       totalMajorSlots,
-      averageCoursesPerUser: round(courses.length / Math.max(totalUsers, 1), 1),
+      averageCoursesPerUser: round(courses.length / Math.max(profilesCreated, 1), 1),
       averageCoursesPerActiveUser: round(courses.length / Math.max(usersWithCourses, 1), 1),
-      averageMajorsPerUser: round(totalMajorSlots / Math.max(totalUsers, 1), 2),
+      averageMajorsPerUser: round(totalMajorSlots / Math.max(profilesCreated, 1), 2),
       averageCreditsPerActiveUser: round(totalCredits / Math.max(usersWithCourses, 1), 1),
       averageGpaAcrossGradedCourses: round(totalGradePoints / Math.max(gradedCredits, 1), 2),
-      profileCompletionRate: round((profileCompleteUsers / Math.max(totalUsers, 1)) * 100, 1),
+      profileCompletionRate: round((profileCompleteUsers / Math.max(profilesCreated, 1)) * 100, 1),
       friendsEnabledUsers,
-      friendsEnabledRate: round((friendsEnabledUsers / Math.max(totalUsers, 1)) * 100, 1),
+      friendsEnabledRate: round((friendsEnabledUsers / Math.max(profilesCreated, 1)) * 100, 1),
       friendshipCount: friendsSnap.size,
       conversationCount: conversationsSnap.size,
       averageMessagesPerConversation: round(totalMessages / Math.max(conversationsSnap.size, 1), 1),
@@ -235,5 +318,6 @@ export async function GET(req: NextRequest) {
       recent: recentUsers,
       heaviestCourseLoads,
     },
+    usersOverTime,
   });
 }

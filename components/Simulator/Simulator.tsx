@@ -22,6 +22,8 @@ import SimulatorManualAssignModal from "./SimulatorManualAssignModal";
 import SimulatorRequirementsBreakdown from "./SimulatorRequirementsBreakdown";
 import CourseGradeControl from "./CourseGradeControl";
 import CourseDistributionalControl from "./CourseDistributionalControl";
+import SimulatorGradesSection from "./SimulatorGradesSection";
+import SimulatorDistributionalsSection from "./SimulatorDistributionalsSection";
 import {
   calculatePreviewMajorProgressByMajors,
   MajorProgress,
@@ -611,6 +613,44 @@ export default function Simulator({
     [plannedNow],
   );
 
+  // ------------ Live add-on derived props (no effects) ------------
+  // GPA entries for planned courses currently on the grid.
+  const plannedGpaEntries = useMemo<GPAEntry[]>(
+    () =>
+      semesters.flatMap((s) =>
+        s.courses
+          .filter((c) => c.status === "not-taken")
+          .map((c) => ({
+            grade: c.grade ?? null,
+            credits: getCourseCredits(c as Course & MaybeCreditFields),
+          })),
+      ),
+    [semesters],
+  );
+
+  // GPA entries from the student's real transcript (completed courses).
+  const completedGpaEntries = useMemo<GPAEntry[]>(
+    () =>
+      completedCourses
+        .filter((c) => c.status === "completed")
+        .map((c) => ({
+          grade: c.grade ?? null,
+          credits: getCourseCredits(c as Course & MaybeCreditFields),
+        })),
+    [completedCourses],
+  );
+
+  // Distributional assignments across planned courses (one string[] per course).
+  const plannedDistAssignments = useMemo<string[][]>(
+    () =>
+      semesters.flatMap((s) =>
+        s.courses
+          .filter((c) => c.status === "not-taken")
+          .map((c) => c.distributionals ?? []),
+      ),
+    [semesters],
+  );
+
   // ------------ Live preview progress (local compute) ------------
   useEffect(() => {
     if (!user) {
@@ -1102,6 +1142,23 @@ export default function Simulator({
           )}
         </AnimatePresence>
       </div>
+
+      {/* Live GPA / Distributionals add-on sections */}
+      {(showGrades || showDistributionals) && (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          {showGrades && (
+            <SimulatorGradesSection
+              completed={completedGpaEntries}
+              planned={plannedGpaEntries}
+            />
+          )}
+          {showDistributionals && (
+            <SimulatorDistributionalsSection
+              assignments={plannedDistAssignments}
+            />
+          )}
+        </div>
+      )}
 
       {/* Available Courses Pool */}
       <div className="sticky top-[72px] z-20 mb-2" data-tour="simulator-course-pool">

@@ -101,8 +101,9 @@ function StatTile({
   icon: ReactNode;
 }) {
   return (
-    <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-neu dark:border-gray-800/60 dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/70 dark:via-gray-900/50 dark:to-gray-950/70">
-      <div className="mb-3 flex items-start justify-between gap-3">
+    <div className="group relative overflow-hidden rounded-xl border border-gray-200 bg-white/80 p-4 shadow-neu backdrop-blur-xl transition-colors hover:border-gray-300 dark:border-white/10 dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/70 dark:via-gray-900/50 dark:to-gray-950/70 dark:hover:border-white/20">
+      <div className="pointer-events-none absolute -right-12 -top-12 h-28 w-28 rounded-full bg-violet-500/10 opacity-0 blur-2xl transition-opacity group-hover:opacity-100 dark:bg-violet-500/20" />
+      <div className="relative mb-3 flex items-start justify-between gap-3">
         <p className="text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">
           {label}
         </p>
@@ -110,10 +111,10 @@ function StatTile({
           {icon}
         </div>
       </div>
-      <p className="font-louize text-2xl font-medium text-gray-950 dark:text-white">
+      <p className="relative font-louize text-2xl font-medium text-gray-950 dark:text-white">
         {value}
       </p>
-      {sub && <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">{sub}</p>}
+      {sub && <p className="relative mt-1 text-xs text-gray-500 dark:text-gray-400">{sub}</p>}
     </div>
   );
 }
@@ -376,8 +377,9 @@ function UsersOverTimeChart({
   const xInterval = data.length > 12 ? Math.ceil(data.length / 10) - 1 : 0;
 
   return (
-    <section className="rounded-xl border border-gray-200 bg-white p-4 shadow-neu dark:border-gray-800/60 dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/70 dark:via-gray-900/50 dark:to-gray-950/70">
-      <div className="mb-4 flex items-center gap-2">
+    <section className="relative overflow-hidden rounded-xl border border-gray-200 bg-white/80 p-4 shadow-neu backdrop-blur-xl dark:border-white/10 dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/70 dark:via-gray-900/50 dark:to-gray-950/70">
+      <div className="pointer-events-none absolute -right-20 -top-20 h-48 w-48 rounded-full bg-violet-500/10 blur-3xl dark:bg-violet-500/20" />
+      <div className="relative mb-4 flex items-center gap-2">
         <TrendingUp className="h-4 w-4 text-violet-500" />
         <h2 className="text-sm font-semibold text-gray-900 dark:text-white">
           User growth over time
@@ -391,7 +393,7 @@ function UsersOverTimeChart({
           Not enough signup history yet.
         </p>
       ) : (
-        <div className="h-72 w-full">
+        <div className="relative h-72 w-full">
           <ResponsiveContainer width="100%" height="100%">
             <ComposedChart data={data} margin={{ top: 8, right: 12, bottom: 4, left: -4 }}>
               <defs>
@@ -742,13 +744,14 @@ export default function AdminPage() {
               <h2 className="font-louize text-lg font-medium text-gray-950 dark:text-white">
                 Users
               </h2>
-              <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-neu dark:border-gray-800/60 dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/70 dark:via-gray-900/50 dark:to-gray-950/70">
-              <div className="mb-4 flex items-center justify-between gap-3">
+              <div className="relative overflow-hidden rounded-xl border border-gray-200 bg-white/80 p-4 shadow-neu backdrop-blur-xl dark:border-white/10 dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/70 dark:via-gray-900/50 dark:to-gray-950/70">
+              <div className="pointer-events-none absolute -right-20 -top-20 h-48 w-48 rounded-full bg-violet-500/10 blur-3xl dark:bg-violet-500/20" />
+              <div className="relative mb-4 flex items-center justify-between gap-3">
                 <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
                   Recently updated users
                 </h3>
               </div>
-              <div className="overflow-x-auto">
+              <div className="relative overflow-x-auto">
                 <table className="w-full min-w-[720px] text-left text-sm">
                   <thead className="text-xs uppercase tracking-wider text-gray-400">
                     <tr>

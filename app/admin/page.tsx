@@ -298,7 +298,7 @@ export default function AdminPage() {
               <StatTile
                 label="Users"
                 value={formatNumber(stats.overview.totalUsers)}
-                sub={`${formatNumber(stats.overview.usersWithCourses)} with courses`}
+                sub={`${formatNumber(stats.overview.profilesCreated)} of ${formatNumber(stats.overview.totalUsers)} have a profile`}
                 icon={<Users className="h-4 w-4" />}
               />
               <StatTile
@@ -328,7 +328,7 @@ export default function AdminPage() {
               <StatTile
                 label="Profile complete"
                 value={`${stats.overview.profileCompletionRate}%`}
-                sub={`${formatNumber(stats.overview.usersWithBio)} users have bios`}
+                sub={`have major, grad year & bio (${formatNumber(stats.overview.usersWithBio)} with a bio)`}
                 icon={<Sparkles className="h-4 w-4" />}
               />
               <StatTile

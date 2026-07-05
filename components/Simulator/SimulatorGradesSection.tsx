@@ -78,7 +78,7 @@ export default function SimulatorGradesSection({
                       <p className="text-[10px] uppercase tracking-wide text-gray-400 dark:text-gray-500">
                         Projected cumulative GPA
                       </p>
-                      <p className="text-3xl font-semibold bg-gradient-to-r from-blue-500 via-violet-500 to-fuchsia-500 bg-clip-text text-transparent">
+                      <p className="text-3xl font-bold text-emerald-600 dark:text-emerald-300">
                         {cumulative.gpa!.toFixed(2)}
                       </p>
                     </div>

@@ -232,6 +232,9 @@ export default function MyCoursesView({
   >(null);
   const [activeSemester, setActiveSemester] = useState<string | null>(null);
   const semesterSectionRefs = useRef<Record<string, HTMLDivElement | null>>({});
+  /** The inner scroll container (flex-1 min-h-0 overflow-y-auto). Scrollspy is
+   *  rooted here, since scrolling no longer happens on the window. */
+  const scrollContainerRef = useRef<HTMLDivElement | null>(null);
 
   /* ---------- derived stats ---------- */
   const stats = useMemo(() => computeStats(courses), [courses]);
@@ -406,6 +409,51 @@ export default function MyCoursesView({
     }
   }, [activeSemester, defaultActiveSemester, semesterGroups]);
 
+  /* ---------- scrollspy: track the active semester against the INNER
+       scroll container (not the window). The section whose top has just
+       passed (or sits closest to) the top of the container is "active". */
+  useEffect(() => {
+    const container = scrollContainerRef.current;
+    if (!container || !semesterGroups || semesterGroups.length === 0) return;
+
+    const semesterKeys = semesterGroups.map(([semester]) => semester);
+
+    const computeActive = () => {
+      const containerTop = container.getBoundingClientRect().top;
+      // Small bias so a section counts as "active" once its header nears the
+      // top of the container rather than only once it's fully past it.
+      const threshold = containerTop + 24;
+
+      let current: string | null = null;
+      for (const key of semesterKeys) {
+        const node = semesterSectionRefs.current[key];
+        if (!node) continue;
+        const top = node.getBoundingClientRect().top;
+        if (top <= threshold) {
+          current = key;
+        } else {
+          break;
+        }
+      }
+
+      // Before the first section crosses the threshold, keep the first one lit.
+      if (!current) current = semesterKeys[0] ?? null;
+
+      if (current) {
+        setActiveSemester((prev) => (prev === current ? prev : current));
+      }
+    };
+
+    computeActive();
+    container.addEventListener("scroll", computeActive, { passive: true });
+    window.addEventListener("resize", computeActive);
+
+    return () => {
+      container.removeEventListener("scroll", computeActive);
+      window.removeEventListener("resize", computeActive);
+    };
+  }, [semesterGroups]);
+
   useEffect(() => {
     if (loadedSemesterStorageKey !== semesterStorageKey || !semesterGroups) {
       return;
@@ -540,9 +588,9 @@ export default function MyCoursesView({
   /*  Loaded state                                                     */
   /* ================================================================ */
   return (
-    <div className="space-y-6">
+    <div className="flex h-full min-h-0 flex-col">
       {/* ---- Header ---- */}
-      <div className="mb-4 lg:mb-6 flex flex-col sm:flex-row justify-between items-start gap-3">
+      <div className="shrink-0 mb-4 lg:mb-6 flex flex-col sm:flex-row justify-between items-start gap-3">
         <div>
           <h2 className="text-xl sm:text-2xl lg:text-3xl font-medium text-gray-900 dark:text-white">
             Your academic journey at Yale
@@ -576,7 +624,7 @@ export default function MyCoursesView({
       </div>
 
       {/* ---- Stat cards ---- */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+      <div className="shrink-0 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 mb-6">
         <StatCard
           label="Total courses"
           value={stats.totalCourses}
@@ -608,8 +656,8 @@ export default function MyCoursesView({
         />
       </div>
 
-      {/* ---- Search + filter + sort controls (sticky while scrolling semesters) ---- */}
-      <div className="sticky top-0 z-20 p-3 rounded-xl bg-white/95 dark:bg-gray-950/80 dark:bg-gradient-to-br dark:from-gray-900/80 dark:via-gray-900/70 dark:to-gray-950/80 backdrop-blur-xl border border-gray-200 dark:border-gray-800/50 shadow-neu">
+      {/* ---- Search + filter + sort controls (fixed frame; only the list below scrolls) ---- */}
+      <div className="shrink-0 z-20 mb-6 p-3 rounded-xl bg-white/95 dark:bg-gray-950/80 dark:bg-gradient-to-br dark:from-gray-900/80 dark:via-gray-900/70 dark:to-gray-950/80 backdrop-blur-xl border border-gray-200 dark:border-gray-800/50 shadow-neu">
         <div className="flex flex-col sm:flex-row gap-2">
           {/* Search */}
           <div className="relative flex-1 min-w-0">
@@ -701,12 +749,17 @@ export default function MyCoursesView({
         )}
       </div>
 
+      {/* ---- Scrollable region: ONLY the course list + disclaimer scroll ---- */}
+      <div
+        ref={scrollContainerRef}
+        className="flex-1 min-h-0 overflow-y-auto overflow-x-clip -mx-1 px-1"
+      >
       {/* ---- Course list ---- */}
       <div className="space-y-8">
         {groupBySemester && semesterGroups ? (
           /* Grouped by semester */
           <div className="grid gap-5 lg:grid-cols-[10rem_minmax(0,1fr)] items-start">
-            <aside className="lg:sticky lg:top-24 lg:self-start">
+            <aside className="lg:sticky lg:top-2 lg:self-start">
               <div className="flex lg:block gap-2 overflow-x-auto lg:overflow-visible pb-2 lg:pb-0 -mx-1 px-1 lg:mx-0 lg:px-0">
                 {semesterGroups.map(([semester, semCourses]) => {
                   const hasInProgress = semesterHasInProgress(semester);
@@ -721,13 +774,25 @@ export default function MyCoursesView({
                       type="button"
                       onClick={() => jumpToSemester(semester)}
                       aria-current={isActive ? "true" : undefined}
-                      className={`group shrink-0 lg:w-full min-w-[8.75rem] lg:min-w-0 text-left px-3 py-2 rounded-lg border transition-all ${
+                      className={`group relative shrink-0 lg:w-full min-w-[8.75rem] lg:min-w-0 text-left px-3 py-2 rounded-lg border transition-colors ${
                         isActive
-                          ? "bg-white dark:bg-gray-900/70 border-pink-400/60 dark:border-pink-400/50 shadow-sm"
+                          ? "border-transparent"
                           : "bg-gray-50/70 dark:bg-gray-950/20 border-gray-200/70 dark:border-gray-800/50 hover:border-gray-300 dark:hover:border-gray-700"
                       } ${semesterGroups.length > 1 ? "lg:mb-2" : ""}`}
                     >
-                      <div className="flex items-center gap-2 min-w-0">
+                      {isActive && (
+                        <motion.span
+                          layoutId="active-semester-indicator"
+                          className="absolute inset-0 rounded-lg bg-white dark:bg-gray-900/70 border border-pink-400/60 dark:border-pink-400/50 shadow-sm"
+                          transition={{
+                            type: "spring",
+                            stiffness: 480,
+                            damping: 38,
+                          }}
+                          aria-hidden="true"
+                        />
+                      )}
+                      <div className="relative flex items-center gap-2 min-w-0">
                         <span
                           className={`w-1 h-5 rounded-full shrink-0 ${accent.bar}`}
                           aria-hidden="true"
@@ -778,11 +843,13 @@ export default function MyCoursesView({
                     }}
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
-                    className="scroll-mt-28"
+                    className="scroll-mt-16"
                   >
                     {/* Header row: collapse toggle + add-course button as siblings
-                        (never a button nested in a button). */}
-                    <div className="flex items-center justify-between mb-3 gap-2">
+                        (never a button nested in a button). Sticks to the top of
+                        the inner scroll container while this semester is in view,
+                        then gets pushed up by the next semester's header. */}
+                    <div className="sticky top-0 z-20 flex items-center justify-between mb-3 gap-2 py-2 rounded-lg bg-white/90 dark:bg-gray-950/85 backdrop-blur-md supports-[backdrop-filter]:bg-white/75 dark:supports-[backdrop-filter]:bg-gray-950/70">
                       <button
                         onClick={() => toggleSemesterCollapse(semester)}
                         className="flex-1 min-w-0 flex items-center justify-between group"
@@ -950,6 +1017,7 @@ export default function MyCoursesView({
           simply a free, student-built personal project that we wanted to share
           with the community because we genuinely found it helpful for ourselves.
         </p>
+      </div>
       </div>
 
       {/* ---- Modals ---- */}

@@ -9,6 +9,7 @@ import {
   FiPlus,
   FiTrash2,
   FiRefreshCw,
+  FiCheck,
 } from "react-icons/fi";
 import { Info } from "lucide-react";
 import { Course } from "@/lib/types";
@@ -1035,7 +1036,17 @@ export default function Simulator({
                   Load Plan
                 </button>
                 <button
-                  onClick={() => setShowSaveModal(true)}
+                  onClick={() => {
+                    // Default to overwriting the currently-loaded plan (if any).
+                    if (loadedPlanIndex >= 0) {
+                      setSelectedPlanToOverwrite(loadedPlanIndex);
+                      setPlanName(savedPlans[loadedPlanIndex]?.name ?? "");
+                    } else {
+                      setSelectedPlanToOverwrite(null);
+                      setPlanName("");
+                    }
+                    setShowSaveModal(true);
+                  }}
                   className={`px-4 py-2 text-sm rounded-xl backdrop-blur-sm transition-all flex items-center gap-2 ${
                     hasChanges
                       ? "bg-gradient-to-r from-emerald-500/20 to-teal-500/20 text-emerald-300 hover:text-emerald-200 hover:from-emerald-500/25 hover:to-teal-500/25 border border-emerald-500/30 hover:border-emerald-400/40"
@@ -1437,13 +1448,15 @@ export default function Simulator({
             >
               {/* Header */}
               <div className="mb-5">
-                <h3 className="text-lg font-medium text-gray-900 dark:text-white">
+                <h3 className="text-lg font-medium text-gray-900 dark:text-white truncate">
                   {selectedPlanToOverwrite !== null
-                    ? "Overwrite Plan"
-                    : "Save Your Plan"}
+                    ? `Overwrite "${savedPlans[selectedPlanToOverwrite]?.name ?? ""}"`
+                    : "Save new plan"}
                 </h3>
                 <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
-                  Give your plan a name to save your progress.
+                  {selectedPlanToOverwrite !== null
+                    ? "Replace this plan with your current canvas, or save as a new plan instead."
+                    : "Give your plan a name to save your progress."}
                 </p>
               </div>
 
@@ -1463,43 +1476,74 @@ export default function Simulator({
               {savedPlans.length > 0 && (
                 <div className="mb-5">
                   <div className="flex items-center gap-3 mb-3">
-                    <div className="flex-1 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+                    <div className="flex-1 h-px bg-gradient-to-r from-transparent via-black/10 dark:via-white/10 to-transparent" />
                     <span className="text-xs text-gray-400 dark:text-gray-500 uppercase tracking-wider">
-                      or overwrite
+                      Overwrite an existing plan
                     </span>
-                    <div className="flex-1 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+                    <div className="flex-1 h-px bg-gradient-to-r from-transparent via-black/10 dark:via-white/10 to-transparent" />
                   </div>
-                  <div className="max-h-32 overflow-y-auto rounded-xl border border-gray-200 dark:border-white/[0.06] bg-gray-50/50 dark:bg-white/[0.02]">
-                    {savedPlans.map((plan, index) => (
-                      <button
-                        key={`${plan.createdAt}-${index}`}
-                        className={`w-full p-3 text-left border-b border-gray-100 dark:border-white/[0.04] last:border-b-0 hover:bg-gray-100 dark:hover:bg-white/[0.04] text-sm transition-all ${
-                          selectedPlanToOverwrite === index
-                            ? "bg-purple-500/10 border-l-2 border-l-purple-500"
-                            : ""
-                        }`}
-                        onClick={() => {
-                          setSelectedPlanToOverwrite(index);
-                          setPlanName(plan.name);
-                        }}
-                      >
-                        <div className="flex justify-between items-center">
-                          <span className="text-gray-700 dark:text-gray-300 font-medium">
-                            {plan.name}
-                          </span>
-                          <span className="text-[10px] text-gray-400 dark:text-gray-500">
-                            {new Date(plan.createdAt).toLocaleDateString(
-                              "en-US",
-                              {
-                                month: "short",
-                                day: "numeric",
-                              },
-                            )}
-                          </span>
-                        </div>
-                      </button>
-                    ))}
+                  <div className="max-h-40 overflow-y-auto rounded-xl border border-gray-200 dark:border-white/[0.06] bg-gray-50/50 dark:bg-white/[0.02]">
+                    {savedPlans.map((plan, index) => {
+                      const selected = selectedPlanToOverwrite === index;
+                      return (
+                        <button
+                          key={`${plan.createdAt}-${index}`}
+                          aria-pressed={selected}
+                          className={`w-full p-3 text-left border-b border-gray-100 dark:border-white/[0.04] last:border-b-0 hover:bg-gray-100 dark:hover:bg-white/[0.04] text-sm transition-all ${
+                            selected
+                              ? "bg-purple-500/10 border-l-2 border-l-purple-500"
+                              : "border-l-2 border-l-transparent"
+                          }`}
+                          onClick={() => {
+                            setSelectedPlanToOverwrite(index);
+                            setPlanName(plan.name);
+                          }}
+                        >
+                          <div className="flex justify-between items-center gap-2">
+                            <span className="flex items-center gap-2 min-w-0">
+                              <span className="text-gray-700 dark:text-gray-300 font-medium truncate">
+                                {plan.name}
+                              </span>
+                              {plan.isDefault && (
+                                <span className="text-[9px] font-medium uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 border border-purple-300 dark:border-purple-700/40 shrink-0">
+                                  Default
+                                </span>
+                              )}
+                            </span>
+                            <span className="flex items-center gap-2 shrink-0">
+                              <span className="text-[10px] text-gray-400 dark:text-gray-500">
+                                {new Date(plan.createdAt).toLocaleDateString(
+                                  "en-US",
+                                  {
+                                    month: "short",
+                                    day: "numeric",
+                                  },
+                                )}
+                              </span>
+                              {selected && (
+                                <FiCheck
+                                  size={13}
+                                  className="text-purple-500 dark:text-purple-300"
+                                />
+                              )}
+                            </span>
+                          </div>
+                        </button>
+                      );
+                    })}
                   </div>
+                  {selectedPlanToOverwrite !== null && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSelectedPlanToOverwrite(null);
+                        setPlanName("");
+                      }}
+                      className="mt-2 text-xs text-gray-400 dark:text-gray-500 hover:text-purple-600 dark:hover:text-purple-300 transition-colors"
+                    >
+                      + Save as a new plan instead
+                    </button>
+                  )}
                 </div>
               )}
 
@@ -1532,7 +1576,9 @@ export default function Simulator({
                       : "bg-black/[0.02] dark:bg-white/[0.02] text-gray-400 dark:text-gray-600 border border-black/[0.04] dark:border-white/[0.04] cursor-not-allowed"
                   }`}
                 >
-                  {selectedPlanToOverwrite !== null ? "Overwrite" : "Save Plan"}
+                  {selectedPlanToOverwrite !== null
+                    ? "Overwrite"
+                    : "Save new plan"}
                 </motion.button>
               </div>
             </motion.div>

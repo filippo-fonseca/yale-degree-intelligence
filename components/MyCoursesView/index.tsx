@@ -184,6 +184,33 @@ function computeStats(courses: Course[]) {
 type SortKey = "semester" | "code" | "grade" | "credits";
 type StatusFilter = "all" | "completed" | "in-progress" | "skipped";
 
+/**
+ * Scroll-triggered "boop" wrapper for a course card. Gives each card a subtle,
+ * springy entrance as it scrolls into the INNER scroll container's viewport
+ * (rooted on `scrollRef`, not the window). Transform/opacity only, so it never
+ * touches layout and never fights the card's own `whileHover` lift, which lives
+ * on the inner CourseCard element.
+ */
+function CardBoop({
+  scrollRef,
+  children,
+}: {
+  scrollRef: React.RefObject<HTMLDivElement | null>;
+  children: React.ReactNode;
+}) {
+  return (
+    <motion.div
+      initial={{ opacity: 0.6, scale: 0.96, y: 6 }}
+      whileInView={{ opacity: 1, scale: 1, y: 0 }}
+      viewport={{ once: false, amount: 0.2, root: scrollRef }}
+      transition={{ type: "spring", stiffness: 500, damping: 30 }}
+      className="min-w-0"
+    >
+      {children}
+    </motion.div>
+  );
+}
+
 interface SemesterOpenPrefs {
   openSemesters: string[];
   knownSemesters: string[];
@@ -912,19 +939,23 @@ export default function MyCoursesView({
                         >
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                             {semCourses.map((course, idx) => (
-                              <CourseCard
+                              <CardBoop
                                 key={course.id || `${course.code}-${idx}`}
-                                course={course}
-                                distSelectorCourseId={distSelectorCourseId}
-                                onCardClick={openCourseModal}
-                                onDeleteClick={openDeleteConfirm}
-                                onDistSelectorToggle={(id) =>
-                                  setDistSelectorCourseId((prev) =>
-                                    prev === id ? null : id,
-                                  )
-                                }
-                                onToggleDistributional={onToggleDistributional}
-                              />
+                                scrollRef={scrollContainerRef}
+                              >
+                                <CourseCard
+                                  course={course}
+                                  distSelectorCourseId={distSelectorCourseId}
+                                  onCardClick={openCourseModal}
+                                  onDeleteClick={openDeleteConfirm}
+                                  onDistSelectorToggle={(id) =>
+                                    setDistSelectorCourseId((prev) =>
+                                      prev === id ? null : id,
+                                    )
+                                  }
+                                  onToggleDistributional={onToggleDistributional}
+                                />
+                              </CardBoop>
                             ))}
                           </div>
                         </motion.div>
@@ -965,19 +996,23 @@ export default function MyCoursesView({
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 {filteredCourses.map((course, idx) => (
-                  <CourseCard
+                  <CardBoop
                     key={course.id || `${course.code}-${idx}`}
-                    course={course}
-                    distSelectorCourseId={distSelectorCourseId}
-                    onCardClick={openCourseModal}
-                    onDeleteClick={openDeleteConfirm}
-                    onDistSelectorToggle={(id) =>
-                      setDistSelectorCourseId((prev) =>
-                        prev === id ? null : id,
-                      )
-                    }
-                    onToggleDistributional={onToggleDistributional}
-                  />
+                    scrollRef={scrollContainerRef}
+                  >
+                    <CourseCard
+                      course={course}
+                      distSelectorCourseId={distSelectorCourseId}
+                      onCardClick={openCourseModal}
+                      onDeleteClick={openDeleteConfirm}
+                      onDistSelectorToggle={(id) =>
+                        setDistSelectorCourseId((prev) =>
+                          prev === id ? null : id,
+                        )
+                      }
+                      onToggleDistributional={onToggleDistributional}
+                    />
+                  </CardBoop>
                 ))}
               </div>
             )}

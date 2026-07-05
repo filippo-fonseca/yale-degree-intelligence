@@ -917,6 +917,30 @@ export default function Simulator({
           {/* Action Buttons */}
           <div className="flex items-center gap-2 flex-wrap shrink-0" data-tour="simulator-plan-actions">
             <button
+              type="button"
+              onClick={() => setShowGrades((v) => !v)}
+              aria-pressed={showGrades}
+              className={`px-4 py-2 text-sm rounded-xl backdrop-blur-sm border flex items-center gap-2 transition-all ${
+                showGrades
+                  ? "bg-gradient-to-r from-emerald-500/15 to-teal-500/15 text-emerald-600 dark:text-emerald-300 border-emerald-500/30 hover:border-emerald-400/40"
+                  : "bg-black/[0.04] dark:bg-white/[0.04] text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-black/[0.06] dark:hover:bg-white/[0.08] border-black/[0.06] dark:border-white/[0.08]"
+              }`}
+            >
+              GPA
+            </button>
+            <button
+              type="button"
+              onClick={() => setShowDistributionals((v) => !v)}
+              aria-pressed={showDistributionals}
+              className={`px-4 py-2 text-sm rounded-xl backdrop-blur-sm border flex items-center gap-2 transition-all ${
+                showDistributionals
+                  ? "bg-gradient-to-r from-purple-500/15 to-blue-500/15 text-purple-600 dark:text-purple-300 border-purple-500/30 hover:border-purple-400/40"
+                  : "bg-black/[0.04] dark:bg-white/[0.04] text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-black/[0.06] dark:hover:bg-white/[0.08] border-black/[0.06] dark:border-white/[0.08]"
+              }`}
+            >
+              Distributionals
+            </button>
+            <button
               onClick={() => setShowHelp((v) => !v)}
               className="px-4 py-2 text-sm rounded-xl bg-black/[0.04] dark:bg-white/[0.04] backdrop-blur-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-black/[0.06] dark:hover:bg-white/[0.08] border border-black/[0.06] dark:border-white/[0.08] flex items-center gap-2 transition-all"
             >

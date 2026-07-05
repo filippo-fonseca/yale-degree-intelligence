@@ -22,9 +22,11 @@ import {
 } from "lucide-react";
 
 type Entry = { label: string; value: number };
+type UsersOverTimePoint = { month: string; count: number; cumulative: number };
 type AdminStats = {
   generatedAt: string;
   overview: Record<string, number>;
+  usersOverTime?: UsersOverTimePoint[];
   distributions: {
     courseStatuses: Entry[];
     graduationYears: Entry[];
@@ -216,20 +218,29 @@ export default function AdminPage() {
   }
 
   return (
-    <main className="min-h-screen bg-gray-50 text-gray-900 dark:bg-black dark:text-white">
-      <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-        <header className="mb-6 flex flex-col gap-4 border-b border-gray-200 pb-5 dark:border-gray-800 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <div className="mb-2 inline-flex items-center gap-2 rounded-full border border-pink-200 bg-pink-50 px-2.5 py-1 text-xs font-medium text-pink-700 dark:border-pink-500/20 dark:bg-pink-500/10 dark:text-pink-300">
+    <main className="min-h-screen scroll-smooth bg-gray-50 text-gray-900 dark:bg-black dark:text-white">
+      <nav className="sticky top-0 z-40 border-b border-gray-200 bg-white/70 backdrop-blur-xl dark:border-gray-800/70 dark:bg-black/60">
+        <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-3 sm:px-6 lg:px-8">
+          <div className="flex items-center gap-3">
+            <div className="inline-flex items-center gap-2 rounded-lg border border-pink-200 bg-pink-50 px-2.5 py-1.5 text-xs font-semibold text-pink-700 dark:border-pink-500/20 dark:bg-pink-500/10 dark:text-pink-300">
               <ShieldCheck className="h-3.5 w-3.5" />
-              Creator dashboard
+              <span className="font-louize text-sm tracking-tight">Admin</span>
             </div>
-            <h1 className="font-louize text-3xl font-medium tracking-tight text-gray-950 dark:text-white">
-              Admin
-            </h1>
-            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-              Product health, usage, courses, majors, and engagement.
-            </p>
+            <div className="hidden items-center gap-1 md:flex">
+              {[
+                { href: "#overview", label: "Overview" },
+                { href: "#charts", label: "Charts" },
+                { href: "#users", label: "Users" },
+              ].map((anchor) => (
+                <a
+                  key={anchor.href}
+                  href={anchor.href}
+                  className="rounded-md px-3 py-1.5 text-sm font-medium text-gray-500 transition hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-white/[0.06] dark:hover:text-white"
+                >
+                  {anchor.label}
+                </a>
+              ))}
+            </div>
           </div>
           <div className="flex items-center gap-2">
             <Link
@@ -255,9 +266,20 @@ export default function AdminPage() {
               className="inline-flex items-center gap-2 rounded-lg bg-gray-950 px-3 py-2 text-sm font-semibold text-white hover:bg-gray-800 disabled:opacity-60 dark:bg-white dark:text-gray-950"
             >
               <RefreshCw className={`h-4 w-4 ${loadingStats ? "animate-spin" : ""}`} />
-              Refresh
+              <span className="hidden sm:inline">Refresh</span>
             </button>
           </div>
+        </div>
+      </nav>
+
+      <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+        <header className="mb-6">
+          <h1 className="font-louize text-3xl font-medium tracking-tight text-gray-950 dark:text-white">
+            Creator dashboard
+          </h1>
+          <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+            Product health, usage, courses, majors, and engagement.
+          </p>
         </header>
 
         {error && (

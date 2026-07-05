@@ -223,25 +223,56 @@ export async function GET(req: NextRequest) {
     .sort((a, b) => b.courseCount - a.courseCount)
     .slice(0, 8);
 
-  // Signups bucketed by month for a users-over-time chart. Prefer createdAt;
-  // fall back to updatedAt for legacy docs written before createdAt existed.
-  // Docs with no usable timestamp are skipped. Sorted ascending with a running
-  // cumulative total.
-  const monthlyNewUsers: Record<string, number> = {};
+  // Signups bucketed by ISO week (Monday start, UTC) for a users-over-time
+  // chart. Prefer createdAt; fall back to updatedAt for legacy docs written
+  // before createdAt existed. Docs with no usable timestamp are skipped. The
+  // timeline is densified so every week between the first and last populated
+  // week is emitted (count 0 for empty weeks) for an evenly-spaced time axis;
+  // the span is clamped to avoid emitting an absurd number of weeks if legacy
+  // timestamps are wildly out of range.
+  const MS_PER_WEEK = 7 * 24 * 60 * 60 * 1000;
+  const MAX_WEEKS = 260; // ~5 years of weekly points; clamp densification here.
+
+  // Monday-00:00:00 UTC of the week containing `date`, as ms since epoch.
+  const weekStartUtcMs = (date: Date): number => {
+    const d = new Date(
+      Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()),
+    );
+    const dow = d.getUTCDay(); // 0=Sun..6=Sat
+    const diffToMonday = (dow + 6) % 7; // days since Monday
+    return d.getTime() - diffToMonday * 24 * 60 * 60 * 1000;
+  };
+  const isoWeekKey = (ms: number): string =>
+    new Date(ms).toISOString().slice(0, 10); // "YYYY-MM-DD"
+
+  const weeklyNewUsers = new Map<number, number>();
   for (const user of users) {
     const stamp = toDateValue(user.createdAt) || toDateValue(user.updatedAt);
     if (!stamp) continue;
-    const month = `${stamp.getUTCFullYear()}-${String(stamp.getUTCMonth() + 1).padStart(2, "0")}`;
-    monthlyNewUsers[month] = (monthlyNewUsers[month] || 0) + 1;
+    const ms = weekStartUtcMs(stamp);
+    weeklyNewUsers.set(ms, (weeklyNewUsers.get(ms) || 0) + 1);
   }
-  let cumulativeUsers = 0;
-  const usersOverTime = Object.keys(monthlyNewUsers)
-    .sort()
-    .map((month) => {
-      const count = monthlyNewUsers[month];
+
+  let usersOverTime: { weekStart: string; count: number; cumulative: number }[] = [];
+  if (weeklyNewUsers.size > 0) {
+    const populated = Array.from(weeklyNewUsers.keys()).sort((a, b) => a - b);
+    let firstWeek = populated[0];
+    const lastWeek = populated[populated.length - 1];
+    // Clamp the densified range so we never emit more than MAX_WEEKS points.
+    if ((lastWeek - firstWeek) / MS_PER_WEEK + 1 > MAX_WEEKS) {
+      firstWeek = lastWeek - (MAX_WEEKS - 1) * MS_PER_WEEK;
+    }
+    let cumulativeUsers = 0;
+    // Users that fall before the clamped window still count toward cumulative.
+    for (const ms of populated) {
+      if (ms < firstWeek) cumulativeUsers += weeklyNewUsers.get(ms) || 0;
+    }
+    for (let ms = firstWeek; ms <= lastWeek; ms += MS_PER_WEEK) {
+      const count = weeklyNewUsers.get(ms) || 0;
       cumulativeUsers += count;
-      return { month, count, cumulative: cumulativeUsers };
-    });
+      usersOverTime.push({ weekStart: isoWeekKey(ms), count, cumulative: cumulativeUsers });
+    }
+  }
 
   return NextResponse.json({
     generatedAt: new Date().toISOString(),

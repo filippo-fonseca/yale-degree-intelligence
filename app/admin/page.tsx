@@ -24,6 +24,7 @@ import {
   BarChart3,
   BookOpen,
   Brain,
+  DownloadCloud,
   GraduationCap,
   Loader2,
   Lock,
@@ -657,6 +658,12 @@ export default function AdminPage() {
                 value={formatNumber(stats.overview.totalCourses)}
                 sub={`${stats.overview.averageCoursesPerUser} avg per user`}
                 icon={<BookOpen className="h-4 w-4" />}
+              />
+              <StatTile
+                label="Imported courses"
+                value={`${stats.overview.importedCoursesRate}%`}
+                sub={`${formatNumber(stats.overview.usersWithCourses)} of ${formatNumber(stats.overview.profilesCreated)} have courses`}
+                icon={<DownloadCloud className="h-4 w-4" />}
               />
               <StatTile
                 label="Avg majors"

@@ -205,27 +205,27 @@ export default function SimulatorRequirementsBreakdown({
                 <div className="text-xs font-medium text-gray-800 dark:text-gray-200 truncate">
                   {MAJORS[majorId] ?? majorId}
                 </div>
-                <div className="flex items-center flex-wrap gap-x-2 gap-y-0.5 mt-0.5 text-[10px] text-gray-400 dark:text-gray-500">
-                  <span>
-                    <span className="text-emerald-600 dark:text-emerald-300 font-medium">
+                <div className="flex flex-wrap items-center gap-x-2.5 gap-y-0.5 mt-0.5 text-[10px] text-gray-500 dark:text-gray-400">
+                  <span className="whitespace-nowrap">
+                    <span className="text-emerald-600 dark:text-emerald-300 font-semibold">
                       {pctCompleted.toFixed(0)}%
                     </span>
-                    <span className="text-gray-400 dark:text-gray-600 ml-0.5">done</span>
+                    <span className="text-gray-500 dark:text-gray-400 ml-0.5">actually done</span>
                   </span>
                   {trueInProgress.length > 0 && (
-                    <span>
-                      <span className="text-blue-600 dark:text-blue-300 font-medium">
+                    <span className="whitespace-nowrap">
+                      <span className="text-blue-600 dark:text-blue-300 font-semibold">
                         {pctWithIP.toFixed(0)}%
                       </span>
-                      <span className="text-gray-400 dark:text-gray-600 ml-0.5">w/ in-progress</span>
+                      <span className="text-gray-500 dark:text-gray-400 ml-0.5">with in-progress credits</span>
                     </span>
                   )}
                   {planned.length > 0 && (
-                    <span>
-                      <span className="text-purple-600 dark:text-purple-300 font-medium">
+                    <span className="whitespace-nowrap">
+                      <span className="text-purple-600 dark:text-purple-300 font-semibold">
                         {pctWithPlanned.toFixed(0)}%
                       </span>
-                      <span className="text-gray-400 dark:text-gray-600 ml-0.5">w/ planned</span>
+                      <span className="text-gray-500 dark:text-gray-400 ml-0.5">completion with planned credits</span>
                     </span>
                   )}
                 </div>

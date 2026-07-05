@@ -10,8 +10,11 @@ import {
   Area,
   Bar,
   CartesianGrid,
+  Cell,
   ComposedChart,
   Legend,
+  Pie,
+  PieChart,
   ResponsiveContainer,
   Tooltip,
   XAxis,
@@ -32,6 +35,21 @@ import {
   TrendingUp,
   Users,
 } from "lucide-react";
+
+// Cohesive slice palette shared with the in-app Academic stats view
+// (components/StatsView.tsx DEPT_COLORS): violet/blue/emerald/amber/pink family.
+const DONUT_COLORS = [
+  "#8B5CF6", // violet
+  "#3B82F6", // blue
+  "#10B981", // emerald
+  "#F59E0B", // amber
+  "#EC4899", // pink
+  "#6366F1", // indigo
+  "#F97316", // orange
+  "#14B8A6", // teal
+  "#EF4444", // red
+  "#84CC16", // lime
+];
 
 type Entry = { label: string; value: number };
 type UsersOverTimePoint = { weekStart: string; count: number; cumulative: number };
@@ -143,6 +161,119 @@ function BarList({
           ))
         )}
       </div>
+    </section>
+  );
+}
+
+// Collapse a long-tailed distribution into the top-N slices plus a rolled-up
+// "Other" bucket, so a donut with many small categories stays legible.
+function rollUpLongTail(data: Entry[], topN = 7): Entry[] {
+  const sorted = [...data].sort((a, b) => b.value - a.value);
+  if (sorted.length <= topN + 1) return sorted;
+  const head = sorted.slice(0, topN);
+  const tail = sorted.slice(topN);
+  const otherValue = tail.reduce((sum, e) => sum + e.value, 0);
+  if (otherValue <= 0) return head;
+  return [...head, { label: `Other (${tail.length})`, value: otherValue }];
+}
+
+// Donut (ring) chart with a bold center total and a side legend listing each
+// category with a colored dot, label, and its percentage. Glassy card styling
+// consistent with the rest of the dashboard; works in light and dark mode.
+function DonutCard({
+  title,
+  data,
+  centerLabel,
+  valueSuffix = "",
+  topN = 7,
+}: {
+  title: string;
+  data: Entry[];
+  centerLabel: string;
+  valueSuffix?: string;
+  topN?: number;
+}) {
+  const slices = useMemo(() => rollUpLongTail(data, topN), [data, topN]);
+  const total = useMemo(
+    () => slices.reduce((sum, e) => sum + e.value, 0),
+    [slices],
+  );
+  const isEmpty = slices.length === 0 || total === 0;
+
+  return (
+    <section className="relative overflow-hidden rounded-xl border border-gray-200 bg-white/80 p-4 shadow-neu backdrop-blur-xl dark:border-white/10 dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/70 dark:via-gray-900/50 dark:to-gray-950/70">
+      {/* Faint accent glow — premium glassy cue */}
+      <div className="pointer-events-none absolute -right-16 -top-16 h-40 w-40 rounded-full bg-violet-500/10 blur-3xl dark:bg-violet-500/20" />
+      <h2 className="relative mb-4 text-sm font-semibold text-gray-900 dark:text-white">
+        {title}
+      </h2>
+      {isEmpty ? (
+        <p className="py-10 text-center text-sm text-gray-400">No data yet.</p>
+      ) : (
+        <div className="relative flex flex-col items-center gap-4 sm:flex-row sm:items-center">
+          {/* Donut with center total */}
+          <div className="relative h-[180px] w-[180px] shrink-0">
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie
+                  data={slices}
+                  dataKey="value"
+                  nameKey="label"
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={55}
+                  outerRadius={82}
+                  paddingAngle={2}
+                  cornerRadius={4}
+                  stroke="none"
+                >
+                  {slices.map((entry, i) => (
+                    <Cell
+                      key={entry.label}
+                      fill={DONUT_COLORS[i % DONUT_COLORS.length]}
+                    />
+                  ))}
+                </Pie>
+              </PieChart>
+            </ResponsiveContainer>
+            <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
+              <span className="font-louize text-2xl font-medium leading-none text-gray-950 dark:text-white">
+                {formatNumber(total)}
+              </span>
+              <span className="mt-1 text-[10px] uppercase tracking-wider text-gray-400">
+                {centerLabel}
+              </span>
+            </div>
+          </div>
+          {/* Side legend: dot + label + right-aligned percentage */}
+          <ul className="w-full min-w-0 flex-1 space-y-1.5">
+            {slices.map((entry, i) => {
+              const pct = total > 0 ? (entry.value / total) * 100 : 0;
+              return (
+                <li
+                  key={entry.label}
+                  className="flex items-center gap-2 text-xs"
+                >
+                  <span
+                    className="h-2.5 w-2.5 shrink-0 rounded-full"
+                    style={{ background: DONUT_COLORS[i % DONUT_COLORS.length] }}
+                  />
+                  <span className="min-w-0 flex-1 truncate font-medium text-gray-700 dark:text-gray-300">
+                    {entry.label}
+                  </span>
+                  <span className="shrink-0 tabular-nums text-gray-400 dark:text-gray-500">
+                    {formatNumber(entry.value)}
+                    {valueSuffix}
+                  </span>
+                  <span className="w-12 shrink-0 text-right font-semibold tabular-nums text-gray-600 dark:text-gray-300">
+                    {pct.toFixed(1)}%
+                  </span>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      )}
     </section>
   );
 }
@@ -556,13 +687,13 @@ export default function AdminPage() {
                 isDark={resolvedTheme === "dark"}
               />
               <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-                <BarList title="Top majors" data={stats.distributions.majors} />
-                <BarList title="Class years" data={stats.distributions.graduationYears} />
-                <BarList title="Departments by courses" data={stats.distributions.departmentsByCourses} />
-                <BarList title="Departments by credits" data={stats.distributions.departmentsByCredits} />
-                <BarList title="Course statuses" data={stats.distributions.courseStatuses} />
-                <BarList title="Distributional tags" data={stats.distributions.distributionals} />
-                <BarList title="Grades" data={stats.distributions.grades} />
+                <DonutCard title="Top majors" data={stats.distributions.majors} centerLabel="selections" />
+                <DonutCard title="Class years" data={stats.distributions.graduationYears} centerLabel="students" />
+                <DonutCard title="Course statuses" data={stats.distributions.courseStatuses} centerLabel="courses" />
+                <DonutCard title="Distributional tags" data={stats.distributions.distributionals} centerLabel="courses" />
+                <DonutCard title="Grades" data={stats.distributions.grades} centerLabel="grades" />
+                <BarList title="Departments by courses" data={stats.distributions.departmentsByCourses.slice(0, 12)} />
+                <BarList title="Departments by credits" data={stats.distributions.departmentsByCredits.slice(0, 12)} valueSuffix=" cr" />
                 <BarList title="Heaviest course loads" data={stats.users.heaviestCourseLoads.map((u) => ({ label: u.displayName, value: u.courseCount }))} />
               </div>
             </section>

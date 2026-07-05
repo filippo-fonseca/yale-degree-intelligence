@@ -456,14 +456,17 @@ function DistReqCard({
       </div>
 
       {/* Progress bar */}
-      <div className="w-full h-2 bg-gray-200 dark:bg-gray-800 rounded-full overflow-hidden mb-2">
+      <div className="relative w-full h-2 bg-gray-200 dark:bg-gray-800/70 rounded-full overflow-hidden mb-2 shadow-[inset_0_1px_2px_rgba(0,0,0,0.08)] dark:shadow-[inset_0_1px_2px_rgba(0,0,0,0.3)]">
         <motion.div
           initial={{ width: 0 }}
           animate={{ width: `${progress * 100}%` }}
           transition={{ duration: 0.6, ease: "easeOut" }}
-          className="h-full rounded-full"
+          className="absolute inset-y-0 left-0 rounded-full"
           style={{
             backgroundColor: fulfilled ? "#34d399" : colors.bar,
+            boxShadow: fulfilled
+              ? "0 0 10px rgba(52,211,153,0.75)"
+              : `0 0 10px ${colors.bar}bf`,
           }}
         />
       </div>
@@ -594,13 +597,18 @@ function LanguageSection({
         )}
 
         {placementLevel !== null && (
-          <div className="w-full h-2 bg-gray-200 dark:bg-gray-800 rounded-full overflow-hidden mb-4">
+          <div className="relative w-full h-2 bg-gray-200 dark:bg-gray-800/70 rounded-full overflow-hidden mb-4 shadow-[inset_0_1px_2px_rgba(0,0,0,0.08)] dark:shadow-[inset_0_1px_2px_rgba(0,0,0,0.3)]">
             <motion.div
               initial={{ width: 0 }}
               animate={{ width: `${progress * 100}%` }}
               transition={{ duration: 0.6, ease: "easeOut" }}
-              className="h-full rounded-full"
-              style={{ backgroundColor: isComplete ? "#34d399" : "#2dd4bf" }}
+              className="absolute inset-y-0 left-0 rounded-full"
+              style={{
+                backgroundColor: isComplete ? "#34d399" : "#2dd4bf",
+                boxShadow: isComplete
+                  ? "0 0 10px rgba(52,211,153,0.75)"
+                  : "0 0 10px rgba(45,212,191,0.75)",
+              }}
             />
           </div>
         )}

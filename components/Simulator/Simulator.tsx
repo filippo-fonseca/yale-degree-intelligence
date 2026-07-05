@@ -189,6 +189,17 @@ export default function Simulator({
   // majors to compute – only the user's declared majors
   const majorIds = useMemo<string[]>(() => userMajors, [userMajors]);
 
+  // Index of the currently-loaded plan within savedPlans (matched by name), or -1.
+  const loadedPlanIndex = useMemo(
+    () =>
+      currentPlanName === null
+        ? -1
+        : savedPlans.findIndex((p) => p.name === currentPlanName),
+    [currentPlanName, savedPlans],
+  );
+  const loadedPlanIsDefault =
+    loadedPlanIndex >= 0 && !!savedPlans[loadedPlanIndex]?.isDefault;
+
   // Auto-detect: does a course code appear in any requirement option across all user majors?
   const isCourseInAnyRequirement = useMemo(() => {
     const allOptionCodes = new Set<string>();
@@ -957,6 +968,11 @@ export default function Simulator({
                   >
                     {currentPlanName}
                   </span>
+                  {loadedPlanIsDefault && (
+                    <span className="text-[9px] font-medium uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 border border-purple-300 dark:border-purple-700/40 shrink-0">
+                      Default
+                    </span>
+                  )}
                   {hasChanges && (
                     <span className="text-xs text-amber-400 ml-1 px-2 py-0.5 rounded-full bg-amber-400/10 border border-amber-400/20 shrink-0">
                       unsaved

@@ -121,9 +121,9 @@ function BarList({
                   {valueSuffix}
                 </span>
               </div>
-              <div className="h-2 overflow-hidden rounded-full bg-gray-100 dark:bg-gray-800">
+              <div className="h-2.5 overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700/70">
                 <div
-                  className="h-full rounded-full bg-gradient-to-r from-sky-500 via-violet-500 to-pink-500"
+                  className="h-full rounded-full bg-violet-600 dark:bg-violet-500"
                   style={{ width: `${Math.max((entry.value / max) * 100, 4)}%` }}
                 />
               </div>

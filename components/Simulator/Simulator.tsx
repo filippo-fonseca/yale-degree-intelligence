@@ -20,12 +20,17 @@ import { db } from "@/config/firebase";
 import ManualCourseLookupModal from "./ManualCourseLookupModal";
 import SimulatorManualAssignModal from "./SimulatorManualAssignModal";
 import SimulatorRequirementsBreakdown from "./SimulatorRequirementsBreakdown";
+import CourseGradeControl from "./CourseGradeControl";
+import CourseDistributionalControl from "./CourseDistributionalControl";
+import SimulatorGradesSection from "./SimulatorGradesSection";
+import SimulatorDistributionalsSection from "./SimulatorDistributionalsSection";
 import {
   calculatePreviewMajorProgressByMajors,
   MajorProgress,
   ManualRequirementEntry,
   majorRequirements,
 } from "@/lib/majors";
+import type { GPAEntry } from "@/lib/gpa";
 
 // ----------------- Types -----------------
 interface Semester {
@@ -47,6 +52,8 @@ type Plan = {
   manualRequirements?: ManualRequirementEntry[];
   createdAt: string; // ISO
   isDefault?: boolean;
+  showDistributionals?: boolean;
+  showGrades?: boolean;
 };
 
 type PreviewProgressMap = Record<string, MajorProgress>;
@@ -140,6 +147,9 @@ export default function Simulator({
   const [hasChanges, setHasChanges] = useState(false);
   const [showPool, setShowPool] = useState(false);
   const [showMajorPreview, setShowMajorPreview] = useState(true);
+  // Optional, independently-toggled live add-ons (both OFF by default).
+  const [showDistributionals, setShowDistributionals] = useState(false);
+  const [showGrades, setShowGrades] = useState(false);
   // Plan selector modal shown on initial load
   const [showPlanSelector, setShowPlanSelector] = useState(false);
   const [plansLoaded, setPlansLoaded] = useState(false);
@@ -168,6 +178,10 @@ export default function Simulator({
   // keep initial snapshot to detect changes
   const initialSemestersRef = useRef<Semester[]>([]);
   const initialManualReqsRef = useRef<ManualRequirementEntry[]>([]);
+  const initialTogglesRef = useRef<{ dist: boolean; grades: boolean }>({
+    dist: false,
+    grades: false,
+  });
   // True once a saved plan has been loaded, so the blank-grid rebuild effect
   // does not clobber the loaded plan when remaining/completed courses change.
   const planLoadedRef = useRef(false);
@@ -349,19 +363,26 @@ export default function Simulator({
   useEffect(() => {
     if (initialSemestersRef.current.length === 0) return;
 
-    // Create a set of "semesterId:courseCode" to detect both additions/deletions AND moves
+    // Placement key folds semester, code, projected grade, and (order-insensitive)
+    // distributionals so edits to any of those enable "Save Current".
+    const placementKey = (s: Semester, c: Course) =>
+      `${s.id}:${c.code}:${c.grade ?? ""}:${[...(c.distributionals ?? [])]
+        .sort()
+        .join("+")}`;
+
+    // Create a set of placements to detect both additions/deletions AND moves
     const currentPlacements = new Set(
       semesters.flatMap((s) =>
         s.courses
           .filter((c) => c.status === "not-taken") // Only track planned courses
-          .map((c) => `${s.id}:${c.code}`),
+          .map((c) => placementKey(s, c)),
       ),
     );
     const initialPlacements = new Set(
       initialSemestersRef.current.flatMap((s) =>
         s.courses
           .filter((c) => c.status === "not-taken")
-          .map((c) => `${s.id}:${c.code}`),
+          .map((c) => placementKey(s, c)),
       ),
     );
 
@@ -376,10 +397,15 @@ export default function Simulator({
     const initialManualReqsStr = JSON.stringify(initialManualReqsRef.current);
     const manualReqsChanged = currentManualReqsStr !== initialManualReqsStr;
 
-    const changed = placementsChanged || manualReqsChanged;
+    // Compare add-on toggles against the loaded-plan snapshot
+    const togglesChanged =
+      showDistributionals !== initialTogglesRef.current.dist ||
+      showGrades !== initialTogglesRef.current.grades;
+
+    const changed = placementsChanged || manualReqsChanged || togglesChanged;
 
     setHasChanges(changed);
-  }, [semesters, simulatorManualReqs]);
+  }, [semesters, simulatorManualReqs, showDistributionals, showGrades]);
 
   // ------------ Saved plans load ------------
   useEffect(() => {
@@ -547,6 +573,26 @@ export default function Simulator({
     }
   };
 
+  // Immutable per-course update for the inline grade/distributional controls.
+  const updatePlannedCourse = (
+    semesterId: string,
+    courseCode: string,
+    patch: Partial<Pick<Course, "grade" | "distributionals">>,
+  ) => {
+    setSemesters((prev) =>
+      prev.map((sem) =>
+        sem.id === semesterId
+          ? {
+              ...sem,
+              courses: sem.courses.map((c) =>
+                c.code === courseCode ? { ...c, ...patch } : c,
+              ),
+            }
+          : sem,
+      ),
+    );
+  };
+
   // ------------ Planned set (for preview) ------------
   const plannedNow = useMemo<PlannedCoursePick[]>(() => {
     const codes = new Set<string>();
@@ -565,6 +611,44 @@ export default function Simulator({
   const plannedCodes = useMemo<string[]>(
     () => plannedNow.map((c) => c.code),
     [plannedNow],
+  );
+
+  // ------------ Live add-on derived props (no effects) ------------
+  // GPA entries for planned courses currently on the grid.
+  const plannedGpaEntries = useMemo<GPAEntry[]>(
+    () =>
+      semesters.flatMap((s) =>
+        s.courses
+          .filter((c) => c.status === "not-taken")
+          .map((c) => ({
+            grade: c.grade ?? null,
+            credits: getCourseCredits(c as Course & MaybeCreditFields),
+          })),
+      ),
+    [semesters],
+  );
+
+  // GPA entries from the student's real transcript (completed courses).
+  const completedGpaEntries = useMemo<GPAEntry[]>(
+    () =>
+      completedCourses
+        .filter((c) => c.status === "completed")
+        .map((c) => ({
+          grade: c.grade ?? null,
+          credits: getCourseCredits(c as Course & MaybeCreditFields),
+        })),
+    [completedCourses],
+  );
+
+  // Distributional assignments across planned courses (one string[] per course).
+  const plannedDistAssignments = useMemo<string[][]>(
+    () =>
+      semesters.flatMap((s) =>
+        s.courses
+          .filter((c) => c.status === "not-taken")
+          .map((c) => c.distributionals ?? []),
+      ),
+    [semesters],
   );
 
   // ------------ Live preview progress (local compute) ------------
@@ -682,6 +766,13 @@ export default function Simulator({
       JSON.stringify(plan.manualRequirements ?? []),
     ) as ManualRequirementEntry[];
 
+    setShowDistributionals(plan.showDistributionals ?? false);
+    setShowGrades(plan.showGrades ?? false);
+    initialTogglesRef.current = {
+      dist: plan.showDistributionals ?? false,
+      grades: plan.showGrades ?? false,
+    };
+
     const usedCodes = new Set<string>();
     plan.semesters.forEach((sem) =>
       sem.courses.forEach((course) => usedCodes.add(course.code)),
@@ -720,6 +811,8 @@ export default function Simulator({
         manualRequirements: simulatorManualReqs,
         createdAt: new Date().toISOString(),
         isDefault,
+        showDistributionals,
+        showGrades,
       };
 
       const updatedPlans: Plan[] =
@@ -808,6 +901,9 @@ export default function Simulator({
       ),
     );
     setSimulatorManualReqs([]);
+    setShowDistributionals(false);
+    setShowGrades(false);
+    initialTogglesRef.current = { dist: false, grades: false };
     setCurrentPlanName(null);
   };
 
@@ -882,6 +978,30 @@ export default function Simulator({
 
           {/* Action Buttons */}
           <div className="flex items-center gap-2 flex-wrap shrink-0" data-tour="simulator-plan-actions">
+            <button
+              type="button"
+              onClick={() => setShowGrades((v) => !v)}
+              aria-pressed={showGrades}
+              className={`px-4 py-2 text-sm rounded-xl backdrop-blur-sm border flex items-center gap-2 transition-all ${
+                showGrades
+                  ? "bg-gradient-to-r from-emerald-500/15 to-teal-500/15 text-emerald-600 dark:text-emerald-300 border-emerald-500/30 hover:border-emerald-400/40"
+                  : "bg-black/[0.04] dark:bg-white/[0.04] text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-black/[0.06] dark:hover:bg-white/[0.08] border-black/[0.06] dark:border-white/[0.08]"
+              }`}
+            >
+              GPA
+            </button>
+            <button
+              type="button"
+              onClick={() => setShowDistributionals((v) => !v)}
+              aria-pressed={showDistributionals}
+              className={`px-4 py-2 text-sm rounded-xl backdrop-blur-sm border flex items-center gap-2 transition-all ${
+                showDistributionals
+                  ? "bg-gradient-to-r from-purple-500/15 to-blue-500/15 text-purple-600 dark:text-purple-300 border-purple-500/30 hover:border-purple-400/40"
+                  : "bg-black/[0.04] dark:bg-white/[0.04] text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-black/[0.06] dark:hover:bg-white/[0.08] border-black/[0.06] dark:border-white/[0.08]"
+              }`}
+            >
+              Distributionals
+            </button>
             <button
               onClick={() => setShowHelp((v) => !v)}
               className="px-4 py-2 text-sm rounded-xl bg-black/[0.04] dark:bg-white/[0.04] backdrop-blur-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-black/[0.06] dark:hover:bg-white/[0.08] border border-black/[0.06] dark:border-white/[0.08] flex items-center gap-2 transition-all"
@@ -1022,6 +1142,23 @@ export default function Simulator({
           )}
         </AnimatePresence>
       </div>
+
+      {/* Live GPA / Distributionals add-on sections */}
+      {(showGrades || showDistributionals) && (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          {showGrades && (
+            <SimulatorGradesSection
+              completed={completedGpaEntries}
+              planned={plannedGpaEntries}
+            />
+          )}
+          {showDistributionals && (
+            <SimulatorDistributionalsSection
+              assignments={plannedDistAssignments}
+            />
+          )}
+        </div>
+      )}
 
       {/* Available Courses Pool */}
       <div className="sticky top-[72px] z-20 mb-2" data-tour="simulator-course-pool">
@@ -1178,7 +1315,12 @@ export default function Simulator({
                       }
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
-                      className={`w-full flex items-center justify-between px-2 py-1 rounded-lg text-xs select-none transition-all border relative group shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]
+                      className={`w-full flex ${
+                        course.status === "not-taken" &&
+                        (showGrades || showDistributionals)
+                          ? "flex-col items-stretch"
+                          : "items-center justify-between"
+                      } px-2 py-1 rounded-lg text-xs select-none transition-all border relative group shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]
                         ${
                           course.status === "completed"
                             ? "bg-emerald-100 dark:bg-emerald-900/25 text-emerald-700 dark:text-emerald-300 border-emerald-300 dark:border-emerald-700/40"
@@ -1209,6 +1351,47 @@ export default function Simulator({
                           </button>
                         )}
                       </div>
+                      {course.status === "not-taken" &&
+                        (showGrades || showDistributionals) && (
+                          <div
+                            className="w-full mt-1.5 pt-1.5 border-t border-black/[0.06] dark:border-white/[0.08] flex flex-col gap-1.5"
+                            onClick={(e) => e.stopPropagation()}
+                            onMouseDown={(e) => e.stopPropagation()}
+                            draggable
+                            onDragStart={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                            }}
+                          >
+                            {showGrades && (
+                              <div className="flex items-center gap-1.5">
+                                <span className="text-[10px] opacity-60">
+                                  Grade
+                                </span>
+                                <CourseGradeControl
+                                  value={course.grade}
+                                  onChange={(grade) =>
+                                    updatePlannedCourse(
+                                      semester.id,
+                                      course.code,
+                                      { grade },
+                                    )
+                                  }
+                                />
+                              </div>
+                            )}
+                            {showDistributionals && (
+                              <CourseDistributionalControl
+                                value={course.distributionals ?? []}
+                                onChange={(codes) =>
+                                  updatePlannedCourse(semester.id, course.code, {
+                                    distributionals: codes,
+                                  })
+                                }
+                              />
+                            )}
+                          </div>
+                        )}
                     </motion.div>
                   ))}
                 </div>

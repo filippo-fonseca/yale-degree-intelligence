@@ -119,12 +119,16 @@ function StatTile({
 
 function BarList({
   title,
+  subtitle,
   data,
   valueSuffix = "",
+  ranked = false,
 }: {
   title: string;
+  subtitle?: string;
   data: Entry[];
   valueSuffix?: string;
+  ranked?: boolean;
 }) {
   const max = useMemo(
     () => Math.max(...data.map((entry) => entry.value), 1),
@@ -132,21 +136,36 @@ function BarList({
   );
 
   return (
-    <section className="rounded-xl border border-gray-200 bg-white p-4 shadow-neu dark:border-gray-800/60 dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/70 dark:via-gray-900/50 dark:to-gray-950/70">
-      <h2 className="mb-4 text-sm font-semibold text-gray-900 dark:text-white">
-        {title}
-      </h2>
-      <div className="space-y-3">
+    <section className="relative overflow-hidden rounded-xl border border-gray-200 bg-white/80 p-4 shadow-neu backdrop-blur-xl dark:border-white/10 dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/70 dark:via-gray-900/50 dark:to-gray-950/70">
+      <div className="pointer-events-none absolute -right-16 -top-16 h-40 w-40 rounded-full bg-violet-500/10 blur-3xl dark:bg-violet-500/20" />
+      <div className="relative mb-4 flex items-baseline justify-between gap-3">
+        <h2 className="text-sm font-semibold text-gray-900 dark:text-white">
+          {title}
+        </h2>
+        {subtitle && (
+          <span className="shrink-0 text-[11px] font-medium text-gray-400">
+            {subtitle}
+          </span>
+        )}
+      </div>
+      <div className="relative space-y-3">
         {data.length === 0 ? (
           <p className="py-6 text-center text-sm text-gray-400">No data yet.</p>
         ) : (
-          data.map((entry) => (
+          data.map((entry, i) => (
             <div key={entry.label}>
               <div className="mb-1 flex items-center justify-between gap-3 text-xs">
-                <span className="truncate font-medium text-gray-700 dark:text-gray-300">
-                  {entry.label}
+                <span className="flex min-w-0 items-center gap-2">
+                  {ranked && (
+                    <span className="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-gray-100 text-[10px] font-semibold tabular-nums text-gray-500 dark:bg-white/[0.06] dark:text-gray-400">
+                      {i + 1}
+                    </span>
+                  )}
+                  <span className="truncate font-medium text-gray-700 dark:text-gray-300">
+                    {entry.label}
+                  </span>
                 </span>
-                <span className="shrink-0 text-gray-500 dark:text-gray-400">
+                <span className="shrink-0 tabular-nums text-gray-500 dark:text-gray-400">
                   {formatNumber(entry.value)}
                   {valueSuffix}
                 </span>
@@ -692,9 +711,23 @@ export default function AdminPage() {
                 <DonutCard title="Course statuses" data={stats.distributions.courseStatuses} centerLabel="courses" />
                 <DonutCard title="Distributional tags" data={stats.distributions.distributionals} centerLabel="courses" />
                 <DonutCard title="Grades" data={stats.distributions.grades} centerLabel="grades" />
-                <BarList title="Departments by courses" data={stats.distributions.departmentsByCourses.slice(0, 12)} />
-                <BarList title="Departments by credits" data={stats.distributions.departmentsByCredits.slice(0, 12)} valueSuffix=" cr" />
-                <BarList title="Heaviest course loads" data={stats.users.heaviestCourseLoads.map((u) => ({ label: u.displayName, value: u.courseCount }))} />
+                <BarList
+                  title="Departments by courses"
+                  subtitle={stats.distributions.departmentsByCourses.length > 12 ? "Top 12" : undefined}
+                  data={stats.distributions.departmentsByCourses.slice(0, 12)}
+                />
+                <BarList
+                  title="Departments by credits"
+                  subtitle={stats.distributions.departmentsByCredits.length > 12 ? "Top 12" : undefined}
+                  data={stats.distributions.departmentsByCredits.slice(0, 12)}
+                  valueSuffix=" cr"
+                />
+                <BarList
+                  title="Heaviest course loads"
+                  subtitle="Leaderboard"
+                  ranked
+                  data={stats.users.heaviestCourseLoads.map((u) => ({ label: u.displayName, value: u.courseCount }))}
+                />
               </div>
             </section>
 

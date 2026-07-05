@@ -338,19 +338,28 @@ export default function Home() {
     if (!user) return;
 
     setProfileLoading(true);
-    const unsub = onSnapshot(doc(db, "users", user.uid), (docSnap) => {
-      if (docSnap.exists()) {
-        const data = docSnap.data() as UserProfile;
-        setUserProfile(data);
-        setSelectedMajor(data.majors?.[0] || "");
-        setShowMajorSelection(false); // auto-close once profile exists
-      } else {
-        setUserProfile(null);
-        setShowMajorSelection(true);
-      }
-      // Profile snapshot has now resolved at least once.
-      setProfileLoading(false);
-    });
+    const unsub = onSnapshot(
+      doc(db, "users", user.uid),
+      (docSnap) => {
+        if (docSnap.exists()) {
+          const data = docSnap.data() as UserProfile;
+          setUserProfile(data);
+          setSelectedMajor(data.majors?.[0] || "");
+          setShowMajorSelection(false); // auto-close once profile exists
+        } else {
+          setUserProfile(null);
+          setShowMajorSelection(true);
+        }
+        // Profile snapshot has now resolved at least once.
+        setProfileLoading(false);
+      },
+      (error) => {
+        // Without this, a Firestore error leaves profileLoading stuck true and
+        // the render gate hangs on the loader until a manual refresh.
+        console.error("Error subscribing to user profile:", error);
+        setProfileLoading(false);
+      },
+    );
     return () => unsub();
   }, [user]);
 

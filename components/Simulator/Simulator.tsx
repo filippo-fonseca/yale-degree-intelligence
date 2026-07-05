@@ -20,6 +20,8 @@ import { db } from "@/config/firebase";
 import ManualCourseLookupModal from "./ManualCourseLookupModal";
 import SimulatorManualAssignModal from "./SimulatorManualAssignModal";
 import SimulatorRequirementsBreakdown from "./SimulatorRequirementsBreakdown";
+import CourseGradeControl from "./CourseGradeControl";
+import CourseDistributionalControl from "./CourseDistributionalControl";
 import {
   calculatePreviewMajorProgressByMajors,
   MajorProgress,
@@ -567,6 +569,26 @@ export default function Simulator({
         prev.some((c) => c.code === rc.code) ? prev : [...prev, rc],
       );
     }
+  };
+
+  // Immutable per-course update for the inline grade/distributional controls.
+  const updatePlannedCourse = (
+    semesterId: string,
+    courseCode: string,
+    patch: Partial<Pick<Course, "grade" | "distributionals">>,
+  ) => {
+    setSemesters((prev) =>
+      prev.map((sem) =>
+        sem.id === semesterId
+          ? {
+              ...sem,
+              courses: sem.courses.map((c) =>
+                c.code === courseCode ? { ...c, ...patch } : c,
+              ),
+            }
+          : sem,
+      ),
+    );
   };
 
   // ------------ Planned set (for preview) ------------
@@ -1236,7 +1258,12 @@ export default function Simulator({
                       }
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
-                      className={`w-full flex items-center justify-between px-2 py-1 rounded-lg text-xs select-none transition-all border relative group shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]
+                      className={`w-full flex ${
+                        course.status === "not-taken" &&
+                        (showGrades || showDistributionals)
+                          ? "flex-col items-stretch"
+                          : "items-center justify-between"
+                      } px-2 py-1 rounded-lg text-xs select-none transition-all border relative group shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]
                         ${
                           course.status === "completed"
                             ? "bg-emerald-100 dark:bg-emerald-900/25 text-emerald-700 dark:text-emerald-300 border-emerald-300 dark:border-emerald-700/40"
@@ -1267,6 +1294,47 @@ export default function Simulator({
                           </button>
                         )}
                       </div>
+                      {course.status === "not-taken" &&
+                        (showGrades || showDistributionals) && (
+                          <div
+                            className="w-full mt-1.5 pt-1.5 border-t border-black/[0.06] dark:border-white/[0.08] flex flex-col gap-1.5"
+                            onClick={(e) => e.stopPropagation()}
+                            onMouseDown={(e) => e.stopPropagation()}
+                            draggable
+                            onDragStart={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                            }}
+                          >
+                            {showGrades && (
+                              <div className="flex items-center gap-1.5">
+                                <span className="text-[10px] opacity-60">
+                                  Grade
+                                </span>
+                                <CourseGradeControl
+                                  value={course.grade}
+                                  onChange={(grade) =>
+                                    updatePlannedCourse(
+                                      semester.id,
+                                      course.code,
+                                      { grade },
+                                    )
+                                  }
+                                />
+                              </div>
+                            )}
+                            {showDistributionals && (
+                              <CourseDistributionalControl
+                                value={course.distributionals ?? []}
+                                onChange={(codes) =>
+                                  updatePlannedCourse(semester.id, course.code, {
+                                    distributionals: codes,
+                                  })
+                                }
+                              />
+                            )}
+                          </div>
+                        )}
                     </motion.div>
                   ))}
                 </div>

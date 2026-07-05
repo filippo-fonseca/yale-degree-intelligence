@@ -338,19 +338,28 @@ export default function Home() {
     if (!user) return;
 
     setProfileLoading(true);
-    const unsub = onSnapshot(doc(db, "users", user.uid), (docSnap) => {
-      if (docSnap.exists()) {
-        const data = docSnap.data() as UserProfile;
-        setUserProfile(data);
-        setSelectedMajor(data.majors?.[0] || "");
-        setShowMajorSelection(false); // auto-close once profile exists
-      } else {
-        setUserProfile(null);
-        setShowMajorSelection(true);
-      }
-      // Profile snapshot has now resolved at least once.
-      setProfileLoading(false);
-    });
+    const unsub = onSnapshot(
+      doc(db, "users", user.uid),
+      (docSnap) => {
+        if (docSnap.exists()) {
+          const data = docSnap.data() as UserProfile;
+          setUserProfile(data);
+          setSelectedMajor(data.majors?.[0] || "");
+          setShowMajorSelection(false); // auto-close once profile exists
+        } else {
+          setUserProfile(null);
+          setShowMajorSelection(true);
+        }
+        // Profile snapshot has now resolved at least once.
+        setProfileLoading(false);
+      },
+      (error) => {
+        // Without this, a Firestore error leaves profileLoading stuck true and
+        // the render gate hangs on the loader until a manual refresh.
+        console.error("Error subscribing to user profile:", error);
+        setProfileLoading(false);
+      },
+    );
     return () => unsub();
   }, [user]);
 
@@ -366,6 +375,10 @@ export default function Home() {
         } else {
           setFriendsEnabled(false);
         }
+      },
+      (error) => {
+        console.error("Error subscribing to friends data:", error);
+        setFriendsEnabled(false);
       },
     );
     return () => unsub();
@@ -441,26 +454,35 @@ export default function Home() {
   const fetchCourses = async () => {
     if (!user) return;
 
-    const q = query(collection(db, "courses"), where("userId", "==", user.uid));
-    const querySnapshot = await getDocs(q);
-    const coursesData: Course[] = [];
+    try {
+      const q = query(
+        collection(db, "courses"),
+        where("userId", "==", user.uid),
+      );
+      const querySnapshot = await getDocs(q);
+      const coursesData: Course[] = [];
 
-    querySnapshot.forEach((doc) => {
-      coursesData.push({ id: doc.id, ...doc.data() } as Course);
-    });
+      querySnapshot.forEach((doc) => {
+        coursesData.push({ id: doc.id, ...doc.data() } as Course);
+      });
 
-    // Use functional update to ensure we get the latest state
-    setCourses((prevCourses) => {
-      // Only update if there are actual changes to prevent unnecessary re-renders
-      if (JSON.stringify(prevCourses) !== JSON.stringify(coursesData)) {
-        return coursesData;
-      }
-      return prevCourses;
-    });
+      // Use functional update to ensure we get the latest state
+      setCourses((prevCourses) => {
+        // Only update if there are actual changes to prevent unnecessary re-renders
+        if (JSON.stringify(prevCourses) !== JSON.stringify(coursesData)) {
+          return coursesData;
+        }
+        return prevCourses;
+      });
 
-    setHasData(coursesData.length > 0);
-
-    setCoursesLoading(false);
+      setHasData(coursesData.length > 0);
+    } catch (error) {
+      // Without this, a failed getDocs leaves coursesLoading stuck true and the
+      // render gate hangs on the loader until a manual refresh.
+      console.error("Error fetching courses:", error);
+    } finally {
+      setCoursesLoading(false);
+    }
   };
 
   const checkAndRemoveDuplicates = async (userId: string) => {

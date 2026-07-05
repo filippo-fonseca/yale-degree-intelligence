@@ -68,17 +68,6 @@ type AdminStats = {
     grades: Entry[];
     distributionals: Entry[];
   };
-  users: {
-    recent: {
-      id: string;
-      displayName: string;
-      email: string | null;
-      majors: string[];
-      graduationYear: number | null;
-      courseCount: number;
-      updatedAt: string | null;
-    }[];
-  };
 };
 
 // Approximate total Yale undergraduate population, used to gauge what share of
@@ -567,7 +556,6 @@ export default function AdminPage() {
               {[
                 { href: "#overview", label: "Overview" },
                 { href: "#charts", label: "Charts" },
-                { href: "#users", label: "Users" },
               ].map((anchor) => (
                 <a
                   key={anchor.href}
@@ -732,59 +720,6 @@ export default function AdminPage() {
                   data={stats.distributions.departmentsByCredits.slice(0, 12)}
                   valueSuffix=" cr"
                 />
-              </div>
-            </section>
-
-            <section id="users" className="scroll-mt-20 space-y-4">
-              <h2 className="font-louize text-lg font-medium text-gray-950 dark:text-white">
-                Users
-              </h2>
-              <div className="relative overflow-hidden rounded-xl border border-gray-200 bg-white/80 p-4 shadow-neu backdrop-blur-xl dark:border-white/10 dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/70 dark:via-gray-900/50 dark:to-gray-950/70">
-              <div className="pointer-events-none absolute -right-20 -top-20 h-48 w-48 rounded-full bg-violet-500/10 blur-3xl dark:bg-violet-500/20" />
-              <div className="relative mb-4 flex items-center justify-between gap-3">
-                <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
-                  Recently updated users
-                </h3>
-              </div>
-              <div className="relative overflow-x-auto">
-                <table className="w-full min-w-[720px] text-left text-sm">
-                  <thead className="text-xs uppercase tracking-wider text-gray-400">
-                    <tr>
-                      <th className="border-b border-gray-100 py-2 pr-4 dark:border-gray-800">User</th>
-                      <th className="border-b border-gray-100 py-2 pr-4 dark:border-gray-800">Majors</th>
-                      <th className="border-b border-gray-100 py-2 pr-4 dark:border-gray-800">Year</th>
-                      <th className="border-b border-gray-100 py-2 pr-4 dark:border-gray-800">Courses</th>
-                      <th className="border-b border-gray-100 py-2 dark:border-gray-800">Updated</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {stats.users.recent.map((recentUser) => (
-                      <tr key={recentUser.id} className="text-gray-700 dark:text-gray-300">
-                        <td className="border-b border-gray-100 py-2 pr-4 dark:border-gray-800">
-                          <div className="font-medium text-gray-950 dark:text-white">
-                            {recentUser.displayName}
-                          </div>
-                          <div className="text-xs text-gray-400">{recentUser.email}</div>
-                        </td>
-                        <td className="border-b border-gray-100 py-2 pr-4 dark:border-gray-800">
-                          {recentUser.majors.length ? recentUser.majors.join(", ") : "None"}
-                        </td>
-                        <td className="border-b border-gray-100 py-2 pr-4 dark:border-gray-800">
-                          {recentUser.graduationYear || "-"}
-                        </td>
-                        <td className="border-b border-gray-100 py-2 pr-4 dark:border-gray-800">
-                          {recentUser.courseCount}
-                        </td>
-                        <td className="border-b border-gray-100 py-2 dark:border-gray-800">
-                          {recentUser.updatedAt
-                            ? new Date(recentUser.updatedAt).toLocaleString()
-                            : "-"}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
               </div>
             </section>
           </div>

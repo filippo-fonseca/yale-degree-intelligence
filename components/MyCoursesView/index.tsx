@@ -540,9 +540,9 @@ export default function MyCoursesView({
   /*  Loaded state                                                     */
   /* ================================================================ */
   return (
-    <div className="space-y-6">
+    <div className="flex h-full min-h-0 flex-col">
       {/* ---- Header ---- */}
-      <div className="mb-4 lg:mb-6 flex flex-col sm:flex-row justify-between items-start gap-3">
+      <div className="shrink-0 mb-4 lg:mb-6 flex flex-col sm:flex-row justify-between items-start gap-3">
         <div>
           <h2 className="text-xl sm:text-2xl lg:text-3xl font-medium text-gray-900 dark:text-white">
             Your academic journey at Yale
@@ -576,7 +576,7 @@ export default function MyCoursesView({
       </div>
 
       {/* ---- Stat cards ---- */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+      <div className="shrink-0 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 mb-6">
         <StatCard
           label="Total courses"
           value={stats.totalCourses}
@@ -608,8 +608,8 @@ export default function MyCoursesView({
         />
       </div>
 
-      {/* ---- Search + filter + sort controls (sticky while scrolling semesters) ---- */}
-      <div className="sticky top-0 z-20 p-3 rounded-xl bg-white/95 dark:bg-gray-950/80 dark:bg-gradient-to-br dark:from-gray-900/80 dark:via-gray-900/70 dark:to-gray-950/80 backdrop-blur-xl border border-gray-200 dark:border-gray-800/50 shadow-neu">
+      {/* ---- Search + filter + sort controls (fixed frame; only the list below scrolls) ---- */}
+      <div className="shrink-0 z-20 mb-6 p-3 rounded-xl bg-white/95 dark:bg-gray-950/80 dark:bg-gradient-to-br dark:from-gray-900/80 dark:via-gray-900/70 dark:to-gray-950/80 backdrop-blur-xl border border-gray-200 dark:border-gray-800/50 shadow-neu">
         <div className="flex flex-col sm:flex-row gap-2">
           {/* Search */}
           <div className="relative flex-1 min-w-0">
@@ -701,12 +701,14 @@ export default function MyCoursesView({
         )}
       </div>
 
+      {/* ---- Scrollable region: ONLY the course list + disclaimer scroll ---- */}
+      <div className="flex-1 min-h-0 overflow-y-auto overflow-x-clip -mx-1 px-1">
       {/* ---- Course list ---- */}
       <div className="space-y-8">
         {groupBySemester && semesterGroups ? (
           /* Grouped by semester */
           <div className="grid gap-5 lg:grid-cols-[10rem_minmax(0,1fr)] items-start">
-            <aside className="lg:sticky lg:top-24 lg:self-start">
+            <aside className="lg:sticky lg:top-2 lg:self-start">
               <div className="flex lg:block gap-2 overflow-x-auto lg:overflow-visible pb-2 lg:pb-0 -mx-1 px-1 lg:mx-0 lg:px-0">
                 {semesterGroups.map(([semester, semCourses]) => {
                   const hasInProgress = semesterHasInProgress(semester);
@@ -778,7 +780,7 @@ export default function MyCoursesView({
                     }}
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
-                    className="scroll-mt-28"
+                    className="scroll-mt-4"
                   >
                     {/* Header row: collapse toggle + add-course button as siblings
                         (never a button nested in a button). */}
@@ -950,6 +952,7 @@ export default function MyCoursesView({
           simply a free, student-built personal project that we wanted to share
           with the community because we genuinely found it helpful for ourselves.
         </p>
+      </div>
       </div>
 
       {/* ---- Modals ---- */}

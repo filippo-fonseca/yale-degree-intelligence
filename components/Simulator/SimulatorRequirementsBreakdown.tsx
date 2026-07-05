@@ -240,22 +240,22 @@ export default function SimulatorRequirementsBreakdown({
 
             {/* Progress bar (always visible) - three tiers */}
             <div className="px-3 pb-2.5 -mt-0.5">
-              <div className="w-full bg-gray-200 dark:bg-gray-950/50 h-1.5 rounded-full overflow-hidden relative shadow-[inset_0_1px_2px_rgba(0,0,0,0.1)] dark:shadow-[inset_0_1px_2px_rgba(0,0,0,0.3)]">
+              <div className="relative w-full bg-gray-200 dark:bg-gray-800/70 h-2 rounded-full overflow-hidden shadow-[inset_0_1px_2px_rgba(0,0,0,0.08)] dark:shadow-[inset_0_1px_2px_rgba(0,0,0,0.3)]">
                 {/* Planned layer (purple, lightest) */}
                 <div
-                  className="h-1.5 bg-gradient-to-r from-purple-400 to-purple-500 opacity-30 absolute top-0 left-0 rounded-full"
+                  className="absolute inset-y-0 left-0 bg-purple-300 dark:bg-purple-500/40 rounded-full"
                   style={{ width: `${Math.min(100, pctWithPlanned)}%` }}
                   aria-hidden
                 />
                 {/* In-progress layer (blue, medium) */}
                 <div
-                  className="h-1.5 bg-gradient-to-r from-blue-400 to-blue-500 opacity-50 absolute top-0 left-0 rounded-full"
+                  className="absolute inset-y-0 left-0 bg-blue-400 dark:bg-blue-500/60 rounded-full"
                   style={{ width: `${Math.min(100, pctWithIP)}%` }}
                   aria-hidden
                 />
-                {/* Completed layer (green, solid) */}
+                {/* Completed layer (solid violet gradient with glow) */}
                 <div
-                  className="h-1.5 bg-gradient-to-r from-emerald-400 to-emerald-500 relative rounded-full shadow-[0_0_6px_rgba(52,211,153,0.3)]"
+                  className="absolute inset-y-0 left-0 bg-gradient-to-r from-blue-500 via-violet-500 to-fuchsia-500 rounded-full shadow-[0_0_10px_rgba(168,85,247,0.75)]"
                   style={{ width: `${Math.min(100, pctCompleted)}%` }}
                 />
               </div>

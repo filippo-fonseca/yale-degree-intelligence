@@ -814,12 +814,23 @@ export default function Home() {
     if (!user) return;
 
     try {
+      // Stamp createdAt only on first creation (set-if-missing), leaving it
+      // intact on later updates. When userProfile is already loaded the doc
+      // exists, so we skip the existence read entirely on the common edit path
+      // and only pay for it when in-memory state suggests a possible first write.
+      let isFirstWrite = false;
+      if (!userProfile) {
+        const existingSnap = await getDoc(doc(db, "users", user.uid));
+        isFirstWrite = !existingSnap.exists();
+      }
+
       await setDoc(
         doc(db, "users", user.uid),
         {
           ...userProfile,
           ...updatedProfile,
           updatedAt: new Date(),
+          ...(isFirstWrite ? { createdAt: new Date() } : {}),
         },
         { merge: true },
       );

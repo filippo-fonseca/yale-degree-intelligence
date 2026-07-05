@@ -33,6 +33,7 @@ import {
   ShieldCheck,
   Sparkles,
   Sun,
+  Target,
   TrendingUp,
   Users,
 } from "lucide-react";
@@ -85,6 +86,10 @@ type AdminStats = {
     }[];
   };
 };
+
+// Approximate total Yale undergraduate population, used to gauge what share of
+// the student body the app reaches. Figure is a rough estimate, not exact.
+const YALE_UNDERGRAD_POPULATION = 6600;
 
 const formatNumber = (value: number | undefined) =>
   typeof value === "number" ? value.toLocaleString() : "0";
@@ -654,6 +659,15 @@ export default function AdminPage() {
                 value={formatNumber(stats.overview.totalUsers)}
                 sub={`${formatNumber(stats.overview.profilesCreated)} of ${formatNumber(stats.overview.totalUsers)} have a profile`}
                 icon={<Users className="h-4 w-4" />}
+              />
+              <StatTile
+                label="Yale coverage"
+                value={`${Math.min(
+                  (stats.overview.totalUsers / YALE_UNDERGRAD_POPULATION) * 100,
+                  100,
+                ).toFixed(1)}%`}
+                sub={`${formatNumber(stats.overview.totalUsers)} of ~6,600 undergrads`}
+                icon={<Target className="h-4 w-4" />}
               />
               <StatTile
                 label="Courses"

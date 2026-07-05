@@ -23,6 +23,8 @@ export interface Plan {
   manualRequirements?: any[];
   createdAt: string;
   isDefault?: boolean;
+  showDistributionals?: boolean;
+  showGrades?: boolean;
 }
 
 const TERMS = ["Spring", "Fall"] as const;

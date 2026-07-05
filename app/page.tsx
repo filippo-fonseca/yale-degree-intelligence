@@ -792,12 +792,19 @@ export default function Home() {
     if (!user) return;
 
     try {
+      // Stamp createdAt only on first creation (set-if-missing). This is the
+      // earliest write to the user doc, so if it doesn't exist yet this is the
+      // create path; on later updates we leave the original createdAt intact.
+      const existingSnap = await getDoc(doc(db, "users", user.uid));
+      const isFirstWrite = !existingSnap.exists();
+
       await setDoc(
         doc(db, "users", user.uid),
         {
           ...userProfile,
           ...updatedProfile,
           updatedAt: new Date(),
+          ...(isFirstWrite ? { createdAt: new Date() } : {}),
         },
         { merge: true },
       );

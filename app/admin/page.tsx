@@ -7,6 +7,15 @@ import { useAuth } from "@/context/AuthContext";
 import { useTheme } from "@/context/ThemeContext";
 import { ADMIN_EMAIL } from "@/lib/admin";
 import {
+  Area,
+  AreaChart,
+  CartesianGrid,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
+import {
   BarChart3,
   BookOpen,
   Brain,
@@ -18,6 +27,7 @@ import {
   ShieldCheck,
   Sparkles,
   Sun,
+  TrendingUp,
   Users,
 } from "lucide-react";
 
@@ -131,6 +141,93 @@ function BarList({
           ))
         )}
       </div>
+    </section>
+  );
+}
+
+const formatMonthLabel = (month: string) => {
+  const [year, m] = month.split("-");
+  if (!year || !m) return month;
+  const date = new Date(Number(year), Number(m) - 1, 1);
+  return date.toLocaleDateString(undefined, { month: "short", year: "2-digit" });
+};
+
+function UsersOverTimeChart({
+  data,
+  isDark,
+}: {
+  data: UsersOverTimePoint[];
+  isDark: boolean;
+}) {
+  const axisColor = isDark ? "#9ca3af" : "#6b7280";
+  const gridColor = isDark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.06)";
+  const accent = "#7c3aed";
+
+  return (
+    <section className="rounded-xl border border-gray-200 bg-white p-4 shadow-neu dark:border-gray-800/60 dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/70 dark:via-gray-900/50 dark:to-gray-950/70">
+      <div className="mb-4 flex items-center gap-2">
+        <TrendingUp className="h-4 w-4 text-violet-500" />
+        <h2 className="text-sm font-semibold text-gray-900 dark:text-white">
+          User growth over time
+        </h2>
+      </div>
+      {data.length < 2 ? (
+        <p className="py-16 text-center text-sm text-gray-400">
+          Not enough signup history yet.
+        </p>
+      ) : (
+        <div className="h-64 w-full">
+          <ResponsiveContainer width="100%" height="100%">
+            <AreaChart data={data} margin={{ top: 4, right: 8, bottom: 0, left: -12 }}>
+              <defs>
+                <linearGradient id="adminUsersArea" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor={accent} stopOpacity={0.35} />
+                  <stop offset="100%" stopColor={accent} stopOpacity={0.02} />
+                </linearGradient>
+              </defs>
+              <CartesianGrid strokeDasharray="3 3" stroke={gridColor} vertical={false} />
+              <XAxis
+                dataKey="month"
+                tickFormatter={formatMonthLabel}
+                tick={{ fill: axisColor, fontSize: 11 }}
+                tickLine={false}
+                axisLine={{ stroke: gridColor }}
+                minTickGap={16}
+              />
+              <YAxis
+                allowDecimals={false}
+                width={44}
+                tick={{ fill: axisColor, fontSize: 11 }}
+                tickLine={false}
+                axisLine={false}
+              />
+              <Tooltip
+                contentStyle={{
+                  borderRadius: 12,
+                  border: `1px solid ${gridColor}`,
+                  background: isDark ? "#0a0a0a" : "#ffffff",
+                  color: isDark ? "#f9fafb" : "#111827",
+                  fontSize: 12,
+                }}
+                labelFormatter={(label) => formatMonthLabel(String(label))}
+                formatter={(value: number, name: string) => [
+                  formatNumber(value),
+                  name === "cumulative" ? "Total users" : "New signups",
+                ]}
+              />
+              <Area
+                type="monotone"
+                dataKey="cumulative"
+                stroke={accent}
+                strokeWidth={2}
+                fill="url(#adminUsersArea)"
+                dot={false}
+                activeDot={{ r: 4 }}
+              />
+            </AreaChart>
+          </ResponsiveContainer>
+        </div>
+      )}
     </section>
   );
 }
@@ -344,6 +441,11 @@ export default function AdminPage() {
                 icon={<Brain className="h-4 w-4" />}
               />
             </div>
+
+            <UsersOverTimeChart
+              data={stats.usersOverTime ?? []}
+              isDark={resolvedTheme === "dark"}
+            />
 
             <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
               <BarList title="Top majors" data={stats.distributions.majors} />

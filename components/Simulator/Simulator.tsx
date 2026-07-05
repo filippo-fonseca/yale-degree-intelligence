@@ -32,6 +32,7 @@ import {
   majorRequirements,
 } from "@/lib/majors";
 import type { GPAEntry } from "@/lib/gpa";
+import { allocateDistributionals } from "@/lib/distributionalAllocation";
 
 // ----------------- Types -----------------
 interface Semester {
@@ -175,6 +176,13 @@ export default function Simulator({
   );
   const [isPreviewLoading, setIsPreviewLoading] = useState<boolean>(false);
   const [previewError, setPreviewError] = useState<string | null>(null);
+
+  // Profile distributional preferences (mirrors the users/{uid} doc fields the
+  // main DistributionalProgress reads); used to seed the sim from real courses.
+  const [distribAutoAllocate, setDistribAutoAllocate] = useState(true);
+  const [distribOverrides, setDistribOverrides] = useState<
+    Record<string, string>
+  >({});
 
   // keep initial snapshot to detect changes
   const initialSemestersRef = useRef<Semester[]>([]);
@@ -427,8 +435,15 @@ export default function Simulator({
         const docRef = doc(db, "users", user.uid);
         const docSnap = await getDoc(docRef);
         const data = docSnap.exists()
-          ? (docSnap.data() as { savedPlans?: Plan[] })
+          ? (docSnap.data() as {
+              savedPlans?: Plan[];
+              distributionalAutoAllocate?: boolean;
+              distributionalAllocations?: Record<string, string>;
+            })
           : null;
+        // Seed the simulator's distributional base from the user's profile prefs.
+        setDistribAutoAllocate(data?.distributionalAutoAllocate ?? true);
+        setDistribOverrides(data?.distributionalAllocations ?? {});
         let plans = data?.savedPlans ?? [];
         if (plans.length > 0) {
           // Migrate existing users: if no default is set, the newest becomes default.
@@ -662,6 +677,23 @@ export default function Simulator({
       ),
     [semesters],
   );
+
+  // The profile base: distributionals already allocated to the student's real
+  // courses, using their saved auto/override preference. Single-counted per the
+  // same allocation the main DistributionalProgress uses, so the sim builds on
+  // real progress instead of starting from zero.
+  const completedDistAssignments = useMemo<string[][]>(() => {
+    const allocation = allocateDistributionals(completedCourses, {
+      auto: distribAutoAllocate,
+      overrides: distribOverrides,
+    });
+    return completedCourses
+      .map((c) => {
+        const req = allocation.reqByCourseKey[allocation.keyOf(c)];
+        return req ? [req] : null;
+      })
+      .filter((a): a is string[] => a !== null);
+  }, [completedCourses, distribAutoAllocate, distribOverrides]);
 
   // ------------ Live preview progress (local compute) ------------
   useEffect(() => {
@@ -1181,7 +1213,10 @@ export default function Simulator({
           )}
           {showDistributionals && (
             <SimulatorDistributionalsSection
-              assignments={plannedDistAssignments}
+              assignments={[
+                ...completedDistAssignments,
+                ...plannedDistAssignments,
+              ]}
             />
           )}
         </div>

@@ -843,11 +843,13 @@ export default function MyCoursesView({
                     }}
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
-                    className="scroll-mt-4"
+                    className="scroll-mt-16"
                   >
                     {/* Header row: collapse toggle + add-course button as siblings
-                        (never a button nested in a button). */}
-                    <div className="flex items-center justify-between mb-3 gap-2">
+                        (never a button nested in a button). Sticks to the top of
+                        the inner scroll container while this semester is in view,
+                        then gets pushed up by the next semester's header. */}
+                    <div className="sticky top-0 z-20 flex items-center justify-between mb-3 gap-2 py-2 rounded-lg bg-white/90 dark:bg-gray-950/85 backdrop-blur-md supports-[backdrop-filter]:bg-white/75 dark:supports-[backdrop-filter]:bg-gray-950/70">
                       <button
                         onClick={() => toggleSemesterCollapse(semester)}
                         className="flex-1 min-w-0 flex items-center justify-between group"

@@ -157,8 +157,14 @@ export async function GET(req: NextRequest) {
   for (const user of users) {
     const majors = Array.isArray(user.majors) ? user.majors : [];
     majorSlotsByUser.push(majors.length);
-    if (majors.length > 0 && user.graduationYear) profileCompleteUsers += 1;
-    if (typeof user.bio === "string" && user.bio.trim()) usersWithBio += 1;
+    const hasBio = typeof user.bio === "string" && user.bio.trim().length > 0;
+    // "Profile complete" is a single coherent completeness measure: the user
+    // has at least one major AND a graduation year AND a non-empty bio. The
+    // resulting profileCompletionRate below is this count over profilesCreated
+    // (you can't have a complete Firestore profile without a doc), so the
+    // number and its subtext are self-consistent.
+    if (majors.length > 0 && user.graduationYear && hasBio) profileCompleteUsers += 1;
+    if (hasBio) usersWithBio += 1;
     if (user.hasSeenTutorial) tutorialSeen += 1;
     if (user.hasSeenV3Welcome) welcomeSeen += 1;
     if (user.danWriteActionsEnabled) danWriteEnabled += 1;

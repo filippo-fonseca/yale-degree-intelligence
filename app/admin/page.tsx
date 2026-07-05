@@ -19,6 +19,8 @@ import {
   YAxis,
 } from "recharts";
 import {
+  ArrowDown,
+  ArrowUp,
   BarChart3,
   BookOpen,
   Brain,
@@ -361,17 +363,54 @@ function UsersOverTimeChart({
   // Keep X labels legible when there are many weeks: aim for ~10 ticks.
   const xInterval = data.length > 12 ? Math.ceil(data.length / 10) - 1 : 0;
 
+  // Headline = current cumulative total. Delta = growth over the last ~4 weeks
+  // (or the previous point when history is short), as a signed percentage.
+  const latest = data.length > 0 ? data[data.length - 1].cumulative : 0;
+  const lookback = Math.min(4, data.length - 1);
+  const prior =
+    lookback > 0 ? data[data.length - 1 - lookback].cumulative : latest;
+  const deltaPct =
+    prior > 0 ? ((latest - prior) / prior) * 100 : latest > 0 ? 100 : 0;
+  const hasDelta = data.length >= 2;
+  const deltaUp = deltaPct >= 0;
+
   return (
     <section className="relative overflow-hidden rounded-xl border border-gray-200 bg-white/80 p-4 shadow-neu backdrop-blur-xl dark:border-white/10 dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/70 dark:via-gray-900/50 dark:to-gray-950/70">
       <div className="pointer-events-none absolute -right-20 -top-20 h-48 w-48 rounded-full bg-emerald-500/10 blur-3xl dark:bg-emerald-500/20" />
-      <div className="relative mb-4 flex items-center gap-2">
-        <TrendingUp className="h-4 w-4 text-emerald-500" />
-        <h2 className="text-sm font-semibold text-gray-900 dark:text-white">
-          User growth
-        </h2>
-        <span className="ml-auto text-[11px] font-medium text-gray-400">
-          Weekly
-        </span>
+      <div className="relative mb-4">
+        <div className="flex items-center gap-2">
+          <TrendingUp className="h-4 w-4 text-emerald-500" />
+          <h2 className="text-sm font-semibold text-gray-900 dark:text-white">
+            User growth
+          </h2>
+          <span className="ml-auto text-[11px] font-medium text-gray-400">
+            Weekly
+          </span>
+        </div>
+        <div className="mt-3 flex items-end gap-3">
+          <p className="text-3xl font-bold leading-none tracking-tight text-gray-900 dark:text-white">
+            {formatNumber(latest)}
+          </p>
+          {hasDelta ? (
+            <span
+              className={`mb-0.5 inline-flex items-center gap-0.5 rounded-full px-1.5 py-0.5 text-xs font-semibold ${
+                deltaUp
+                  ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
+                  : "bg-red-500/10 text-red-600 dark:text-red-400"
+              }`}
+            >
+              {deltaUp ? (
+                <ArrowUp className="h-3 w-3" />
+              ) : (
+                <ArrowDown className="h-3 w-3" />
+              )}
+              {Math.abs(deltaPct).toFixed(1)}%
+            </span>
+          ) : null}
+        </div>
+        <p className="mt-1 text-[11px] text-gray-400">
+          Total users{lookback > 0 ? ` · vs ${lookback}w ago` : ""}
+        </p>
       </div>
       {data.length < 2 ? (
         <p className="py-16 text-center text-sm text-gray-400">

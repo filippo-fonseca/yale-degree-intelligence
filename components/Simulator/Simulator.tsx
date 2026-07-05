@@ -26,6 +26,7 @@ import {
   ManualRequirementEntry,
   majorRequirements,
 } from "@/lib/majors";
+import type { GPAEntry } from "@/lib/gpa";
 
 // ----------------- Types -----------------
 interface Semester {
@@ -47,6 +48,8 @@ type Plan = {
   manualRequirements?: ManualRequirementEntry[];
   createdAt: string; // ISO
   isDefault?: boolean;
+  showDistributionals?: boolean;
+  showGrades?: boolean;
 };
 
 type PreviewProgressMap = Record<string, MajorProgress>;
@@ -140,6 +143,9 @@ export default function Simulator({
   const [hasChanges, setHasChanges] = useState(false);
   const [showPool, setShowPool] = useState(false);
   const [showMajorPreview, setShowMajorPreview] = useState(true);
+  // Optional, independently-toggled live add-ons (both OFF by default).
+  const [showDistributionals, setShowDistributionals] = useState(false);
+  const [showGrades, setShowGrades] = useState(false);
   // Plan selector modal shown on initial load
   const [showPlanSelector, setShowPlanSelector] = useState(false);
   const [plansLoaded, setPlansLoaded] = useState(false);
@@ -168,6 +174,10 @@ export default function Simulator({
   // keep initial snapshot to detect changes
   const initialSemestersRef = useRef<Semester[]>([]);
   const initialManualReqsRef = useRef<ManualRequirementEntry[]>([]);
+  const initialTogglesRef = useRef<{ dist: boolean; grades: boolean }>({
+    dist: false,
+    grades: false,
+  });
   // True once a saved plan has been loaded, so the blank-grid rebuild effect
   // does not clobber the loaded plan when remaining/completed courses change.
   const planLoadedRef = useRef(false);
@@ -349,19 +359,26 @@ export default function Simulator({
   useEffect(() => {
     if (initialSemestersRef.current.length === 0) return;
 
-    // Create a set of "semesterId:courseCode" to detect both additions/deletions AND moves
+    // Placement key folds semester, code, projected grade, and (order-insensitive)
+    // distributionals so edits to any of those enable "Save Current".
+    const placementKey = (s: Semester, c: Course) =>
+      `${s.id}:${c.code}:${c.grade ?? ""}:${[...(c.distributionals ?? [])]
+        .sort()
+        .join("+")}`;
+
+    // Create a set of placements to detect both additions/deletions AND moves
     const currentPlacements = new Set(
       semesters.flatMap((s) =>
         s.courses
           .filter((c) => c.status === "not-taken") // Only track planned courses
-          .map((c) => `${s.id}:${c.code}`),
+          .map((c) => placementKey(s, c)),
       ),
     );
     const initialPlacements = new Set(
       initialSemestersRef.current.flatMap((s) =>
         s.courses
           .filter((c) => c.status === "not-taken")
-          .map((c) => `${s.id}:${c.code}`),
+          .map((c) => placementKey(s, c)),
       ),
     );
 
@@ -376,10 +393,15 @@ export default function Simulator({
     const initialManualReqsStr = JSON.stringify(initialManualReqsRef.current);
     const manualReqsChanged = currentManualReqsStr !== initialManualReqsStr;
 
-    const changed = placementsChanged || manualReqsChanged;
+    // Compare add-on toggles against the loaded-plan snapshot
+    const togglesChanged =
+      showDistributionals !== initialTogglesRef.current.dist ||
+      showGrades !== initialTogglesRef.current.grades;
+
+    const changed = placementsChanged || manualReqsChanged || togglesChanged;
 
     setHasChanges(changed);
-  }, [semesters, simulatorManualReqs]);
+  }, [semesters, simulatorManualReqs, showDistributionals, showGrades]);
 
   // ------------ Saved plans load ------------
   useEffect(() => {
@@ -682,6 +704,13 @@ export default function Simulator({
       JSON.stringify(plan.manualRequirements ?? []),
     ) as ManualRequirementEntry[];
 
+    setShowDistributionals(plan.showDistributionals ?? false);
+    setShowGrades(plan.showGrades ?? false);
+    initialTogglesRef.current = {
+      dist: plan.showDistributionals ?? false,
+      grades: plan.showGrades ?? false,
+    };
+
     const usedCodes = new Set<string>();
     plan.semesters.forEach((sem) =>
       sem.courses.forEach((course) => usedCodes.add(course.code)),
@@ -720,6 +749,8 @@ export default function Simulator({
         manualRequirements: simulatorManualReqs,
         createdAt: new Date().toISOString(),
         isDefault,
+        showDistributionals,
+        showGrades,
       };
 
       const updatedPlans: Plan[] =
@@ -808,6 +839,9 @@ export default function Simulator({
       ),
     );
     setSimulatorManualReqs([]);
+    setShowDistributionals(false);
+    setShowGrades(false);
+    initialTogglesRef.current = { dist: false, grades: false };
     setCurrentPlanName(null);
   };
 

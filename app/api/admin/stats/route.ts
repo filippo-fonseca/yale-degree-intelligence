@@ -223,6 +223,26 @@ export async function GET(req: NextRequest) {
     .sort((a, b) => b.courseCount - a.courseCount)
     .slice(0, 8);
 
+  // Signups bucketed by month for a users-over-time chart. Prefer createdAt;
+  // fall back to updatedAt for legacy docs written before createdAt existed.
+  // Docs with no usable timestamp are skipped. Sorted ascending with a running
+  // cumulative total.
+  const monthlyNewUsers: Record<string, number> = {};
+  for (const user of users) {
+    const stamp = toDateValue(user.createdAt) || toDateValue(user.updatedAt);
+    if (!stamp) continue;
+    const month = `${stamp.getUTCFullYear()}-${String(stamp.getUTCMonth() + 1).padStart(2, "0")}`;
+    monthlyNewUsers[month] = (monthlyNewUsers[month] || 0) + 1;
+  }
+  let cumulativeUsers = 0;
+  const usersOverTime = Object.keys(monthlyNewUsers)
+    .sort()
+    .map((month) => {
+      const count = monthlyNewUsers[month];
+      cumulativeUsers += count;
+      return { month, count, cumulative: cumulativeUsers };
+    });
+
   return NextResponse.json({
     generatedAt: new Date().toISOString(),
     overview: {
@@ -266,5 +286,6 @@ export async function GET(req: NextRequest) {
       recent: recentUsers,
       heaviestCourseLoads,
     },
+    usersOverTime,
   });
 }

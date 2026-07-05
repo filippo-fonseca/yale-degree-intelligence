@@ -390,8 +390,17 @@ export default function AdminPage() {
             <Loader2 className="h-5 w-5 animate-spin text-gray-400" />
           </div>
         ) : (
-          <div className="space-y-6">
-            <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+          <div className="space-y-12">
+            <section id="overview" className="scroll-mt-20 space-y-4">
+              <div className="flex items-baseline justify-between gap-3">
+                <h2 className="font-louize text-lg font-medium text-gray-950 dark:text-white">
+                  Overview
+                </h2>
+                <p className="text-xs text-gray-400">
+                  Generated {new Date(stats.generatedAt).toLocaleString()}
+                </p>
+              </div>
+              <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
               <StatTile
                 label="Users"
                 value={formatNumber(stats.overview.totalUsers)}
@@ -440,32 +449,38 @@ export default function AdminPage() {
                 sub={`${stats.overview.averageMessagesPerConversation} messages per convo`}
                 icon={<Brain className="h-4 w-4" />}
               />
-            </div>
+              </div>
+            </section>
 
-            <UsersOverTimeChart
-              data={stats.usersOverTime ?? []}
-              isDark={resolvedTheme === "dark"}
-            />
+            <section id="charts" className="scroll-mt-20 space-y-4">
+              <h2 className="font-louize text-lg font-medium text-gray-950 dark:text-white">
+                Charts
+              </h2>
+              <UsersOverTimeChart
+                data={stats.usersOverTime ?? []}
+                isDark={resolvedTheme === "dark"}
+              />
+              <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+                <BarList title="Top majors" data={stats.distributions.majors} />
+                <BarList title="Class years" data={stats.distributions.graduationYears} />
+                <BarList title="Departments by courses" data={stats.distributions.departmentsByCourses} />
+                <BarList title="Departments by credits" data={stats.distributions.departmentsByCredits} />
+                <BarList title="Course statuses" data={stats.distributions.courseStatuses} />
+                <BarList title="Distributional tags" data={stats.distributions.distributionals} />
+                <BarList title="Grades" data={stats.distributions.grades} />
+                <BarList title="Heaviest course loads" data={stats.users.heaviestCourseLoads.map((u) => ({ label: u.displayName, value: u.courseCount }))} />
+              </div>
+            </section>
 
-            <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-              <BarList title="Top majors" data={stats.distributions.majors} />
-              <BarList title="Class years" data={stats.distributions.graduationYears} />
-              <BarList title="Departments by courses" data={stats.distributions.departmentsByCourses} />
-              <BarList title="Departments by credits" data={stats.distributions.departmentsByCredits} />
-              <BarList title="Course statuses" data={stats.distributions.courseStatuses} />
-              <BarList title="Distributional tags" data={stats.distributions.distributionals} />
-              <BarList title="Grades" data={stats.distributions.grades} />
-              <BarList title="Heaviest course loads" data={stats.users.heaviestCourseLoads.map((u) => ({ label: u.displayName, value: u.courseCount }))} />
-            </div>
-
-            <section className="rounded-xl border border-gray-200 bg-white p-4 shadow-neu dark:border-gray-800/60 dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/70 dark:via-gray-900/50 dark:to-gray-950/70">
+            <section id="users" className="scroll-mt-20 space-y-4">
+              <h2 className="font-louize text-lg font-medium text-gray-950 dark:text-white">
+                Users
+              </h2>
+              <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-neu dark:border-gray-800/60 dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/70 dark:via-gray-900/50 dark:to-gray-950/70">
               <div className="mb-4 flex items-center justify-between gap-3">
-                <h2 className="text-sm font-semibold text-gray-900 dark:text-white">
+                <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
                   Recently updated users
-                </h2>
-                <p className="text-xs text-gray-400">
-                  Generated {new Date(stats.generatedAt).toLocaleString()}
-                </p>
+                </h3>
               </div>
               <div className="overflow-x-auto">
                 <table className="w-full min-w-[720px] text-left text-sm">
@@ -505,6 +520,7 @@ export default function AdminPage() {
                     ))}
                   </tbody>
                 </table>
+              </div>
               </div>
             </section>
           </div>

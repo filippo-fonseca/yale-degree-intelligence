@@ -641,31 +641,56 @@ export default function Simulator({
   );
 
   // ------------ Live add-on derived props (no effects) ------------
-  // GPA entries for planned courses currently on the grid.
-  const plannedGpaEntries = useMemo<GPAEntry[]>(
-    () =>
-      semesters.flatMap((s) =>
-        s.courses
-          .filter((c) => c.status === "not-taken")
-          .map((c) => ({
-            grade: c.grade ?? null,
-            credits: getCourseCredits(c as Course & MaybeCreditFields),
-          })),
-      ),
-    [semesters],
-  );
+  // Chronological, term-keyed GPA timeline: completed transcript courses merged
+  // with planned sim courses under a shared `${semester} ${year}` key.
+  const gpaTimelineTerms = useMemo<
+    { key: string; label: string; completed: GPAEntry[]; planned: GPAEntry[] }[]
+  >(() => {
+    const byKey = new Map<
+      string,
+      { completed: GPAEntry[]; planned: GPAEntry[] }
+    >();
+    const bucket = (key: string) => {
+      let b = byKey.get(key);
+      if (!b) {
+        b = { completed: [], planned: [] };
+        byKey.set(key, b);
+      }
+      return b;
+    };
 
-  // GPA entries from the student's real transcript (completed courses).
-  const completedGpaEntries = useMemo<GPAEntry[]>(
-    () =>
-      completedCourses
-        .filter((c) => c.status === "completed")
-        .map((c) => ({
+    completedCourses
+      .filter((c) => !c.skipped)
+      .forEach((c) => {
+        bucket(`${c.semester} ${c.year}`).completed.push({
           grade: c.grade ?? null,
           credits: getCourseCredits(c as Course & MaybeCreditFields),
-        })),
-    [completedCourses],
-  );
+        });
+      });
+
+    semesters.forEach((s) => {
+      s.courses
+        .filter((c) => c.status === "not-taken")
+        .forEach((c) => {
+          bucket(s.name).planned.push({
+            grade: c.grade ?? null,
+            credits: getCourseCredits(c as Course & MaybeCreditFields),
+          });
+        });
+    });
+
+    const seasonOrder: Record<string, number> = { Spring: 0, Summer: 1, Fall: 2 };
+    return Array.from(byKey.entries())
+      .map(([key, v]) => ({ key, label: key, ...v }))
+      .sort((a, b) => {
+        const [seasonA, yearA] = a.key.split(" ");
+        const [seasonB, yearB] = b.key.split(" ");
+        const yA = parseInt(yearA, 10);
+        const yB = parseInt(yearB, 10);
+        if (yA !== yB) return yA - yB;
+        return (seasonOrder[seasonA] ?? 0) - (seasonOrder[seasonB] ?? 0);
+      });
+  }, [completedCourses, semesters]);
 
   // Distributional assignments across planned courses (one string[] per course).
   const plannedDistAssignments = useMemo<string[][]>(
@@ -1206,10 +1231,7 @@ export default function Simulator({
       {(showGrades || showDistributionals) && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           {showGrades && (
-            <SimulatorGradesSection
-              completed={completedGpaEntries}
-              planned={plannedGpaEntries}
-            />
+            <SimulatorGradesSection terms={gpaTimelineTerms} />
           )}
           {showDistributionals && (
             <SimulatorDistributionalsSection

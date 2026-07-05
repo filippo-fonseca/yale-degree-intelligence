@@ -774,13 +774,25 @@ export default function MyCoursesView({
                       type="button"
                       onClick={() => jumpToSemester(semester)}
                       aria-current={isActive ? "true" : undefined}
-                      className={`group shrink-0 lg:w-full min-w-[8.75rem] lg:min-w-0 text-left px-3 py-2 rounded-lg border transition-all ${
+                      className={`group relative shrink-0 lg:w-full min-w-[8.75rem] lg:min-w-0 text-left px-3 py-2 rounded-lg border transition-colors ${
                         isActive
-                          ? "bg-white dark:bg-gray-900/70 border-pink-400/60 dark:border-pink-400/50 shadow-sm"
+                          ? "border-transparent"
                           : "bg-gray-50/70 dark:bg-gray-950/20 border-gray-200/70 dark:border-gray-800/50 hover:border-gray-300 dark:hover:border-gray-700"
                       } ${semesterGroups.length > 1 ? "lg:mb-2" : ""}`}
                     >
-                      <div className="flex items-center gap-2 min-w-0">
+                      {isActive && (
+                        <motion.span
+                          layoutId="active-semester-indicator"
+                          className="absolute inset-0 rounded-lg bg-white dark:bg-gray-900/70 border border-pink-400/60 dark:border-pink-400/50 shadow-sm"
+                          transition={{
+                            type: "spring",
+                            stiffness: 480,
+                            damping: 38,
+                          }}
+                          aria-hidden="true"
+                        />
+                      )}
+                      <div className="relative flex items-center gap-2 min-w-0">
                         <span
                           className={`w-1 h-5 rounded-full shrink-0 ${accent.bar}`}
                           aria-hidden="true"

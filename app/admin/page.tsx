@@ -8,11 +8,9 @@ import { useTheme } from "@/context/ThemeContext";
 import { ADMIN_EMAIL } from "@/lib/admin";
 import {
   Area,
-  Bar,
+  AreaChart,
   CartesianGrid,
   Cell,
-  ComposedChart,
-  Legend,
   Pie,
   PieChart,
   ResponsiveContainer,
@@ -305,7 +303,18 @@ const formatWeekTooltip = (weekStart: string) => {
   })}`;
 };
 
-// Styled, dark-mode-aware tooltip showing the week plus both series values.
+// Compact "18.6K" style formatter for large totals on the Y-axis + tooltip.
+const formatCompact = (value: number) => {
+  if (!Number.isFinite(value)) return "0";
+  if (Math.abs(value) >= 1000) {
+    const k = value / 1000;
+    // One decimal only when it adds signal (e.g. 18.6K, but 24K not 24.0K).
+    return `${k % 1 === 0 ? k.toFixed(0) : k.toFixed(1)}K`;
+  }
+  return value.toLocaleString();
+};
+
+// Styled, dark-mode-aware tooltip callout showing the week + cumulative total.
 function UsersOverTimeTooltip({
   active,
   payload,
@@ -318,8 +327,8 @@ function UsersOverTimeTooltip({
   isDark: boolean;
 }) {
   if (!active || !payload || payload.length === 0) return null;
-  const byKey = (key: string) =>
-    payload.find((p) => p.dataKey === key)?.value ?? 0;
+  const cumulative =
+    payload.find((p) => p.dataKey === "cumulative")?.value ?? 0;
   return (
     <div
       className="rounded-xl border px-3 py-2 text-xs shadow-lg"
@@ -329,14 +338,10 @@ function UsersOverTimeTooltip({
         color: isDark ? "#f9fafb" : "#111827",
       }}
     >
-      <p className="mb-1 font-semibold">{formatWeekTooltip(String(label))}</p>
-      <p className="flex items-center gap-1.5">
-        <span className="inline-block h-2 w-2 rounded-full" style={{ background: "#7c3aed" }} />
-        Total users: <span className="font-semibold">{formatNumber(byKey("cumulative"))}</span>
-      </p>
-      <p className="flex items-center gap-1.5">
-        <span className="inline-block h-2 w-2 rounded-sm" style={{ background: "#ec4899" }} />
-        New signups: <span className="font-semibold">{formatNumber(byKey("count"))}</span>
+      <p className="mb-0.5 text-[11px] text-gray-400">{formatWeekTooltip(String(label))}</p>
+      <p className="flex items-center gap-1.5 text-sm font-semibold">
+        <span className="inline-block h-2 w-2 rounded-full" style={{ background: "#10b981" }} />
+        {formatNumber(cumulative)}
       </p>
     </div>
   );
@@ -351,19 +356,18 @@ function UsersOverTimeChart({
 }) {
   const axisColor = isDark ? "#9ca3af" : "#6b7280";
   const gridColor = isDark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.06)";
-  const cumulativeColor = "#7c3aed"; // violet — running total
-  const newUsersColor = "#ec4899"; // pink — weekly new signups
+  const accentColor = "#10b981"; // emerald — running total glow
 
   // Keep X labels legible when there are many weeks: aim for ~10 ticks.
   const xInterval = data.length > 12 ? Math.ceil(data.length / 10) - 1 : 0;
 
   return (
     <section className="relative overflow-hidden rounded-xl border border-gray-200 bg-white/80 p-4 shadow-neu backdrop-blur-xl dark:border-white/10 dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/70 dark:via-gray-900/50 dark:to-gray-950/70">
-      <div className="pointer-events-none absolute -right-20 -top-20 h-48 w-48 rounded-full bg-violet-500/10 blur-3xl dark:bg-violet-500/20" />
+      <div className="pointer-events-none absolute -right-20 -top-20 h-48 w-48 rounded-full bg-emerald-500/10 blur-3xl dark:bg-emerald-500/20" />
       <div className="relative mb-4 flex items-center gap-2">
-        <TrendingUp className="h-4 w-4 text-violet-500" />
+        <TrendingUp className="h-4 w-4 text-emerald-500" />
         <h2 className="text-sm font-semibold text-gray-900 dark:text-white">
-          User growth over time
+          User growth
         </h2>
         <span className="ml-auto text-[11px] font-medium text-gray-400">
           Weekly
@@ -376,14 +380,21 @@ function UsersOverTimeChart({
       ) : (
         <div className="relative h-72 w-full">
           <ResponsiveContainer width="100%" height="100%">
-            <ComposedChart data={data} margin={{ top: 8, right: 12, bottom: 4, left: -4 }}>
+            <AreaChart data={data} margin={{ top: 8, right: 12, bottom: 4, left: -4 }}>
               <defs>
                 <linearGradient id="adminUsersArea" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor={cumulativeColor} stopOpacity={0.35} />
-                  <stop offset="100%" stopColor={cumulativeColor} stopOpacity={0.02} />
+                  <stop offset="0%" stopColor={accentColor} stopOpacity={0.4} />
+                  <stop offset="100%" stopColor={accentColor} stopOpacity={0} />
                 </linearGradient>
+                <filter id="adminUsersGlow" x="-20%" y="-20%" width="140%" height="140%">
+                  <feGaussianBlur stdDeviation="3" result="blur" />
+                  <feMerge>
+                    <feMergeNode in="blur" />
+                    <feMergeNode in="SourceGraphic" />
+                  </feMerge>
+                </filter>
               </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke={gridColor} vertical={false} />
+              <CartesianGrid stroke={gridColor} vertical={false} />
               <XAxis
                 dataKey="weekStart"
                 tickFormatter={formatWeekLabel}
@@ -391,69 +402,37 @@ function UsersOverTimeChart({
                 tickLine={false}
                 axisLine={{ stroke: gridColor }}
                 interval={xInterval}
-                minTickGap={16}
+                minTickGap={24}
               />
               <YAxis
-                yAxisId="left"
                 allowDecimals={false}
-                width={48}
+                width={44}
+                tickFormatter={formatCompact}
                 tick={{ fill: axisColor, fontSize: 11 }}
                 tickLine={false}
                 axisLine={false}
-                label={{
-                  value: "Total users",
-                  angle: -90,
-                  position: "insideLeft",
-                  style: { fill: axisColor, fontSize: 11, textAnchor: "middle" },
-                }}
-              />
-              <YAxis
-                yAxisId="right"
-                orientation="right"
-                allowDecimals={false}
-                width={40}
-                tick={{ fill: axisColor, fontSize: 11 }}
-                tickLine={false}
-                axisLine={false}
-                label={{
-                  value: "New / week",
-                  angle: 90,
-                  position: "insideRight",
-                  style: { fill: axisColor, fontSize: 11, textAnchor: "middle" },
-                }}
               />
               <Tooltip
-                cursor={{ fill: isDark ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.04)" }}
+                cursor={{ stroke: accentColor, strokeWidth: 1, strokeOpacity: 0.4 }}
                 content={<UsersOverTimeTooltip isDark={isDark} />}
               />
-              <Legend
-                iconType="circle"
-                wrapperStyle={{ fontSize: 12, paddingTop: 8 }}
-                formatter={(value) =>
-                  value === "cumulative" ? "Total users" : "New signups / week"
-                }
-              />
-              <Bar
-                yAxisId="right"
-                dataKey="count"
-                name="count"
-                fill={newUsersColor}
-                fillOpacity={0.7}
-                radius={[3, 3, 0, 0]}
-                maxBarSize={18}
-              />
               <Area
-                yAxisId="left"
                 type="monotone"
                 dataKey="cumulative"
                 name="cumulative"
-                stroke={cumulativeColor}
-                strokeWidth={2}
+                stroke={accentColor}
+                strokeWidth={2.5}
                 fill="url(#adminUsersArea)"
-                dot={false}
-                activeDot={{ r: 4 }}
+                style={{ filter: "url(#adminUsersGlow)" }}
+                dot={{ r: 2, fill: accentColor, strokeWidth: 0 }}
+                activeDot={{
+                  r: 5,
+                  fill: accentColor,
+                  stroke: isDark ? "#0a0a0a" : "#ffffff",
+                  strokeWidth: 2,
+                }}
               />
-            </ComposedChart>
+            </AreaChart>
           </ResponsiveContainer>
         </div>
       )}

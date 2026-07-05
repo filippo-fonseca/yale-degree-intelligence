@@ -280,6 +280,7 @@ export async function GET(req: NextRequest) {
       totalUsers,
       profilesCreated,
       usersWithCourses,
+      importedCoursesRate: round((usersWithCourses / Math.max(profilesCreated, 1)) * 100, 1),
       usersWithoutCourses: Math.max(profilesCreated - usersWithCourses, 0),
       totalCourses: courses.length,
       completedCourses,

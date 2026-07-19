@@ -75,6 +75,7 @@ import CommandPalette from "@/components/CommandPalette/CommandPalette";
 import V3WelcomeModal from "@/components/V3Welcome/V3WelcomeModal";
 import AppTour from "@/components/Tutorial/AppTour";
 import { setUserFlag } from "@/lib/userFlags";
+import { TabNeedsCoursesEmpty } from "@/components/ui/TabNeedsCoursesEmpty";
 import dynamic from "next/dynamic";
 
 // Heavy, tab-gated views are code-split so logged-out visitors and inactive
@@ -314,13 +315,11 @@ export default function Home() {
       id: "stats",
       icon: FiBarChart2,
       label: "Academic stats",
-      disabled: !hasData,
     },
     {
       id: "friends",
       icon: FiUsers,
       label: "Friends",
-      disabled: !hasData,
     },
     {
       id: "cleoai",
@@ -332,7 +331,6 @@ export default function Home() {
       id: "distributionals",
       icon: FaBuildingCircleCheck,
       label: "Distributionals",
-      disabled: !hasData,
     },
   ];
 
@@ -1693,16 +1691,25 @@ export default function Home() {
                   exit={{ opacity: 0 }}
                   transition={{ duration: 0.3 }}
                 >
-                  <div className="mb-4">
-                    <h2 className="text-2xl font-medium text-gray-900 dark:text-white">
-                      Numbers aren't everything, but they're important.
-                    </h2>
-                    <p className="text-sm text-gray-600 dark:text-gray-300">
-                      Here's a comprehensive visual overview of your academic
-                      trajectory over your time at Yale.
-                    </p>
-                  </div>
-                  <StatsView courses={courses} />
+                  {!hasData ? (
+                    <TabNeedsCoursesEmpty
+                      tabLabel="Academic Stats"
+                      onGoToCourses={() => handleTabChange("upload")}
+                    />
+                  ) : (
+                    <>
+                      <div className="mb-4">
+                        <h2 className="text-2xl font-medium text-gray-900 dark:text-white">
+                          Numbers aren't everything, but they're important.
+                        </h2>
+                        <p className="text-sm text-gray-600 dark:text-gray-300">
+                          Here's a comprehensive visual overview of your academic
+                          trajectory over your time at Yale.
+                        </p>
+                      </div>
+                      <StatsView courses={courses} />
+                    </>
+                  )}
                 </motion.div>
               )}
               {activeTab === "major" && (
@@ -2119,10 +2126,17 @@ export default function Home() {
                   exit={{ opacity: 0 }}
                   transition={{ duration: 0.3 }}
                 >
-                  <DistributionalsView
-                    courses={courses}
-                    onGoToCourses={() => handleTabChange("upload")}
-                  />
+                  {!hasData ? (
+                    <TabNeedsCoursesEmpty
+                      tabLabel="Distributionals"
+                      onGoToCourses={() => handleTabChange("upload")}
+                    />
+                  ) : (
+                    <DistributionalsView
+                      courses={courses}
+                      onGoToCourses={() => handleTabChange("upload")}
+                    />
+                  )}
                 </motion.div>
               )}
               {activeTab === "friends" && (
@@ -2133,12 +2147,19 @@ export default function Home() {
                   exit={{ opacity: 0 }}
                   transition={{ duration: 0.3 }}
                 >
-                  <FriendsTab
-                    friendsEnabled={friendsEnabled}
-                    onToggleFriends={handleToggleFriends}
-                    courses={courses}
-                    userProfile={userProfile}
-                  />
+                  {!hasData ? (
+                    <TabNeedsCoursesEmpty
+                      tabLabel="Friends"
+                      onGoToCourses={() => handleTabChange("upload")}
+                    />
+                  ) : (
+                    <FriendsTab
+                      friendsEnabled={friendsEnabled}
+                      onToggleFriends={handleToggleFriends}
+                      courses={courses}
+                      userProfile={userProfile}
+                    />
+                  )}
                 </motion.div>
               )}
               {activeTab === "cleoai" && !cleoaiComingSoon && (

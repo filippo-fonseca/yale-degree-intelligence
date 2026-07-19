@@ -29,6 +29,9 @@ import {
   FiToggleRight,
   FiAlertTriangle,
   FiInfo,
+  FiExternalLink,
+  FiSettings,
+  FiChevronDown,
 } from "react-icons/fi";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
@@ -37,16 +40,13 @@ import { Panda } from "lucide-react";
 import { YearBadge } from "../ui/YearBadge";
 import { UserAvatar } from "../ui/UserAvatar";
 import { Skeleton } from "../ui/Skeleton";
+import { EmptyState } from "../ui/EmptyState";
 import { Course, FriendsProfileVisibility, resolveFriendsProfileVisibility } from "@/lib/types";
-import ProfilePreviewCard, {
+import { PublicProfileView } from "@/components/FriendsProfile/PublicProfileView";
+import {
   DEMO_PREVIEW_COURSES,
   DEMO_PREVIEW_USER,
 } from "@/components/FriendsProfile/ProfilePreviewCard";
-import {
-  FiExternalLink,
-  FiSettings,
-  FiChevronDown,
-} from "react-icons/fi";
 
 type UserProfile = {
   uid: string;
@@ -493,13 +493,6 @@ export default function FriendsTab({
     }
   };
 
-  const previewUser = {
-    displayName: user?.displayName || undefined,
-    photoURL: user?.photoURL,
-    majors: userProfile?.majors || [],
-    graduationYear: userProfile?.graduationYear,
-    bio: userProfile?.bio,
-  };
 
   const profileShareUrl =
     typeof window !== "undefined" && user
@@ -552,11 +545,18 @@ export default function FriendsTab({
             <p className="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-2">
               What your page could look like
             </p>
-            <ProfilePreviewCard
-              user={DEMO_PREVIEW_USER}
-              courses={DEMO_PREVIEW_COURSES}
-              isDemo
-            />
+            <div className="rounded-xl overflow-hidden bg-gray-950 p-2">
+              <PublicProfileView
+                profile={{
+                  displayName: DEMO_PREVIEW_USER.displayName,
+                  majors: DEMO_PREVIEW_USER.majors,
+                  graduationYear: DEMO_PREVIEW_USER.graduationYear,
+                  bio: DEMO_PREVIEW_USER.bio,
+                }}
+                courses={DEMO_PREVIEW_COURSES}
+                isPreview
+              />
+            </div>
           </div>
 
           {/* What's shared */}
@@ -633,12 +633,22 @@ export default function FriendsTab({
         <p className="text-xs font-semibold uppercase tracking-wider text-pink-600 dark:text-pink-400 mb-3">
           Your public page
         </p>
-        <ProfilePreviewCard
-          user={previewUser}
-          courses={courses}
-          visibility={profileVisibility}
-          compact
-        />
+        <div className="rounded-xl overflow-hidden bg-gray-950 p-2 mb-3">
+          <PublicProfileView
+            profile={{
+              displayName: user?.displayName || undefined,
+              email: user?.email || undefined,
+              photoURL: user?.photoURL || undefined,
+              majors: userProfile?.majors || [],
+              graduationYear: userProfile?.graduationYear,
+              bio: userProfile?.bio,
+            }}
+            courses={courses}
+            visibility={profileVisibility}
+            isPreview
+            isOwnProfile
+          />
+        </div>
         <div className="mt-3 flex flex-wrap gap-2">
           <button
             type="button"
@@ -1076,36 +1086,15 @@ export default function FriendsTab({
 
             {/* Empty state */}
             {friendProfiles.length === 0 && (
-              <motion.div
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="flex flex-col items-center justify-center gap-4 py-12 px-6 rounded-xl bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/50 dark:via-gray-900/35 dark:to-gray-950/50 backdrop-blur-md border border-dashed border-gray-200 dark:border-white/[0.10] text-center"
-              >
-                <div className="p-4 rounded-2xl bg-gray-100 dark:bg-white/[0.04] border border-gray-200 dark:border-white/[0.08]">
-                  <FiUsers className="w-7 h-7 text-gray-300 dark:text-gray-500" />
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    No friends yet
-                  </p>
-                  <p className="text-xs text-gray-400 dark:text-gray-500 max-w-xs">
-                    Use the{" "}
-                    <span className="font-medium text-gray-600 dark:text-gray-400">
-                      Add Friend
-                    </span>{" "}
-                    button above to connect with fellow Yale students.
-                  </p>
-                </div>
-                <motion.button
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-pink-600 dark:text-pink-300 bg-pink-50 dark:bg-pink-900/20 rounded-lg border border-pink-200 dark:border-pink-800/40 hover:bg-pink-100 dark:hover:bg-pink-800/30 transition"
-                  onClick={() => setShowSearchModal(true)}
-                >
-                  <FiUserPlus size={12} />
-                  Add your first friend
-                </motion.button>
-              </motion.div>
+              <EmptyState
+                icon={<FiUsers className="w-7 h-7 text-gray-300 dark:text-gray-500" />}
+                title="No friends yet"
+                description="Add your froco, an upperclassman in your major, or anyone whose path you want to learn from."
+                primaryAction={{
+                  label: "Add friend",
+                  onClick: () => setShowSearchModal(true),
+                }}
+              />
             )}
 
             {/* Friend cards */}

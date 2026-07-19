@@ -1,95 +1,15 @@
 "use client";
 
+import { useRef, useState } from "react";
+import { motion } from "framer-motion";
+import { setUserFlag } from "@/lib/userFlags";
+import CustomLoader from "@/components/ui/CustomLoader";
+import PublicFacingPage from "@/screens/PublicFacingPage";
 import { useAuth } from "@/context/AuthContext";
 import { useTheme } from "@/context/ThemeContext";
-import FileUpload from "@/components/file-upload";
-import { useEffect, useState, useRef } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import {
-  FiBarChart2,
-  FiBook,
-  FiChevronRight,
-  FiChevronDown,
-  FiCoffee,
-  FiRefreshCw,
-  FiUsers,
-  FiTrash2,
-  FiX,
-  FiMenu,
-  FiAlertTriangle,
-  FiCheck,
-  FiPlus,
-  FiSun,
-  FiMoon,
-  FiChevronsLeft,
-  FiChevronsRight,
-} from "react-icons/fi";
-import {
-  collection,
-  query,
-  where,
-  getDocs,
-  doc,
-  setDoc,
-  updateDoc,
-  getDoc,
-  writeBatch,
-  deleteDoc,
-  onSnapshot,
-} from "firebase/firestore";
-import { Course } from "@/lib/types";
-import { db } from "@/config/firebase";
-import {
-  syncFriendsPublicData,
-  enableFriendsFeature,
-  disableFriendsFeature,
-} from "@/lib/syncFriendsPublicData";
-import { getDistPillStyle } from "@/lib/constants";
-import { computeAcademicStatsSummary } from "@/lib/utils/academicStats";
-import { useLocalStorage } from "@/hooks/useLocalStorage";
-import { calculateMajorProgress, MAJORS } from "@/lib/majors";
-import { HiDocumentDuplicate } from "react-icons/hi";
-import { RiProgress3Fill } from "react-icons/ri";
-import CompoundLogo from "@/components/ui/CompoundLogo";
-import { getCourseNameFromCode } from "@/lib/courseCatalog";
-import { FaBuildingCircleCheck, FaHeart } from "react-icons/fa6";
-import CustomLoader from "@/components/ui/CustomLoader";
-import UserSettingsModal from "@/components/UserSettingsModal/UserSettingsModal";
-import Link from "next/link";
-import LogoIcon from "@/icons/LogoIcon";
-import CourseModal from "@/components/MajorProgressView/CourseModal";
-import { getGPAColor } from "@/lib/utils/utils";
-import { getSharedCourses } from "@/lib/utils/sharedCourses";
-import { toggleDistributionalTag } from "@/lib/distributionalTags";
-import ConfirmDeleteModal from "@/components/ConfirmDeleteModal/ConfirmDeleteModal";
-import ManualCourseEntryModal from "@/components/ManualCourseEntryModal";
-import PublicFacingPage from "@/screens/PublicFacingPage";
-import {
-  MessageCircleQuestionMark,
-  MonitorCog,
-  Printer,
-  Search,
-} from "lucide-react";
-import { UserAvatar } from "@/components/ui/UserAvatar";
-import CommandPalette from "@/components/CommandPalette/CommandPalette";
-import V3WelcomeModal from "@/components/V3Welcome/V3WelcomeModal";
-import AppTour from "@/components/Tutorial/AppTour";
-import { setUserFlag } from "@/lib/userFlags";
-import { TabNeedsCoursesEmpty } from "@/components/ui/TabNeedsCoursesEmpty";
 import type { UserProfile } from "@/components/dashboard/types";
 import { createNavItems } from "@/components/dashboard/navItems";
 import { getMajorProgress as computeMajorProgress } from "@/components/dashboard/getMajorProgress";
-import { buildSimulatorRemainingCourses } from "@/components/dashboard/buildSimulatorRemainingCourses";
-import {
-  MyCoursesView,
-  StatsView,
-  MajorProgressView,
-  DistributionalsView,
-  FriendsTab,
-  Simulator,
-  CleoAITab,
-  MajorSelectionFlow,
-} from "@/components/dashboard/dynamicTabs";
 import { useCommandPaletteHotkey } from "@/components/dashboard/useCommandPaletteHotkey";
 import { useSidebarState } from "@/components/dashboard/useSidebarState";
 import { useOnboarding } from "@/components/dashboard/useOnboarding";
@@ -101,12 +21,19 @@ import { DashboardBackground } from "@/components/dashboard/DashboardBackground"
 import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
 import { MobileSidebar } from "@/components/dashboard/MobileSidebar";
 import { DesktopSidebar } from "@/components/dashboard/DesktopSidebar";
+import { DashboardTabPanels } from "@/components/dashboard/DashboardTabPanels";
+import { DashboardOverlays } from "@/components/dashboard/DashboardOverlays";
 
 export default function Home() {
   const { user, loading, logout } = useAuth();
   const { resolvedTheme, toggleTheme } = useTheme();
+
   const [showUpdateModal, setShowUpdateModal] = useState(false);
   const [showManualEntryModal, setShowManualEntryModal] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
+  const [manualEntryPreselectSemester, setManualEntryPreselectSemester] =
+    useState<string | undefined>(undefined);
+
   const {
     userProfile,
     profileLoading,
@@ -118,7 +45,7 @@ export default function Home() {
     handleProfileUpdate,
     handleTogglePrereqOverride,
   } = useUserProfile(user);
-  const [showSettings, setShowSettings] = useState(false);
+
   const {
     sidebarOpen,
     setSidebarOpen,
@@ -128,20 +55,14 @@ export default function Home() {
     setSidebarHovered,
     sidebarExpanded,
   } = useSidebarState();
+
   const { commandPaletteOpen, setCommandPaletteOpen } =
     useCommandPaletteHotkey();
-
-  // NEW: state for confirming deletion of an in-progress course
-  const [confirmDelete, setConfirmDelete] = useState<{
-    open: boolean;
-    course: Course | null;
-  }>({ open: false, course: null });
 
   const friendsEnabledRef = useRef(false);
 
   const {
     courses,
-    setCourses,
     hasData,
     coursesLoading,
     fetchCourses,
@@ -164,7 +85,18 @@ export default function Home() {
   );
   friendsEnabledRef.current = friendsEnabled;
 
-  //for the "My courses" section:
+  const navItems = createNavItems(userProfile?.majors?.length ?? 0);
+  const cleoaiComingSoon =
+    navItems.find((i) => i.id === "cleoai")?.comingSoon ?? false;
+
+  const { activeTab, setActiveTab, handleTabChange, setSimulatorNavCheck } =
+    useDashboardNav(cleoaiComingSoon);
+
+  const { welcomeOpen, setWelcomeOpen, tourOpen, setTourOpen } = useOnboarding(
+    user,
+    userProfile,
+  );
+
   const [modalOpen, setModalOpen] = useState<{
     isOpen: boolean;
     course: {
@@ -177,74 +109,9 @@ export default function Home() {
     } | null;
   }>({ isOpen: false, course: null });
 
-  const navItems = createNavItems(userProfile?.majors?.length ?? 0);
-
-  const cleoaiComingSoon =
-    navItems.find((i) => i.id === "cleoai")?.comingSoon ?? false;
-
-  const { activeTab, setActiveTab, handleTabChange, setSimulatorNavCheck } =
-    useDashboardNav(cleoaiComingSoon);
-
-  const { welcomeOpen, setWelcomeOpen, tourOpen, setTourOpen } = useOnboarding(
-    user,
-    userProfile,
-  );
-
-  // When the manual-add flow is opened from a specific semester header, this
-  // holds that semester key (e.g. "Fall 2026") so the modal can preselect it.
-  const [manualEntryPreselectSemester, setManualEntryPreselectSemester] =
-    useState<string | undefined>(undefined);
   const openManualEntry = (semester?: string) => {
     setManualEntryPreselectSemester(semester);
     setShowManualEntryModal(true);
-  };
-  const [showSharedCoursesDropdown, setShowSharedCoursesDropdown] =
-    useState(false);
-  const sharedCoursesRef = useRef<HTMLDivElement>(null);
-
-  // Close shared courses dropdown on outside click
-  useEffect(() => {
-    if (!showSharedCoursesDropdown) return;
-    const handleClick = (e: MouseEvent) => {
-      if (
-        sharedCoursesRef.current &&
-        !sharedCoursesRef.current.contains(e.target as Node)
-      ) {
-        setShowSharedCoursesDropdown(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClick);
-    return () => document.removeEventListener("mousedown", handleClick);
-  }, [showSharedCoursesDropdown]);
-
-  const [distSelectorCourseId, setDistSelectorCourseId] = useState<
-    string | null
-  >(null);
-  const [collapsedSemesters, setCollapsedSemesters] = useState<Set<string>>(
-    new Set(),
-  );
-
-  // Helper to check if a semester has any in-progress courses
-  const semesterHasInProgress = (semesterKey: string) => {
-    return courses.some(
-      (c) =>
-        `${c.semester} ${c.year}` === semesterKey &&
-        c.status === "in-progress" &&
-        !c.skipped,
-    );
-  };
-
-  // Toggle semester collapse
-  const toggleSemesterCollapse = (semesterKey: string) => {
-    setCollapsedSemesters((prev) => {
-      const next = new Set(prev);
-      if (next.has(semesterKey)) {
-        next.delete(semesterKey);
-      } else {
-        next.add(semesterKey);
-      }
-      return next;
-    });
   };
 
   const getMajorProgress = () => {
@@ -252,39 +119,10 @@ export default function Home() {
     return computeMajorProgress(selectedMajor, courses);
   };
 
-  const calculateStats = () => computeAcademicStatsSummary(courses);
-
   const onProfileSave = async (updatedProfile: Partial<UserProfile>) => {
     await handleProfileUpdate(updatedProfile);
     setShowSettings(false);
   };
-
-  const openDeleteConfirm = (course: Course) =>
-    setConfirmDelete({ open: true, course });
-
-  const closeDeleteConfirm = () =>
-    setConfirmDelete({ open: false, course: null });
-
-  // NEW: delete handler (by the doc id we already render in the list)
-  const handleDeleteInProgress = async () => {
-    if (!user || !confirmDelete.course?.id) return;
-    try {
-      await deleteDoc(doc(db, "courses", confirmDelete.course.id));
-      await fetchCourses(); // refresh list
-    } catch (err) {
-      console.error("Error deleting course:", err);
-    } finally {
-      closeDeleteConfirm();
-    }
-  };
-
-  // useEffect(() => {
-  //   // Play sound on tab change
-  //   if (typeof window === "undefined") return;
-
-  //   // Only play if we have data (for tabs that require it) or if it's the upload tab
-  //   void new Audio("/audio/pop.mp3").play().catch(() => null);
-  // }, [activeTab, hasData]);
 
   if (loading || (user && (coursesLoading || profileLoading)))
     return <CustomLoader />;
@@ -292,113 +130,111 @@ export default function Home() {
   if (!user) return <PublicFacingPage />;
 
   return (
-    <main
-      className={`min-h-screen bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100 font-louize overflow-hidden`}
-    >
-      {/* {showBetaBanner && (
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="w-full bg-red-900 border-b border-gray-800"
-        >
-          <div className="max-w-7xl mx-auto px-6 py-2.5 flex items-center justify-center">
-            <div className="flex items-center space-x-3">
-              <span className="px-2 py-1 bg-blue-500/10 text-blue-400 rounded text-xs font-medium border border-blue-500/20">
-                BETA
-              </span>
-              <p className="text-sm text-gray-300">
-                Initial version - features may change.{" "}
-                <a
-                  href="/methodology"
-                  className="text-blue-400 hover:text-blue-300 hover:underline"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  View methodology
-                </a>
-              </p>
-            </div>
-            <button
-              onClick={() => setShowBetaBanner(false)}
-              className="p-1 rounded-md hover:bg-gray-800 transition-colors text-gray-400 hover:text-gray-200"
-              aria-label="Dismiss banner"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-4 w-4"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth={2}
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              </svg>
-            </button>
-          </div>
-        </motion.div>
-      )} */}
-      {/* Major Selection Flow */}
-      {showMajorSelection && (
-        <MajorSelectionFlow onComplete={() => setShowMajorSelection(false)} />
-      )}
-
-      {showSettings && userProfile && (
-        <UserSettingsModal
-          user={user}
-          userProfile={userProfile}
-          friendsEnabled={friendsEnabled}
-          onClose={() => setShowSettings(false)}
-          onSave={onProfileSave}
-          onToggleFriends={handleToggleFriends}
-          onReplayTour={() => {
-            setShowSettings(false);
-            setTourOpen(true);
-          }}
-          onReplayWelcome={() => {
-            // Dev-only: replay the full new-user v3 flow. Resets BOTH onboarding
-            // booleans on users/{uid} and re-opens the welcome modal immediately.
-            // This ONLY flips flags; it never touches plans or courses.
-            if (user) {
-              void setUserFlag(user.uid, "hasSeenV3Welcome", false);
-              void setUserFlag(user.uid, "hasSeenTutorial", false);
-            }
-            setShowSettings(false);
-            setTourOpen(false);
-            setWelcomeOpen(true);
-          }}
-          onReplayTutorial={() => {
-            // Dev-only: reset just the tutorial flag and re-open the tour.
-            if (user) void setUserFlag(user.uid, "hasSeenTutorial", false);
-            setShowSettings(false);
-            setWelcomeOpen(false);
-            setTourOpen(true);
-          }}
-          onLogout={() => {
-            setShowSettings(false);
-            setActiveTab("upload");
-            logout();
-          }}
-          onDeleteAccount={async () => {
-            const idToken = await user.getIdToken();
-            const response = await fetch("/api/delete-account", {
-              method: "POST",
-              headers: {
-                Authorization: `Bearer ${idToken}`,
-              },
-            });
-            if (!response.ok) {
-              throw new Error("Failed to delete account");
-            }
-            setShowSettings(false);
-            setActiveTab("upload");
-            logout();
-          }}
-        />
-      )}
+    <main className="min-h-screen bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100 font-louize overflow-hidden">
+      <DashboardOverlays
+        user={user}
+        userProfile={userProfile}
+        courses={courses}
+        selectedMajor={selectedMajor}
+        hasData={hasData}
+        friendsEnabled={friendsEnabled}
+        showMajorSelection={showMajorSelection}
+        showSettings={showSettings}
+        showUpdateModal={showUpdateModal}
+        showManualEntryModal={showManualEntryModal}
+        manualEntryPreselectSemester={manualEntryPreselectSemester}
+        commandPaletteOpen={commandPaletteOpen}
+        welcomeOpen={welcomeOpen}
+        tourOpen={tourOpen}
+        modalOpen={modalOpen}
+        onMajorSelectionComplete={() => setShowMajorSelection(false)}
+        onCloseSettings={() => setShowSettings(false)}
+        onProfileSave={onProfileSave}
+        onToggleFriends={handleToggleFriends}
+        onReplayTour={() => {
+          setShowSettings(false);
+          setTourOpen(true);
+        }}
+        onReplayWelcome={() => {
+          if (user) {
+            void setUserFlag(user.uid, "hasSeenV3Welcome", false);
+            void setUserFlag(user.uid, "hasSeenTutorial", false);
+          }
+          setShowSettings(false);
+          setTourOpen(false);
+          setWelcomeOpen(true);
+        }}
+        onReplayTutorial={() => {
+          if (user) void setUserFlag(user.uid, "hasSeenTutorial", false);
+          setShowSettings(false);
+          setWelcomeOpen(false);
+          setTourOpen(true);
+        }}
+        onLogout={() => {
+          setShowSettings(false);
+          setActiveTab("upload");
+          logout();
+        }}
+        onDeleteAccount={async () => {
+          const idToken = await user.getIdToken();
+          const response = await fetch("/api/delete-account", {
+            method: "POST",
+            headers: { Authorization: `Bearer ${idToken}` },
+          });
+          if (!response.ok) throw new Error("Failed to delete account");
+          setShowSettings(false);
+          setActiveTab("upload");
+          logout();
+        }}
+        onCloseUpdateModal={() => setShowUpdateModal(false)}
+        onUploadSuccess={parseAndStoreCourses}
+        onCloseManualEntry={() => {
+          setShowManualEntryModal(false);
+          setManualEntryPreselectSemester(undefined);
+        }}
+        onManualCourseEntry={handleManualCourseEntry}
+        onCloseCommandPalette={() => setCommandPaletteOpen(false)}
+        onNavigate={handleTabChange}
+        onImportTranscript={() => {
+          handleTabChange("upload");
+          if (hasData) setShowUpdateModal(true);
+        }}
+        onManualAdd={() => setShowManualEntryModal(true)}
+        onToggleTheme={toggleTheme}
+        onCloseWelcome={() => {
+          setWelcomeOpen(false);
+          void setUserFlag(user.uid, "hasSeenV3Welcome");
+        }}
+        onStartTour={() => {
+          setWelcomeOpen(false);
+          void setUserFlag(user.uid, "hasSeenV3Welcome");
+          setTourOpen(true);
+        }}
+        onCloseTour={() => {
+          setTourOpen(false);
+          void setUserFlag(user.uid, "hasSeenTutorial");
+        }}
+        onCompleteTour={() => {
+          void setUserFlag(user.uid, "hasSeenTutorial");
+        }}
+        onCloseCourseModal={() => setModalOpen({ isOpen: false, course: null })}
+        onToggleDistributional={(courseId, dist) => {
+          void toggleDistributional(courseId, dist);
+        }}
+        onUpdateModalCourseDistributional={(courseId, dist) => {
+          setModalOpen((prev) => {
+            if (!prev.course || prev.course.id !== courseId) return prev;
+            const currentDists = prev.course.distributionals || [];
+            const newDists = currentDists.includes(dist)
+              ? currentDists.filter((d) => d !== dist)
+              : [...currentDists, dist];
+            return {
+              ...prev,
+              course: { ...prev.course, distributionals: newDists },
+            };
+          });
+        }}
+      />
 
       <DashboardBackground />
 
@@ -437,614 +273,38 @@ export default function Home() {
             onClearHover={() => setSidebarHovered(false)}
           />
 
-          {/* Main Content Area */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3, duration: 0.5 }}
             className="flex-1 min-w-0 h-full overflow-y-auto overflow-x-clip"
           >
-            <AnimatePresence mode="wait">
-              {activeTab === "upload" && (
-                <motion.div
-                  key="upload"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.3 }}
-                  className="h-full"
-                >
-                  <MyCoursesView
-                    courses={courses}
-                    hasData={hasData}
-                    coursesLoading={coursesLoading}
-                    user={user}
-                    isBrandNew={isBrandNew}
-                    onManualAdd={openManualEntry}
-                    onReupload={() => setShowUpdateModal(true)}
-                    onUploadSuccess={parseAndStoreCourses}
-                    onDeleteCourse={async (course) => {
-                      if (!user || !course?.id) return;
-                      await deleteDoc(doc(db, "courses", course.id));
-                      await fetchCourses();
-                    }}
-                    onToggleDistributional={async (courseId, dist) => {
-                      await toggleDistributional(courseId, dist);
-                    }}
-                  />
-
-
-                </motion.div>
-              )}
-
-              {showUpdateModal && (
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  className="fixed inset-0 bg-gray-100/70 dark:bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4"
-                  onClick={() => setShowUpdateModal(false)}
-                >
-                  <motion.div
-                    initial={{ scale: 0.9, y: 20 }}
-                    animate={{ scale: 1, y: 0 }}
-                    onClick={(e) => e.stopPropagation()}
-                    className="w-full max-w-lg bg-white dark:bg-gray-900/90 backdrop-blur-sm p-8 rounded-xl border border-gray-200 dark:border-gray-800 relative shadow-xl dark:shadow-none"
-                  >
-                    <button
-                      onClick={() => setShowUpdateModal(false)}
-                      className="absolute top-4 right-4 p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-                    >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-5 w-5 text-gray-500 dark:text-gray-400"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M6 18L18 6M6 6l12 12"
-                        />
-                      </svg>
-                    </button>
-                    <h3 className="text-xl font-medium mb-4 text-gray-800 dark:text-gray-200">
-                      Update your transcript
-                    </h3>
-                    <p className="text-gray-600 dark:text-gray-400 mb-4">
-                      Upload a new transcript to update your course history.
-                      We'll only add new courses that aren't already in your
-                      record.
-                    </p>
-                    <div className="mb-5 p-3 rounded-xl bg-gray-50 dark:bg-gray-800/40 border border-gray-200 dark:border-gray-700/50">
-                      <p className="text-[11px] font-medium text-gray-500 dark:text-gray-400 mb-2 uppercase tracking-wider">
-                        How to get your transcript
-                      </p>
-                      <ol className="space-y-1.5 text-sm text-gray-700 dark:text-gray-300">
-                        <li>
-                          1. Go to{" "}
-                          <a
-                            href="https://yub.yale.edu"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-pink-600 dark:text-pink-400 hover:underline underline-offset-2"
-                          >
-                            Yale Hub
-                          </a>{" "}
-                          and sign in
-                        </li>
-                        <li>
-                          2. Go to{" "}
-                          <span className="font-mono text-xs px-1 py-0.5 rounded bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700/50 text-gray-800 dark:text-gray-200">
-                            Academics
-                          </span>{" "}
-                          →{" "}
-                          <span className="font-mono text-xs px-1 py-0.5 rounded bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700/50 text-gray-800 dark:text-gray-200">
-                            Unofficial Transcript
-                          </span>
-                        </li>
-                        <li>
-                          3. Click{" "}
-                          <span className="font-medium text-blue-600 dark:text-blue-300">
-                            Print
-                          </span>
-                          , save as PDF, and upload it below
-                        </li>
-                      </ol>
-                    </div>
-                    <FileUpload onSuccess={parseAndStoreCourses} />
-                  </motion.div>
-                </motion.div>
-              )}
-
-              {/* Manual Course Entry Modal */}
-              <ManualCourseEntryModal
-                isOpen={showManualEntryModal}
-                onClose={() => {
-                  setShowManualEntryModal(false);
-                  setManualEntryPreselectSemester(undefined);
-                }}
-                onSubmit={handleManualCourseEntry}
-                userId={user?.uid || ""}
-                initialSemester={manualEntryPreselectSemester}
-              />
-
-              {activeTab === "stats" && (
-                <motion.div
-                  key="stats"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  {!hasData ? (
-                    <TabNeedsCoursesEmpty
-                      tabLabel="Academic Stats"
-                      onGoToCourses={() => handleTabChange("upload")}
-                    />
-                  ) : (
-                    <>
-                      <div className="mb-4">
-                        <h2 className="text-2xl font-medium text-gray-900 dark:text-white">
-                          Numbers aren't everything, but they're important.
-                        </h2>
-                        <p className="text-sm text-gray-600 dark:text-gray-300">
-                          Here's a comprehensive visual overview of your academic
-                          trajectory over your time at Yale.
-                        </p>
-                      </div>
-                      <StatsView courses={courses} />
-                    </>
-                  )}
-                </motion.div>
-              )}
-              {activeTab === "major" && (
-                <motion.div
-                  key="major"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  {user && userProfile && (
-                    <div className="mb-6">
-                      <h2 className="text-3xl font-medium text-gray-900 dark:text-white">
-                        This is how you're doing for your{" "}
-                        {userProfile?.majors?.length > 1 ? "majors" : "major"},{" "}
-                        {user?.displayName?.split(" ")[0]}.
-                      </h2>
-                      <p className="text-gray-600 dark:text-gray-300">
-                        This is based on data from your transcript and the{" "}
-                        {userProfile?.majors?.length > 1 ? "majors" : "major"}{" "}
-                        you indicated to us.
-                      </p>
-                    </div>
-                  )}
-                  {/* Major Selector */}
-                  {userProfile &&
-                    activeTab === "major" &&
-                    userProfile?.majors?.length > 1 && (
-                      <div className="mb-4">
-                        <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1.5 uppercase tracking-wider">
-                          Viewing Progress For
-                        </label>
-                        <div className="flex flex-wrap items-center gap-1.5">
-                          {userProfile.majors.map((major) => (
-                            <button
-                              key={major}
-                              onClick={() => setSelectedMajor(major)}
-                              className={`px-3 py-1.5 rounded-xl text-sm transition-all duration-200 ${
-                                selectedMajor === major
-                                  ? "bg-gradient-to-br from-blue-500/20 via-blue-600/15 to-purple-500/20 text-blue-200 border border-blue-500/40 shadow-[inset_0_1px_0_rgba(255,255,255,0.1),0_2px_8px_rgba(59,130,246,0.15)]"
-                                  : "bg-gray-50 dark:bg-gray-900/40 text-gray-500 dark:text-gray-400 border border-gray-200 dark:border-gray-800/60 hover:border-gray-300 dark:hover:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800/50 hover:text-gray-700 dark:hover:text-gray-300 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)]"
-                              }`}
-                            >
-                              {major} - {MAJORS[major] || major}
-                            </button>
-                          ))}
-
-                          {/* Shared Courses Indicator */}
-                          {(() => {
-                            const {
-                              courses: sharedCourses,
-                              totalCredits,
-                              overriddenCredits,
-                            } = getSharedCourses(userProfile, courses);
-                            const isWarning = totalCredits > 2;
-                            const hasShared = sharedCourses.length > 0;
-                            const overrideCount = sharedCourses.filter(
-                              (c) => c.isPrereqOverride,
-                            ).length;
-
-                            return (
-                              <div
-                                ref={sharedCoursesRef}
-                                data-tour="major-shared-courses"
-                                className="relative ml-2"
-                              >
-                                <button
-                                  onClick={() =>
-                                    setShowSharedCoursesDropdown(
-                                      !showSharedCoursesDropdown,
-                                    )
-                                  }
-                                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs transition-all duration-200 ${
-                                    isWarning
-                                      ? "bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 border border-amber-400/60 dark:border-amber-600/40 hover:border-amber-500/60"
-                                      : "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 border border-emerald-400/60 dark:border-emerald-600/40 hover:border-emerald-500/60"
-                                  }`}
-                                >
-                                  {isWarning ? (
-                                    <FiAlertTriangle size={12} />
-                                  ) : (
-                                    <FiCheck size={12} />
-                                  )}
-                                  <span>
-                                    {totalCredits > 0
-                                      ? `${totalCredits} shared cr${totalCredits !== 1 ? "s" : ""}`
-                                      : "No overlap"}
-                                  </span>
-                                  <FiChevronDown
-                                    size={12}
-                                    className={`transition-transform ${showSharedCoursesDropdown ? "rotate-180" : ""}`}
-                                  />
-                                </button>
-
-                                {/* Dropdown */}
-                                <AnimatePresence>
-                                  {showSharedCoursesDropdown && (
-                                    <motion.div
-                                      initial={{ opacity: 0, y: -5 }}
-                                      animate={{ opacity: 1, y: 0 }}
-                                      exit={{ opacity: 0, y: -5 }}
-                                      className="absolute top-full left-0 mt-2 z-50 w-80 max-h-80 overflow-y-auto rounded-xl bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl border border-gray-200 dark:border-gray-700/50 shadow-[0_8px_32px_rgba(0,0,0,0.15)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.4)] p-3"
-                                    >
-                                      <div className="flex items-center justify-between mb-2">
-                                        <h4 className="text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider">
-                                          Double Major Conflict Manager
-                                        </h4>
-                                        <button
-                                          onClick={() =>
-                                            setShowSharedCoursesDropdown(false)
-                                          }
-                                          className="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
-                                        >
-                                          <FiX size={14} />
-                                        </button>
-                                      </div>
-
-                                      {!hasShared ? (
-                                        <div className="text-center py-4">
-                                          <FiCheck
-                                            className="mx-auto text-emerald-600 dark:text-emerald-400 mb-2"
-                                            size={24}
-                                          />
-                                          <p className="text-sm text-emerald-600 dark:text-emerald-300 font-medium">
-                                            All clear!
-                                          </p>
-                                          <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
-                                            No courses are counting toward
-                                            multiple majors.
-                                          </p>
-                                        </div>
-                                      ) : (
-                                        <>
-                                          <div
-                                            className={`text-xs mb-3 p-2 rounded-lg ${
-                                              isWarning
-                                                ? "bg-amber-100 dark:bg-amber-900/20 text-amber-700 dark:text-amber-300 border border-amber-300 dark:border-amber-700/30"
-                                                : "bg-emerald-100 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-700/30"
-                                            }`}
-                                          >
-                                            {isWarning ? (
-                                              <>
-                                                <strong>Heads up:</strong> You
-                                                have more than 2 credits shared
-                                                between majors. You may need to
-                                                revise your course plan.
-                                              </>
-                                            ) : (
-                                              <>
-                                                <strong>
-                                                  You&apos;re good!
-                                                </strong>{" "}
-                                                Having 1-2 shared credits
-                                                between majors is typically
-                                                allowed. Do check with both
-                                                DUSs!
-                                              </>
-                                            )}
-                                          </div>
-                                          <p className="text-[10px] text-gray-400 dark:text-gray-600 mb-3 italic">
-                                            Prerequisites don&apos;t count toward
-                                            the 2-credit overlap limit, but Yale
-                                            isn&apos;t always clear about which
-                                            courses are prereqs. If you know one
-                                            is, mark it below to exempt it from
-                                            the warning.
-                                          </p>
-                                          {overrideCount > 0 && (
-                                            <p className="text-[10px] text-emerald-600 dark:text-emerald-400 mb-3 -mt-1.5">
-                                              {overriddenCredits} cr
-                                              {overriddenCredits !== 1
-                                                ? "s"
-                                                : ""}{" "}
-                                              waived as prerequisite
-                                              {overrideCount !== 1
-                                                ? "s"
-                                                : ""}
-                                              .
-                                            </p>
-                                          )}
-
-                                          <div className="space-y-2">
-                                            {sharedCourses.map((course, idx) => {
-                                              const showPrereqHeader =
-                                                course.isPrereqOverride &&
-                                                (idx === 0 ||
-                                                  !sharedCourses[idx - 1]
-                                                    .isPrereqOverride);
-                                              return (
-                                                <div key={course.code}>
-                                                  {showPrereqHeader && (
-                                                    <div className="flex items-center gap-2 pt-1 pb-1.5">
-                                                      <span className="text-[10px] font-medium uppercase tracking-wider text-emerald-600 dark:text-emerald-400 whitespace-nowrap">
-                                                        Marked as prerequisites
-                                                      </span>
-                                                      <div className="flex-1 h-px bg-emerald-300/50 dark:bg-emerald-700/30" />
-                                                    </div>
-                                                  )}
-                                                  <div
-                                                    className={`p-2 rounded-lg border transition-all ${
-                                                      course.isPrereqOverride
-                                                        ? "bg-emerald-50/60 dark:bg-emerald-900/10 border-emerald-300/60 dark:border-emerald-700/30"
-                                                        : "bg-gray-50 dark:bg-gray-800/50 border-gray-200 dark:border-gray-700/30"
-                                                    }`}
-                                                  >
-                                                <div className="flex items-center justify-between mb-1">
-                                                  <span
-                                                    className={`text-sm font-medium ${
-                                                      course.isPrereqOverride
-                                                        ? "text-gray-500 dark:text-gray-400 line-through"
-                                                        : "text-gray-800 dark:text-gray-200"
-                                                    }`}
-                                                  >
-                                                    {course.code}
-                                                  </span>
-                                                  <span className="text-[10px] text-gray-400 dark:text-gray-500">
-                                                    {course.credits} cr
-                                                  </span>
-                                                </div>
-                                                <div className="space-y-1">
-                                                  {course.majors.map((m) => (
-                                                    <div
-                                                      key={m.majorId}
-                                                      className="text-[11px]"
-                                                    >
-                                                      <span className="text-purple-600 dark:text-purple-300">
-                                                        {m.majorName}:
-                                                      </span>{" "}
-                                                      <span className="text-gray-500 dark:text-gray-400">
-                                                        {m.requirements.join(
-                                                          ", ",
-                                                        ) || "General"}
-                                                      </span>
-                                                    </div>
-                                                  ))}
-                                                </div>
-                                                <button
-                                                  onClick={() =>
-                                                    handleTogglePrereqOverride(
-                                                      course.code,
-                                                    )
-                                                  }
-                                                  className={`mt-2 w-full flex items-center justify-center gap-1.5 px-2 py-1 rounded-md text-[11px] font-medium border transition-all ${
-                                                    course.isPrereqOverride
-                                                      ? "border-gray-300 dark:border-gray-700 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800"
-                                                      : "border-emerald-400/60 dark:border-emerald-600/40 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-50 dark:hover:bg-emerald-900/20"
-                                                  }`}
-                                                >
-                                                  {course.isPrereqOverride ? (
-                                                    <>
-                                                      <FiX size={11} />
-                                                      Unmark prerequisite
-                                                    </>
-                                                  ) : (
-                                                    <>
-                                                      <FiCheck size={11} />
-                                                      Mark as prerequisite
-                                                    </>
-                                                  )}
-                                                </button>
-                                                  </div>
-                                                </div>
-                                              );
-                                            })}
-                                          </div>
-                                        </>
-                                      )}
-                                    </motion.div>
-                                  )}
-                                </AnimatePresence>
-                              </div>
-                            );
-                          })()}
-                        </div>
-                      </div>
-                    )}
-                  {getMajorProgress() ? (
-                    <MajorProgressView
-                      selectedMajor={selectedMajor}
-                      progress={getMajorProgress()!}
-                      onRequirementChange={fetchCourses}
-                      courses={courses}
-                    />
-                  ) : (
-                    <div className="flex flex-col items-center justify-center py-16 text-center">
-                      <p className="text-gray-500 dark:text-gray-400 text-lg">
-                        {!selectedMajor
-                          ? "Please select a major to view your progress."
-                          : "Loading your major progress..."}
-                      </p>
-                    </div>
-                  )}
-                </motion.div>
-              )}
-              {activeTab === "simulator" && (
-                <motion.div
-                  key="simulator"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  {userProfile && (
-                    <Simulator
-                      remainingCourses={buildSimulatorRemainingCourses(
-                        userProfile.majors,
-                        courses,
-                        user?.uid || "",
-                      )}
-                      completedCourses={courses.filter(
-                        (c) =>
-                          c.status === "completed" ||
-                          c.status === "in-progress",
-                      )}
-                      graduationYear={userProfile.graduationYear}
-                      userMajors={userProfile.majors}
-                      onRegisterNavCheck={setSimulatorNavCheck}
-                    />
-                  )}
-                </motion.div>
-              )}
-              {activeTab === "distributionals" && (
-                <motion.div
-                  key="distributionals"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  {!hasData ? (
-                    <TabNeedsCoursesEmpty
-                      tabLabel="Distributionals"
-                      onGoToCourses={() => handleTabChange("upload")}
-                    />
-                  ) : (
-                    <DistributionalsView
-                      courses={courses}
-                      onGoToCourses={() => handleTabChange("upload")}
-                    />
-                  )}
-                </motion.div>
-              )}
-              {activeTab === "friends" && (
-                <motion.div
-                  key="friends"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  {!hasData ? (
-                    <TabNeedsCoursesEmpty
-                      tabLabel="Friends"
-                      onGoToCourses={() => handleTabChange("upload")}
-                    />
-                  ) : (
-                    <FriendsTab
-                      friendsEnabled={friendsEnabled}
-                      onToggleFriends={handleToggleFriends}
-                      courses={courses}
-                      userProfile={userProfile}
-                    />
-                  )}
-                </motion.div>
-              )}
-              {activeTab === "cleoai" && !cleoaiComingSoon && (
-                <motion.div
-                  key="cleoai"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.3 }}
-                  className="h-[calc(100vh-200px)]"
-                >
-                  <CleoAITab
-                    courses={courses}
-                    selectedMajor={selectedMajor}
-                    userProfile={userProfile}
-                    stats={calculateStats()}
-                  />
-                </motion.div>
-              )}
-            </AnimatePresence>
+            <DashboardTabPanels
+              activeTab={activeTab}
+              cleoaiComingSoon={cleoaiComingSoon}
+              user={user}
+              userProfile={userProfile}
+              courses={courses}
+              hasData={hasData}
+              coursesLoading={coursesLoading}
+              isBrandNew={isBrandNew}
+              selectedMajor={selectedMajor}
+              friendsEnabled={friendsEnabled}
+              getMajorProgress={getMajorProgress}
+              onTabChange={handleTabChange}
+              onSelectMajor={setSelectedMajor}
+              onManualAdd={openManualEntry}
+              onReupload={() => setShowUpdateModal(true)}
+              onUploadSuccess={parseAndStoreCourses}
+              fetchCourses={fetchCourses}
+              toggleDistributional={toggleDistributional}
+              onTogglePrereqOverride={handleTogglePrereqOverride}
+              onToggleFriends={handleToggleFriends}
+              onRegisterNavCheck={setSimulatorNavCheck}
+            />
           </motion.div>
         </div>
       </div>
-      <CourseModal
-        isOpen={modalOpen.isOpen}
-        course={modalOpen.course}
-        onClose={() => setModalOpen({ isOpen: false, course: null })}
-        allowSkip={false}
-        onToggleDistributional={(courseId, dist) => {
-          toggleDistributional(courseId, dist);
-          // Update modal state to reflect change
-          setModalOpen((prev) => {
-            if (!prev.course || prev.course.id !== courseId) return prev;
-            const currentDists = prev.course.distributionals || [];
-            const newDists = currentDists.includes(dist)
-              ? currentDists.filter((d) => d !== dist)
-              : [...currentDists, dist];
-            return {
-              ...prev,
-              course: { ...prev.course, distributionals: newDists },
-            };
-          });
-        }}
-      />
-
-      <CommandPalette
-        isOpen={commandPaletteOpen}
-        onClose={() => setCommandPaletteOpen(false)}
-        courses={courses}
-        selectedMajor={selectedMajor}
-        hasData={hasData}
-        onNavigate={handleTabChange}
-        onImportTranscript={() => {
-          handleTabChange("upload");
-          if (hasData) setShowUpdateModal(true);
-        }}
-        onManualAdd={() => setShowManualEntryModal(true)}
-        onToggleTheme={toggleTheme}
-      />
-
-      <V3WelcomeModal
-        open={welcomeOpen}
-        onClose={() => {
-          setWelcomeOpen(false);
-          if (user) void setUserFlag(user.uid, "hasSeenV3Welcome");
-        }}
-        onStartTour={() => {
-          setWelcomeOpen(false);
-          if (user) void setUserFlag(user.uid, "hasSeenV3Welcome");
-          setTourOpen(true);
-        }}
-      />
-
-      <AppTour
-        open={tourOpen}
-        onClose={() => {
-          setTourOpen(false);
-          if (user) void setUserFlag(user.uid, "hasSeenTutorial");
-        }}
-        onComplete={() => {
-          if (user) void setUserFlag(user.uid, "hasSeenTutorial");
-        }}
-        onNavigate={(tabId) => handleTabChange(tabId)}
-      />
     </main>
   );
 }

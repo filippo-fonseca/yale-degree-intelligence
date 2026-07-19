@@ -7,7 +7,7 @@ import {
   signInWithPopup,
   signOut,
 } from "firebase/auth";
-import { auth, googleProvider } from "@/config/firebase";
+import { auth, googleProvider, isFirebaseConfigured } from "@/config/firebase";
 
 type AuthContextType = {
   user: User | null;
@@ -28,13 +28,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (user) {
-        // Verify email domain
-        if (user.email?.endsWith("@yale.edu")) {
-          setUser(user);
+    if (!isFirebaseConfigured) {
+      setLoading(false);
+      return;
+    }
+
+    const unsubscribe = onAuthStateChanged(auth, (nextUser) => {
+      if (nextUser) {
+        if (nextUser.email?.endsWith("@yale.edu")) {
+          setUser(nextUser);
         } else {
-          // If not Yale email, log them out
           logout();
         }
       } else {
@@ -48,6 +51,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const signInWithGoogle = async () => {
+    if (!isFirebaseConfigured) {
+      throw new Error("Firebase is not configured");
+    }
     try {
       const result = await signInWithPopup(auth, googleProvider);
       if (
@@ -56,7 +62,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       ) {
         await logout();
         alert("Only valid Yale email addresses are allowed. Sorry!! :)");
-        // throw new Error("Only Yale email addresses are allowed");
       }
     } catch (error) {
       console.error("Error signing in with Google", error);
@@ -65,6 +70,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const logout = async () => {
+    if (!isFirebaseConfigured) return;
     try {
       await signOut(auth);
     } catch (error) {

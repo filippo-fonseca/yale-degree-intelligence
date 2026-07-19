@@ -5,6 +5,7 @@
 - **Never work directly on `main`.** `main` is tied to production (Vercel). All work happens on a feature branch.
 - Once a chunk of work is approved, push the whole branch to a new remote branch and open a PR against `main`. Merging happens via PR, never by committing to `main` directly.
 - Do not push without approval. After approval, push the branch and open the PR.
+- **Public changelog:** User-facing changes that will land on `main` must update `app/changelog/releases.ts` (plain language, no internals). A GitHub Action posts a sticky reminder on PRs to `main` if that path was not touched — if you see it (or are opening/updating such a PR), update the changelog yourself in the background and mention it in your summary. Docs/chore-only PRs can skip with a note in the PR template checkbox.
 
 ## Working autonomously (orchestrator mode)
 - For large, well-scoped initiatives (e.g. the Dan AI advisor), drive the work end to end without asking to be prompted at each step. Plan with a task list, delegate well-bounded, isolated chunks to subagents, then verify their output (typecheck, read the diff) before moving on. Do not delegate security-sensitive code (auth, crypto, key handling) without reviewing it yourself.

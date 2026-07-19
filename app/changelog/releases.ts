@@ -71,6 +71,7 @@ export const RELEASES: Release[] = [
           "Light mode. A full, carefully tuned light theme that matches the dark one, with a system-default option.",
           "A guided in-app tutorial that walks new students through uploading a transcript and reading their plan.",
           "An overall UI and UX polish: a collapsible sidebar, smoother transitions, and a more consistent look everywhere.",
+          "A large under-the-hood cleanup: the biggest screens are split into smaller modules so we can ship fixes faster without breaking things.",
         ],
       },
     ],

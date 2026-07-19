@@ -61,13 +61,13 @@ interface UserProfile {
 
 export default function UserProfilePage() {
   const { userId } = useParams();
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
-  const [authLoading, setAuthLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [hasPermission, setHasPermission] = useState(false);
+  const [permissionChecked, setPermissionChecked] = useState(false);
   const [friendsFeatureDisabled, setFriendsFeatureDisabled] = useState(false);
   const [isOwnProfile, setIsOwnProfile] = useState(false);
   const router = useRouter();
@@ -184,45 +184,90 @@ export default function UserProfilePage() {
     return "text-red-400";
   };
 
-  // 1. Permission check
+  // Permission check (only when authenticated)
   useEffect(() => {
-    if (!user) return; // or handle not-logged-in edge case
-    setAuthLoading(true);
+    if (authLoading || !user) {
+      setPermissionChecked(false);
+      return;
+    }
+
+    let cancelled = false;
+    setPermissionChecked(false);
+
     const checkFriend = async () => {
+      let allowed = false;
       try {
-        // Allow viewing own profile
         if (user.uid === userId) {
-          setHasPermission(true);
-          return setAuthLoading(false);
+          allowed = true;
+        } else {
+          const friendsQ = query(
+            collection(db, "friends"),
+            where("users", "array-contains", user.uid),
+          );
+          const friendsSnap = await getDocs(friendsQ);
+          friendsSnap.forEach((doc) => {
+            const users: string[] = doc.data().users;
+            if (users.includes(userId as string)) allowed = true;
+          });
         }
-        // Check "friends" collection for mutual friendship
-        const friendsQ = query(
-          collection(db, "friends"),
-          where("users", "array-contains", user.uid),
-        );
-        const friendsSnap = await getDocs(friendsQ);
-        let allowed = false;
-        friendsSnap.forEach((doc) => {
-          const users: string[] = doc.data().users;
-          if (users.includes(userId as string)) allowed = true;
-        });
-        setHasPermission(allowed);
       } catch {
-        setHasPermission(false);
+        allowed = false;
       } finally {
-        setAuthLoading(false);
+        if (!cancelled) {
+          setHasPermission(allowed);
+          setPermissionChecked(true);
+          if (!allowed) setLoading(false);
+        }
       }
     };
     checkFriend();
-  }, [user, userId]);
 
-  // 3. Early return logic
-  if (!user || authLoading)
+    return () => {
+      cancelled = true;
+    };
+  }, [user, userId, authLoading]);
+
+  if (authLoading) {
     return (
       <div className="min-h-screen bg-gray-950 flex items-center justify-center">
         <div className="animate-pulse text-gray-400">Loading profile...</div>
       </div>
     );
+  }
+
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-gray-950 flex flex-col items-center justify-center px-6">
+        <div className="text-2xl font-semibold text-blue-300 mb-3 text-center">
+          Sign in to view profiles
+        </div>
+        <p className="text-gray-400 text-center max-w-md mb-6">
+          You need to be signed in with your Yale account to view student
+          profiles on DegreeIntelligence.
+        </p>
+        <Link
+          href="/login"
+          className="px-4 py-2 text-sm font-semibold border-2 border-pink-500 hover:bg-pink-700 text-white rounded-lg transition"
+        >
+          Sign in
+        </Link>
+        <Link
+          href="/"
+          className="mt-4 text-sm text-gray-500 hover:text-gray-300 transition"
+        >
+          Back to homepage
+        </Link>
+      </div>
+    );
+  }
+
+  if (user && !permissionChecked) {
+    return (
+      <div className="min-h-screen bg-gray-950 flex items-center justify-center">
+        <div className="animate-pulse text-gray-400">Loading profile...</div>
+      </div>
+    );
+  }
 
   if (!hasPermission) {
     return (

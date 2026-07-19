@@ -100,7 +100,7 @@ export const RELEASES: Release[] = [
       {
         title: "The core",
         items: [
-          "Sign in with Yale CAS and have your transcript parsed automatically into a live view of your courses.",
+          "Sign in with Yale Google and have your transcript parsed automatically into a live view of your courses.",
           "A requirements engine that tracks every major and concentration, including partially fulfilled credit totals.",
           "Skip and unskip courses, handle duplicates cleanly, and keep your transcript dashboard accurate.",
         ],

@@ -6,7 +6,9 @@ import { doc, setDoc } from "firebase/firestore";
 import { db } from "@/config/firebase";
 import { useAuth } from "@/context/AuthContext";
 import { MAJORS } from "@/lib/majors";
+import { CERTIFICATES } from "@/lib/certificates";
 import { MajorDropdown } from "./ui/MajorDropdown";
+import { CertificateDropdown } from "./ui/CertificateDropdown";
 import { InfoCard } from "./ui/InfoCard";
 import Link from "next/link";
 import CompoundLogo from "./ui/CompoundLogo";
@@ -25,9 +27,12 @@ export default function MajorSelectionFlow({
 }: MajorSelectionFlowProps) {
   const { user } = useAuth();
   const [step, setStep] = useState<
-    "welcome" | "majors" | "bio" | "year" | "complete"
+    "welcome" | "majors" | "certificates" | "bio" | "year" | "complete"
   >("welcome");
   const [selectedMajors, setSelectedMajors] = useState<string[]>([]);
+  const [selectedCertificates, setSelectedCertificates] = useState<string[]>(
+    [],
+  );
   const [graduationYear, setGraduationYear] = useState<string>("2029");
   const [bio, setBio] = useState<string>("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -75,6 +80,7 @@ export default function MajorSelectionFlow({
       await setDoc(doc(db, "users", user.uid), {
         displayName: user.displayName,
         majors: selectedMajors,
+        certificates: selectedCertificates,
         graduationYear: parseInt(graduationYear),
         bio: bio,
         updatedAt: new Date(),
@@ -125,7 +131,7 @@ export default function MajorSelectionFlow({
   ];
 
   // Step indicator
-  const steps = ["majors", "bio", "year"];
+  const steps = ["majors", "certificates", "bio", "year"];
   const currentStepIndex = steps.indexOf(step);
 
   return (
@@ -432,7 +438,7 @@ export default function MajorSelectionFlow({
                 Back
               </button>
               <button
-                onClick={() => setStep("bio")}
+                onClick={() => setStep("certificates")}
                 disabled={selectedMajors.length === 0}
                 className={`py-2.5 px-5 rounded-xl font-medium text-sm transition-all ${
                   selectedMajors.length === 0
@@ -441,6 +447,115 @@ export default function MajorSelectionFlow({
                 }`}
               >
                 Continue
+              </button>
+            </div>
+          </motion.div>
+        )}
+
+        {step === "certificates" && (
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -20 }}
+            className="space-y-4 sm:space-y-5"
+          >
+            <div className="text-center">
+              <h2 className="text-lg sm:text-xl font-medium text-gray-900 dark:text-white">
+                Add certificates (optional)
+              </h2>
+              <p className="text-gray-500 dark:text-gray-400 text-xs sm:text-sm mt-1">
+                Pick up to 3 Yale College certificates, or skip for now.
+              </p>
+            </div>
+
+            <InfoCard className="text-xs">
+              Courses counted toward a certificate cannot also count toward your
+              majors. You can update certificates anytime in Settings.
+            </InfoCard>
+
+            <div className="space-y-3">
+              {selectedCertificates.map((cert, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="flex items-center gap-2"
+                >
+                  <div className="flex-1">
+                    <CertificateDropdown
+                      value={cert}
+                      onChange={(newCert) => {
+                        const next = [...selectedCertificates];
+                        next[index] = newCert;
+                        setSelectedCertificates(next);
+                      }}
+                      disabledOptions={selectedCertificates.filter(
+                        (c) => c !== cert,
+                      )}
+                    />
+                  </div>
+                  <button
+                    onClick={() =>
+                      setSelectedCertificates(
+                        selectedCertificates.filter((_, i) => i !== index),
+                      )
+                    }
+                    className="p-2 rounded-lg text-gray-400 dark:text-gray-500 hover:text-red-500 dark:hover:text-red-400 hover:bg-red-500/10 border border-transparent hover:border-red-500/20 transition-all"
+                    title="Remove certificate"
+                  >
+                    <FiX size={16} />
+                  </button>
+                </motion.div>
+              ))}
+
+              {selectedCertificates.length < 3 && (
+                <motion.button
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  onClick={() => {
+                    const available = Object.keys(CERTIFICATES).find(
+                      (id) => !selectedCertificates.includes(id),
+                    );
+                    if (available) {
+                      setSelectedCertificates([
+                        ...selectedCertificates,
+                        available,
+                      ]);
+                    }
+                  }}
+                  className="w-full py-2.5 px-4 rounded-xl border border-dashed border-gray-300 dark:border-gray-700/60 hover:border-teal-500/40 bg-gradient-to-br from-black/[0.02] to-transparent dark:from-white/[0.02] dark:to-transparent hover:from-teal-500/5 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 flex items-center justify-center gap-1.5 transition-all"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-4 w-4"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                    />
+                  </svg>
+                  Add a certificate
+                </motion.button>
+              )}
+            </div>
+
+            <div className="flex justify-between pt-4">
+              <button
+                onClick={() => setStep("majors")}
+                className="py-2 px-4 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors text-sm"
+              >
+                Back
+              </button>
+              <button
+                onClick={() => setStep("bio")}
+                className="py-2.5 px-5 rounded-xl font-medium text-sm bg-purple-500/10 hover:bg-purple-500/20 text-purple-600 dark:text-purple-200 border border-purple-500/30 hover:border-purple-500/50 shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_2px_8px_rgba(139,92,246,0.15)] transition-all"
+              >
+                {selectedCertificates.length === 0 ? "Skip" : "Continue"}
               </button>
             </div>
           </motion.div>
@@ -491,7 +606,7 @@ export default function MajorSelectionFlow({
 
             <div className="flex justify-between pt-2 sm:pt-4">
               <button
-                onClick={() => setStep("majors")}
+                onClick={() => setStep("certificates")}
                 className="py-2 px-3 sm:px-4 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors text-sm"
               >
                 Back

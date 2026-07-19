@@ -44,7 +44,8 @@ import {
   enableFriendsFeature,
   disableFriendsFeature,
 } from "@/lib/syncFriendsPublicData";
-import { gradePoints, getDistPillStyle } from "@/lib/constants";
+import { getDistPillStyle } from "@/lib/constants";
+import { computeAcademicStatsSummary } from "@/lib/utils/academicStats";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
 import { calculateMajorProgress, MAJORS } from "@/lib/majors";
 import { HiDocumentDuplicate } from "react-icons/hi";
@@ -59,6 +60,7 @@ import LogoIcon from "@/icons/LogoIcon";
 import CourseModal from "@/components/MajorProgressView/CourseModal";
 import { getGPAColor } from "@/lib/utils/utils";
 import { getSharedCourses } from "@/lib/utils/sharedCourses";
+import { toggleDistributionalTag } from "@/lib/distributionalTags";
 import ConfirmDeleteModal from "@/components/ConfirmDeleteModal/ConfirmDeleteModal";
 import ManualCourseEntryModal from "@/components/ManualCourseEntryModal";
 import PublicFacingPage from "@/screens/PublicFacingPage";
@@ -333,6 +335,16 @@ export default function Home() {
     },
   ];
 
+  const cleoaiComingSoon =
+    navItems.find((i) => i.id === "cleoai")?.comingSoon ?? false;
+
+  // Reset stale tab if Dan is gated as coming soon (e.g. from localStorage).
+  useEffect(() => {
+    if (cleoaiComingSoon && activeTab === "cleoai") {
+      setActiveTab("upload");
+    }
+  }, [cleoaiComingSoon, activeTab, setActiveTab]);
+
   // Live-subscribe to user profile so UI updates without refresh
   useEffect(() => {
     if (!user) return;
@@ -344,7 +356,13 @@ export default function Home() {
         if (docSnap.exists()) {
           const data = docSnap.data() as UserProfile;
           setUserProfile(data);
-          setSelectedMajor(data.majors?.[0] || "");
+          setSelectedMajor((current) => {
+            const majors = data.majors || [];
+            if (!current || !majors.includes(current)) {
+              return majors[0] || "";
+            }
+            return current;
+          });
           setShowMajorSelection(false); // auto-close once profile exists
         } else {
           setUserProfile(null);
@@ -777,38 +795,7 @@ export default function Home() {
     setShowManualEntryModal(false);
   };
 
-  const calculateStats = () => {
-    if (courses.length === 0) return null;
-    let totalCredits = 0;
-    let totalGradePoints = 0;
-    let completedCoursesWithGrades = 0;
-    let inProgressCourses = 0;
-    const distribution: Record<string, number> = {};
-
-    courses.forEach((course) => {
-      if (course.status === "in-progress") {
-        inProgressCourses++;
-        return;
-      }
-      if (course.skipped) return;
-
-      if (course.grade && gradePoints[course.grade]) {
-        completedCoursesWithGrades++;
-        totalCredits += course.credits || 0;
-        totalGradePoints += gradePoints[course.grade] * (course.credits || 1.0);
-        distribution[course.grade] = (distribution[course.grade] || 0) + 1;
-      }
-    });
-
-    const gpa = totalCredits > 0 ? totalGradePoints / totalCredits : 0;
-    return {
-      gpa: gpa.toFixed(2),
-      totalCredits,
-      completedCourses: completedCoursesWithGrades,
-      inProgressCourses,
-      distribution,
-    };
-  };
+  const calculateStats = () => computeAcademicStatsSummary(courses);
 
   const handleProfileUpdate = async (updatedProfile: Partial<UserProfile>) => {
     if (!user) return;
@@ -912,9 +899,7 @@ export default function Home() {
     const course = courses.find((c) => c.id === courseId);
     if (!course) return;
     const current = course.distributionals || [];
-    const updated = current.includes(dist)
-      ? current.filter((d) => d !== dist)
-      : [...current, dist];
+    const updated = toggleDistributionalTag(current, dist);
     setCourses((prev) =>
       prev.map((c) =>
         c.id === courseId ? { ...c, distributionals: updated } : c,
@@ -2120,6 +2105,7 @@ export default function Home() {
                       )}
                       graduationYear={userProfile.graduationYear}
                       userMajors={userProfile.majors}
+                      onRegisterNavCheck={setSimulatorNavCheck}
                     />
                   )}
                 </motion.div>
@@ -2132,7 +2118,10 @@ export default function Home() {
                   exit={{ opacity: 0 }}
                   transition={{ duration: 0.3 }}
                 >
-                  <DistributionalsView courses={courses} />
+                  <DistributionalsView
+                    courses={courses}
+                    onGoToCourses={() => handleTabChange("upload")}
+                  />
                 </motion.div>
               )}
               {activeTab === "friends" && (
@@ -2149,7 +2138,7 @@ export default function Home() {
                   />
                 </motion.div>
               )}
-              {activeTab === "cleoai" && (
+              {activeTab === "cleoai" && !cleoaiComingSoon && (
                 <motion.div
                   key="cleoai"
                   initial={{ opacity: 0 }}

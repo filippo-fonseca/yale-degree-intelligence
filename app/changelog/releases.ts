@@ -22,7 +22,7 @@ export const RELEASES: Release[] = [
     date: "Summer 2026",
     current: true,
     summary:
-      "Our largest update yet — and the public launch of DegreeIntelligence 3. Faster planning, clearer numbers, a friend page worth sharing, tighter privacy, and emptier states that actually tell you what to do next.",
+      "Our largest update yet — and the public launch of DegreeIntelligence 3. Faster planning, clearer numbers, a friend page worth sharing, tighter privacy, emptier states that actually tell you what to do next, and a cleaned-up codebase so we can keep shipping safely.",
     sections: [
       {
         title: "Move faster",

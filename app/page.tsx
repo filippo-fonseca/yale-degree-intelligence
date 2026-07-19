@@ -2,12 +2,10 @@
 
 import { useRef, useState } from "react";
 import { motion } from "framer-motion";
-import { setUserFlag } from "@/lib/userFlags";
 import CustomLoader from "@/components/ui/CustomLoader";
 import PublicFacingPage from "@/screens/PublicFacingPage";
 import { useAuth } from "@/context/AuthContext";
 import { useTheme } from "@/context/ThemeContext";
-import type { UserProfile } from "@/components/dashboard/types";
 import { createNavItems } from "@/components/dashboard/navItems";
 import { getMajorProgress as computeMajorProgress } from "@/components/dashboard/getMajorProgress";
 import { useCommandPaletteHotkey } from "@/components/dashboard/useCommandPaletteHotkey";
@@ -23,6 +21,7 @@ import { MobileSidebar } from "@/components/dashboard/MobileSidebar";
 import { DesktopSidebar } from "@/components/dashboard/DesktopSidebar";
 import { DashboardTabPanels } from "@/components/dashboard/DashboardTabPanels";
 import { DashboardOverlays } from "@/components/dashboard/DashboardOverlays";
+import { useDashboardOverlayActions } from "@/components/dashboard/useDashboardOverlayActions";
 
 export default function Home() {
   const { user, loading, logout } = useAuth();
@@ -119,10 +118,22 @@ export default function Home() {
     return computeMajorProgress(selectedMajor, courses);
   };
 
-  const onProfileSave = async (updatedProfile: Partial<UserProfile>) => {
-    await handleProfileUpdate(updatedProfile);
-    setShowSettings(false);
-  };
+  const overlayActions = useDashboardOverlayActions({
+    user,
+    hasData,
+    setShowSettings,
+    setShowMajorSelection,
+    setShowUpdateModal,
+    setShowManualEntryModal,
+    setManualEntryPreselectSemester,
+    setCommandPaletteOpen,
+    setWelcomeOpen,
+    setTourOpen,
+    setActiveTab,
+    handleTabChange,
+    handleProfileUpdate,
+    logout,
+  });
 
   if (loading || (user && (coursesLoading || profileLoading)))
     return <CustomLoader />;
@@ -147,76 +158,28 @@ export default function Home() {
         welcomeOpen={welcomeOpen}
         tourOpen={tourOpen}
         modalOpen={modalOpen}
-        onMajorSelectionComplete={() => setShowMajorSelection(false)}
-        onCloseSettings={() => setShowSettings(false)}
-        onProfileSave={onProfileSave}
+        onMajorSelectionComplete={overlayActions.onMajorSelectionComplete}
+        onCloseSettings={overlayActions.onCloseSettings}
+        onProfileSave={overlayActions.onProfileSave}
         onToggleFriends={handleToggleFriends}
-        onReplayTour={() => {
-          setShowSettings(false);
-          setTourOpen(true);
-        }}
-        onReplayWelcome={() => {
-          if (user) {
-            void setUserFlag(user.uid, "hasSeenV3Welcome", false);
-            void setUserFlag(user.uid, "hasSeenTutorial", false);
-          }
-          setShowSettings(false);
-          setTourOpen(false);
-          setWelcomeOpen(true);
-        }}
-        onReplayTutorial={() => {
-          if (user) void setUserFlag(user.uid, "hasSeenTutorial", false);
-          setShowSettings(false);
-          setWelcomeOpen(false);
-          setTourOpen(true);
-        }}
-        onLogout={() => {
-          setShowSettings(false);
-          setActiveTab("upload");
-          logout();
-        }}
-        onDeleteAccount={async () => {
-          const idToken = await user.getIdToken();
-          const response = await fetch("/api/delete-account", {
-            method: "POST",
-            headers: { Authorization: `Bearer ${idToken}` },
-          });
-          if (!response.ok) throw new Error("Failed to delete account");
-          setShowSettings(false);
-          setActiveTab("upload");
-          logout();
-        }}
-        onCloseUpdateModal={() => setShowUpdateModal(false)}
+        onReplayTour={overlayActions.onReplayTour}
+        onReplayWelcome={overlayActions.onReplayWelcome}
+        onReplayTutorial={overlayActions.onReplayTutorial}
+        onLogout={overlayActions.onLogout}
+        onDeleteAccount={overlayActions.onDeleteAccount}
+        onCloseUpdateModal={overlayActions.onCloseUpdateModal}
         onUploadSuccess={parseAndStoreCourses}
-        onCloseManualEntry={() => {
-          setShowManualEntryModal(false);
-          setManualEntryPreselectSemester(undefined);
-        }}
+        onCloseManualEntry={overlayActions.onCloseManualEntry}
         onManualCourseEntry={handleManualCourseEntry}
-        onCloseCommandPalette={() => setCommandPaletteOpen(false)}
+        onCloseCommandPalette={overlayActions.onCloseCommandPalette}
         onNavigate={handleTabChange}
-        onImportTranscript={() => {
-          handleTabChange("upload");
-          if (hasData) setShowUpdateModal(true);
-        }}
-        onManualAdd={() => setShowManualEntryModal(true)}
+        onImportTranscript={overlayActions.onImportTranscript}
+        onManualAdd={overlayActions.onManualAdd}
         onToggleTheme={toggleTheme}
-        onCloseWelcome={() => {
-          setWelcomeOpen(false);
-          void setUserFlag(user.uid, "hasSeenV3Welcome");
-        }}
-        onStartTour={() => {
-          setWelcomeOpen(false);
-          void setUserFlag(user.uid, "hasSeenV3Welcome");
-          setTourOpen(true);
-        }}
-        onCloseTour={() => {
-          setTourOpen(false);
-          void setUserFlag(user.uid, "hasSeenTutorial");
-        }}
-        onCompleteTour={() => {
-          void setUserFlag(user.uid, "hasSeenTutorial");
-        }}
+        onCloseWelcome={overlayActions.onCloseWelcome}
+        onStartTour={overlayActions.onStartTour}
+        onCloseTour={overlayActions.onCloseTour}
+        onCompleteTour={overlayActions.onCompleteTour}
         onCloseCourseModal={() => setModalOpen({ isOpen: false, course: null })}
         onToggleDistributional={(courseId, dist) => {
           void toggleDistributional(courseId, dist);

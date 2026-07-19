@@ -1,0 +1,63 @@
+{
+  "id": "CERT_RUSSIAN",
+  "name": "Russian",
+  "category": "advanced_language",
+  "source_url": "https://catalog.yale.edu/ycps/subjects-of-instruction/slavic-languages-literatures/",
+  "page_title": "Russian",
+  "tabs": [
+    {
+      "label": "Overview",
+      "href": "#text",
+      "id": null
+    },
+    {
+      "label": "Summary of Requirements",
+      "href": "#summaryofrequirementstext",
+      "id": null
+    },
+    {
+      "label": "First year",
+      "href": "#firstyearstext",
+      "id": null
+    },
+    {
+      "label": "Certificate",
+      "href": "#certificatetext",
+      "id": null
+    },
+    {
+      "label": "Faculty",
+      "href": "#ftext",
+      "id": null
+    },
+    {
+      "label": "Roadmap",
+      "href": "#roadmaptext",
+      "id": null
+    },
+    {
+      "label": "Courses",
+      "href": "#coursestext",
+      "id": null
+    }
+  ],
+  "extracted_from_container": "certificatetextcontainer",
+  "parent_program": "Slavic Languages and Literatures",
+  "requires_application": false,
+  "full_text": "The Department of Slavic Languages and Literatures offers a Certificate of Advanced Language Study in Russian. A certificate adviser, typically the director of undergraduate studies (DUS), advises students on the certification process. The Certificate of Advanced Language Study is listed on student transcripts.\nRequirements\nStudents seeking to earn the certificate are required to take four courses beyond the L4 level in their chosen language, at least two of which must be Yale courses designated as L5. Students should\ntake L5 content courses only after they have completed\nRUSS 1510\n, Third-Year Russian II.\nAll courses must be taken for a letter grade, and students must achieve a grade of B or above. With the approval of the adviser, one advanced non-L5 course, conducted in the target language, such as an independent study course (graded pass/fail), a graduate seminar, or an advanced seminar may count toward certification requirements.\nThe certificate adviser may allow one “language across the curriculum” (LxC) course taught in English to count toward the certification requirements provided the course includes at minimum a weekly discussion section conducted entirely in the target language. The discussion section must enroll a minimum of three students and the course must be designated as LxC in the course description.\nThe certificate adviser may also approve the substitution of up to two credits earned during study abroad and taught in the target language to count toward the certificate requirements. If the adviser approves courses taken outside of Yale for inclusion in the certificate requirements, students must take the necessary steps to ensure those courses appear on their transcript.\nCredit/D/Fail\nNo courses taken Credit/D/Fail may be counted toward the requirements of the certificate.\nDeclaration of Candidacy\nStudents must declare their intention to earn a Certificate on the\nDeclare Major, Concentration within the Major, Certificate\npage on\nYale Hub\n, as early as possible, but at the very latest, by the 15th of January or September in their last semester at Yale. Once declared, Degree Audit tracks students' progress toward completion of the certificate.",
+  "isolation": {
+    "mode": "isolated_subsection",
+    "text": "The Department of Slavic Languages and Literatures offers a Certificate of Advanced Language Study in Russian. A certificate adviser, typically the director of undergraduate studies (DUS), advises students on the certification process. The Certificate of Advanced Language Study is listed on student transcripts.\nRequirements\nStudents seeking to earn the certificate are required to take four courses beyond the L4 level in their chosen language, at least two of which must be Yale courses designated as L5. Students should\ntake L5 content courses only after they have completed\nRUSS 1510\n, Third-Year Russian II.\nAll courses must be taken for a letter grade, and students must achieve a grade of B or above. With the approval of the adviser, one advanced non-L5 course, conducted in the target language, such as an independent study course (graded pass/fail), a graduate seminar, or an advanced seminar may count toward certification requirements.\nThe certificate adviser may allow one “language across the curriculum” (LxC) course taught in English to count toward the certification requirements provided the course includes at minimum a weekly discussion section conducted entirely in the target language. The discussion section must enroll a minimum of three students and the course must be designated as LxC in the course description.\nThe certificate adviser may also approve the substitution of up to two credits earned during study abroad and taught in the target language to count toward the certificate requirements. If the adviser approves courses taken outside of Yale for inclusion in the certificate requirements, students must take the necessary steps to ensure those courses appear on their transcript.\nCredit/D/Fail\nNo courses taken Credit/D/Fail may be counted toward the requirements of the certificate.\nDeclaration of Candidacy\nStudents must declare their intention to earn a Certificate on the\nDeclare Major, Concentration within the Major, Certificate\npage on\nYale Hub\n, as early as possible, but at the very latest, by the 15th of January or September in their last semester at Yale. Once declared, Degree Audit tracks students' progress toward completion of the certificate.",
+    "start_line": 4,
+    "end_line": 21,
+    "matched_name": "Russian"
+  },
+  "sections": {
+    "overview": "The Department of Slavic Languages and Literatures offers a Certificate of Advanced Language Study in Russian. A certificate adviser, typically the director of undergraduate studies (DUS), advises students on the certification process. The Certificate of Advanced Language Study is listed on student transcripts.",
+    "requirements": "Students seeking to earn the certificate are required to take four courses beyond the L4 level in their chosen language, at least two of which must be Yale courses designated as L5. Students should\ntake L5 content courses only after they have completed\nRUSS 1510\n, Third-Year Russian II.\nAll courses must be taken for a letter grade, and students must achieve a grade of B or above. With the approval of the adviser, one advanced non-L5 course, conducted in the target language, such as an independent study course (graded pass/fail), a graduate seminar, or an advanced seminar may count toward certification requirements.\nThe certificate adviser may allow one “language across the curriculum” (LxC) course taught in English to count toward the certification requirements provided the course includes at minimum a weekly discussion section conducted entirely in the target language. The discussion section must enroll a minimum of three students and the course must be designated as LxC in the course description.\nThe certificate adviser may also approve the substitution of up to two credits earned during study abroad and taught in the target language to count toward the certificate requirements. If the adviser approves courses taken outside of Yale for inclusion in the certificate requirements, students must take the necessary steps to ensure those courses appear on their transcript.\nCredit/D/Fail\nNo courses taken Credit/D/Fail may be counted toward the requirements of the certificate.",
+    "declaration": "Students must declare their intention to earn a Certificate on the\nDeclare Major, Concentration within the Major, Certificate\npage on\nYale Hub\n, as early as possible, but at the very latest, by the 15th of January or September in their last semester at Yale. Once declared, Degree Audit tracks students' progress toward completion of the certificate."
+  },
+  "summary_of_requirements_tab": null,
+  "tables": [],
+  "raw_html_length": 46033
+}

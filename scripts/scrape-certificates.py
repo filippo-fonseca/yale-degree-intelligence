@@ -65,7 +65,7 @@ def container_candidates(soup: BeautifulSoup) -> dict[str, Tag]:
     out: dict[str, Tag] = {}
     for div in soup.find_all("div", id=True):
         tid = div.get("id") or ""
-        if tid.endswith("container") or tid in {"textcontainer", "certificatetextcontainer", "intensivetextcontainer", "summaryofrequirementstextcontainer"}:
+        if tid.endswith("container"):
             out[tid] = div
     return out
 
@@ -75,11 +75,19 @@ def pick_container(soup: BeautifulSoup, extract: str, cert_name: str) -> tuple[s
     if extract != "auto" and extract in containers:
         return extract, containers[extract]
 
-    # Prefer explicit certificate / intensive containers when present
-    for key in ("certificatetextcontainer", "intensivetextcontainer", "textcontainer"):
+    # Prefer explicit certificate / intensive containers when present.
+    # Note: some departments use plural "certificatestextcontainer".
+    preferred = (
+        "certificatetextcontainer",
+        "certificatestextcontainer",
+        "intensivetextcontainer",
+        "maptextcontainer",  # Education Studies Scholars Intensive tab
+        "textcontainer",
+    )
+    for key in preferred:
         if key in containers:
             text = clean_text(containers[key]).lower()
-            if "certif" in text or key == "textcontainer":
+            if key == "textcontainer" or "certif" in text or "scholar" in text:
                 return key, containers[key]
 
     # Fallback: whole #content

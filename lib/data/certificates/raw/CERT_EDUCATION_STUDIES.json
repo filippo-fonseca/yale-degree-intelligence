@@ -1,0 +1,42 @@
+{
+  "id": "CERT_EDUCATION_STUDIES",
+  "name": "Education Studies",
+  "category": "interdisciplinary",
+  "source_url": "https://catalog.yale.edu/ycps/subjects-of-instruction/education-studies/",
+  "page_title": "Education Studies Certificates",
+  "tabs": [
+    {
+      "label": "Overview",
+      "href": "#text",
+      "id": null
+    },
+    {
+      "label": "Scholar Intensive Certificate",
+      "href": "#maptext",
+      "id": null
+    },
+    {
+      "label": "Certificate",
+      "href": "#certificatetext",
+      "id": null
+    },
+    {
+      "label": "Courses",
+      "href": "#coursestext",
+      "id": null
+    }
+  ],
+  "extracted_from_container": "certificatetextcontainer",
+  "parent_program": null,
+  "requires_application": false,
+  "full_text": "Certificate in Education Studies\nSee Links\nto the attributes indicating courses approved for the certificate\nrequirements.\nOpen to all interested Yale students, the Certificate in Education Studies provides an opportunity to pursue an interdisciplinary study of education to complement their major.\nTo earn the certificate, students must complete a total of five courses: the prerequisite\nEDST 1110\n, one course in Theory and Research, one course in either Policy or Pedagogy, and two electives. No more than two course credits may overlap in the fulfillment of the requirements of the Education Studies Certificate or of a major, a simultaneous degree, or another certificate. Additionally, no course credit may be counted toward the requirements of more than two curricular programs. For example, the same course credit may not be used to fulfill the requirements of two certificates and a major. Graduate and professional school courses may count with approval from the Education Studies Associate Director. For a listing of courses in the area categories, see the\nEducation Studies website\n.\nCredit/D/Fail\nCourses taken Credit/D/Fail\nmay not be applied toward the requirements of the certificate.\nSuccessful completion of the Certificate is noted on transcripts.\nDeclaration of Candidacy\nOnce students are enrolled in the prerequisite\nEDST 1110\n, they may\ndeclare their intent to earn a Certificate in Education Studies.\nStudents must declare their intention to earn a certificate on the\nDeclare Major, Concentration within the Major, Certificate\npage on\nYale Hub\n, as early as possible, but at the very latest, by the 15th of January or September in their last semester at Yale. Once declared, Degree Audit tracks students' progress toward completion of the certificate.\nSUMMARY OF Requirements\nPrerequisite\nEDST 1110\nNumber of courses\n5 courses\nDistribution of courses\n1 course credit in Theory and Research, 1 course credit in either Policy or Pedagogy; 2 EDST electives",
+  "isolation": null,
+  "sections": {
+    "overview": "Certificate in Education Studies\nSee Links\nto the attributes indicating courses approved for the certificate\nrequirements.\nOpen to all interested Yale students, the Certificate in Education Studies provides an opportunity to pursue an interdisciplinary study of education to complement their major.\nTo earn the certificate, students must complete a total of five courses: the prerequisite\nEDST 1110\n, one course in Theory and Research, one course in either Policy or Pedagogy, and two electives. No more than two course credits may overlap in the fulfillment of the requirements of the Education Studies Certificate or of a major, a simultaneous degree, or another certificate. Additionally, no course credit may be counted toward the requirements of more than two curricular programs. For example, the same course credit may not be used to fulfill the requirements of two certificates and a major. Graduate and professional school courses may count with approval from the Education Studies Associate Director. For a listing of courses in the area categories, see the\nEducation Studies website\n.\nCredit/D/Fail\nCourses taken Credit/D/Fail\nmay not be applied toward the requirements of the certificate.\nSuccessful completion of the Certificate is noted on transcripts.",
+    "declaration": "Once students are enrolled in the prerequisite\nEDST 1110\n, they may\ndeclare their intent to earn a Certificate in Education Studies.\nStudents must declare their intention to earn a certificate on the\nDeclare Major, Concentration within the Major, Certificate\npage on\nYale Hub\n, as early as possible, but at the very latest, by the 15th of January or September in their last semester at Yale. Once declared, Degree Audit tracks students' progress toward completion of the certificate.",
+    "summary_of_requirements": "Prerequisite\nEDST 1110\nNumber of courses\n5 courses\nDistribution of courses\n1 course credit in Theory and Research, 1 course credit in either Policy or Pedagogy; 2 EDST electives"
+  },
+  "summary_of_requirements_tab": null,
+  "tables": [],
+  "raw_html_length": 25535
+}

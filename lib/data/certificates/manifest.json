@@ -18,7 +18,7 @@
       "name": "Ancient Greek",
       "category": "advanced_language",
       "url": "/ycps/subjects-of-instruction/classics/",
-      "extract": "certificatetextcontainer",
+      "extract": "certificatestextcontainer",
       "parent_program": "Classics",
       "notes": "Listed under Classics Certificates tab"
     },
@@ -83,7 +83,7 @@
       "name": "isiZulu",
       "category": "advanced_language",
       "url": "/ycps/subjects-of-instruction/african-studies/",
-      "extract": "certificatetextcontainer",
+      "extract": "certificatestextcontainer",
       "parent_program": "African Studies"
     },
     {
@@ -107,7 +107,7 @@
       "name": "Kiswahili",
       "category": "advanced_language",
       "url": "/ycps/subjects-of-instruction/african-studies/",
-      "extract": "certificatetextcontainer",
+      "extract": "certificatestextcontainer",
       "parent_program": "African Studies"
     },
     {
@@ -123,7 +123,7 @@
       "name": "Latin",
       "category": "advanced_language",
       "url": "/ycps/subjects-of-instruction/classics/",
-      "extract": "certificatetextcontainer",
+      "extract": "certificatestextcontainer",
       "parent_program": "Classics"
     },
     {
@@ -179,7 +179,7 @@
       "name": "Yoruba",
       "category": "advanced_language",
       "url": "/ycps/subjects-of-instruction/african-studies/",
-      "extract": "certificatetextcontainer",
+      "extract": "certificatestextcontainer",
       "parent_program": "African Studies"
     },
     {
@@ -201,7 +201,7 @@
       "name": "Education Studies",
       "category": "interdisciplinary",
       "url": "/ycps/subjects-of-instruction/education-studies/",
-      "extract": "auto",
+      "extract": "certificatetextcontainer",
       "notes": "Education Studies page may have multiple certificates"
     },
     {
@@ -209,7 +209,7 @@
       "name": "Education Studies Scholars Intensive",
       "category": "interdisciplinary",
       "url": "/ycps/subjects-of-instruction/education-studies/",
-      "extract": "auto",
+      "extract": "maptextcontainer",
       "requires_application": true
     },
     {

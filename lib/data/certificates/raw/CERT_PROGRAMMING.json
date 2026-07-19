@@ -1,0 +1,57 @@
+{
+  "id": "CERT_PROGRAMMING",
+  "name": "Programming",
+  "category": "skills_based",
+  "source_url": "https://catalog.yale.edu/ycps/subjects-of-instruction/computer-science/",
+  "page_title": "Computer Science",
+  "tabs": [
+    {
+      "label": "Overview",
+      "href": "#text",
+      "id": null
+    },
+    {
+      "label": "Summary of Requirements",
+      "href": "#summaryofrequirementstext",
+      "id": null
+    },
+    {
+      "label": "First year",
+      "href": "#firstyearstext",
+      "id": null
+    },
+    {
+      "label": "Certificate",
+      "href": "#certificatetext",
+      "id": null
+    },
+    {
+      "label": "Faculty",
+      "href": "#facultytext",
+      "id": null
+    },
+    {
+      "label": "Roadmap",
+      "href": "#roadmaptext",
+      "id": null
+    },
+    {
+      "label": "Courses",
+      "href": "#coursestext",
+      "id": null
+    }
+  ],
+  "extracted_from_container": "certificatetextcontainer",
+  "parent_program": "Computer Science",
+  "requires_application": false,
+  "full_text": "Certificate in Programming\nCertificate director:\nStephen Slade\n;\ncpsc.yale.edu\nThe Certificate in Programming prepares students to program computers in support of work in any area of study. While the certificate does not provide the grounding in theory and systems that the computer science majors do, it does provide a short path to programming literacy that can be completed in a span of four terms. Majors in Computer Science, and in the joint programs with Economics, Electrical Engineering, Mathematics, and Psychology, or in Computing and the Arts may not pursue the Certificate.\nRefer to the\nComputer Science website\nfor more information.\nPrerequisite\nThe prerequisite for the Certificate is an introductory programming course,\nCPSC 1100\n,\n1001\n,\nS115\nor successful completion of an AP Computer Science course.\nRequirements of the Certificate\nStudents may not use any of the five required courses, indicated below, to satisfy the requirements of any major or other certificate. If such a course is required for another program, the student must substitute another course from the same category or a more advanced one for the Programming Certificate. No course may be used to satisfy more than one of the five required courses.\nProgramming\nOne from\nCPSC 2010\nor\nCPSC 2000\nData structures\nCPSC 2230\nAdvanced programming\nOne from\nCPSC 3270\nor\nCPSC 3230\nA programming elective\nA CPSC course with\nCPSC 2230\nas a listed or implied prerequisite and a primary focus on programming (such as\nCPSC 4180\n,\n4210\n,\n4230\n,\n4240\n,\n4330\n,\n4370\n,\n4390\n,\n4460\n, or\n4780\n) or a second course that satisfies the advanced programming requirement\nAn applications or algorithms elective\nEither a programming in context course that requires significant programming (such as\nCPSC 3340\n,\n3760\n,\n4310\n,\n4320\n,\n4740\n,\n4770\n,\n4790\n, or\nLING 3800\n) or a course in algorithms (such as\nCPSC 3650\nor\n3660\n)\nCredit/D/Fail\nNo course\ntaken Credit/D/Fail may be\napplied\ntoward the requirements of the certificate.\nAdvising\nOzan Erat from the Department of Computer Science advises students pursuing the Certificate. Exceptions to the requirements, other than the substitution of a more advanced course for a required one, are limited.\nSummary of Requirements\nPrerequisite\nCPSC 1100\n,\n1001\n,\nS115\nor AP Computer Science course\nNumber of courses\n5 term courses\nSpecific courses required\nCPSC 2010\nor\n2000\n;\nCPSC 2230\n;\nCPSC 3270\nor\n3230\nDistribution of courses\n2 electives, as specified",
+  "isolation": null,
+  "sections": {
+    "overview": "Certificate in Programming\nCertificate director:\nStephen Slade\n;\ncpsc.yale.edu\nThe Certificate in Programming prepares students to program computers in support of work in any area of study. While the certificate does not provide the grounding in theory and systems that the computer science majors do, it does provide a short path to programming literacy that can be completed in a span of four terms. Majors in Computer Science, and in the joint programs with Economics, Electrical Engineering, Mathematics, and Psychology, or in Computing and the Arts may not pursue the Certificate.\nRefer to the\nComputer Science website\nfor more information.\nPrerequisite\nThe prerequisite for the Certificate is an introductory programming course,\nCPSC 1100\n,\n1001\n,\nS115\nor successful completion of an AP Computer Science course.",
+    "requirements": "Students may not use any of the five required courses, indicated below, to satisfy the requirements of any major or other certificate. If such a course is required for another program, the student must substitute another course from the same category or a more advanced one for the Programming Certificate. No course may be used to satisfy more than one of the five required courses.\nProgramming\nOne from\nCPSC 2010\nor\nCPSC 2000\nData structures\nCPSC 2230\nAdvanced programming\nOne from\nCPSC 3270\nor\nCPSC 3230\nA programming elective\nA CPSC course with\nCPSC 2230\nas a listed or implied prerequisite and a primary focus on programming (such as\nCPSC 4180\n,\n4210\n,\n4230\n,\n4240\n,\n4330\n,\n4370\n,\n4390\n,\n4460\n, or\n4780\n) or a second course that satisfies the advanced programming requirement\nAn applications or algorithms elective\nEither a programming in context course that requires significant programming (such as\nCPSC 3340\n,\n3760\n,\n4310\n,\n4320\n,\n4740\n,\n4770\n,\n4790\n, or\nLING 3800\n) or a course in algorithms (such as\nCPSC 3650\nor\n3660\n)\nCredit/D/Fail\nNo course\ntaken Credit/D/Fail may be\napplied\ntoward the requirements of the certificate.\nAdvising\nOzan Erat from the Department of Computer Science advises students pursuing the Certificate. Exceptions to the requirements, other than the substitution of a more advanced course for a required one, are limited.",
+    "summary_of_requirements": "Prerequisite\nCPSC 1100\n,\n1001\n,\nS115\nor AP Computer Science course\nNumber of courses\n5 term courses\nSpecific courses required\nCPSC 2010\nor\n2000\n;\nCPSC 2230\n;\nCPSC 3270\nor\n3230\nDistribution of courses\n2 electives, as specified"
+  },
+  "summary_of_requirements_tab": null,
+  "tables": [],
+  "raw_html_length": 65433
+}

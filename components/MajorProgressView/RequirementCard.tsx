@@ -2,7 +2,7 @@
 
 import React from "react";
 import { motion } from "framer-motion";
-import { FiX, FiPlus } from "react-icons/fi";
+import { FiX, FiPlus, FiRotateCcw } from "react-icons/fi";
 
 import {
   getReqStatus,
@@ -19,9 +19,13 @@ export type RequirementCardHandlers = {
   onOpenRequirement: (req: any) => void;
   /** Only used on completed cards: drop a completed course from this requirement. */
   onExcludeFromRequirement?: (code: string, reqName: string) => void;
+  /** Undo an exclusion so the course counts toward this requirement again. */
+  onReIncludeFromRequirement?: (code: string, reqName: string) => void;
 };
 
 function optionPillClasses(opt: any): string {
+  if (opt.excluded)
+    return "bg-amber-100 dark:bg-amber-900/20 text-amber-700 dark:text-amber-300 border border-dashed border-amber-400 dark:border-amber-600";
   if (opt.manual)
     return "bg-purple-100 dark:bg-purple-900/20 text-purple-700 dark:text-purple-300 border border-purple-300 dark:border-purple-700";
   if (opt.completed)
@@ -34,6 +38,7 @@ function optionPillClasses(opt: any): string {
 }
 
 function optionSuffix(opt: any): string {
+  if (opt.excluded) return ", excluded";
   if (opt.manual) return ", manual";
   if (opt.skipped) return ", skipped";
   if (opt.inProgress) return ", in progress";
@@ -63,6 +68,7 @@ const RequirementCard = React.memo(function RequirementCard({
     onAddManual,
     onOpenRequirement,
     onExcludeFromRequirement,
+    onReIncludeFromRequirement,
   } = handlers;
 
   const openRequirement = () =>
@@ -122,11 +128,14 @@ const RequirementCard = React.memo(function RequirementCard({
 
       <div className="flex flex-wrap gap-1.5">
         {visibleOptions.map((opt: any) => {
-          const interactive = !isCompletedCard && !opt.completed && !opt.skipped;
+          const interactive =
+            !opt.skipped &&
+            (opt.completed || opt.inProgress || !isCompletedCard);
+          const showExclude =
+            isCompletedCard && opt.completed && !opt.excluded;
+          const showUndoExclude = !!opt.excluded;
           const showX =
-            opt.skipped ||
-            opt.manual ||
-            (isCompletedCard && opt.completed);
+            opt.skipped || opt.manual || showExclude || showUndoExclude;
           return (
             <div
               key={opt.code}
@@ -148,25 +157,31 @@ const RequirementCard = React.memo(function RequirementCard({
                   type="button"
                   onClick={(e) => {
                     e.stopPropagation();
-                    if (opt.skipped) onUnskip(opt.code);
+                    if (showUndoExclude)
+                      onReIncludeFromRequirement?.(opt.code, req.name);
+                    else if (opt.skipped) onUnskip(opt.code);
                     else if (opt.manual) onRemoveManual(opt.code, req.name);
-                    else if (opt.completed)
+                    else if (showExclude)
                       onExcludeFromRequirement?.(opt.code, req.name);
                   }}
                   className={`ml-1 text-[0.65rem] transition-colors ${
-                    isCompletedCard && opt.completed
-                      ? "text-emerald-600/60 dark:text-emerald-500/40 hover:text-red-500 dark:hover:text-red-400"
-                      : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
+                    showUndoExclude
+                      ? "text-amber-600/70 dark:text-amber-500/50 hover:text-emerald-600 dark:hover:text-emerald-400"
+                      : isCompletedCard && opt.completed
+                        ? "text-emerald-600/60 dark:text-emerald-500/40 hover:text-red-500 dark:hover:text-red-400"
+                        : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
                   }`}
                   title={
-                    opt.manual
-                      ? "Remove manual course"
-                      : opt.skipped
-                        ? "Unskip this course"
-                        : "Remove from this requirement"
+                    showUndoExclude
+                      ? "Re-include in this requirement"
+                      : opt.manual
+                        ? "Remove manual course"
+                        : opt.skipped
+                          ? "Unskip this course"
+                          : "Remove from this requirement"
                   }
                 >
-                  <FiX size={10} />
+                  {showUndoExclude ? <FiRotateCcw size={10} /> : <FiX size={10} />}
                 </button>
               )}
             </div>

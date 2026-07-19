@@ -276,6 +276,7 @@ What can I help you with? I can help plan your schedule, find courses that count
           onClick={resetConversation}
           className="p-1.5 rounded-lg bg-black/[0.04] dark:bg-gray-800/40 hover:bg-black/[0.08] dark:hover:bg-gray-700/50 text-gray-500 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 border border-black/[0.06] dark:border-gray-700/40 transition-all shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]"
           title="Reset conversation"
+          aria-label="Reset conversation"
         >
           <FiRefreshCw size={14} />
         </button>
@@ -289,7 +290,12 @@ What can I help you with? I can help plan your schedule, find courses that count
       )}
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto space-y-3 mb-3">
+      <div
+        className="flex-1 overflow-y-auto space-y-3 mb-3"
+        aria-live="polite"
+        aria-relevant="additions"
+        aria-label="Chat messages"
+      >
         {messages.map((message, idx) => {
           const isLastAssistant =
             message.role === "assistant" && idx === messages.length - 1 && isLoading;
@@ -360,6 +366,7 @@ What can I help you with? I can help plan your schedule, find courses that count
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder="Ask Dan about requirements, courses, planning..."
+            aria-label="Message Dan"
             className="w-full px-3 py-2.5 pr-11 text-sm bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-xl text-gray-900 dark:text-gray-200 focus:outline-none focus:ring-1 focus:ring-purple-500/40 focus:border-purple-600/50 resize-none placeholder:text-gray-400 dark:placeholder:text-gray-500 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]"
             rows={2}
             disabled={isLoading}
@@ -367,6 +374,7 @@ What can I help you with? I can help plan your schedule, find courses that count
           <button
             onClick={handleSendMessage}
             disabled={!input.trim() || isLoading}
+            aria-label="Send message"
             className={`absolute right-2.5 bottom-2.5 p-1.5 rounded-lg transition-all ${
               input.trim()
                 ? "bg-gradient-to-br from-purple-600 to-purple-700 text-white hover:from-purple-500 hover:to-purple-600 shadow-[0_2px_8px_rgba(147,51,234,0.3)]"
@@ -376,6 +384,9 @@ What can I help you with? I can help plan your schedule, find courses that count
             <FiSend size={14} />
           </button>
         </div>
+        <p className="mt-2 text-[10px] text-gray-400 dark:text-gray-500 text-center">
+          AI-generated — confirm with your DUS.
+        </p>
       </div>
     </div>
   );

@@ -1,0 +1,47 @@
+{
+  "id": "CERT_EDUCATION_STUDIES",
+  "name": "Education Studies",
+  "description": "Open to all interested Yale students, this certificate provides an opportunity to pursue an interdisciplinary study of education to complement their major.",
+  "category": "interdisciplinary",
+  "sourceUrl": "https://catalog.yale.edu/ycps/subjects-of-instruction/education-studies/",
+  "requiresApplication": false,
+  "creditRequirements": {
+    "total": 5
+  },
+  "notes": [
+    "Successful completion of the certificate is noted on transcripts.",
+    "Courses taken Credit/D/Fail may not be applied toward the certificate.",
+    "No more than two course credits may overlap with a major, simultaneous degree, or another certificate.",
+    "No course credit may be counted toward the requirements of more than two curricular programs.",
+    "Graduate and professional school courses may count with approval from the Education Studies Associate Director.",
+    "Declare on Yale Hub once enrolled in EDST 1110; by January 15 or September 15 of the final semester at the latest."
+  ],
+  "requirements": [
+    {
+      "name": "Prerequisite",
+      "required": 1,
+      "description": "Foundational education studies course counted toward the five-course total.",
+      "options": [
+        { "type": "course", "code": "EDST 1110" }
+      ]
+    },
+    {
+      "name": "Theory and Research",
+      "required": 1,
+      "description": "One course in Theory and Research as approved for the certificate. See Education Studies website for area listings.",
+      "options": []
+    },
+    {
+      "name": "Policy or Pedagogy",
+      "required": 1,
+      "description": "One course in either Policy or Pedagogy as approved for the certificate.",
+      "options": []
+    },
+    {
+      "name": "EDST electives",
+      "required": 2,
+      "description": "Two Education Studies electives as approved for the certificate.",
+      "options": []
+    }
+  ]
+}

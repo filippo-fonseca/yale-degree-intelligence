@@ -1,0 +1,43 @@
+{
+  "id": "CERT_ENERGY_STUDIES",
+  "name": "Energy Studies",
+  "description": "Provides undergraduates with the knowledge and skills needed for advanced studies, leadership, and success in energy-related fields through coursework in three multidisciplinary tracks.",
+  "category": "interdisciplinary",
+  "sourceUrl": "https://catalog.yale.edu/ycps/subjects-of-instruction/energy-studies/",
+  "requiresApplication": false,
+  "creditRequirements": {
+    "total": 6
+  },
+  "notes": [
+    "ENRG 3000 is required as one of the six course credits (exceptions can be granted by the certificate director) and counts toward the Energy & Society track; take during junior or senior year.",
+    "ENRG 4000 (Senior Capstone Seminar) is optional but can count toward the six required credits in any one of the three tracks depending on project topic.",
+    "Language courses may not count toward the certificate.",
+    "No more than one course taken Credit/D/Fail or one independent study course graded Pass/Fail may count toward the certificate.",
+    "No more than two course credits may overlap with a major, simultaneous degree, or another certificate.",
+    "No course credit may be applied toward the requirements of more than two curricular programs.",
+    "Graduate and professional school courses and non-Yale courses accepted for full course credit by Yale College may count toward the certificate.",
+    "Declare on Yale Hub by January 15 or September 15 of the final semester at the latest."
+  ],
+  "requirements": [
+    {
+      "name": "Energy Science & Technology",
+      "required": 2,
+      "description": "Two courses in the Energy Science & Technology track as approved for the certificate.",
+      "options": []
+    },
+    {
+      "name": "Energy & Environment",
+      "required": 2,
+      "description": "Two courses in the Energy & Environment track as approved for the certificate.",
+      "options": []
+    },
+    {
+      "name": "Energy & Society",
+      "required": 2,
+      "description": "Two courses in the Energy & Society track as approved for the certificate. ENRG 3000 is required as one of the six total credits (exceptions may be granted by the certificate director).",
+      "options": [
+        { "type": "course", "code": "ENRG 3000" }
+      ]
+    }
+  ]
+}

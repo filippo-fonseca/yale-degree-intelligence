@@ -1,0 +1,52 @@
+{
+  "id": "CERT_CLIMATE_SCIENCE",
+  "name": "Climate Science and Solutions",
+  "description": "Provides students with a foundation in basic climate science, anthropogenic climate change, and solutions, preparing them to be effective and informed leaders on one of humanity's grand challenges.",
+  "category": "interdisciplinary",
+  "sourceUrl": "https://catalog.yale.edu/ycps/subjects-of-instruction/climate-science-and-solutions/",
+  "requiresApplication": false,
+  "creditRequirements": {
+    "total": 6
+  },
+  "notes": [
+    "Three of the six courses must have a science, engineering, or technology focus.",
+    "No more than two course credits may overlap with a major, simultaneous degree, or another certificate.",
+    "No course credit may be applied toward the requirements of more than two curricular programs.",
+    "No more than four credits may come from a single department or school.",
+    "No more than one course taken Credit/D/Fail or one independent study course graded pass/fail may count toward the certificate.",
+    "Courses taken at another institution or during an approved summer or term-time study abroad program may count with certificate director approval. An on-topic summer internship can replace one elective.",
+    "Declare on Yale Hub by January 15 or September 15 of the final semester at the latest."
+  ],
+  "requirements": [
+    {
+      "name": "Basic Climate Science",
+      "required": 1,
+      "description": "Course with YC Climate Basic Climate Sci attribute. Covers components, processes, and feedback of the climate system, including ocean-atmosphere dynamics, the carbon cycle, atmospheric gases, radiative balance, and spatial and temporal climate variability.",
+      "options": []
+    },
+    {
+      "name": "Anthropogenic Climate Change",
+      "required": 1,
+      "description": "Course with YC Climate Anthropogenic attribute. Covers drivers and projections for anthropogenic climate change, feedback and uncertainties in regional-to-global climate models, climate change impacts, mitigation, adaptation, and interactions with other aspects of global societal and environmental change.",
+      "options": []
+    },
+    {
+      "name": "Climate Solutions",
+      "required": 1,
+      "description": "Course with YC Climate Solutions attribute. Covers scientific, technological, and socio-political aspects of natural and technological solutions and strategies.",
+      "options": []
+    },
+    {
+      "name": "Climate seminar",
+      "required": 1,
+      "description": "Seminar on climate science and solutions as approved by the certificate director.",
+      "options": []
+    },
+    {
+      "name": "Additional electives",
+      "required": 2,
+      "description": "Remaining certificate-eligible courses. At least three of the six total courses must have a science, engineering, or technology focus.",
+      "options": []
+    }
+  ]
+}

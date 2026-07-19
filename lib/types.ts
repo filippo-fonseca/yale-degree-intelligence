@@ -1,7 +1,14 @@
+/**
+ * Manual requirement assignment on a course.
+ * - Majors use `major_id` (legacy + current)
+ * - Certificates use `certificate_id`
+ * A course should not carry both for exclusivity (cert ↔ major).
+ */
 export type ManualRequirement = {
-  major_id: string;
+  major_id?: string;
+  certificate_id?: string;
   requirement_title: string;
-}
+};
 
 // src/lib/types.ts
 export type Course = {
@@ -49,6 +56,7 @@ export interface ConversationContext {
     email: string;
     graduationYear: number;
     majors: string[];
+    certificates?: string[];
   };
   statsSnapshot: {
     gpa: string;
@@ -78,6 +86,7 @@ export interface FriendsPublicData {
   email?: string;
   photoURL?: string;
   majors: string[];
+  certificates?: string[];
   graduationYear?: number;
   bio?: string;
   courses: PublicCourse[];

@@ -15,12 +15,15 @@ export default function AddManualCourseModal({
   onClose,
   onSuccess,
   userCourses,
+  programType = "major",
 }: {
   isOpen: boolean;
   requirement: string;
   onClose: () => void;
   onSuccess: () => void;
   userCourses: Course[];
+  /** When "certificate", writes certificate_id instead of major_id. */
+  programType?: "major" | "certificate";
 }) {
   const { user } = useAuth();
   const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
@@ -42,12 +45,22 @@ export default function AddManualCourseModal({
     try {
       // Update the existing course document
       const courseRef = doc(db, "courses", selectedCourse.id);
+      const programId = requirement.split("|")[0];
+      const requirementTitle = requirement.split("|")[1];
+
+      const payload =
+        programType === "certificate"
+          ? {
+              certificate_id: programId,
+              requirement_title: requirementTitle,
+            }
+          : {
+              major_id: programId,
+              requirement_title: requirementTitle,
+            };
 
       await updateDoc(courseRef, {
-        manualRequirementsFulfilled: arrayUnion({
-          major_id: requirement.split("|")[0],
-          requirement_title: requirement.split("|")[1],
-        }),
+        manualRequirementsFulfilled: arrayUnion(payload),
       });
 
       onSuccess();

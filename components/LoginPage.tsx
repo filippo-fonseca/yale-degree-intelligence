@@ -268,7 +268,7 @@ export default function LoginPage({
           </a>
         </p>
         <p className="text-[10px] mt-0.5 text-gray-400 dark:text-gray-600">
-          v2.0 · Not affiliated with Yale University. We store parsed course data
+          v3.0.0 · Not affiliated with Yale University. We store parsed course data
           from uploads, not your raw transcript file. See our{" "}
           <Link
             href="/terms"

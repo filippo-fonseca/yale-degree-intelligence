@@ -1,5 +1,5 @@
 // Public changelog data for DegreeIntelligence.
-// Newest first. Append future entries (v3.1, v3.2, ...) to the TOP of this array.
+// Newest first. Append future entries (v3.0.1, v3.1.0, ...) to the TOP of this array.
 
 export type ChangelogSection = {
   title: string;
@@ -17,58 +17,12 @@ export type Release = {
 
 export const RELEASES: Release[] = [
   {
-    version: "v3.1",
-    name: "Safer, clearer, more shareable",
-    date: "July 2026",
-    current: true,
-    summary:
-      "A focused polish wave: tighter privacy, fewer silent bugs, a friend page worth sharing with your froco, and emptier states that actually tell you what to do next.",
-    sections: [
-      {
-        title: "Safer by default",
-        items: [
-          "Transcript upload and AI features only work when you're signed in, with basic spam protection so they can't be abused.",
-          "Friend connections are created through the server now — nobody can fake a friendship to peek at your courses.",
-          "Deleting your account also clears your Dan chat history, not just your courses and profile.",
-          "Honest copy: login says Yale Google (not CAS), and we no longer claim your transcript is processed only on your device.",
-        ],
-      },
-      {
-        title: "Fewer silent bugs",
-        items: [
-          "Simulator warns you before leaving with unsaved plans, and won't wipe your work when course data refreshes.",
-          "Double-major view stays on the major you're looking at instead of jumping back to the first one.",
-          "F grades finally count in Academic Stats (they were being skipped by mistake).",
-          "Distributionals count real credits, not just courses — and a course can only sit at one language level.",
-          "Contact form works again. Friend profiles no longer hang forever if you're logged out.",
-        ],
-      },
-      {
-        title: "Friends you can actually use",
-        items: [
-          "A rebuilt public friend page: who they are, simple stats (no grades), distributional progress, and courses by semester — built for checking out your froco.",
-          "The Friends tab always shows a live preview of your public page, plus Copy link, Open my page, and Customize.",
-          "Choose what friends see: bio, stats overview, distributionals, and course list — toggles that stick.",
-          "Before you enable Friends, you see a demo of what the page looks like and exactly what's shared.",
-        ],
-      },
-      {
-        title: "Clearer empty states",
-        items: [
-          "Stats, Friends, and Distributionals no longer sit greyed out — they invite you to upload a transcript first.",
-          "Friendlier “no friends yet” copy: add your froco or someone in your major.",
-          "Smaller polish across Major, Simulator, and onboarding so empty screens feel intentional, not broken.",
-        ],
-      },
-    ],
-  },
-  {
-    version: "v3",
+    version: "v3.0.0",
     name: "The big release",
     date: "Summer 2026",
-    current: false,
+    current: true,
     summary:
-      "Our largest update yet. We rebuilt the way you move through DegreeIntelligence, sharpened every number we show you, and made the whole thing faster and friendlier. This is the version we always wanted to ship.",
+      "Our largest update yet — and the public launch of DegreeIntelligence 3. Faster planning, clearer numbers, a friend page worth sharing, tighter privacy, and emptier states that actually tell you what to do next.",
     sections: [
       {
         title: "Move faster",
@@ -81,7 +35,7 @@ export const RELEASES: Release[] = [
       {
         title: "Plan with confidence",
         items: [
-          "A much better course Simulator. A cleaner semester layout, a live stat header, and a default-plan system that auto-loads where you left off.",
+          "A much better course Simulator. A cleaner semester layout, a live stat header, and a default-plan system that auto-loads where you left off — plus unsaved-change warnings so you don’t lose work.",
           "Better My Major(s) with a double-major conflict manager that flags shared courses, overlaps, and prerequisite conflicts across both majors.",
           "A Board and Heat map view of your requirements, so you can read your whole degree at a glance or zoom into a single track.",
         ],
@@ -89,9 +43,26 @@ export const RELEASES: Release[] = [
       {
         title: "Understand your degree",
         items: [
-          "More and better academic Stats: a polished chart grid for GPA trends, credits, and grade distribution that stays legible in light and dark.",
-          "Distributional-requirement tracking improvements, including a breakdown donut and clearer, honestly labeled progress cards.",
-          "Friends, redesigned. Compare progress, see where classmates and mentors slotted their courses, and plan alongside your major.",
+          "More and better academic Stats: GPA trends, credits, and grade distribution that stay legible in light and dark — including F grades that were previously skipped by mistake.",
+          "Distributional-requirement tracking that counts real credits, clearer progress cards, and a course can only sit at one language level.",
+          "Clearer empty states: Stats, Friends, and Distributionals invite you to upload a transcript instead of sitting greyed out.",
+        ],
+      },
+      {
+        title: "Friends you can actually use",
+        items: [
+          "A rebuilt public friend page: who they are, simple stats (no grades), distributional progress, and courses by semester — built for checking out your froco.",
+          "The Friends tab always shows a live preview of your public page, plus Copy link, Open my page, and Customize what friends see.",
+          "Before you enable Friends, you see a demo of what the page looks like and exactly what’s shared. Grades and GPA are never shared.",
+        ],
+      },
+      {
+        title: "Safer and more honest",
+        items: [
+          "Transcript upload and AI features only work when you’re signed in, with basic spam protection.",
+          "Friend connections go through the server — nobody can fake a friendship to peek at your courses.",
+          "Deleting your account also clears your Dan chat history.",
+          "Honest copy: login says Yale Google (not CAS), and we no longer claim your transcript is processed only on your device.",
         ],
       },
       {
@@ -99,7 +70,7 @@ export const RELEASES: Release[] = [
         items: [
           "Light mode. A full, carefully tuned light theme that matches the dark one, with a system-default option.",
           "A guided in-app tutorial that walks new students through uploading a transcript and reading their plan.",
-          "An overall UI and UX polish: a collapsible sidebar, smoother transitions, and a more consistent, refined look everywhere.",
+          "An overall UI and UX polish: a collapsible sidebar, smoother transitions, and a more consistent look everywhere.",
         ],
       },
     ],

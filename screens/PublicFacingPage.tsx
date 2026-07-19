@@ -1528,7 +1528,7 @@ export default function AboutPage() {
         </p>
         <p className="mt-2 text-gray-400 dark:text-gray-500 flex flex-wrap items-center justify-center gap-1.5">
           <span className="px-1.5 py-0.5 rounded-full text-[10px] bg-gradient-to-r from-purple-500/20 to-pink-500/20 border border-purple-500/30 text-purple-300">
-            v3.1
+            v3.0.0
           </span>
           <span>© {new Date().getFullYear()} DegreeIntelligence</span>
         </p>

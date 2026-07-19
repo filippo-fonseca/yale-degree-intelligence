@@ -147,7 +147,7 @@ export default function V3WelcomeModal({
                   Welcome to DegreeIntelligence
                 </h2>
                 <span className="inline-flex items-center rounded-full bg-gradient-to-r from-pink-500 to-purple-600 px-2.5 py-0.5 text-xs font-semibold text-white shadow-[0_2px_10px_rgba(168,85,247,0.4)]">
-                  v3
+                  v3.0.0
                 </span>
               </div>
 

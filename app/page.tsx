@@ -90,6 +90,10 @@ import {
   CleoAITab,
   MajorSelectionFlow,
 } from "@/components/dashboard/dynamicTabs";
+import { useCommandPaletteHotkey } from "@/components/dashboard/useCommandPaletteHotkey";
+import { useSidebarState } from "@/components/dashboard/useSidebarState";
+import { useOnboarding } from "@/components/dashboard/useOnboarding";
+import { useDashboardNav } from "@/components/dashboard/useDashboardNav";
 
 export default function Home() {
   const { user, loading, logout } = useAuth();
@@ -99,17 +103,17 @@ export default function Home() {
   const [selectedMajor, setSelectedMajor] = useState<string>("");
   const [showMajorSelection, setShowMajorSelection] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [sidebarPinned, setSidebarPinned] = useLocalStorage<boolean>(
-    "di-sidebar-pinned",
-    true,
-  );
-  const [sidebarHovered, setSidebarHovered] = useState(false);
-  const sidebarExpanded = sidebarPinned || sidebarHovered;
-  const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
-  const [welcomeOpen, setWelcomeOpen] = useState(false);
-  const [tourOpen, setTourOpen] = useState(false);
-  const [onboardChecked, setOnboardChecked] = useState(false);
+  const {
+    sidebarOpen,
+    setSidebarOpen,
+    sidebarPinned,
+    setSidebarPinned,
+    sidebarHovered,
+    setSidebarHovered,
+    sidebarExpanded,
+  } = useSidebarState();
+  const { commandPaletteOpen, setCommandPaletteOpen } =
+    useCommandPaletteHotkey();
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   // Tracks whether the live profile subscription has resolved at least once.
   // Kept separate from coursesLoading so we don't flash the new-user/empty
@@ -151,39 +155,18 @@ export default function Home() {
     } | null;
   }>({ isOpen: false, course: null });
 
-  //tabs:
-  const [activeTab, setActiveTab] = useLocalStorage(
-    "dashboardActiveTab",
-    "upload",
+  const navItems = createNavItems(userProfile?.majors?.length ?? 0);
+
+  const cleoaiComingSoon =
+    navItems.find((i) => i.id === "cleoai")?.comingSoon ?? false;
+
+  const { activeTab, setActiveTab, handleTabChange, setSimulatorNavCheck } =
+    useDashboardNav(cleoaiComingSoon);
+
+  const { welcomeOpen, setWelcomeOpen, tourOpen, setTourOpen } = useOnboarding(
+    user,
+    userProfile,
   );
-
-  // Simulator unsaved changes check
-  const [simulatorNavCheck, setSimulatorNavCheck] = useState<
-    ((callback: () => void) => void) | null
-  >(null);
-
-  // Safe tab switch that checks for unsaved simulator changes
-  const handleTabChange = (newTab: string) => {
-    if (activeTab === "simulator" && simulatorNavCheck) {
-      simulatorNavCheck(() => {
-        setActiveTab(newTab);
-      });
-    } else {
-      setActiveTab(newTab);
-    }
-  };
-
-  // Global ⌘K / Ctrl+K to open the command palette
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
-        e.preventDefault();
-        setCommandPaletteOpen((o) => !o);
-      }
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, []);
 
   const [showUpdateModal, setShowUpdateModal] = useState(false);
   const [showManualEntryModal, setShowManualEntryModal] = useState(false);
@@ -243,87 +226,6 @@ export default function Home() {
       return next;
     });
   };
-
-  const navItems = createNavItems(userProfile?.majors?.length ?? 0);
-
-  const cleoaiComingSoon =
-    navItems.find((i) => i.id === "cleoai")?.comingSoon ?? false;
-
-  // Reset stale tab if Dan is gated as coming soon (e.g. from localStorage).
-  useEffect(() => {
-    if (cleoaiComingSoon && activeTab === "cleoai") {
-      setActiveTab("upload");
-    }
-  }, [cleoaiComingSoon, activeTab, setActiveTab]);
-
-  // Live-subscribe to user profile so UI updates without refresh
-  useEffect(() => {
-    if (!user) return;
-
-    setProfileLoading(true);
-    const unsub = onSnapshot(
-      doc(db, "users", user.uid),
-      (docSnap) => {
-        if (docSnap.exists()) {
-          const data = docSnap.data() as UserProfile;
-          setUserProfile(data);
-          setSelectedMajor((current) => {
-            const majors = data.majors || [];
-            if (!current || !majors.includes(current)) {
-              return majors[0] || "";
-            }
-            return current;
-          });
-          setShowMajorSelection(false); // auto-close once profile exists
-        } else {
-          setUserProfile(null);
-          setShowMajorSelection(true);
-        }
-        // Profile snapshot has now resolved at least once.
-        setProfileLoading(false);
-      },
-      (error) => {
-        // Without this, a Firestore error leaves profileLoading stuck true and
-        // the render gate hangs on the loader until a manual refresh.
-        console.error("Error subscribing to user profile:", error);
-        setProfileLoading(false);
-      },
-    );
-    return () => unsub();
-  }, [user]);
-
-  // Listen to friends_public_data to track friends feature status
-  useEffect(() => {
-    if (!user) return;
-
-    const unsub = onSnapshot(
-      doc(db, "friends_public_data", user.uid),
-      (docSnap) => {
-        if (docSnap.exists()) {
-          setFriendsEnabled(docSnap.data().enabled || false);
-        } else {
-          setFriendsEnabled(false);
-        }
-      },
-      (error) => {
-        console.error("Error subscribing to friends data:", error);
-        setFriendsEnabled(false);
-      },
-    );
-    return () => unsub();
-  }, [user]);
-
-  // One-time onboarding: show the v3 welcome (then the tour) to users who
-  // haven't seen them yet. Runs once per session after the profile loads.
-  useEffect(() => {
-    if (onboardChecked || !user || !userProfile) return;
-    setOnboardChecked(true);
-    if (!userProfile.hasSeenV3Welcome) {
-      setWelcomeOpen(true);
-    } else if (!userProfile.hasSeenTutorial) {
-      setTourOpen(true);
-    }
-  }, [user, userProfile, onboardChecked]);
 
   const getMajorProgress = () => {
     if (!user || !selectedMajor) return null;

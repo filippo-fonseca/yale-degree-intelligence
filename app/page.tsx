@@ -94,14 +94,25 @@ import { useCommandPaletteHotkey } from "@/components/dashboard/useCommandPalett
 import { useSidebarState } from "@/components/dashboard/useSidebarState";
 import { useOnboarding } from "@/components/dashboard/useOnboarding";
 import { useDashboardNav } from "@/components/dashboard/useDashboardNav";
+import { useUserProfile } from "@/components/dashboard/useUserProfile";
+import { useFriendsFeature } from "@/components/dashboard/useFriendsFeature";
 
 export default function Home() {
   const { user, loading, logout } = useAuth();
   const { resolvedTheme, toggleTheme } = useTheme();
   const [courses, setCourses] = useState<Course[]>([]);
   const [hasData, setHasData] = useState(false);
-  const [selectedMajor, setSelectedMajor] = useState<string>("");
-  const [showMajorSelection, setShowMajorSelection] = useState(false);
+  const {
+    userProfile,
+    profileLoading,
+    selectedMajor,
+    setSelectedMajor,
+    showMajorSelection,
+    setShowMajorSelection,
+    isBrandNew,
+    handleProfileUpdate,
+    handleTogglePrereqOverride,
+  } = useUserProfile(user);
   const [showSettings, setShowSettings] = useState(false);
   const {
     sidebarOpen,
@@ -114,12 +125,6 @@ export default function Home() {
   } = useSidebarState();
   const { commandPaletteOpen, setCommandPaletteOpen } =
     useCommandPaletteHotkey();
-  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
-  // Tracks whether the live profile subscription has resolved at least once.
-  // Kept separate from coursesLoading so we don't flash the new-user/empty
-  // state for returning users while their profile snapshot is still in-flight.
-  const [profileLoading, setProfileLoading] = useState(true);
-  const isBrandNew = userProfile?.graduationYear === 2030;
 
   // NEW: state for confirming deletion of an in-progress course
   const [confirmDelete, setConfirmDelete] = useState<{
@@ -129,16 +134,17 @@ export default function Home() {
 
   const [coursesLoading, setCoursesLoading] = useState(true);
 
-  // Friends feature state
-  const [friendsEnabled, setFriendsEnabled] = useState(false);
+  const { friendsEnabled, handleToggleFriends } = useFriendsFeature(
+    user,
+    courses,
+    userProfile,
+  );
 
   useEffect(() => {
     if (!user) {
       setCoursesLoading(false);
-      setProfileLoading(false);
       setCourses([]);
       setHasData(false);
-      setFriendsEnabled(false);
     }
   }, [user]);
 
@@ -564,83 +570,9 @@ export default function Home() {
 
   const calculateStats = () => computeAcademicStatsSummary(courses);
 
-  const handleProfileUpdate = async (updatedProfile: Partial<UserProfile>) => {
-    if (!user) return;
-
-    try {
-      // Stamp createdAt only on first creation (set-if-missing), leaving it
-      // intact on later updates. When userProfile is already loaded the doc
-      // exists, so we skip the existence read entirely on the common edit path
-      // and only pay for it when in-memory state suggests a possible first write.
-      let isFirstWrite = false;
-      if (!userProfile) {
-        const existingSnap = await getDoc(doc(db, "users", user.uid));
-        isFirstWrite = !existingSnap.exists();
-      }
-
-      await setDoc(
-        doc(db, "users", user.uid),
-        {
-          ...userProfile,
-          ...updatedProfile,
-          updatedAt: new Date(),
-          ...(isFirstWrite ? { createdAt: new Date() } : {}),
-        },
-        { merge: true },
-      );
-
-      const docRef = doc(db, "users", user.uid);
-      const docSnap = await getDoc(docRef);
-      if (docSnap.exists()) {
-        setUserProfile(docSnap.data() as UserProfile);
-        if (updatedProfile.majors) {
-          setSelectedMajor(updatedProfile.majors[0] || "");
-        }
-      }
-      setShowSettings(false);
-    } catch (error) {
-      console.error("Error updating profile:", error);
-    }
-  };
-
-  // Mark/unmark a shared course as a prerequisite (exempt from overlap warning).
-  // Persisted on the profile; the onSnapshot subscription refreshes the UI.
-  const handleTogglePrereqOverride = async (code: string) => {
-    if (!user) return;
-    const current = userProfile?.prereqOverrides || [];
-    const next = current.includes(code)
-      ? current.filter((c) => c !== code)
-      : [...current, code];
-    try {
-      await setDoc(
-        doc(db, "users", user.uid),
-        { prereqOverrides: next, updatedAt: new Date() },
-        { merge: true },
-      );
-    } catch (error) {
-      console.error("Error updating prerequisite overrides:", error);
-    }
-  };
-
-  // Handle toggling the friends feature
-  const handleToggleFriends = async (enabled: boolean) => {
-    if (!user) return;
-
-    try {
-      if (enabled) {
-        // Enable and sync current courses (without grades)
-        await enableFriendsFeature(user.uid, courses, userProfile, {
-          displayName: user.displayName,
-          email: user.email,
-          photoURL: user.photoURL,
-        });
-      } else {
-        // Disable (keep document but set enabled = false)
-        await disableFriendsFeature(user.uid);
-      }
-    } catch (error) {
-      console.error("Error toggling friends feature:", error);
-    }
+  const onProfileSave = async (updatedProfile: Partial<UserProfile>) => {
+    await handleProfileUpdate(updatedProfile);
+    setShowSettings(false);
   };
 
   const openDeleteConfirm = (course: Course) =>
@@ -760,7 +692,7 @@ export default function Home() {
           userProfile={userProfile}
           friendsEnabled={friendsEnabled}
           onClose={() => setShowSettings(false)}
-          onSave={handleProfileUpdate}
+          onSave={onProfileSave}
           onToggleFriends={handleToggleFriends}
           onReplayTour={() => {
             setShowSettings(false);

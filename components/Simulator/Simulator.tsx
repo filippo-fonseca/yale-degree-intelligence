@@ -876,13 +876,43 @@ export default function Simulator({
       (m) => m.programType === "certificate",
     );
 
+    // Prefer majors for auto-matched planned courses that hit both catalogs.
+    // Explicit certificate assignment still wins via simulatorCertificateManuals.
+    const certAssignedCodes = new Set(
+      simulatorCertificateManuals.map(
+        (m) => getCanonicalCode(m.code) || m.code,
+      ),
+    );
+    const majorAssignedCodes = new Set(
+      simulatorMajorManuals.map((m) => getCanonicalCode(m.code) || m.code),
+    );
+    const plannedAutoMajorCodes: string[] = [];
+    const plannedAutoCertificateOnlyCodes: string[] = [];
+    for (const code of plannedCodesLocal) {
+      const canon = getCanonicalCode(code) || code;
+      if (certAssignedCodes.has(canon) || majorAssignedCodes.has(canon)) {
+        continue;
+      }
+      const matches = findMatchedRequirements(
+        code,
+        majorIds,
+        certificateIds,
+      );
+      const hitsMajor = matches.some((m) => m.programType === "major");
+      const hitsCert = matches.some((m) => m.programType === "certificate");
+      if (hitsMajor) plannedAutoMajorCodes.push(canon);
+      else if (hitsCert) plannedAutoCertificateOnlyCodes.push(canon);
+    }
+
     const majorBlockedCodes = [
       ...getMajorBlockedCodes(completedCourses),
       ...simulatorCertificateManuals.map((m) => m.code),
+      ...plannedAutoCertificateOnlyCodes,
     ];
     const certificateBlockedCodes = [
       ...getCertificateBlockedCodes(completedCourses),
       ...simulatorMajorManuals.map((m) => m.code),
+      ...plannedAutoMajorCodes,
     ];
 
     const majorManualReqs = [

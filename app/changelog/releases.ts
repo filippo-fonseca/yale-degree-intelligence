@@ -17,10 +17,56 @@ export type Release = {
 
 export const RELEASES: Release[] = [
   {
+    version: "v3.1",
+    name: "Safer, clearer, more shareable",
+    date: "July 2026",
+    current: true,
+    summary:
+      "A focused polish wave: tighter privacy, fewer silent bugs, a friend page worth sharing with your froco, and emptier states that actually tell you what to do next.",
+    sections: [
+      {
+        title: "Safer by default",
+        items: [
+          "Transcript upload and AI features only work when you're signed in, with basic spam protection so they can't be abused.",
+          "Friend connections are created through the server now — nobody can fake a friendship to peek at your courses.",
+          "Deleting your account also clears your Dan chat history, not just your courses and profile.",
+          "Honest copy: login says Yale Google (not CAS), and we no longer claim your transcript is processed only on your device.",
+        ],
+      },
+      {
+        title: "Fewer silent bugs",
+        items: [
+          "Simulator warns you before leaving with unsaved plans, and won't wipe your work when course data refreshes.",
+          "Double-major view stays on the major you're looking at instead of jumping back to the first one.",
+          "F grades finally count in Academic Stats (they were being skipped by mistake).",
+          "Distributionals count real credits, not just courses — and a course can only sit at one language level.",
+          "Contact form works again. Friend profiles no longer hang forever if you're logged out.",
+        ],
+      },
+      {
+        title: "Friends you can actually use",
+        items: [
+          "A rebuilt public friend page: who they are, simple stats (no grades), distributional progress, and courses by semester — built for checking out your froco.",
+          "The Friends tab always shows a live preview of your public page, plus Copy link, Open my page, and Customize.",
+          "Choose what friends see: bio, stats overview, distributionals, and course list — toggles that stick.",
+          "Before you enable Friends, you see a demo of what the page looks like and exactly what's shared.",
+        ],
+      },
+      {
+        title: "Clearer empty states",
+        items: [
+          "Stats, Friends, and Distributionals no longer sit greyed out — they invite you to upload a transcript first.",
+          "Friendlier “no friends yet” copy: add your froco or someone in your major.",
+          "Smaller polish across Major, Simulator, and onboarding so empty screens feel intentional, not broken.",
+        ],
+      },
+    ],
+  },
+  {
     version: "v3",
     name: "The big release",
     date: "Summer 2026",
-    current: true,
+    current: false,
     summary:
       "Our largest update yet. We rebuilt the way you move through DegreeIntelligence, sharpened every number we show you, and made the whole thing faster and friendlier. This is the version we always wanted to ship.",
     sections: [

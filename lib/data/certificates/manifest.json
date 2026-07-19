@@ -1,0 +1,332 @@
+{
+  "source": "https://catalog.yale.edu/ycps/programs_certificates/",
+  "edition": "YCPS 2026\u20132027",
+  "scraped_note": "Yale catalog tabs (Overview / Summary of Requirements / Certificate) are DOM toggles; content is present in HTML containers without separate URLs.",
+  "count": 42,
+  "certificates": [
+    {
+      "id": "CERT_ANCIENT_EGYPTIAN",
+      "name": "Ancient Egyptian",
+      "category": "advanced_language",
+      "url": "/ycps/subjects-of-instruction/near-eastern-languages-civilizations/",
+      "extract": "certificatetextcontainer",
+      "parent_program": "Near Eastern Languages and Civilizations",
+      "notes": "Listed under NELC Certificates tab"
+    },
+    {
+      "id": "CERT_ANCIENT_GREEK",
+      "name": "Ancient Greek",
+      "category": "advanced_language",
+      "url": "/ycps/subjects-of-instruction/classics/",
+      "extract": "certificatetextcontainer",
+      "parent_program": "Classics",
+      "notes": "Listed under Classics Certificates tab"
+    },
+    {
+      "id": "CERT_MODERN_ARABIC",
+      "name": "Modern Arabic",
+      "category": "advanced_language",
+      "url": "/ycps/subjects-of-instruction/near-eastern-languages-civilizations/",
+      "extract": "certificatetextcontainer",
+      "parent_program": "Near Eastern Languages and Civilizations"
+    },
+    {
+      "id": "CERT_CHINESE",
+      "name": "Chinese",
+      "category": "advanced_language",
+      "url": "/ycps/subjects-of-instruction/east-asian-languages-literatures/",
+      "extract": "certificatetextcontainer",
+      "parent_program": "East Asian Languages and Literatures"
+    },
+    {
+      "id": "CERT_FRENCH",
+      "name": "French",
+      "category": "advanced_language",
+      "url": "/ycps/subjects-of-instruction/french/",
+      "extract": "certificatetextcontainer",
+      "parent_program": "French"
+    },
+    {
+      "id": "CERT_GERMAN",
+      "name": "German",
+      "category": "advanced_language",
+      "url": "/ycps/subjects-of-instruction/german-studies/",
+      "extract": "certificatetextcontainer",
+      "parent_program": "German Studies"
+    },
+    {
+      "id": "CERT_MODERN_HEBREW",
+      "name": "Modern Hebrew",
+      "category": "advanced_language",
+      "url": "/ycps/subjects-of-instruction/near-eastern-languages-civilizations/",
+      "extract": "certificatetextcontainer",
+      "parent_program": "Near Eastern Languages and Civilizations"
+    },
+    {
+      "id": "CERT_HINDI",
+      "name": "Hindi",
+      "category": "advanced_language",
+      "url": "/ycps/subjects-of-instruction/south-asian-studies/",
+      "extract": "certificatetextcontainer",
+      "parent_program": "South Asian Studies"
+    },
+    {
+      "id": "CERT_INDONESIAN",
+      "name": "Indonesian",
+      "category": "advanced_language",
+      "url": "/ycps/subjects-of-instruction/southeast-asia-studies/",
+      "extract": "certificatetextcontainer",
+      "parent_program": "Southeast Asia Studies"
+    },
+    {
+      "id": "CERT_ISIZULU",
+      "name": "isiZulu",
+      "category": "advanced_language",
+      "url": "/ycps/subjects-of-instruction/african-studies/",
+      "extract": "certificatetextcontainer",
+      "parent_program": "African Studies"
+    },
+    {
+      "id": "CERT_ITALIAN",
+      "name": "Italian",
+      "category": "advanced_language",
+      "url": "/ycps/subjects-of-instruction/italian/",
+      "extract": "certificatetextcontainer",
+      "parent_program": "Italian"
+    },
+    {
+      "id": "CERT_JAPANESE",
+      "name": "Japanese",
+      "category": "advanced_language",
+      "url": "/ycps/subjects-of-instruction/east-asian-languages-literatures/",
+      "extract": "certificatetextcontainer",
+      "parent_program": "East Asian Languages and Literatures"
+    },
+    {
+      "id": "CERT_KISWAHILI",
+      "name": "Kiswahili",
+      "category": "advanced_language",
+      "url": "/ycps/subjects-of-instruction/african-studies/",
+      "extract": "certificatetextcontainer",
+      "parent_program": "African Studies"
+    },
+    {
+      "id": "CERT_KOREAN",
+      "name": "Korean",
+      "category": "advanced_language",
+      "url": "/ycps/subjects-of-instruction/east-asian-languages-literatures/",
+      "extract": "certificatetextcontainer",
+      "parent_program": "East Asian Languages and Literatures"
+    },
+    {
+      "id": "CERT_LATIN",
+      "name": "Latin",
+      "category": "advanced_language",
+      "url": "/ycps/subjects-of-instruction/classics/",
+      "extract": "certificatetextcontainer",
+      "parent_program": "Classics"
+    },
+    {
+      "id": "CERT_PORTUGUESE",
+      "name": "Portuguese",
+      "category": "advanced_language",
+      "url": "/ycps/subjects-of-instruction/portuguese/",
+      "extract": "certificatetextcontainer",
+      "parent_program": "Portuguese"
+    },
+    {
+      "id": "CERT_RUSSIAN",
+      "name": "Russian",
+      "category": "advanced_language",
+      "url": "/ycps/subjects-of-instruction/slavic-languages-literatures/",
+      "extract": "certificatetextcontainer",
+      "parent_program": "Slavic Languages and Literatures"
+    },
+    {
+      "id": "CERT_SANSKRIT",
+      "name": "Sanskrit",
+      "category": "advanced_language",
+      "url": "/ycps/subjects-of-instruction/south-asian-studies/",
+      "extract": "certificatetextcontainer",
+      "parent_program": "South Asian Studies"
+    },
+    {
+      "id": "CERT_SPANISH",
+      "name": "Spanish",
+      "category": "advanced_language",
+      "url": "/ycps/subjects-of-instruction/spanish/",
+      "extract": "certificatetextcontainer",
+      "parent_program": "Spanish"
+    },
+    {
+      "id": "CERT_MODERN_TURKISH",
+      "name": "Modern Turkish",
+      "category": "advanced_language",
+      "url": "/ycps/subjects-of-instruction/near-eastern-languages-civilizations/",
+      "extract": "certificatetextcontainer",
+      "parent_program": "Near Eastern Languages and Civilizations"
+    },
+    {
+      "id": "CERT_VIETNAMESE",
+      "name": "Vietnamese",
+      "category": "advanced_language",
+      "url": "/ycps/subjects-of-instruction/southeast-asia-studies/",
+      "extract": "certificatetextcontainer",
+      "parent_program": "Southeast Asia Studies"
+    },
+    {
+      "id": "CERT_YORUBA",
+      "name": "Yoruba",
+      "category": "advanced_language",
+      "url": "/ycps/subjects-of-instruction/african-studies/",
+      "extract": "certificatetextcontainer",
+      "parent_program": "African Studies"
+    },
+    {
+      "id": "CERT_CLIMATE_SCIENCE",
+      "name": "Climate Science and Solutions",
+      "category": "interdisciplinary",
+      "url": "/ycps/subjects-of-instruction/climate-science-and-solutions/",
+      "extract": "textcontainer"
+    },
+    {
+      "id": "CERT_COMPUTING_CULTURE_SOCIETY",
+      "name": "Computing, Culture & Society",
+      "category": "interdisciplinary",
+      "url": "/ycps/subjects-of-instruction/critical-computing/",
+      "extract": "textcontainer"
+    },
+    {
+      "id": "CERT_EDUCATION_STUDIES",
+      "name": "Education Studies",
+      "category": "interdisciplinary",
+      "url": "/ycps/subjects-of-instruction/education-studies/",
+      "extract": "auto",
+      "notes": "Education Studies page may have multiple certificates"
+    },
+    {
+      "id": "CERT_EDUCATION_STUDIES_SCHOLARS",
+      "name": "Education Studies Scholars Intensive",
+      "category": "interdisciplinary",
+      "url": "/ycps/subjects-of-instruction/education-studies/",
+      "extract": "auto",
+      "requires_application": true
+    },
+    {
+      "id": "CERT_ENERGY_STUDIES",
+      "name": "Energy Studies",
+      "category": "interdisciplinary",
+      "url": "/ycps/subjects-of-instruction/energy-studies/",
+      "extract": "textcontainer"
+    },
+    {
+      "id": "CERT_FOOD_AG_CLIMATE",
+      "name": "Food, Agriculture, and Climate Change",
+      "category": "interdisciplinary",
+      "url": "/ycps/subjects-of-instruction/food_agriculture_climate_change/",
+      "extract": "textcontainer"
+    },
+    {
+      "id": "CERT_GLOBAL_HEALTH",
+      "name": "Global Health Studies",
+      "category": "interdisciplinary",
+      "url": "/ycps/subjects-of-instruction/global-health-studies/",
+      "extract": "textcontainer",
+      "requires_application": true
+    },
+    {
+      "id": "CERT_HUMAN_RIGHTS",
+      "name": "Human Rights Studies",
+      "category": "interdisciplinary",
+      "url": "/ycps/subjects-of-instruction/human-rights/",
+      "extract": "certificatetextcontainer"
+    },
+    {
+      "id": "CERT_HUMAN_RIGHTS_INTENSIVE",
+      "name": "Human Rights Studies Intensive",
+      "category": "interdisciplinary",
+      "url": "/ycps/subjects-of-instruction/human-rights/",
+      "extract": "intensivetextcontainer",
+      "requires_application": true
+    },
+    {
+      "id": "CERT_ISLAMIC_STUDIES",
+      "name": "Islamic Studies",
+      "category": "interdisciplinary",
+      "url": "/ycps/subjects-of-instruction/islamic-studies/",
+      "extract": "textcontainer"
+    },
+    {
+      "id": "CERT_MEDIEVAL_STUDIES",
+      "name": "Medieval Studies",
+      "category": "interdisciplinary",
+      "url": "/ycps/subjects-of-instruction/medieval_studies/",
+      "extract": "textcontainer"
+    },
+    {
+      "id": "CERT_NATIVE_AMERICAN_INDIGENOUS",
+      "name": "Native American and Indigenous Studies",
+      "category": "interdisciplinary",
+      "url": "/ycps/subjects-of-instruction/native-american-indigenous-studies/",
+      "extract": "textcontainer"
+    },
+    {
+      "id": "CERT_PERSIAN_IRANIAN",
+      "name": "Persian and Iranian Studies",
+      "category": "interdisciplinary",
+      "url": "/ycps/subjects-of-instruction/persian-and-iranian/",
+      "extract": "textcontainer"
+    },
+    {
+      "id": "CERT_TRANSLATION_STUDIES",
+      "name": "Translation Studies",
+      "category": "interdisciplinary",
+      "url": "/ycps/subjects-of-instruction/translation_studies/",
+      "extract": "textcontainer"
+    },
+    {
+      "id": "CERT_COLLECTIONS",
+      "name": "Collections: Objects, Research, Society",
+      "category": "skills_based",
+      "url": "/ycps/subjects-of-instruction/collections/",
+      "extract": "textcontainer"
+    },
+    {
+      "id": "CERT_DATA_SCIENCE",
+      "name": "Data Science",
+      "category": "skills_based",
+      "url": "/ycps/subjects-of-instruction/statistics/",
+      "extract": "certificatetextcontainer",
+      "parent_program": "Statistics & Data Science"
+    },
+    {
+      "id": "CERT_ETHNOGRAPHY",
+      "name": "Ethnography",
+      "category": "skills_based",
+      "url": "/ycps/subjects-of-instruction/ethnography/",
+      "extract": "textcontainer"
+    },
+    {
+      "id": "CERT_PROGRAMMING",
+      "name": "Programming",
+      "category": "skills_based",
+      "url": "/ycps/subjects-of-instruction/computer-science/",
+      "extract": "certificatetextcontainer",
+      "parent_program": "Computer Science"
+    },
+    {
+      "id": "CERT_QUANTUM",
+      "name": "Quantum Science and Engineering",
+      "category": "skills_based",
+      "url": "/ycps/subjects-of-instruction/quantum-science/",
+      "extract": "textcontainer"
+    },
+    {
+      "id": "CERT_TECH_ENTREPRENEURSHIP",
+      "name": "Technology Entrepreneurship",
+      "category": "skills_based",
+      "url": "/ycps/subjects-of-instruction/technology-entrepreneurship-cert/",
+      "extract": "textcontainer"
+    }
+  ]
+}

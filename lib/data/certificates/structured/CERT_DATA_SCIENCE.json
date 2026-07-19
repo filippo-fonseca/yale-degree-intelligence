@@ -1,0 +1,84 @@
+{
+  "id": "CERT_DATA_SCIENCE",
+  "name": "Data Science",
+  "description": "Designed for students majoring in disciplines other than Statistics and Data Science to acquire knowledge for mature use of data analysis. Students gain skills to tackle real-world data analysis challenges in the humanities, social sciences, sciences, and engineering.",
+  "category": "skills_based",
+  "sourceUrl": "https://catalog.yale.edu/ycps/subjects-of-instruction/statistics/",
+  "requiresApplication": false,
+  "parentProgram": "Statistics & Data Science",
+  "creditRequirements": {
+    "total": 5
+  },
+  "notes": [
+    "Minimum grade B– in each certificate course",
+    "No course may satisfy both a major and the certificate",
+    "No single course may count toward two certificate areas",
+    "Declare intent by the last day of add/drop in the final term of enrollment on Yale Hub",
+    "Students are held to the Statistical Methodology and Data Analysis requirements in place when they declared; with DUS approval, updated 2024–2025 requirements may be fulfilled by prior declarers"
+  ],
+  "requirements": [
+    {
+      "name": "Prerequisite",
+      "required": 0,
+      "description": "Suggested introductory course. An introductory data analysis course from another department may also satisfy this prerequisite.",
+      "options": [
+        { "type": "course", "code": "S&DS 1000" },
+        { "type": "course", "code": "S&DS 1080" },
+        { "type": "course", "code": "S&DS 1090" },
+        { "type": "course", "code": "S&DS 1230" }
+      ]
+    },
+    {
+      "name": "Probability and Statistical Theory",
+      "required": 1,
+      "description": "Advanced students may substitute S&DS 3510, S&DS 3640, or ECE 4310.",
+      "options": [
+        { "type": "course", "code": "S&DS 2380" },
+        { "type": "course", "code": "S&DS 2400" },
+        { "type": "course", "code": "S&DS 2410" },
+        { "type": "course", "code": "S&DS 2420" },
+        { "type": "course", "code": "S&DS 3510" },
+        { "type": "course", "code": "S&DS 3640" },
+        { "type": "course", "code": "ECE 4310" }
+      ]
+    },
+    {
+      "name": "Statistical Methodology and Data Analysis",
+      "required": 2,
+      "description": "S&DS 2200 and S&DS 2300 may not both count. ECON 2136 may be substituted for S&DS 2420.",
+      "options": [
+        { "type": "course", "code": "S&DS 2200" },
+        { "type": "course", "code": "S&DS 2300" },
+        { "type": "course", "code": "S&DS 2420" },
+        { "type": "course", "code": "S&DS 3120" },
+        { "type": "course", "code": "S&DS 3610" },
+        { "type": "course", "code": "S&DS 3630" },
+        { "type": "course", "code": "PLSC 2501" },
+        { "type": "course", "code": "ECON 2136" }
+      ]
+    },
+    {
+      "name": "Computation and Machine Learning",
+      "required": 1,
+      "description": "CPSC 3230 may be substituted for CPSC 2230.",
+      "options": [
+        { "type": "course", "code": "S&DS 2620" },
+        { "type": "course", "code": "S&DS 2650" },
+        { "type": "course", "code": "S&DS 3170" },
+        { "type": "course", "code": "S&DS 3650" },
+        { "type": "course", "code": "CPSC 2230" },
+        { "type": "course", "code": "CPSC 3230" },
+        { "type": "course", "code": "CPSC 3810" },
+        { "type": "course", "code": "CPSC 4770" },
+        { "type": "course", "code": "PHYS 3780" },
+        { "type": "course", "code": "PLSC 5060" }
+      ]
+    },
+    {
+      "name": "Data Analysis in a Discipline Area",
+      "required": 1,
+      "description": "One course approved for this requirement and listed on the S&DS website.",
+      "options": []
+    }
+  ]
+}

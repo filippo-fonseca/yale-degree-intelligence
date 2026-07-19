@@ -76,62 +76,20 @@ import V3WelcomeModal from "@/components/V3Welcome/V3WelcomeModal";
 import AppTour from "@/components/Tutorial/AppTour";
 import { setUserFlag } from "@/lib/userFlags";
 import { TabNeedsCoursesEmpty } from "@/components/ui/TabNeedsCoursesEmpty";
-import dynamic from "next/dynamic";
-
-// Heavy, tab-gated views are code-split so logged-out visitors and inactive
-// tabs don't pull this code into the initial bundle. They render client-side
-// only (the dashboard is already a client tree behind auth).
-const TabFallback = () => (
-  <div className="flex items-center justify-center py-24 text-sm text-gray-400 dark:text-gray-500">
-    Loading…
-  </div>
-);
-const MyCoursesView = dynamic(() => import("@/components/MyCoursesView"), {
-  ssr: false,
-  loading: TabFallback,
-});
-const StatsView = dynamic(() => import("@/components/StatsView"), {
-  ssr: false,
-  loading: TabFallback,
-});
-const MajorProgressView = dynamic(
-  () => import("@/components/MajorProgressView"),
-  { ssr: false, loading: TabFallback },
-);
-const DistributionalsView = dynamic(
-  () => import("@/components/DistributionalProgress"),
-  { ssr: false, loading: TabFallback },
-);
-const FriendsTab = dynamic(() => import("@/components/FriendsTab/FriendsTab"), {
-  ssr: false,
-  loading: TabFallback,
-});
-const Simulator = dynamic(() => import("@/components/Simulator/Simulator"), {
-  ssr: false,
-  loading: TabFallback,
-});
-const CleoAITab = dynamic(() => import("@/components/CleoAITab/CleoAITab"), {
-  ssr: false,
-  loading: TabFallback,
-});
-const MajorSelectionFlow = dynamic(
-  () => import("@/components/MajorSelectionFlow"),
-  { ssr: false },
-);
-
-interface UserProfile {
-  majors: string[];
-  graduationYear: number;
-  updatedAt: Date;
-  bio?: string;
-  // Shared courses the user has manually marked as prerequisites, which are
-  // exempt from the cross-major overlap warning (Yale's prereq data is spotty).
-  prereqOverrides?: string[];
-  // Onboarding flags: whether the user has seen the guided tour and the v3
-  // welcome modal. Persisted so we don't re-show them on every visit.
-  hasSeenTutorial?: boolean;
-  hasSeenV3Welcome?: boolean;
-}
+import type { UserProfile } from "@/components/dashboard/types";
+import { createNavItems } from "@/components/dashboard/navItems";
+import { getMajorProgress as computeMajorProgress } from "@/components/dashboard/getMajorProgress";
+import { buildSimulatorRemainingCourses } from "@/components/dashboard/buildSimulatorRemainingCourses";
+import {
+  MyCoursesView,
+  StatsView,
+  MajorProgressView,
+  DistributionalsView,
+  FriendsTab,
+  Simulator,
+  CleoAITab,
+  MajorSelectionFlow,
+} from "@/components/dashboard/dynamicTabs";
 
 export default function Home() {
   const { user, loading, logout } = useAuth();
@@ -286,53 +244,7 @@ export default function Home() {
     });
   };
 
-  const navItems: {
-    id: string;
-    icon: React.ComponentType<any>;
-    label: string;
-    disabled?: boolean;
-    comingSoon?: boolean;
-  }[] = [
-    {
-      id: "upload",
-      icon: HiDocumentDuplicate,
-      label: "My courses",
-      disabled: false,
-    },
-    {
-      id: "major",
-      icon: RiProgress3Fill,
-      label: (userProfile?.majors?.length ?? 0) > 1 ? "My majors" : "My major",
-      // badge: "2029 can use!",
-    },
-    {
-      id: "simulator",
-      icon: MonitorCog,
-      label: "Simulator",
-      // badge: "2029 can use!",
-    },
-    {
-      id: "stats",
-      icon: FiBarChart2,
-      label: "Academic stats",
-    },
-    {
-      id: "friends",
-      icon: FiUsers,
-      label: "Friends",
-    },
-    {
-      id: "cleoai",
-      icon: LogoIcon,
-      label: "Dan",
-      comingSoon: true,
-    },
-    {
-      id: "distributionals",
-      icon: FaBuildingCircleCheck,
-      label: "Distributionals",
-    },
-  ];
+  const navItems = createNavItems(userProfile?.majors?.length ?? 0);
 
   const cleoaiComingSoon =
     navItems.find((i) => i.id === "cleoai")?.comingSoon ?? false;
@@ -413,55 +325,9 @@ export default function Home() {
     }
   }, [user, userProfile, onboardChecked]);
 
-  // Replace your current getMajorProgress with this:
   const getMajorProgress = () => {
     if (!user || !selectedMajor) return null;
-
-    const completedCourseCodes = courses
-      .filter(
-        (course) =>
-          course.status === "completed" &&
-          ((course.grade !== null && course.grade !== "In Progress") ||
-            course.skipped),
-      )
-      .map((course) => course.code);
-
-    const inProgressCourseCodes = courses
-      .filter((course) => course.grade === "In Progress" && !course.skipped)
-      .map((course) => course.code);
-
-    const skippedCourseCodes = courses
-      .filter((course) => course.skipped)
-      .map((course) => course.code);
-
-    const manualRequirements = courses.flatMap((course) =>
-      (course.manualRequirementsFulfilled || [])
-        .filter((m) => m.major_id === selectedMajor)
-        .map((m) => ({
-          code: course.code,
-          requirement: m.requirement_title,
-          credits: course.credits || 1,
-        })),
-    );
-
-    const excludedRequirements = courses.flatMap((course) =>
-      (course.excludedFromRequirements || [])
-        .filter((m) => m.major_id === selectedMajor)
-        .map((m) => ({
-          code: course.code,
-          requirement: m.requirement_title,
-        })),
-    );
-
-    // This works fine even if all arrays are empty.
-    return calculateMajorProgress(
-      selectedMajor,
-      completedCourseCodes,
-      inProgressCourseCodes,
-      skippedCourseCodes,
-      manualRequirements,
-      excludedRequirements,
-    );
+    return computeMajorProgress(selectedMajor, courses);
   };
 
   useEffect(() => {
@@ -2035,98 +1901,11 @@ export default function Home() {
                 >
                   {userProfile && (
                     <Simulator
-                      remainingCourses={
-                        // 1. Aggregate all remaining courses across ALL majors
-                        userProfile.majors
-                          .flatMap((major) => {
-                            // You'll need to compute progress for each major
-                            const completedCourseCodes = courses
-                              .filter(
-                                (course) =>
-                                  course.status === "completed" &&
-                                  ((course.grade !== null &&
-                                    course.grade !== "In Progress") ||
-                                    course.skipped),
-                              )
-                              .map((course) => course.code);
-
-                            const inProgressCourseCodes = courses
-                              .filter(
-                                (course) =>
-                                  course.grade === "In Progress" &&
-                                  !course.skipped,
-                              )
-                              .map((course) => course.code);
-
-                            const skippedCourseCodes = courses
-                              .filter((course) => course.skipped)
-                              .map((course) => course.code);
-
-                            const manualRequirements = courses.flatMap(
-                              (course) =>
-                                (course.manualRequirementsFulfilled || [])
-                                  .filter((m) => m.major_id === major)
-                                  .map((m) => ({
-                                    code: course.code,
-                                    requirement: m.requirement_title,
-                                    credits: course.credits || 1,
-                                  })),
-                            );
-
-                            const excludedRequirements = courses.flatMap(
-                              (course) =>
-                                (course.excludedFromRequirements || [])
-                                  .filter((m) => m.major_id === major)
-                                  .map((m) => ({
-                                    code: course.code,
-                                    requirement: m.requirement_title,
-                                  })),
-                            );
-
-                            // Get progress for this major
-                            const progress = calculateMajorProgress(
-                              major,
-                              completedCourseCodes,
-                              inProgressCourseCodes,
-                              skippedCourseCodes,
-                              manualRequirements,
-                              excludedRequirements,
-                            );
-
-                            // Extract all "not taken" requirements
-                            return (
-                              progress?.remainingRequirements.flatMap((req) =>
-                                req.options
-                                  .filter(
-                                    (opt) =>
-                                      !opt.completed &&
-                                      !opt.inProgress &&
-                                      !opt.skipped,
-                                  )
-                                  .map(
-                                    (opt) =>
-                                      ({
-                                        id: `${opt.code}-sim-${major}`,
-                                        code: opt.code,
-                                        name: opt.name,
-                                        grade: null,
-                                        semester: "TBD",
-                                        year: 0,
-                                        userId: user?.uid || "",
-                                        status: "not-taken" as const, // This is the key fix
-                                        credits: opt.credits,
-                                        skipped: false,
-                                      }) as Course,
-                                  ),
-                              ) || []
-                            );
-                          })
-                          .filter(
-                            (course, idx, arr) =>
-                              arr.findIndex((c) => c.code === course.code) ===
-                              idx,
-                          )
-                      }
+                      remainingCourses={buildSimulatorRemainingCourses(
+                        userProfile.majors,
+                        courses,
+                        user?.uid || "",
+                      )}
                       completedCourses={courses.filter(
                         (c) =>
                           c.status === "completed" ||

@@ -1,0 +1,26 @@
+{
+  "id": "CERT_PORTUGUESE",
+  "name": "Portuguese (Advanced Language Study)",
+  "description": "Certificate of Advanced Language Study in Portuguese offered by the Department of Spanish and Portuguese. A certificate adviser, typically the DUS, advises students on the certification process and certifies completion before the end of eight terms of study. The certificate is listed on the student transcript once certified.",
+  "category": "advanced_language",
+  "sourceUrl": "https://catalog.yale.edu/ycps/subjects-of-instruction/portuguese/",
+  "requiresApplication": false,
+  "parentProgram": "Portuguese",
+  "creditRequirements": { "total": 4 },
+  "notes": [
+    "No Credit/D/Fail",
+    "Letter grade B or above required in all courses",
+    "Must complete requirements before the end of eight terms of study",
+    "Declare candidacy on Yale Hub as early as possible, no later than January 15 or September 15 of final semester",
+    "With adviser approval, one advanced non-L5 course conducted in Portuguese (e.g., independent study graded pass/fail, graduate seminar, or advanced seminar) may count",
+    "One credit from a Yale or Yale-designated study-abroad program taught in Portuguese may be substituted with adviser approval"
+  ],
+  "requirements": [
+    {
+      "name": "Courses beyond L4",
+      "required": 4,
+      "description": "Four courses, all beyond the L4 level in Portuguese. At least two must be Yale courses designated L5.",
+      "options": []
+    }
+  ]
+}

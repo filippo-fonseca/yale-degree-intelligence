@@ -1,0 +1,27 @@
+{
+  "id": "CERT_FRENCH",
+  "name": "French (Advanced Language Study)",
+  "description": "Certificate of Advanced Language Study in French offered by the French Department to Yale College undergraduates who are not French majors.",
+  "category": "advanced_language",
+  "sourceUrl": "https://catalog.yale.edu/ycps/subjects-of-instruction/french/",
+  "requiresApplication": false,
+  "parentProgram": "French",
+  "creditRequirements": { "total": 4 },
+  "notes": [
+    "For non-majors only",
+    "No Credit/D/Fail",
+    "Letter grade B or above required in all courses",
+    "Declare candidacy on Yale Hub as early as possible, no later than January 15 or September 15 of final semester",
+    "With DUS approval, one advanced non-L5 course conducted in French (e.g., independent study graded pass/fail or graduate seminar) may count",
+    "One LxC course taught in English may count if it includes a weekly discussion section conducted entirely in French and the student completes all readings and assignments in French",
+    "Up to two study-abroad courses taught in French may count as electives with DUS approval"
+  ],
+  "requirements": [
+    {
+      "name": "Courses beyond L4",
+      "required": 4,
+      "description": "Four courses beyond the L4 level in French. At least two must be Yale courses designated L5. At least one must be a French Department course in French in the FREN 2000–4999 range.",
+      "options": []
+    }
+  ]
+}

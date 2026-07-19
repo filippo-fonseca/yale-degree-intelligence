@@ -289,14 +289,14 @@ export default function AboutPage() {
             onClick={() => setLogInFlow(true)}
           >
             <span className="sm:hidden">Log in</span>
-            <span className="hidden sm:inline">Log in with CAS</span>
+            <span className="hidden sm:inline">Log in with @yale.edu Google</span>
             <FiArrowRight size={14} className="opacity-70" />
           </motion.button>
         </div>
       </motion.nav>
 
       {/* Hero Section */}
-      <div className="relative pt-6 sm:pt-8l">
+      <div className="relative pt-6 sm:pt-8">
         {/* Cursor-adaptive constellation background (sits behind hero content) */}
         <HeroConstellation />
         {/* increased top padding to fix logo spacing */}
@@ -404,7 +404,7 @@ export default function AboutPage() {
                 />
                 {/* Button content */}
                 <span className="relative z-10 flex items-center gap-2">
-                  Log in with CAS
+                  Log in with @yale.edu Google
                   <FiArrowRight
                     className="opacity-80 group-hover:translate-x-0.5 transition-transform"
                     size={14}
@@ -650,9 +650,11 @@ export default function AboutPage() {
             {/* Right: GIF/video placeholder */}
             <div className="flex-1 w-full px-4">
               <div className="relative rounded-xl border-2 border-pink-500 bg-black/40 overflow-hidden shadow-2xl">
+                {/* GIF ~2MB; compress with gifsicle -O3 if load time becomes an issue */}
                 <img
                   src="/demo/simulator.gif"
                   alt="Simulator demo"
+                  loading="lazy"
                   className="w-[80%] h-[80%] object-cover aspect-video"
                 />
               </div>
@@ -1510,6 +1512,17 @@ export default function AboutPage() {
           <span className="hidden sm:inline">|</span>
           <span>Not affiliated with Yale University.</span>
         </p>
+        <p className="mt-2 flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-gray-500 dark:text-gray-400">
+          <Link href="/terms" className="hover:text-gray-800 dark:hover:text-gray-200 transition-colors">
+            Terms
+          </Link>
+          <Link href="/mission" className="hover:text-gray-800 dark:hover:text-gray-200 transition-colors">
+            Mission
+          </Link>
+          <Link href="/contact" className="hover:text-gray-800 dark:hover:text-gray-200 transition-colors">
+            Contact
+          </Link>
+        </p>
         <p className="mt-2 text-gray-400 dark:text-gray-500 flex flex-wrap items-center justify-center gap-1.5">
           <span className="px-1.5 py-0.5 rounded-full text-[10px] bg-gradient-to-r from-purple-500/20 to-pink-500/20 border border-purple-500/30 text-purple-300">
             v2.0
@@ -1561,7 +1574,7 @@ export default function AboutPage() {
                 {/* Video embed */}
                 <div className="aspect-video bg-black/50">
                   <iframe
-                    src="https://youtu.be/5H1kjMWQfgs"
+                    src="https://www.youtube.com/embed/5H1kjMWQfgs"
                     title="DegreeIntelligence v2 Launch"
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                     allowFullScreen

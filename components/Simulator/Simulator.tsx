@@ -34,94 +34,19 @@ import {
 } from "@/lib/majors";
 import type { GPAEntry } from "@/lib/gpa";
 import { allocateDistributionals } from "@/lib/distributionalAllocation";
-
-// ----------------- Types -----------------
-interface Semester {
-  id: string;
-  name: string; // e.g. "Fall 2026"
-  courses: Course[];
-}
-
-interface SimulatorProps {
-  remainingCourses: Course[];
-  completedCourses: Course[];
-  graduationYear: number;
-  userMajors: string[];
-  onRegisterNavCheck?: (fn: ((cb: () => void) => void) | null) => void;
-}
-
-type Plan = {
-  name: string;
-  semesters: Semester[];
-  manualRequirements?: ManualRequirementEntry[];
-  createdAt: string; // ISO
-  isDefault?: boolean;
-  showDistributionals?: boolean;
-  showGrades?: boolean;
-};
-
-type PreviewProgressMap = Record<string, MajorProgress>;
-
-type PlannedCoursePick = Pick<Course, "code" | "status"> & {
-  status: "in-progress"; // coerced for preview semantics
-};
-
-type MaybeCreditFields = Partial<{
-  credits: number | string;
-  credit: number | string;
-  units: number | string;
-  yaleCredits: number | string;
-  ECTS: number | string;
-}>;
-
-// ----------------- Helpers -----------------
-const getCourseCredits = (c: Course & MaybeCreditFields): number => {
-  const raw = c.credits ?? c.credit ?? c.units ?? c.yaleCredits ?? c.ECTS;
-
-  const n =
-    typeof raw === "string"
-      ? parseFloat(raw)
-      : typeof raw === "number"
-        ? raw
-        : NaN;
-
-  return Number.isFinite(n) ? (n as number) : 1; // default to 1 if missing
-};
-
-const getSemesterCredits = (sem: Semester): number =>
-  sem.courses.reduce(
-    (sum, c) => sum + getCourseCredits(c as Course & MaybeCreditFields),
-    0,
-  );
-
-function compareSemesters(a: string, b: string) {
-  const [semA, yearA] = a.split(" ");
-  const [semB, yearB] = b.split(" ");
-  const yA = parseInt(yearA, 10);
-  const yB = parseInt(yearB, 10);
-  if (yA !== yB) return yA - yB;
-  const order: Record<"Spring" | "Fall", number> = { Spring: 0, Fall: 1 };
-  return order[semA as "Spring" | "Fall"] - order[semB as "Spring" | "Fall"];
-}
-
-function isPastSemester(semesterName: string) {
-  const [sem, yearStr] = semesterName.split(" ");
-  const year = parseInt(yearStr, 10);
-  const now = new Date();
-  const currentYear = now.getFullYear();
-  const currentMonth = now.getMonth(); // 0 = Jan
-
-  if (year < currentYear) return true;
-  if (year > currentYear) return false;
-
-  // Coarse cutoffs so you can't alter clearly past terms:
-  // Fall of current year is editable until January of the next year
-  // (at which point year < currentYear catches it)
-  // Spring is past once it ends (June+)
-  if (sem === "Fall" && currentMonth > 11) return true; // > Dec (never true, handled by next year check)
-  if (sem === "Spring" && currentMonth >= 5) return true; // June 1+ (Spring ended)
-  return false;
-}
+import type {
+  MaybeCreditFields,
+  Plan,
+  PlannedCoursePick,
+  PreviewProgressMap,
+  Semester,
+  SimulatorProps,
+} from "./simulatorTypes";
+import {
+  getCourseCredits,
+  getSemesterCredits,
+  isPastSemester,
+} from "./simulatorUtils";
 
 // ----------------- Component -----------------
 export default function Simulator({

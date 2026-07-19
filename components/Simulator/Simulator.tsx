@@ -9,7 +9,11 @@ import {
   FiRefreshCw,
 } from "react-icons/fi";
 import { Course } from "@/lib/types";
-import { getCanonicalCode } from "@/lib/courseCatalog";
+import {
+  codesReferToSameCourse,
+  getCanonicalCode,
+  resolveCanonicalCode,
+} from "@/lib/courseCatalog";
 import toast from "react-hot-toast";
 import { useAuth } from "@/context/AuthContext";
 import ManualCourseLookupModal from "./ManualCourseLookupModal";
@@ -315,7 +319,9 @@ export default function Simulator({
     setAvailableCourses(
       remainingCourses.filter(
         (rc) =>
-          !completedCourses.some((cc) => cc.code === rc.code) &&
+          !completedCourses.some((cc) =>
+            codesReferToSameCourse(cc.code, rc.code),
+          ) &&
           rc.status === "not-taken",
       ),
     );
@@ -843,8 +849,15 @@ export default function Simulator({
         onSelect={(manualCourse) => {
           if (!lookupSemesterId || !manualCourse?.code) return;
 
+          const courseToAdd = {
+            ...manualCourse,
+            code: resolveCanonicalCode(manualCourse.code),
+          };
+
           const isDuplicate = semesters.some((s) =>
-            s.courses.some((c) => c.code === manualCourse.code),
+            s.courses.some((c) =>
+              codesReferToSameCourse(c.code, courseToAdd.code),
+            ),
           );
           if (isDuplicate) {
             toast.error("This course is already on your plan.");
@@ -854,19 +867,21 @@ export default function Simulator({
           setSemesters((prev) =>
             prev.map((sem) =>
               sem.id === lookupSemesterId
-                ? { ...sem, courses: [...sem.courses, manualCourse] }
+                ? { ...sem, courses: [...sem.courses, courseToAdd] }
                 : sem,
             ),
           );
 
           setAvailableCourses((prev) =>
-            prev.filter((c) => c.code !== manualCourse.code),
+            prev.filter(
+              (c) => !codesReferToSameCourse(c.code, courseToAdd.code),
+            ),
           );
 
           // Auto-detect: prompt manual assignment if not in any requirement
-          if (!isCourseInAnyRequirement(manualCourse.code)) {
+          if (!isCourseInAnyRequirement(courseToAdd.code)) {
             setManualAssignPending({
-              course: manualCourse,
+              course: courseToAdd,
               semesterId: lookupSemesterId,
             });
           } else {

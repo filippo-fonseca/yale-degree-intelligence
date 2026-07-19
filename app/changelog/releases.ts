@@ -38,6 +38,7 @@ export const RELEASES: Release[] = [
           "A much better course Simulator. A cleaner semester layout, a live stat header, and a default-plan system that auto-loads where you left off — plus unsaved-change warnings so you don’t lose work.",
           "Better My Major(s) with a double-major conflict manager that flags shared courses, overlaps, and prerequisite conflicts across both majors.",
           "A Board and Heat map view of your requirements, so you can read your whole degree at a glance or zoom into a single track.",
+          "A full Yale College catalog (Fall 2023 → Spring 2027): 6,500+ courses, 3→4 digit renumbers, EENG→ECE aliases, and Fall 2026 / Spring 2027 flags for the Simulator.",
         ],
       },
       {
@@ -45,6 +46,7 @@ export const RELEASES: Release[] = [
         items: [
           "More and better academic Stats: GPA trends, credits, and grade distribution that stay legible in light and dark — including F grades that were previously skipped by mistake.",
           "Distributional-requirement tracking that counts real credits, clearer progress cards, and a course can only sit at one language level.",
+          "Distributionals come from your transcript when we can read them — you can still override any course by hand.",
           "Clearer empty states: Stats, Friends, and Distributionals invite you to upload a transcript instead of sitting greyed out.",
         ],
       },

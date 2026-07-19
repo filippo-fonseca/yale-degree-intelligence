@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import { Course } from "@/lib/types";
+import { codesReferToSameCourse } from "@/lib/courseCatalog";
 import { ManualRequirementEntry } from "@/lib/majors";
 import toast from "react-hot-toast";
 import { doc, getDoc, setDoc } from "firebase/firestore";
@@ -98,7 +99,9 @@ export function useSimulatorPlans({
         remainingCourses.filter(
           (c) =>
             !usedCodes.has(c.code) &&
-            !completedCourses.some((cc) => cc.code === c.code),
+            !completedCourses.some((cc) =>
+              codesReferToSameCourse(cc.code, c.code),
+            ),
         ),
       );
 
@@ -266,7 +269,9 @@ export function useSimulatorPlans({
     setAvailableCourses(
       remainingCourses.filter(
         (rc) =>
-          !completedCourses.some((cc) => cc.code === rc.code) &&
+          !completedCourses.some((cc) =>
+            codesReferToSameCourse(cc.code, rc.code),
+          ) &&
           rc.status === "not-taken",
       ),
     );

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Course } from "@/lib/types";
+import { codesReferToSameCourse } from "@/lib/courseCatalog";
 import toast from "react-hot-toast";
 import type { Semester } from "./simulatorTypes";
 
@@ -52,7 +53,7 @@ export function useSimulatorDragDrop({
 
   const placeCourseInSemester = (course: Course, semesterId: string) => {
     const isDuplicate = semesters.some((s) =>
-      s.courses.some((c) => c.code === course.code),
+      s.courses.some((c) => codesReferToSameCourse(c.code, course.code)),
     );
     if (isDuplicate) {
       toast.error("This course is already on your plan.");
@@ -64,7 +65,9 @@ export function useSimulatorDragDrop({
     setSemesters((prev) =>
       prev.map((sem) =>
         sem.id === semesterId
-          ? sem.courses.some((c) => c.code === course.code)
+          ? sem.courses.some((c) =>
+              codesReferToSameCourse(c.code, course.code),
+            )
             ? sem
             : { ...sem, courses: [...sem.courses, course] }
           : sem,
@@ -105,7 +108,9 @@ export function useSimulatorDragDrop({
         }
         // Add to target semester (if not already there)
         if (sem.id === semesterId) {
-          return sem.courses.some((c) => c.code === draggedCourse.code)
+          return sem.courses.some((c) =>
+            codesReferToSameCourse(c.code, draggedCourse.code),
+          )
             ? sem
             : { ...sem, courses: [...sem.courses, draggedCourse] };
         }
@@ -147,10 +152,14 @@ export function useSimulatorDragDrop({
     // Clean up any simulator manual reqs for this course
     setSimulatorManualReqs((prev) => prev.filter((m) => m.code !== courseCode));
 
-    const rc = remainingCourses.find((c) => c.code === courseCode);
+    const rc = remainingCourses.find((c) =>
+      codesReferToSameCourse(c.code, courseCode),
+    );
     if (rc && rc.status === "not-taken") {
       setAvailableCourses((prev) =>
-        prev.some((c) => c.code === rc.code) ? prev : [...prev, rc],
+        prev.some((c) => codesReferToSameCourse(c.code, rc.code))
+          ? prev
+          : [...prev, rc],
       );
     }
   };
@@ -167,7 +176,9 @@ export function useSimulatorDragDrop({
           ? {
               ...sem,
               courses: sem.courses.map((c) =>
-                c.code === courseCode ? { ...c, ...patch } : c,
+                codesReferToSameCourse(c.code, courseCode)
+                  ? { ...c, ...patch }
+                  : c,
               ),
             }
           : sem,

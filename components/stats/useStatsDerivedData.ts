@@ -8,6 +8,7 @@ import {
   toGPAEntry,
   gradeDistributionColor,
 } from "@/lib/utils/academicStats";
+import { getCourseDepartmentFromCode } from "@/lib/courseCatalog";
 import { DEPT_COLORS, seasonOrder } from "./chartTheme";
 
 export interface SemesterDataEntry {
@@ -153,7 +154,10 @@ export function useStatsDerivedData(
     const departmentData = Object.entries(
       activeCourses.reduce(
         (acc, c) => {
-          const dept = c.code.split(" ")[0];
+          const prefix = c.code.split(" ")[0];
+          const dept =
+            getCourseDepartmentFromCode(c.code) ??
+            (prefix === "EENG" ? "ECE" : prefix);
           if (!acc[dept]) acc[dept] = { creds: 0, pts: 0, count: 0 };
           acc[dept].creds += c.credits;
           acc[dept].pts += gradePoints[c.grade!] * c.credits;

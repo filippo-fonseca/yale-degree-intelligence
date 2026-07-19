@@ -2,7 +2,9 @@ import type { Course } from "@/lib/types";
 import {
   getCourseNameFromCode,
   getCourseCreditsFromCode,
-  getCourseDistributionalsFromCode,
+  getCanonicalCode,
+  resolveCanonicalCode,
+  codesReferToSameCourse,
   isValidCourseCode,
 } from "@/lib/courseCatalog";
 
@@ -77,17 +79,18 @@ export function makePlannedCourse(
   semester: PlanSemester,
   uid = ""
 ): Course {
+  const canonicalCode = getCanonicalCode(code) ?? code;
   const [term, yearStr] = semester.id.split("-");
   return {
-    id: `plan-${code}-${semester.id}`,
-    code,
+    id: `plan-${canonicalCode}-${semester.id}`,
+    code: canonicalCode,
     grade: null,
     semester: term,
     year: Number(yearStr) || new Date().getFullYear(),
     userId: uid,
     status: "not-taken",
     credits: getCourseCreditsFromCode(code) ?? 1,
-    distributionals: getCourseDistributionalsFromCode(code) ?? [],
+    distributionals: [],
   };
 }
 
@@ -120,19 +123,22 @@ export function addCourseToSemester(
         .join(", ")}.`,
     };
   }
-  if (sem.courses.some((c) => c.code === code)) {
-    return { plan, ok: false, message: `${code} is already in ${sem.name}.` };
+  const canonicalCode = resolveCanonicalCode(code);
+  if (sem.courses.some((c) => codesReferToSameCourse(c.code, canonicalCode))) {
+    return { plan, ok: false, message: `${canonicalCode} is already in ${sem.name}.` };
   }
   const next: Plan = {
     ...plan,
     semesters: plan.semesters.map((s) =>
-      s.id === sem.id ? { ...s, courses: [...s.courses, makePlannedCourse(code, s, uid)] } : s
+      s.id === sem.id
+        ? { ...s, courses: [...s.courses, makePlannedCourse(canonicalCode, s, uid)] }
+        : s
     ),
   };
   return {
     plan: next,
     ok: true,
-    message: `Added ${code} (${getCourseNameFromCode(code) || "course"}) to ${sem.name}.`,
+    message: `Added ${canonicalCode} (${getCourseNameFromCode(canonicalCode) || "course"}) to ${sem.name}.`,
   };
 }
 
@@ -143,13 +149,20 @@ export function removeCourseFromSemester(
 ): PlanMutationResult {
   const sem = findSemester(plan, semesterId);
   if (!sem) return { plan, ok: false, message: `No semester "${semesterId}" in plan.` };
-  if (!sem.courses.some((c) => c.code === code)) {
+  if (!sem.courses.some((c) => codesReferToSameCourse(c.code, code))) {
     return { plan, ok: false, message: `${code} is not in ${sem.name}.` };
   }
   const next: Plan = {
     ...plan,
     semesters: plan.semesters.map((s) =>
-      s.id === sem.id ? { ...s, courses: s.courses.filter((c) => c.code !== code) } : s
+      s.id === sem.id
+        ? {
+            ...s,
+            courses: s.courses.filter(
+              (c) => !codesReferToSameCourse(c.code, code),
+            ),
+          }
+        : s,
     ),
   };
   return { plan: next, ok: true, message: `Removed ${code} from ${sem.name}.` };

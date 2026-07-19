@@ -12,10 +12,46 @@ import {
   deleteDoc,
 } from "firebase/firestore";
 import { Course } from "@/lib/types";
+import {
+  resolveCanonicalCode,
+} from "@/lib/courseCatalog";
 import { db } from "@/config/firebase";
 import { syncFriendsPublicData } from "@/lib/syncFriendsPublicData";
 import { toggleDistributionalTag } from "@/lib/distributionalTags";
 import type { UserProfile } from "./types";
+
+const VALID_DIST_TAGS = new Set([
+  "Hu",
+  "So",
+  "Sc",
+  "QR",
+  "WR",
+  "L1",
+  "L2",
+  "L3",
+  "L4",
+  "L5",
+]);
+
+/** Parse optional `[Hu, WR]` suffix from an extracted course line. */
+function parseDistributionalsFromBracket(
+  raw: string | undefined,
+): string[] | undefined {
+  if (raw === undefined) return undefined;
+  const tags = raw
+    .split(",")
+    .map((tag) => tag.trim())
+    .filter((tag) => VALID_DIST_TAGS.has(tag));
+  return tags;
+}
+
+function distributionalFields(
+  raw: string | undefined,
+): Pick<Course, "distributionals"> | Record<string, never> {
+  const distributionals = parseDistributionalsFromBracket(raw);
+  if (distributionals === undefined) return {};
+  return { distributionals };
+}
 
 interface UseCoursesDataOptions {
   user: User | null;
@@ -110,7 +146,8 @@ export function useCoursesData({
 
       querySnapshot.forEach((docSnap) => {
         const course = docSnap.data() as Course;
-        const key = `${course.semester}-${course.year}-${course.code}-${
+        const codeKey = resolveCanonicalCode(course.code);
+        const key = `${course.semester}-${course.year}-${codeKey}-${
           course.grade || "null"
         }`;
 
@@ -158,12 +195,21 @@ export function useCoursesData({
     >();
     existingSnapshot.docs.forEach((docSnap) => {
       const data = docSnap.data();
-      const key = `${data.semester}-${data.year}-${data.code}`;
+      const canonicalCode = resolveCanonicalCode(data.code);
+      const key = `${data.semester}-${data.year}-${canonicalCode}`;
       existingCoursesMap.set(key, {
         docId: docSnap.id,
         grade: data.grade || null,
       });
     });
+
+    const findExistingCourse = (semester: string, year: string, code: string) => {
+      const canonicalCode = resolveCanonicalCode(code);
+      return (
+        existingCoursesMap.get(`${semester}-${year}-${canonicalCode}`) ??
+        existingCoursesMap.get(`${semester}-${year}-${code.trim()}`)
+      );
+    };
 
     const semesterBlocks = extractedText
       .split("Semester: ")
@@ -180,17 +226,21 @@ export function useCoursesData({
         if (line.trim() === "") continue;
 
         const completedMatch = line.match(
-          /^- (.+?): (.+?) — (.+?) \((\d+\.\d+)\)$/,
+          /^- (.+?): (.+?) — (.+?) \((\d+\.\d+)\)(?: \[(.*?)\])?$/,
         );
         if (completedMatch) {
-          const [, code, , grade, credits] = completedMatch;
-          const key = `${season.trim()}-${year.trim()}-${code.trim()}`;
-          const courseKey = `${key}-${grade.trim()}`;
+          const [, rawCode, , grade, credits, distRaw] = completedMatch;
+          const canonicalCode = resolveCanonicalCode(rawCode.trim());
+          const courseKey = `${season.trim()}-${year.trim()}-${canonicalCode}-${grade.trim()}`;
 
           if (seenInThisParse.has(courseKey)) continue;
           seenInThisParse.add(courseKey);
 
-          const existingCourse = existingCoursesMap.get(key);
+          const existingCourse = findExistingCourse(
+            season.trim(),
+            year.trim(),
+            rawCode.trim(),
+          );
           if (existingCourse) {
             if (existingCourse.grade !== grade.trim()) {
               await deleteDoc(doc(db, "courses", existingCourse.docId));
@@ -200,7 +250,7 @@ export function useCoursesData({
           }
 
           coursesToAdd.push({
-            code: code.trim(),
+            code: canonicalCode,
             grade: grade.trim(),
             semester: season.trim(),
             year: parseInt(year.trim()),
@@ -208,22 +258,27 @@ export function useCoursesData({
             status:
               grade.trim() === "In Progress" ? "in-progress" : "completed",
             credits: parseFloat(credits),
+            ...distributionalFields(distRaw),
           });
           continue;
         }
 
         const inProgressMatch = line.match(
-          /^- (.+?): (.+?) — (?:In Progress|IP) \((\d+\.\d+)\)$/,
+          /^- (.+?): (.+?) — (?:In Progress|IP) \((\d+\.\d+)\)(?: \[(.*?)\])?$/,
         );
         if (inProgressMatch) {
-          const [, code, , credits] = inProgressMatch;
-          const key = `${season.trim()}-${year.trim()}-${code.trim()}`;
-          const courseKey = `${key}-null`;
+          const [, rawCode, , credits, distRaw] = inProgressMatch;
+          const canonicalCode = resolveCanonicalCode(rawCode.trim());
+          const courseKey = `${season.trim()}-${year.trim()}-${canonicalCode}-null`;
 
           if (seenInThisParse.has(courseKey)) continue;
           seenInThisParse.add(courseKey);
 
-          const existingCourse = existingCoursesMap.get(key);
+          const existingCourse = findExistingCourse(
+            season.trim(),
+            year.trim(),
+            rawCode.trim(),
+          );
           if (existingCourse) {
             if (existingCourse.grade !== null) {
               await deleteDoc(doc(db, "courses", existingCourse.docId));
@@ -233,13 +288,14 @@ export function useCoursesData({
           }
 
           coursesToAdd.push({
-            code: code.trim(),
+            code: canonicalCode,
             grade: null,
             semester: season.trim(),
             year: parseInt(year.trim()),
             userId: user.uid,
             status: "in-progress",
             credits: parseFloat(credits),
+            ...distributionalFields(distRaw),
           });
         }
       }

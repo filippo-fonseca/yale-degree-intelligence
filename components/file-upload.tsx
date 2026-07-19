@@ -5,33 +5,43 @@ import { FilePond, registerPlugin } from "react-filepond";
 import "filepond/dist/filepond.min.css";
 import "./filepond-custom.css";
 import FilePondPluginFileValidateType from "filepond-plugin-file-validate-type";
+import FilePondPluginFileValidateSize from "filepond-plugin-file-validate-size";
+import { auth } from "@/config/firebase";
 import CustomLoader from "./ui/CustomLoader";
-import Link from "next/link";
 
-registerPlugin(FilePondPluginFileValidateType);
+registerPlugin(FilePondPluginFileValidateType, FilePondPluginFileValidateSize);
 
 type FileUploadProps = {
   onSuccess: (extractedText: string) => Promise<void>;
 };
 
+async function getAuthHeaders(): Promise<Record<string, string>> {
+  const user = auth.currentUser;
+  if (!user) throw new Error("You must be signed in to upload a transcript");
+  const token = await user.getIdToken();
+  return { Authorization: `Bearer ${token}` };
+}
+
 export default function FileUpload({ onSuccess }: FileUploadProps) {
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  async function handleUpload(fileItems: any[]) {
+  async function handleUpdateFiles(fileItems: any[]) {
+    if (!fileItems?.length || !fileItems[0]?.file) {
+      return;
+    }
+
     try {
       setIsProcessing(true);
       setError(null);
 
-      if (!fileItems || fileItems.length === 0) {
-        throw new Error("No file selected");
-      }
-
+      const authHeaders = await getAuthHeaders();
       const formData = new FormData();
       formData.append("filepond", fileItems[0].file);
 
       const response = await fetch("/api/upload", {
         method: "POST",
+        headers: authHeaders,
         body: formData,
       });
 
@@ -46,7 +56,10 @@ export default function FileUpload({ onSuccess }: FileUploadProps) {
 
       const extractRes = await fetch("/api/extract", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          ...authHeaders,
+        },
         body: JSON.stringify({ text }),
       });
 
@@ -84,8 +97,9 @@ export default function FileUpload({ onSuccess }: FileUploadProps) {
     <div className="space-y-4">
       <FilePond
         allowMultiple={false}
-        onupdatefiles={handleUpload}
+        onupdatefiles={handleUpdateFiles}
         acceptedFileTypes={["application/pdf"]}
+        maxFileSize="5MB"
         credits={false}
         labelIdle='
           <div class="filepond--label-icon filepond--label-action">

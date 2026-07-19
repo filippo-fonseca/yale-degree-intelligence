@@ -28,6 +28,7 @@ import MajorTipModal, {
   resetMajorTipSeen,
 } from "./MajorTipModal";
 import { Skeleton } from "@/components/ui/Skeleton";
+import toast from "react-hot-toast";
 
 function MajorProgressLoadingSkeleton() {
   return (
@@ -180,6 +181,7 @@ export default function MajorProgressView({
       await onRequirementChange();
     } catch (error) {
       console.error("Error skipping course:", error);
+      toast.error("Failed to skip course. Please try again.");
     }
   };
 
@@ -190,8 +192,19 @@ export default function MajorProgressView({
       await onRequirementChange();
     } catch (error) {
       console.error("Error unskipping course:", error);
+      toast.error("Failed to unskip course. Please try again.");
     }
   };
+
+  const findCourseByCode = useCallback(
+    (courseCode: string) =>
+      courses.find((c) => {
+        const courseInfo = getCourseInfo(c.code);
+        if (!courseInfo) return c.code === courseCode;
+        return courseInfo.codes.includes(courseCode);
+      }),
+    [courses],
+  );
 
   const handleRemoveManualCourse = async (
     courseCode: string,
@@ -199,23 +212,28 @@ export default function MajorProgressView({
   ) => {
     if (!user) return;
     try {
-      // Find the course in the courses array by checking all possible codes
-      const courseToUpdate = courses.find((c) => {
-        const courseInfo = getCourseInfo(c.code);
-        if (!courseInfo) return false;
-        return courseInfo.codes.includes(courseCode);
-      });
+      const courseToUpdate = findCourseByCode(courseCode);
 
       if (!courseToUpdate) {
         console.error("Course not found:", courseCode);
+        toast.error("Course not found.");
         return;
       }
+
+      const currentManual = courseToUpdate.manualRequirementsFulfilled || [];
+      const updatedManual = currentManual.filter(
+        (m) =>
+          !(
+            m.major_id === selectedMajor &&
+            m.requirement_title === requirementTitle
+          ),
+      );
 
       await setDoc(
         doc(db, "courses", courseToUpdate.id),
         {
-          ...courseToUpdate,
-          manualRequirementsFulfilled: null,
+          manualRequirementsFulfilled:
+            updatedManual.length > 0 ? updatedManual : [],
         },
         { merge: true },
       );
@@ -223,6 +241,7 @@ export default function MajorProgressView({
       await onRequirementChange();
     } catch (error) {
       console.error("Error removing manual course:", error);
+      toast.error("Failed to remove manual fulfillment. Please try again.");
     }
   };
 
@@ -232,29 +251,32 @@ export default function MajorProgressView({
     requirementTitle: string,
   ) => {
     if (!user) return;
+
+    if (
+      !window.confirm(
+        `Remove ${courseCode} from "${requirementTitle}"? You can undo this later.`,
+      )
+    ) {
+      return;
+    }
+
     try {
-      // Find the course in the courses array by checking all possible codes
-      const courseToUpdate = courses.find((c) => {
-        const courseInfo = getCourseInfo(c.code);
-        if (!courseInfo) return c.code === courseCode;
-        return courseInfo.codes.includes(courseCode);
-      });
+      const courseToUpdate = findCourseByCode(courseCode);
 
       if (!courseToUpdate) {
         console.error("Course not found:", courseCode);
+        toast.error("Course not found.");
         return;
       }
 
-      // Add to excludedFromRequirements array
       const currentExclusions = courseToUpdate.excludedFromRequirements || [];
       const newExclusion = {
         major_id: selectedMajor,
         requirement_title: requirementTitle,
       };
 
-      // Check if already excluded
       const alreadyExcluded = currentExclusions.some(
-        (e: any) =>
+        (e) =>
           e.major_id === selectedMajor &&
           e.requirement_title === requirementTitle,
       );
@@ -272,6 +294,47 @@ export default function MajorProgressView({
       await onRequirementChange();
     } catch (error) {
       console.error("Error excluding course from requirement:", error);
+      toast.error("Failed to exclude course from requirement. Please try again.");
+    }
+  };
+
+  const handleReIncludeFromRequirement = async (
+    courseCode: string,
+    requirementTitle: string,
+  ) => {
+    if (!user) return;
+    try {
+      const courseToUpdate = findCourseByCode(courseCode);
+
+      if (!courseToUpdate) {
+        console.error("Course not found:", courseCode);
+        toast.error("Course not found.");
+        return;
+      }
+
+      const currentExclusions = courseToUpdate.excludedFromRequirements || [];
+      const updatedExclusions = currentExclusions.filter(
+        (e) =>
+          !(
+            e.major_id === selectedMajor &&
+            e.requirement_title === requirementTitle
+          ),
+      );
+
+      await setDoc(
+        doc(db, "courses", courseToUpdate.id),
+        {
+          excludedFromRequirements:
+            updatedExclusions.length > 0 ? updatedExclusions : [],
+        },
+        { merge: true },
+      );
+
+      await onRequirementChange();
+      toast.success("Course re-included in requirement.");
+    } catch (error) {
+      console.error("Error re-including course in requirement:", error);
+      toast.error("Failed to re-include course. Please try again.");
     }
   };
 
@@ -286,10 +349,6 @@ export default function MajorProgressView({
   const withInProgressPercentage = clampPct(
     progress?.inProgressPercentage ?? progress?.percentage,
   );
-
-  /* ---------------------------
-     NORMALIZATION + DEDUPE (memoized)
-     --------------------------- */
 
   // 1) Build status map from user's transcript across all alias codes
   const codeStatusMap = useMemo(() => {
@@ -311,6 +370,21 @@ export default function MajorProgressView({
     }
     return m;
   }, [courses]);
+
+  const excludedLookup = useMemo(() => {
+    const set = new Set<string>();
+    for (const c of courses) {
+      const info = getCourseInfo(c.code);
+      const codes = info?.codes?.length ? info.codes : [c.code];
+      for (const ex of c.excludedFromRequirements || []) {
+        if (ex.major_id !== selectedMajor) continue;
+        for (const code of codes) {
+          set.add(`${ex.requirement_title}:${code}`);
+        }
+      }
+    }
+    return set;
+  }, [courses, selectedMajor]);
 
   // 2) Normalize a single option using user's real status
   const normalizeOpt = useCallback(
@@ -341,9 +415,12 @@ export default function MajorProgressView({
   const normalizeReq = useCallback(
     (req: any) => ({
       ...req,
-      options: (req.options || []).map(normalizeOpt),
+      options: (req.options || []).map((opt: any) => ({
+        ...normalizeOpt(opt),
+        excluded: excludedLookup.has(`${req.name}:${opt.code}`),
+      })),
     }),
-    [normalizeOpt],
+    [normalizeOpt, excludedLookup],
   );
 
   const completedNorm = useMemo(
@@ -552,6 +629,7 @@ export default function MajorProgressView({
     onAddManual: handleAddManual,
     onOpenRequirement: openRequirement,
     onExcludeFromRequirement: handleExcludeFromRequirement,
+    onReIncludeFromRequirement: handleReIncludeFromRequirement,
   };
 
   const columns: {
@@ -616,6 +694,20 @@ export default function MajorProgressView({
         </div>
       </div>
 
+      <MajorTipHelpButton
+        onClick={() => {
+          resetMajorTipSeen("myMajorTipModalShown");
+          setForceMajorTipOpen(true);
+        }}
+      />
+
+      <MajorTipModal
+        storageKey="myMajorTipModalShown"
+        autoOpenOnMount
+        forceOpen={forceMajorTipOpen}
+        onDismiss={() => setForceMajorTipOpen(false)}
+      />
+
       {/* Progress bar + Stats toggle - Compact neumorphic */}
       <div
         data-tour="major-progress-bar"
@@ -673,7 +765,11 @@ export default function MajorProgressView({
       </div>
 
       {/* Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div
+        className={`grid grid-cols-1 gap-4 ${
+          showInProgressStats ? "md:grid-cols-3" : "md:grid-cols-2"
+        }`}
+      >
         <MajorStatCard
           label="Total Credits"
           value={
@@ -692,12 +788,14 @@ export default function MajorProgressView({
           ).toFixed(0)}%`}
           color="text-emerald-600 dark:text-emerald-300"
         />
-        <MajorStatCard
-          label="In-progress Credits"
-          value={`${inProgressCredits}`}
-          color="text-blue-600 dark:text-blue-300"
-          infoTooltip="Credits from courses you're currently taking that count toward this major but aren't finished yet."
-        />
+        {showInProgressStats && (
+          <MajorStatCard
+            label="In-progress Credits"
+            value={`${inProgressCredits}`}
+            color="text-blue-600 dark:text-blue-300"
+            infoTooltip="Credits from courses you're currently taking that count toward this major but aren't finished yet."
+          />
+        )}
       </div>
 
       <div className="p-1" data-tour="major-manual-tip">
@@ -718,7 +816,7 @@ export default function MajorProgressView({
         </InfoCard>
       </div>
 
-      {/* View switcher (sticky) + tip help */}
+      {/* View switcher (sticky) */}
       <div
         data-tour="major-view-switcher"
         className="sticky top-0 z-20 -mx-1 px-1 py-2 bg-gradient-to-b from-white via-white to-white/0 dark:from-gray-950 dark:via-gray-950 dark:to-gray-950/0 backdrop-blur-sm"
@@ -756,21 +854,8 @@ export default function MajorProgressView({
               </span>
             </button>
           </div>
-          <MajorTipHelpButton
-            onClick={() => {
-              resetMajorTipSeen("myMajorTipModalShown");
-              setForceMajorTipOpen(true);
-            }}
-          />
         </div>
       </div>
-
-      <MajorTipModal
-        storageKey="myMajorTipModalShown"
-        autoOpenOnMount={false}
-        forceOpen={forceMajorTipOpen}
-        onDismiss={() => setForceMajorTipOpen(false)}
-      />
 
       {/* Board view: Remaining · In progress · Completed columns */}
       {view === "board" && (

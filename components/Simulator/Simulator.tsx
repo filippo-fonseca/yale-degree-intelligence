@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef, useMemo } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   FiChevronDown,
@@ -17,8 +17,6 @@ import { Course } from "@/lib/types";
 import { getCourseNameFromCode, getCanonicalCode } from "@/lib/courseCatalog";
 import toast from "react-hot-toast";
 import { useAuth } from "@/context/AuthContext";
-import { doc, getDoc, setDoc } from "firebase/firestore";
-import { db } from "@/config/firebase";
 import ManualCourseLookupModal from "./ManualCourseLookupModal";
 import SimulatorManualAssignModal from "./SimulatorManualAssignModal";
 import SimulatorRequirementsBreakdown from "./SimulatorRequirementsBreakdown";
@@ -48,6 +46,7 @@ import {
   isPastSemester,
 } from "./simulatorUtils";
 import { useSimulatorDragDrop } from "./useSimulatorDragDrop";
+import { useSimulatorPlans } from "./useSimulatorPlans";
 
 // ----------------- Component -----------------
 export default function Simulator({
@@ -62,26 +61,9 @@ export default function Simulator({
   const [semesters, setSemesters] = useState<Semester[]>([]);
   const [availableCourses, setAvailableCourses] = useState<Course[]>([]);
   const [showHelp, setShowHelp] = useState(false);
-  const [savedPlans, setSavedPlans] = useState<Plan[]>([]);
-  const [planName, setPlanName] = useState("");
-  const [showSaveModal, setShowSaveModal] = useState(false);
-  const [showPlansModal, setShowPlansModal] = useState(false);
   const [lookupSemesterId, setLookupSemesterId] = useState<string | null>(null);
-  const [selectedPlanToOverwrite, setSelectedPlanToOverwrite] = useState<
-    number | null
-  >(null);
-  const [hasChanges, setHasChanges] = useState(false);
   const [showPool, setShowPool] = useState(false);
   const [showMajorPreview, setShowMajorPreview] = useState(true);
-  // Optional, independently-toggled live add-ons (both OFF by default).
-  const [showDistributionals, setShowDistributionals] = useState(false);
-  const [showGrades, setShowGrades] = useState(false);
-  // Plan selector modal shown on initial load
-  const [showPlanSelector, setShowPlanSelector] = useState(false);
-  const [plansLoaded, setPlansLoaded] = useState(false);
-  // Track currently loaded plan
-  const [currentPlanName, setCurrentPlanName] = useState<string | null>(null);
-  // Track scroll state for sticky nav background
   const [isScrolled, setIsScrolled] = useState(false);
 
   // Simulator-local manual requirements (plan-scoped, NOT in Firebase courses)
@@ -101,40 +83,53 @@ export default function Simulator({
   const [isPreviewLoading, setIsPreviewLoading] = useState<boolean>(false);
   const [previewError, setPreviewError] = useState<string | null>(null);
 
-  // Profile distributional preferences (mirrors the users/{uid} doc fields the
-  // main DistributionalProgress reads); used to seed the sim from real courses.
-  const [distribAutoAllocate, setDistribAutoAllocate] = useState(true);
-  const [distribOverrides, setDistribOverrides] = useState<
-    Record<string, string>
-  >({});
-
-  // keep initial snapshot to detect changes
-  const initialSemestersRef = useRef<Semester[]>([]);
-  const initialManualReqsRef = useRef<ManualRequirementEntry[]>([]);
-  const initialTogglesRef = useRef<{ dist: boolean; grades: boolean }>({
-    dist: false,
-    grades: false,
+  const {
+    savedPlans,
+    planName,
+    setPlanName,
+    showSaveModal,
+    setShowSaveModal,
+    showPlansModal,
+    setShowPlansModal,
+    selectedPlanToOverwrite,
+    setSelectedPlanToOverwrite,
+    hasChanges,
+    showDistributionals,
+    setShowDistributionals,
+    showGrades,
+    setShowGrades,
+    showPlanSelector,
+    setShowPlanSelector,
+    currentPlanName,
+    distribAutoAllocate,
+    distribOverrides,
+    loadedPlanIndex,
+    loadedPlanIsDefault,
+    initialSemestersRef,
+    initialManualReqsRef,
+    planLoadedRef,
+    hasInitializedRef,
+    hasChangesRef,
+    currentPlanNameRef,
+    savePlan,
+    loadPlan,
+    setDefaultPlan,
+    deletePlan,
+    resetSimulator: resetPlans,
+  } = useSimulatorPlans({
+    user,
+    semesters,
+    setSemesters,
+    simulatorManualReqs,
+    setSimulatorManualReqs,
+    remainingCourses,
+    completedCourses,
+    setAvailableCourses,
+    onRegisterNavCheck,
   });
-  // True once a saved plan has been loaded, so the blank-grid rebuild effect
-  // does not clobber the loaded plan when remaining/completed courses change.
-  const planLoadedRef = useRef(false);
-  const hasInitializedRef = useRef(false);
-  const hasChangesRef = useRef(false);
-  const currentPlanNameRef = useRef<string | null>(null);
 
-  // majors to compute – only the user's declared majors
+  // Manual assignment modal state
   const majorIds = useMemo<string[]>(() => userMajors, [userMajors]);
-
-  // Index of the currently-loaded plan within savedPlans (matched by name), or -1.
-  const loadedPlanIndex = useMemo(
-    () =>
-      currentPlanName === null
-        ? -1
-        : savedPlans.findIndex((p) => p.name === currentPlanName),
-    [currentPlanName, savedPlans],
-  );
-  const loadedPlanIsDefault =
-    loadedPlanIndex >= 0 && !!savedPlans[loadedPlanIndex]?.isDefault;
 
   // Auto-detect: does a course code appear in any requirement option across all user majors?
   const isCourseInAnyRequirement = useMemo(() => {
@@ -262,36 +257,6 @@ export default function Simulator({
 
   // ------------ Build initial semesters & pools ------------
   useEffect(() => {
-    if (!onRegisterNavCheck) return;
-    onRegisterNavCheck((proceed) => {
-      if (hasChanges) {
-        if (
-          window.confirm(
-            "You have unsaved simulator changes. Leave without saving?",
-          )
-        ) {
-          proceed();
-        }
-      } else {
-        proceed();
-      }
-    });
-    return () => onRegisterNavCheck(null);
-  }, [onRegisterNavCheck, hasChanges]);
-
-  const confirmDiscardChanges = (message: string): boolean => {
-    if (!hasChanges) return true;
-    return window.confirm(message);
-  };
-
-  useEffect(() => {
-  }, [hasChanges]);
-
-  useEffect(() => {
-    currentPlanNameRef.current = currentPlanName;
-  }, [currentPlanName]);
-
-  useEffect(() => {
     // Don't rebuild the blank grid on top of a loaded or dirty plan when
     // remaining/completed courses settle or refresh.
     if (
@@ -367,132 +332,6 @@ export default function Simulator({
     );
     hasInitializedRef.current = true;
   }, [graduationYear, remainingCourses, completedCourses]);
-
-  // ------------ Change detection ------------
-  useEffect(() => {
-    if (initialSemestersRef.current.length === 0) return;
-
-    // Placement key folds semester, code, projected grade, and (order-insensitive)
-    // distributionals so edits to any of those enable "Save Current".
-    const placementKey = (s: Semester, c: Course) =>
-      `${s.id}:${c.code}:${c.grade ?? ""}:${[...(c.distributionals ?? [])]
-        .sort()
-        .join("+")}`;
-
-    // Create a set of placements to detect both additions/deletions AND moves
-    const currentPlacements = new Set(
-      semesters.flatMap((s) =>
-        s.courses
-          .filter((c) => c.status === "not-taken") // Only track planned courses
-          .map((c) => placementKey(s, c)),
-      ),
-    );
-    const initialPlacements = new Set(
-      initialSemestersRef.current.flatMap((s) =>
-        s.courses
-          .filter((c) => c.status === "not-taken")
-          .map((c) => placementKey(s, c)),
-      ),
-    );
-
-    // Check if sets are different (different size or different contents)
-    const placementsChanged =
-      currentPlacements.size !== initialPlacements.size ||
-      Array.from(currentPlacements).some((p) => !initialPlacements.has(p)) ||
-      Array.from(initialPlacements).some((p) => !currentPlacements.has(p));
-
-    // Compare manual requirements
-    const currentManualReqsStr = JSON.stringify(simulatorManualReqs);
-    const initialManualReqsStr = JSON.stringify(initialManualReqsRef.current);
-    const manualReqsChanged = currentManualReqsStr !== initialManualReqsStr;
-
-    // Compare add-on toggles against the loaded-plan snapshot
-    const togglesChanged =
-      showDistributionals !== initialTogglesRef.current.dist ||
-      showGrades !== initialTogglesRef.current.grades;
-
-    const changed = placementsChanged || manualReqsChanged || togglesChanged;
-
-    setHasChanges(changed);
-  }, [semesters, simulatorManualReqs, showDistributionals, showGrades]);
-
-  // ------------ Saved plans load ------------
-  useEffect(() => {
-    if (!user) return;
-    const loadSavedPlans = async () => {
-      try {
-        const docRef = doc(db, "users", user.uid);
-        const docSnap = await getDoc(docRef);
-        const data = docSnap.exists()
-          ? (docSnap.data() as {
-              savedPlans?: Plan[];
-              distributionalAutoAllocate?: boolean;
-              distributionalAllocations?: Record<string, string>;
-            })
-          : null;
-        // Seed the simulator's distributional base from the user's profile prefs.
-        setDistribAutoAllocate(data?.distributionalAutoAllocate ?? true);
-        setDistribOverrides(data?.distributionalAllocations ?? {});
-        let plans = data?.savedPlans ?? [];
-        if (plans.length > 0) {
-          // Migrate existing users: if no default is set, the newest becomes default.
-          if (!plans.some((p) => p.isDefault)) {
-            const newestName = [...plans].sort((a, b) =>
-              (b.createdAt || "").localeCompare(a.createdAt || ""),
-            )[0]?.name;
-            plans = plans.map((p) => ({
-              ...p,
-              isDefault: p.name === newestName,
-            }));
-            await setDoc(docRef, { savedPlans: plans }, { merge: true });
-          }
-          setSavedPlans(plans);
-          // Auto-load the most-recently-viewed plan (localStorage), else default.
-          let recentName: string | null = null;
-          try {
-            recentName = window.localStorage.getItem(
-              `di-sim-recent-${user.uid}`,
-            );
-          } catch {
-            // ignore
-          }
-          const newest = [...plans].sort((a, b) =>
-            (b.createdAt || "").localeCompare(a.createdAt || ""),
-          )[0];
-          const toLoad =
-            plans.find((p) => p.name === recentName) ||
-            plans.find((p) => p.isDefault) ||
-            newest;
-          if (toLoad) loadPlanData(toLoad);
-        } else {
-          // Brand-new user with no plans → show the welcome modal.
-          setShowPlanSelector(true);
-        }
-        setPlansLoaded(true);
-      } catch (e) {
-        console.error("Error loading saved plans:", e);
-        setPlansLoaded(true);
-      }
-    };
-    loadSavedPlans();
-  }, [user]);
-
-  // ------------ Keyboard handler for modals ------------
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        if (showPlanSelector) setShowPlanSelector(false);
-        if (showSaveModal) {
-          setShowSaveModal(false);
-          setSelectedPlanToOverwrite(null);
-          setPlanName("");
-        }
-        if (showPlansModal) setShowPlansModal(false);
-      }
-    };
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [showPlanSelector, showSaveModal, showPlansModal]);
 
   // ------------ Scroll detection for sticky nav ------------
   useEffect(() => {
@@ -703,189 +542,8 @@ export default function Simulator({
     simulatorManualReqs,
   ]);
 
-  // ------------ Save / Load / Delete Plans ------------
-
-  // Helper to load a plan from Plan object directly
-  const loadPlanData = (plan: Plan) => {
-    // Mark that a plan is loaded so the blank-grid rebuild effect won't clobber it.
-    planLoadedRef.current = true;
-    setSemesters(plan.semesters);
-    setSimulatorManualReqs(plan.manualRequirements ?? []);
-    initialSemestersRef.current = JSON.parse(
-      JSON.stringify(plan.semesters),
-    ) as Semester[];
-    initialManualReqsRef.current = JSON.parse(
-      JSON.stringify(plan.manualRequirements ?? []),
-    ) as ManualRequirementEntry[];
-
-    setShowDistributionals(plan.showDistributionals ?? false);
-    setShowGrades(plan.showGrades ?? false);
-    initialTogglesRef.current = {
-      dist: plan.showDistributionals ?? false,
-      grades: plan.showGrades ?? false,
-    };
-
-    const usedCodes = new Set<string>();
-    plan.semesters.forEach((sem) =>
-      sem.courses.forEach((course) => usedCodes.add(course.code)),
-    );
-
-    setAvailableCourses(
-      remainingCourses.filter(
-        (c) =>
-          !usedCodes.has(c.code) &&
-          !completedCourses.some((cc) => cc.code === c.code),
-      ),
-    );
-
-    setCurrentPlanName(plan.name);
-    setHasChanges(false);
-    try {
-      if (user)
-        window.localStorage.setItem(`di-sim-recent-${user.uid}`, plan.name);
-    } catch {
-      // ignore
-    }
-  };
-
-  const savePlan = async () => {
-    if (!user || !planName.trim()) return;
-    try {
-      const savedName = planName.trim();
-      // First-ever plan auto-becomes the default; overwrites keep their flag.
-      const isDefault =
-        selectedPlanToOverwrite !== null
-          ? (savedPlans[selectedPlanToOverwrite]?.isDefault ?? false)
-          : savedPlans.length === 0;
-      const newPlan: Plan = {
-        name: savedName,
-        semesters,
-        manualRequirements: simulatorManualReqs,
-        createdAt: new Date().toISOString(),
-        isDefault,
-        showDistributionals,
-        showGrades,
-      };
-
-      const updatedPlans: Plan[] =
-        selectedPlanToOverwrite !== null
-          ? savedPlans.map((p, i) =>
-              i === selectedPlanToOverwrite ? newPlan : p,
-            )
-          : [...savedPlans, newPlan];
-
-      await setDoc(
-        doc(db, "users", user.uid),
-        { savedPlans: updatedPlans },
-        { merge: true },
-      );
-      setSavedPlans(updatedPlans);
-
-      // Load the saved plan
-      loadPlanData(newPlan);
-
-      setPlanName("");
-      setSelectedPlanToOverwrite(null);
-      setShowSaveModal(false);
-      toast.success(`Plan "${savedName}" saved!`);
-    } catch (error) {
-      console.error("Error saving plan:", error);
-      toast.error("Failed to save plan");
-    }
-  };
-
-  const loadPlan = (planIndex: number) => {
-    if (planIndex < 0 || planIndex >= savedPlans.length) return;
-    if (
-      !confirmDiscardChanges(
-        "You have unsaved changes. Discard them and load this plan?",
-      )
-    ) {
-      return;
-    }
-    const plan = savedPlans[planIndex];
-    loadPlanData(plan);
-    setShowPlansModal(false);
-  };
-
-  const setDefaultPlan = async (planIndex: number) => {
-    if (!user || planIndex < 0 || planIndex >= savedPlans.length) return;
-    try {
-      const updatedPlans = savedPlans.map((p, i) => ({
-        ...p,
-        isDefault: i === planIndex,
-      }));
-      await setDoc(
-        doc(db, "users", user.uid),
-        { savedPlans: updatedPlans },
-        { merge: true },
-      );
-      setSavedPlans(updatedPlans);
-      toast.success(`"${savedPlans[planIndex].name}" is now your default plan`);
-    } catch (error) {
-      console.error("Error setting default plan:", error);
-      toast.error("Failed to set default plan");
-    }
-  };
-
-  const deletePlan = async (planIndex: number) => {
-    if (!user || planIndex < 0 || planIndex >= savedPlans.length) return;
-    const planName = savedPlans[planIndex].name;
-    if (
-      !window.confirm(
-        `Delete plan "${planName}"? This cannot be undone.`,
-      )
-    ) {
-      return;
-    }
-    try {
-      const updatedPlans = savedPlans.filter((_, i) => i !== planIndex);
-      await setDoc(
-        doc(db, "users", user.uid),
-        { savedPlans: updatedPlans },
-        { merge: true },
-      );
-      setSavedPlans(updatedPlans);
-    } catch (e) {
-      console.error("Error deleting plan:", e);
-    }
-  };
-
   const resetSimulator = () => {
-    if (
-      !confirmDiscardChanges(
-        "You have unsaved changes. Clear the canvas and discard them?",
-      )
-    ) {
-      return;
-    }
-
-    const clearedSemesters = semesters.map((sem) => ({
-      ...sem,
-      courses: sem.courses.filter(
-        (c) => c.status === "completed" || c.status === "in-progress",
-      ),
-    }));
-
-    setSemesters(clearedSemesters);
-    setAvailableCourses(
-      remainingCourses.filter(
-        (rc) =>
-          !completedCourses.some((cc) => cc.code === rc.code) &&
-          rc.status === "not-taken",
-      ),
-    );
-    setSimulatorManualReqs([]);
-    setShowDistributionals(false);
-    setShowGrades(false);
-    initialSemestersRef.current = JSON.parse(
-      JSON.stringify(clearedSemesters),
-    ) as Semester[];
-    initialManualReqsRef.current = [];
-    initialTogglesRef.current = { dist: false, grades: false };
-    setCurrentPlanName(null);
-    planLoadedRef.current = false;
-    setHasChanges(false);
+    resetPlans();
     setSelectedPoolCourse(null);
   };
 

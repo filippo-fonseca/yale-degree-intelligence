@@ -11,6 +11,7 @@ import { db } from "@/config/firebase";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import {
   allocateDistributionals,
+  sumCourseCredits,
   type DistAllocation,
 } from "@/lib/distributionalAllocation";
 import {
@@ -228,7 +229,7 @@ function DistPieChart({ distMap }: { distMap: Record<string, Course[]> }) {
             No distributional tags yet.
           </p>
           <p className="text-[11px] text-gray-400 dark:text-gray-600 mt-1">
-            Tag courses in the My Courses tab to see a breakdown here.
+            Tag courses in the My courses tab to see a breakdown here.
           </p>
         </div>
       ) : (
@@ -488,14 +489,32 @@ function DistReqCard({
             const options =
               allocation?.optionsByCourseKey[allocation.keyOf(course)] ?? [];
             const canReassign = manual && options.length > 1 && onReassign;
+            const isCompleted =
+              course.status === "completed" && !course.skipped;
+            const isInProgress = course.status === "in-progress";
             return (
               <div
                 key={course.id}
                 className="flex items-center justify-between gap-2"
               >
-                <span className="text-xs text-gray-700 dark:text-gray-300 font-medium">
-                  {course.code}
-                </span>
+                <div className="flex items-center gap-1.5 min-w-0">
+                  <span
+                    className={`text-xs font-medium ${
+                      isCompleted
+                        ? "text-gray-700 dark:text-gray-300"
+                        : isInProgress
+                        ? "text-blue-600 dark:text-blue-300"
+                        : "text-gray-500 dark:text-gray-400"
+                    }`}
+                  >
+                    {course.code}
+                  </span>
+                  {isInProgress && (
+                    <span className="text-[9px] px-1 py-0.5 rounded bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-300 border border-blue-300/50 dark:border-blue-700/40 shrink-0">
+                      IP
+                    </span>
+                  )}
+                </div>
                 {canReassign ? (
                   <select
                     value={req.code}
@@ -740,7 +759,7 @@ function LanguageSection({
 
 // ─── Empty State ──────────────────────────────────────────────────────────────
 
-function EmptyState() {
+function EmptyState({ onGoToCourses }: { onGoToCourses?: () => void }) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 8 }}
@@ -754,9 +773,25 @@ function EmptyState() {
         No distributionals tagged yet
       </h3>
       <p className="text-sm text-gray-500 dark:text-gray-400 max-w-xs leading-relaxed">
-        Head to the <span className="font-semibold text-gray-700 dark:text-gray-200">My Courses</span> tab and click{" "}
-        <span className="font-mono text-blue-500 dark:text-blue-300">+ dist</span> on your courses to start tracking requirements.
+        Head to the{" "}
+        <span className="font-semibold text-gray-700 dark:text-gray-200">
+          My courses
+        </span>{" "}
+        tab and click{" "}
+        <span className="font-mono text-blue-600 dark:text-blue-300">
+          + assign distributional
+        </span>{" "}
+        on your courses to start tracking requirements.
       </p>
+      {onGoToCourses && (
+        <button
+          type="button"
+          onClick={onGoToCourses}
+          className="mt-5 inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg bg-purple-500/15 text-purple-700 dark:text-purple-300 border border-purple-500/30 hover:bg-purple-500/25 transition-colors"
+        >
+          Go to My courses
+        </button>
+      )}
     </motion.div>
   );
 }
@@ -817,7 +852,13 @@ function AllocationControl({
 
 // ─── Main component ───────────────────────────────────────────────────────────
 
-const DistributionalsView = ({ courses }: { courses: Course[] }) => {
+const DistributionalsView = ({
+  courses,
+  onGoToCourses,
+}: {
+  courses: Course[];
+  onGoToCourses?: () => void;
+}) => {
   const { user } = useAuth();
   const [view, setView] = useState<"board" | "heatmap">("board");
   const [autoAllocate, setAutoAllocate] = useState(true);
@@ -900,8 +941,8 @@ const DistributionalsView = ({ courses }: { courses: Course[] }) => {
     auto: autoAllocate,
     overrides,
   });
-  const allocCount = (code: string) =>
-    (allocation.coursesByReq[code] || []).length;
+  const allocCredits = (code: string) =>
+    sumCourseCredits(allocation.coursesByReq[code] || []);
   const allocCoursesFor = (code: string): Course[] =>
     allocation.coursesByReq[code] || [];
 
@@ -913,18 +954,18 @@ const DistributionalsView = ({ courses }: { courses: Course[] }) => {
   );
 
   const hasAnyDistributionals = courses.some(
-    (c) => (c.distributionals || []).length > 0,
+    (c) => !c.skipped && (c.distributionals || []).length > 0,
   );
 
   // Summary stats (based on the single-allocation, not raw tags)
   const metCount = [...AREA_REQS, ...SKILL_REQS].filter(
-    (r) => allocCount(r.code) >= 2,
+    (r) => allocCredits(r.code) >= 2,
   ).length;
   const inProgressCount = [...AREA_REQS, ...SKILL_REQS].filter(
-    (r) => allocCount(r.code) > 0 && allocCount(r.code) < 2,
+    (r) => allocCredits(r.code) > 0 && allocCredits(r.code) < 2,
   ).length;
   const remainingCount = [...AREA_REQS, ...SKILL_REQS].filter(
-    (r) => allocCount(r.code) === 0,
+    (r) => allocCredits(r.code) === 0,
   ).length;
 
   // Language progress for stat card
@@ -996,13 +1037,18 @@ const DistributionalsView = ({ courses }: { courses: Course[] }) => {
         />
       </div>
 
-      {/* Overall progress bar */}
+      {/* Overall progress bar (areas & skills only — language tracked separately) */}
       <div className="p-3 rounded-xl bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 border border-gray-200 dark:border-gray-800/50 shadow-neu">
-        <div className="flex items-center justify-between mb-2">
-          <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-            Areas & Skills Overall
-          </span>
-          <span className="text-xs font-medium text-gray-700 dark:text-gray-300">
+        <div className="flex items-center justify-between mb-2 gap-2">
+          <div className="flex items-center gap-2 min-w-0">
+            <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+              Areas &amp; Skills Overall
+            </span>
+            <span className="text-[10px] px-1.5 py-0.5 rounded-md bg-gray-100 dark:bg-gray-800/60 text-gray-500 dark:text-gray-400 border border-gray-200 dark:border-gray-700/50 shrink-0">
+              Excludes language
+            </span>
+          </div>
+          <span className="text-xs font-medium text-gray-700 dark:text-gray-300 shrink-0">
             {metCount}/5 requirements met
           </span>
         </div>
@@ -1022,7 +1068,7 @@ const DistributionalsView = ({ courses }: { courses: Course[] }) => {
       </div>
 
       {/* Empty state */}
-      {!hasAnyDistributionals && <EmptyState />}
+      {!hasAnyDistributionals && <EmptyState onGoToCourses={onGoToCourses} />}
 
       {/* View switcher */}
       {hasAnyDistributionals && (
@@ -1066,7 +1112,7 @@ const DistributionalsView = ({ courses }: { courses: Course[] }) => {
             exit={{ opacity: 0, y: -4 }}
             transition={{ duration: 0.2 }}
           >
-            <DistHeatMap getCount={allocCount} />
+            <DistHeatMap getCount={allocCredits} />
           </motion.div>
         ) : hasAnyDistributionals ? (
           <motion.div
@@ -1095,7 +1141,7 @@ const DistributionalsView = ({ courses }: { courses: Course[] }) => {
                   <DistReqCard
                     key={req.code}
                     req={req}
-                    count={allocCount(req.code)}
+                    count={allocCredits(req.code)}
                     courses={allocCoursesFor(req.code)}
                     manual={!autoAllocate}
                     allocation={allocation}
@@ -1115,7 +1161,7 @@ const DistributionalsView = ({ courses }: { courses: Course[] }) => {
                   <DistReqCard
                     key={req.code}
                     req={req}
-                    count={allocCount(req.code)}
+                    count={allocCredits(req.code)}
                     courses={allocCoursesFor(req.code)}
                     manual={!autoAllocate}
                     allocation={allocation}

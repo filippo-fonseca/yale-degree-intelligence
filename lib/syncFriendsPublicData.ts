@@ -10,7 +10,7 @@ import {
   serverTimestamp,
 } from "firebase/firestore";
 import { db } from "@/config/firebase";
-import { Course, PublicCourse } from "@/lib/types";
+import { Course, PublicCourse, DEFAULT_FRIENDS_PROFILE_VISIBILITY } from "@/lib/types";
 
 interface UserProfile {
   majors: string[];
@@ -173,6 +173,7 @@ export async function enableFriendsFeature(
     graduationYear: userProfile?.graduationYear ?? null,
     bio: userProfile?.bio || null,
     courses: publicCourses,
+    visibility: { ...DEFAULT_FRIENDS_PROFILE_VISIBILITY },
   });
 }
 

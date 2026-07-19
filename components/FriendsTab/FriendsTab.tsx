@@ -46,7 +46,7 @@ import { PublicProfileView } from "@/components/FriendsProfile/PublicProfileView
 import {
   DEMO_PREVIEW_COURSES,
   DEMO_PREVIEW_USER,
-} from "@/components/FriendsProfile/ProfilePreviewCard";
+} from "@/components/FriendsProfile/demoPreviewData";
 
 type UserProfile = {
   uid: string;

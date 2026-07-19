@@ -1,16 +1,32 @@
 // app/api/extract/route.ts
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import OpenAI from 'openai'
+import { requireAuth, isAuthError, rateLimit } from '@/lib/apiAuth'
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
 
-export async function POST(request: Request) {
+const MAX_TEXT_LENGTH = 50_000
+
+export async function POST(request: NextRequest) {
+  const user = await requireAuth(request)
+  if (isAuthError(user)) return user
+
+  const limited = rateLimit(`extract:${user.uid}`, 15, 60 * 60 * 1000)
+  if (limited) return limited
+
   try {
     const { text } = await request.json()
 
     if (!text || typeof text !== 'string') {
       return NextResponse.json(
         { error: 'Missing or invalid text in request body' },
+        { status: 400 }
+      )
+    }
+
+    if (text.length > MAX_TEXT_LENGTH) {
+      return NextResponse.json(
+        { error: 'Transcript text exceeds maximum allowed length' },
         { status: 400 }
       )
     }
@@ -50,11 +66,10 @@ ${text}
       model: 'gpt-4.1',
       messages: [{ role: 'user', content: prompt }],
       temperature: 0,
-      max_tokens: 2000
+      max_tokens: 4000
     })
 
     const result = chat.choices[0].message?.content ?? ''
-    // console.log("the openai result is:", result);
     return NextResponse.json({ result })
   } catch (error) {
     console.error('OpenAI error:', error)

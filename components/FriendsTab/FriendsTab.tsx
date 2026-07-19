@@ -42,7 +42,6 @@ import { Skeleton } from "../ui/Skeleton";
 type UserProfile = {
   uid: string;
   displayName?: string;
-  email?: string;
   photoURL?: string;
   majors: string[];
   graduationYear?: number;
@@ -64,12 +63,11 @@ type Friend = {
 
 function getDisplayName(profile: UserProfile) {
   if (profile.displayName) return profile.displayName;
-  if (profile.email) return profile.email.split("@")[0];
   return "Yale Student";
 }
 
 function getInitials(profile: UserProfile): string {
-  const name = profile.displayName || profile.email?.split("@")[0] || "Y";
+  const name = profile.displayName || "Y";
   const parts = name.trim().split(" ");
   if (parts.length >= 2) {
     return (parts[0].charAt(0) + parts[parts.length - 1].charAt(0)).toUpperCase();
@@ -77,11 +75,11 @@ function getInitials(profile: UserProfile): string {
   return name.charAt(0).toUpperCase();
 }
 
-function CopyButton() {
+function CopyButton({ profileUrl }: { profileUrl: string }) {
   const [copied, setCopied] = useState(false);
 
   const handleCopy = () => {
-    navigator.clipboard.writeText(window.location.href);
+    navigator.clipboard.writeText(profileUrl);
     setCopied(true);
     toast.success("Link copied to clipboard!");
     setTimeout(() => setCopied(false), 2000);
@@ -226,30 +224,39 @@ export default function FriendsTab({
   }, []);
 
   const [hydrated, setHydrated] = useState({
-    users: false,
+    publicProfiles: false,
     friends: false,
     sent: false,
     incoming: false,
   });
   const ready =
-    hydrated.users && hydrated.friends && hydrated.sent && hydrated.incoming;
+    hydrated.publicProfiles && hydrated.friends && hydrated.sent && hydrated.incoming;
 
   useEffect(() => {
     if (!user) return;
 
-    const usersUnsub = onSnapshot(collection(db, "users"), (snapshot) => {
-      const users: UserProfile[] = [];
-      const byId: Record<string, UserProfile> = {};
-      snapshot.forEach((d) => {
-        const data = d.data() as UserProfile;
-        const p = { ...data, uid: d.id };
-        users.push(p);
-        byId[d.id] = p;
-      });
-      setAllUsers(users);
-      setUserProfilesById(byId);
-      setHydrated((h) => ({ ...h, users: true }));
-    });
+    const publicProfilesUnsub = onSnapshot(
+      query(collection(db, "friends_public_data"), where("enabled", "==", true)),
+      (snapshot) => {
+        const users: UserProfile[] = [];
+        const byId: Record<string, UserProfile> = {};
+        snapshot.forEach((d) => {
+          const data = d.data();
+          const p: UserProfile = {
+            uid: d.id,
+            displayName: data.displayName,
+            photoURL: data.photoURL,
+            majors: data.majors || [],
+            graduationYear: data.graduationYear,
+          };
+          users.push(p);
+          byId[d.id] = p;
+        });
+        setAllUsers(users);
+        setUserProfilesById(byId);
+        setHydrated((h) => ({ ...h, publicProfiles: true }));
+      },
+    );
 
     const friendsUnsub = onSnapshot(
       query(collection(db, "friends"), where("users", "array-contains", user.uid)),
@@ -294,7 +301,7 @@ export default function FriendsTab({
     );
 
     return () => {
-      usersUnsub();
+      publicProfilesUnsub();
       friendsUnsub();
       sentRequestsUnsub();
       incomingRequestsUnsub();
@@ -306,8 +313,13 @@ export default function FriendsTab({
     const profiles = friends
       .map((fr) => fr.users.find((id) => id !== user.uid))
       .filter(Boolean)
-      .map((id) => userProfilesById[id as string])
-      .filter(Boolean) as UserProfile[];
+      .map(
+        (id) =>
+          userProfilesById[id as string] || {
+            uid: id as string,
+            majors: [],
+          },
+      ) as UserProfile[];
     setFriendProfiles(profiles);
   }, [friends, userProfilesById, user]);
 
@@ -348,16 +360,27 @@ export default function FriendsTab({
   };
 
   const acceptFriendRequest = async (req: FriendRequest) => {
+    if (!user) return;
     try {
-      await setDoc(doc(db, "friend-requests", req.id), { ...req, status: "accepted" });
-      const users = [req.from, req.to].sort();
-      await addDoc(collection(db, "friends"), { users, createdAt: serverTimestamp() });
-      const lookupId = `${users[0]}_${users[1]}`;
-      await setDoc(doc(db, "friends_lookup", lookupId), { users, createdAt: serverTimestamp() });
+      const idToken = await user.getIdToken();
+      const response = await fetch("/api/friends/accept", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${idToken}`,
+        },
+        body: JSON.stringify({ requestId: req.id }),
+      });
+      if (!response.ok) {
+        const data = await response.json().catch(() => ({}));
+        throw new Error(data.error || "Failed to accept friend request");
+      }
       toast.success("Friend request accepted!");
     } catch (error) {
       console.error("Error accepting friend request:", error);
-      toast.error("Failed to accept friend request");
+      toast.error(
+        error instanceof Error ? error.message : "Failed to accept friend request"
+      );
     }
   };
 
@@ -372,20 +395,27 @@ export default function FriendsTab({
   };
 
   const removeFriend = async (friendId: string) => {
+    if (!user) return;
     try {
-      const friendDoc = friends.find((f) => f.id === friendId);
-      if (friendDoc) {
-        const users = [...friendDoc.users].sort();
-        const lookupId = `${users[0]}_${users[1]}`;
-        await deleteDoc(doc(db, "friends", friendId));
-        await deleteDoc(doc(db, "friends_lookup", lookupId));
-      } else {
-        await deleteDoc(doc(db, "friends", friendId));
+      const idToken = await user.getIdToken();
+      const response = await fetch("/api/friends/remove", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${idToken}`,
+        },
+        body: JSON.stringify({ friendId }),
+      });
+      if (!response.ok) {
+        const data = await response.json().catch(() => ({}));
+        throw new Error(data.error || "Failed to remove friend");
       }
       toast.success("Friend removed");
     } catch (error) {
       console.error("Error removing friend:", error);
-      toast.error("Failed to remove friend");
+      toast.error(
+        error instanceof Error ? error.message : "Failed to remove friend"
+      );
     }
   };
 
@@ -400,6 +430,18 @@ export default function FriendsTab({
   };
 
   const [showSearchModal, setShowSearchModal] = useState(false);
+  const [showAllIncoming, setShowAllIncoming] = useState(false);
+  const [showAllSent, setShowAllSent] = useState(false);
+  const [removeFriendTarget, setRemoveFriendTarget] = useState<{
+    friend: Friend;
+    profile: UserProfile;
+  } | null>(null);
+  const [isRemovingFriend, setIsRemovingFriend] = useState(false);
+
+  const profileShareUrl =
+    typeof window !== "undefined" && user
+      ? `${window.location.origin}/user/${user.uid}`
+      : "";
 
   const filteredUsers = allUsers.filter(
     (u) =>
@@ -408,7 +450,6 @@ export default function FriendsTab({
       !sentRequests.some((req) => req.to === u.uid) &&
       !incomingRequests.some((req) => req.from === u.uid) &&
       (u.displayName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        u.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         (u.majors || []).join(" ").toLowerCase().includes(searchTerm.toLowerCase())),
   );
 
@@ -554,9 +595,8 @@ export default function FriendsTab({
         social).
         <br />
         <br />
-        NOTE: Sensitive/private info and statistics such as your GPA are NEVER made
-        public, not even to your friends. Only you can see them. In fact, they're
-        processed locally on your device, so we don't even store them on our database.
+        NOTE: Sensitive/private info and statistics such as your GPA and grades
+        are never made public, not even to your friends — only you can see them.
       </InfoCard>
 
       {/* Loading skeletons */}
@@ -646,9 +686,14 @@ export default function FriendsTab({
                       accent="text-emerald-600 dark:text-emerald-400"
                     />
                     <div className="space-y-1.5">
-                      {incomingRequests.slice(0, 4).map((req) => {
-                        const sender = userProfilesById[req.from];
-                        if (!sender) return null;
+                      {(showAllIncoming
+                        ? incomingRequests
+                        : incomingRequests.slice(0, 4)
+                      ).map((req) => {
+                        const sender = userProfilesById[req.from] || {
+                          uid: req.from,
+                          majors: [],
+                        };
                         return (
                           <motion.div
                             key={req.id}
@@ -662,7 +707,6 @@ export default function FriendsTab({
                               <UserAvatar
                                 photoURL={sender.photoURL}
                                 displayName={sender.displayName}
-                                email={sender.email}
                                 size={24}
                               />
                               <span className="text-xs text-gray-800 dark:text-gray-200 truncate font-medium">
@@ -689,9 +733,15 @@ export default function FriendsTab({
                         );
                       })}
                       {incomingRequests.length > 4 && (
-                        <p className="text-[10px] text-gray-400 dark:text-gray-500 pt-0.5">
-                          +{incomingRequests.length - 4} more
-                        </p>
+                        <button
+                          type="button"
+                          onClick={() => setShowAllIncoming((v) => !v)}
+                          className="text-[10px] text-emerald-500 dark:text-emerald-400 hover:underline pt-0.5"
+                        >
+                          {showAllIncoming
+                            ? "Show less"
+                            : `View all ${incomingRequests.length} requests`}
+                        </button>
                       )}
                     </div>
                   </div>
@@ -707,9 +757,14 @@ export default function FriendsTab({
                       accent="text-blue-600 dark:text-blue-400"
                     />
                     <div className="space-y-1.5">
-                      {sentRequests.slice(0, 4).map((req) => {
-                        const recipient = userProfilesById[req.to];
-                        if (!recipient) return null;
+                      {(showAllSent
+                        ? sentRequests
+                        : sentRequests.slice(0, 4)
+                      ).map((req) => {
+                        const recipient = userProfilesById[req.to] || {
+                          uid: req.to,
+                          majors: [],
+                        };
                         return (
                           <motion.div
                             key={req.id}
@@ -723,7 +778,6 @@ export default function FriendsTab({
                               <UserAvatar
                                 photoURL={recipient.photoURL}
                                 displayName={recipient.displayName}
-                                email={recipient.email}
                                 size={24}
                               />
                               <div className="min-w-0">
@@ -746,9 +800,15 @@ export default function FriendsTab({
                         );
                       })}
                       {sentRequests.length > 4 && (
-                        <p className="text-[10px] text-gray-400 dark:text-gray-500 pt-0.5">
-                          +{sentRequests.length - 4} more
-                        </p>
+                        <button
+                          type="button"
+                          onClick={() => setShowAllSent((v) => !v)}
+                          className="text-[10px] text-blue-500 dark:text-blue-400 hover:underline pt-0.5"
+                        >
+                          {showAllSent
+                            ? "Show less"
+                            : `View all ${sentRequests.length} requests`}
+                        </button>
                       )}
                     </div>
                   </div>
@@ -780,7 +840,7 @@ export default function FriendsTab({
                         Add a Friend
                       </h3>
                       <p className="text-[11px] text-gray-400 dark:text-gray-500 mt-0.5">
-                        Search by name, email, or major
+                        Search by name or major
                       </p>
                     </div>
                     <button
@@ -824,7 +884,6 @@ export default function FriendsTab({
                             <UserAvatar
                               photoURL={u.photoURL}
                               displayName={u.displayName}
-                              email={u.email}
                               size={32}
                             />
                             <div className="min-w-0">
@@ -926,7 +985,6 @@ export default function FriendsTab({
                         <UserAvatar
                           photoURL={f.photoURL}
                           displayName={f.displayName}
-                          email={f.email}
                           size={38}
                         />
                         <div className="min-w-0">
@@ -967,6 +1025,63 @@ export default function FriendsTab({
           </section>
         </>
       )}
+
+      {/* Remove friend confirmation modal */}
+      <AnimatePresence>
+        {removeFriendTarget && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/70 backdrop-blur-sm z-[9999] flex items-center justify-center p-4"
+            onClick={(e) => {
+              if (e.target === e.currentTarget && !isRemovingFriend) {
+                setRemoveFriendTarget(null);
+              }
+            }}
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 8 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 8 }}
+              className="bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/95 dark:via-gray-900/90 dark:to-gray-950/95 backdrop-blur-2xl border border-gray-200 dark:border-white/[0.10] rounded-xl p-5 max-w-sm w-full shadow-[0_8px_48px_rgba(0,0,0,0.5)]"
+            >
+              <h3 className="text-base font-semibold text-gray-900 dark:text-gray-100 mb-2">
+                Remove {getDisplayName(removeFriendTarget.profile)}?
+              </h3>
+              <p className="text-gray-500 dark:text-gray-400 text-sm mb-4 leading-relaxed">
+                They will no longer appear in your friends list. You can send a
+                new request later.
+              </p>
+              <div className="flex justify-end gap-2">
+                <button
+                  onClick={() => setRemoveFriendTarget(null)}
+                  disabled={isRemovingFriend}
+                  className="px-3 py-1.5 rounded-lg border border-gray-200 dark:border-white/[0.08] hover:bg-gray-100 dark:hover:bg-white/[0.06] text-gray-700 dark:text-gray-300 text-sm disabled:opacity-50 transition"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={async () => {
+                    if (!removeFriendTarget.friend.id) return;
+                    setIsRemovingFriend(true);
+                    try {
+                      await removeFriend(removeFriendTarget.friend.id);
+                      setRemoveFriendTarget(null);
+                    } finally {
+                      setIsRemovingFriend(false);
+                    }
+                  }}
+                  disabled={isRemovingFriend}
+                  className="px-3 py-1.5 rounded-lg bg-red-600 hover:bg-red-700 text-white text-sm disabled:opacity-50 flex items-center gap-1.5 transition"
+                >
+                  {isRemovingFriend ? "Removing..." : "Remove friend"}
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Disable confirmation modal */}
       <AnimatePresence>
@@ -1054,7 +1169,12 @@ export default function FriendsTab({
           <Panda size={28} className="text-gray-400 dark:text-gray-500" />
         </div>
         <div className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">
-          Can't find your friend? <CopyButton />
+          Can't find your friend?{" "}
+          {profileShareUrl ? (
+            <CopyButton profileUrl={profileShareUrl} />
+          ) : (
+            <span>Share your profile link from settings</span>
+          )}
           <br />
           and text it to them! You'll be helping them (and us) out
           <br />
@@ -1161,7 +1281,7 @@ export default function FriendsTab({
               </Link>
               <button
                 onClick={() => {
-                  if (friend.id) removeFriend(friend.id);
+                  setRemoveFriendTarget({ friend, profile });
                   setIsOpen(false);
                 }}
                 className="flex items-center gap-2 w-full text-left px-4 py-2.5 text-sm text-red-500 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/15 transition-colors border-t border-gray-100 dark:border-white/[0.06]"

@@ -31,8 +31,17 @@ import {
   ManualRequirementEntry,
   majorRequirements,
 } from "@/lib/majors";
+import {
+  calculatePreviewCertificateProgressByCertificates,
+  certificateRequirements,
+  type CertificateProgress,
+} from "@/lib/certificates";
 import type { GPAEntry } from "@/lib/gpa";
 import { allocateDistributionals } from "@/lib/distributionalAllocation";
+import {
+  getCertificateBlockedCodes,
+  getMajorBlockedCodes,
+} from "@/lib/utils/programClaims";
 
 // ----------------- Types -----------------
 interface Semester {
@@ -46,6 +55,11 @@ interface SimulatorProps {
   completedCourses: Course[];
   graduationYear: number;
   userMajors: string[];
+  userCertificates?: string[];
+  /** Permanent manual fulfillments from Firebase, filtered to major_id only. */
+  majorPermanentManuals?: ManualRequirementEntry[];
+  /** Permanent manual fulfillments from Firebase, filtered to certificate_id only. */
+  certificatePermanentManuals?: ManualRequirementEntry[];
 }
 
 type Plan = {
@@ -59,6 +73,115 @@ type Plan = {
 };
 
 type PreviewProgressMap = Record<string, MajorProgress>;
+type CertificatePreviewProgressMap = Record<string, CertificateProgress>;
+
+type MatchedRequirement = {
+  programType: "major" | "certificate";
+  programName: string;
+  requirementName: string;
+};
+
+function collectRequirementOptionCodes(
+  requirements: { options: Array<{ type: string; code?: string; options?: string[] }> }[],
+): Set<string> {
+  const codes = new Set<string>();
+  for (const req of requirements) {
+    for (const opt of req.options) {
+      if (opt.type === "course" && opt.code) {
+        codes.add(opt.code);
+        const canon = getCanonicalCode(opt.code);
+        if (canon) codes.add(canon);
+      } else if (opt.type === "group" && opt.options) {
+        for (const code of opt.options) {
+          codes.add(code);
+          const canon = getCanonicalCode(code);
+          if (canon) codes.add(canon);
+        }
+      }
+    }
+  }
+  return codes;
+}
+
+function courseMatchesOptionCodes(
+  courseCode: string,
+  optionCodes: Set<string>,
+): boolean {
+  const canon = getCanonicalCode(courseCode) || courseCode;
+  return optionCodes.has(courseCode) || optionCodes.has(canon);
+}
+
+function findMatchedRequirements(
+  courseCode: string,
+  majorIds: string[],
+  certificateIds: string[],
+): MatchedRequirement[] {
+  const matches: MatchedRequirement[] = [];
+  const canon = getCanonicalCode(courseCode) || courseCode;
+
+  for (const majorId of majorIds) {
+    const major = majorRequirements[majorId];
+    if (!major) continue;
+
+    for (const req of major.requirements) {
+      let found = false;
+      for (const opt of req.options) {
+        if (opt.type === "course") {
+          const optCanon = getCanonicalCode(opt.code) || opt.code;
+          if (
+            opt.code === courseCode ||
+            opt.code === canon ||
+            optCanon === courseCode ||
+            optCanon === canon
+          ) {
+            found = true;
+            break;
+          }
+        } else if (opt.type === "group") {
+          for (const code of (opt as { type: "group"; options: string[] })
+            .options) {
+            const codeCanon = getCanonicalCode(code) || code;
+            if (
+              code === courseCode ||
+              code === canon ||
+              codeCanon === courseCode ||
+              codeCanon === canon
+            ) {
+              found = true;
+              break;
+            }
+          }
+        }
+        if (found) break;
+      }
+      if (found) {
+        matches.push({
+          programType: "major",
+          programName: major.name,
+          requirementName: req.name,
+        });
+      }
+    }
+  }
+
+  for (const certId of certificateIds) {
+    const cert = certificateRequirements[certId];
+    if (!cert) continue;
+
+    for (const req of cert.requirements) {
+      const optionCodes = collectRequirementOptionCodes([req]);
+      if (courseMatchesOptionCodes(courseCode, optionCodes)) {
+        matches.push({
+          programType: "certificate",
+          programName: cert.name,
+          requirementName: req.name,
+        });
+      }
+    }
+  }
+
+  return matches;
+}
 
 type PlannedCoursePick = Pick<Course, "code" | "status"> & {
   status: "in-progress"; // coerced for preview semantics
@@ -127,6 +250,9 @@ export default function Simulator({
   completedCourses,
   graduationYear,
   userMajors,
+  userCertificates = [],
+  majorPermanentManuals,
+  certificatePermanentManuals,
 }: SimulatorProps) {
   const { user } = useAuth();
 
@@ -174,6 +300,8 @@ export default function Simulator({
   const [previewProgress, setPreviewProgress] = useState<PreviewProgressMap>(
     {},
   );
+  const [certificatePreviewProgress, setCertificatePreviewProgress] =
+    useState<CertificatePreviewProgressMap>({});
   const [isPreviewLoading, setIsPreviewLoading] = useState<boolean>(false);
   const [previewError, setPreviewError] = useState<string | null>(null);
 
@@ -195,8 +323,54 @@ export default function Simulator({
   // does not clobber the loaded plan when remaining/completed courses change.
   const planLoadedRef = useRef(false);
 
-  // majors to compute – only the user's declared majors
+  // majors / certificates to compute
   const majorIds = useMemo<string[]>(() => userMajors, [userMajors]);
+  const certificateIds = useMemo<string[]>(
+    () => userCertificates,
+    [userCertificates],
+  );
+
+  const majorPermanentManualsResolved = useMemo<ManualRequirementEntry[]>(
+    () =>
+      majorPermanentManuals ??
+      completedCourses.flatMap((course) =>
+        (course.manualRequirementsFulfilled || [])
+          .filter(
+            (m) =>
+              m.major_id &&
+              !m.certificate_id &&
+              majorIds.includes(m.major_id),
+          )
+          .map((m) => ({
+            code: course.code,
+            requirement: m.requirement_title,
+            credits: course.credits || 1,
+            programType: "major" as const,
+            programId: m.major_id,
+          })),
+      ),
+    [majorPermanentManuals, completedCourses, majorIds],
+  );
+
+  const certificatePermanentManualsResolved = useMemo<ManualRequirementEntry[]>(
+    () =>
+      certificatePermanentManuals ??
+      completedCourses.flatMap((course) =>
+        (course.manualRequirementsFulfilled || [])
+          .filter(
+            (m) =>
+              m.certificate_id && certificateIds.includes(m.certificate_id),
+          )
+          .map((m) => ({
+            code: course.code,
+            requirement: m.requirement_title,
+            credits: course.credits || 1,
+            programType: "certificate" as const,
+            programId: m.certificate_id,
+          })),
+      ),
+    [certificatePermanentManuals, completedCourses, certificateIds],
+  );
 
   // Index of the currently-loaded plan within savedPlans (matched by name), or -1.
   const loadedPlanIndex = useMemo(
@@ -209,102 +383,53 @@ export default function Simulator({
   const loadedPlanIsDefault =
     loadedPlanIndex >= 0 && !!savedPlans[loadedPlanIndex]?.isDefault;
 
-  // Auto-detect: does a course code appear in any requirement option across all user majors?
+  // Auto-detect: does a course code appear in any major or certificate requirement?
   const isCourseInAnyRequirement = useMemo(() => {
     const allOptionCodes = new Set<string>();
+
     for (const majorId of majorIds) {
       const major = majorRequirements[majorId];
       if (!major) continue;
-      for (const req of major.requirements) {
-        for (const opt of req.options) {
-          if (opt.type === "course") {
-            allOptionCodes.add(opt.code);
-            const canon = getCanonicalCode(opt.code);
-            if (canon) allOptionCodes.add(canon);
-          } else if (opt.type === "group") {
-            for (const code of (opt as { type: "group"; options: string[] })
-              .options) {
-              allOptionCodes.add(code);
-              const canon = getCanonicalCode(code);
-              if (canon) allOptionCodes.add(canon);
-            }
-          }
-        }
+      for (const code of collectRequirementOptionCodes(major.requirements)) {
+        allOptionCodes.add(code);
       }
     }
-    return (courseCode: string): boolean => {
-      const canon = getCanonicalCode(courseCode) || courseCode;
-      return allOptionCodes.has(courseCode) || allOptionCodes.has(canon);
-    };
-  }, [majorIds]);
 
-  // Find which requirement(s) a course matches for toast notification
-  const getMatchedRequirements = useMemo(() => {
-    return (
-      courseCode: string,
-    ): { majorName: string; requirementName: string }[] => {
-      const matches: { majorName: string; requirementName: string }[] = [];
-      const canon = getCanonicalCode(courseCode) || courseCode;
-
-      for (const majorId of majorIds) {
-        const major = majorRequirements[majorId];
-        if (!major) continue;
-
-        for (const req of major.requirements) {
-          let found = false;
-          for (const opt of req.options) {
-            if (opt.type === "course") {
-              const optCanon = getCanonicalCode(opt.code) || opt.code;
-              if (
-                opt.code === courseCode ||
-                opt.code === canon ||
-                optCanon === courseCode ||
-                optCanon === canon
-              ) {
-                found = true;
-                break;
-              }
-            } else if (opt.type === "group") {
-              for (const code of (opt as { type: "group"; options: string[] })
-                .options) {
-                const codeCanon = getCanonicalCode(code) || code;
-                if (
-                  code === courseCode ||
-                  code === canon ||
-                  codeCanon === courseCode ||
-                  codeCanon === canon
-                ) {
-                  found = true;
-                  break;
-                }
-              }
-            }
-            if (found) break;
-          }
-          if (found) {
-            matches.push({ majorName: major.name, requirementName: req.name });
-          }
-        }
+    for (const certId of certificateIds) {
+      const cert = certificateRequirements[certId];
+      if (!cert) continue;
+      for (const code of collectRequirementOptionCodes(cert.requirements)) {
+        allOptionCodes.add(code);
       }
-      return matches;
-    };
-  }, [majorIds]);
+    }
+
+    return (courseCode: string): boolean =>
+      courseMatchesOptionCodes(courseCode, allOptionCodes);
+  }, [majorIds, certificateIds]);
 
   // Show toast for auto-matched course
   const showAutoMatchToast = (courseCode: string) => {
-    const matches = getMatchedRequirements(courseCode);
+    const matches = findMatchedRequirements(
+      courseCode,
+      majorIds,
+      certificateIds,
+    );
     if (matches.length === 0) return;
 
     const firstMatch = matches[0];
+    const programLabel =
+      firstMatch.programType === "certificate"
+        ? `certificate: ${firstMatch.programName}`
+        : firstMatch.programName;
 
     if (matches.length === 1) {
       toast.success(
-        `Auto-detected match: "${firstMatch.requirementName}" (${firstMatch.majorName})`,
+        `Auto-detected match: "${firstMatch.requirementName}" (${programLabel})`,
         { duration: 3000 },
       );
     } else {
       toast.success(
-        `Auto-detected match: "${firstMatch.requirementName}" (${firstMatch.majorName}) +${matches.length - 1} more`,
+        `Auto-detected match: "${firstMatch.requirementName}" (${programLabel}) +${matches.length - 1} more`,
         { duration: 3000 },
       );
     }
@@ -724,57 +849,85 @@ export default function Simulator({
   useEffect(() => {
     if (!user) {
       setPreviewProgress({});
+      setCertificatePreviewProgress({});
+      return;
+    }
+
+    if (majorIds.length === 0 && certificateIds.length === 0) {
+      setPreviewProgress({});
+      setCertificatePreviewProgress({});
       return;
     }
 
     setIsPreviewLoading(true);
     setPreviewError(null);
 
-    // Inputs for progress calc
     const completedCodes = completedCourses.map((c) => c.code);
     const inProgCodes = semesters.flatMap((s) =>
       s.courses.filter((c) => c.status === "in-progress").map((c) => c.code),
     );
-    const plannedCodesLocal = plannedCodes; // from memo
-    const skippedCodes: string[] = []; // wire up if you track skips
+    const plannedCodesLocal = plannedCodes;
+    const skippedCodes: string[] = [];
 
-    // Extract permanent manual fulfillments from Firebase courses
-    const permanentManualReqs: ManualRequirementEntry[] =
-      completedCourses.flatMap((course) =>
-        (course.manualRequirementsFulfilled || [])
-          .filter((m) => majorIds.includes(m.major_id))
-          .map((m) => ({
-            code: course.code,
-            requirement: m.requirement_title,
-            credits: course.credits || 1,
-          })),
-      );
+    const simulatorMajorManuals = simulatorManualReqs.filter(
+      (m) => m.programType === "major" || !m.programType,
+    );
+    const simulatorCertificateManuals = simulatorManualReqs.filter(
+      (m) => m.programType === "certificate",
+    );
 
-    // Merge permanent manual reqs with simulator-local manual reqs
-    // Simulator manuals are ALWAYS planned (for future courses)
-    const manualReqs = [
-      ...permanentManualReqs,
-      ...simulatorManualReqs.map((m) => ({ ...m, isPlanned: true })),
+    const majorBlockedCodes = [
+      ...getMajorBlockedCodes(completedCourses),
+      ...simulatorCertificateManuals.map((m) => m.code),
+    ];
+    const certificateBlockedCodes = [
+      ...getCertificateBlockedCodes(completedCourses),
+      ...simulatorMajorManuals.map((m) => m.code),
+    ];
+
+    const majorManualReqs = [
+      ...majorPermanentManualsResolved,
+      ...simulatorMajorManuals.map((m) => ({ ...m, isPlanned: true })),
+    ];
+    const certificateManualReqs = [
+      ...certificatePermanentManualsResolved,
+      ...simulatorCertificateManuals.map((m) => ({ ...m, isPlanned: true })),
     ];
 
     try {
-      // 1) Batch compute for all majors
-      const all = calculatePreviewMajorProgressByMajors(
-        majorIds,
-        completedCodes,
-        inProgCodes,
-        skippedCodes,
-        manualReqs,
-        plannedCodesLocal,
-      );
+      if (majorIds.length > 0) {
+        const all = calculatePreviewMajorProgressByMajors(
+          majorIds,
+          completedCodes,
+          inProgCodes,
+          skippedCodes,
+          majorManualReqs,
+          plannedCodesLocal,
+          majorBlockedCodes,
+        );
+        setPreviewProgress(all);
+      } else {
+        setPreviewProgress({});
+      }
 
-      setPreviewProgress(all);
+      if (certificateIds.length > 0) {
+        const certAll = calculatePreviewCertificateProgressByCertificates(
+          certificateIds,
+          completedCodes,
+          inProgCodes,
+          skippedCodes,
+          certificateManualReqs,
+          plannedCodesLocal,
+          certificateBlockedCodes,
+        );
+        setCertificatePreviewProgress(certAll);
+      } else {
+        setCertificatePreviewProgress({});
+      }
     } catch (batchErr) {
-      // 2) Fallback: compute per-major so one bad major doesn't break others
       console.error("[PreviewProgress] batch compute failed:", batchErr);
       const result: PreviewProgressMap = {};
       let successes = 0;
-      let failures = 0;
 
       for (const mid of majorIds) {
         try {
@@ -783,30 +936,56 @@ export default function Simulator({
             completedCodes,
             inProgCodes,
             skippedCodes,
-            manualReqs,
+            majorManualReqs,
             plannedCodesLocal,
+            majorBlockedCodes,
           )[mid];
 
-          if (one) {
-            // keep only majors with any signal
-            if (
-              (one.completedCredits ?? 0) > 0 ||
-              (one.inProgressCredits ?? 0) > 0
-            ) {
-              result[mid] = one;
-              successes++;
-            }
+          if (
+            one &&
+            ((one.completedCredits ?? 0) > 0 || (one.inProgressCredits ?? 0) > 0)
+          ) {
+            result[mid] = one;
+            successes++;
           }
         } catch (perErr) {
-          failures++;
           console.error(`[PreviewProgress] failed for major "${mid}":`, perErr);
         }
       }
 
+      const certResult: CertificatePreviewProgressMap = {};
+      for (const cid of certificateIds) {
+        try {
+          const one = calculatePreviewCertificateProgressByCertificates(
+            [cid],
+            completedCodes,
+            inProgCodes,
+            skippedCodes,
+            certificateManualReqs,
+            plannedCodesLocal,
+            certificateBlockedCodes,
+          )[cid];
+
+          if (
+            one &&
+            ((one.completedCredits ?? 0) > 0 || (one.inProgressCredits ?? 0) > 0)
+          ) {
+            certResult[cid] = one;
+            successes++;
+          }
+        } catch (perErr) {
+          console.error(
+            `[PreviewProgress] failed for certificate "${cid}":`,
+            perErr,
+          );
+        }
+      }
+
       setPreviewProgress(result);
+      setCertificatePreviewProgress(certResult);
 
       if (successes === 0) {
-        setPreviewError("Could not load simulated major progress.");
+        setPreviewError("Could not load simulated progress.");
       }
     } finally {
       setIsPreviewLoading(false);
@@ -814,10 +993,13 @@ export default function Simulator({
   }, [
     user,
     majorIds,
+    certificateIds,
     semesters,
     completedCourses,
     plannedCodes,
     simulatorManualReqs,
+    majorPermanentManualsResolved,
+    certificatePermanentManualsResolved,
   ]);
 
   // ------------ Save / Load / Delete Plans ------------
@@ -1174,7 +1356,16 @@ export default function Simulator({
         >
           <div>
             <h3 className="text-lg font-medium text-gray-900 dark:text-white">
-              Progress toward {majorIds.length > 1 ? "majors" : "major"}
+              Progress toward{" "}
+              {majorIds.length > 0 && certificateIds.length > 0
+                ? "majors & certificates"
+                : certificateIds.length > 0
+                  ? certificateIds.length > 1
+                    ? "certificates"
+                    : "certificate"
+                  : majorIds.length > 1
+                    ? "majors"
+                    : "major"}
             </h3>
             <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
               Live preview — reflects completed, in-progress, and courses placed
@@ -1211,7 +1402,9 @@ export default function Simulator({
 
               <SimulatorRequirementsBreakdown
                 majorIds={majorIds}
+                certificateIds={certificateIds}
                 previewProgress={previewProgress}
+                certificatePreviewProgress={certificatePreviewProgress}
                 plannedCodes={plannedCodes}
                 simulatorManualReqs={simulatorManualReqs}
                 onRemoveManualReq={(code, requirement) => {
@@ -1817,7 +2010,9 @@ export default function Simulator({
         isOpen={manualAssignPending !== null}
         course={manualAssignPending?.course ?? null}
         majorIds={majorIds}
+        certificateIds={certificateIds}
         previewProgress={previewProgress}
+        certificatePreviewProgress={certificatePreviewProgress}
         onAssign={(entry) => {
           setSimulatorManualReqs((prev) => [...prev, entry]);
           setManualAssignPending(null);

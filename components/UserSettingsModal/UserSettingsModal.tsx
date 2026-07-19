@@ -17,7 +17,9 @@ import {
 } from "react-icons/fi";
 import { User } from "firebase/auth";
 import { MAJORS } from "@/lib/majors";
+import { CERTIFICATES } from "@/lib/certificates";
 import { MajorDropdown } from "../ui/MajorDropdown";
+import { CertificateDropdown } from "../ui/CertificateDropdown";
 import { YearBadge } from "../ui/YearBadge";
 import Link from "next/link";
 import { Info } from "lucide-react";
@@ -39,6 +41,7 @@ import { isAdminEmail } from "@/lib/admin";
 
 interface UserProfile {
   majors: string[];
+  certificates: string[];
   graduationYear: number;
   bio?: string;
   updatedAt: Date;
@@ -83,6 +86,9 @@ export default function UserSettingsModal({
   const [duplicateMajorError, setDuplicateMajorError] = useState<string | null>(
     null,
   );
+  const [duplicateCertificateError, setDuplicateCertificateError] = useState<
+    string | null
+  >(null);
   const [isSaving, setIsSaving] = useState(false);
 
   // Bio edit flow
@@ -141,7 +147,10 @@ export default function UserSettingsModal({
   // Initialize local profile state
   useEffect(() => {
     if (userProfile) {
-      setLocalProfile(userProfile);
+      setLocalProfile({
+        ...userProfile,
+        certificates: userProfile.certificates ?? [],
+      });
       setTempBio(userProfile.bio || "");
       setBioCount((userProfile.bio || "").length);
     }
@@ -162,6 +171,7 @@ export default function UserSettingsModal({
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as HTMLElement;
       if (target.closest('[data-major-dropdown-portal="true"]')) return;
+      if (target.closest('[data-certificate-dropdown-portal="true"]')) return;
       if (modalRef.current && !modalRef.current.contains(target)) onClose();
     };
     document.addEventListener("mousedown", handleClickOutside);
@@ -212,6 +222,8 @@ export default function UserSettingsModal({
     return (
       JSON.stringify(userProfile.majors) !==
         JSON.stringify(localProfile.majors) ||
+      JSON.stringify(userProfile.certificates ?? []) !==
+        JSON.stringify(localProfile.certificates) ||
       userProfile.graduationYear !== localProfile.graduationYear
     );
   };
@@ -223,6 +235,12 @@ export default function UserSettingsModal({
     if (!localProfile) return false;
     const uniqueMajors = new Set(localProfile.majors);
     return uniqueMajors.size !== localProfile.majors.length;
+  };
+
+  const hasDuplicateCertificates = () => {
+    if (!localProfile) return false;
+    const uniqueCertificates = new Set(localProfile.certificates);
+    return uniqueCertificates.size !== localProfile.certificates.length;
   };
 
   const handleAddMajor = () => {
@@ -262,6 +280,45 @@ export default function UserSettingsModal({
     setDuplicateMajorError(null);
   };
 
+  const handleAddCertificate = () => {
+    if (!localProfile || localProfile.certificates.length >= 3) return;
+    const availableCertificate = Object.keys(CERTIFICATES).find(
+      (cert) => !localProfile.certificates.includes(cert),
+    );
+    if (availableCertificate) {
+      setLocalProfile({
+        ...localProfile,
+        certificates: [...localProfile.certificates, availableCertificate],
+      });
+      setDuplicateCertificateError(null);
+    }
+  };
+
+  const handleCertificateChange = (index: number, newCertificate: string) => {
+    if (!localProfile) return;
+    if (
+      localProfile.certificates.includes(newCertificate) &&
+      localProfile.certificates[index] !== newCertificate
+    ) {
+      setDuplicateCertificateError(
+        "You can't select the same certificate twice",
+      );
+      return;
+    }
+    setDuplicateCertificateError(null);
+    const newCertificates = [...localProfile.certificates];
+    newCertificates[index] = newCertificate;
+    setLocalProfile({ ...localProfile, certificates: newCertificates });
+  };
+
+  const handleRemoveCertificate = (index: number) => {
+    if (!localProfile) return;
+    const newCertificates = [...localProfile.certificates];
+    newCertificates.splice(index, 1);
+    setLocalProfile({ ...localProfile, certificates: newCertificates });
+    setDuplicateCertificateError(null);
+  };
+
   // Save bio immediately (does not affect hasChanges()); KEEP EDIT MODE
   const handleSaveBio = async () => {
     if (!localProfile) return;
@@ -294,11 +351,18 @@ export default function UserSettingsModal({
       setDuplicateMajorError("Please remove duplicate majors before saving");
       return;
     }
+    if (hasDuplicateCertificates()) {
+      setDuplicateCertificateError(
+        "Please remove duplicate certificates before saving",
+      );
+      return;
+    }
     if (!localProfile) return;
     try {
       setIsSaving(true);
       await onSave({
         majors: localProfile.majors,
+        certificates: localProfile.certificates,
         graduationYear: localProfile.graduationYear,
       });
     } finally {
@@ -1007,6 +1071,60 @@ export default function UserSettingsModal({
             </div>
           </div>
 
+          {/* Certificates */}
+          <div className="rounded-xl border border-black/[0.06] dark:border-white/[0.08] bg-gray-50 dark:bg-transparent dark:bg-gradient-to-br dark:from-white/[0.06] dark:via-transparent dark:to-black/10 shadow-sm dark:shadow-[0_2px_12px_rgba(0,0,0,0.2)] backdrop-blur-sm px-3 py-2.5">
+            <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+              Certificates
+            </label>
+            <p className="text-[10px] text-gray-500 dark:text-gray-400 mb-1.5">
+              Optional. Courses counted for a certificate cannot also count
+              toward majors.
+            </p>
+            {duplicateCertificateError && (
+              <div className="mb-1 text-[10px] text-red-400">
+                {duplicateCertificateError}
+              </div>
+            )}
+            <div className="space-y-1.5">
+              {localProfile.certificates.map((certificate, index) => (
+                <div key={index} className="relative z-[60] overflow-visible">
+                  <div className="flex items-center gap-1.5">
+                    <div className="flex-1">
+                      <CertificateDropdown
+                        value={certificate}
+                        onChange={(newCertificate) =>
+                          handleCertificateChange(index, newCertificate)
+                        }
+                        disabledOptions={localProfile.certificates.filter(
+                          (c) => c !== certificate,
+                        )}
+                      />
+                    </div>
+                    <button
+                      onClick={() => handleRemoveCertificate(index)}
+                      className="text-red-400 hover:text-red-300 px-1.5 py-0.5 rounded hover:bg-red-400/10 transition-colors text-xs"
+                      title="Remove certificate"
+                    >
+                      ×
+                    </button>
+                  </div>
+                </div>
+              ))}
+              {localProfile.certificates.length < 3 && (
+                <button
+                  onClick={handleAddCertificate}
+                  className="text-[11px] text-teal-500 hover:text-teal-400 flex items-center gap-1"
+                  disabled={
+                    Object.keys(CERTIFICATES).length ===
+                    localProfile.certificates.length
+                  }
+                >
+                  + Add certificate
+                </button>
+              )}
+            </div>
+          </div>
+
           {/* Year */}
           <div className="rounded-xl border border-black/[0.06] dark:border-white/[0.08] bg-gray-50 dark:bg-transparent dark:bg-gradient-to-br dark:from-white/[0.06] dark:via-transparent dark:to-black/10 shadow-sm dark:shadow-[0_2px_12px_rgba(0,0,0,0.2)] backdrop-blur-sm px-3 py-2.5">
             <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">
@@ -1164,9 +1282,17 @@ export default function UserSettingsModal({
               </button>
               <button
                 onClick={handleSave}
-                disabled={isSaving || !isDirty || hasDuplicateMajors()}
+                disabled={
+                  isSaving ||
+                  !isDirty ||
+                  hasDuplicateMajors() ||
+                  hasDuplicateCertificates()
+                }
                 className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 ${
-                  isDirty && !hasDuplicateMajors() && !isSaving
+                  isDirty &&
+                  !hasDuplicateMajors() &&
+                  !hasDuplicateCertificates() &&
+                  !isSaving
                     ? "bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white shadow-[0_4px_16px_rgba(168,85,247,0.35)] ring-1 ring-purple-400/40 animate-pulse"
                     : "bg-gray-100 dark:bg-gray-800/50 text-gray-400 dark:text-gray-500 cursor-not-allowed border border-black/[0.05] dark:border-white/[0.05]"
                 }`}

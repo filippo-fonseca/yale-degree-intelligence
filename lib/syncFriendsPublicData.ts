@@ -14,6 +14,7 @@ import { Course, PublicCourse } from "@/lib/types";
 
 interface UserProfile {
   majors: string[];
+  certificates?: string[];
   graduationYear?: number;
   bio?: string;
 }
@@ -101,6 +102,7 @@ export async function syncFriendsPublicData(
       coursesAreEqual(existingCourses, publicCourses) &&
       existingData.displayName === (user.displayName || null) &&
       JSON.stringify(existingData.majors || []) === JSON.stringify(userProfile?.majors || []) &&
+      JSON.stringify(existingData.certificates || []) === JSON.stringify(userProfile?.certificates || []) &&
       existingData.graduationYear === (userProfile?.graduationYear || null)
     ) {
       return; // Data unchanged, skip update
@@ -116,6 +118,7 @@ export async function syncFriendsPublicData(
       email: user.email || null,
       photoURL: user.photoURL || null,
       majors: userProfile?.majors || [],
+      certificates: userProfile?.certificates || [],
       graduationYear: userProfile?.graduationYear ?? null,
       bio: userProfile?.bio || null,
       courses: publicCourses,
@@ -161,6 +164,7 @@ export async function enableFriendsFeature(
     email: user.email || null,
     photoURL: user.photoURL || null,
     majors: userProfile?.majors || [],
+    certificates: userProfile?.certificates || [],
     graduationYear: userProfile?.graduationYear ?? null,
     bio: userProfile?.bio || null,
     courses: publicCourses,

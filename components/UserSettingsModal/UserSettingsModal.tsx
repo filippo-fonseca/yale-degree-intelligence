@@ -20,6 +20,7 @@ import { MAJORS } from "@/lib/majors";
 import { MajorDropdown } from "../ui/MajorDropdown";
 import { YearBadge } from "../ui/YearBadge";
 import Link from "next/link";
+import { toast } from "react-hot-toast";
 import { Info } from "lucide-react";
 import { UserAvatar } from "../ui/UserAvatar";
 import { useTheme } from "@/context/ThemeContext";
@@ -102,6 +103,7 @@ export default function UserSettingsModal({
   const [isTogglingFriends, setIsTogglingFriends] = useState(false);
   const [showDisableFriendsConfirm, setShowDisableFriendsConfirm] =
     useState(false);
+  const [showDiscardConfirm, setShowDiscardConfirm] = useState(false);
 
   // Dan AI advisor — API key
   const [danKeyStatus, setDanKeyStatus] = useState<DanKeyStatus>({
@@ -162,11 +164,17 @@ export default function UserSettingsModal({
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as HTMLElement;
       if (target.closest('[data-major-dropdown-portal="true"]')) return;
-      if (modalRef.current && !modalRef.current.contains(target)) onClose();
+      if (modalRef.current && !modalRef.current.contains(target)) {
+        if (hasChanges()) {
+          setShowDiscardConfirm(true);
+        } else {
+          onClose();
+        }
+      }
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [onClose]);
+  }, [onClose, userProfile, localProfile]);
 
   // Close more menu when clicking outside
   useEffect(() => {
@@ -191,8 +199,10 @@ export default function UserSettingsModal({
       await onDeleteAccount();
     } catch (error) {
       console.error("Failed to delete account:", error);
+      toast.error(
+        error instanceof Error ? error.message : "Failed to delete account"
+      );
       setIsDeleting(false);
-      setShowDeleteConfirm(false);
     }
   };
 
@@ -226,7 +236,7 @@ export default function UserSettingsModal({
   };
 
   const handleAddMajor = () => {
-    if (!localProfile || localProfile.majors.length >= 3) return;
+    if (!localProfile || localProfile.majors.length >= 2) return;
     const availableMajor = Object.keys(MAJORS).find(
       (major) => !localProfile.majors.includes(major),
     );
@@ -1178,6 +1188,48 @@ export default function UserSettingsModal({
 
           {/* Delete Account Confirmation Modal */}
           <AnimatePresence>
+            {showDiscardConfirm && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="fixed inset-0 bg-black/70 backdrop-blur-md z-[9999] flex items-center justify-center p-4"
+                onClick={(e) => {
+                  if (e.target === e.currentTarget) setShowDiscardConfirm(false);
+                }}
+              >
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.95, y: 10 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.95, y: 10 }}
+                  className="bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/95 dark:via-gray-900/90 dark:to-gray-950/95 border border-gray-200 dark:border-white/[0.1] rounded-2xl p-4 max-w-xs w-full shadow-[0_16px_48px_rgba(0,0,0,0.5)] backdrop-blur-2xl"
+                >
+                  <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-2">
+                    Discard unsaved changes?
+                  </h3>
+                  <p className="text-gray-500 dark:text-gray-400 text-xs mb-3">
+                    You have unsaved changes to your majors or graduation year.
+                  </p>
+                  <div className="flex justify-end gap-2">
+                    <button
+                      onClick={() => setShowDiscardConfirm(false)}
+                      className="px-3 py-1.5 rounded-lg bg-gray-100 dark:bg-white/[0.04] border border-gray-200 dark:border-white/[0.08] hover:bg-gray-200 dark:hover:bg-white/[0.08] text-gray-700 dark:text-gray-300 text-xs transition-all duration-200"
+                    >
+                      Keep editing
+                    </button>
+                    <button
+                      onClick={() => {
+                        setShowDiscardConfirm(false);
+                        onClose();
+                      }}
+                      className="px-3 py-1.5 rounded-lg bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white text-xs transition-all duration-200"
+                    >
+                      Discard
+                    </button>
+                  </div>
+                </motion.div>
+              </motion.div>
+            )}
             {showDeleteConfirm && (
               <motion.div
                 initial={{ opacity: 0 }}

@@ -153,9 +153,9 @@ export default function SimulatorManualAssignModal({
                       onClick={() => setSelectedMajor(mid)}
                       className="flex-1 px-3 py-2.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 text-sm text-gray-700 dark:text-gray-200 hover:border-purple-500 hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-colors text-left"
                     >
-                      <div className="font-medium">{mid}</div>
+                      <div className="font-medium">{MAJORS[mid] ?? mid}</div>
                       <div className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
-                        {MAJORS[mid] ?? mid}
+                        {mid}
                       </div>
                     </button>
                   ))}

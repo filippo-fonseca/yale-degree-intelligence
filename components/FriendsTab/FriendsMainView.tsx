@@ -117,10 +117,10 @@ export function FriendsMainView({
         (u.majors || []).join(" ").toLowerCase().includes(searchTerm.toLowerCase())),
   );
 
-  const closeSearchModal = () => {
+  const closeSearchModal = useCallback(() => {
     setSearchTerm("");
     setShowSearchModal(false);
-  };
+  }, []);
 
   return (
     <div className="w-full max-w-3xl mx-auto font-louize">

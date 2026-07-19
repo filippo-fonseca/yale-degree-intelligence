@@ -663,7 +663,7 @@ export default function MajorProgressView({
       items: completedStats,
       credits: completedCredits || 0,
       emptyText:
-        "Nothing here yet! Upload your transcript on the My courses page to get started.",
+        "Upload your transcript on My courses to see completed requirements here.",
     },
   ];
 

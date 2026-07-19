@@ -23,6 +23,7 @@ import {
 import { PieChart } from "@mui/x-charts/PieChart";
 import { useTheme } from "@/context/ThemeContext";
 import { Skeleton } from "@/components/ui/Skeleton";
+import { EmptyState } from "@/components/ui/EmptyState";
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -759,40 +760,18 @@ function LanguageSection({
 
 // ─── Empty State ──────────────────────────────────────────────────────────────
 
-function EmptyState({ onGoToCourses }: { onGoToCourses?: () => void }) {
+function DistEmptyState({ onGoToCourses }: { onGoToCourses?: () => void }) {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 8 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="flex flex-col items-center justify-center py-16 px-6 text-center"
-    >
-      <div className="w-16 h-16 rounded-2xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center mb-4">
-        <FiGrid className="text-blue-400 dark:text-blue-300" size={28} />
-      </div>
-      <h3 className="text-base font-medium text-gray-700 dark:text-gray-300 mb-2">
-        No distributionals tagged yet
-      </h3>
-      <p className="text-sm text-gray-500 dark:text-gray-400 max-w-xs leading-relaxed">
-        Head to the{" "}
-        <span className="font-semibold text-gray-700 dark:text-gray-200">
-          My courses
-        </span>{" "}
-        tab and click{" "}
-        <span className="font-mono text-blue-600 dark:text-blue-300">
-          + assign distributional
-        </span>{" "}
-        on your courses to start tracking requirements.
-      </p>
-      {onGoToCourses && (
-        <button
-          type="button"
-          onClick={onGoToCourses}
-          className="mt-5 inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg bg-purple-500/15 text-purple-700 dark:text-purple-300 border border-purple-500/30 hover:bg-purple-500/25 transition-colors"
-        >
-          Go to My courses
-        </button>
-      )}
-    </motion.div>
+    <EmptyState
+      icon={<FiGrid className="text-blue-400 dark:text-blue-300" size={28} />}
+      title="No distributionals tagged yet"
+      description="Open My courses and tap + assign distributional on a course to start tracking Yale's area and skill requirements."
+      primaryAction={
+        onGoToCourses
+          ? { label: "Go to My courses", onClick: onGoToCourses }
+          : undefined
+      }
+    />
   );
 }
 
@@ -1068,7 +1047,7 @@ const DistributionalsView = ({
       </div>
 
       {/* Empty state */}
-      {!hasAnyDistributionals && <EmptyState onGoToCourses={onGoToCourses} />}
+      {!hasAnyDistributionals && <DistEmptyState onGoToCourses={onGoToCourses} />}
 
       {/* View switcher */}
       {hasAnyDistributionals && (

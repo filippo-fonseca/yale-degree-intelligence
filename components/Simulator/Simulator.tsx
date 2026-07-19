@@ -1820,9 +1820,11 @@ export default function Simulator({
                   <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-gray-100 dark:bg-transparent dark:bg-gradient-to-br dark:from-white/[0.04] dark:to-transparent border border-gray-200 dark:border-white/[0.06] flex items-center justify-center">
                     <FiPlus className="w-5 h-5 text-gray-400 dark:text-gray-500" />
                   </div>
-                  <p className="text-gray-500 dark:text-gray-500 text-sm">No saved plans yet</p>
-                  <p className="text-gray-400 dark:text-gray-600 text-xs mt-1">
-                    Make changes and save to create your first plan.
+                  <p className="text-gray-500 dark:text-gray-500 text-sm font-medium">
+                    No saved plans yet
+                  </p>
+                  <p className="text-gray-400 dark:text-gray-600 text-xs mt-1 max-w-xs mx-auto">
+                    Tweak your schedule in the simulator, then save a plan to compare paths.
                   </p>
                 </div>
               ) : (

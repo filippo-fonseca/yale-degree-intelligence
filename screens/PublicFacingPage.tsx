@@ -317,7 +317,7 @@ export default function AboutPage() {
               <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase bg-gradient-to-r from-blue-500/20 via-purple-500/20 to-pink-500/20 border border-white/[0.15] shadow-[0_4px_20px_rgba(139,92,246,0.25),inset_0_1px_0_rgba(255,255,255,0.15)] backdrop-blur-xl">
                 <span className="w-1.5 h-1.5 rounded-full bg-gradient-to-r from-emerald-400 to-emerald-500 animate-pulse shadow-[0_0_8px_rgba(52,211,153,0.6)]"></span>
                 <span className="bg-gradient-to-r from-blue-300 via-purple-300 to-pink-300 bg-clip-text text-transparent">
-                  Introducing DegreeIntelligence v2
+                  Introducing DegreeIntelligence v3.0.0
                 </span>
               </span>
             </motion.div>
@@ -381,7 +381,7 @@ export default function AboutPage() {
                 whileTap={{ scale: 0.98 }}
                 onClick={() => setShowVideoModal(true)}
               >
-                See v2 launch vid
+                See v3.0.0 launch vid
                 <FiPlayCircle className="opacity-70" size={14} />
               </motion.button>
               <motion.button
@@ -1578,7 +1578,7 @@ export default function AboutPage() {
                 <div className="aspect-video bg-black/50">
                   <iframe
                     src="https://www.youtube.com/embed/5H1kjMWQfgs"
-                    title="DegreeIntelligence v2 Launch"
+                    title="DegreeIntelligence v3.0.0 Launch"
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                     allowFullScreen
                     className="w-full h-full"

@@ -2,6 +2,14 @@
 
 import { Course } from "@/lib/types";
 import { gradePoints } from "@/lib/constants";
+import { computeGPA } from "@/lib/gpa";
+import {
+  getGPAEligibleCourses,
+  getInProgressCount,
+  toGPAEntry,
+  gradeDistributionColor,
+  safeGpaChartYMin,
+} from "@/lib/utils/academicStats";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   GraduationCap,
@@ -282,8 +290,8 @@ function ChartCardSkeleton({ className = "" }: { className?: string }) {
   );
 }
 
-/** Empty state when no graded courses exist. */
-function EmptyState() {
+/** Empty state when no GPA-eligible courses exist. */
+function EmptyState({ inProgressCount = 0 }: { inProgressCount?: number }) {
   return (
     <AnimatePresence>
       <motion.div
@@ -293,15 +301,24 @@ function EmptyState() {
         className="flex flex-col items-center justify-center py-20 text-center gap-4"
       >
         <div className="p-4 rounded-2xl bg-gradient-to-br from-violet-500/10 to-blue-500/10 border border-violet-200 dark:border-violet-800/30">
-          <GraduationCap className="h-10 w-10 text-violet-400 dark:text-violet-300" />
+          <GraduationCap className="h-10 w-10 text-violet-600 dark:text-violet-300" />
         </div>
         <div>
           <p className="text-base font-medium text-gray-800 dark:text-gray-200">
             No graded courses yet
           </p>
           <p className="text-sm text-gray-500 dark:text-gray-400 mt-1 max-w-xs mx-auto">
-            Once you've added courses with grades, your academic stats will
-            appear here.
+            Add completed courses with grades and credits to see your GPA and
+            charts here.
+          </p>
+          {inProgressCount > 0 && (
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+              {inProgressCount} course{inProgressCount !== 1 ? "s" : ""} in
+              progress — stats will appear once graded.
+            </p>
+          )}
+          <p className="text-[11px] text-gray-400 dark:text-gray-500 mt-3">
+            Only you can see your grades.
           </p>
         </div>
       </motion.div>
@@ -392,17 +409,17 @@ function DeptCreditPieChart({
 // GPA color (numeric)
 // ──────────────────────────────────────────────
 function gpaColor(gpa: number): string {
-  if (gpa >= 3.7) return "text-emerald-600 dark:text-emerald-400";
-  if (gpa >= 3.3) return "text-blue-600 dark:text-blue-400";
-  if (gpa >= 2.7) return "text-amber-600 dark:text-amber-400";
-  return "text-red-600 dark:text-red-400";
+  if (gpa >= 3.7) return "text-emerald-600 dark:text-emerald-300";
+  if (gpa >= 3.3) return "text-blue-600 dark:text-blue-300";
+  if (gpa >= 2.7) return "text-amber-600 dark:text-amber-300";
+  return "text-red-600 dark:text-red-300";
 }
 
 function creditsColor(credits: number): string {
-  if (credits >= 32) return "text-emerald-600 dark:text-emerald-400";
-  if (credits >= 24) return "text-blue-600 dark:text-blue-400";
-  if (credits >= 16) return "text-amber-600 dark:text-amber-400";
-  return "text-red-600 dark:text-red-400";
+  if (credits >= 32) return "text-emerald-600 dark:text-emerald-300";
+  if (credits >= 24) return "text-blue-600 dark:text-blue-300";
+  if (credits >= 16) return "text-amber-600 dark:text-amber-300";
+  return "text-red-600 dark:text-red-300";
 }
 
 // ──────────────────────────────────────────────
@@ -418,27 +435,15 @@ export default function StatsView({ courses }: { courses: Course[] }) {
 
   // ── Derived data (all math kept exactly as before) ──────────────────────
 
-  const activeCourses = courses.filter(
-    (c) =>
-      !c.skipped &&
-      c.status !== "in-progress" &&
-      c.grade &&
-      gradePoints[c.grade],
-  );
-
-  const summary = activeCourses.reduce(
-    (acc, c) => {
-      acc.totalCredits += c.credits || 0;
-      acc.totalGradePoints += gradePoints[c.grade!] * (c.credits || 1);
-      return acc;
-    },
-    { totalCredits: 0, totalGradePoints: 0 },
-  );
-
-  const overallGpa =
-    summary.totalCredits > 0
-      ? summary.totalGradePoints / summary.totalCredits
-      : 0;
+  const activeCourses = getGPAEligibleCourses(courses);
+  const inProgressCount = getInProgressCount(courses);
+  const gpaResult = computeGPA(activeCourses.map(toGPAEntry));
+  const overallGpa = gpaResult.gpa ?? 0;
+  const summary = {
+    totalCredits: gpaResult.gradedCredits,
+    totalGradePoints:
+      gpaResult.gpa != null ? gpaResult.gpa * gpaResult.gradedCredits : 0,
+  };
 
   // Grade distribution
   const allGrades = Object.keys(gradePoints);
@@ -453,8 +458,8 @@ export default function StatsView({ courses }: { courses: Course[] }) {
     (acc, c) => {
       const key = `${c.semester} ${c.year}`;
       if (!acc[key]) acc[key] = { credits: 0, points: 0, courses: [] };
-      acc[key].credits += c.credits || 0;
-      acc[key].points += gradePoints[c.grade!] * (c.credits || 1);
+      acc[key].credits += c.credits;
+      acc[key].points += gradePoints[c.grade!] * c.credits;
       acc[key].courses.push(c);
       return acc;
     },
@@ -468,7 +473,7 @@ export default function StatsView({ courses }: { courses: Course[] }) {
       credits,
       courseCount: courses.length,
     }))
-    .filter((item) => item.gpa > 0);
+    .filter((item) => item.credits > 0);
 
   const sortedSemData = semesterData.sort((a, b) => {
     const [sa, ya] = a.semester.split(" ");
@@ -484,9 +489,9 @@ export default function StatsView({ courses }: { courses: Course[] }) {
     const semCourses = activeCourses.filter(
       (c) => `${c.semester} ${c.year}` === entry.semester,
     );
-    const sc = semCourses.reduce((s, c) => s + (c.credits || 0), 0);
+    const sc = semCourses.reduce((s, c) => s + c.credits, 0);
     const sp = semCourses.reduce(
-      (s, c) => s + gradePoints[c.grade!] * (c.credits || 1),
+      (s, c) => s + gradePoints[c.grade!] * c.credits,
       0,
     );
     cumCreds += sc;
@@ -504,8 +509,8 @@ export default function StatsView({ courses }: { courses: Course[] }) {
       (acc, c) => {
         const dept = c.code.split(" ")[0];
         if (!acc[dept]) acc[dept] = { creds: 0, pts: 0, count: 0 };
-        acc[dept].creds += c.credits || 0;
-        acc[dept].pts += gradePoints[c.grade!] * (c.credits || 1);
+        acc[dept].creds += c.credits;
+        acc[dept].pts += gradePoints[c.grade!] * c.credits;
         acc[dept].count += 1;
         return acc;
       },
@@ -518,7 +523,7 @@ export default function StatsView({ courses }: { courses: Course[] }) {
       credits: d.creds,
       courseCount: d.count,
     }))
-    .filter((dept) => dept.gpa > 0)
+    .filter((dept) => dept.credits > 0)
     .sort((a, b) => b.credits - a.credits);
 
   // Progress to graduation (36-credit Yale minimum)
@@ -560,7 +565,9 @@ export default function StatsView({ courses }: { courses: Course[] }) {
     datasets: [
       {
         data: filteredGradeDistribution.map((g) => g.count),
-        backgroundColor: filteredGradeDistribution.map((_, i) => DEPT_COLORS[i % DEPT_COLORS.length]),
+        backgroundColor: filteredGradeDistribution.map((g) =>
+          gradeDistributionColor(g.grade),
+        ),
         borderColor: Array(filteredGradeDistribution.length).fill(pieBorderColor),
         borderWidth: 2,
       },
@@ -589,13 +596,30 @@ export default function StatsView({ courses }: { courses: Course[] }) {
         </div>
       );
     }
-    return <EmptyState />;
+    return <EmptyState inProgressCount={inProgressCount} />;
   }
+
+  const cumulativeGpas = cumulativeData.map((d) => d.cumulativeGpa);
+  const semesterGpas = sortedSemData.map((d) => d.gpa);
+  const canRenderCumulativeChart =
+    cumulativeGpas.length >= 2 && cumulativeGpas.every(Number.isFinite);
+  const canRenderSemesterChart =
+    semesterGpas.length > 0 && semesterGpas.every(Number.isFinite);
 
   // ── Full view ─────────────────────────────────────────────────────────
 
   return (
     <div className="space-y-4 font-louize text-gray-800 dark:text-gray-200">
+
+      <p className="text-[11px] text-gray-400 dark:text-gray-500 text-center -mt-1">
+        {inProgressCount > 0 && (
+          <>
+            {inProgressCount} in progress
+            <span className="mx-1.5">·</span>
+          </>
+        )}
+        Only you can see your grades.
+      </p>
 
       {/* ── Stat Cards ───────────────────────────────────────────────────── */}
       <motion.div
@@ -632,7 +656,7 @@ export default function StatsView({ courses }: { courses: Course[] }) {
           <StatCard
             label="Best Semester"
             value={`${bestSem.gpa.toFixed(2)} GPA`}
-            color="text-amber-600 dark:text-amber-400"
+            color="text-amber-600 dark:text-amber-300"
             icon={<Star className="h-3.5 w-3.5" />}
             sub={bestSem.semester}
           />
@@ -640,7 +664,7 @@ export default function StatsView({ courses }: { courses: Course[] }) {
           <StatCard
             label="Avg Credits / Semester"
             value={avgCreditsPerSem > 0 ? avgCreditsPerSem.toFixed(1) : "—"}
-            color="text-blue-600 dark:text-blue-400"
+            color="text-blue-600 dark:text-blue-300"
             icon={<Clock className="h-3.5 w-3.5" />}
             sub={`Across ${nonSummerSems.length} completed semesters`}
           />
@@ -658,14 +682,14 @@ export default function StatsView({ courses }: { courses: Course[] }) {
           <StatCard
             label="Avg Credits / Semester"
             value={avgCreditsPerSem > 0 ? avgCreditsPerSem.toFixed(1) : "—"}
-            color="text-blue-600 dark:text-blue-400"
+            color="text-blue-600 dark:text-blue-300"
             icon={<Clock className="h-3.5 w-3.5" />}
             sub={`Across ${nonSummerSems.length} semesters`}
           />
           <StatCard
             label="Departments Explored"
             value={departmentData.length}
-            color="text-teal-600 dark:text-teal-400"
+            color="text-teal-600 dark:text-teal-300"
             icon={<Layers className="h-3.5 w-3.5" />}
             sub="Unique subject areas"
           />
@@ -681,14 +705,14 @@ export default function StatsView({ courses }: { courses: Course[] }) {
                   })()
                 : "—"
             }
-            color="text-emerald-600 dark:text-emerald-400"
+            color="text-emerald-600 dark:text-emerald-300"
             icon={<BarChart2 className="h-3.5 w-3.5" />}
             sub="Most frequent grade"
           />
           <StatCard
             label="Semesters Completed"
             value={nonSummerSems.length}
-            color="text-pink-600 dark:text-pink-400"
+            color="text-pink-600 dark:text-pink-300"
             icon={<TrendingUp className="h-3.5 w-3.5" />}
             sub={
               sortedSemData.length - nonSummerSems.length > 0
@@ -712,7 +736,7 @@ export default function StatsView({ courses }: { courses: Course[] }) {
           description="How your overall GPA has trended across semesters."
           icon={<GraduationCap className="h-3.5 w-3.5" />}
         >
-          {cumulativeData.length < 2 ? (
+          {!canRenderCumulativeChart ? (
             <div className="h-[220px] flex items-center justify-center text-sm text-gray-400 dark:text-gray-500">
               Need at least two semesters of data.
             </div>
@@ -734,12 +758,7 @@ export default function StatsView({ courses }: { courses: Course[] }) {
                 yAxis={[
                   {
                     label: "GPA",
-                    min: Math.max(
-                      0,
-                      Math.floor(
-                        Math.min(...cumulativeData.map((d) => d.cumulativeGpa)) * 2,
-                      ) / 2,
-                    ),
+                    min: safeGpaChartYMin(cumulativeGpas),
                     max: 4,
                     tickInterval: [0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4],
                   },
@@ -769,7 +788,7 @@ export default function StatsView({ courses }: { courses: Course[] }) {
           description="Your GPA for each individual semester in isolation."
           icon={<BookOpen className="h-3.5 w-3.5" />}
         >
-          {sortedSemData.length === 0 ? (
+          {!canRenderSemesterChart ? (
             <div className="h-[220px] flex items-center justify-center text-sm text-gray-400 dark:text-gray-500">
               No semester data yet.
             </div>
@@ -791,12 +810,7 @@ export default function StatsView({ courses }: { courses: Course[] }) {
                 yAxis={[
                   {
                     label: "GPA",
-                    min: Math.max(
-                      0,
-                      Math.floor(
-                        Math.min(...sortedSemData.map((d) => d.gpa)) * 2,
-                      ) / 2,
-                    ),
+                    min: safeGpaChartYMin(semesterGpas),
                     max: 4,
                     tickInterval: [0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4],
                   },

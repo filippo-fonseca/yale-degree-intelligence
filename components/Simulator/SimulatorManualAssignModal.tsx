@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FiX } from "react-icons/fi";
 import { Course } from "@/lib/types";
@@ -11,88 +11,172 @@ import {
   MAJORS,
   majorRequirements,
 } from "@/lib/majors";
+import {
+  CERTIFICATES,
+  certificateRequirements,
+  type CertificateProgress,
+} from "@/lib/certificates";
+
+type ProgramType = "major" | "certificate";
 
 interface SimulatorManualAssignModalProps {
   isOpen: boolean;
   course: Course | null;
   majorIds: string[];
+  certificateIds: string[];
   previewProgress: Record<string, MajorProgress>;
+  certificatePreviewProgress: Record<string, CertificateProgress>;
   onAssign: (entry: ManualRequirementEntry) => void;
   onSkip: () => void;
   onClose: () => void;
+}
+
+function getUnfulfilledRequirements(
+  programType: ProgramType,
+  programId: string,
+  previewProgress: Record<string, MajorProgress>,
+  certificatePreviewProgress: Record<string, CertificateProgress>,
+) {
+  const progress =
+    programType === "major"
+      ? previewProgress[programId]
+      : certificatePreviewProgress[programId];
+  const programDef =
+    programType === "major"
+      ? majorRequirements[programId]
+      : certificateRequirements[programId];
+  if (!programDef) return [];
+
+  const progressByName = new Map<
+    string,
+    { completed: number; required: number }
+  >();
+  const allReqs = [
+    ...(progress?.completedRequirements ?? []),
+    ...(progress?.inProgressRequirements ?? []),
+    ...(progress?.remainingRequirements ?? []),
+  ];
+  for (const r of allReqs) {
+    progressByName.set(r.name, {
+      completed: r.completed,
+      required: r.required,
+    });
+  }
+
+  return programDef.requirements
+    .map((req) => {
+      const prog = progressByName.get(req.name);
+      return {
+        name: req.name,
+        description: req.description,
+        completed: prog?.completed ?? 0,
+        required: req.required,
+      };
+    })
+    .filter((r) => r.completed < r.required);
 }
 
 export default function SimulatorManualAssignModal({
   isOpen,
   course,
   majorIds,
+  certificateIds,
   previewProgress,
+  certificatePreviewProgress,
   onAssign,
   onSkip,
   onClose,
 }: SimulatorManualAssignModalProps) {
-  const [selectedMajor, setSelectedMajor] = useState<string | null>(null);
+  const [selectedProgramType, setSelectedProgramType] =
+    useState<ProgramType | null>(null);
+  const [selectedProgramId, setSelectedProgramId] = useState<string | null>(
+    null,
+  );
 
-  // Auto-select if only 1 major
-  const activeMajor = majorIds.length === 1 ? majorIds[0] : selectedMajor;
+  const hasMajors = majorIds.length > 0;
+  const hasCertificates = certificateIds.length > 0;
 
-  // Get unfulfilled requirements for the selected major
-  const unfulfilledReqs = useMemo(() => {
-    if (!activeMajor) return [];
-    const progress = previewProgress[activeMajor];
-    const majorDef = majorRequirements[activeMajor];
-    if (!majorDef) return [];
-
-    // Build a lookup from progress data
-    const progressByName = new Map<
-      string,
-      { completed: number; required: number }
-    >();
-    const allReqs = [
-      ...(progress?.completedRequirements ?? []),
-      ...(progress?.inProgressRequirements ?? []),
-      ...(progress?.remainingRequirements ?? []),
-    ];
-    for (const r of allReqs) {
-      progressByName.set(r.name, {
-        completed: r.completed,
-        required: r.required,
-      });
+  useEffect(() => {
+    if (!isOpen) {
+      setSelectedProgramType(null);
+      setSelectedProgramId(null);
+      return;
     }
+    if (hasMajors && !hasCertificates) {
+      setSelectedProgramType("major");
+    } else if (hasCertificates && !hasMajors) {
+      setSelectedProgramType("certificate");
+    }
+  }, [isOpen, hasMajors, hasCertificates]);
 
-    // Filter to requirements that are not yet fully satisfied
-    return majorDef.requirements
-      .map((req) => {
-        const prog = progressByName.get(req.name);
-        return {
-          name: req.name,
-          description: req.description,
-          completed: prog?.completed ?? 0,
-          required: req.required,
-        };
-      })
-      .filter((r) => r.completed < r.required);
-  }, [activeMajor, previewProgress]);
+  const activeProgramType = useMemo<ProgramType | null>(() => {
+    if (selectedProgramType) return selectedProgramType;
+    if (hasMajors && !hasCertificates) return "major";
+    if (hasCertificates && !hasMajors) return "certificate";
+    return null;
+  }, [selectedProgramType, hasMajors, hasCertificates]);
+
+  const programIdsForType = useMemo(() => {
+    if (activeProgramType === "major") return majorIds;
+    if (activeProgramType === "certificate") return certificateIds;
+    return [];
+  }, [activeProgramType, majorIds, certificateIds]);
+
+  const activeProgramId = useMemo(() => {
+    if (!activeProgramType) return null;
+    if (programIdsForType.length === 1) return programIdsForType[0];
+    return selectedProgramId;
+  }, [activeProgramType, programIdsForType, selectedProgramId]);
+
+  const unfulfilledReqs = useMemo(() => {
+    if (!activeProgramType || !activeProgramId) return [];
+    return getUnfulfilledRequirements(
+      activeProgramType,
+      activeProgramId,
+      previewProgress,
+      certificatePreviewProgress,
+    );
+  }, [
+    activeProgramType,
+    activeProgramId,
+    previewProgress,
+    certificatePreviewProgress,
+  ]);
+
+  const showTypeStep =
+    hasMajors && hasCertificates && selectedProgramType === null;
+  const showProgramStep =
+    !!activeProgramType &&
+    programIdsForType.length > 1 &&
+    selectedProgramId === null;
+  const showRequirementStep = !!activeProgramId;
 
   const handleAssign = (reqName: string) => {
-    if (!activeMajor || !course) return;
+    if (!activeProgramType || !activeProgramId || !course) return;
     onAssign({
       code: course.code,
       requirement: reqName,
       credits: course.credits || 1,
-      isPlanned: true, // Simulator manuals are for future planning
+      isPlanned: true,
+      programType: activeProgramType,
+      programId: activeProgramId,
     });
   };
 
   const handleClose = () => {
-    setSelectedMajor(null);
+    setSelectedProgramType(null);
+    setSelectedProgramId(null);
     onClose();
   };
 
   const handleSkip = () => {
-    setSelectedMajor(null);
+    setSelectedProgramType(null);
+    setSelectedProgramId(null);
     onSkip();
   };
+
+  const programDisplayName = (type: ProgramType, id: string) =>
+    type === "major" ? (MAJORS[id] ?? id) : (CERTIFICATES[id] ?? id);
 
   return (
     <AnimatePresence>
@@ -111,7 +195,6 @@ export default function SimulatorManualAssignModal({
             exit={{ scale: 0.97, y: 20 }}
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Header */}
             <div className="flex justify-between items-start mb-4">
               <div>
                 <h3 className="text-base font-semibold text-gray-900 dark:text-white">
@@ -128,8 +211,12 @@ export default function SimulatorManualAssignModal({
                   )}
                 </p>
                 <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
-                  This course wasn&apos;t auto-detected for any requirement for
-                  your major(s).
+                  This course wasn&apos;t auto-detected for any major or
+                  certificate requirement.
+                </p>
+                <p className="text-xs text-amber-600/80 dark:text-amber-400/80 mt-2">
+                  Assigning a course to a certificate means it won&apos;t count
+                  toward your major(s), and vice versa.
                 </p>
               </div>
               <button
@@ -140,22 +227,64 @@ export default function SimulatorManualAssignModal({
               </button>
             </div>
 
-            {/* Major selector (if 2 majors) */}
-            {majorIds.length > 1 && !selectedMajor && (
+            {showTypeStep && (
               <div className="space-y-2 mb-4">
                 <p className="text-xs text-gray-500 dark:text-gray-400 font-medium uppercase tracking-wide">
-                  Which major?
+                  Assign to
                 </p>
                 <div className="flex gap-2">
-                  {majorIds.map((mid) => (
+                  <button
+                    onClick={() => setSelectedProgramType("major")}
+                    className="flex-1 px-3 py-2.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 text-sm text-gray-700 dark:text-gray-200 hover:border-purple-500 hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-colors text-left"
+                  >
+                    <div className="font-medium">Major</div>
+                    <div className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
+                      {majorIds.length} declared
+                    </div>
+                  </button>
+                  <button
+                    onClick={() => setSelectedProgramType("certificate")}
+                    className="flex-1 px-3 py-2.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 text-sm text-gray-700 dark:text-gray-200 hover:border-teal-500 hover:bg-teal-50 dark:hover:bg-teal-900/20 transition-colors text-left"
+                  >
+                    <div className="font-medium">Certificate</div>
+                    <div className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
+                      {certificateIds.length} declared
+                    </div>
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {showProgramStep && activeProgramType && (
+              <div className="space-y-2 mb-4">
+                {hasMajors && hasCertificates && (
+                  <button
+                    onClick={() => {
+                      setSelectedProgramType(null);
+                      setSelectedProgramId(null);
+                    }}
+                    className="text-xs text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 transition"
+                  >
+                    &larr; Back
+                  </button>
+                )}
+                <p className="text-xs text-gray-500 dark:text-gray-400 font-medium uppercase tracking-wide">
+                  Which {activeProgramType}?
+                </p>
+                <div className="space-y-1.5">
+                  {programIdsForType.map((pid) => (
                     <button
-                      key={mid}
-                      onClick={() => setSelectedMajor(mid)}
-                      className="flex-1 px-3 py-2.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 text-sm text-gray-700 dark:text-gray-200 hover:border-purple-500 hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-colors text-left"
+                      key={pid}
+                      onClick={() => setSelectedProgramId(pid)}
+                      className={`w-full px-3 py-2.5 rounded-lg border text-sm text-left transition-colors ${
+                        activeProgramType === "certificate"
+                          ? "border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 text-gray-700 dark:text-gray-200 hover:border-teal-500 hover:bg-teal-50 dark:hover:bg-teal-900/20"
+                          : "border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 text-gray-700 dark:text-gray-200 hover:border-purple-500 hover:bg-purple-50 dark:hover:bg-purple-900/20"
+                      }`}
                     >
-                      <div className="font-medium">{mid}</div>
+                      <div className="font-medium">{pid}</div>
                       <div className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
-                        {MAJORS[mid] ?? mid}
+                        {programDisplayName(activeProgramType, pid)}
                       </div>
                     </button>
                   ))}
@@ -163,19 +292,31 @@ export default function SimulatorManualAssignModal({
               </div>
             )}
 
-            {/* Requirements list */}
-            {activeMajor && (
+            {showRequirementStep && activeProgramType && activeProgramId && (
               <div className="flex-1 overflow-hidden flex flex-col">
-                {majorIds.length > 1 && (
+                {(programIdsForType.length > 1 || (hasMajors && hasCertificates)) && (
                   <div className="flex items-center gap-2 mb-3">
-                    <button
-                      onClick={() => setSelectedMajor(null)}
-                      className="text-xs text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 transition"
-                    >
-                      &larr; Back
-                    </button>
+                    {programIdsForType.length > 1 && (
+                      <button
+                        onClick={() => setSelectedProgramId(null)}
+                        className="text-xs text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 transition"
+                      >
+                        &larr; Back
+                      </button>
+                    )}
+                    {hasMajors && hasCertificates && programIdsForType.length === 1 && (
+                      <button
+                        onClick={() => {
+                          setSelectedProgramType(null);
+                          setSelectedProgramId(null);
+                        }}
+                        className="text-xs text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 transition"
+                      >
+                        &larr; Back
+                      </button>
+                    )}
                     <span className="text-xs text-gray-400 dark:text-gray-500">
-                      {MAJORS[activeMajor] ?? activeMajor}
+                      {programDisplayName(activeProgramType, activeProgramId)}
                     </span>
                   </div>
                 )}
@@ -186,7 +327,8 @@ export default function SimulatorManualAssignModal({
 
                 {unfulfilledReqs.length === 0 ? (
                   <p className="text-sm text-gray-400 dark:text-gray-500 py-4 text-center">
-                    All requirements are satisfied for this major.
+                    All requirements are satisfied for this{" "}
+                    {activeProgramType}.
                   </p>
                 ) : (
                   <div className="overflow-y-auto flex-1 -mx-1 px-1 space-y-1.5">
@@ -194,10 +336,20 @@ export default function SimulatorManualAssignModal({
                       <button
                         key={req.name}
                         onClick={() => handleAssign(req.name)}
-                        className="w-full text-left px-3 py-2.5 rounded-lg border border-gray-200 dark:border-gray-700/60 bg-gray-50/50 dark:bg-gray-800/30 hover:border-purple-500/60 hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-colors group"
+                        className={`w-full text-left px-3 py-2.5 rounded-lg border border-gray-200 dark:border-gray-700/60 bg-gray-50/50 dark:bg-gray-800/30 transition-colors group ${
+                          activeProgramType === "certificate"
+                            ? "hover:border-teal-500/60 hover:bg-teal-50 dark:hover:bg-teal-900/20"
+                            : "hover:border-purple-500/60 hover:bg-purple-50 dark:hover:bg-purple-900/20"
+                        }`}
                       >
                         <div className="flex items-center justify-between">
-                          <span className="text-sm text-gray-700 dark:text-gray-200 group-hover:text-purple-600 dark:group-hover:text-purple-200 transition-colors">
+                          <span
+                            className={`text-sm text-gray-700 dark:text-gray-200 transition-colors ${
+                              activeProgramType === "certificate"
+                                ? "group-hover:text-teal-600 dark:group-hover:text-teal-200"
+                                : "group-hover:text-purple-600 dark:group-hover:text-purple-200"
+                            }`}
+                          >
                             {req.name}
                           </span>
                           <span className="text-xs text-gray-400 dark:text-gray-500 ml-2 flex-shrink-0">
@@ -216,13 +368,12 @@ export default function SimulatorManualAssignModal({
               </div>
             )}
 
-            {/* Skip button */}
             <div className="mt-4 pt-3 border-t border-gray-200 dark:border-gray-800">
               <button
                 onClick={handleSkip}
                 className="w-full px-4 py-2 rounded-lg bg-gray-100 dark:bg-gray-800/50 text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700/50 hover:text-gray-700 dark:hover:text-gray-300 transition-colors text-sm"
               >
-                Skip &mdash; not for my major
+                Skip &mdash; not for my major or certificate
               </button>
             </div>
           </motion.div>

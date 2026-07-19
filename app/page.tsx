@@ -96,12 +96,13 @@ import { useOnboarding } from "@/components/dashboard/useOnboarding";
 import { useDashboardNav } from "@/components/dashboard/useDashboardNav";
 import { useUserProfile } from "@/components/dashboard/useUserProfile";
 import { useFriendsFeature } from "@/components/dashboard/useFriendsFeature";
+import { useCoursesData } from "@/components/dashboard/useCoursesData";
 
 export default function Home() {
   const { user, loading, logout } = useAuth();
   const { resolvedTheme, toggleTheme } = useTheme();
-  const [courses, setCourses] = useState<Course[]>([]);
-  const [hasData, setHasData] = useState(false);
+  const [showUpdateModal, setShowUpdateModal] = useState(false);
+  const [showManualEntryModal, setShowManualEntryModal] = useState(false);
   const {
     userProfile,
     profileLoading,
@@ -132,21 +133,32 @@ export default function Home() {
     course: Course | null;
   }>({ open: false, course: null });
 
-  const [coursesLoading, setCoursesLoading] = useState(true);
+  const friendsEnabledRef = useRef(false);
+
+  const {
+    courses,
+    setCourses,
+    hasData,
+    coursesLoading,
+    fetchCourses,
+    parseAndStoreCourses,
+    handleManualCourseEntry,
+    toggleDistributional,
+  } = useCoursesData({
+    user,
+    getFriendsEnabled: () => friendsEnabledRef.current,
+    userProfile,
+    showUpdateModal,
+    setShowUpdateModal,
+    setShowManualEntryModal,
+  });
 
   const { friendsEnabled, handleToggleFriends } = useFriendsFeature(
     user,
     courses,
     userProfile,
   );
-
-  useEffect(() => {
-    if (!user) {
-      setCoursesLoading(false);
-      setCourses([]);
-      setHasData(false);
-    }
-  }, [user]);
+  friendsEnabledRef.current = friendsEnabled;
 
   //for the "My courses" section:
   const [modalOpen, setModalOpen] = useState<{
@@ -174,8 +186,6 @@ export default function Home() {
     userProfile,
   );
 
-  const [showUpdateModal, setShowUpdateModal] = useState(false);
-  const [showManualEntryModal, setShowManualEntryModal] = useState(false);
   // When the manual-add flow is opened from a specific semester header, this
   // holds that semester key (e.g. "Fall 2026") so the modal can preselect it.
   const [manualEntryPreselectSemester, setManualEntryPreselectSemester] =
@@ -238,336 +248,6 @@ export default function Home() {
     return computeMajorProgress(selectedMajor, courses);
   };
 
-  useEffect(() => {
-    if (user) fetchCourses();
-  }, [user]);
-
-  const fetchCourses = async () => {
-    if (!user) return;
-
-    try {
-      const q = query(
-        collection(db, "courses"),
-        where("userId", "==", user.uid),
-      );
-      const querySnapshot = await getDocs(q);
-      const coursesData: Course[] = [];
-
-      querySnapshot.forEach((doc) => {
-        coursesData.push({ id: doc.id, ...doc.data() } as Course);
-      });
-
-      // Use functional update to ensure we get the latest state
-      setCourses((prevCourses) => {
-        // Only update if there are actual changes to prevent unnecessary re-renders
-        if (JSON.stringify(prevCourses) !== JSON.stringify(coursesData)) {
-          return coursesData;
-        }
-        return prevCourses;
-      });
-
-      setHasData(coursesData.length > 0);
-    } catch (error) {
-      // Without this, a failed getDocs leaves coursesLoading stuck true and the
-      // render gate hangs on the loader until a manual refresh.
-      console.error("Error fetching courses:", error);
-    } finally {
-      setCoursesLoading(false);
-    }
-  };
-
-  const checkAndRemoveDuplicates = async (userId: string) => {
-    if (!userId) return;
-
-    try {
-      // Fetch all courses for the user
-      const q = query(collection(db, "courses"), where("userId", "==", userId));
-      const querySnapshot = await getDocs(q);
-
-      const coursesMap = new Map<string, { id: string; count: number }>();
-
-      // Identify duplicates
-      querySnapshot.forEach((doc) => {
-        const course = doc.data() as Course;
-        // Create a unique key combining semester, year, code, and grade
-        const key = `${course.semester}-${course.year}-${course.code}-${
-          course.grade || "null"
-        }`;
-
-        if (coursesMap.has(key)) {
-          // Increment count if duplicate exists
-          const existing = coursesMap.get(key)!;
-          coursesMap.set(key, { ...existing, count: existing.count + 1 });
-        } else {
-          // Add new entry
-          coursesMap.set(key, { id: doc.id, count: 1 });
-        }
-      });
-
-      // Prepare batch delete for duplicates
-      const batch = writeBatch(db);
-      let duplicatesFound = 0;
-
-      coursesMap.forEach((value, key) => {
-        if (value.count > 1) {
-          // Add to batch delete (we'll keep one copy)
-          batch.delete(doc(db, "courses", value.id));
-          duplicatesFound++;
-          // console.log(`Found duplicate course: ${key}`);
-        }
-      });
-
-      if (duplicatesFound > 0) {
-        // console.log(`Found ${duplicatesFound} duplicates, removing...`);
-        await batch.commit();
-        // console.log(
-        //   `Successfully removed ${duplicatesFound} duplicate courses`
-        // );
-      } else {
-        // console.log("No duplicate courses found");
-      }
-
-      return duplicatesFound;
-    } catch (error) {
-      console.error("Error checking for duplicates:", error);
-      throw error;
-    }
-  };
-
-  const parseAndStoreCourses = async (extractedText: string) => {
-    if (!user) return;
-
-    const existingCoursesQuery = query(
-      collection(db, "courses"),
-      where("userId", "==", user.uid),
-    );
-    const existingSnapshot = await getDocs(existingCoursesQuery);
-
-    const existingCoursesMap = new Map<
-      string,
-      { docId: string; grade: string | null }
-    >();
-    existingSnapshot.docs.forEach((doc) => {
-      const data = doc.data();
-      const key = `${data.semester}-${data.year}-${data.code}`;
-      existingCoursesMap.set(key, { docId: doc.id, grade: data.grade || null });
-    });
-
-    const semesterBlocks = extractedText
-      .split("Semester: ")
-      .filter((block) => block.trim() !== "");
-    const coursesToAdd: Omit<Course, "id">[] = [];
-
-    const seenInThisParse = new Set<string>();
-
-    for (const block of semesterBlocks) {
-      const [semesterInfo, ...courseLines] = block.split("\n");
-      const [season, year] = semesterInfo.split(" ");
-
-      for (const line of courseLines) {
-        if (line.trim() === "") continue;
-
-        const completedMatch = line.match(
-          /^- (.+?): (.+?) — (.+?) \((\d+\.\d+)\)$/,
-        );
-        if (completedMatch) {
-          const [, code, name, grade, credits] = completedMatch;
-          const key = `${season.trim()}-${year.trim()}-${code.trim()}`;
-          const courseKey = `${key}-${grade.trim()}`;
-
-          if (seenInThisParse.has(courseKey)) continue;
-          seenInThisParse.add(courseKey);
-
-          const existingCourse = existingCoursesMap.get(key);
-          if (existingCourse) {
-            if (existingCourse.grade !== grade.trim()) {
-              // Grade changed → delete old course
-              // console.log(
-              //   `Deleting outdated course: ${key} (old grade: ${
-              //     existingCourse.grade
-              //   }, new grade: ${grade.trim()})`
-              // );
-              await deleteDoc(doc(db, "courses", existingCourse.docId));
-            } else {
-              // Already exists with same grade → skip
-              // console.log(`Skipping duplicate: ${courseKey}`);
-              continue;
-            }
-          }
-
-          coursesToAdd.push({
-            code: code.trim(),
-            grade: grade.trim(),
-            semester: season.trim(),
-            year: parseInt(year.trim()),
-            userId: user.uid,
-            status:
-              grade.trim() === "In Progress" ? "in-progress" : "completed",
-            credits: parseFloat(credits),
-          });
-          continue;
-        }
-
-        const inProgressMatch = line.match(
-          /^- (.+?): (.+?) — (?:In Progress|IP) \((\d+\.\d+)\)$/,
-        );
-        if (inProgressMatch) {
-          const [, code, name, credits] = inProgressMatch;
-          const key = `${season.trim()}-${year.trim()}-${code.trim()}`;
-          const courseKey = `${key}-null`;
-
-          if (seenInThisParse.has(courseKey)) continue;
-          seenInThisParse.add(courseKey);
-
-          const existingCourse = existingCoursesMap.get(key);
-          if (existingCourse) {
-            if (existingCourse.grade !== null) {
-              // Grade changed from completed to in-progress → delete old
-              // console.log(
-              //   `Deleting outdated course: ${key} (old grade: ${existingCourse.grade}, new: null)`
-              // );
-              await deleteDoc(doc(db, "courses", existingCourse.docId));
-            } else {
-              // Already exists with same null grade → skip
-              // console.log(`Skipping duplicate in-progress: ${courseKey}`);
-              continue;
-            }
-          }
-
-          coursesToAdd.push({
-            code: code.trim(),
-            grade: null,
-            semester: season.trim(),
-            year: parseInt(year.trim()),
-            userId: user.uid,
-            status: "in-progress",
-            credits: parseFloat(credits),
-          });
-        }
-      }
-    }
-
-    if (coursesToAdd.length > 0) {
-      // console.log(`Adding ${coursesToAdd.length} new/updated courses`);
-      const batchWrites = coursesToAdd.map((course) => {
-        const docRef = doc(collection(db, "courses"));
-        return setDoc(docRef, course);
-      });
-      await Promise.all(batchWrites);
-    } else {
-      // console.log("No new or updated courses to add");
-    }
-
-    // Refresh
-    await fetchCourses();
-
-    try {
-      await checkAndRemoveDuplicates(user.uid);
-      await fetchCourses();
-    } catch (error) {
-      console.error("Error during duplicate check:", error);
-    }
-
-    // Sync to friends_public_data if enabled
-    if (friendsEnabled) {
-      const q = query(
-        collection(db, "courses"),
-        where("userId", "==", user.uid),
-      );
-      const snap = await getDocs(q);
-      const freshCourses = snap.docs.map((d) => ({
-        id: d.id,
-        ...d.data(),
-      })) as Course[];
-      await syncFriendsPublicData(user.uid, freshCourses, userProfile, {
-        displayName: user.displayName,
-        email: user.email,
-        photoURL: user.photoURL,
-      });
-    }
-
-    if (showUpdateModal) setShowUpdateModal(false);
-  };
-
-  // Handler for manually entered courses
-  const handleManualCourseEntry = async (coursesToAdd: Omit<Course, "id">[]) => {
-    if (!user) return;
-
-    // Check for duplicates against existing courses
-    const existingCoursesQuery = query(
-      collection(db, "courses"),
-      where("userId", "==", user.uid),
-    );
-    const existingSnapshot = await getDocs(existingCoursesQuery);
-
-    const existingCoursesMap = new Map<
-      string,
-      { docId: string; grade: string | null }
-    >();
-    existingSnapshot.docs.forEach((docSnap) => {
-      const data = docSnap.data();
-      const key = `${data.semester}-${data.year}-${data.code}`;
-      existingCoursesMap.set(key, { docId: docSnap.id, grade: data.grade || null });
-    });
-
-    const newCoursesToAdd: Omit<Course, "id">[] = [];
-
-    for (const course of coursesToAdd) {
-      const key = `${course.semester}-${course.year}-${course.code}`;
-      const existingCourse = existingCoursesMap.get(key);
-
-      if (existingCourse) {
-        // If course exists with different grade, delete old and add new
-        if (existingCourse.grade !== course.grade) {
-          await deleteDoc(doc(db, "courses", existingCourse.docId));
-          newCoursesToAdd.push(course);
-        }
-        // If same grade, skip (duplicate)
-      } else {
-        newCoursesToAdd.push(course);
-      }
-    }
-
-    if (newCoursesToAdd.length > 0) {
-      const batchWrites = newCoursesToAdd.map((course) => {
-        const docRef = doc(collection(db, "courses"));
-        return setDoc(docRef, course);
-      });
-      await Promise.all(batchWrites);
-    }
-
-    // Refresh courses
-    await fetchCourses();
-
-    // Check and remove any duplicates
-    try {
-      await checkAndRemoveDuplicates(user.uid);
-      await fetchCourses();
-    } catch (error) {
-      console.error("Error during duplicate check:", error);
-    }
-
-    // Sync to friends_public_data if enabled
-    if (friendsEnabled) {
-      const q = query(
-        collection(db, "courses"),
-        where("userId", "==", user.uid),
-      );
-      const snap = await getDocs(q);
-      const freshCourses = snap.docs.map((d) => ({
-        id: d.id,
-        ...d.data(),
-      })) as Course[];
-      await syncFriendsPublicData(user.uid, freshCourses, userProfile, {
-        displayName: user.displayName,
-        email: user.email,
-        photoURL: user.photoURL,
-      });
-    }
-
-    setShowManualEntryModal(false);
-  };
-
   const calculateStats = () => computeAcademicStatsSummary(courses);
 
   const onProfileSave = async (updatedProfile: Partial<UserProfile>) => {
@@ -591,30 +271,6 @@ export default function Home() {
       console.error("Error deleting course:", err);
     } finally {
       closeDeleteConfirm();
-    }
-  };
-
-  const toggleDistributional = async (courseId: string, dist: string) => {
-    const course = courses.find((c) => c.id === courseId);
-    if (!course) return;
-    const current = course.distributionals || [];
-    const updated = toggleDistributionalTag(current, dist);
-    setCourses((prev) =>
-      prev.map((c) =>
-        c.id === courseId ? { ...c, distributionals: updated } : c,
-      ),
-    );
-    try {
-      await updateDoc(doc(db, "courses", courseId), {
-        distributionals: updated,
-      });
-    } catch (error) {
-      console.error("Error updating distributionals:", error);
-      setCourses((prev) =>
-        prev.map((c) =>
-          c.id === courseId ? { ...c, distributionals: current } : c,
-        ),
-      );
     }
   };
 

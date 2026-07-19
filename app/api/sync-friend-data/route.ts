@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { adminAuth, adminDb } from "@/config/firebaseAdmin";
+import { requireAuth, isAuthError, rateLimit } from "@/lib/apiAuth";
 import { FieldValue } from "firebase-admin/firestore";
 
 interface PublicCourse {
@@ -25,14 +26,9 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const authHeader = req.headers.get("Authorization");
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    const idToken = authHeader.split("Bearer ")[1];
-    const decodedToken = await adminAuth.verifyIdToken(idToken);
-    const callerId = decodedToken.uid;
+    const user = await requireAuth(req);
+    if (isAuthError(user)) return user;
+    const callerId = user.uid;
 
     // Get the target user ID from request body
     const { targetUserId } = await req.json();
@@ -42,6 +38,13 @@ export async function POST(req: NextRequest) {
         { status: 400 }
       );
     }
+
+    const limited = rateLimit(
+      `sync-friend:${callerId}:${targetUserId}`,
+      30,
+      60 * 60 * 1000
+    );
+    if (limited) return limited;
 
     // Allow syncing own data or friend's data
     if (callerId !== targetUserId) {

@@ -1051,9 +1051,10 @@ export default function UserSettingsModal({
           <div className="mt-4 flex items-center justify-center gap-1.5 relative">
             <Link
               href={`/user/${user.uid}`}
+              target="_blank"
               className="cursor-pointer text-[11px] px-3 py-1.5 rounded-lg border border-black/[0.06] dark:border-white/[0.08] hover:border-pink-500/50 hover:bg-black/[0.03] dark:hover:bg-white/[0.04] text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-all duration-200"
             >
-              View public profile
+              Open my page
             </Link>
             {onReplayTour && (
               <button

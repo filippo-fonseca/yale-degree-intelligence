@@ -122,6 +122,7 @@ interface UserProfile {
   majors: string[];
   graduationYear: number;
   updatedAt: Date;
+  bio?: string;
   // Shared courses the user has manually marked as prerequisites, which are
   // exempt from the cross-major overlap warning (Yale's prereq data is spotty).
   prereqOverrides?: string[];
@@ -2135,6 +2136,8 @@ export default function Home() {
                   <FriendsTab
                     friendsEnabled={friendsEnabled}
                     onToggleFriends={handleToggleFriends}
+                    courses={courses}
+                    userProfile={userProfile}
                   />
                 </motion.div>
               )}

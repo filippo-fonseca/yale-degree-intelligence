@@ -35,9 +35,18 @@ import Link from "next/link";
 import { toast } from "react-hot-toast";
 import { Panda } from "lucide-react";
 import { YearBadge } from "../ui/YearBadge";
-import { InfoCard } from "../ui/InfoCard";
 import { UserAvatar } from "../ui/UserAvatar";
 import { Skeleton } from "../ui/Skeleton";
+import { Course, FriendsProfileVisibility, resolveFriendsProfileVisibility } from "@/lib/types";
+import ProfilePreviewCard, {
+  DEMO_PREVIEW_COURSES,
+  DEMO_PREVIEW_USER,
+} from "@/components/FriendsProfile/ProfilePreviewCard";
+import {
+  FiExternalLink,
+  FiSettings,
+  FiChevronDown,
+} from "react-icons/fi";
 
 type UserProfile = {
   uid: string;
@@ -190,14 +199,24 @@ function SectionHeading({
   );
 }
 
+type FriendsUserProfile = {
+  majors: string[];
+  graduationYear?: number;
+  bio?: string;
+};
+
 interface FriendsTabProps {
   friendsEnabled: boolean;
   onToggleFriends: (enabled: boolean) => Promise<void>;
+  courses: Course[];
+  userProfile: FriendsUserProfile | null;
 }
 
 export default function FriendsTab({
   friendsEnabled,
   onToggleFriends,
+  courses,
+  userProfile,
 }: FriendsTabProps) {
   const { user } = useAuth();
   const [searchTerm, setSearchTerm] = useState("");
@@ -437,6 +456,50 @@ export default function FriendsTab({
     profile: UserProfile;
   } | null>(null);
   const [isRemovingFriend, setIsRemovingFriend] = useState(false);
+  const [showCustomize, setShowCustomize] = useState(false);
+  const [profileVisibility, setProfileVisibility] =
+    useState<FriendsProfileVisibility>({});
+  const [savingVisibility, setSavingVisibility] = useState(false);
+
+  useEffect(() => {
+    if (!user) return;
+    const unsub = onSnapshot(doc(db, "friends_public_data", user.uid), (snap) => {
+      if (snap.exists()) {
+        const data = snap.data();
+        setProfileVisibility(data.visibility || {});
+      }
+    });
+    return () => unsub();
+  }, [user]);
+
+  const resolvedVisibility = resolveFriendsProfileVisibility(profileVisibility);
+
+  const updateVisibility = async (patch: Partial<FriendsProfileVisibility>) => {
+    if (!user) return;
+    const next = { ...profileVisibility, ...patch };
+    setProfileVisibility(next);
+    setSavingVisibility(true);
+    try {
+      await setDoc(
+        doc(db, "friends_public_data", user.uid),
+        { visibility: next, enabled: true },
+        { merge: true },
+      );
+    } catch (error) {
+      console.error("Error saving visibility:", error);
+      toast.error("Failed to save visibility settings");
+    } finally {
+      setSavingVisibility(false);
+    }
+  };
+
+  const previewUser = {
+    displayName: user?.displayName || undefined,
+    photoURL: user?.photoURL,
+    majors: userProfile?.majors || [],
+    graduationYear: userProfile?.graduationYear,
+    bio: userProfile?.bio,
+  };
 
   const profileShareUrl =
     typeof window !== "undefined" && user
@@ -471,52 +534,47 @@ export default function FriendsTab({
   if (!friendsEnabled) {
     return (
       <div className="w-full max-w-3xl mx-auto font-louize">
-        <h2 className="text-2xl font-medium text-gray-900 dark:text-white mb-6">
-          Friends & Connections
-        </h2>
+        <div className="mb-6">
+          <h2 className="text-2xl font-medium text-gray-900 dark:text-white">Friends</h2>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+            See how older students in your major built their path — courses and
+            distributionals, never grades.
+          </p>
+        </div>
 
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="flex flex-col items-center justify-center py-10 px-8 rounded-2xl bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/80 dark:via-gray-900/60 dark:to-gray-950/80 backdrop-blur-2xl border border-gray-200 dark:border-white/[0.08] shadow-[0_8px_48px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.08)] dark:ring-1 dark:ring-white/[0.05]"
+          className="space-y-6"
         >
-          {/* Icon */}
-          <div className="relative mb-6">
-            <div className="absolute inset-0 bg-gradient-to-br from-pink-500/20 to-purple-500/20 rounded-full blur-xl" />
-            <div className="relative p-4 rounded-2xl bg-gradient-to-br from-pink-500/15 to-purple-500/15 border border-pink-500/20 shadow-[inset_0_1px_0_rgba(255,255,255,0.1),0_4px_16px_rgba(236,72,153,0.2)]">
-              <FiUsers className="w-8 h-8 text-pink-500 dark:text-pink-300" />
-            </div>
+          {/* Demo preview */}
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-2">
+              What your page could look like
+            </p>
+            <ProfilePreviewCard
+              user={DEMO_PREVIEW_USER}
+              courses={DEMO_PREVIEW_COURSES}
+              isDemo
+            />
           </div>
 
-          <h3 className="text-xl font-medium text-gray-900 dark:text-white mb-2 text-center">
-            Enable Friends
-          </h3>
-
-          <p className="text-gray-500 dark:text-gray-400 text-sm text-center max-w-md mb-6 leading-relaxed">
-            Connect with other Yale students to see what courses they've taken and get
-            inspiration for your own academic journey. Your grades are{" "}
-            <strong className="text-gray-800 dark:text-gray-200">never shared</strong>.
-          </p>
-
-          {/* What's shared card */}
-          <div className="w-full max-w-sm mb-6">
-            <div className="p-4 rounded-xl bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 backdrop-blur-md border border-gray-200 dark:border-white/[0.06] shadow-neu">
-              <h4 className="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-3 flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-pink-400" />
-                Shared with friends
-              </h4>
-              <ul className="text-xs text-gray-500 dark:text-gray-400 space-y-1.5 ml-3.5">
-                <li>Course codes (e.g., CPSC 201)</li>
-                <li>Semesters and years taken</li>
-                <li>Credit counts</li>
-                <li>Your major and graduation year</li>
-              </ul>
-              <div className="mt-3 pt-3 border-t border-gray-200 dark:border-white/[0.06] flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                <span className="text-[11px] text-emerald-500 dark:text-emerald-400 font-medium">
-                  Grades and GPA are NEVER shared
-                </span>
-              </div>
+          {/* What's shared */}
+          <div className="p-4 rounded-xl bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 backdrop-blur-md border border-gray-200 dark:border-white/[0.06] shadow-neu">
+            <h4 className="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-3 flex items-center gap-2">
+              <span className="w-1.5 h-1.5 rounded-full bg-pink-400" />
+              What friends see
+            </h4>
+            <ul className="text-xs text-gray-500 dark:text-gray-400 space-y-1.5 ml-3.5">
+              <li>Course codes and names (no grades)</li>
+              <li>Semesters, credits, and distributionals</li>
+              <li>Your major, year, and optional bio</li>
+            </ul>
+            <div className="mt-3 pt-3 border-t border-gray-200 dark:border-white/[0.06] flex items-center gap-2">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+              <span className="text-[11px] text-emerald-500 dark:text-emerald-400 font-medium">
+                Grades and GPA are NEVER shared
+              </span>
             </div>
           </div>
 
@@ -536,17 +594,17 @@ export default function FriendsTab({
             disabled={isEnabling}
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
-            className="px-6 py-3 bg-purple-500/10 hover:bg-purple-500/20 text-purple-600 dark:text-purple-200 text-sm rounded-xl font-medium transition-all disabled:opacity-50 flex items-center gap-2 border border-purple-500/30 hover:border-purple-500/50 shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_4px_16px_rgba(139,92,246,0.15)]"
+            className="w-full px-6 py-3.5 bg-gradient-to-br from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 text-white text-sm rounded-xl font-medium transition-all disabled:opacity-50 flex items-center justify-center gap-2 shadow-[0_4px_16px_rgba(236,72,153,0.3)]"
           >
             {isEnabling ? (
               <>
-                <span className="animate-spin h-4 w-4 border-2 border-purple-300/30 border-t-purple-300 rounded-full" />
+                <span className="animate-spin h-4 w-4 border-2 border-white/30 border-t-white rounded-full" />
                 Enabling...
               </>
             ) : (
               <>
                 <FiToggleRight size={18} />
-                Enable Friends Feature
+                Enable Friends
               </>
             )}
           </motion.button>
@@ -558,15 +616,121 @@ export default function FriendsTab({
   /* ─── Main view ─── */
   return (
     <div className="w-full max-w-3xl mx-auto font-louize">
-      {/* Header */}
-      <div className="flex items-center justify-between w-full mb-5">
-        <div className="flex items-center gap-2">
-          <h2 className="text-2xl font-medium text-gray-900 dark:text-white">
-            Friends & Connections
-          </h2>
+      {/* Purpose strip */}
+      <div className="mb-5">
+        <div className="flex items-center justify-between gap-2">
+          <h2 className="text-2xl font-medium text-gray-900 dark:text-white">Friends</h2>
           <MoreOptionsDropdown onDisable={() => setShowDisableConfirm(true)} />
         </div>
+        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+          See how older students in your major built their path — courses and
+          distributionals, never grades.
+        </p>
+      </div>
 
+      {/* Your public page */}
+      <section className="mb-6 p-4 rounded-xl bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 backdrop-blur-md border border-gray-200 dark:border-white/[0.08] shadow-neu">
+        <p className="text-xs font-semibold uppercase tracking-wider text-pink-600 dark:text-pink-400 mb-3">
+          Your public page
+        </p>
+        <ProfilePreviewCard
+          user={previewUser}
+          courses={courses}
+          visibility={profileVisibility}
+          compact
+        />
+        <div className="mt-3 flex flex-wrap gap-2">
+          <button
+            type="button"
+            onClick={() => {
+              if (!profileShareUrl) return;
+              navigator.clipboard.writeText(profileShareUrl);
+              toast.success("Link copied to clipboard!");
+            }}
+            className="flex-1 min-w-[100px] inline-flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-medium rounded-lg bg-pink-50 dark:bg-pink-900/20 text-pink-600 dark:text-pink-300 border border-pink-200 dark:border-pink-800/40 hover:bg-pink-100 dark:hover:bg-pink-800/30 transition"
+          >
+            <FiCopy size={12} />
+            Copy link
+          </button>
+          <Link
+            href={user ? `/user/${user.uid}` : "#"}
+            target="_blank"
+            className="flex-1 min-w-[100px] inline-flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-medium rounded-lg bg-gray-50 dark:bg-white/[0.04] text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-white/[0.08] hover:border-pink-300 dark:hover:border-pink-500/40 hover:text-pink-600 dark:hover:text-pink-300 transition"
+          >
+            <FiExternalLink size={12} />
+            Open my page
+          </Link>
+          <button
+            type="button"
+            onClick={() => setShowCustomize((v) => !v)}
+            className="flex-1 min-w-[100px] inline-flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-medium rounded-lg bg-purple-500/10 text-purple-700 dark:text-purple-300 border border-purple-500/30 hover:bg-purple-500/20 transition"
+          >
+            <FiSettings size={12} />
+            Customize
+            <FiChevronDown
+              size={12}
+              className={`transition-transform ${showCustomize ? "rotate-180" : ""}`}
+            />
+          </button>
+        </div>
+
+        <AnimatePresence>
+          {showCustomize && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              className="overflow-hidden"
+            >
+              <div className="mt-4 pt-4 border-t border-gray-200 dark:border-white/[0.06]">
+                <p className="text-[11px] text-gray-500 dark:text-gray-400 mb-3">
+                  This is what friends see on your page.
+                </p>
+                <div className="space-y-2">
+                  {(
+                    [
+                      { key: "showBio", label: "Bio" },
+                      { key: "showStats", label: "Stats overview" },
+                      { key: "showDistributionals", label: "Distributionals" },
+                      { key: "showCourses", label: "Course list" },
+                    ] as const
+                  ).map(({ key, label }) => (
+                    <label
+                      key={key}
+                      className="flex items-center justify-between p-2.5 rounded-lg bg-gray-50 dark:bg-white/[0.03] border border-gray-200/70 dark:border-white/[0.06] cursor-pointer"
+                    >
+                      <span className="text-xs text-gray-700 dark:text-gray-300">{label}</span>
+                      <button
+                        type="button"
+                        role="switch"
+                        aria-checked={resolvedVisibility[key]}
+                        disabled={savingVisibility}
+                        onClick={() =>
+                          updateVisibility({ [key]: !resolvedVisibility[key] })
+                        }
+                        className={`relative w-9 h-5 rounded-full transition-colors ${
+                          resolvedVisibility[key]
+                            ? "bg-pink-500"
+                            : "bg-gray-300 dark:bg-gray-600"
+                        }`}
+                      >
+                        <span
+                          className={`absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform ${
+                            resolvedVisibility[key] ? "translate-x-4" : ""
+                          }`}
+                        />
+                      </button>
+                    </label>
+                  ))}
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </section>
+
+      {/* Actions row */}
+      <div className="flex justify-end mb-5">
         <motion.button
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
@@ -578,26 +742,6 @@ export default function FriendsTab({
           Add Friend
         </motion.button>
       </div>
-
-      <InfoCard className="mb-6" autoHide previewText="Why add friends?">
-        The friends feature lets you see what classes your friends (or other Yale students
-        you know) have taken.
-        <br />
-        <br />
-        It's useful if you're curious about someone in your year or just want to explore
-        different academic paths, but we see it as <i>most powerful</i> when used to
-        connect with people in your <strong>major</strong>, especially older students who
-        have already walked the path you're striving to follow.
-        <br />
-        <br />
-        See what courses they took, how they structured their academic journey, and get
-        inspiration or guidance for planning your own (all while keeping it kinda fun and
-        social).
-        <br />
-        <br />
-        NOTE: Sensitive/private info and statistics such as your GPA and grades
-        are never made public, not even to your friends — only you can see them.
-      </InfoCard>
 
       {/* Loading skeletons */}
       {!ready && (

@@ -12,6 +12,7 @@ import {
 import Link from "next/link";
 import { Course } from "@/lib/types";
 import { gradePoints } from "@/lib/constants";
+import { toggleDistributionalTag } from "@/lib/distributionalTags";
 import { getGPAColor as getLetterGradeColor } from "@/lib/utils/utils";
 
 /** Color class for a numeric GPA value (matches StatsView's logic). */
@@ -1026,16 +1027,16 @@ export default function MyCoursesView({
           <span className="font-medium text-gray-600 dark:text-gray-400">
             By using DegreeIntelligence, you voluntarily share your grades.
           </span>{" "}
-          Your transcript PDF is processed locally and is{" "}
+          Your transcript PDF is sent to our server for parsing and is{" "}
           <span className="text-emerald-600 dark:text-emerald-400/80">
-            never stored
+            not stored
           </span>{" "}
-          on our servers. However, we do store your course and grade data in our
-          database (private only to your profile) to provide you with insights,
-          progress tracking, and recommendations for your major. By uploading
-          academic information, you confirm that you are providing your own data
-          and consent to its storage and processing for academic planning
-          purposes.{" "}
+          after extraction. Course text may be sent to OpenAI to extract your
+          courses. We store your course and grade data in our database (private
+          only to your account) to provide you with insights, progress tracking,
+          and recommendations for your major. By uploading academic information,
+          you confirm that you are providing your own data and consent to its
+          storage and processing for academic planning purposes.{" "}
           <Link
             href="/terms"
             target="_blank"
@@ -1067,9 +1068,7 @@ export default function MyCoursesView({
           setModalState((prev) => {
             if (!prev.course || prev.course.id !== courseId) return prev;
             const cur = prev.course.distributionals || [];
-            const next = cur.includes(dist)
-              ? cur.filter((d) => d !== dist)
-              : [...cur, dist];
+            const next = toggleDistributionalTag(cur, dist);
             return { ...prev, course: { ...prev.course, distributionals: next } };
           });
         }}

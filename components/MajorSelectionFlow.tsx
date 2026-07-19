@@ -15,6 +15,7 @@ import { FiArrowRight, FiX, FiCheck, FiChevronDown } from "react-icons/fi";
 import { RiProgress3Fill } from "react-icons/ri";
 import { HiSparkles } from "react-icons/hi2";
 import { FaUsers, FaGraduationCap } from "react-icons/fa6";
+import { toast } from "react-hot-toast";
 
 interface MajorSelectionFlowProps {
   onComplete: () => void;
@@ -33,6 +34,16 @@ export default function MajorSelectionFlow({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showMajorsInfo, setShowMajorsInfo] = useState(false);
   const [isKeyboardOpen, setIsKeyboardOpen] = useState(false);
+  const [duplicateMajorError, setDuplicateMajorError] = useState<string | null>(
+    null,
+  );
+
+  useEffect(() => {
+    if (step === "majors" && selectedMajors.length === 0) {
+      const firstMajor = Object.keys(MAJORS)[0];
+      if (firstMajor) setSelectedMajors([firstMajor]);
+    }
+  }, [step, selectedMajors.length]);
 
   // Detect mobile keyboard opening via visualViewport
   useEffect(() => {
@@ -84,6 +95,7 @@ export default function MajorSelectionFlow({
       onComplete();
     } catch (error) {
       console.error("Error saving user data:", error);
+      toast.error("Failed to save your profile. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
@@ -357,6 +369,11 @@ export default function MajorSelectionFlow({
 
             {/* Major Selection */}
             <div className="space-y-3">
+              {duplicateMajorError && (
+                <div className="text-[11px] text-red-500 dark:text-red-400">
+                  {duplicateMajorError}
+                </div>
+              )}
               {selectedMajors.map((major, index) => (
                 <motion.div
                   key={index}
@@ -368,6 +385,16 @@ export default function MajorSelectionFlow({
                     <MajorDropdown
                       value={major}
                       onChange={(newMajor) => {
+                        if (
+                          selectedMajors.includes(newMajor) &&
+                          selectedMajors[index] !== newMajor
+                        ) {
+                          setDuplicateMajorError(
+                            "You can't select the same major twice",
+                          );
+                          return;
+                        }
+                        setDuplicateMajorError(null);
                         const newMajors = [...selectedMajors];
                         newMajors[index] = newMajor;
                         setSelectedMajors(newMajors);
@@ -418,7 +445,7 @@ export default function MajorSelectionFlow({
                       d="M12 6v6m0 0v6m0-6h6m-6 0H6"
                     />
                   </svg>
-                  Add another major
+                  Add {selectedMajors.length === 0 ? "a major" : "another major"}
                 </motion.button>
               )}
             </div>

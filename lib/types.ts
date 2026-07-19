@@ -67,6 +67,32 @@ export interface PublicCourse {
   status: "completed" | "in-progress" | "skipped";
   skipped?: boolean; // Explicit flag for skipped courses (counts toward requirements)
   manualRequirementsFulfilled?: ManualRequirement[]; // For tracking manually assigned requirements
+  distributionals?: string[]; // Hu, So, Sc, QR, WR, L1-L5 — never grades
+}
+
+export interface FriendsProfileVisibility {
+  showBio?: boolean;
+  showStats?: boolean;
+  showDistributionals?: boolean;
+  showCourses?: boolean;
+}
+
+export const DEFAULT_FRIENDS_PROFILE_VISIBILITY: Required<FriendsProfileVisibility> = {
+  showBio: true,
+  showStats: true,
+  showDistributionals: true,
+  showCourses: true,
+};
+
+export function resolveFriendsProfileVisibility(
+  visibility?: FriendsProfileVisibility,
+): Required<FriendsProfileVisibility> {
+  return {
+    showBio: visibility?.showBio ?? true,
+    showStats: visibility?.showStats ?? true,
+    showDistributionals: visibility?.showDistributionals ?? true,
+    showCourses: visibility?.showCourses ?? true,
+  };
 }
 
 export interface FriendsPublicData {
@@ -80,6 +106,7 @@ export interface FriendsPublicData {
   majors: string[];
   graduationYear?: number;
   bio?: string;
+  visibility?: FriendsProfileVisibility;
   courses: PublicCourse[];
 }
 

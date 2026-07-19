@@ -49,6 +49,9 @@ function coursesAreEqual(
     const existingManual = JSON.stringify(existing.manualRequirementsFulfilled || []);
     const newManual = JSON.stringify(newCourse.manualRequirementsFulfilled || []);
     if (existingManual !== newManual) return false;
+    const existingDists = JSON.stringify([...(existing.distributionals || [])].sort());
+    const newDists = JSON.stringify([...(newCourse.distributionals || [])].sort());
+    if (existingDists !== newDists) return false;
   }
 
   return true;
@@ -92,6 +95,9 @@ export async function syncFriendsPublicData(
       if (c.manualRequirementsFulfilled && c.manualRequirementsFulfilled.length > 0) {
         course.manualRequirementsFulfilled = c.manualRequirementsFulfilled;
       }
+      if (c.distributionals && c.distributionals.length > 0) {
+        course.distributionals = c.distributionals;
+      }
       return course;
     });
 
@@ -101,12 +107,13 @@ export async function syncFriendsPublicData(
       coursesAreEqual(existingCourses, publicCourses) &&
       existingData.displayName === (user.displayName || null) &&
       JSON.stringify(existingData.majors || []) === JSON.stringify(userProfile?.majors || []) &&
-      existingData.graduationYear === (userProfile?.graduationYear || null)
+      existingData.graduationYear === (userProfile?.graduationYear || null) &&
+      existingData.bio === (userProfile?.bio || null)
     ) {
       return; // Data unchanged, skip update
     }
 
-    // Update the public data document
+    // Update the public data document (preserve visibility settings)
     await setDoc(doc(db, "friends_public_data", userId), {
       userId,
       enabled: true,
@@ -117,6 +124,7 @@ export async function syncFriendsPublicData(
       majors: userProfile?.majors || [],
       graduationYear: userProfile?.graduationYear ?? null,
       bio: userProfile?.bio || null,
+      visibility: existingData.visibility ?? undefined,
       courses: publicCourses,
     });
   } catch (error) {
@@ -147,6 +155,9 @@ export async function enableFriendsFeature(
     // Only include manualRequirementsFulfilled if it exists and is not empty
     if (c.manualRequirementsFulfilled && c.manualRequirementsFulfilled.length > 0) {
       course.manualRequirementsFulfilled = c.manualRequirementsFulfilled;
+    }
+    if (c.distributionals && c.distributionals.length > 0) {
+      course.distributionals = c.distributionals;
     }
     return course;
   });

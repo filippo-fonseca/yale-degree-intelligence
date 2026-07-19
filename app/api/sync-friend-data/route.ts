@@ -11,6 +11,7 @@ interface PublicCourse {
   status: "completed" | "in-progress" | "skipped";
   skipped?: boolean;
   manualRequirementsFulfilled?: { major_id: string; requirement_title: string }[];
+  distributionals?: string[];
 }
 
 /**
@@ -94,15 +95,23 @@ export async function POST(req: NextRequest) {
 
     // Build public courses array (NO GRADES)
     // Include ALL courses including skipped ones (they count toward requirements)
-    const publicCourses: PublicCourse[] = courses.map((c) => ({
-      code: c.code,
-      semester: c.semester,
-      year: c.year,
-      credits: c.credits,
-      status: c.skipped ? "skipped" : (c.status === "not-taken" ? "completed" : c.status),
-      skipped: c.skipped || false,
-      manualRequirementsFulfilled: c.manualRequirementsFulfilled,
-    }));
+    const publicCourses: PublicCourse[] = courses.map((c) => {
+      const course: PublicCourse = {
+        code: c.code,
+        semester: c.semester,
+        year: c.year,
+        credits: c.credits,
+        status: c.skipped ? "skipped" : (c.status === "not-taken" ? "completed" : c.status),
+        skipped: c.skipped || false,
+      };
+      if (c.manualRequirementsFulfilled?.length) {
+        course.manualRequirementsFulfilled = c.manualRequirementsFulfilled;
+      }
+      if (c.distributionals?.length) {
+        course.distributionals = c.distributionals;
+      }
+      return course;
+    });
 
     // Fetch target user's profile for majors, etc.
     const userDoc = await adminDb.collection("users").doc(targetUserId).get();
@@ -183,6 +192,13 @@ function coursesAreEqual(
       newCourse.manualRequirementsFulfilled || []
     );
     if (existingManual !== newManual) return false;
+    const existingDists = JSON.stringify(
+      [...(existing.distributionals || [])].sort()
+    );
+    const newDists = JSON.stringify(
+      [...(newCourse.distributionals || [])].sort()
+    );
+    if (existingDists !== newDists) return false;
   }
 
   return true;

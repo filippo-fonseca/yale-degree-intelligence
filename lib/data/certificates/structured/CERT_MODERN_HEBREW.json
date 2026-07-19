@@ -1,0 +1,25 @@
+{
+  "id": "CERT_MODERN_HEBREW",
+  "name": "Modern Hebrew (Advanced Language Study)",
+  "description": "Certificate of Advanced Language Study in Modern Hebrew offered by the Department of Near Eastern Languages and Civilizations. A certificate adviser advises students on the certification process. The certificate is listed on the student's transcript once completed.",
+  "category": "advanced_language",
+  "sourceUrl": "https://catalog.yale.edu/ycps/subjects-of-instruction/near-eastern-languages-civilizations/",
+  "requiresApplication": false,
+  "parentProgram": "Near Eastern Languages and Civilizations",
+  "creditRequirements": { "total": 4 },
+  "notes": [
+    "No Credit/D/Fail",
+    "Letter grade B or above required in all courses",
+    "With adviser approval, one advanced non-L5 Yale course and/or a graduate or advanced seminar may count",
+    "One LxC course taught in English may count if it includes a weekly discussion section conducted entirely in Hebrew (minimum three students; course designated LxC)",
+    "Up to two study-abroad credits taught in Hebrew may be substituted with adviser approval"
+  ],
+  "requirements": [
+    {
+      "name": "Courses beyond L4",
+      "required": 4,
+      "description": "Four courses beyond the L4 level in Modern Hebrew. At least two must be Yale courses designated L5.",
+      "options": []
+    }
+  ]
+}

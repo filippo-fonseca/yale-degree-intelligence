@@ -1,0 +1,25 @@
+{
+  "id": "CERT_ANCIENT_EGYPTIAN",
+  "name": "Ancient Egyptian (Advanced Language Study)",
+  "description": "Certificate of Advanced Language Study in Ancient Egyptian offered by the Department of Near Eastern Languages and Civilizations. A certificate adviser advises students on the certification process. The certificate is listed on the student's transcript once completed.",
+  "category": "advanced_language",
+  "sourceUrl": "https://catalog.yale.edu/ycps/subjects-of-instruction/near-eastern-languages-civilizations/",
+  "requiresApplication": false,
+  "parentProgram": "Near Eastern Languages and Civilizations",
+  "creditRequirements": { "total": 4 },
+  "notes": [
+    "No Credit/D/Fail",
+    "Letter grade B or above required in all courses",
+    "Declare candidacy on Yale Hub as early as possible, no later than January 15 or September 15 of final semester",
+    "With adviser approval, an advanced texts seminar and/or graduate seminar may count toward requirements",
+    "Up to two courses of credit-bearing academic study abroad may be substituted with prior permission"
+  ],
+  "requirements": [
+    {
+      "name": "Courses beyond L3",
+      "required": 4,
+      "description": "Four courses beyond the L3 level in Ancient Egyptian. At least two must be Yale courses designated L5.",
+      "options": []
+    }
+  ]
+}

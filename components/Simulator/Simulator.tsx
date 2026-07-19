@@ -47,6 +47,7 @@ import {
   getSemesterCredits,
   isPastSemester,
 } from "./simulatorUtils";
+import { useSimulatorDragDrop } from "./useSimulatorDragDrop";
 
 // ----------------- Component -----------------
 export default function Simulator({
@@ -60,16 +61,11 @@ export default function Simulator({
 
   const [semesters, setSemesters] = useState<Semester[]>([]);
   const [availableCourses, setAvailableCourses] = useState<Course[]>([]);
-  const [draggedCourse, setDraggedCourse] = useState<Course | null>(null);
-  const [dragSourceSemester, setDragSourceSemester] = useState<string | null>(
-    null,
-  );
   const [showHelp, setShowHelp] = useState(false);
   const [savedPlans, setSavedPlans] = useState<Plan[]>([]);
   const [planName, setPlanName] = useState("");
   const [showSaveModal, setShowSaveModal] = useState(false);
   const [showPlansModal, setShowPlansModal] = useState(false);
-  const [hoveredSemester, setHoveredSemester] = useState<string | null>(null);
   const [lookupSemesterId, setLookupSemesterId] = useState<string | null>(null);
   const [selectedPlanToOverwrite, setSelectedPlanToOverwrite] = useState<
     number | null
@@ -97,10 +93,6 @@ export default function Simulator({
     course: Course;
     semesterId: string;
   } | null>(null);
-  // Mobile-friendly tap-to-place: select a pool course, then tap a semester
-  const [selectedPoolCourse, setSelectedPoolCourse] = useState<Course | null>(
-    null,
-  );
 
   // Preview state
   const [previewProgress, setPreviewProgress] = useState<PreviewProgressMap>(
@@ -244,6 +236,29 @@ export default function Simulator({
       );
     }
   };
+
+  const {
+    draggedCourse,
+    hoveredSemester,
+    setHoveredSemester,
+    selectedPoolCourse,
+    setSelectedPoolCourse,
+    handleDragStart,
+    placeCourseInSemester,
+    handleDrop,
+    removeCourseFromSemester,
+    updatePlannedCourse,
+    clearDragState,
+  } = useSimulatorDragDrop({
+    semesters,
+    setSemesters,
+    setAvailableCourses,
+    remainingCourses,
+    isCourseInAnyRequirement,
+    showAutoMatchToast,
+    setManualAssignPending,
+    setSimulatorManualReqs,
+  });
 
   // ------------ Build initial semesters & pools ------------
   useEffect(() => {
@@ -487,143 +502,6 @@ export default function Simulator({
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
-
-  // ------------ Drag & Drop ------------
-  const playPopSound = () => {
-    const audio = new Audio("/audio/pop.mp3");
-    audio.volume = 0.5;
-    audio.play().catch(() => {}); // Ignore errors if audio can't play
-  };
-
-  const handleDragStart = (course: Course, sourceSemesterId?: string) => {
-    setDraggedCourse(course);
-    setDragSourceSemester(sourceSemesterId ?? null);
-  };
-
-  const placeCourseInSemester = (course: Course, semesterId: string) => {
-    const isDuplicate = semesters.some((s) =>
-      s.courses.some((c) => c.code === course.code),
-    );
-    if (isDuplicate) {
-      toast.error("This course is already on your plan.");
-      return;
-    }
-
-    playPopSound();
-
-    setSemesters((prev) =>
-      prev.map((sem) =>
-        sem.id === semesterId
-          ? sem.courses.some((c) => c.code === course.code)
-            ? sem
-            : { ...sem, courses: [...sem.courses, course] }
-          : sem,
-      ),
-    );
-
-    setAvailableCourses((prev) => prev.filter((c) => c.code !== course.code));
-    setSelectedPoolCourse(null);
-
-    if (!isCourseInAnyRequirement(course.code)) {
-      setManualAssignPending({ course, semesterId });
-    } else {
-      showAutoMatchToast(course.code);
-    }
-  };
-
-  const handleDrop = (semesterId: string) => {
-    if (!draggedCourse) return;
-
-    // Dropping back on the same semester — no-op
-    if (dragSourceSemester === semesterId) {
-      setDraggedCourse(null);
-      setDragSourceSemester(null);
-      return;
-    }
-
-    // Play pop sound on successful drop
-    playPopSound();
-
-    setSemesters((prev) =>
-      prev.map((sem) => {
-        // Remove from source semester (inter-semester move)
-        if (dragSourceSemester && sem.id === dragSourceSemester) {
-          return {
-            ...sem,
-            courses: sem.courses.filter((c) => c.code !== draggedCourse.code),
-          };
-        }
-        // Add to target semester (if not already there)
-        if (sem.id === semesterId) {
-          return sem.courses.some((c) => c.code === draggedCourse.code)
-            ? sem
-            : { ...sem, courses: [...sem.courses, draggedCourse] };
-        }
-        return sem;
-      }),
-    );
-
-    // Only remove from pool if dragged from pool (not from another semester)
-    if (!dragSourceSemester) {
-      setAvailableCourses((prev) =>
-        prev.filter((c) => c.code !== draggedCourse.code),
-      );
-
-      // Auto-detect: prompt manual assignment if not in any requirement
-      if (!isCourseInAnyRequirement(draggedCourse.code)) {
-        setManualAssignPending({ course: draggedCourse, semesterId });
-      } else {
-        // Show toast for auto-matched course
-        showAutoMatchToast(draggedCourse.code);
-      }
-    }
-
-    setDraggedCourse(null);
-    setDragSourceSemester(null);
-  };
-
-  const removeCourseFromSemester = (semesterId: string, courseCode: string) => {
-    setSemesters((prev) =>
-      prev.map((sem) =>
-        sem.id === semesterId
-          ? {
-              ...sem,
-              courses: sem.courses.filter((c) => c && c.code !== courseCode),
-            }
-          : sem,
-      ),
-    );
-
-    // Clean up any simulator manual reqs for this course
-    setSimulatorManualReqs((prev) => prev.filter((m) => m.code !== courseCode));
-
-    const rc = remainingCourses.find((c) => c.code === courseCode);
-    if (rc && rc.status === "not-taken") {
-      setAvailableCourses((prev) =>
-        prev.some((c) => c.code === rc.code) ? prev : [...prev, rc],
-      );
-    }
-  };
-
-  // Immutable per-course update for the inline grade/distributional controls.
-  const updatePlannedCourse = (
-    semesterId: string,
-    courseCode: string,
-    patch: Partial<Pick<Course, "grade" | "distributionals">>,
-  ) => {
-    setSemesters((prev) =>
-      prev.map((sem) =>
-        sem.id === semesterId
-          ? {
-              ...sem,
-              courses: sem.courses.map((c) =>
-                c.code === courseCode ? { ...c, ...patch } : c,
-              ),
-            }
-          : sem,
-      ),
-    );
-  };
 
   // ------------ Planned set (for preview) ------------
   const plannedNow = useMemo<PlannedCoursePick[]>(() => {
@@ -1018,11 +896,7 @@ export default function Simulator({
   return (
     <div
       className="space-y-4 font-louize"
-      onDragEnd={() => {
-        setDraggedCourse(null);
-        setDragSourceSemester(null);
-        setHoveredSemester(null);
-      }}
+      onDragEnd={clearDragState}
     >
       {/* Header */}
       <div className="mb-4">

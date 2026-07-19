@@ -1,0 +1,29 @@
+{
+  "id": "CERT_TRANSLATION_STUDIES",
+  "name": "Translation Studies",
+  "description": "Promotes the interdisciplinary study of translation and facilitates translation practices encompassing literary, social, political, economic, legal, technological, and medical dimensions.",
+  "category": "interdisciplinary",
+  "sourceUrl": "https://catalog.yale.edu/ycps/subjects-of-instruction/translation_studies/",
+  "requiresApplication": false,
+  "creditRequirements": {
+    "total": 5
+  },
+  "notes": [
+    "No more than three of the five courses may originate in the same department.",
+    "Each student must attend three lectures or events listed through the Translation Initiative and submit a brief written response for each. Other translation activities may count at the director's discretion.",
+    "No course taken Credit/D/Fail may be applied toward the certificate.",
+    "No more than two course credits may overlap with a major, simultaneous degree, or another certificate.",
+    "No course credit may be applied toward the requirements of more than two curricular programs.",
+    "Approved graduate and professional school courses may count toward the certificate.",
+    "Courses taken at another institution or during an approved summer or term-time study abroad program may count with DUS approval.",
+    "Declare on Yale Hub by January 15 or September 15 of the final semester at the latest."
+  ],
+  "requirements": [
+    {
+      "name": "Translation-themed courses",
+      "required": 5,
+      "description": "Five course credits on translation-themed topics from the approved course list posted each semester on the Translation Studies Initiative website. No more than three may originate in the same department.",
+      "options": []
+    }
+  ]
+}

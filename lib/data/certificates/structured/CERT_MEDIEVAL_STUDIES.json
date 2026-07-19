@@ -1,0 +1,28 @@
+{
+  "id": "CERT_MEDIEVAL_STUDIES",
+  "name": "Medieval Studies",
+  "description": "Provides interested Yale College students a focused interdisciplinary curriculum on the histories, languages, and cultures of the medieval period worldwide.",
+  "category": "interdisciplinary",
+  "sourceUrl": "https://catalog.yale.edu/ycps/subjects-of-instruction/medieval_studies/",
+  "requiresApplication": false,
+  "creditRequirements": {
+    "total": 5
+  },
+  "notes": [
+    "No more than three of the five courses may originate in the same geographic zone. Zones: East and Southeast Asia (YC MDVL East & SE Asia); South and Central Asia (YC MDVL S & Central Asia); Near East and North Africa (YC MDVL Nr East & N Africa); Europe, Russia, and the North Atlantic (YC MDVL Eur Russ & N Atlantic). YC MDVL Other MDVL Topics also available.",
+    "Each student must attend three lectures on medieval topics and submit a 1–2 page account of each to the certificate director or an advisor.",
+    "Only one course taken Credit/D/Fail may be applied toward the certificate.",
+    "No more than two course credits may overlap with a major, simultaneous degree, or another certificate.",
+    "No course credit may be applied toward the requirements of more than two curricular programs.",
+    "Courses taken at another institution or during an approved summer or term-time study abroad program may count with director approval.",
+    "Declare on Yale Hub by January 15 or September 15 of the final semester at the latest."
+  ],
+  "requirements": [
+    {
+      "name": "Medieval courses",
+      "required": 5,
+      "description": "Five course credits on medieval topics from the approved course list. No more than three may originate in the same geographic zone among East and Southeast Asia, South and Central Asia, Near East and North Africa, and Europe, Russia, and the North Atlantic.",
+      "options": []
+    }
+  ]
+}

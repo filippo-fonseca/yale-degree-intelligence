@@ -1,0 +1,38 @@
+{
+  "id": "CERT_PERSIAN_IRANIAN",
+  "name": "Persian and Iranian Studies",
+  "description": "Recognizes undergraduates who combine the study of Persian language and literature with wider engagement with the art, philosophy, religion, history, politics, and culture of the Persian-speaking world.",
+  "category": "interdisciplinary",
+  "sourceUrl": "https://catalog.yale.edu/ycps/subjects-of-instruction/persian-and-iranian/",
+  "requiresApplication": false,
+  "creditRequirements": {
+    "total": 5
+  },
+  "notes": [
+    "Students must attend three events (e.g. Iran Colloquium lectures, Persian Circle, Persian-language film screenings, PSA events, CMES/NELC/SASC/CAI events) and submit a 1–2 page write-up for each.",
+    "All courses must be taken for a letter grade of B or above.",
+    "Only two content courses should originate in the same department.",
+    "Persian L5 courses are content-oriented and may count as either a content or language course.",
+    "Premodern Iranian language courses (e.g. Old Persian, Middle Persian, Soghdian) count as content courses.",
+    "No course taken Credit/D/Fail may be applied toward the certificate.",
+    "No more than two course credits may overlap with a major, simultaneous degree, or another certificate.",
+    "No course credit may be applied toward the requirements of more than two curricular programs.",
+    "Graduate and professional school courses may count toward the certificate.",
+    "Courses taken at another institution or during an approved summer or term-time study abroad program may count with DUS approval.",
+    "Declare on Yale Hub by January 15 or September 15 of the final semester at the latest."
+  ],
+  "requirements": [
+    {
+      "name": "Content courses",
+      "required": 3,
+      "description": "Three courses with YC Persia & Iran Content attribute covering art, philosophy, religion, history, politics, and culture of the Persian-speaking world.",
+      "options": []
+    },
+    {
+      "name": "Persian language",
+      "required": 2,
+      "description": "Two courses in Persian language (L1–L5).",
+      "options": []
+    }
+  ]
+}

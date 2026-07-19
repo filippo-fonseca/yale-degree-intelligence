@@ -1,0 +1,26 @@
+{
+  "id": "CERT_KISWAHILI",
+  "name": "Kiswahili (Advanced Language Study)",
+  "description": "Certificate of Advanced Language Study in Kiswahili offered by the Department of African Studies. A certificate adviser, typically the DUS, advises students on the certification process and certifies completion before the end of eight terms of study. The certificate is listed on the student's transcript once certified.",
+  "category": "advanced_language",
+  "sourceUrl": "https://catalog.yale.edu/ycps/subjects-of-instruction/african-studies/",
+  "requiresApplication": false,
+  "parentProgram": "African Studies",
+  "creditRequirements": { "total": 4 },
+  "notes": [
+    "Letter grade B or above required in all courses",
+    "Must complete requirements before the end of eight terms of study",
+    "Declare candidacy on Yale Hub as early as possible, no later than January 15 or September 15 of final semester",
+    "With adviser approval, one advanced non-L5 Yale course conducted in Kiswahili (e.g., independent study graded pass/fail, graduate seminar, or advanced seminar) may count",
+    "One LxC course taught in English may count if it includes a weekly discussion section conducted entirely in Kiswahili (minimum three students; course designated LxC)",
+    "Up to two study-abroad credits taught in Kiswahili may be substituted with adviser approval"
+  ],
+  "requirements": [
+    {
+      "name": "Courses beyond L4",
+      "required": 4,
+      "description": "Four courses beyond the L4 level in Kiswahili. At least two must be Yale courses designated L5.",
+      "options": []
+    }
+  ]
+}

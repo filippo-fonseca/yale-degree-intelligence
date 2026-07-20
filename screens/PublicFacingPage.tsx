@@ -587,6 +587,12 @@ export default function AboutPage() {
           <p className="mt-5 font-mono text-xs tracking-tight text-gray-400 dark:text-gray-500">
             Free forever · No install · 1 in 6 Yale undergrads already on board
           </p>
+
+          {/* 6. Class of 2030 welcome chip */}
+          <p className="mt-6 inline-flex items-center gap-2 rounded-full border border-pink-500/15 bg-pink-500/[0.07] px-4 py-1.5 font-sf text-xs font-medium text-pink-900/80 dark:bg-pink-500/10 dark:text-pink-200/80">
+            🎓 Class of 2030: welcome to Yale. No transcript needed, plan from
+            day one.
+          </p>
         </div>
       </section>
 

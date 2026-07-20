@@ -360,7 +360,7 @@ export default function AboutPage() {
               </div>
             </div>
 
-            <h1 className="flex items-center justify-center text-4xl font-bold tracking-tight text-gray-900 dark:text-white mb-3">
+            <h1 className="flex items-center justify-center text-4xl font-medium leading-[0.98] tracking-[-0.02em] text-balance text-gray-900 dark:text-white mb-3">
               <CompoundLogo hideLogo animated size="lg" />
             </h1>
             {/* Welcome Badge */}
@@ -373,11 +373,10 @@ export default function AboutPage() {
               </div>
             </div>
 
-            <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-4">
+            <h2 className="text-2xl sm:text-3xl font-medium leading-[0.98] tracking-[-0.02em] text-balance text-gray-900 dark:text-white mb-4">
               Your Yale Degree,
-              <br className="sm:hidden" />
-              <span className="hidden sm:inline"> </span>
-              <span className="text-blue-600 dark:text-blue-300">made easy.</span>
+              <br />
+              <span className="text-gray-500 dark:text-gray-400">made easy.</span>
             </h2>
 
             <p className="text-base text-gray-700 dark:text-gray-300 max-w-2xl mx-auto mb-5">
@@ -440,7 +439,7 @@ export default function AboutPage() {
               transition={{ duration: 0.8, delay: 0.3 }}
               className="mt-8 pt-6 border-t border-gray-200 dark:border-white/[0.08]"
             >
-              <p className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-pink-600 via-purple-600 to-blue-600 dark:from-blue-200 dark:via-purple-200 dark:to-pink-200 bg-clip-text text-transparent leading-relaxed">
+              <p className="text-xl sm:text-2xl font-medium bg-gradient-to-r from-pink-600 via-purple-600 to-blue-600 dark:from-blue-200 dark:via-purple-200 dark:to-pink-200 bg-clip-text text-transparent leading-relaxed">
                 Have you heard? 1 in 6 Yale undergrads already use DegreeIntelligence.
               </p>
               <p className="text-base text-gray-500 dark:text-gray-400 mt-2">
@@ -519,8 +518,10 @@ export default function AboutPage() {
       <div className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="bg-white/70 dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/70 dark:via-gray-900/50 dark:to-gray-950/70 backdrop-blur-2xl rounded-xl p-6 border border-gray-200 dark:border-gray-800/50 shadow-neu">
           <div className="text-center mb-8">
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">
-              Our blueprint, broken down.
+            <h2 className="text-2xl font-medium leading-[0.98] tracking-[-0.02em] text-balance text-gray-900 dark:text-white mb-3">
+              Our blueprint,
+              <br />
+              <span className="text-gray-500 dark:text-gray-400">broken down.</span>
             </h2>
             <p className="text-sm text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
               How we believe we transformed frustration into an elegant solution
@@ -610,8 +611,10 @@ export default function AboutPage() {
           <div className="flex flex-col lg:flex-row gap-6 items-center">
             {/* Left: copy + bullets */}
             <div className="flex-1 min-w-0">
-              <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-                Simulator: drag, drop, done.
+              <h3 className="text-2xl font-medium leading-[0.98] tracking-[-0.02em] text-balance text-gray-900 dark:text-white mb-2">
+                Simulator: drag, drop,
+                <br />
+                <span className="text-gray-500 dark:text-gray-400">done.</span>
               </h3>
               <p className="text-gray-700 dark:text-gray-300 text-sm mb-4 max-w-xl">
                 Build a semester-by-semester plan by dragging courses from your
@@ -702,8 +705,10 @@ export default function AboutPage() {
           <div className="absolute -left-24 -bottom-24 h-64 w-64 rounded-full bg-blue-500/10 blur-3xl" />
 
           <div className="mb-4">
-            <h3 className="text-2xl font-bold text-gray-900 dark:text-white">
-              Contextual stats that actually help.
+            <h3 className="text-2xl font-medium leading-[0.98] tracking-[-0.02em] text-balance text-gray-900 dark:text-white">
+              Contextual stats that
+              <br />
+              <span className="text-gray-500 dark:text-gray-400">actually help.</span>
             </h3>
             <p className="text-gray-700 dark:text-gray-300 text-sm mt-1">
               See your progress and trajectory in context so you know where to
@@ -1002,8 +1007,10 @@ export default function AboutPage() {
       >
         <div className="bg-white/70 dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/70 dark:via-gray-900/50 dark:to-gray-950/70 backdrop-blur-2xl rounded-xl p-6 border border-gray-200 dark:border-gray-800/50 shadow-neu">
           <div className="mb-3">
-            <h3 className="text-xl font-bold text-gray-900 dark:text-white">
-              Your <i>Major</i> progress, visualized.
+            <h3 className="text-xl font-medium leading-[0.98] tracking-[-0.02em] text-balance text-gray-900 dark:text-white">
+              Your <i>Major</i> progress,
+              <br />
+              <span className="text-gray-500 dark:text-gray-400">visualized.</span>
             </h3>
             <p className="text-gray-700 dark:text-gray-300 text-sm mt-1">
               Track your journey at a glance, complete with a clean progress bar
@@ -1185,8 +1192,10 @@ export default function AboutPage() {
       <section className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="bg-white/70 dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/70 dark:via-gray-900/50 dark:to-gray-950/70 backdrop-blur-2xl rounded-xl p-6 border border-gray-200 dark:border-gray-800/50 shadow-neu">
           <div className="text-center mb-8 flex flex-col gap-2">
-            <h2 className="text-2xl font-medium text-gray-900 dark:text-white">
-              Friends & Connections
+            <h2 className="text-2xl font-medium leading-[0.98] tracking-[-0.02em] text-balance text-gray-900 dark:text-white">
+              Friends &
+              <br />
+              <span className="text-gray-500 dark:text-gray-400">Connections</span>
             </h2>
             <p className="text-gray-700 dark:text-gray-300 text-sm max-w-2xl mx-auto">
               Add friends and mutually see each other's academic journeys. Learn
@@ -1324,8 +1333,10 @@ export default function AboutPage() {
           className="bg-white/70 dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/70 dark:via-gray-900/50 dark:to-gray-950/70 backdrop-blur-2xl rounded-xl p-6 border border-gray-200 dark:border-gray-800/50 shadow-neu"
         >
           <div className="text-center mb-8">
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">
-              What it is and why we built this.
+            <h2 className="text-2xl font-medium leading-[0.98] tracking-[-0.02em] text-balance text-gray-900 dark:text-white mb-3">
+              What it is and
+              <br />
+              <span className="text-gray-500 dark:text-gray-400">why we built this.</span>
             </h2>
             <p className="text-sm text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
               Trying to plan our majors, we kept running into the same problem:
@@ -1364,8 +1375,10 @@ export default function AboutPage() {
         className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 scroll-mt-20"
       >
         <div className="text-center mb-8">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">
-            It's nice to meet you!
+          <h2 className="text-2xl font-medium leading-[0.98] tracking-[-0.02em] text-balance text-gray-900 dark:text-white mb-3">
+            It's nice to
+            <br />
+            <span className="text-gray-500 dark:text-gray-400">meet you!</span>
           </h2>
           <p className="text-sm text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
             We're just two Yale students who got tired of spreadsheet hell and
@@ -1458,8 +1471,10 @@ export default function AboutPage() {
           transition={{ duration: 0.8 }}
           className="bg-gradient-to-br from-pink-50 via-purple-50 to-blue-50 dark:from-blue-900/30 dark:via-purple-900/20 dark:to-pink-900/30 backdrop-blur-2xl rounded-xl p-6 border border-pink-200/60 dark:border-white/[0.1] shadow-neu text-center"
         >
-          <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-3">
-            Want to contribute?
+          <h2 className="text-xl font-medium leading-[0.98] tracking-[-0.02em] text-balance text-gray-900 dark:text-white mb-3">
+            Want to
+            <br />
+            <span className="text-gray-500 dark:text-gray-400">contribute?</span>
           </h2>
           <p className="text-gray-700 dark:text-gray-300 text-sm max-w-xl mx-auto mb-4">
             This is a project by and for the Yale community. We'd love your

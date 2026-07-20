@@ -448,6 +448,28 @@ export default function AboutPage() {
         </motion.div>
       </section>
 
+      {/* §5 Statement band */}
+      <section className="px-4 py-28 lg:px-6">
+        <motion.div
+          initial={{ opacity: 0.001, y: 10 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.2 }}
+          transition={{ duration: 0.6 }}
+          className="mx-auto max-w-3xl text-center"
+        >
+          <h2 className="font-medium text-balance text-4xl md:text-5xl leading-[1.02] tracking-[-0.015em] text-gray-900 dark:text-white">
+            Used by 1 in 6 Yale undergrads.
+            <br />
+            <span className="text-gray-400 dark:text-gray-500">
+              Some of them even like it.
+            </span>
+          </h2>
+          <p className="mt-6 font-mono text-xs tracking-tight text-gray-400 dark:text-gray-500">
+            ~2,000 students · every residential college · zero ads, zero fees
+          </p>
+        </motion.div>
+      </section>
+
       {/* Blueprint Section */}
       <div className="relative max-w-7xl mx-auto px-4 lg:px-6 py-24">
         <div className="bg-white/70 dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/70 dark:via-gray-900/50 dark:to-gray-950/70 backdrop-blur-2xl rounded-xl p-6 border border-gray-200 dark:border-gray-800/50 shadow-neu">

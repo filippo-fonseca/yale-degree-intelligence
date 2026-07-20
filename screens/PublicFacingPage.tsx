@@ -297,10 +297,13 @@ export default function AboutPage() {
           className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(circle,rgba(0,0,0,0.05)_1px,transparent_1px)] dark:bg-[radial-gradient(circle,rgba(255,255,255,0.055)_1px,transparent_1px)] [background-size:24px_24px] [mask-image:linear-gradient(to_bottom,black,transparent_55%)]"
         />
 
-        {/* §3 Floating course tiles. Framed around the headline, md+ only. */}
+        {/* §3 Floating course tiles. Framed around the headline, md+ only.
+            The inner max-w-5xl track matches the headline block's envelope, so
+            the tiles orbit the type instead of hugging the viewport edges. */}
         <div className="pointer-events-none absolute inset-0 -z-[1]">
+          <div className="relative mx-auto h-full max-w-5xl px-4 lg:px-6">
           <FloatingTile
-            className="top-[11%] left-[2%] lg:left-[6%]"
+            className="top-[11%] left-[1%] lg:left-[3%]"
             rotate={-6}
             delay={0}
           >
@@ -313,7 +316,7 @@ export default function AboutPage() {
           </FloatingTile>
 
           <FloatingTile
-            className="top-[14%] right-[2%] lg:right-[7%]"
+            className="top-[14%] right-[1%] lg:right-[4%]"
             rotate={5}
             delay={1.5}
           >
@@ -327,7 +330,7 @@ export default function AboutPage() {
           </FloatingTile>
 
           <FloatingTile
-            className="bottom-[13%] left-[4%] lg:left-[9%] !flex-col !items-start !gap-1.5"
+            className="bottom-[13%] left-[2%] lg:left-[5%] !flex-col !items-start !gap-1.5"
             rotate={4}
             delay={3}
           >
@@ -340,7 +343,7 @@ export default function AboutPage() {
           </FloatingTile>
 
           <FloatingTile
-            className="bottom-[10%] right-[3%] lg:right-[8%]"
+            className="bottom-[10%] right-[2%] lg:right-[5%]"
             rotate={-4}
             delay={4.5}
           >
@@ -351,6 +354,7 @@ export default function AboutPage() {
               Hum
             </span>
           </FloatingTile>
+          </div>
         </div>
 
         <div className="relative max-w-5xl mx-auto px-4 lg:px-6 text-center">
@@ -463,95 +467,51 @@ export default function AboutPage() {
         </motion.div>
       </section>
 
-      {/* Blueprint Section */}
-      <div className="relative max-w-7xl mx-auto px-4 lg:px-6 py-24">
-        <div className="bg-white/70 dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/70 dark:via-gray-900/50 dark:to-gray-950/70 backdrop-blur-2xl rounded-xl p-6 border border-gray-200 dark:border-gray-800/50 shadow-neu">
-          <div className="text-center mb-8">
-            <SectionEyebrow
-              centered
-              icon={<FiAlertCircle />}
-              label="Blueprint"
-            />
-            <h2 className="text-2xl font-medium leading-[0.98] tracking-[-0.02em] text-balance text-gray-900 dark:text-white mb-3">
+      {/* Blueprint band — open canvas, no panel */}
+      <section className="px-4 py-24 lg:px-6">
+        <motion.div {...reveal} className="mx-auto max-w-5xl">
+          <div className="text-center">
+            <Kicker>The blueprint</Kicker>
+            <h2 className="mt-4 text-balance text-4xl font-medium leading-[1.02] tracking-[-0.015em] text-gray-900 dark:text-white md:text-5xl">
               Our blueprint,
               <br />
-              <span className="text-gray-500 dark:text-gray-400">broken down.</span>
+              <span className="text-gray-400 dark:text-gray-500">
+                broken down.
+              </span>
             </h2>
-            <p className="text-sm text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
-              How we believe we transformed frustration into an elegant solution
-              for academic planning and visualization at Yale.
+            <p className="mx-auto mt-6 max-w-[60ch] font-sf text-base leading-relaxed text-gray-500 dark:text-gray-400 md:text-lg">
+              How we turned frustration into an elegant way to plan and see a
+              Yale degree.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {/* Problem */}
-            <Card fade>
-              <CardHeader
-                icon={<FiAlertCircle className="w-4 h-4" />}
-                title="The Problem"
-                color="red"
-              />
-              <ul className="space-y-2 text-gray-700 dark:text-gray-300 text-sm">
-                {[
-                  "Scattered requirements across PDFs and websites",
-                  "Manual tracking in error-prone spreadsheets",
-                  "No centralized view of progress",
-                  "Planning nightmares (esp. double majors)",
-                ].map((t) => (
-                  <li key={t} className="flex items-start gap-2">
-                    <FiChevronRight className="text-red-400 mt-1" />
-                    <span>{t}</span>
-                  </li>
-                ))}
-              </ul>
-            </Card>
-
-            {/* Solution */}
-            <Card fade delay={0.1}>
-              <CardHeader
-                icon={<FiZap className="w-4 h-4" />}
-                title="Our Solution"
-                color="blue"
-              />
-              <ul className="space-y-2 text-gray-700 dark:text-gray-300 text-sm">
-                {[
-                  "Unified requirements database",
-                  "Real-time progress stats + visualization",
-                  "Intelligent course recommendations",
-                  "Clean, intuitive interface",
-                ].map((t) => (
-                  <li key={t} className="flex items-start gap-2">
-                    <FiChevronRight className="text-blue-400 mt-1" />
-                    <span>{t}</span>
-                  </li>
-                ))}
-              </ul>
-            </Card>
-
-            {/* Impact */}
-            <Card fade>
-              <CardHeader
-                icon={<FiTrendingUp className="w-4 h-4" />}
-                title="The Impact"
-                color="green"
-              />
-              <ul className="space-y-2 text-gray-700 dark:text-gray-300 text-sm">
-                {[
-                  "Hours saved on academic planning",
-                  "Reduced errors in requirement tracking",
-                  "Empowered students can make space for fun classes",
-                  "Democratized access to academic insights",
-                ].map((t) => (
-                  <li key={t} className="flex items-start gap-2">
-                    <FiChevronRight className="text-green-400 mt-1" />
-                    <span>{t}</span>
-                  </li>
-                ))}
-              </ul>
-            </Card>
+          <div className="mt-16 grid gap-12 font-sf sm:grid-cols-3 sm:gap-10">
+            {[
+              {
+                title: "The problem",
+                body: "Requirements scattered across PDFs and websites, tracked by hand in fragile spreadsheets, with no single view of progress. Double majors made it worse.",
+              },
+              {
+                title: "Our solution",
+                body: "One unified requirements database, real-time progress and visualization, course recommendations that know your major, and an interface that stays out of the way.",
+              },
+              {
+                title: "The impact",
+                body: "Hours back on planning, far fewer tracking errors, room left for the fun classes, and academic insight that is no longer gatekept.",
+              },
+            ].map((item) => (
+              <div key={item.title}>
+                <h3 className="text-sm font-medium text-gray-900 dark:text-white">
+                  {item.title}
+                </h3>
+                <p className="mt-3 text-sm leading-relaxed text-gray-500 dark:text-gray-400">
+                  {item.body}
+                </p>
+              </div>
+            ))}
           </div>
-        </div>
-      </div>
+        </motion.div>
+      </section>
 
       {/* Simulator Section */}
       <section
@@ -1696,6 +1656,7 @@ function GhostCTA({ children, onClick, href, className = "" }: CTAProps) {
   );
 }
 
+/* Unit 2 leftover; removed in the cleanup sweep once no section uses it. */
 function SectionEyebrow({
   icon,
   label,
@@ -1714,6 +1675,115 @@ function SectionEyebrow({
         {label}
       </span>
     </div>
+  );
+}
+
+/** Mono kicker above a section statement (spec §6). */
+function Kicker({ children }: { children: React.ReactNode }) {
+  return (
+    <p className="font-mono text-xs uppercase tracking-[0.2em] text-pink-500/80">
+      {children}
+    </p>
+  );
+}
+
+/** The one window-chrome recipe (spec §0). Content sits edge to edge below it. */
+function MockWindow({
+  filename,
+  children,
+  className = "",
+}: {
+  filename: string;
+  children: React.ReactNode;
+  className?: string;
+}) {
+  return (
+    <div
+      className={`overflow-hidden rounded-2xl border border-black/[0.08] bg-white shadow-[0_32px_80px_-24px_rgba(0,0,0,0.35)] dark:border-white/[0.09] dark:bg-[#101013] ${className}`}
+    >
+      <div className="relative flex items-center gap-1.5 border-b border-black/[0.05] px-4 py-2.5 dark:border-white/[0.06]">
+        <span className="h-2.5 w-2.5 rounded-full bg-red-500/80" />
+        <span className="h-2.5 w-2.5 rounded-full bg-yellow-500/80" />
+        <span className="h-2.5 w-2.5 rounded-full bg-green-500/80" />
+        <span className="pointer-events-none absolute inset-x-0 text-center font-mono text-[10px] text-gray-400 dark:text-gray-500">
+          {filename}
+        </span>
+      </div>
+      {children}
+    </div>
+  );
+}
+
+/**
+ * The shared open-canvas feature template (spec §6). Alternating split: the
+ * mock column sits right by default, left when `mockSide` says so. No panel,
+ * no glow, no section shell; whitespace does the separating.
+ */
+function FeatureSection({
+  id,
+  kicker,
+  line1,
+  line2,
+  body,
+  checks,
+  actions,
+  mock,
+  mockSide = "right",
+}: {
+  id?: string;
+  kicker: string;
+  line1: string;
+  line2: React.ReactNode;
+  body: React.ReactNode;
+  checks: React.ReactNode[];
+  actions?: React.ReactNode;
+  mock: React.ReactNode;
+  mockSide?: "left" | "right";
+}) {
+  return (
+    <section id={id} className="px-4 py-24 lg:px-6">
+      <div className="mx-auto grid max-w-6xl items-center gap-12 lg:grid-cols-[5fr,7fr]">
+        <motion.div
+          {...reveal}
+          className={mockSide === "left" ? "lg:order-2" : undefined}
+        >
+          <Kicker>{kicker}</Kicker>
+          <h2 className="mt-4 text-balance text-4xl font-medium leading-[1.02] tracking-[-0.015em] text-gray-900 dark:text-white md:text-5xl">
+            {line1}
+            <br />
+            <span className="text-gray-400 dark:text-gray-500">{line2}</span>
+          </h2>
+          <p className="mt-6 max-w-[46ch] font-sf text-base leading-relaxed text-gray-500 dark:text-gray-400 md:text-lg">
+            {body}
+          </p>
+          <ul className="mt-8 space-y-3">{checks}</ul>
+          {actions ? (
+            <div className="mt-8 flex flex-wrap items-center gap-3 font-sf">
+              {actions}
+            </div>
+          ) : null}
+        </motion.div>
+
+        <motion.div
+          {...reveal}
+          className={mockSide === "left" ? "lg:order-1" : undefined}
+        >
+          {mock}
+        </motion.div>
+      </div>
+    </section>
+  );
+}
+
+/** t3-style checklist row. Not a chip, not a box. */
+function CheckRow({ children }: { children: React.ReactNode }) {
+  return (
+    <li className="flex items-start gap-2.5 font-sf text-sm text-gray-600 dark:text-gray-300">
+      <span aria-hidden className="mt-px shrink-0 text-pink-500">
+        ✓
+      </span>
+      <span>{children}</span>
+    </li>
   );
 }
 

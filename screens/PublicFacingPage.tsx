@@ -641,7 +641,7 @@ export default function AboutPage() {
             </span>
           </h2>
           <p className="mt-6 font-mono text-xs tracking-tight text-gray-400 dark:text-gray-500">
-            ~2,000 students · every residential college · zero ads, zero fees
+            ~1,200 students · every residential college · zero ads, zero fees
           </p>
         </motion.div>
       </section>

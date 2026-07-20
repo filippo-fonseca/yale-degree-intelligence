@@ -228,6 +228,9 @@ export default function AboutPage() {
 
   return (
     <div className="min-h-screen bg-[#fafafa] dark:bg-[#0a0a0b] font-louize overflow-x-hidden">
+      {/* §1 YDN banner, above the nav and dismissible for good */}
+      <YdnBanner />
+
       {/* Nav */}
       <nav className="sticky top-0 z-50 h-14 backdrop-blur-xl bg-white/70 dark:bg-[#0a0a0b]/70 border-b border-black/[0.05] dark:border-white/[0.06]">
         <div className="max-w-7xl mx-auto h-full px-4 lg:px-6 flex items-center justify-between">
@@ -346,25 +349,13 @@ export default function AboutPage() {
         <div className="relative max-w-5xl mx-auto px-4 lg:px-6 text-center">
           {/* 1. The one hero pill */}
           <div className="flex justify-center">
-            <span className="inline-flex items-center gap-2 rounded-full border border-black/[0.08] dark:border-white/10 bg-white dark:bg-white/[0.04] px-3.5 py-1 text-xs font-medium font-sf">
-              <Link
-                href="/changelog"
-                className="text-gray-900 dark:text-white transition-opacity hover:opacity-70"
-              >
-                ✦ v3 is out now
-              </Link>
-              <span aria-hidden className="text-gray-300 dark:text-gray-600">
-                ·
-              </span>
-              <a
-                href="https://yaledailynews.com/blog/2025/09/23/new-student-run-platform-aims-to-simplify-degree-planning/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-gray-500 dark:text-gray-400 transition-colors hover:text-gray-900 dark:hover:text-white"
-              >
-                featured in the Yale Daily News ↗
-              </a>
-            </span>
+            {/* The banner owns the YDN mention, so the pill is just the release. */}
+            <Link
+              href="/changelog"
+              className="inline-flex items-center gap-2 rounded-full border border-black/[0.08] dark:border-white/10 bg-white dark:bg-white/[0.04] px-3.5 py-1 text-xs font-medium font-sf text-gray-900 dark:text-white transition-opacity hover:opacity-70"
+            >
+              ✦ v3 is out now
+            </Link>
           </div>
 
           {/* 2. Headline */}
@@ -1450,6 +1441,72 @@ const reveal = {
   viewport: { once: true, amount: 0.2, margin: "0px 0px 1000% 0px" },
   transition: { duration: 0.6 },
 } as const;
+
+const YDN_BANNER_KEY = "di-ydn-banner-dismissed";
+const YDN_ARTICLE_URL =
+  "https://yaledailynews.com/blog/2025/09/23/new-student-run-platform-aims-to-simplify-degree-planning/";
+
+/**
+ * §1: the slim band above the nav. It defaults to visible and only hides once
+ * the effect has read localStorage, so the server render and the first client
+ * render agree. Dismissal is permanent.
+ */
+function YdnBanner() {
+  const [dismissed, setDismissed] = useState(false);
+
+  useEffect(() => {
+    try {
+      if (window.localStorage.getItem(YDN_BANNER_KEY) === "1")
+        setDismissed(true);
+    } catch {
+      // Private mode or a blocked store: keep the banner, it is not critical.
+    }
+  }, []);
+
+  const dismiss = () => {
+    setDismissed(true);
+    try {
+      window.localStorage.setItem(YDN_BANNER_KEY, "1");
+    } catch {
+      // Nothing to do; the banner still collapses for this session.
+    }
+  };
+
+  return (
+    <AnimatePresence initial={false}>
+      {!dismissed && (
+        <motion.div
+          initial={false}
+          exit={{ height: 0, opacity: 0 }}
+          transition={{ duration: 0.22, ease: "easeOut" }}
+          className="overflow-hidden bg-gray-900 text-white dark:bg-white/[0.06]"
+        >
+          <div className="relative mx-auto flex h-9 max-w-7xl items-center justify-center px-10 font-sf text-xs font-medium">
+            <a
+              href={YDN_ARTICLE_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="transition-opacity hover:opacity-80"
+            >
+              Featured in the Yale Daily News{" "}
+              <span aria-hidden className="opacity-70">
+                ↗
+              </span>
+            </a>
+            <button
+              type="button"
+              onClick={dismiss}
+              aria-label="Dismiss"
+              className="absolute right-3 rounded p-1 text-white/60 transition-colors hover:text-white"
+            >
+              <FiX size={14} />
+            </button>
+          </div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+}
 
 /**
  * A small hero tile that drifts on a gentle 6s loop. Positioned by the caller

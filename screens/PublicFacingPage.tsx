@@ -518,6 +518,11 @@ export default function AboutPage() {
       <div className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="bg-white/70 dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/70 dark:via-gray-900/50 dark:to-gray-950/70 backdrop-blur-2xl rounded-xl p-6 border border-gray-200 dark:border-gray-800/50 shadow-neu">
           <div className="text-center mb-8">
+            <SectionEyebrow
+              centered
+              icon={<FiAlertCircle />}
+              label="Blueprint"
+            />
             <h2 className="text-2xl font-medium leading-[0.98] tracking-[-0.02em] text-balance text-gray-900 dark:text-white mb-3">
               Our blueprint,
               <br />
@@ -611,6 +616,7 @@ export default function AboutPage() {
           <div className="flex flex-col lg:flex-row gap-6 items-center">
             {/* Left: copy + bullets */}
             <div className="flex-1 min-w-0">
+              <SectionEyebrow icon={<FiZap />} label="Simulator" />
               <h3 className="text-2xl font-medium leading-[0.98] tracking-[-0.02em] text-balance text-gray-900 dark:text-white mb-2">
                 Simulator: drag, drop,
                 <br />
@@ -705,6 +711,7 @@ export default function AboutPage() {
           <div className="absolute -left-24 -bottom-24 h-64 w-64 rounded-full bg-blue-500/10 blur-3xl" />
 
           <div className="mb-4">
+            <SectionEyebrow icon={<FiBarChart2 />} label="Stats" />
             <h3 className="text-2xl font-medium leading-[0.98] tracking-[-0.02em] text-balance text-gray-900 dark:text-white">
               Contextual stats that
               <br />
@@ -1007,6 +1014,7 @@ export default function AboutPage() {
       >
         <div className="bg-white/70 dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/70 dark:via-gray-900/50 dark:to-gray-950/70 backdrop-blur-2xl rounded-xl p-6 border border-gray-200 dark:border-gray-800/50 shadow-neu">
           <div className="mb-3">
+            <SectionEyebrow icon={<GraduationCap />} label="Major progress" />
             <h3 className="text-xl font-medium leading-[0.98] tracking-[-0.02em] text-balance text-gray-900 dark:text-white">
               Your <i>Major</i> progress,
               <br />
@@ -1192,6 +1200,7 @@ export default function AboutPage() {
       <section className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="bg-white/70 dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/70 dark:via-gray-900/50 dark:to-gray-950/70 backdrop-blur-2xl rounded-xl p-6 border border-gray-200 dark:border-gray-800/50 shadow-neu">
           <div className="text-center mb-8 flex flex-col gap-2">
+            <SectionEyebrow centered icon={<FiUsers />} label="Friends" />
             <h2 className="text-2xl font-medium leading-[0.98] tracking-[-0.02em] text-balance text-gray-900 dark:text-white">
               Friends &
               <br />
@@ -1333,6 +1342,7 @@ export default function AboutPage() {
           className="bg-white/70 dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/70 dark:via-gray-900/50 dark:to-gray-950/70 backdrop-blur-2xl rounded-xl p-6 border border-gray-200 dark:border-gray-800/50 shadow-neu"
         >
           <div className="text-center mb-8">
+            <SectionEyebrow centered icon={<FiHeart />} label="Mission" />
             <h2 className="text-2xl font-medium leading-[0.98] tracking-[-0.02em] text-balance text-gray-900 dark:text-white mb-3">
               What it is and
               <br />
@@ -1375,6 +1385,7 @@ export default function AboutPage() {
         className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 scroll-mt-20"
       >
         <div className="text-center mb-8">
+          <SectionEyebrow centered icon={<FiUsers />} label="Team" />
           <h2 className="text-2xl font-medium leading-[0.98] tracking-[-0.02em] text-balance text-gray-900 dark:text-white mb-3">
             It's nice to
             <br />
@@ -1471,6 +1482,7 @@ export default function AboutPage() {
           transition={{ duration: 0.8 }}
           className="bg-gradient-to-br from-pink-50 via-purple-50 to-blue-50 dark:from-blue-900/30 dark:via-purple-900/20 dark:to-pink-900/30 backdrop-blur-2xl rounded-xl p-6 border border-pink-200/60 dark:border-white/[0.1] shadow-neu text-center"
         >
+          <SectionEyebrow centered icon={<FiMail />} label="Contribute" />
           <h2 className="text-xl font-medium leading-[0.98] tracking-[-0.02em] text-balance text-gray-900 dark:text-white mb-3">
             Want to
             <br />
@@ -1639,6 +1651,27 @@ export default function AboutPage() {
           animation: border-spin 3s linear infinite;
         }
       `}</style>
+    </div>
+  );
+}
+
+function SectionEyebrow({
+  icon,
+  label,
+  centered = false,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  centered?: boolean;
+}) {
+  return (
+    <div className={`mb-3 ${centered ? "flex justify-center" : ""}`}>
+      <span className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[13px] font-medium bg-pink-500/[0.06] text-pink-900/70 dark:bg-pink-500/10 dark:text-pink-200/80 border border-pink-500/10">
+        <span className="inline-flex h-3.5 w-3.5 items-center justify-center [&>svg]:h-3.5 [&>svg]:w-3.5">
+          {icon}
+        </span>
+        {label}
+      </span>
     </div>
   );
 }

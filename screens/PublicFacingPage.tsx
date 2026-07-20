@@ -9,7 +9,6 @@ import {
   AnimatePresence,
 } from "framer-motion";
 import {
-  FiArrowRight,
   FiGithub,
   FiMail,
   FiExternalLink,
@@ -31,16 +30,12 @@ import {
   FiMoon,
   FiSun,
 } from "react-icons/fi";
-import { HiSparkles } from "react-icons/hi2";
 import LogoIcon from "@/icons/LogoIcon";
-import CompoundLogo from "@/components/ui/CompoundLogo";
 import Link from "next/link";
 import { useState, useRef, useEffect } from "react";
 import LoginPage from "@/components/LoginPage";
 import dynamic from "next/dynamic";
 import { GraduationCap, BookOpen, Award, Clock } from "lucide-react";
-import CosmicBackground from "@/components/CosmicBackground/page";
-import HeroConstellation from "@/components/landing/HeroConstellation";
 import { useTheme } from "@/context/ThemeContext";
 
 function CountUp({
@@ -248,52 +243,34 @@ export default function AboutPage() {
   if (logInFlow) return <LoginPage onBackClick={() => setLogInFlow(false)} />;
 
   return (
-    <div className="min-h-screen pt-2 bg-gradient-to-br from-gray-50 via-gray-100 to-white dark:from-gray-950 dark:via-gray-900 dark:to-gray-900 font-louize overflow-x-hidden">
-      <CosmicBackground mode="stars" opacity={0.9} />
-      {/* Welcome Banner */}
-      <div className="relative mb-8 mt-14 z-30 bg-gradient-to-r from-emerald-50 via-blue-50 to-purple-50 dark:from-emerald-900/20 dark:via-blue-900/20 dark:to-purple-900/20 backdrop-blur-xl border-b border-gray-200 dark:border-white/[0.08] shadow-sm dark:shadow-[0_8px_32px_rgba(0,0,0,0.3),inset_0_1px_0_rgba(255,255,255,0.1)]">
-        <div className="max-w-7xl mx-auto px-4 lg:px-6 py-2.5 flex items-center justify-center gap-2">
-          <span className="px-2.5 py-1 text-[10px] sm:text-xs font-semibold rounded-full bg-gradient-to-r from-emerald-500/20 to-emerald-600/20 border border-emerald-500/30 text-emerald-700 dark:text-emerald-300 shadow-[inset_0_1px_0_rgba(255,255,255,0.1),0_2px_8px_rgba(52,211,153,0.2)] flex items-center gap-1 shrink-0">
-            <HiSparkles className="w-3 h-3" />{" "}
-            <span className="hidden sm:inline">News</span>
-          </span>
-          <p className="text-[11px] sm:text-sm text-emerald-800 dark:text-emerald-100">
-            <span className="sm:hidden">The YDN featured us.</span>
-            <span className="hidden sm:inline">
-              The Yale Daily News featured us.
-            </span>{" "}
-            <a
-              href="https://yaledailynews.com/blog/2025/09/23/new-student-run-platform-aims-to-simplify-degree-planning/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-blue-600 dark:text-blue-300 font-medium hover:text-gray-900 dark:hover:text-white hover:underline transition-colors"
-            >
-              Read it!
-            </a>
-          </p>
-        </div>
-      </div>
-
-      {/* Sticky Navbar */}
-      <motion.nav
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="fixed top-0 left-0 right-0 z-50 bg-white/80 dark:bg-gray-950/80 backdrop-blur-xl border-b border-black/[0.06] dark:border-white/[0.06] shadow-[0_4px_24px_rgba(0,0,0,0.3)]"
-      >
-        <div className="max-w-7xl mx-auto px-3 lg:px-6 py-2.5 sm:py-3 flex items-center justify-between">
+    <div className="min-h-screen bg-[#fafafa] dark:bg-[#0a0a0b] font-louize overflow-x-hidden">
+      {/* Nav */}
+      <nav className="sticky top-0 z-50 h-14 backdrop-blur-xl bg-white/70 dark:bg-[#0a0a0b]/70 border-b border-black/[0.05] dark:border-white/[0.06]">
+        <div className="max-w-7xl mx-auto h-full px-4 lg:px-6 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <LogoIcon width={22} height={22} className="sm:w-6 sm:h-6" />
-            <span className="text-sm font-medium text-gray-800 dark:text-gray-200 hidden sm:inline">
+            <LogoIcon width={22} height={22} />
+            <span className="text-sm font-medium text-gray-900 dark:text-white hidden sm:inline">
               DegreeIntelligence
             </span>
           </div>
-          <div className="flex items-center gap-1.5 sm:gap-2">
+          <div className="flex items-center gap-3 sm:gap-5">
+            <Link
+              href="/changelog"
+              className="hidden sm:inline text-sm text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white transition-colors"
+            >
+              Changelog
+            </Link>
+            <Link
+              href="/mission"
+              className="hidden sm:inline text-sm text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white transition-colors"
+            >
+              Mission
+            </Link>
             <button
               type="button"
               onClick={toggleTheme}
               aria-label="Toggle theme"
-              className="rounded-xl border border-black/[0.06] p-2 text-gray-600 transition-colors hover:bg-black/[0.04] dark:border-white/[0.08] dark:text-gray-300 dark:hover:bg-white/[0.06]"
+              className="rounded-full p-2 text-gray-500 transition-colors hover:bg-black/[0.04] hover:text-gray-900 dark:text-gray-400 dark:hover:bg-white/[0.06] dark:hover:text-white"
             >
               {resolvedTheme === "dark" ? (
                 <FiSun size={14} />
@@ -301,218 +278,190 @@ export default function AboutPage() {
                 <FiMoon size={14} />
               )}
             </button>
-            <motion.button
-              className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm bg-gradient-to-r from-pink-500/20 via-purple-500/20 to-blue-500/20 hover:from-pink-500/30 hover:via-purple-500/30 hover:to-blue-500/30 backdrop-blur-xl rounded-lg sm:rounded-xl text-gray-900 dark:text-white font-medium transition-all shadow-[0_4px_20px_rgba(139,92,246,0.2),inset_0_1px_0_rgba(255,255,255,0.1)] border border-black/[0.08] dark:border-white/[0.1]"
-              whileHover={{ y: -1 }}
-              whileTap={{ scale: 0.98 }}
-              onClick={() => setLogInFlow(true)}
-            >
+            <MonoCTA onClick={() => setLogInFlow(true)}>
               <span className="sm:hidden">Log in</span>
               <span className="hidden sm:inline">Log in with CAS</span>
-              <FiArrowRight size={14} className="opacity-70" />
-            </motion.button>
+              <span aria-hidden>→</span>
+            </MonoCTA>
           </div>
         </div>
-      </motion.nav>
+      </nav>
 
-      {/* Hero Section */}
-      <div className="relative pt-6 sm:pt-8">
-        {/* Cursor-adaptive constellation background (sits behind hero content) */}
-        <HeroConstellation />
-        {/* increased top padding to fix logo spacing */}
-        <div className="max-w-7xl mx-auto px-4 pb-3 lg:px-6 relative z-10">
-          <motion.div
-            initial={{ opacity: 1, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="text-center p-6 sm:p-8 rounded-xl bg-white/70 dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 backdrop-blur-xl border border-gray-200 dark:border-gray-800/50 shadow-neu"
+      {/* §2 Hero */}
+      {/* isolate: the dot grid and tiles sit on negative z, so the band needs its
+          own stacking context or they paint behind the canvas background. */}
+      <section className="relative isolate pt-24 md:pt-32 pb-16 md:pb-24">
+        {/* Hero dot grid, faded out by ~55% of the hero band's height */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(circle,rgba(0,0,0,0.05)_1px,transparent_1px)] dark:bg-[radial-gradient(circle,rgba(255,255,255,0.055)_1px,transparent_1px)] [background-size:24px_24px] [mask-image:linear-gradient(to_bottom,black,transparent_55%)]"
+        />
+
+        {/* §3 Floating course tiles. Framed around the headline, md+ only. */}
+        <div className="pointer-events-none absolute inset-0 -z-[1]">
+          <FloatingTile
+            className="top-[11%] left-[2%] lg:left-[6%]"
+            rotate={-6}
+            delay={0}
           >
-            {/* Version Badge */}
-            <motion.div
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-              className="mb-4 flex justify-center"
-            >
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase bg-gradient-to-r from-blue-500/20 via-purple-500/20 to-pink-500/20 border border-pink-500/20 dark:border-white/[0.15] shadow-[0_4px_20px_rgba(139,92,246,0.25),inset_0_1px_0_rgba(255,255,255,0.15)] backdrop-blur-xl">
-                <span className="w-1.5 h-1.5 rounded-full bg-gradient-to-r from-emerald-400 to-emerald-500 animate-pulse shadow-[0_0_8px_rgba(52,211,153,0.6)]"></span>
-                <span className="bg-gradient-to-r from-pink-600 via-purple-600 to-blue-600 dark:from-blue-300 dark:via-purple-300 dark:to-pink-300 bg-clip-text text-transparent">
-                  Introducing DegreeIntelligence v3
-                </span>
-              </span>
-            </motion.div>
+            <span className="font-mono text-xs text-gray-900 dark:text-white">
+              CPSC 323
+            </span>
+            <span className="rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] font-medium text-emerald-600 dark:text-emerald-400">
+              A-
+            </span>
+          </FloatingTile>
 
-            <div className="flex justify-center mb-5">
-              {/* more space under logo */}
-              <div className="relative w-20 h-20">
-                <motion.div
-                  animate={{ rotate: 360 }}
-                  transition={{
-                    duration: 20,
-                    repeat: Infinity,
-                    ease: "linear",
-                  }}
-                  className="absolute inset-0 rounded-full border-2 border-transparent border-t-blue-400/30 border-r-purple-400/30"
-                />
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <LogoIcon width={40} height={40} />
-                </div>
-              </div>
-            </div>
+          <FloatingTile
+            className="top-[14%] right-[2%] lg:right-[7%]"
+            rotate={5}
+            delay={1.5}
+          >
+            <span className="text-xs text-gray-500 dark:text-gray-400">GPA</span>
+            <span className="font-mono text-xs font-medium text-gray-900 dark:text-white">
+              3.87
+            </span>
+            <span className="text-[10px] text-emerald-600 dark:text-emerald-400">
+              ↑
+            </span>
+          </FloatingTile>
 
-            <h1 className="flex items-center justify-center text-4xl font-medium leading-[0.98] tracking-[-0.02em] text-balance text-gray-900 dark:text-white mb-3">
-              <CompoundLogo hideLogo animated size="lg" />
-            </h1>
-            {/* Welcome Badge */}
-            <div className="mb-3 flex justify-center">
-              <div className="relative p-[1px] rounded-xl bg-gradient-to-r from-pink-500/40 via-purple-500/40 to-blue-500/40">
-                <span className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-medium bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/90 dark:via-gray-900/80 dark:to-gray-950/90 text-pink-600 dark:text-pink-200 shadow-[0_8px_32px_rgba(236,72,153,0.2),inset_0_1px_0_rgba(255,255,255,0.1),inset_0_-1px_0_rgba(0,0,0,0.2)] backdrop-blur-xl">
-                  <FiHeart className="w-3 h-3 text-blue-400" /> We're so glad
-                  you're here. We think you'll love this.
-                </span>
-              </div>
-            </div>
+          <FloatingTile
+            className="bottom-[13%] left-[4%] lg:left-[9%] !flex-col !items-start !gap-1.5"
+            rotate={4}
+            delay={3}
+          >
+            <span className="font-mono text-[10px] text-gray-500 dark:text-gray-400">
+              Core 7/9
+            </span>
+            <span className="block h-1 w-20 overflow-hidden rounded-full bg-gray-200 dark:bg-white/10">
+              <span className="block h-full w-[78%] rounded-full bg-gradient-to-r from-pink-500 to-purple-600" />
+            </span>
+          </FloatingTile>
 
-            <h2 className="text-2xl sm:text-3xl font-medium leading-[0.98] tracking-[-0.02em] text-balance text-gray-900 dark:text-white mb-4">
-              Your Yale Degree,
-              <br />
-              <span className="text-gray-500 dark:text-gray-400">made easy.</span>
-            </h2>
+          <FloatingTile
+            className="bottom-[10%] right-[3%] lg:right-[8%]"
+            rotate={-4}
+            delay={4.5}
+          >
+            <span className="font-mono text-xs text-gray-900 dark:text-white">
+              ECON 121
+            </span>
+            <span className="rounded-full bg-black/[0.05] px-2 py-0.5 text-[10px] font-medium text-gray-500 dark:bg-white/10 dark:text-gray-400">
+              Hum
+            </span>
+          </FloatingTile>
+        </div>
 
-            <p className="text-base text-gray-700 dark:text-gray-300 max-w-2xl mx-auto mb-5">
-              Let's democratize academic planning, stats, & insights at Yale,
-              together.{" "}
+        <div className="relative max-w-5xl mx-auto px-4 lg:px-6 text-center">
+          {/* 1. The one hero pill */}
+          <div className="flex justify-center">
+            <span className="inline-flex items-center gap-2 rounded-full border border-black/[0.08] dark:border-white/10 bg-white dark:bg-white/[0.04] px-3.5 py-1 text-xs font-medium font-sf">
               <Link
-                href="#team"
-                className="inline-flex items-center gap-1.5 text-transparent bg-clip-text bg-gradient-to-r from-pink-600 to-purple-600 dark:from-blue-300 dark:to-purple-300 hover:from-pink-500 hover:to-purple-500 dark:hover:from-blue-200 dark:hover:to-purple-200 font-medium transition-all group"
+                href="/changelog"
+                className="text-gray-900 dark:text-white transition-opacity hover:opacity-70"
               >
-                For Yalies, by Yalies
-                <span className="text-purple-400 text-sm opacity-70 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all">
-                  ↓
-                </span>
+                ✦ v3 is out now
               </Link>
-            </p>
-
-            <motion.div className="flex flex-wrap justify-center gap-3">
-              <motion.button
-                className="px-5 py-2.5 text-sm bg-gradient-to-br from-black/[0.04] to-transparent dark:from-white/[0.06] hover:from-black/[0.08] dark:hover:from-white/[0.1] backdrop-blur-xl rounded-xl text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white font-medium flex items-center gap-2 transition-all shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] border border-black/[0.06] dark:border-white/[0.08] hover:border-black/[0.12] dark:hover:border-white/[0.15]"
-                whileHover={{ y: -1 }}
-                whileTap={{ scale: 0.98 }}
-                onClick={() => setShowVideoModal(true)}
+              <span aria-hidden className="text-gray-300 dark:text-gray-600">
+                ·
+              </span>
+              <a
+                href="https://yaledailynews.com/blog/2025/09/23/new-student-run-platform-aims-to-simplify-degree-planning/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-gray-500 dark:text-gray-400 transition-colors hover:text-gray-900 dark:hover:text-white"
               >
-                See v3 launch vid
-                <FiPlayCircle className="opacity-70" size={14} />
-              </motion.button>
-              <motion.button
-                className="group relative px-5 py-2.5 text-sm rounded-xl text-white font-medium flex items-center gap-2 transition-all overflow-hidden"
-                whileHover={{ y: -1 }}
-                whileTap={{ scale: 0.98 }}
-                onClick={() => setLogInFlow(true)}
-              >
-                {/* Animated gradient border */}
-                <span
-                  className="absolute inset-0 rounded-xl bg-[conic-gradient(from_var(--angle),#06b6d4,#8b5cf6,#ec4899,#06b6d4)] p-[2px] animate-border-spin"
-                  style={{ "--angle": "0deg" } as React.CSSProperties}
-                >
-                  <span className="flex h-full w-full rounded-[10px] bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl" />
-                </span>
-                {/* Glow effect */}
-                <span
-                  className="absolute inset-0 rounded-xl opacity-50 blur-md bg-[conic-gradient(from_var(--angle),#06b6d4,#8b5cf6,#ec4899,#06b6d4)] animate-border-spin"
-                  style={{ "--angle": "0deg" } as React.CSSProperties}
-                />
-                {/* Button content */}
-                <span className="relative z-10 flex items-center gap-2">
-                  Log in with CAS
-                  <FiArrowRight
-                    className="opacity-80 group-hover:translate-x-0.5 transition-transform"
-                    size={14}
-                  />
-                </span>
-              </motion.button>
-            </motion.div>
+                featured in the Yale Daily News ↗
+              </a>
+            </span>
+          </div>
 
-            {/* Social Proof */}
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.3 }}
-              className="mt-8 pt-6"
-            >
-              <p className="text-xl sm:text-2xl font-medium bg-gradient-to-r from-pink-600 via-purple-600 to-blue-600 dark:from-blue-200 dark:via-purple-200 dark:to-pink-200 bg-clip-text text-transparent leading-relaxed">
-                Have you heard? 1 in 6 Yale undergrads already use DegreeIntelligence.
-              </p>
-              <p className="text-base text-gray-500 dark:text-gray-400 mt-2">
-                Why don't you? Even if you do...{" "}
-                <span className="text-purple-600 dark:text-purple-300 font-medium">
-                  We just launched v3. Free. Always.
-                </span>
-              </p>
+          {/* 2. Headline */}
+          <h1 className="mt-8 font-medium text-balance text-6xl md:text-7xl lg:text-[5.5rem] leading-[0.95] tracking-[-0.02em] text-gray-900 dark:text-white">
+            Your Yale degree,
+            <br />
+            <span className="text-gray-400 dark:text-gray-500">made easy.</span>
+          </h1>
 
-              {/* V3 Launch Video */}
-              <motion.div
-                initial={{ opacity: 0, y: 15 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.5 }}
-                className="mt-8"
-              >
-                {/* Caption */}
-                <div className="mb-4 text-center">
-                  <p className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed">
-                    <span className="font-semibold bg-gradient-to-r from-pink-600 via-purple-600 to-blue-600 dark:from-pink-300 dark:via-purple-300 dark:to-blue-300 bg-clip-text text-transparent">
-                      OUR V3 LAUNCH, FEB 2026.
-                    </span>
-                    <br />
-                    <span className="text-gray-400 dark:text-gray-500">
-                      it's prettier. it's faster. it's better. you should
-                      probably check it out idk
-                    </span>
-                  </p>
-                </div>
+          {/* 3. Subhead */}
+          <p className="mt-6 mx-auto max-w-[60ch] font-sf text-base md:text-lg text-gray-500 dark:text-gray-400 leading-relaxed">
+            Plan semesters, track requirements, simulate outcomes, and see
+            exactly how your degree is going. Built by Yalies, for Yalies.
+          </p>
 
-                {/* Video Container */}
-                <div className="relative mx-auto max-w-2xl">
-                  {/* Glow effect */}
-                  <div className="absolute -inset-1 bg-gradient-to-r from-pink-500/20 via-purple-500/20 to-blue-500/20 rounded-2xl blur-xl opacity-60" />
+          {/* 4. CTA row */}
+          <div className="mt-8 flex flex-wrap items-center justify-center gap-3 font-sf">
+            <BrandCTA onClick={() => setLogInFlow(true)}>
+              Log in with CAS
+            </BrandCTA>
+            <GhostCTA onClick={() => setShowVideoModal(true)}>
+              Watch the launch film
+            </GhostCTA>
+          </div>
 
-                  {/* Video wrapper */}
-                  <div className="relative rounded-2xl overflow-hidden border-2 border-black/[0.08] dark:border-white/[0.1] shadow-[0_8px_48px_rgba(0,0,0,0.5),0_0_60px_rgba(139,92,246,0.15),inset_0_1px_0_rgba(255,255,255,0.1)] bg-white/80 dark:bg-gray-950/80 backdrop-blur-xl">
-                    {/* Decorative top bar */}
-                    <div className="flex items-center gap-1.5 px-4 py-2.5 bg-gradient-to-r from-gray-100/80 to-gray-50/80 dark:from-gray-900/80 dark:to-gray-950/80 border-b border-black/[0.05] dark:border-white/[0.06]">
-                      <div className="w-2.5 h-2.5 rounded-full bg-red-500/80" />
-                      <div className="w-2.5 h-2.5 rounded-full bg-yellow-500/80" />
-                      <div className="w-2.5 h-2.5 rounded-full bg-green-500/80" />
-                      <span className="ml-3 text-[10px] text-gray-400 dark:text-gray-500 font-medium tracking-wide">
-                        v3-launch-vid.mp4
-                      </span>
-                    </div>
+          {/* 5. Mono microcopy */}
+          <p className="mt-5 font-mono text-xs tracking-tight text-gray-400 dark:text-gray-500">
+            Free forever · No install · 1 in 6 Yale undergrads already on board
+          </p>
+        </div>
+      </section>
 
-                    {/* Video embed */}
-                    <div className="aspect-video">
-                      <iframe
-                        width="560"
-                        height="315"
-                        src="https://www.youtube.com/embed/5H1kjMWQfgs?si=F9mSXs1G_Wy1Fkx-"
-                        title="YouTube video player"
-                        frameBorder="0"
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                        referrerPolicy="strict-origin-when-cross-origin"
-                        allowFullScreen
-                        className="w-full h-full"
-                      ></iframe>
-                    </div>
-                  </div>
-                </div>
-              </motion.div>
-            </motion.div>
-          </motion.div>
+      {/* §4 The product window: the launch film */}
+      <section className="relative isolate px-4 lg:px-6">
+        {/* The page's one glow */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0 -z-10 flex items-start justify-center"
+        >
+          <div className="h-[28rem] w-[52rem] max-w-full rounded-full bg-gradient-to-r from-pink-500/15 to-purple-600/15 blur-[120px]" />
         </div>
 
-        {/* soft brand glow — hero only */}
-        <div className="pointer-events-none absolute inset-0 -z-10">
-          <div className="absolute left-1/2 top-10 -translate-x-1/2 h-72 w-[36rem] rounded-full bg-gradient-to-r from-pink-500/20 to-purple-600/20 blur-3xl" />
-        </div>
-      </div>
+        <motion.div
+          {...reveal}
+          className="relative mx-auto max-w-6xl [mask-image:linear-gradient(to_bottom,black_85%,transparent)]"
+        >
+          <div className="overflow-hidden rounded-2xl border border-black/[0.08] dark:border-white/[0.09] bg-white dark:bg-[#101013] shadow-[0_32px_80px_-24px_rgba(0,0,0,0.35)]">
+            {/* Title bar */}
+            <div className="relative flex items-center gap-1.5 border-b border-black/[0.05] px-4 py-2.5 dark:border-white/[0.06]">
+              <span className="h-2.5 w-2.5 rounded-full bg-red-500/80" />
+              <span className="h-2.5 w-2.5 rounded-full bg-yellow-500/80" />
+              <span className="h-2.5 w-2.5 rounded-full bg-green-500/80" />
+              <span className="pointer-events-none absolute inset-x-0 text-center font-mono text-[10px] text-gray-400 dark:text-gray-500">
+                v3-launch-film.mp4
+              </span>
+            </div>
+
+            {/* Film, edge to edge under the title bar */}
+            <div className="aspect-video">
+              <iframe
+                src="https://www.youtube.com/embed/5H1kjMWQfgs?si=F9mSXs1G_Wy1Fkx-"
+                title="DegreeIntelligence v3 launch film"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                referrerPolicy="strict-origin-when-cross-origin"
+                allowFullScreen
+                className="h-full w-full border-0"
+              />
+            </div>
+          </div>
+        </motion.div>
+      </section>
+
+      {/* §5 Statement band */}
+      <section className="px-4 py-28 lg:px-6">
+        <motion.div {...reveal} className="mx-auto max-w-3xl text-center">
+          <h2 className="font-medium text-balance text-4xl md:text-5xl leading-[1.02] tracking-[-0.015em] text-gray-900 dark:text-white">
+            Used by 1 in 6 Yale undergrads.
+            <br />
+            <span className="text-gray-400 dark:text-gray-500">
+              Some of them even like it.
+            </span>
+          </h2>
+          <p className="mt-6 font-mono text-xs tracking-tight text-gray-400 dark:text-gray-500">
+            ~2,000 students · every residential college · zero ads, zero fees
+          </p>
+        </motion.div>
+      </section>
 
       {/* Blueprint Section */}
       <div className="relative max-w-7xl mx-auto px-4 lg:px-6 py-24">
@@ -1631,27 +1580,119 @@ export default function AboutPage() {
           -ms-overflow-style: none;
           scrollbar-width: none;
         }
-
-        @property --angle {
-          syntax: "<angle>";
-          initial-value: 0deg;
-          inherits: false;
-        }
-
-        @keyframes border-spin {
-          from {
-            --angle: 0deg;
-          }
-          to {
-            --angle: 360deg;
-          }
-        }
-
-        .animate-border-spin {
-          animation: border-spin 3s linear infinite;
-        }
       `}</style>
     </div>
+  );
+}
+
+/**
+ * The one entrance treatment (spec §0): opacity 0.001 -> 1, y 10 -> 0, once.
+ *
+ * The viewport look-ahead of a full extra screen matters. Without it a band
+ * that starts just below the fold stays at opacity 0.001 in a static full-page
+ * capture, because the observer never fires when nothing scrolls. Content is
+ * never hidden by default, so the entrance has to resolve on its own.
+ */
+const reveal = {
+  initial: { opacity: 0.001, y: 10 },
+  whileInView: { opacity: 1, y: 0 },
+  viewport: { once: true, amount: 0.2, margin: "0px 0px 100% 0px" },
+  transition: { duration: 0.6 },
+} as const;
+
+/**
+ * A small hero tile that drifts on a gentle 6s loop. Positioned by the caller
+ * against the hero band; sits behind the headline text but above the canvas.
+ */
+function FloatingTile({
+  className,
+  rotate,
+  delay,
+  children,
+}: {
+  className: string;
+  rotate: number;
+  delay: number;
+  children: React.ReactNode;
+}) {
+  return (
+    <motion.div
+      aria-hidden
+      animate={{ y: [0, -4, 0] }}
+      transition={{
+        duration: 6,
+        delay,
+        repeat: Infinity,
+        ease: "easeInOut",
+      }}
+      style={{ rotate: `${rotate}deg` }}
+      className={`absolute hidden md:flex items-center gap-2 rounded-xl border border-black/[0.08] dark:border-white/[0.09] bg-white/90 dark:bg-white/[0.05] backdrop-blur px-3 py-2 shadow-lg font-sf dark:opacity-90 ${className}`}
+    >
+      {children}
+    </motion.div>
+  );
+}
+
+/* --- The sealed button mix (spec §0). Three treatments, nothing else. --- */
+
+type CTAProps = {
+  children: React.ReactNode;
+  onClick?: () => void;
+  href?: string;
+  className?: string;
+};
+
+/** (a) BRAND primary. Hero CTA and the closing-statement CTA only. */
+function BrandCTA({ children, onClick, href, className = "" }: CTAProps) {
+  const cls = `inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 px-6 py-3 text-sm font-medium text-white shadow-lg shadow-purple-600/25 ${className}`;
+  const body = (
+    <>
+      {children}
+      <span aria-hidden>→</span>
+    </>
+  );
+  if (href)
+    return (
+      <motion.a whileHover={{ y: -1 }} href={href} className={cls}>
+        {body}
+      </motion.a>
+    );
+  return (
+    <motion.button whileHover={{ y: -1 }} onClick={onClick} className={cls}>
+      {body}
+    </motion.button>
+  );
+}
+
+/** (b) MONO primary. Nav CTA and any in-section primary. */
+function MonoCTA({ children, onClick, href, className = "" }: CTAProps) {
+  const cls = `inline-flex items-center gap-1.5 rounded-full bg-gray-900 text-white dark:bg-white dark:text-gray-900 px-4 py-1.5 text-sm font-medium ${className}`;
+  if (href)
+    return (
+      <motion.a whileHover={{ y: -1 }} href={href} className={cls}>
+        {children}
+      </motion.a>
+    );
+  return (
+    <motion.button whileHover={{ y: -1 }} onClick={onClick} className={cls}>
+      {children}
+    </motion.button>
+  );
+}
+
+/** (c) Ghost secondary. */
+function GhostCTA({ children, onClick, href, className = "" }: CTAProps) {
+  const cls = `inline-flex items-center gap-2 rounded-full px-6 py-3 text-sm font-medium bg-white text-gray-900 ring-1 ring-black/10 dark:bg-white/[0.06] dark:text-white dark:ring-white/15 ${className}`;
+  if (href)
+    return (
+      <motion.a whileHover={{ y: -1 }} href={href} className={cls}>
+        {children}
+      </motion.a>
+    );
+  return (
+    <motion.button whileHover={{ y: -1 }} onClick={onClick} className={cls}>
+      {children}
+    </motion.button>
   );
 }
 

@@ -369,9 +369,11 @@ export default function AboutPage() {
 
           {/* 2. Headline */}
           <h1 className="mt-8 font-medium text-balance text-6xl md:text-7xl lg:text-[5.5rem] leading-[0.95] tracking-[-0.02em] text-gray-900 dark:text-white">
-            Your Yale degree,
+            The control plane
             <br />
-            <span className="text-gray-400 dark:text-gray-500">made easy.</span>
+            <span className="text-gray-400 dark:text-gray-500">
+              for your Yale degree.
+            </span>
           </h1>
 
           {/* 3. Subhead */}

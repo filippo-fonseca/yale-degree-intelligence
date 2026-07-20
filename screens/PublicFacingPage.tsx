@@ -21,10 +21,11 @@ import {
 import LogoIcon from "@/icons/LogoIcon";
 import Link from "next/link";
 import { useState, useRef, useEffect } from "react";
-import LoginPage from "@/components/LoginPage";
 import dynamic from "next/dynamic";
+import toast from "react-hot-toast";
 import { GraduationCap, BookOpen, Award, Clock } from "lucide-react";
 import { useTheme } from "@/context/ThemeContext";
+import { useAuth } from "@/context/AuthContext";
 
 function CountUp({
   to,
@@ -102,9 +103,26 @@ function MajorProgressBar({ percent }: { percent: number }) {
 }
 
 export default function AboutPage() {
-  const [logInFlow, setLogInFlow] = useState(false);
   const [showVideoModal, setShowVideoModal] = useState(false);
   const { resolvedTheme, toggleTheme } = useTheme();
+
+  // §11: no interstitial. Every "Log in with CAS" opens the CAS popup straight
+  // from here. The id tracks which button was pressed so only that one shows a
+  // pending state. The yale.edu allowlist stays where it is, inside
+  // signInWithGoogle; this layer only reports failures.
+  const { signInWithGoogle } = useAuth();
+  const [authPendingId, setAuthPendingId] = useState<string | null>(null);
+  const startLogin = async (id: string) => {
+    if (authPendingId) return;
+    setAuthPendingId(id);
+    try {
+      await signInWithGoogle();
+    } catch {
+      toast.error("Could not sign you in. Please try again.");
+    } finally {
+      setAuthPendingId(null);
+    }
+  };
 
   // Close modal on ESC key
   useEffect(() => {
@@ -224,8 +242,6 @@ export default function AboutPage() {
     "not-taken",
   ];
 
-  if (logInFlow) return <LoginPage onBackClick={() => setLogInFlow(false)} />;
-
   return (
     <div className="min-h-screen bg-[#fafafa] dark:bg-[#0a0a0b] font-louize overflow-x-hidden">
       {/* §1 YDN banner, above the nav and dismissible for good */}
@@ -265,7 +281,10 @@ export default function AboutPage() {
                 <FiMoon size={14} />
               )}
             </button>
-            <MonoCTA onClick={() => setLogInFlow(true)}>
+            <MonoCTA
+              onClick={() => startLogin("nav")}
+              pending={authPendingId === "nav"}
+            >
               <span className="sm:hidden">Log in</span>
               <span className="hidden sm:inline">Log in with CAS</span>
               <span aria-hidden>→</span>
@@ -438,7 +457,10 @@ export default function AboutPage() {
 
           {/* 4. CTA row */}
           <div className="mt-8 flex flex-wrap items-center justify-center gap-3 font-sf">
-            <BrandCTA onClick={() => setLogInFlow(true)}>
+            <BrandCTA
+              onClick={() => startLogin("hero")}
+              pending={authPendingId === "hero"}
+            >
               Log in with CAS
             </BrandCTA>
             <GhostCTA onClick={() => setShowVideoModal(true)}>
@@ -577,7 +599,10 @@ export default function AboutPage() {
         ]}
         actions={
           <>
-            <MonoCTA onClick={() => setLogInFlow(true)}>
+            <MonoCTA
+              onClick={() => startLogin("simulator")}
+              pending={authPendingId === "simulator"}
+            >
               Try the simulator
             </MonoCTA>
             <GhostCTA onClick={() => setShowVideoModal(true)}>
@@ -624,7 +649,10 @@ export default function AboutPage() {
           <CheckRow key="c">Your grade distribution at a glance</CheckRow>,
         ]}
         actions={
-          <MonoCTA onClick={() => setLogInFlow(true)}>
+          <MonoCTA
+            onClick={() => startLogin("stats")}
+            pending={authPendingId === "stats"}
+          >
             See my full stats
           </MonoCTA>
         }
@@ -959,7 +987,10 @@ export default function AboutPage() {
           </CheckRow>,
         ]}
         actions={
-          <MonoCTA onClick={() => setLogInFlow(true)}>
+          <MonoCTA
+            onClick={() => startLogin("major")}
+            pending={authPendingId === "major"}
+          >
             See my major progress
           </MonoCTA>
         }
@@ -1154,7 +1185,12 @@ export default function AboutPage() {
           <CheckRow key="c">Grades and GPA are never shared</CheckRow>,
         ]}
         actions={
-          <MonoCTA onClick={() => setLogInFlow(true)}>Enable friends</MonoCTA>
+          <MonoCTA
+            onClick={() => startLogin("friends")}
+            pending={authPendingId === "friends"}
+          >
+            Enable friends
+          </MonoCTA>
         }
         mock={
           <MockWindow filename="friends.tsx">
@@ -1340,7 +1376,10 @@ export default function AboutPage() {
             </span>
           </h2>
           <div className="mt-10 flex justify-center font-sf">
-            <BrandCTA onClick={() => setLogInFlow(true)}>
+            <BrandCTA
+              onClick={() => startLogin("closing")}
+              pending={authPendingId === "closing"}
+            >
               Log in with CAS
             </BrandCTA>
           </div>
@@ -1611,12 +1650,34 @@ type CTAProps = {
   onClick?: () => void;
   href?: string;
   className?: string;
+  /** §11: the pressed CTA disables itself and says so while CAS is open. */
+  pending?: boolean;
 };
 
+/** The one pending treatment: a label swap, disabled, dimmed. No spinner ring. */
+function Pending() {
+  return (
+    <motion.span
+      animate={{ opacity: [0.55, 1, 0.55] }}
+      transition={{ duration: 1.4, repeat: Infinity }}
+    >
+      Signing in...
+    </motion.span>
+  );
+}
+
 /** (a) BRAND primary. Hero CTA and the closing-statement CTA only. */
-function BrandCTA({ children, onClick, href, className = "" }: CTAProps) {
-  const cls = `inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 px-6 py-3 text-sm font-medium text-white shadow-lg shadow-purple-600/25 ${className}`;
-  const body = (
+function BrandCTA({
+  children,
+  onClick,
+  href,
+  className = "",
+  pending = false,
+}: CTAProps) {
+  const cls = `inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 px-6 py-3 text-sm font-medium text-white shadow-lg shadow-purple-600/25 ${pending ? "opacity-70" : ""} ${className}`;
+  const body = pending ? (
+    <Pending />
+  ) : (
     <>
       {children}
       <span aria-hidden>→</span>
@@ -1629,15 +1690,27 @@ function BrandCTA({ children, onClick, href, className = "" }: CTAProps) {
       </motion.a>
     );
   return (
-    <motion.button whileHover={{ y: -1 }} onClick={onClick} className={cls}>
+    <motion.button
+      whileHover={pending ? undefined : { y: -1 }}
+      onClick={onClick}
+      disabled={pending}
+      aria-busy={pending}
+      className={cls}
+    >
       {body}
     </motion.button>
   );
 }
 
 /** (b) MONO primary. Nav CTA and any in-section primary. */
-function MonoCTA({ children, onClick, href, className = "" }: CTAProps) {
-  const cls = `inline-flex items-center gap-1.5 rounded-full bg-gray-900 text-white dark:bg-white dark:text-gray-900 px-4 py-1.5 text-sm font-medium ${className}`;
+function MonoCTA({
+  children,
+  onClick,
+  href,
+  className = "",
+  pending = false,
+}: CTAProps) {
+  const cls = `inline-flex items-center gap-1.5 rounded-full bg-gray-900 text-white dark:bg-white dark:text-gray-900 px-4 py-1.5 text-sm font-medium ${pending ? "opacity-70" : ""} ${className}`;
   if (href)
     return (
       <motion.a whileHover={{ y: -1 }} href={href} className={cls}>
@@ -1645,8 +1718,14 @@ function MonoCTA({ children, onClick, href, className = "" }: CTAProps) {
       </motion.a>
     );
   return (
-    <motion.button whileHover={{ y: -1 }} onClick={onClick} className={cls}>
-      {children}
+    <motion.button
+      whileHover={pending ? undefined : { y: -1 }}
+      onClick={onClick}
+      disabled={pending}
+      aria-busy={pending}
+      className={cls}
+    >
+      {pending ? <Pending /> : children}
     </motion.button>
   );
 }

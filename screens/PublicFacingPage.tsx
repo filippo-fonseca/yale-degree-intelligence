@@ -650,11 +650,22 @@ export default function AboutPage() {
 
             {/* Right: GIF/video placeholder */}
             <div className="flex-1 w-full px-4">
-              <div className="relative rounded-xl border-2 border-pink-500 bg-black/40 overflow-hidden shadow-2xl">
+              <div className="relative rounded-2xl overflow-hidden border-2 border-black/[0.08] dark:border-white/[0.1] shadow-[0_8px_48px_rgba(0,0,0,0.5),0_0_60px_rgba(139,92,246,0.15),inset_0_1px_0_rgba(255,255,255,0.1)] bg-white/80 dark:bg-gray-950/80 backdrop-blur-xl">
+                <div className="flex items-center gap-1.5 px-4 py-2.5 bg-gradient-to-r from-gray-100/80 to-gray-50/80 dark:from-gray-900/80 dark:to-gray-950/80 border-b border-black/[0.05] dark:border-white/[0.06]">
+                  <div className="w-2.5 h-2.5 rounded-full bg-red-500/80" />
+                  <div className="w-2.5 h-2.5 rounded-full bg-yellow-500/80" />
+                  <div className="w-2.5 h-2.5 rounded-full bg-green-500/80" />
+                  <span className="ml-3 text-[10px] text-gray-400 dark:text-gray-500 font-medium tracking-wide">
+                    simulator-demo.gif
+                  </span>
+                </div>
                 <img
                   src="/demo/simulator.gif"
                   alt="Simulator demo"
-                  className="w-[80%] h-[80%] object-cover aspect-video"
+                  className="w-full aspect-video object-cover"
+                  loading="lazy"
+                  width={860}
+                  height={704}
                 />
               </div>
             </div>

@@ -343,6 +343,69 @@ export default function AboutPage() {
                 Hum
               </span>
             </FloatingTile>
+
+            {/* A tiny GPA sparkline, the stats view in miniature */}
+            <FloatingTile
+              className="top-[42%] right-[0%] lg:right-[1%] !flex-col !items-start !gap-1.5"
+              rotate={-5}
+              delay={2.2}
+            >
+              <span className="font-mono text-[10px] text-gray-500 dark:text-gray-400">
+                GPA trend
+              </span>
+              <svg
+                width="64"
+                height="18"
+                viewBox="0 0 64 18"
+                fill="none"
+                aria-hidden
+              >
+                <path
+                  d="M1 14L13 11L25 13L37 7L49 8L63 2"
+                  stroke="url(#tileSpark)"
+                  strokeWidth="1.75"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+                <defs>
+                  <linearGradient id="tileSpark" x1="0" y1="0" x2="64" y2="0">
+                    <stop stopColor="#ec4899" />
+                    <stop offset="1" stopColor="#9333ea" />
+                  </linearGradient>
+                </defs>
+              </svg>
+            </FloatingTile>
+
+            {/* Distributionals, using the app's own chip colors */}
+            <FloatingTile
+              className="top-[47%] left-[0%] lg:left-[1%]"
+              rotate={5}
+              delay={5.2}
+            >
+              <span className="rounded-full border border-purple-500/30 bg-purple-500/20 px-2 py-0.5 text-[10px] font-medium text-purple-700 dark:text-purple-300">
+                Hu ✓
+              </span>
+              <span className="rounded-full border border-sky-500/30 bg-sky-500/20 px-2 py-0.5 text-[10px] font-medium text-sky-700 dark:text-sky-300">
+                So ✓
+              </span>
+              <span className="rounded-full border border-red-500/30 bg-red-500/20 px-2 py-0.5 text-[10px] font-medium text-red-700 dark:text-red-300">
+                QR 1/2
+              </span>
+            </FloatingTile>
+
+            {/* A friend, the one social note in the orbit */}
+            <FloatingTile
+              className="top-[5%] right-[17%] lg:right-[21%]"
+              rotate={6}
+              delay={3.7}
+            >
+              <span className="flex h-5 w-5 items-center justify-center rounded-full bg-gradient-to-br from-pink-500 to-purple-600 text-[9px] font-medium text-white">
+                SC
+              </span>
+              <span className="text-[10px] text-gray-500 dark:text-gray-400">
+                2 mutual courses
+              </span>
+            </FloatingTile>
           </div>
         </div>
 

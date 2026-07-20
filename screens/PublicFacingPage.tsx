@@ -288,7 +288,9 @@ export default function AboutPage() {
       </nav>
 
       {/* §2 Hero */}
-      <section className="relative pt-24 md:pt-32 pb-16 md:pb-24">
+      {/* isolate: the dot grid and tiles sit on negative z, so the band needs its
+          own stacking context or they paint behind the canvas background. */}
+      <section className="relative isolate pt-24 md:pt-32 pb-16 md:pb-24">
         {/* Hero dot grid, faded out by ~55% of the hero band's height */}
         <div
           aria-hidden
@@ -406,7 +408,7 @@ export default function AboutPage() {
       </section>
 
       {/* §4 The product window: the launch film */}
-      <section className="relative px-4 lg:px-6">
+      <section className="relative isolate px-4 lg:px-6">
         {/* The page's one glow */}
         <div
           aria-hidden
@@ -416,10 +418,7 @@ export default function AboutPage() {
         </div>
 
         <motion.div
-          initial={{ opacity: 0.001, y: 10 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.2 }}
-          transition={{ duration: 0.6 }}
+          {...reveal}
           className="relative mx-auto max-w-6xl [mask-image:linear-gradient(to_bottom,black_85%,transparent)]"
         >
           <div className="overflow-hidden rounded-2xl border border-black/[0.08] dark:border-white/[0.09] bg-white dark:bg-[#101013] shadow-[0_32px_80px_-24px_rgba(0,0,0,0.35)]">
@@ -450,13 +449,7 @@ export default function AboutPage() {
 
       {/* §5 Statement band */}
       <section className="px-4 py-28 lg:px-6">
-        <motion.div
-          initial={{ opacity: 0.001, y: 10 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.2 }}
-          transition={{ duration: 0.6 }}
-          className="mx-auto max-w-3xl text-center"
-        >
+        <motion.div {...reveal} className="mx-auto max-w-3xl text-center">
           <h2 className="font-medium text-balance text-4xl md:text-5xl leading-[1.02] tracking-[-0.015em] text-gray-900 dark:text-white">
             Used by 1 in 6 Yale undergrads.
             <br />
@@ -1591,6 +1584,21 @@ export default function AboutPage() {
     </div>
   );
 }
+
+/**
+ * The one entrance treatment (spec §0): opacity 0.001 -> 1, y 10 -> 0, once.
+ *
+ * The viewport look-ahead of a full extra screen matters. Without it a band
+ * that starts just below the fold stays at opacity 0.001 in a static full-page
+ * capture, because the observer never fires when nothing scrolls. Content is
+ * never hidden by default, so the entrance has to resolve on its own.
+ */
+const reveal = {
+  initial: { opacity: 0.001, y: 10 },
+  whileInView: { opacity: 1, y: 0 },
+  viewport: { once: true, amount: 0.2, margin: "0px 0px 100% 0px" },
+  transition: { duration: 0.6 },
+} as const;
 
 /**
  * A small hero tile that drifts on a gentle 6s loop. Positioned by the caller

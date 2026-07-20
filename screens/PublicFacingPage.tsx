@@ -531,11 +531,12 @@ export default function AboutPage() {
         }
         mock={
           <MockWindow filename="simulator-demo.gif">
+            {/* Not lazy: this mock is the section's whole payload, and a lazy
+                image never fetches in a static full-page capture. */}
             <img
               src="/demo/simulator.gif"
               alt="Simulator demo"
               className="aspect-video w-full object-cover"
-              loading="lazy"
               width={860}
               height={704}
             />

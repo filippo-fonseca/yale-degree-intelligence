@@ -57,8 +57,9 @@ function CountUp({
   const mv = useMotionValue(0);
   const sp = useSpring(mv, { stiffness: 120, damping: 20, duration });
   const rounded = useTransform(sp, (v) => v.toFixed(decimals));
-  // start when visible
-  if (inView) mv.set(to);
+  useEffect(() => {
+    if (inView) mv.set(to);
+  }, [inView, to, mv]);
   return <motion.span>{rounded as any}</motion.span>;
 }
 

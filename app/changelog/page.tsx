@@ -137,7 +137,7 @@ export default function ChangelogPage() {
             initial={{ opacity: 0, y: -8 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
-            className="mb-6 inline-flex items-center gap-1.5 rounded-full border border-gray-200 bg-black/[0.03] px-3 py-1 text-xs text-gray-600 backdrop-blur-md dark:border-white/10 dark:bg-white/[0.04] dark:text-white/65"
+            className="mb-6 inline-flex items-center gap-1.5 rounded-full border border-gray-200 bg-black/[0.03] px-3 py-1 text-xs text-gray-600 backdrop-blur-md dark:border-white/[0.14] dark:bg-white/[0.08] dark:text-white/90"
           >
             <Command size={12} className="text-pink-500 dark:text-pink-300" />
             Changelog

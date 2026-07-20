@@ -21,10 +21,12 @@ import {
 import LogoIcon from "@/icons/LogoIcon";
 import Link from "next/link";
 import { useState, useRef, useEffect } from "react";
-import LoginPage from "@/components/LoginPage";
 import dynamic from "next/dynamic";
+import toast from "react-hot-toast";
 import { GraduationCap, BookOpen, Award, Clock } from "lucide-react";
 import { useTheme } from "@/context/ThemeContext";
+import { useAuth } from "@/context/AuthContext";
+import { UserAvatar } from "@/components/ui/UserAvatar";
 
 function CountUp({
   to,
@@ -69,15 +71,18 @@ const statsDemo = {
   semesters: ["Fall 23", "Spring 24", "Fall 24", "Spring 25"],
   cumulativeGpa: [3.79, 3.71, 3.8, 3.88], // smooth upward trend
   gradeDistribution: [
-    { label: "A", count: 12.5 },
+    { label: "A", count: 9.5 },
+    { label: "A-", count: 3 },
     { label: "B+", count: 4 },
     { label: "B", count: 1 },
     { label: "B-", count: 1 },
   ],
 };
 
-const CHART_COLORS = [
-  "#8B5CF6", // purple
+// The app's own DEPT_COLORS (StatsView.tsx:26). The grade pie must not invent
+// a palette of its own.
+const DEPT_COLORS = [
+  "#8B5CF6", // violet
   "#3B82F6", // blue
   "#10B981", // emerald
   "#F59E0B", // amber
@@ -85,26 +90,138 @@ const CHART_COLORS = [
   "#6366F1", // indigo
   "#F97316", // orange
   "#14B8A6", // teal
+  "#EF4444", // red
+  "#84CC16", // lime
 ];
 
-function MajorProgressBar({ percent }: { percent: number }) {
+/**
+ * The app's requirement status tokens, lifted verbatim from
+ * MajorProgressView/requirementStatus.ts so the mock cards are the same cards.
+ */
+const STATUS_CLASSES = {
+  completed: {
+    card: "bg-emerald-50 dark:bg-transparent dark:bg-gradient-to-br dark:from-emerald-950/30 dark:via-gray-900/50 dark:to-gray-950/50 border-emerald-200 dark:border-emerald-800/25",
+    title: "text-emerald-700 dark:text-emerald-300",
+    badge:
+      "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-700/30",
+    description: "text-emerald-600 dark:text-emerald-300/70",
+    accent: "text-emerald-600 dark:text-emerald-300",
+  },
+  inProgress: {
+    card: "bg-blue-50 dark:bg-transparent dark:bg-gradient-to-br dark:from-blue-950/40 dark:via-gray-900/50 dark:to-gray-950/50 border-blue-200 dark:border-blue-800/30",
+    title: "text-blue-600 dark:text-blue-300",
+    badge:
+      "bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-300 border border-blue-300 dark:border-blue-700/30",
+    description: "text-blue-500 dark:text-blue-300/70",
+    accent: "text-blue-600 dark:text-blue-300",
+  },
+  partial: {
+    card: "bg-amber-50 dark:bg-transparent dark:bg-gradient-to-br dark:from-amber-950/30 dark:via-gray-900/50 dark:to-gray-950/50 border-amber-200 dark:border-amber-800/30",
+    title: "text-amber-700 dark:text-amber-300",
+    badge:
+      "bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 border border-amber-300 dark:border-amber-700/30",
+    description: "text-amber-600 dark:text-amber-300/70",
+    accent: "text-amber-600 dark:text-amber-300",
+  },
+  notStarted: {
+    card: "bg-red-50 dark:bg-transparent dark:bg-gradient-to-br dark:from-red-950/30 dark:via-gray-900/50 dark:to-gray-950/50 border-red-200 dark:border-red-800/25",
+    title: "text-red-600 dark:text-red-300",
+    badge:
+      "bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-300 border border-red-300 dark:border-red-700/30",
+    description: "text-red-500 dark:text-red-300/70",
+    accent: "text-red-600 dark:text-red-300",
+  },
+} as const;
+
+type DemoStatus = keyof typeof STATUS_CLASSES;
+
+/** getHeatCellClasses, same source file, for the requirement heat map. */
+const HEAT_CELL: Record<DemoStatus, string> = {
+  completed:
+    "bg-emerald-500/90 dark:bg-emerald-500/80 border-emerald-600/40 text-white",
+  inProgress:
+    "bg-blue-500/80 dark:bg-blue-500/70 border-blue-600/40 text-white",
+  partial:
+    "bg-amber-400/90 dark:bg-amber-500/70 border-amber-600/40 text-amber-950 dark:text-white",
+  notStarted:
+    "bg-red-200/80 dark:bg-red-900/40 border-red-400/40 text-red-900 dark:text-red-200",
+};
+
+/** optionPillClasses, RequirementCard.tsx. */
+const OPTION_PILL = {
+  complete:
+    "bg-emerald-100 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-700",
+  "in-progress":
+    "bg-blue-100 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 border border-blue-300 dark:border-blue-700",
+  "not-taken":
+    "bg-red-100 dark:bg-red-900/20 text-red-700 dark:text-red-300 border border-red-300 dark:border-red-700",
+} as const;
+
+/** The app's card idiom, StatsView.tsx:178. */
+const APP_CARD_P3 =
+  "p-3 rounded-xl bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 backdrop-blur-md border border-gray-200 dark:border-gray-800/50 transition-all relative shadow-neu";
+const APP_CARD_P4 =
+  "p-4 rounded-xl bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 backdrop-blur-md border border-gray-200 dark:border-gray-800/50 shadow-neu";
+
+/**
+ * The app's major progress bar (MajorProgressView/index.tsx:620): one track,
+ * two stacked fills, completed painted over in-progress. Not two rainbow bars.
+ */
+function MajorProgressBar({
+  completedPct,
+  withInProgressPct,
+}: {
+  completedPct: number;
+  withInProgressPct: number;
+}) {
   return (
-    <div className="w-full bg-gray-100 dark:bg-gray-900/80 rounded-full h-3 overflow-hidden border border-black/[0.05] dark:border-white/[0.05] shadow-[inset_0_2px_4px_rgba(0,0,0,0.3)]">
+    <div className="relative w-full bg-gray-200 dark:bg-gray-800 rounded-full h-3 overflow-hidden shadow-[inset_0_1px_2px_rgba(0,0,0,0.08)] dark:shadow-[inset_0_1px_2px_rgba(0,0,0,0.3)]">
       <motion.div
         initial={{ width: 0 }}
-        whileInView={{ width: `${Math.min(Math.max(percent, 0), 100)}%` }}
+        whileInView={{ width: `${withInProgressPct}%` }}
         viewport={mockViewport}
         transition={{ duration: 1, ease: "easeOut" }}
-        className="h-3 rounded-full bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 shadow-[0_0_12px_rgba(139,92,246,0.4),inset_0_1px_0_rgba(255,255,255,0.3)]"
+        className="absolute inset-y-0 left-0 rounded-full bg-purple-400 dark:bg-purple-500/70"
+      />
+      <motion.div
+        initial={{ width: 0 }}
+        whileInView={{ width: `${completedPct}%` }}
+        viewport={mockViewport}
+        transition={{ duration: 1, ease: "easeOut" }}
+        className="absolute inset-y-0 left-0 rounded-full bg-violet-500 shadow-[0_0_10px_rgba(139,92,246,0.6)]"
       />
     </div>
   );
 }
 
 export default function AboutPage() {
-  const [logInFlow, setLogInFlow] = useState(false);
   const [showVideoModal, setShowVideoModal] = useState(false);
   const { resolvedTheme, toggleTheme } = useTheme();
+
+  // The chart tokens StatsView derives from the theme. Same values, so the
+  // mock charts read as the app's charts in both themes.
+  const isDark = resolvedTheme === "dark";
+  const axisTickColor = isDark ? "#9CA3AF" : "#4B5563";
+  const gridLineColor = isDark ? "#374151" : "#E5E7EB";
+  const pieBorderColor = isDark ? "#0B1120" : "#FFFFFF";
+
+  // §11: no interstitial. Every "Log in with CAS" opens the CAS popup straight
+  // from here. The id tracks which button was pressed so only that one shows a
+  // pending state. The yale.edu allowlist stays where it is, inside
+  // signInWithGoogle; this layer only reports failures.
+  const { signInWithGoogle } = useAuth();
+  const [authPendingId, setAuthPendingId] = useState<string | null>(null);
+  const startLogin = async (id: string) => {
+    if (authPendingId) return;
+    setAuthPendingId(id);
+    try {
+      await signInWithGoogle();
+    } catch {
+      toast.error("Could not sign you in. Please try again.");
+    } finally {
+      setAuthPendingId(null);
+    }
+  };
 
   // Close modal on ESC key
   useEffect(() => {
@@ -155,9 +272,7 @@ export default function AboutPage() {
     ((demoTotals.completed + demoTotals.inProgress) / demoTotals.total) * 100,
   );
 
-  // Mock requirement cards mirroring the real MajorProgressView layout:
-  // status-colored card + n/N badge + course pills (emerald=complete,
-  // blue=in progress, red=not taken). Marketing preview only, no fetching.
+  // The requirements board, grouped by status the way the app groups it.
   type DemoPill = {
     code: string;
     cr: number;
@@ -165,69 +280,88 @@ export default function AboutPage() {
   };
   type DemoReq = {
     name: string;
-    have: number;
-    required: number;
-    status: "in-progress" | "not-started";
+    badge: string;
     desc: string;
     pills: DemoPill[];
   };
-  const demoReqs: DemoReq[] = [
+  const demoColumns: Array<{
+    label: string;
+    status: DemoStatus;
+    meta: string;
+    reqs: DemoReq[];
+  }> = [
     {
-      name: "Introductory Sequence",
-      have: 2,
-      required: 2,
-      status: "in-progress",
-      desc: "Two foundational courses.",
-      pills: [
-        { code: "CPSC 201", cr: 1, status: "complete" },
-        { code: "CPSC 202", cr: 1, status: "complete" },
+      label: "Completed",
+      status: "completed",
+      meta: "1 req · 2 cr",
+      reqs: [
+        {
+          name: "Introductory Sequence",
+          badge: "\u2713",
+          desc: "Two foundational courses.",
+          pills: [
+            { code: "CPSC 201", cr: 1, status: "complete" },
+            { code: "CPSC 202", cr: 1, status: "complete" },
+          ],
+        },
       ],
     },
     {
-      name: "Core Systems",
-      have: 1,
-      required: 3,
-      status: "in-progress",
-      desc: "Three systems-level courses.",
-      pills: [
-        { code: "CPSC 223", cr: 1, status: "complete" },
-        { code: "CPSC 323", cr: 1, status: "in-progress" },
-        { code: "CPSC 365", cr: 1, status: "not-taken" },
+      label: "In progress",
+      status: "inProgress",
+      meta: "1 req · 3 cr",
+      reqs: [
+        {
+          name: "Core Systems",
+          badge: "1/3",
+          desc: "Three systems-level courses.",
+          pills: [
+            { code: "CPSC 223", cr: 1, status: "complete" },
+            { code: "CPSC 323", cr: 1, status: "in-progress" },
+            { code: "CPSC 365", cr: 1, status: "not-taken" },
+          ],
+        },
       ],
     },
     {
-      name: "Mathematics",
-      have: 0,
-      required: 2,
-      status: "not-started",
-      desc: "Two math electives.",
-      pills: [
-        { code: "MATH 222", cr: 1, status: "not-taken" },
-        { code: "MATH 241", cr: 1, status: "not-taken" },
+      label: "Not started",
+      status: "notStarted",
+      meta: "1 req · 2 cr",
+      reqs: [
+        {
+          name: "Mathematics",
+          badge: "0/2",
+          desc: "Two math electives.",
+          pills: [
+            { code: "MATH 222", cr: 1, status: "not-taken" },
+            { code: "MATH 241", cr: 1, status: "not-taken" },
+          ],
+        },
       ],
     },
   ];
 
-  // Mock heat-map grid: each cell is a requirement's fulfilment state.
-  const demoHeat: Array<"complete" | "in-progress" | "not-taken"> = [
-    "complete",
-    "complete",
-    "complete",
-    "in-progress",
-    "complete",
-    "in-progress",
-    "in-progress",
-    "not-taken",
-    "complete",
-    "not-taken",
-    "not-taken",
-    "not-taken",
+  // The heat map grid: one cell per requirement, labelled as the app labels it.
+  const demoHeat: Array<{ name: string; ratio: string; status: DemoStatus }> = [
+    { name: "Intro Seq", ratio: "2/2", status: "completed" },
+    { name: "Core Systems", ratio: "1/3", status: "inProgress" },
+    { name: "Algorithms", ratio: "1/1", status: "completed" },
+    { name: "Math", ratio: "0/2", status: "notStarted" },
+    { name: "Senior Proj", ratio: "0/1", status: "notStarted" },
+    { name: "Electives", ratio: "2/3", status: "partial" },
+    { name: "Systems Lab", ratio: "1/1", status: "completed" },
+    { name: "Theory", ratio: "1/2", status: "partial" },
+    { name: "Ethics", ratio: "1/1", status: "completed" },
+    { name: "Statistics", ratio: "0/1", status: "notStarted" },
+    { name: "Capstone", ratio: "0/1", status: "notStarted" },
+    { name: "Seminar", ratio: "1/1", status: "inProgress" },
   ];
-
-  if (logInFlow) return <LoginPage onBackClick={() => setLogInFlow(false)} />;
 
   return (
     <div className="min-h-screen bg-[#fafafa] dark:bg-[#0a0a0b] font-louize overflow-x-hidden">
+      {/* §1 YDN banner, above the nav and dismissible for good */}
+      <YdnBanner />
+
       {/* Nav */}
       <nav className="sticky top-0 z-50 h-14 backdrop-blur-xl bg-white/70 dark:bg-[#0a0a0b]/70 border-b border-black/[0.05] dark:border-white/[0.06]">
         <div className="max-w-7xl mx-auto h-full px-4 lg:px-6 flex items-center justify-between">
@@ -262,7 +396,10 @@ export default function AboutPage() {
                 <FiMoon size={14} />
               )}
             </button>
-            <MonoCTA onClick={() => setLogInFlow(true)}>
+            <MonoCTA
+              onClick={() => startLogin("nav")}
+              pending={authPendingId === "nav"}
+            >
               <span className="sm:hidden">Log in</span>
               <span className="hidden sm:inline">Log in with CAS</span>
               <span aria-hidden>→</span>
@@ -340,38 +477,91 @@ export default function AboutPage() {
                 Hum
               </span>
             </FloatingTile>
+
+            {/* A tiny GPA sparkline, the stats view in miniature */}
+            <FloatingTile
+              className="top-[42%] right-[0%] lg:right-[1%] !flex-col !items-start !gap-1.5"
+              rotate={-5}
+              delay={2.2}
+            >
+              <span className="font-mono text-[10px] text-gray-500 dark:text-gray-400">
+                GPA trend
+              </span>
+              <svg
+                width="64"
+                height="18"
+                viewBox="0 0 64 18"
+                fill="none"
+                aria-hidden
+              >
+                <path
+                  d="M1 14L13 11L25 13L37 7L49 8L63 2"
+                  stroke="url(#tileSpark)"
+                  strokeWidth="1.75"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+                <defs>
+                  <linearGradient id="tileSpark" x1="0" y1="0" x2="64" y2="0">
+                    <stop stopColor="#ec4899" />
+                    <stop offset="1" stopColor="#9333ea" />
+                  </linearGradient>
+                </defs>
+              </svg>
+            </FloatingTile>
+
+            {/* Distributionals, using the app's own chip colors */}
+            <FloatingTile
+              className="top-[47%] left-[0%] lg:left-[1%]"
+              rotate={5}
+              delay={5.2}
+            >
+              <span className="rounded-full border border-purple-500/30 bg-purple-500/20 px-2 py-0.5 text-[10px] font-medium text-purple-700 dark:text-purple-300">
+                Hu ✓
+              </span>
+              <span className="rounded-full border border-sky-500/30 bg-sky-500/20 px-2 py-0.5 text-[10px] font-medium text-sky-700 dark:text-sky-300">
+                So ✓
+              </span>
+              <span className="rounded-full border border-red-500/30 bg-red-500/20 px-2 py-0.5 text-[10px] font-medium text-red-700 dark:text-red-300">
+                QR 1/2
+              </span>
+            </FloatingTile>
+
+            {/* A friend, the one social note in the orbit */}
+            <FloatingTile
+              className="top-[5%] right-[17%] lg:right-[21%]"
+              rotate={6}
+              delay={3.7}
+            >
+              <span className="flex h-5 w-5 items-center justify-center rounded-full bg-gradient-to-br from-pink-500 to-purple-600 text-[9px] font-medium text-white">
+                SC
+              </span>
+              <span className="text-[10px] text-gray-500 dark:text-gray-400">
+                2 mutual courses
+              </span>
+            </FloatingTile>
           </div>
         </div>
 
         <div className="relative max-w-5xl mx-auto px-4 lg:px-6 text-center">
           {/* 1. The one hero pill */}
           <div className="flex justify-center">
-            <span className="inline-flex items-center gap-2 rounded-full border border-black/[0.08] dark:border-white/10 bg-white dark:bg-white/[0.04] px-3.5 py-1 text-xs font-medium font-sf">
-              <Link
-                href="/changelog"
-                className="text-gray-900 dark:text-white transition-opacity hover:opacity-70"
-              >
-                ✦ v3 is out now
-              </Link>
-              <span aria-hidden className="text-gray-300 dark:text-gray-600">
-                ·
-              </span>
-              <a
-                href="https://yaledailynews.com/blog/2025/09/23/new-student-run-platform-aims-to-simplify-degree-planning/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-gray-500 dark:text-gray-400 transition-colors hover:text-gray-900 dark:hover:text-white"
-              >
-                featured in the Yale Daily News ↗
-              </a>
-            </span>
+            {/* The banner owns the YDN mention, so the pill is just the release. */}
+            <Link
+              href="/changelog"
+              className="inline-flex items-center gap-2 rounded-full border border-black/[0.08] dark:border-white/10 bg-white dark:bg-white/[0.04] px-3.5 py-1 text-xs font-medium font-sf text-gray-900 dark:text-white transition-opacity hover:opacity-70"
+            >
+              ✦ v3 is out now
+            </Link>
           </div>
 
           {/* 2. Headline */}
           <h1 className="mt-8 font-medium text-balance text-6xl md:text-7xl lg:text-[5.5rem] leading-[0.95] tracking-[-0.02em] text-gray-900 dark:text-white">
-            Your Yale degree,
+            The control plane
             <br />
-            <span className="text-gray-400 dark:text-gray-500">made easy.</span>
+            <span className="text-gray-400 dark:text-gray-500">
+              for your Yale degree.
+            </span>
           </h1>
 
           {/* 3. Subhead */}
@@ -382,7 +572,10 @@ export default function AboutPage() {
 
           {/* 4. CTA row */}
           <div className="mt-8 flex flex-wrap items-center justify-center gap-3 font-sf">
-            <BrandCTA onClick={() => setLogInFlow(true)}>
+            <BrandCTA
+              onClick={() => startLogin("hero")}
+              pending={authPendingId === "hero"}
+            >
               Log in with CAS
             </BrandCTA>
             <GhostCTA onClick={() => setShowVideoModal(true)}>
@@ -393,6 +586,12 @@ export default function AboutPage() {
           {/* 5. Mono microcopy */}
           <p className="mt-5 font-mono text-xs tracking-tight text-gray-400 dark:text-gray-500">
             Free forever · No install · 1 in 6 Yale undergrads already on board
+          </p>
+
+          {/* 6. Class of 2030 welcome chip */}
+          <p className="mt-6 inline-flex items-center gap-2 rounded-full border border-pink-500/15 bg-pink-500/[0.07] px-4 py-1.5 font-sf text-xs font-medium text-pink-900/80 dark:bg-pink-500/10 dark:text-pink-200/80">
+            🎓 Class of 2030: welcome to Yale. No transcript needed, plan from
+            day one.
           </p>
         </div>
       </section>
@@ -448,7 +647,7 @@ export default function AboutPage() {
             </span>
           </h2>
           <p className="mt-6 font-mono text-xs tracking-tight text-gray-400 dark:text-gray-500">
-            ~2,000 students · every residential college · zero ads, zero fees
+            ~1,200 students · every residential college · zero ads, zero fees
           </p>
         </motion.div>
       </section>
@@ -521,7 +720,10 @@ export default function AboutPage() {
         ]}
         actions={
           <>
-            <MonoCTA onClick={() => setLogInFlow(true)}>
+            <MonoCTA
+              onClick={() => startLogin("simulator")}
+              pending={authPendingId === "simulator"}
+            >
               Try the simulator
             </MonoCTA>
             <GhostCTA onClick={() => setShowVideoModal(true)}>
@@ -568,143 +770,110 @@ export default function AboutPage() {
           <CheckRow key="c">Your grade distribution at a glance</CheckRow>,
         ]}
         actions={
-          <MonoCTA onClick={() => setLogInFlow(true)}>
+          <MonoCTA
+            onClick={() => startLogin("stats")}
+            pending={authPendingId === "stats"}
+          >
             See my full stats
           </MonoCTA>
         }
         mock={
           <MockWindow filename="stats.tsx">
-            <div className="p-4">
-              <div ref={cardsRef} className="mb-4">
-                <div className="grid grid-cols-2 gap-3">
-                  {/* Cumulative GPA */}
+            <div className="p-4 space-y-4">
+              {/* StatsView's stat card grid */}
+              <div ref={cardsRef} className="grid grid-cols-2 gap-3">
+                {[
+                  {
+                    label: "Cumulative GPA",
+                    to: statsMock.gpa,
+                    decimals: 2,
+                    color: "text-emerald-600 dark:text-emerald-400",
+                    icon: <GraduationCap className="h-3.5 w-3.5" />,
+                    sub: "Across all completed courses",
+                    delta: "+0.12",
+                  },
+                  {
+                    label: "Total Credits",
+                    to: statsMock.totalCredits,
+                    decimals: 1,
+                    color: "text-amber-600 dark:text-amber-400",
+                    icon: <BookOpen className="h-3.5 w-3.5" />,
+                    sub: `${statsMock.progressToGradPct}% of the way to graduation`,
+                  },
+                  {
+                    label: "Courses Completed",
+                    to: statsMock.coursesCompleted,
+                    decimals: 0,
+                    color: "text-violet-600 dark:text-violet-300",
+                    icon: <Award className="h-3.5 w-3.5" />,
+                    sub: "5 more in progress right now",
+                  },
+                  {
+                    label: "Avg Credits / Semester",
+                    to: statsMock.avgCreditsPerSem,
+                    decimals: 1,
+                    color: "text-blue-600 dark:text-blue-400",
+                    icon: <Clock className="h-3.5 w-3.5" />,
+                    sub: "Across 6 semesters",
+                  },
+                ].map((s, i) => (
                   <motion.div
+                    key={s.label}
                     initial={{ opacity: 0, y: 16 }}
                     animate={cardsShown ? { opacity: 1, y: 0 } : {}}
-                    transition={{ duration: 0.5 }}
-                    className="p-4 rounded-xl bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 backdrop-blur-sm border border-gray-200 dark:border-gray-800/50 shadow-neu"
+                    transition={{ duration: 0.5, delay: i * 0.05 }}
+                    className={APP_CARD_P3}
                   >
-                    <div className="flex items-center justify-between">
-                      <p className="text-xs text-gray-500 dark:text-gray-400">
-                        Cumulative GPA
+                    <div className="mb-0.5 flex items-center gap-1.5">
+                      <span className={`${s.color} opacity-70`}>{s.icon}</span>
+                      <p className="text-xs text-gray-400 dark:text-gray-500">
+                        {s.label}
                       </p>
-                      <div className="text-emerald-400 drop-shadow-[0_0_8px_rgba(52,211,153,0.5)]">
-                        <GraduationCap className="h-4 w-4" />
-                      </div>
                     </div>
-                    <p className="text-2xl font-medium text-emerald-400 mt-1.5 drop-shadow-[0_0_12px_rgba(52,211,153,0.3)]">
+                    <p className={`text-lg font-medium ${s.color}`}>
                       <CountUp
-                        to={statsMock.gpa}
+                        to={s.to}
                         inView={cardsShown}
-                        decimals={2}
+                        decimals={s.decimals}
                       />
                     </p>
-                  </motion.div>
-
-                  {/* Total Credits */}
-                  <motion.div
-                    initial={{ opacity: 0, y: 16 }}
-                    animate={cardsShown ? { opacity: 1, y: 0 } : {}}
-                    transition={{ duration: 0.5, delay: 0.05 }}
-                    className="p-4 rounded-xl bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 backdrop-blur-sm border border-gray-200 dark:border-gray-800/50 shadow-neu"
-                  >
-                    <div className="flex items-center justify-between">
-                      <p className="text-xs text-gray-500 dark:text-gray-400">
-                        Total Credits
+                    <p className="mt-0.5 text-[11px] leading-snug text-gray-400 dark:text-gray-500">
+                      {s.sub}
+                    </p>
+                    {s.delta ? (
+                      <p className="mt-0.5 text-[11px] text-emerald-500 dark:text-emerald-400">
+                        {s.delta}{" "}
+                        <span className="text-gray-400 dark:text-gray-500">
+                          since last semester
+                        </span>
                       </p>
-                      <div className="text-blue-400 drop-shadow-[0_0_8px_rgba(59,130,246,0.5)]">
-                        <BookOpen className="h-4 w-4" />
-                      </div>
-                    </div>
-                    <p className="text-2xl font-medium text-blue-400 mt-1.5 drop-shadow-[0_0_12px_rgba(59,130,246,0.3)]">
-                      <CountUp
-                        to={statsMock.totalCredits}
-                        inView={cardsShown}
-                      />
-                    </p>
-                    <p className="text-[10px] text-gray-500 dark:text-gray-400 mt-0.5">
-                      {statsMock.progressToGradPct}% to graduation
-                    </p>
+                    ) : null}
                   </motion.div>
-
-                  {/* Courses Completed */}
-                  <motion.div
-                    initial={{ opacity: 0, y: 16 }}
-                    animate={cardsShown ? { opacity: 1, y: 0 } : {}}
-                    transition={{ duration: 0.5, delay: 0.1 }}
-                    className="p-4 rounded-xl bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 backdrop-blur-sm border border-gray-200 dark:border-gray-800/50 shadow-neu"
-                  >
-                    <div className="flex items-center justify-between">
-                      <p className="text-xs text-gray-500 dark:text-gray-400">
-                        Courses Completed
-                      </p>
-                      <div className="text-purple-600 dark:text-purple-300 drop-shadow-[0_0_8px_rgba(216,180,254,0.5)]">
-                        <Award className="h-4 w-4" />
-                      </div>
-                    </div>
-                    <p className="text-2xl font-medium text-purple-600 dark:text-purple-300 mt-1.5 drop-shadow-[0_0_12px_rgba(216,180,254,0.3)]">
-                      <CountUp
-                        to={statsMock.coursesCompleted}
-                        inView={cardsShown}
-                      />
-                    </p>
-                    <p className="text-[10px] text-gray-500 dark:text-gray-400 mt-0.5">
-                      & 5 courses in progress right now
-                    </p>
-                  </motion.div>
-
-                  {/* Average Credits / Semester */}
-                  <motion.div
-                    initial={{ opacity: 0, y: 16 }}
-                    animate={cardsShown ? { opacity: 1, y: 0 } : {}}
-                    transition={{ duration: 0.5, delay: 0.15 }}
-                    className="p-4 rounded-xl bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 backdrop-blur-sm border border-gray-200 dark:border-gray-800/50 shadow-neu"
-                  >
-                    <div className="flex items-center justify-between">
-                      <p className="text-xs text-gray-500 dark:text-gray-400">
-                        Average Credits/Semester
-                      </p>
-                      <div className="text-blue-600 dark:text-blue-300 drop-shadow-[0_0_8px_rgba(147,197,253,0.5)]">
-                        <Clock className="h-4 w-4" />
-                      </div>
-                    </div>
-                    <p className="text-2xl font-medium text-blue-600 dark:text-blue-300 mt-1.5 drop-shadow-[0_0_12px_rgba(147,197,253,0.3)]">
-                      <CountUp
-                        to={statsMock.avgCreditsPerSem}
-                        inView={cardsShown}
-                        decimals={1}
-                      />
-                    </p>
-                    <p className="text-[10px] text-gray-500 dark:text-gray-400 mt-0.5">
-                      across 6 semesters
-                    </p>
-                  </motion.div>
-                </div>
+                ))}
               </div>
 
+              {/* StatsView's ChartCard, twice */}
               <div className="grid grid-cols-1 gap-4">
-                {/* Cumulative GPA */}
                 <motion.div
                   initial={{ opacity: 0, y: 16 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={mockViewport}
                   transition={{ duration: 0.6 }}
-                  className="p-4 rounded-xl bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 backdrop-blur-sm border border-gray-200 dark:border-gray-800/50 shadow-neu"
+                  className={APP_CARD_P4}
                 >
-                  <div className="flex items-start justify-between mb-3">
+                  <div className="mb-3 flex items-start justify-between">
                     <div>
-                      <h4 className="font-medium text-base text-gray-900 dark:text-white">
+                      <h3 className="text-sm font-medium leading-snug text-gray-900 dark:text-white">
                         Cumulative GPA
-                      </h4>
-                      <p className="text-[10px] text-gray-500 dark:text-gray-400 mt-0.5">
+                      </h3>
+                      <p className="mt-0.5 text-[11px] leading-snug text-gray-400 dark:text-gray-500">
                         Watch your GPA evolve semester by semester.
                       </p>
                     </div>
-                    <div className="p-1.5 rounded-full bg-gray-100 dark:bg-gray-800/50 text-purple-600 dark:text-purple-300">
-                      {/* icon-ish sparkline */}
+                    <div className="ml-2 shrink-0 rounded-lg bg-gray-100 p-1.5 text-gray-500 dark:bg-gray-800/60 dark:text-gray-400">
                       <svg
-                        width="18"
-                        height="18"
+                        width="14"
+                        height="14"
                         viewBox="0 0 24 24"
                         fill="none"
                       >
@@ -717,113 +886,80 @@ export default function AboutPage() {
                       </svg>
                     </div>
                   </div>
-                  <div className="h-[280px] w-full">
-                    <div ref={lineRef} className="relative">
-                      {/* Wipe reveal overlay */}
-                      <motion.div
-                        initial={{ x: 0 }}
-                        animate={lineShown ? { x: "100%" } : {}}
-                        transition={{
-                          duration: 0.9,
-                          ease: "easeOut",
-                          delay: 0.15,
+                  <div ref={lineRef} className="h-[220px] w-full">
+                    {lineShown && (
+                      <LineChart
+                        key="cum-line-mounted"
+                        height={220}
+                        xAxis={[
+                          {
+                            scaleType: "point",
+                            data: statsDemo.semesters,
+                            tickLabelStyle: {
+                              angle: 40,
+                              textAnchor: "start",
+                              fontSize: 10,
+                              fill: axisTickColor,
+                            },
+                          },
+                        ]}
+                        yAxis={[
+                          {
+                            label: "GPA",
+                            min: 3,
+                            max: 4,
+                            tickInterval: [3, 3.25, 3.5, 3.75, 4],
+                          },
+                        ]}
+                        series={[
+                          {
+                            data: statsDemo.cumulativeGpa,
+                            showMark: true,
+                            color: "#8B5CF6",
+                            curve: "natural",
+                            area: true,
+                            label: "Cumulative GPA",
+                          },
+                        ]}
+                        grid={{ vertical: false, horizontal: true }}
+                        margin={{ left: 50, right: 16, top: 12, bottom: 64 }}
+                        sx={{
+                          backgroundColor: "transparent",
+                          "& .MuiChartsAxis-tickLabel": { fill: axisTickColor },
+                          "& .MuiChartsAxis-label": { fill: axisTickColor },
+                          "& .MuiChartsAxis-line, & .MuiChartsAxis-tick": {
+                            stroke: gridLineColor,
+                          },
+                          "& .MuiChartsGrid-line": {
+                            stroke: gridLineColor,
+                            opacity: isDark ? 0.3 : 0.8,
+                          },
                         }}
-                        className="pointer-events-none absolute inset-0 bg-white/50 dark:bg-gray-900/50"
-                        style={{ mixBlendMode: "multiply" }}
                       />
-                      {lineShown && (
-                        <LineChart
-                          key="cum-line-mounted"
-                          height={280}
-                          xAxis={[
-                            {
-                              scaleType: "point",
-                              data: statsDemo.semesters,
-                              tickLabelStyle: {
-                                angle: 45,
-                                textAnchor: "start",
-                                fontSize: 12,
-                                fill: "#9CA3AF",
-                              },
-                            },
-                          ]}
-                          yAxis={[
-                            {
-                              label: "GPA",
-                              min: Math.max(
-                                0,
-                                Math.floor(
-                                  Math.min(...statsDemo.cumulativeGpa) * 2,
-                                ) / 2,
-                              ),
-                              max: 4,
-                            },
-                          ]}
-                          series={[
-                            {
-                              data: statsDemo.cumulativeGpa,
-                              showMark: true,
-                              color: "#ed64a6",
-                              area: true,
-                              curve: "natural",
-                            },
-                          ]}
-                          grid={{ vertical: true, horizontal: true }}
-                          margin={{ left: 60, right: 20, top: 20, bottom: 80 }}
-                          slotProps={{
-                            tooltip: {
-                              sx: {
-                                backgroundColor: "#1F2937",
-                                borderColor: "#374151",
-                                color: "#F3F4F6",
-                                borderRadius: "0.5rem",
-                              },
-                            },
-                          }}
-                          sx={{
-                            "& .MuiChartsAxis-left .MuiChartsAxis-tickLabel": {
-                              fill: "#9CA3AF",
-                            },
-                            "& .MuiChartsAxis-bottom .MuiChartsAxis-tickLabel":
-                              {
-                                fill: "#9CA3AF",
-                              },
-                            "& .MuiChartsAxis-left .MuiChartsAxis-label": {
-                              fill: "#9CA3AF",
-                            },
-                            "& .MuiChartsAxis-left .MuiChartsAxis-line, & .MuiChartsAxis-bottom .MuiChartsAxis-line":
-                              {
-                                stroke: "#374151",
-                                opacity: 0.4,
-                              },
-                          }}
-                        />
-                      )}
-                    </div>
+                    )}
                   </div>
                 </motion.div>
 
-                {/* Grade Distribution (Pie) */}
                 <motion.div
                   initial={{ opacity: 0, y: 16 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={mockViewport}
                   transition={{ duration: 0.6, delay: 0.05 }}
-                  className="p-4 rounded-xl bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 backdrop-blur-sm border border-gray-200 dark:border-gray-800/50 shadow-neu"
+                  className={APP_CARD_P4}
                 >
-                  <div className="flex items-start justify-between mb-3">
+                  <div className="mb-3 flex items-start justify-between">
                     <div>
-                      <h4 className="font-medium text-base text-gray-900 dark:text-white">
-                        Grade distribution
-                      </h4>
-                      <p className="text-[10px] text-gray-500 dark:text-gray-400 mt-0.5">
-                        Your percentage mix of A's, A-'s, B+'s, and beyond.
+                      <h3 className="text-sm font-medium leading-snug text-gray-900 dark:text-white">
+                        Grade Distribution
+                      </h3>
+                      <p className="mt-0.5 text-[11px] leading-snug text-gray-400 dark:text-gray-500">
+                        Your mix of A's, A-'s, B+'s, and beyond.
                       </p>
                     </div>
-                    <div className="p-1.5 rounded-full bg-gray-100 dark:bg-gray-800/50 text-blue-600 dark:text-blue-300">
+                    <div className="ml-2 shrink-0 rounded-lg bg-gray-100 p-1.5 text-gray-500 dark:bg-gray-800/60 dark:text-gray-400">
                       <svg
-                        width="18"
-                        height="18"
+                        width="14"
+                        height="14"
                         viewBox="0 0 24 24"
                         fill="none"
                       >
@@ -835,41 +971,32 @@ export default function AboutPage() {
                       </svg>
                     </div>
                   </div>
-
-                  <div ref={pieRef} className="h-[260px] w-full">
-                    <motion.div
-                      initial={{ scale: 0.9, opacity: 0 }}
-                      animate={pieShown ? { scale: 1, opacity: 1 } : {}}
-                      transition={{ duration: 0.5, ease: "easeOut" }}
-                      className="w-full h-full"
-                    >
-                      {pieShown && (
-                        <PieChartWrapper
-                          key="pie-mounted"
-                          data={{
-                            labels: statsDemo.gradeDistribution.map(
-                              (g) => g.label,
-                            ),
-                            datasets: [
-                              {
-                                data: statsDemo.gradeDistribution.map(
-                                  (g) => g.count,
-                                ),
-                                backgroundColor: CHART_COLORS.slice(
-                                  0,
-                                  statsDemo.gradeDistribution.length,
-                                ),
-                                borderColor: Array(
-                                  statsDemo.gradeDistribution.length,
-                                ).fill("#1F2937"),
-                                borderWidth: 1,
-                              },
-                            ],
-                          }}
-                          showLegend={true}
-                        />
-                      )}
-                    </motion.div>
+                  <div ref={pieRef} className="h-[220px] w-full">
+                    {pieShown && (
+                      <PieChartWrapper
+                        key="pie-mounted"
+                        data={{
+                          labels: statsDemo.gradeDistribution.map(
+                            (g) => g.label,
+                          ),
+                          datasets: [
+                            {
+                              data: statsDemo.gradeDistribution.map(
+                                (g) => g.count,
+                              ),
+                              backgroundColor: statsDemo.gradeDistribution.map(
+                                (_, i) => DEPT_COLORS[i % DEPT_COLORS.length],
+                              ),
+                              borderColor: Array(
+                                statsDemo.gradeDistribution.length,
+                              ).fill(pieBorderColor),
+                              borderWidth: 2,
+                            },
+                          ],
+                        }}
+                        showLegend={true}
+                      />
+                    )}
                   </div>
                 </motion.div>
               </div>
@@ -903,173 +1030,187 @@ export default function AboutPage() {
           </CheckRow>,
         ]}
         actions={
-          <MonoCTA onClick={() => setLogInFlow(true)}>
+          <MonoCTA
+            onClick={() => startLogin("major")}
+            pending={authPendingId === "major"}
+          >
             See my major progress
           </MonoCTA>
         }
         mock={
           <MockWindow filename="major-progress.tsx">
-            <div className="p-4">
-              <div className="space-y-4">
-                {/* Strict (completed only) */}
+            <div className="p-4 space-y-4">
+              {/* MajorProgressView's header row */}
+              <div className="flex items-start justify-between gap-4">
                 <div>
-                  <div className="flex items-center justify-between text-xs mb-1.5">
-                    <span className="text-gray-500 dark:text-gray-400">
-                      Completed only
-                    </span>
-                    <span className="text-blue-600 dark:text-blue-300 font-medium">
-                      {demoStrictPct}%
-                    </span>
-                  </div>
-                  <MajorProgressBar percent={demoStrictPct} />
-                  <div className="text-[10px] text-gray-500 dark:text-gray-400 mt-1.5">
-                    {demoTotals.completed}/{demoTotals.total} credits
-                  </div>
+                  <h3 className="text-xl font-medium text-gray-900 dark:text-white">
+                    Computer Science
+                  </h3>
+                  <p className="text-sm text-gray-500">
+                    B.S. · {demoTotals.total} credits required
+                  </p>
                 </div>
+                <p className="shrink-0 text-2xl font-medium text-gray-900 dark:text-white">
+                  {demoStrictPct}%
+                </p>
+              </div>
 
-                {/* Including in-progress */}
-                <div>
-                  <div className="flex items-center justify-between text-xs mb-1.5">
-                    <span className="text-gray-500 dark:text-gray-400">
-                      Including in-progress
-                    </span>
-                    <span className="text-purple-600 dark:text-purple-300 font-medium">
-                      {demoWithIPPct}%
-                    </span>
-                  </div>
-                  <MajorProgressBar percent={demoWithIPPct} />
-                  <div className="text-[10px] text-gray-500 dark:text-gray-400 mt-1.5">
-                    {demoTotals.completed + demoTotals.inProgress}/
-                    {demoTotals.total} credits
-                  </div>
+              {/* One track, two stacked fills, exactly as the app draws it */}
+              <div className="p-3 rounded-xl bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 border border-gray-200 dark:border-gray-800/50 shadow-neu">
+                <MajorProgressBar
+                  completedPct={demoStrictPct}
+                  withInProgressPct={demoWithIPPct}
+                />
+                <div className="mt-2 flex flex-wrap items-center gap-1.5">
+                  <span className="text-[10px] uppercase tracking-wider text-gray-400 dark:text-gray-500">
+                    Show:
+                  </span>
+                  <span className="rounded-lg border border-purple-600/40 bg-purple-500/15 px-2.5 py-1 text-[11px] text-purple-600 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] dark:text-purple-300">
+                    Completed only
+                  </span>
+                  <span className="rounded-lg border border-gray-200 bg-gray-100 px-2.5 py-1 text-[11px] text-gray-400 dark:border-gray-800/50 dark:bg-gray-900/50 dark:text-gray-500">
+                    Including in progress
+                  </span>
                 </div>
               </div>
 
-              {/* Requirement cards: mirrors the real MajorProgressView grid */}
-              <div className="mt-6">
-                <div className="flex items-center justify-between mb-2.5">
-                  <h4 className="text-sm font-medium text-gray-900 dark:text-white">
-                    Requirements
-                  </h4>
-                  <div className="flex items-center gap-2.5 text-[10px] text-gray-500 dark:text-gray-400">
-                    <span className="flex items-center gap-1">
-                      <span className="w-2 h-2 rounded-full bg-emerald-400" />{" "}
-                      Complete
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <span className="w-2 h-2 rounded-full bg-blue-400" /> In
-                      progress
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <span className="w-2 h-2 rounded-full bg-red-400" /> Not
-                      taken
-                    </span>
+              {/* MajorStatCard row */}
+              <div className="grid grid-cols-3 gap-3">
+                {[
+                  {
+                    label: "Completed",
+                    value: `${demoTotals.completed} cr`,
+                    color: "text-emerald-600 dark:text-emerald-400",
+                  },
+                  {
+                    label: "In progress",
+                    value: `${demoTotals.inProgress} cr`,
+                    color: "text-blue-600 dark:text-blue-400",
+                  },
+                  {
+                    label: "Remaining",
+                    value: `${demoTotals.total - demoTotals.completed - demoTotals.inProgress} cr`,
+                    color: "text-gray-900 dark:text-white",
+                  },
+                ].map((s) => (
+                  <div key={s.label} className={APP_CARD_P3}>
+                    <p className="text-xs text-gray-400 dark:text-gray-500">
+                      {s.label}
+                    </p>
+                    <p className={`mt-0.5 text-lg font-medium ${s.color}`}>
+                      {s.value}
+                    </p>
                   </div>
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                  {demoReqs.map((req, i) => {
-                    const inProgress = req.status === "in-progress";
-                    return (
-                      <motion.div
-                        key={req.name}
-                        initial={{ opacity: 0, y: 12 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={mockViewport}
-                        transition={{ duration: 0.45, delay: i * 0.08 }}
-                        className={`p-3 rounded-xl backdrop-blur-md border transition-all relative shadow-neu-sm ${
-                          inProgress
-                            ? "bg-blue-50 dark:bg-transparent dark:bg-gradient-to-br dark:from-blue-950/40 dark:via-gray-900/50 dark:to-gray-950/50 border-blue-200 dark:border-blue-800/30"
-                            : "bg-red-50 dark:bg-transparent dark:bg-gradient-to-br dark:from-red-950/30 dark:via-gray-900/50 dark:to-gray-950/50 border-red-200 dark:border-red-800/25"
-                        }`}
-                      >
-                        <div className="flex justify-between items-start mb-1.5">
-                          <h5
-                            className={`font-medium text-sm ${
-                              inProgress
-                                ? "text-blue-600 dark:text-blue-300"
-                                : "text-red-600 dark:text-red-300"
-                            }`}
+                ))}
+              </div>
+
+              {/* The requirements board: one column per status, as in the app */}
+              <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
+                {demoColumns.map((col, ci) => {
+                  const sc = STATUS_CLASSES[col.status];
+                  return (
+                    <motion.div
+                      key={col.label}
+                      initial={{ opacity: 0, y: 12 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={mockViewport}
+                      transition={{ duration: 0.45, delay: ci * 0.08 }}
+                      className="flex flex-col rounded-xl border border-gray-200 bg-white/40 dark:border-gray-800/50 dark:bg-gray-900/20"
+                    >
+                      <div className="flex items-center justify-between rounded-t-xl border-b border-gray-200 bg-white/80 px-3 py-2.5 backdrop-blur-md dark:border-gray-800/50 dark:bg-gray-900/70">
+                        <h4 className={`text-sm font-medium ${sc.accent}`}>
+                          {col.label}
+                        </h4>
+                        <span className="text-[10px] text-gray-500 dark:text-gray-400">
+                          {col.meta}
+                        </span>
+                      </div>
+                      <div className="space-y-3 p-3">
+                        {col.reqs.map((req) => (
+                          <div
+                            key={req.name}
+                            className={`relative rounded-xl border p-3 shadow-neu-sm backdrop-blur-md transition-all ${sc.card}`}
                           >
-                            {req.name}
-                          </h5>
-                          <span
-                            className={`text-[10px] px-1.5 py-0.5 rounded-md ${
-                              inProgress
-                                ? "bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-300 border border-blue-300 dark:border-blue-700/30"
-                                : "bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-300 border border-red-300 dark:border-red-700/30"
-                            }`}
-                          >
-                            {req.have}/{req.required}
-                          </span>
-                        </div>
-                        <p
-                          className={`text-[11px] mb-2 ${
-                            inProgress
-                              ? "text-blue-500 dark:text-blue-300/70"
-                              : "text-red-500 dark:text-red-300/70"
-                          }`}
-                        >
-                          {req.desc}
-                        </p>
-                        <div className="flex flex-wrap gap-1.5">
-                          {req.pills.map((opt) => (
-                            <div
-                              key={opt.code}
-                              className={`relative px-2 py-0.5 rounded-full text-xs flex items-center ${
-                                opt.status === "complete"
-                                  ? "bg-emerald-100 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-700"
-                                  : opt.status === "in-progress"
-                                    ? "bg-blue-100 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 border border-blue-300 dark:border-blue-700"
-                                    : "bg-red-100 dark:bg-red-900/20 text-red-700 dark:text-red-300 border border-red-300 dark:border-red-700"
-                              }`}
-                            >
-                              {opt.code}
-                              <span className="ml-1 text-[0.65rem]">
-                                ({opt.cr}cr
-                                {opt.status === "in-progress"
-                                  ? ", in progress"
-                                  : opt.status === "complete"
-                                    ? ", complete"
-                                    : ""}
-                                )
+                            <div className="mb-1.5 flex items-start justify-between gap-2">
+                              <h5 className={`text-sm font-medium ${sc.title}`}>
+                                {req.name}
+                              </h5>
+                              <span
+                                className={`shrink-0 rounded-md px-1.5 py-0.5 text-[10px] ${sc.badge}`}
+                              >
+                                {req.badge}
                               </span>
                             </div>
-                          ))}
-                        </div>
-                      </motion.div>
-                    );
-                  })}
-                </div>
+                            <p className={`mb-2 text-[11px] ${sc.description}`}>
+                              {req.desc}
+                            </p>
+                            <div className="flex flex-wrap gap-1.5">
+                              {req.pills.map((opt) => (
+                                <div
+                                  key={opt.code}
+                                  className={`relative flex items-center rounded-full px-2 py-0.5 text-xs ${OPTION_PILL[opt.status]}`}
+                                >
+                                  {opt.code}
+                                  <span className="ml-1 text-[0.65rem]">
+                                    ({opt.cr}cr
+                                    {opt.status === "in-progress"
+                                      ? ", in progress"
+                                      : opt.status === "complete"
+                                        ? ", complete"
+                                        : ""}
+                                    )
+                                  </span>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </motion.div>
+                  );
+                })}
               </div>
 
-              {/* Requirement heat map: color-coded fulfilment grid */}
-              <div className="mt-6">
-                <h4 className="text-sm font-medium text-gray-900 dark:text-white mb-2.5">
+              {/* The heat map, cell classes and legend from the app */}
+              <div>
+                <h4 className="mb-2.5 text-sm font-medium text-gray-900 dark:text-white">
                   Requirement heat map
                 </h4>
-                <div className="grid grid-cols-6 sm:grid-cols-12 gap-1.5">
+                <div className="mb-3 flex flex-wrap items-center gap-3">
+                  {[
+                    { label: "Met", dot: "bg-emerald-500" },
+                    { label: "In progress", dot: "bg-blue-500" },
+                    { label: "Partial", dot: "bg-amber-400" },
+                    { label: "Not started", dot: "bg-red-300" },
+                  ].map((l) => (
+                    <div key={l.label} className="flex items-center gap-1.5">
+                      <span
+                        className={`h-3 w-3 rounded ${l.dot}`}
+                        aria-hidden
+                      />
+                      <span className="text-[10px] text-gray-500 dark:text-gray-400">
+                        {l.label}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+                <div className="grid grid-cols-6 gap-2">
                   {demoHeat.map((cell, i) => (
                     <motion.div
-                      key={i}
+                      key={cell.name}
                       initial={{ opacity: 0, scale: 0.6 }}
                       whileInView={{ opacity: 1, scale: 1 }}
                       viewport={mockViewport}
                       transition={{ duration: 0.3, delay: i * 0.03 }}
-                      title={
-                        cell === "complete"
-                          ? "Complete"
-                          : cell === "in-progress"
-                            ? "In progress"
-                            : "Not taken"
-                      }
-                      className={`aspect-square rounded-md border ${
-                        cell === "complete"
-                          ? "bg-emerald-500/20 border-emerald-500/40 dark:bg-emerald-500/15"
-                          : cell === "in-progress"
-                            ? "bg-blue-500/20 border-blue-500/40 dark:bg-blue-500/15"
-                            : "bg-red-500/15 border-red-500/30 dark:bg-red-500/10"
-                      }`}
-                    />
+                      className={`flex aspect-square w-full flex-col justify-between rounded-lg border p-1.5 text-left ${HEAT_CELL[cell.status]}`}
+                    >
+                      <span className="line-clamp-2 text-[9px] font-medium leading-tight">
+                        {cell.name}
+                      </span>
+                      <span className="mt-1 text-[8px] opacity-80">
+                        {cell.ratio}
+                      </span>
+                    </motion.div>
                   ))}
                 </div>
               </div>
@@ -1098,98 +1239,106 @@ export default function AboutPage() {
           <CheckRow key="c">Grades and GPA are never shared</CheckRow>,
         ]}
         actions={
-          <MonoCTA onClick={() => setLogInFlow(true)}>Enable friends</MonoCTA>
+          <MonoCTA
+            onClick={() => startLogin("friends")}
+            pending={authPendingId === "friends"}
+          >
+            Enable friends
+          </MonoCTA>
         }
         mock={
           <MockWindow filename="friends.tsx">
             <div className="p-4">
-              <div className="flex items-center justify-between mb-5">
-                <h3 className="text-base font-medium text-pink-600 dark:text-pink-200 flex items-center gap-2">
-                  <FiUsers size={14} /> Your Friends (3)
+              {/* FriendsTab's header row */}
+              <div className="mb-4 flex items-center justify-between">
+                <h3 className="text-base font-medium text-gray-900 dark:text-white">
+                  Friends
                 </h3>
-                <span className="px-3 py-1.5 text-white bg-gradient-to-r from-pink-500 to-purple-600 rounded-lg flex items-center gap-1.5 text-xs font-medium">
+                <span className="flex items-center gap-1.5 rounded-lg bg-gradient-to-br from-pink-600 to-pink-700 px-3 py-1.5 text-xs font-medium text-white shadow-[0_2px_8px_rgba(236,72,153,0.25)]">
                   <FiUserPlus size={12} /> Add Friend
                 </span>
               </div>
 
-              {/* Mock Friend Cards */}
-              <div className="space-y-4">
+              <h4 className="mb-2.5 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-pink-500 dark:text-pink-400">
+                <FiUsers size={12} />
+                Your Friends
+                <span className="ml-1 rounded-full border border-gray-200 bg-gray-100 px-1.5 py-0.5 text-[10px] font-medium text-gray-500 dark:border-white/[0.08] dark:bg-white/[0.06] dark:text-gray-400">
+                  3
+                </span>
+              </h4>
+
+              <div className="space-y-2">
                 {[
                   {
                     name: "Sarah Chen",
-                    major: "CPSC & MATH",
+                    major: "CPSC, MATH",
                     year: "2026",
-                    initials: "SC",
-                    gradient: "from-pink-500 to-purple-600",
                   },
                   {
                     name: "Alex Rivera",
-                    major: "ECON & S&DS",
+                    major: "ECON, S&DS",
                     year: "2027",
-                    initials: "AR",
-                    gradient: "from-blue-500 to-purple-600",
                   },
-                  {
-                    name: "Jordan Kim",
-                    major: "MCDB",
-                    year: "2025",
-                    initials: "JK",
-                    gradient: "from-pink-500 to-purple-600",
-                  },
+                  { name: "Jordan Kim", major: "MCDB", year: "2025" },
                 ].map((friend, i) => (
                   <motion.div
                     key={friend.name}
                     initial={{ opacity: 0, y: 10 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={mockViewport}
-                    transition={{ duration: 0.4, delay: i * 0.1 }}
-                    className="flex items-center justify-between p-5 rounded-xl bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 border border-gray-200 dark:border-gray-800/50 hover:border-pink-500/30 dark:hover:border-pink-500/30 transition-all duration-300 shadow-neu group"
+                    transition={{ duration: 0.4, delay: i * 0.08 }}
+                    className="relative flex items-center justify-between rounded-xl border border-gray-200 bg-white p-3 shadow-neu backdrop-blur-md transition-all dark:border-white/[0.06] dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60"
                   >
-                    <div className="flex items-center gap-4">
-                      <div
-                        className={`w-10 h-10 rounded-full bg-gradient-to-br ${friend.gradient} flex items-center justify-center text-white font-medium text-sm border-2 border-gray-300 dark:border-gray-700/50 shadow-[0_4px_12px_rgba(0,0,0,0.3)]`}
-                      >
-                        {friend.initials}
-                      </div>
-                      <div>
-                        <div className="font-medium text-pink-600 dark:text-pink-200 group-hover:text-pink-700 dark:group-hover:text-pink-100 transition-colors">
+                    <div className="flex min-w-0 items-center gap-3">
+                      <UserAvatar displayName={friend.name} size={38} />
+                      <div className="min-w-0">
+                        <div className="truncate text-sm font-medium text-gray-900 dark:text-gray-100">
                           {friend.name}
                         </div>
-                        <div className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-2">
-                          {friend.major}
-                          <span className="px-1.5 py-0.5 rounded-full text-[10px] bg-gradient-to-r from-purple-500/20 to-pink-500/20 border border-purple-500/30 text-purple-700 dark:text-purple-200">
-                            '{friend.year.slice(-2)}
+                        <div className="mt-0.5 flex flex-wrap items-center gap-1 text-[10px] text-gray-400 dark:text-gray-500">
+                          <span className="text-pink-500 dark:text-pink-400">
+                            {friend.major}
                           </span>
+                          <span className="text-gray-300 dark:text-gray-700">
+                            ·
+                          </span>
+                          <span>Class of {friend.year}</span>
                         </div>
                       </div>
                     </div>
-                    <div className="flex gap-2">
-                      <span className="flex items-center gap-1.5 px-4 py-2 bg-black/[0.04] dark:bg-white/[0.06] text-gray-600 dark:text-gray-300 rounded-xl border border-black/[0.06] dark:border-white/[0.08] text-sm">
-                        <FiUser className="inline-block" size={14} />
-                        Profile
-                      </span>
-                    </div>
+                    <span className="flex shrink-0 items-center gap-1 rounded-lg border border-gray-200 bg-gray-50 px-2.5 py-1.5 text-[11px] font-medium text-gray-600 dark:border-white/[0.08] dark:bg-white/[0.04] dark:text-gray-300">
+                      <FiUser size={12} /> Profile
+                    </span>
                   </motion.div>
                 ))}
               </div>
 
-              {/* What gets shared, kept as the mock's own footer row */}
-              <div className="mt-5 border-t border-black/[0.05] dark:border-white/[0.06] pt-4">
-                <h4 className="text-sm font-medium text-pink-600 dark:text-pink-200 mb-3">
-                  What gets shared:
-                </h4>
-                <ul className="text-sm text-gray-500 dark:text-gray-400 space-y-2">
-                  <li className="flex items-center gap-2.5">
-                    <FiCheck className="text-emerald-400 shrink-0" size={14} />{" "}
+              {/* What gets shared, in the app's muted note idiom */}
+              <div className="mt-4 rounded-xl border border-gray-200 bg-gray-100 p-3 dark:border-white/[0.08] dark:bg-white/[0.04]">
+                <h5 className="mb-2 text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                  What gets shared
+                </h5>
+                <ul className="space-y-1.5 text-[11px] text-gray-500 dark:text-gray-400">
+                  <li className="flex items-center gap-2">
+                    <FiCheck
+                      className="shrink-0 text-emerald-500 dark:text-emerald-400"
+                      size={12}
+                    />{" "}
                     Course codes, semesters, and credits
                   </li>
-                  <li className="flex items-center gap-2.5">
-                    <FiCheck className="text-emerald-400 shrink-0" size={14} />{" "}
+                  <li className="flex items-center gap-2">
+                    <FiCheck
+                      className="shrink-0 text-emerald-500 dark:text-emerald-400"
+                      size={12}
+                    />{" "}
                     Major and graduation year
                   </li>
-                  <li className="flex items-center gap-2.5">
-                    <FiX className="text-red-400 shrink-0" size={14} /> Grades
-                    and GPA are never shared
+                  <li className="flex items-center gap-2">
+                    <FiX
+                      className="shrink-0 text-red-500 dark:text-red-400"
+                      size={12}
+                    />{" "}
+                    Grades and GPA are never shared
                   </li>
                 </ul>
               </div>
@@ -1284,7 +1433,10 @@ export default function AboutPage() {
             </span>
           </h2>
           <div className="mt-10 flex justify-center font-sf">
-            <BrandCTA onClick={() => setLogInFlow(true)}>
+            <BrandCTA
+              onClick={() => startLogin("closing")}
+              pending={authPendingId === "closing"}
+            >
               Log in with CAS
             </BrandCTA>
           </div>
@@ -1449,6 +1601,72 @@ const reveal = {
   transition: { duration: 0.6 },
 } as const;
 
+const YDN_BANNER_KEY = "di-ydn-banner-dismissed";
+const YDN_ARTICLE_URL =
+  "https://yaledailynews.com/blog/2025/09/23/new-student-run-platform-aims-to-simplify-degree-planning/";
+
+/**
+ * §1: the slim band above the nav. It defaults to visible and only hides once
+ * the effect has read localStorage, so the server render and the first client
+ * render agree. Dismissal is permanent.
+ */
+function YdnBanner() {
+  const [dismissed, setDismissed] = useState(false);
+
+  useEffect(() => {
+    try {
+      if (window.localStorage.getItem(YDN_BANNER_KEY) === "1")
+        setDismissed(true);
+    } catch {
+      // Private mode or a blocked store: keep the banner, it is not critical.
+    }
+  }, []);
+
+  const dismiss = () => {
+    setDismissed(true);
+    try {
+      window.localStorage.setItem(YDN_BANNER_KEY, "1");
+    } catch {
+      // Nothing to do; the banner still collapses for this session.
+    }
+  };
+
+  return (
+    <AnimatePresence initial={false}>
+      {!dismissed && (
+        <motion.div
+          initial={false}
+          exit={{ height: 0, opacity: 0 }}
+          transition={{ duration: 0.22, ease: "easeOut" }}
+          className="overflow-hidden bg-gray-900 text-white dark:bg-white/[0.06]"
+        >
+          <div className="relative mx-auto flex h-9 max-w-7xl items-center justify-center px-10 font-sf text-xs font-medium">
+            <a
+              href={YDN_ARTICLE_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="transition-opacity hover:opacity-80"
+            >
+              Featured in the Yale Daily News{" "}
+              <span aria-hidden className="opacity-70">
+                ↗
+              </span>
+            </a>
+            <button
+              type="button"
+              onClick={dismiss}
+              aria-label="Dismiss"
+              className="absolute right-3 rounded p-1 text-white/60 transition-colors hover:text-white"
+            >
+              <FiX size={14} />
+            </button>
+          </div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+}
+
 /**
  * A small hero tile that drifts on a gentle 6s loop. Positioned by the caller
  * against the hero band; sits behind the headline text but above the canvas.
@@ -1489,12 +1707,34 @@ type CTAProps = {
   onClick?: () => void;
   href?: string;
   className?: string;
+  /** §11: the pressed CTA disables itself and says so while CAS is open. */
+  pending?: boolean;
 };
 
+/** The one pending treatment: a label swap, disabled, dimmed. No spinner ring. */
+function Pending() {
+  return (
+    <motion.span
+      animate={{ opacity: [0.55, 1, 0.55] }}
+      transition={{ duration: 1.4, repeat: Infinity }}
+    >
+      Signing in...
+    </motion.span>
+  );
+}
+
 /** (a) BRAND primary. Hero CTA and the closing-statement CTA only. */
-function BrandCTA({ children, onClick, href, className = "" }: CTAProps) {
-  const cls = `inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 px-6 py-3 text-sm font-medium text-white shadow-lg shadow-purple-600/25 ${className}`;
-  const body = (
+function BrandCTA({
+  children,
+  onClick,
+  href,
+  className = "",
+  pending = false,
+}: CTAProps) {
+  const cls = `inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 px-6 py-3 text-sm font-medium text-white shadow-lg shadow-purple-600/25 ${pending ? "opacity-70" : ""} ${className}`;
+  const body = pending ? (
+    <Pending />
+  ) : (
     <>
       {children}
       <span aria-hidden>→</span>
@@ -1507,15 +1747,27 @@ function BrandCTA({ children, onClick, href, className = "" }: CTAProps) {
       </motion.a>
     );
   return (
-    <motion.button whileHover={{ y: -1 }} onClick={onClick} className={cls}>
+    <motion.button
+      whileHover={pending ? undefined : { y: -1 }}
+      onClick={onClick}
+      disabled={pending}
+      aria-busy={pending}
+      className={cls}
+    >
       {body}
     </motion.button>
   );
 }
 
 /** (b) MONO primary. Nav CTA and any in-section primary. */
-function MonoCTA({ children, onClick, href, className = "" }: CTAProps) {
-  const cls = `inline-flex items-center gap-1.5 rounded-full bg-gray-900 text-white dark:bg-white dark:text-gray-900 px-4 py-1.5 text-sm font-medium ${className}`;
+function MonoCTA({
+  children,
+  onClick,
+  href,
+  className = "",
+  pending = false,
+}: CTAProps) {
+  const cls = `inline-flex items-center gap-1.5 rounded-full bg-gray-900 text-white dark:bg-white dark:text-gray-900 px-4 py-1.5 text-sm font-medium ${pending ? "opacity-70" : ""} ${className}`;
   if (href)
     return (
       <motion.a whileHover={{ y: -1 }} href={href} className={cls}>
@@ -1523,8 +1775,14 @@ function MonoCTA({ children, onClick, href, className = "" }: CTAProps) {
       </motion.a>
     );
   return (
-    <motion.button whileHover={{ y: -1 }} onClick={onClick} className={cls}>
-      {children}
+    <motion.button
+      whileHover={pending ? undefined : { y: -1 }}
+      onClick={onClick}
+      disabled={pending}
+      aria-busy={pending}
+      className={cls}
+    >
+      {pending ? <Pending /> : children}
     </motion.button>
   );
 }

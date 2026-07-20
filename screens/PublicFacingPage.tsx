@@ -1362,38 +1362,33 @@ export default function AboutPage() {
             Built at Yale, because
             <br />
             <span className="text-gray-400 dark:text-gray-500">
-              we needed it.
+              I needed it.
             </span>
           </h2>
 
           <div className="mt-8 space-y-5 font-sf text-base leading-relaxed text-gray-500 dark:text-gray-400 md:text-lg">
             <p>
-              Trying to plan our own majors, we kept hitting the same wall.
+              Trying to plan my own majors, I kept hitting the same wall.
               Yale's requirements are complex, scattered across PDFs and half a
               dozen poorly organized websites, and nearly impossible to track by
               hand. Planning a double major turned that into a second job.
             </p>
             <p>
-              So we built the tool we wish we had: the tedious parts automated,
+              So I built the tool I wish I had: the tedious parts automated,
               every major and concentration requirement in one place, and no
               fragile spreadsheet formulas to maintain. Rather than keep it to
-              ourselves, we cleaned it up and published it. We sincerely hope it
+              myself, I cleaned it up and published it. I sincerely hope it
               helps.
             </p>
           </div>
 
-          {/* Team, a single row, no cards */}
-          <div className="mt-16 flex flex-wrap items-start justify-center gap-x-14 gap-y-10 font-sf">
+          {/* Team, a single centered person, no cards */}
+          <div className="mt-16 flex justify-center font-sf">
             {[
               {
                 name: "Filippo Fonseca",
-                line: "Founder · MechE (ABET) & EECS '28",
+                line: "Yale '28 · MechE (ABET) & EECS",
                 photoRoute: "/team/filippo.jpeg",
-              },
-              {
-                name: "Emir Ahmed",
-                line: "Development · EECS '28",
-                photoRoute: "/team/emir.JPG",
               },
             ].map((person) => (
               <div
@@ -1418,10 +1413,10 @@ export default function AboutPage() {
           <p className="mt-14 font-mono text-xs tracking-tight text-gray-400 dark:text-gray-500">
             want to contribute?{" "}
             <a
-              href="mailto:filippo.fonseca@yale.edu,emir.ahmed@yale.edu"
+              href="mailto:filippo.fonseca@yale.edu"
               className="underline underline-offset-4 transition-colors hover:text-gray-900 dark:hover:text-white"
             >
-              → email us
+              → email me
             </a>
           </p>
         </motion.div>

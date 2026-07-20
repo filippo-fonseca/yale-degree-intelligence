@@ -7,7 +7,7 @@ import {
   signInWithPopup,
   signOut,
 } from "firebase/auth";
-import { auth, googleProvider, isFirebaseConfigured } from "@/config/firebase";
+import { auth, googleProvider } from "@/config/firebase";
 
 type AuthContextType = {
   user: User | null;
@@ -28,11 +28,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!isFirebaseConfigured) {
-      setLoading(false);
-      return;
-    }
-
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
         // Verify email domain
@@ -53,11 +48,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const signInWithGoogle = async () => {
-    if (!isFirebaseConfigured) {
-      throw new Error(
-        "Firebase is not configured. Copy .env.example to .env.local and restart the dev server."
-      );
-    }
     try {
       const result = await signInWithPopup(auth, googleProvider);
       if (

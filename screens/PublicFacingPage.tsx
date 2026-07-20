@@ -133,12 +133,20 @@ export default function AboutPage() {
     };
   }, [showVideoModal]);
 
+  // The same look-ahead the `reveal` constant uses: these gate whether the
+  // charts mount at all, so without it they stay unmounted in a static
+  // full-page capture where nothing ever scrolls.
+  const lookAhead = {
+    once: true,
+    amount: 0.35,
+    margin: "0px 0px 100% 0px",
+  } as const;
   const lineRef = useRef<HTMLDivElement | null>(null);
-  const lineInView = useInView(lineRef, { once: true, amount: 0.35 });
+  const lineInView = useInView(lineRef, lookAhead);
   const pieRef = useRef<HTMLDivElement | null>(null);
-  const pieInView = useInView(pieRef, { once: true, amount: 0.35 });
+  const pieInView = useInView(pieRef, lookAhead);
   const cardsRef = useRef<HTMLDivElement | null>(null);
-  const cardsInView = useInView(cardsRef, { once: true, amount: 0.35 });
+  const cardsInView = useInView(cardsRef, lookAhead);
 
   const features = [
     {
@@ -513,127 +521,77 @@ export default function AboutPage() {
         </motion.div>
       </section>
 
-      {/* Simulator Section */}
-      <section
+      {/* §6.1 Simulator */}
+      <FeatureSection
         id="simulator"
-        className="relative max-w-7xl mx-auto px-4 lg:px-6 py-24"
-      >
-        <div className="relative bg-white/70 dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/70 dark:via-gray-900/50 dark:to-gray-950/70 backdrop-blur-2xl rounded-xl p-6 border border-gray-200 dark:border-gray-800/50 shadow-neu overflow-hidden">
-          <div className="absolute -right-24 -top-24 h-64 w-64 rounded-full bg-pink-500/10 blur-3xl" />
-          <div className="absolute -left-24 -bottom-24 h-64 w-64 rounded-full bg-purple-500/10 blur-3xl" />
+        kicker="Simulator"
+        line1="Simulator: drag, drop,"
+        line2="done."
+        body={
+          <>
+            Build a semester-by-semester plan by dragging courses from your
+            major, or search every course at Yale. Save plans, load them later,
+            and see how fun classes and distributionals fit without breaking
+            anything.
+          </>
+        }
+        checks={[
+          <CheckRow key="a">Search the full catalog and your major</CheckRow>,
+          <CheckRow key="b">Save and duplicate plans instantly</CheckRow>,
+          <CheckRow key="c">Share with friends or mentors</CheckRow>,
+          <CheckRow key="d">See where friends slotted courses</CheckRow>,
+        ]}
+        actions={
+          <>
+            <MonoCTA onClick={() => setLogInFlow(true)}>
+              Try the simulator
+            </MonoCTA>
+            <GhostCTA onClick={() => setShowVideoModal(true)}>
+              Watch the launch film
+            </GhostCTA>
+          </>
+        }
+        mock={
+          <MockWindow filename="simulator-demo.gif">
+            <img
+              src="/demo/simulator.gif"
+              alt="Simulator demo"
+              className="aspect-video w-full object-cover"
+              loading="lazy"
+              width={860}
+              height={704}
+            />
+          </MockWindow>
+        }
+      />
 
-          <div className="flex flex-col lg:flex-row gap-6 items-center">
-            {/* Left: copy + bullets */}
-            <div className="flex-1 min-w-0">
-              <SectionEyebrow icon={<FiZap />} label="Simulator" />
-              <h3 className="text-2xl font-medium leading-[0.98] tracking-[-0.02em] text-balance text-gray-900 dark:text-white mb-2">
-                Simulator: drag, drop,
-                <br />
-                <span className="text-gray-500 dark:text-gray-400">done.</span>
-              </h3>
-              <p className="text-gray-700 dark:text-gray-300 text-sm mb-4 max-w-xl">
-                Build a semester-by-semester plan by dragging courses from your
-                major (or search <em>every</em> course at Yale). Save multiple
-                plans, load them later, and see how fun classes and
-                distributional requirements fit without breaking anything.
-              </p>
-
-              <div className="grid sm:grid-cols-2 gap-2">
-                {[
-                  {
-                    icon: <FiSearch size={14} />,
-                    text: "Search the full catalog + your major",
-                  },
-                  {
-                    icon: <FiSave size={14} />,
-                    text: "Save and duplicate plans instantly",
-                  },
-                  {
-                    icon: <FiShare2 size={14} />,
-                    text: "Share with friends / mentors",
-                  },
-                  {
-                    icon: <FiUsers size={14} />,
-                    text: "See where friends slotted courses",
-                  },
-                ].map((b) => (
-                  <div
-                    key={b.text}
-                    className="flex items-center gap-2 text-gray-700 dark:text-gray-200 bg-gradient-to-br from-black/[0.04] to-transparent dark:from-white/[0.06] border border-black/[0.06] dark:border-white/[0.08] rounded-lg px-3 py-2 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur-sm"
-                  >
-                    <span className="shrink-0 text-pink-500 dark:text-pink-400">
-                      {b.icon}
-                    </span>
-                    <span className="text-xs">{b.text}</span>
-                  </div>
-                ))}
-              </div>
-
-              <div className="mt-4 flex gap-2">
-                <button
-                  className="px-4 py-2 text-sm rounded-xl text-white bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 transition-all duration-200"
-                  onClick={() => setLogInFlow(true)}
-                >
-                  Try Simulator
-                </button>
-                <button
-                  className="px-4 py-2 text-sm rounded-xl bg-gradient-to-br from-black/[0.04] to-transparent dark:from-white/[0.06] hover:from-black/[0.08] dark:hover:from-white/[0.1] text-gray-900 dark:text-white border border-black/[0.06] dark:border-white/[0.08] shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] transition-all duration-200"
-                  onClick={() => setShowVideoModal(true)}
-                >
-                  Watch Demo
-                </button>
-              </div>
-            </div>
-
-            {/* Right: GIF/video placeholder */}
-            <div className="flex-1 w-full px-4">
-              <div className="relative rounded-2xl overflow-hidden border-2 border-black/[0.08] dark:border-white/[0.1] shadow-[0_8px_48px_rgba(0,0,0,0.5),0_0_60px_rgba(139,92,246,0.15),inset_0_1px_0_rgba(255,255,255,0.1)] bg-white/80 dark:bg-gray-950/80 backdrop-blur-xl">
-                <div className="flex items-center gap-1.5 px-4 py-2.5 bg-gradient-to-r from-gray-100/80 to-gray-50/80 dark:from-gray-900/80 dark:to-gray-950/80 border-b border-black/[0.05] dark:border-white/[0.06]">
-                  <div className="w-2.5 h-2.5 rounded-full bg-red-500/80" />
-                  <div className="w-2.5 h-2.5 rounded-full bg-yellow-500/80" />
-                  <div className="w-2.5 h-2.5 rounded-full bg-green-500/80" />
-                  <span className="ml-3 text-[10px] text-gray-400 dark:text-gray-500 font-medium tracking-wide">
-                    simulator-demo.gif
-                  </span>
-                </div>
-                <img
-                  src="/demo/simulator.gif"
-                  alt="Simulator demo"
-                  className="w-full aspect-video object-cover"
-                  loading="lazy"
-                  width={860}
-                  height={704}
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Stats Preview (public) */}
-      <section
+      {/* §6.2 Stats preview */}
+      <FeatureSection
         id="stats"
-        className="relative max-w-7xl mx-auto px-4 lg:px-6 py-24"
-      >
-        <div className="relative bg-white/70 dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/70 dark:via-gray-900/50 dark:to-gray-950/70 backdrop-blur-2xl rounded-xl p-6 border border-gray-200 dark:border-gray-800/50 shadow-neu overflow-hidden">
-          <div className="absolute -right-24 -top-24 h-64 w-64 rounded-full bg-purple-500/10 blur-3xl" />
-          <div className="absolute -left-24 -bottom-24 h-64 w-64 rounded-full bg-blue-500/10 blur-3xl" />
-
-          <div className="mb-4">
-            <SectionEyebrow icon={<FiBarChart2 />} label="Stats" />
-            <h3 className="text-2xl font-medium leading-[0.98] tracking-[-0.02em] text-balance text-gray-900 dark:text-white">
-              Contextual stats that
-              <br />
-              <span className="text-gray-500 dark:text-gray-400">actually help.</span>
-            </h3>
-            <p className="text-gray-700 dark:text-gray-300 text-sm mt-1">
-              See your progress and trajectory in context so you know where to
-              improve, not just your grades in isolation. This is just a preview
-              of all that we have; log in to see it!
-            </p>
-          </div>
+        kicker="Stats"
+        line1="Contextual stats that"
+        line2="actually help."
+        mockSide="left"
+        body={
+          <>
+            See your progress and trajectory in context, so you know where to
+            improve instead of reading grades in isolation. This is only a
+            preview of what is inside.
+          </>
+        }
+        checks={[
+          <CheckRow key="a">Cumulative GPA, tracked semester by semester</CheckRow>,
+          <CheckRow key="b">Credits and pace against your graduation target</CheckRow>,
+          <CheckRow key="c">Your grade distribution at a glance</CheckRow>,
+        ]}
+        actions={
+          <MonoCTA onClick={() => setLogInFlow(true)}>See my full stats</MonoCTA>
+        }
+        mock={
+          <MockWindow filename="stats.tsx">
+            <div className="p-4">
           <div ref={cardsRef} className="mb-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+            <div className="grid grid-cols-2 gap-3">
               {/* Cumulative GPA */}
               <motion.div
                 initial={{ opacity: 0, y: 16 }}
@@ -730,7 +688,7 @@ export default function AboutPage() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4">
             {/* Cumulative GPA */}
             <motion.div
               initial={{ opacity: 0, y: 16 }}
@@ -905,16 +863,10 @@ export default function AboutPage() {
             </motion.div>
           </div>
 
-          <div className="mt-4">
-            <button
-              className="px-4 py-2 text-sm rounded-xl text-white bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 transition-all duration-200"
-              onClick={() => setLogInFlow(true)}
-            >
-              See my full stats
-            </button>
-          </div>
-        </div>
-      </section>
+            </div>
+          </MockWindow>
+        }
+      />
 
       {/* Major Progress — compact bar only */}
       <section

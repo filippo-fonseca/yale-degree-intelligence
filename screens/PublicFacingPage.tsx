@@ -412,14 +412,14 @@ export default function AboutPage() {
               >
                 {/* Animated gradient border */}
                 <span
-                  className="absolute inset-0 rounded-xl bg-[conic-gradient(from_var(--angle),#06b6d4,#8b5cf6,#ec4899,#f97316,#06b6d4)] p-[2px] animate-border-spin"
+                  className="absolute inset-0 rounded-xl bg-[conic-gradient(from_var(--angle),#06b6d4,#8b5cf6,#ec4899,#06b6d4)] p-[2px] animate-border-spin"
                   style={{ "--angle": "0deg" } as React.CSSProperties}
                 >
                   <span className="flex h-full w-full rounded-[10px] bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl" />
                 </span>
                 {/* Glow effect */}
                 <span
-                  className="absolute inset-0 rounded-xl opacity-50 blur-md bg-[conic-gradient(from_var(--angle),#06b6d4,#8b5cf6,#ec4899,#f97316,#06b6d4)] animate-border-spin"
+                  className="absolute inset-0 rounded-xl opacity-50 blur-md bg-[conic-gradient(from_var(--angle),#06b6d4,#8b5cf6,#ec4899,#06b6d4)] animate-border-spin"
                   style={{ "--angle": "0deg" } as React.CSSProperties}
                 />
                 {/* Button content */}
@@ -643,7 +643,7 @@ export default function AboutPage() {
                     key={b.text}
                     className="flex items-center gap-2 text-gray-700 dark:text-gray-200 bg-gradient-to-br from-black/[0.04] to-transparent dark:from-white/[0.06] border border-black/[0.06] dark:border-white/[0.08] rounded-lg px-3 py-2 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur-sm"
                   >
-                    <span className="shrink-0 text-cyan-400 drop-shadow-[0_0_6px_rgba(6,182,212,0.5)]">
+                    <span className="shrink-0 text-pink-500 dark:text-pink-400">
                       {b.icon}
                     </span>
                     <span className="text-xs">{b.text}</span>
@@ -653,7 +653,7 @@ export default function AboutPage() {
 
               <div className="mt-4 flex gap-2">
                 <button
-                  className="px-4 py-2 text-sm rounded-xl bg-gradient-to-r from-cyan-500/30 to-cyan-600/30 hover:from-cyan-500/40 hover:to-cyan-600/40 text-white border border-white/[0.1] shadow-[0_4px_16px_rgba(6,182,212,0.3),inset_0_1px_0_rgba(255,255,255,0.15)] transition-all duration-200"
+                  className="px-4 py-2 text-sm rounded-xl text-white bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 transition-all duration-200"
                   onClick={() => setLogInFlow(true)}
                 >
                   Try Simulator
@@ -986,7 +986,7 @@ export default function AboutPage() {
 
           <div className="mt-4">
             <button
-              className="px-4 py-2 text-sm rounded-xl bg-gradient-to-r from-purple-500/30 to-purple-600/30 hover:from-purple-500/40 hover:to-purple-600/40 text-white border border-white/[0.1] shadow-[0_4px_16px_rgba(139,92,246,0.3),inset_0_1px_0_rgba(255,255,255,0.15)] transition-all duration-200"
+              className="px-4 py-2 text-sm rounded-xl text-white bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 transition-all duration-200"
               onClick={() => setLogInFlow(true)}
             >
               See my full stats
@@ -1172,7 +1172,7 @@ export default function AboutPage() {
 
           <div className="mt-6">
             <button
-              className="px-4 py-2 text-sm rounded-xl bg-gradient-to-r from-pink-500/30 to-blue-500/30 hover:from-pink-500/40 hover:to-blue-500/40 text-white border border-white/[0.1] shadow-[0_4px_16px_rgba(236,72,153,0.25),inset_0_1px_0_rgba(255,255,255,0.15)] transition-all duration-200"
+              className="px-4 py-2 text-sm rounded-xl text-white bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 transition-all duration-200"
               onClick={() => setLogInFlow(true)}
             >
               Let's do this
@@ -1206,7 +1206,7 @@ export default function AboutPage() {
                 Your Friends (3)
               </h3>
               <button
-                className="px-3 py-1.5 bg-gradient-to-r from-pink-500/30 to-pink-600/30 hover:from-pink-500/40 hover:to-pink-600/40 text-white rounded-lg transition flex items-center gap-1.5 text-xs font-medium border border-white/[0.1] shadow-[0_4px_16px_rgba(236,72,153,0.25),inset_0_1px_0_rgba(255,255,255,0.15)]"
+                className="px-3 py-1.5 text-white bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 rounded-lg transition flex items-center gap-1.5 text-xs font-medium"
                 onClick={() => setLogInFlow(true)}
               >
                 <FiUserPlus size={12} /> Add Friend
@@ -1228,14 +1228,14 @@ export default function AboutPage() {
                   major: "ECON & S&DS",
                   year: "2027",
                   initials: "AR",
-                  gradient: "from-blue-500 to-cyan-600",
+                  gradient: "from-blue-500 to-purple-600",
                 },
                 {
                   name: "Jordan Kim",
                   major: "MCDB",
                   year: "2025",
                   initials: "JK",
-                  gradient: "from-emerald-500 to-teal-600",
+                  gradient: "from-pink-500 to-purple-600",
                 },
               ].map((friend, i) => (
                 <motion.div
@@ -1306,7 +1306,7 @@ export default function AboutPage() {
 
             <div className="mt-8 text-center">
               <button
-                className="px-6 py-3 rounded-2xl bg-gradient-to-r from-pink-500/30 via-purple-500/30 to-blue-500/30 hover:from-pink-500/40 hover:via-purple-500/40 hover:to-blue-500/40 text-white border border-white/[0.1] shadow-[0_4px_16px_rgba(236,72,153,0.25),inset_0_1px_0_rgba(255,255,255,0.15)] transition-all duration-200 font-medium"
+                className="px-6 py-3 rounded-xl text-white bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 transition-all duration-200 font-medium"
                 onClick={() => setLogInFlow(true)}
               >
                 Enable Friends Feature
@@ -1470,7 +1470,7 @@ export default function AboutPage() {
           <div className="flex justify-center">
             <a
               href="mailto:filippo.fonseca@yale.edu,emir.ahmed@yale.edu"
-              className="px-4 py-2 text-sm bg-gradient-to-r from-blue-500/30 via-purple-500/30 to-pink-500/30 hover:from-blue-500/40 hover:via-purple-500/40 hover:to-pink-500/40 rounded-xl text-white flex items-center gap-2 transition-all hover:scale-105 border border-white/[0.1] shadow-[0_4px_16px_rgba(139,92,246,0.25),inset_0_1px_0_rgba(255,255,255,0.15)]"
+              className="px-4 py-2 text-sm text-white bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 rounded-xl flex items-center gap-2 transition-all"
             >
               <FiMail size={14} /> Email Us
             </a>

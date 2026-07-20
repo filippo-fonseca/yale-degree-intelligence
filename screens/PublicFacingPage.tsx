@@ -55,7 +55,7 @@ function CountUp({
   duration?: number;
 }) {
   const mv = useMotionValue(0);
-  const sp = useSpring(mv, { stiffness: 120, damping: 20, duration });
+  const sp = useSpring(mv, { stiffness: 480, damping: 35, duration });
   const rounded = useTransform(sp, (v) => v.toFixed(decimals));
   useEffect(() => {
     if (inView) mv.set(to);
@@ -251,13 +251,13 @@ export default function AboutPage() {
     <div className="min-h-screen pt-2 bg-gradient-to-br from-gray-50 via-gray-100 to-white dark:from-gray-950 dark:via-gray-900 dark:to-gray-900 font-louize overflow-x-hidden">
       <CosmicBackground mode="stars" opacity={0.9} />
       {/* Welcome Banner */}
-      <div className="relative mb-8 mt-14 z-30 bg-gradient-to-r from-emerald-900/20 via-blue-900/20 to-purple-900/20 backdrop-blur-xl border-b border-white/[0.08] shadow-[0_8px_32px_rgba(0,0,0,0.3),inset_0_1px_0_rgba(255,255,255,0.1)]">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-2.5 flex items-center justify-center gap-2">
-          <span className="px-2.5 py-1 text-[10px] sm:text-xs font-semibold rounded-full bg-gradient-to-r from-emerald-500/20 to-emerald-600/20 border border-emerald-500/30 text-emerald-300 shadow-[inset_0_1px_0_rgba(255,255,255,0.1),0_2px_8px_rgba(52,211,153,0.2)] flex items-center gap-1 shrink-0">
+      <div className="relative mb-8 mt-14 z-30 bg-gradient-to-r from-emerald-50 via-blue-50 to-purple-50 dark:from-emerald-900/20 dark:via-blue-900/20 dark:to-purple-900/20 backdrop-blur-xl border-b border-gray-200 dark:border-white/[0.08] shadow-sm dark:shadow-[0_8px_32px_rgba(0,0,0,0.3),inset_0_1px_0_rgba(255,255,255,0.1)]">
+        <div className="max-w-7xl mx-auto px-4 lg:px-6 py-2.5 flex items-center justify-center gap-2">
+          <span className="px-2.5 py-1 text-[10px] sm:text-xs font-semibold rounded-full bg-gradient-to-r from-emerald-500/20 to-emerald-600/20 border border-emerald-500/30 text-emerald-700 dark:text-emerald-300 shadow-[inset_0_1px_0_rgba(255,255,255,0.1),0_2px_8px_rgba(52,211,153,0.2)] flex items-center gap-1 shrink-0">
             <HiSparkles className="w-3 h-3" />{" "}
             <span className="hidden sm:inline">News</span>
           </span>
-          <p className="text-[11px] sm:text-sm text-emerald-100">
+          <p className="text-[11px] sm:text-sm text-emerald-800 dark:text-emerald-100">
             <span className="sm:hidden">The YDN featured us.</span>
             <span className="hidden sm:inline">
               The Yale Daily News featured us.
@@ -281,7 +281,7 @@ export default function AboutPage() {
         transition={{ duration: 0.5 }}
         className="fixed top-0 left-0 right-0 z-50 bg-white/80 dark:bg-gray-950/80 backdrop-blur-xl border-b border-black/[0.06] dark:border-white/[0.06] shadow-[0_4px_24px_rgba(0,0,0,0.3)]"
       >
-        <div className="max-w-6xl mx-auto px-3 sm:px-6 lg:px-8 py-2.5 sm:py-3 flex items-center justify-between">
+        <div className="max-w-7xl mx-auto px-3 lg:px-6 py-2.5 sm:py-3 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <LogoIcon width={22} height={22} className="sm:w-6 sm:h-6" />
             <span className="text-sm font-medium text-gray-800 dark:text-gray-200 hidden sm:inline">
@@ -303,7 +303,7 @@ export default function AboutPage() {
             </button>
             <motion.button
               className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm bg-gradient-to-r from-pink-500/20 via-purple-500/20 to-blue-500/20 hover:from-pink-500/30 hover:via-purple-500/30 hover:to-blue-500/30 backdrop-blur-xl rounded-lg sm:rounded-xl text-gray-900 dark:text-white font-medium transition-all shadow-[0_4px_20px_rgba(139,92,246,0.2),inset_0_1px_0_rgba(255,255,255,0.1)] border border-black/[0.08] dark:border-white/[0.1]"
-              whileHover={{ scale: 1.02 }}
+              whileHover={{ y: -1 }}
               whileTap={{ scale: 0.98 }}
               onClick={() => setLogInFlow(true)}
             >
@@ -320,12 +320,12 @@ export default function AboutPage() {
         {/* Cursor-adaptive constellation background (sits behind hero content) */}
         <HeroConstellation />
         {/* increased top padding to fix logo spacing */}
-        <div className="max-w-6xl mx-auto px-4 pb-3 sm:px-6 lg:px-8 relative z-10">
+        <div className="max-w-7xl mx-auto px-4 pb-3 lg:px-6 relative z-10">
           <motion.div
             initial={{ opacity: 1, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
-            className="text-center p-6 sm:p-8 rounded-2xl bg-white/70 dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 backdrop-blur-xl border border-black/[0.06] dark:border-white/[0.08] shadow-[0_8px_48px_rgba(0,0,0,0.4),0_0_100px_rgba(139,92,246,0.08),inset_0_1px_0_rgba(255,255,255,0.1)] ring-1 ring-black/[0.04] dark:ring-white/[0.05]"
+            className="text-center p-6 sm:p-8 rounded-xl bg-white/70 dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 backdrop-blur-xl border border-gray-200 dark:border-gray-800/50 shadow-neu"
           >
             {/* Version Badge */}
             <motion.div
@@ -334,9 +334,9 @@ export default function AboutPage() {
               transition={{ duration: 0.6 }}
               className="mb-4 flex justify-center"
             >
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase bg-gradient-to-r from-blue-500/20 via-purple-500/20 to-pink-500/20 border border-white/[0.15] shadow-[0_4px_20px_rgba(139,92,246,0.25),inset_0_1px_0_rgba(255,255,255,0.15)] backdrop-blur-xl">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase bg-gradient-to-r from-blue-500/20 via-purple-500/20 to-pink-500/20 border border-pink-500/20 dark:border-white/[0.15] shadow-[0_4px_20px_rgba(139,92,246,0.25),inset_0_1px_0_rgba(255,255,255,0.15)] backdrop-blur-xl">
                 <span className="w-1.5 h-1.5 rounded-full bg-gradient-to-r from-emerald-400 to-emerald-500 animate-pulse shadow-[0_0_8px_rgba(52,211,153,0.6)]"></span>
-                <span className="bg-gradient-to-r from-blue-300 via-purple-300 to-pink-300 bg-clip-text text-transparent">
+                <span className="bg-gradient-to-r from-pink-600 via-purple-600 to-blue-600 dark:from-blue-300 dark:via-purple-300 dark:to-pink-300 bg-clip-text text-transparent">
                   Introducing DegreeIntelligence v3
                 </span>
               </span>
@@ -360,7 +360,7 @@ export default function AboutPage() {
               </div>
             </div>
 
-            <h1 className="flex items-center justify-center text-4xl font-bold tracking-tight text-gray-900 dark:text-white mb-3">
+            <h1 className="flex items-center justify-center text-4xl font-medium leading-[0.98] tracking-[-0.02em] text-balance text-gray-900 dark:text-white mb-3">
               <CompoundLogo hideLogo animated size="lg" />
             </h1>
             {/* Welcome Badge */}
@@ -373,11 +373,10 @@ export default function AboutPage() {
               </div>
             </div>
 
-            <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-4">
+            <h2 className="text-2xl sm:text-3xl font-medium leading-[0.98] tracking-[-0.02em] text-balance text-gray-900 dark:text-white mb-4">
               Your Yale Degree,
-              <br className="sm:hidden" />
-              <span className="hidden sm:inline"> </span>
-              <span className="text-blue-600 dark:text-blue-300">made easy.</span>
+              <br />
+              <span className="text-gray-500 dark:text-gray-400">made easy.</span>
             </h2>
 
             <p className="text-base text-gray-700 dark:text-gray-300 max-w-2xl mx-auto mb-5">
@@ -385,7 +384,7 @@ export default function AboutPage() {
               together.{" "}
               <Link
                 href="#team"
-                className="inline-flex items-center gap-1.5 text-transparent bg-clip-text bg-gradient-to-r from-blue-300 to-purple-300 hover:from-blue-200 hover:to-purple-200 font-medium transition-all group"
+                className="inline-flex items-center gap-1.5 text-transparent bg-clip-text bg-gradient-to-r from-pink-600 to-purple-600 dark:from-blue-300 dark:to-purple-300 hover:from-pink-500 hover:to-purple-500 dark:hover:from-blue-200 dark:hover:to-purple-200 font-medium transition-all group"
               >
                 For Yalies, by Yalies
                 <span className="text-purple-400 text-sm opacity-70 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all">
@@ -397,7 +396,7 @@ export default function AboutPage() {
             <motion.div className="flex flex-wrap justify-center gap-3">
               <motion.button
                 className="px-5 py-2.5 text-sm bg-gradient-to-br from-black/[0.04] to-transparent dark:from-white/[0.06] hover:from-black/[0.08] dark:hover:from-white/[0.1] backdrop-blur-xl rounded-xl text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white font-medium flex items-center gap-2 transition-all shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] border border-black/[0.06] dark:border-white/[0.08] hover:border-black/[0.12] dark:hover:border-white/[0.15]"
-                whileHover={{ scale: 1.03, y: -2 }}
+                whileHover={{ y: -1 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={() => setShowVideoModal(true)}
               >
@@ -406,20 +405,20 @@ export default function AboutPage() {
               </motion.button>
               <motion.button
                 className="group relative px-5 py-2.5 text-sm rounded-xl text-white font-medium flex items-center gap-2 transition-all overflow-hidden"
-                whileHover={{ scale: 1.03, y: -2 }}
+                whileHover={{ y: -1 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={() => setLogInFlow(true)}
               >
                 {/* Animated gradient border */}
                 <span
-                  className="absolute inset-0 rounded-xl bg-[conic-gradient(from_var(--angle),#06b6d4,#8b5cf6,#ec4899,#f97316,#06b6d4)] p-[2px] animate-border-spin"
+                  className="absolute inset-0 rounded-xl bg-[conic-gradient(from_var(--angle),#06b6d4,#8b5cf6,#ec4899,#06b6d4)] p-[2px] animate-border-spin"
                   style={{ "--angle": "0deg" } as React.CSSProperties}
                 >
                   <span className="flex h-full w-full rounded-[10px] bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl" />
                 </span>
                 {/* Glow effect */}
                 <span
-                  className="absolute inset-0 rounded-xl opacity-50 blur-md bg-[conic-gradient(from_var(--angle),#06b6d4,#8b5cf6,#ec4899,#f97316,#06b6d4)] animate-border-spin"
+                  className="absolute inset-0 rounded-xl opacity-50 blur-md bg-[conic-gradient(from_var(--angle),#06b6d4,#8b5cf6,#ec4899,#06b6d4)] animate-border-spin"
                   style={{ "--angle": "0deg" } as React.CSSProperties}
                 />
                 {/* Button content */}
@@ -438,9 +437,9 @@ export default function AboutPage() {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.3 }}
-              className="mt-8 pt-6 border-t border-white/[0.08]"
+              className="mt-8 pt-6"
             >
-              <p className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-blue-200 via-purple-200 to-pink-200 bg-clip-text text-transparent leading-relaxed">
+              <p className="text-xl sm:text-2xl font-medium bg-gradient-to-r from-pink-600 via-purple-600 to-blue-600 dark:from-blue-200 dark:via-purple-200 dark:to-pink-200 bg-clip-text text-transparent leading-relaxed">
                 Have you heard? 1 in 6 Yale undergrads already use DegreeIntelligence.
               </p>
               <p className="text-base text-gray-500 dark:text-gray-400 mt-2">
@@ -460,7 +459,7 @@ export default function AboutPage() {
                 {/* Caption */}
                 <div className="mb-4 text-center">
                   <p className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed">
-                    <span className="font-semibold bg-gradient-to-r from-pink-300 via-purple-300 to-blue-300 bg-clip-text text-transparent">
+                    <span className="font-semibold bg-gradient-to-r from-pink-600 via-purple-600 to-blue-600 dark:from-pink-300 dark:via-purple-300 dark:to-blue-300 bg-clip-text text-transparent">
                       OUR V3 LAUNCH, FEB 2026.
                     </span>
                     <br />
@@ -509,18 +508,25 @@ export default function AboutPage() {
           </motion.div>
         </div>
 
-        {/* subtle splash gradient */}
+        {/* soft brand glow — hero only */}
         <div className="pointer-events-none absolute inset-0 -z-10">
-          <div className="absolute left-1/2 top-10 -translate-x-1/2 h-72 w-[36rem] rounded-full bg-gradient-to-r from-blue-600/20 to-purple-600/20 blur-3xl" />
+          <div className="absolute left-1/2 top-10 -translate-x-1/2 h-72 w-[36rem] rounded-full bg-gradient-to-r from-pink-500/20 to-purple-600/20 blur-3xl" />
         </div>
       </div>
 
       {/* Blueprint Section */}
-      <div className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="bg-white/70 dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/70 dark:via-gray-900/50 dark:to-gray-950/70 backdrop-blur-2xl rounded-2xl p-6 border border-black/[0.06] dark:border-white/[0.08] shadow-[0_8px_48px_rgba(0,0,0,0.4),0_0_80px_rgba(139,92,246,0.08),inset_0_1px_0_rgba(255,255,255,0.1)] ring-1 ring-white/[0.05]">
+      <div className="relative max-w-7xl mx-auto px-4 lg:px-6 py-24">
+        <div className="bg-white/70 dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/70 dark:via-gray-900/50 dark:to-gray-950/70 backdrop-blur-2xl rounded-xl p-6 border border-gray-200 dark:border-gray-800/50 shadow-neu">
           <div className="text-center mb-8">
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">
-              Our blueprint, broken down.
+            <SectionEyebrow
+              centered
+              icon={<FiAlertCircle />}
+              label="Blueprint"
+            />
+            <h2 className="text-2xl font-medium leading-[0.98] tracking-[-0.02em] text-balance text-gray-900 dark:text-white mb-3">
+              Our blueprint,
+              <br />
+              <span className="text-gray-500 dark:text-gray-400">broken down.</span>
             </h2>
             <p className="text-sm text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
               How we believe we transformed frustration into an elegant solution
@@ -601,17 +607,20 @@ export default function AboutPage() {
       {/* Simulator Section */}
       <section
         id="simulator"
-        className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8"
+        className="relative max-w-7xl mx-auto px-4 lg:px-6 py-24"
       >
-        <div className="bg-white/70 dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/70 dark:via-gray-900/50 dark:to-gray-950/70 backdrop-blur-2xl rounded-2xl p-6 border border-black/[0.06] dark:border-white/[0.08] shadow-[0_8px_48px_rgba(0,0,0,0.4),0_0_100px_rgba(6,182,212,0.1),inset_0_1px_0_rgba(255,255,255,0.1)] ring-1 ring-cyan-500/20 overflow-hidden">
-          <div className="absolute -right-24 -top-24 h-64 w-64 rounded-full bg-cyan-500/10 blur-3xl" />
+        <div className="relative bg-white/70 dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/70 dark:via-gray-900/50 dark:to-gray-950/70 backdrop-blur-2xl rounded-xl p-6 border border-gray-200 dark:border-gray-800/50 shadow-neu overflow-hidden">
+          <div className="absolute -right-24 -top-24 h-64 w-64 rounded-full bg-pink-500/10 blur-3xl" />
           <div className="absolute -left-24 -bottom-24 h-64 w-64 rounded-full bg-purple-500/10 blur-3xl" />
 
           <div className="flex flex-col lg:flex-row gap-6 items-center">
             {/* Left: copy + bullets */}
             <div className="flex-1 min-w-0">
-              <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-                Simulator: drag, drop, done.
+              <SectionEyebrow icon={<FiZap />} label="Simulator" />
+              <h3 className="text-2xl font-medium leading-[0.98] tracking-[-0.02em] text-balance text-gray-900 dark:text-white mb-2">
+                Simulator: drag, drop,
+                <br />
+                <span className="text-gray-500 dark:text-gray-400">done.</span>
               </h3>
               <p className="text-gray-700 dark:text-gray-300 text-sm mb-4 max-w-xl">
                 Build a semester-by-semester plan by dragging courses from your
@@ -643,7 +652,7 @@ export default function AboutPage() {
                     key={b.text}
                     className="flex items-center gap-2 text-gray-700 dark:text-gray-200 bg-gradient-to-br from-black/[0.04] to-transparent dark:from-white/[0.06] border border-black/[0.06] dark:border-white/[0.08] rounded-lg px-3 py-2 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur-sm"
                   >
-                    <span className="shrink-0 text-cyan-400 drop-shadow-[0_0_6px_rgba(6,182,212,0.5)]">
+                    <span className="shrink-0 text-pink-500 dark:text-pink-400">
                       {b.icon}
                     </span>
                     <span className="text-xs">{b.text}</span>
@@ -653,7 +662,7 @@ export default function AboutPage() {
 
               <div className="mt-4 flex gap-2">
                 <button
-                  className="px-4 py-2 text-sm rounded-xl bg-gradient-to-r from-cyan-500/30 to-cyan-600/30 hover:from-cyan-500/40 hover:to-cyan-600/40 text-white border border-white/[0.1] shadow-[0_4px_16px_rgba(6,182,212,0.3),inset_0_1px_0_rgba(255,255,255,0.15)] transition-all duration-200"
+                  className="px-4 py-2 text-sm rounded-xl text-white bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 transition-all duration-200"
                   onClick={() => setLogInFlow(true)}
                 >
                   Try Simulator
@@ -695,15 +704,18 @@ export default function AboutPage() {
       {/* Stats Preview (public) */}
       <section
         id="stats"
-        className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8"
+        className="relative max-w-7xl mx-auto px-4 lg:px-6 py-24"
       >
-        <div className="bg-white/70 dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/70 dark:via-gray-900/50 dark:to-gray-950/70 backdrop-blur-2xl rounded-2xl p-6 border border-black/[0.06] dark:border-white/[0.08] shadow-[0_8px_48px_rgba(0,0,0,0.4),0_0_100px_rgba(139,92,246,0.1),inset_0_1px_0_rgba(255,255,255,0.1)] ring-1 ring-purple-500/20 overflow-hidden">
+        <div className="relative bg-white/70 dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/70 dark:via-gray-900/50 dark:to-gray-950/70 backdrop-blur-2xl rounded-xl p-6 border border-gray-200 dark:border-gray-800/50 shadow-neu overflow-hidden">
           <div className="absolute -right-24 -top-24 h-64 w-64 rounded-full bg-purple-500/10 blur-3xl" />
           <div className="absolute -left-24 -bottom-24 h-64 w-64 rounded-full bg-blue-500/10 blur-3xl" />
 
           <div className="mb-4">
-            <h3 className="text-2xl font-bold text-gray-900 dark:text-white">
-              Contextual stats that actually help.
+            <SectionEyebrow icon={<FiBarChart2 />} label="Stats" />
+            <h3 className="text-2xl font-medium leading-[0.98] tracking-[-0.02em] text-balance text-gray-900 dark:text-white">
+              Contextual stats that
+              <br />
+              <span className="text-gray-500 dark:text-gray-400">actually help.</span>
             </h3>
             <p className="text-gray-700 dark:text-gray-300 text-sm mt-1">
               See your progress and trajectory in context so you know where to
@@ -718,7 +730,7 @@ export default function AboutPage() {
                 initial={{ opacity: 0, y: 16 }}
                 animate={cardsInView ? { opacity: 1, y: 0 } : {}}
                 transition={{ duration: 0.5 }}
-                className="p-4 rounded-xl bg-gradient-to-br from-white/[0.06] via-transparent to-black/10 backdrop-blur-sm border border-white/[0.08] shadow-[0_4px_24px_rgba(0,0,0,0.2),inset_0_1px_0_rgba(255,255,255,0.1)]"
+                className="p-4 rounded-xl bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 backdrop-blur-sm border border-gray-200 dark:border-gray-800/50 shadow-neu"
               >
                 <div className="flex items-center justify-between">
                   <p className="text-xs text-gray-500 dark:text-gray-400">Cumulative GPA</p>
@@ -740,7 +752,7 @@ export default function AboutPage() {
                 initial={{ opacity: 0, y: 16 }}
                 animate={cardsInView ? { opacity: 1, y: 0 } : {}}
                 transition={{ duration: 0.5, delay: 0.05 }}
-                className="p-4 rounded-xl bg-gradient-to-br from-white/[0.06] via-transparent to-black/10 backdrop-blur-sm border border-white/[0.08] shadow-[0_4px_24px_rgba(0,0,0,0.2),inset_0_1px_0_rgba(255,255,255,0.1)]"
+                className="p-4 rounded-xl bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 backdrop-blur-sm border border-gray-200 dark:border-gray-800/50 shadow-neu"
               >
                 <div className="flex items-center justify-between">
                   <p className="text-xs text-gray-500 dark:text-gray-400">Total Credits</p>
@@ -761,7 +773,7 @@ export default function AboutPage() {
                 initial={{ opacity: 0, y: 16 }}
                 animate={cardsInView ? { opacity: 1, y: 0 } : {}}
                 transition={{ duration: 0.5, delay: 0.1 }}
-                className="p-4 rounded-xl bg-gradient-to-br from-white/[0.06] via-transparent to-black/10 backdrop-blur-sm border border-white/[0.08] shadow-[0_4px_24px_rgba(0,0,0,0.2),inset_0_1px_0_rgba(255,255,255,0.1)]"
+                className="p-4 rounded-xl bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 backdrop-blur-sm border border-gray-200 dark:border-gray-800/50 shadow-neu"
               >
                 <div className="flex items-center justify-between">
                   <p className="text-xs text-gray-500 dark:text-gray-400">Courses Completed</p>
@@ -785,7 +797,7 @@ export default function AboutPage() {
                 initial={{ opacity: 0, y: 16 }}
                 animate={cardsInView ? { opacity: 1, y: 0 } : {}}
                 transition={{ duration: 0.5, delay: 0.15 }}
-                className="p-4 rounded-xl bg-gradient-to-br from-white/[0.06] via-transparent to-black/10 backdrop-blur-sm border border-white/[0.08] shadow-[0_4px_24px_rgba(0,0,0,0.2),inset_0_1px_0_rgba(255,255,255,0.1)]"
+                className="p-4 rounded-xl bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 backdrop-blur-sm border border-gray-200 dark:border-gray-800/50 shadow-neu"
               >
                 <div className="flex items-center justify-between">
                   <p className="text-xs text-gray-500 dark:text-gray-400">
@@ -816,7 +828,7 @@ export default function AboutPage() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, amount: 0.35 }}
               transition={{ duration: 0.6 }}
-              className="p-4 rounded-xl bg-gradient-to-br from-white/[0.06] via-transparent to-black/10 backdrop-blur-sm border border-white/[0.08] shadow-[0_4px_24px_rgba(0,0,0,0.2),inset_0_1px_0_rgba(255,255,255,0.1)]"
+              className="p-4 rounded-xl bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 backdrop-blur-sm border border-gray-200 dark:border-gray-800/50 shadow-neu"
             >
               <div className="flex items-start justify-between mb-3">
                 <div>
@@ -926,7 +938,7 @@ export default function AboutPage() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, amount: 0.35 }}
               transition={{ duration: 0.6, delay: 0.05 }}
-              className="p-4 rounded-xl bg-gradient-to-br from-white/[0.06] via-transparent to-black/10 backdrop-blur-sm border border-white/[0.08] shadow-[0_4px_24px_rgba(0,0,0,0.2),inset_0_1px_0_rgba(255,255,255,0.1)]"
+              className="p-4 rounded-xl bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 backdrop-blur-sm border border-gray-200 dark:border-gray-800/50 shadow-neu"
             >
               <div className="flex items-start justify-between mb-3">
                 <div>
@@ -986,7 +998,7 @@ export default function AboutPage() {
 
           <div className="mt-4">
             <button
-              className="px-4 py-2 text-sm rounded-xl bg-gradient-to-r from-purple-500/30 to-purple-600/30 hover:from-purple-500/40 hover:to-purple-600/40 text-white border border-white/[0.1] shadow-[0_4px_16px_rgba(139,92,246,0.3),inset_0_1px_0_rgba(255,255,255,0.15)] transition-all duration-200"
+              className="px-4 py-2 text-sm rounded-xl text-white bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 transition-all duration-200"
               onClick={() => setLogInFlow(true)}
             >
               See my full stats
@@ -998,12 +1010,15 @@ export default function AboutPage() {
       {/* Major Progress — compact bar only */}
       <section
         id="major-progress"
-        className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8"
+        className="relative max-w-7xl mx-auto px-4 lg:px-6 py-24"
       >
-        <div className="bg-white/70 dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/70 dark:via-gray-900/50 dark:to-gray-950/70 backdrop-blur-2xl rounded-2xl p-6 border border-black/[0.06] dark:border-white/[0.08] shadow-[0_8px_48px_rgba(0,0,0,0.4),0_0_100px_rgba(59,130,246,0.1),inset_0_1px_0_rgba(255,255,255,0.1)] ring-1 ring-blue-500/20">
+        <div className="bg-white/70 dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/70 dark:via-gray-900/50 dark:to-gray-950/70 backdrop-blur-2xl rounded-xl p-6 border border-gray-200 dark:border-gray-800/50 shadow-neu">
           <div className="mb-3">
-            <h3 className="text-xl font-bold text-gray-900 dark:text-white">
-              Your <i>Major</i> progress, visualized.
+            <SectionEyebrow icon={<GraduationCap />} label="Major progress" />
+            <h3 className="text-xl font-medium leading-[0.98] tracking-[-0.02em] text-balance text-gray-900 dark:text-white">
+              Your <i>Major</i> progress,
+              <br />
+              <span className="text-gray-500 dark:text-gray-400">visualized.</span>
             </h3>
             <p className="text-gray-700 dark:text-gray-300 text-sm mt-1">
               Track your journey at a glance, complete with a clean progress bar
@@ -1172,7 +1187,7 @@ export default function AboutPage() {
 
           <div className="mt-6">
             <button
-              className="px-4 py-2 text-sm rounded-xl bg-gradient-to-r from-pink-500/30 to-blue-500/30 hover:from-pink-500/40 hover:to-blue-500/40 text-white border border-white/[0.1] shadow-[0_4px_16px_rgba(236,72,153,0.25),inset_0_1px_0_rgba(255,255,255,0.15)] transition-all duration-200"
+              className="px-4 py-2 text-sm rounded-xl text-white bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 transition-all duration-200"
               onClick={() => setLogInFlow(true)}
             >
               Let's do this
@@ -1182,11 +1197,14 @@ export default function AboutPage() {
       </section>
 
       {/* Public Profiles & Friends */}
-      <section className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="bg-white/70 dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/70 dark:via-gray-900/50 dark:to-gray-950/70 backdrop-blur-2xl rounded-2xl p-6 border border-black/[0.06] dark:border-white/[0.08] shadow-[0_8px_48px_rgba(0,0,0,0.4),0_0_100px_rgba(236,72,153,0.08),inset_0_1px_0_rgba(255,255,255,0.1)] ring-1 ring-pink-500/20">
+      <section className="relative max-w-7xl mx-auto px-4 lg:px-6 py-32">
+        <div className="bg-white/70 dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/70 dark:via-gray-900/50 dark:to-gray-950/70 backdrop-blur-2xl rounded-xl p-6 border border-gray-200 dark:border-gray-800/50 shadow-neu">
           <div className="text-center mb-8 flex flex-col gap-2">
-            <h2 className="text-2xl font-medium text-gray-900 dark:text-white">
-              Friends & Connections
+            <SectionEyebrow centered icon={<FiUsers />} label="Friends" />
+            <h2 className="text-2xl font-medium leading-[0.98] tracking-[-0.02em] text-balance text-gray-900 dark:text-white">
+              Friends &
+              <br />
+              <span className="text-gray-500 dark:text-gray-400">Connections</span>
             </h2>
             <p className="text-gray-700 dark:text-gray-300 text-sm max-w-2xl mx-auto">
               Add friends and mutually see each other's academic journeys. Learn
@@ -1206,7 +1224,7 @@ export default function AboutPage() {
                 Your Friends (3)
               </h3>
               <button
-                className="px-3 py-1.5 bg-gradient-to-r from-pink-500/30 to-pink-600/30 hover:from-pink-500/40 hover:to-pink-600/40 text-white rounded-lg transition flex items-center gap-1.5 text-xs font-medium border border-white/[0.1] shadow-[0_4px_16px_rgba(236,72,153,0.25),inset_0_1px_0_rgba(255,255,255,0.15)]"
+                className="px-3 py-1.5 text-white bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 rounded-lg transition flex items-center gap-1.5 text-xs font-medium"
                 onClick={() => setLogInFlow(true)}
               >
                 <FiUserPlus size={12} /> Add Friend
@@ -1228,14 +1246,14 @@ export default function AboutPage() {
                   major: "ECON & S&DS",
                   year: "2027",
                   initials: "AR",
-                  gradient: "from-blue-500 to-cyan-600",
+                  gradient: "from-blue-500 to-purple-600",
                 },
                 {
                   name: "Jordan Kim",
                   major: "MCDB",
                   year: "2025",
                   initials: "JK",
-                  gradient: "from-emerald-500 to-teal-600",
+                  gradient: "from-pink-500 to-purple-600",
                 },
               ].map((friend, i) => (
                 <motion.div
@@ -1244,7 +1262,7 @@ export default function AboutPage() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.4, delay: i * 0.1 }}
-                  className="flex items-center justify-between p-5 rounded-2xl bg-gradient-to-br from-white/[0.06] via-transparent to-black/10 border border-white/[0.08] hover:border-pink-500/30 transition-all duration-300 shadow-[0_4px_24px_rgba(0,0,0,0.2),inset_0_1px_0_rgba(255,255,255,0.1)] group"
+                  className="flex items-center justify-between p-5 rounded-xl bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 border border-gray-200 dark:border-gray-800/50 hover:border-pink-500/30 dark:hover:border-pink-500/30 transition-all duration-300 shadow-neu group"
                 >
                   <div className="flex items-center gap-4">
                     <div
@@ -1258,7 +1276,7 @@ export default function AboutPage() {
                       </div>
                       <div className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-2">
                         {friend.major}
-                        <span className="px-1.5 py-0.5 rounded-full text-[10px] bg-gradient-to-r from-purple-500/20 to-pink-500/20 border border-purple-500/30 text-purple-200">
+                        <span className="px-1.5 py-0.5 rounded-full text-[10px] bg-gradient-to-r from-purple-500/20 to-pink-500/20 border border-purple-500/30 text-purple-700 dark:text-purple-200">
                           '{friend.year.slice(-2)}
                         </span>
                       </div>
@@ -1283,7 +1301,7 @@ export default function AboutPage() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: 0.3 }}
-              className="mt-8 p-5 rounded-2xl bg-gradient-to-br from-pink-500/10 via-transparent to-purple-500/10 border border-pink-500/20 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]"
+              className="mt-8 p-5 rounded-xl bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-pink-500/10 dark:via-transparent dark:to-purple-500/10 border border-pink-200 dark:border-pink-500/20 shadow-neu"
             >
               <h4 className="text-sm font-medium text-pink-600 dark:text-pink-200 mb-3">
                 What gets shared:
@@ -1299,14 +1317,14 @@ export default function AboutPage() {
                 </li>
                 <li className="flex items-center gap-2.5">
                   <FiX className="text-red-400 shrink-0" size={14} /> Grades and
-                  GPA are <strong className="text-red-300">NEVER</strong> shared
+                  GPA are <strong className="text-red-600 dark:text-red-300">NEVER</strong> shared
                 </li>
               </ul>
             </motion.div>
 
             <div className="mt-8 text-center">
               <button
-                className="px-6 py-3 rounded-2xl bg-gradient-to-r from-pink-500/30 via-purple-500/30 to-blue-500/30 hover:from-pink-500/40 hover:via-purple-500/40 hover:to-blue-500/40 text-white border border-white/[0.1] shadow-[0_4px_16px_rgba(236,72,153,0.25),inset_0_1px_0_rgba(255,255,255,0.15)] transition-all duration-200 font-medium"
+                className="px-6 py-3 rounded-xl text-white bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 transition-all duration-200 font-medium"
                 onClick={() => setLogInFlow(true)}
               >
                 Enable Friends Feature
@@ -1317,15 +1335,18 @@ export default function AboutPage() {
       </section>
 
       {/* Mission Section */}
-      <div className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="relative max-w-7xl mx-auto px-4 lg:px-6 py-32">
         <motion.div
           viewport={{ once: true }}
           transition={{ duration: 0.8 }}
-          className="bg-white/70 dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/70 dark:via-gray-900/50 dark:to-gray-950/70 backdrop-blur-2xl rounded-2xl p-6 border border-black/[0.06] dark:border-white/[0.08] shadow-[0_8px_48px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.1)] ring-1 ring-white/[0.05]"
+          className="bg-white/70 dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/70 dark:via-gray-900/50 dark:to-gray-950/70 backdrop-blur-2xl rounded-xl p-6 border border-gray-200 dark:border-gray-800/50 shadow-neu"
         >
           <div className="text-center mb-8">
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">
-              What it is and why we built this.
+            <SectionEyebrow centered icon={<FiHeart />} label="Mission" />
+            <h2 className="text-2xl font-medium leading-[0.98] tracking-[-0.02em] text-balance text-gray-900 dark:text-white mb-3">
+              What it is and
+              <br />
+              <span className="text-gray-500 dark:text-gray-400">why we built this.</span>
             </h2>
             <p className="text-sm text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
               Trying to plan our majors, we kept running into the same problem:
@@ -1343,7 +1364,7 @@ export default function AboutPage() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.6, delay: i * 0.1 }}
-                className="bg-gradient-to-br from-white/[0.08] via-transparent to-black/10 p-4 rounded-xl border border-white/[0.08] hover:border-white/[0.15] transition-all duration-300 hover:scale-[1.02] shadow-[0_4px_24px_rgba(0,0,0,0.2),inset_0_1px_0_rgba(255,255,255,0.1)] backdrop-blur-sm hover:shadow-[0_8px_32px_rgba(0,0,0,0.3),inset_0_1px_0_rgba(255,255,255,0.12)]"
+                className="bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 p-4 rounded-xl border border-gray-200 dark:border-gray-800/50 hover:border-gray-300 dark:hover:border-gray-700/60 transition-all duration-300 shadow-neu backdrop-blur-sm"
               >
                 <div className="p-2.5 rounded-xl bg-gradient-to-br from-black/[0.04] via-transparent to-black/10 dark:from-white/[0.08] border border-black/[0.06] dark:border-white/[0.08] text-blue-600 dark:text-blue-300 mb-3 w-fit shadow-[inset_0_1px_0_rgba(255,255,255,0.1)]">
                   {feature.icon}
@@ -1361,11 +1382,14 @@ export default function AboutPage() {
       {/* Team Section */}
       <div
         id="team"
-        className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 scroll-mt-20"
+        className="max-w-7xl mx-auto px-4 lg:px-6 py-24 scroll-mt-20"
       >
         <div className="text-center mb-8">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">
-            It's nice to meet you!
+          <SectionEyebrow centered icon={<FiUsers />} label="Team" />
+          <h2 className="text-2xl font-medium leading-[0.98] tracking-[-0.02em] text-balance text-gray-900 dark:text-white mb-3">
+            It's nice to
+            <br />
+            <span className="text-gray-500 dark:text-gray-400">meet you!</span>
           </h2>
           <p className="text-sm text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
             We're just two Yale students who got tired of spreadsheet hell and
@@ -1400,7 +1424,7 @@ export default function AboutPage() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6, delay: i * 0.1 }}
-              className="bg-gradient-to-br from-white/[0.08] via-transparent to-black/10 backdrop-blur-xl p-4 rounded-xl border border-white/[0.08] hover:border-white/[0.15] flex-1 max-w-sm hover:scale-[1.02] transition-all duration-300 shadow-[0_4px_24px_rgba(0,0,0,0.2),inset_0_1px_0_rgba(255,255,255,0.1)] hover:shadow-[0_8px_32px_rgba(0,0,0,0.3),inset_0_1px_0_rgba(255,255,255,0.12)]"
+              className="bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 backdrop-blur-xl p-4 rounded-xl border border-gray-200 dark:border-gray-800/50 hover:border-gray-300 dark:hover:border-gray-700/60 flex-1 max-w-sm transition-all duration-300 shadow-neu"
             >
               <div className="flex items-center gap-3 mb-3">
                 <div className="w-11 h-11 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center shadow-[0_4px_16px_rgba(139,92,246,0.3)]">
@@ -1450,16 +1474,19 @@ export default function AboutPage() {
       </div>
 
       {/* CTA Section */}
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto px-4 lg:px-6 py-32">
         <motion.div
           initial={{ opacity: 0.75 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8 }}
-          className="bg-gradient-to-br from-blue-900/30 via-purple-900/20 to-pink-900/30 backdrop-blur-2xl rounded-2xl p-6 border border-white/[0.1] shadow-[0_8px_48px_rgba(0,0,0,0.4),0_0_100px_rgba(139,92,246,0.1),inset_0_1px_0_rgba(255,255,255,0.1)] ring-1 ring-purple-500/20 text-center"
+          className="bg-gradient-to-br from-pink-50 via-purple-50 to-blue-50 dark:from-blue-900/30 dark:via-purple-900/20 dark:to-pink-900/30 backdrop-blur-2xl rounded-xl p-6 border border-pink-200/60 dark:border-white/[0.1] shadow-neu text-center"
         >
-          <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-3">
-            Want to contribute?
+          <SectionEyebrow centered icon={<FiMail />} label="Contribute" />
+          <h2 className="text-xl font-medium leading-[0.98] tracking-[-0.02em] text-balance text-gray-900 dark:text-white mb-3">
+            Want to
+            <br />
+            <span className="text-gray-500 dark:text-gray-400">contribute?</span>
           </h2>
           <p className="text-gray-700 dark:text-gray-300 text-sm max-w-xl mx-auto mb-4">
             This is a project by and for the Yale community. We'd love your
@@ -1470,7 +1497,7 @@ export default function AboutPage() {
           <div className="flex justify-center">
             <a
               href="mailto:filippo.fonseca@yale.edu,emir.ahmed@yale.edu"
-              className="px-4 py-2 text-sm bg-gradient-to-r from-blue-500/30 via-purple-500/30 to-pink-500/30 hover:from-blue-500/40 hover:via-purple-500/40 hover:to-pink-500/40 rounded-xl text-white flex items-center gap-2 transition-all hover:scale-105 border border-white/[0.1] shadow-[0_4px_16px_rgba(139,92,246,0.25),inset_0_1px_0_rgba(255,255,255,0.15)]"
+              className="px-4 py-2 text-sm text-white bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 rounded-xl flex items-center gap-2 transition-all"
             >
               <FiMail size={14} /> Email Us
             </a>
@@ -1514,7 +1541,7 @@ export default function AboutPage() {
           <span>Not affiliated with Yale University.</span>
         </p>
         <p className="mt-2 text-gray-400 dark:text-gray-500 flex flex-wrap items-center justify-center gap-1.5">
-          <span className="px-1.5 py-0.5 rounded-full text-[10px] bg-gradient-to-r from-purple-500/20 to-pink-500/20 border border-purple-500/30 text-purple-300">
+          <span className="px-1.5 py-0.5 rounded-full text-[10px] bg-gradient-to-r from-purple-500/20 to-pink-500/20 border border-purple-500/30 text-purple-700 dark:text-purple-300">
             v3.0
           </span>
           <span>© {new Date().getFullYear()} DegreeIntelligence</span>
@@ -1628,6 +1655,27 @@ export default function AboutPage() {
   );
 }
 
+function SectionEyebrow({
+  icon,
+  label,
+  centered = false,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  centered?: boolean;
+}) {
+  return (
+    <div className={`mb-3 ${centered ? "flex justify-center" : ""}`}>
+      <span className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[13px] font-medium bg-pink-500/[0.06] text-pink-900/70 dark:bg-pink-500/10 dark:text-pink-200/80 border border-pink-500/10">
+        <span className="inline-flex h-3.5 w-3.5 items-center justify-center [&>svg]:h-3.5 [&>svg]:w-3.5">
+          {icon}
+        </span>
+        {label}
+      </span>
+    </div>
+  );
+}
+
 function Card({
   children,
   fade,
@@ -1638,7 +1686,7 @@ function Card({
   delay?: number;
 }) {
   const cardClass =
-    "bg-gradient-to-br from-white/[0.08] via-transparent to-black/10 p-4 rounded-xl border border-white/[0.08] hover:border-white/[0.15] transition-all duration-300 shadow-[0_4px_24px_rgba(0,0,0,0.2),inset_0_1px_0_rgba(255,255,255,0.1)] backdrop-blur-sm hover:shadow-[0_8px_32px_rgba(0,0,0,0.3),inset_0_1px_0_rgba(255,255,255,0.12)]";
+    "bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 p-4 rounded-xl border border-gray-200 dark:border-gray-800/50 hover:border-gray-300 dark:hover:border-gray-700/60 transition-all duration-300 shadow-neu backdrop-blur-sm";
 
   if (!fade) return <div className={cardClass}>{children}</div>;
   return (

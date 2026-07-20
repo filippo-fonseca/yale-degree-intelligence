@@ -453,7 +453,7 @@ export default function AboutPage() {
         </motion.div>
       </section>
 
-      {/* Blueprint band — open canvas, no panel */}
+      {/* Blueprint band: open canvas, no panel */}
       <section className="px-4 py-24 lg:px-6">
         <motion.div {...reveal} className="mx-auto max-w-5xl">
           <div className="text-center">
@@ -945,7 +945,7 @@ export default function AboutPage() {
                 </div>
               </div>
 
-              {/* Requirement cards — mirrors the real MajorProgressView grid */}
+              {/* Requirement cards: mirrors the real MajorProgressView grid */}
               <div className="mt-6">
                 <div className="flex items-center justify-between mb-2.5">
                   <h4 className="text-sm font-medium text-gray-900 dark:text-white">
@@ -1042,7 +1042,7 @@ export default function AboutPage() {
                 </div>
               </div>
 
-              {/* Requirement heat map — color-coded fulfilment grid */}
+              {/* Requirement heat map: color-coded fulfilment grid */}
               <div className="mt-6">
                 <h4 className="text-sm font-medium text-gray-900 dark:text-white mb-2.5">
                   Requirement heat map

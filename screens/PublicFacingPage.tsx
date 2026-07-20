@@ -251,13 +251,13 @@ export default function AboutPage() {
     <div className="min-h-screen pt-2 bg-gradient-to-br from-gray-50 via-gray-100 to-white dark:from-gray-950 dark:via-gray-900 dark:to-gray-900 font-louize overflow-x-hidden">
       <CosmicBackground mode="stars" opacity={0.9} />
       {/* Welcome Banner */}
-      <div className="relative mb-8 mt-14 z-30 bg-gradient-to-r from-emerald-900/20 via-blue-900/20 to-purple-900/20 backdrop-blur-xl border-b border-white/[0.08] shadow-[0_8px_32px_rgba(0,0,0,0.3),inset_0_1px_0_rgba(255,255,255,0.1)]">
+      <div className="relative mb-8 mt-14 z-30 bg-gradient-to-r from-emerald-50 via-blue-50 to-purple-50 dark:from-emerald-900/20 dark:via-blue-900/20 dark:to-purple-900/20 backdrop-blur-xl border-b border-gray-200 dark:border-white/[0.08] shadow-sm dark:shadow-[0_8px_32px_rgba(0,0,0,0.3),inset_0_1px_0_rgba(255,255,255,0.1)]">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-2.5 flex items-center justify-center gap-2">
-          <span className="px-2.5 py-1 text-[10px] sm:text-xs font-semibold rounded-full bg-gradient-to-r from-emerald-500/20 to-emerald-600/20 border border-emerald-500/30 text-emerald-300 shadow-[inset_0_1px_0_rgba(255,255,255,0.1),0_2px_8px_rgba(52,211,153,0.2)] flex items-center gap-1 shrink-0">
+          <span className="px-2.5 py-1 text-[10px] sm:text-xs font-semibold rounded-full bg-gradient-to-r from-emerald-500/20 to-emerald-600/20 border border-emerald-500/30 text-emerald-700 dark:text-emerald-300 shadow-[inset_0_1px_0_rgba(255,255,255,0.1),0_2px_8px_rgba(52,211,153,0.2)] flex items-center gap-1 shrink-0">
             <HiSparkles className="w-3 h-3" />{" "}
             <span className="hidden sm:inline">News</span>
           </span>
-          <p className="text-[11px] sm:text-sm text-emerald-100">
+          <p className="text-[11px] sm:text-sm text-emerald-800 dark:text-emerald-100">
             <span className="sm:hidden">The YDN featured us.</span>
             <span className="hidden sm:inline">
               The Yale Daily News featured us.
@@ -334,9 +334,9 @@ export default function AboutPage() {
               transition={{ duration: 0.6 }}
               className="mb-4 flex justify-center"
             >
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase bg-gradient-to-r from-blue-500/20 via-purple-500/20 to-pink-500/20 border border-white/[0.15] shadow-[0_4px_20px_rgba(139,92,246,0.25),inset_0_1px_0_rgba(255,255,255,0.15)] backdrop-blur-xl">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase bg-gradient-to-r from-blue-500/20 via-purple-500/20 to-pink-500/20 border border-pink-500/20 dark:border-white/[0.15] shadow-[0_4px_20px_rgba(139,92,246,0.25),inset_0_1px_0_rgba(255,255,255,0.15)] backdrop-blur-xl">
                 <span className="w-1.5 h-1.5 rounded-full bg-gradient-to-r from-emerald-400 to-emerald-500 animate-pulse shadow-[0_0_8px_rgba(52,211,153,0.6)]"></span>
-                <span className="bg-gradient-to-r from-blue-300 via-purple-300 to-pink-300 bg-clip-text text-transparent">
+                <span className="bg-gradient-to-r from-pink-600 via-purple-600 to-blue-600 dark:from-blue-300 dark:via-purple-300 dark:to-pink-300 bg-clip-text text-transparent">
                   Introducing DegreeIntelligence v3
                 </span>
               </span>
@@ -385,7 +385,7 @@ export default function AboutPage() {
               together.{" "}
               <Link
                 href="#team"
-                className="inline-flex items-center gap-1.5 text-transparent bg-clip-text bg-gradient-to-r from-blue-300 to-purple-300 hover:from-blue-200 hover:to-purple-200 font-medium transition-all group"
+                className="inline-flex items-center gap-1.5 text-transparent bg-clip-text bg-gradient-to-r from-pink-600 to-purple-600 dark:from-blue-300 dark:to-purple-300 hover:from-pink-500 hover:to-purple-500 dark:hover:from-blue-200 dark:hover:to-purple-200 font-medium transition-all group"
               >
                 For Yalies, by Yalies
                 <span className="text-purple-400 text-sm opacity-70 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all">
@@ -438,9 +438,9 @@ export default function AboutPage() {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.3 }}
-              className="mt-8 pt-6 border-t border-white/[0.08]"
+              className="mt-8 pt-6 border-t border-gray-200 dark:border-white/[0.08]"
             >
-              <p className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-blue-200 via-purple-200 to-pink-200 bg-clip-text text-transparent leading-relaxed">
+              <p className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-pink-600 via-purple-600 to-blue-600 dark:from-blue-200 dark:via-purple-200 dark:to-pink-200 bg-clip-text text-transparent leading-relaxed">
                 Have you heard? 1 in 6 Yale undergrads already use DegreeIntelligence.
               </p>
               <p className="text-base text-gray-500 dark:text-gray-400 mt-2">
@@ -460,7 +460,7 @@ export default function AboutPage() {
                 {/* Caption */}
                 <div className="mb-4 text-center">
                   <p className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed">
-                    <span className="font-semibold bg-gradient-to-r from-pink-300 via-purple-300 to-blue-300 bg-clip-text text-transparent">
+                    <span className="font-semibold bg-gradient-to-r from-pink-600 via-purple-600 to-blue-600 dark:from-pink-300 dark:via-purple-300 dark:to-blue-300 bg-clip-text text-transparent">
                       OUR V3 LAUNCH, FEB 2026.
                     </span>
                     <br />
@@ -1258,7 +1258,7 @@ export default function AboutPage() {
                       </div>
                       <div className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-2">
                         {friend.major}
-                        <span className="px-1.5 py-0.5 rounded-full text-[10px] bg-gradient-to-r from-purple-500/20 to-pink-500/20 border border-purple-500/30 text-purple-200">
+                        <span className="px-1.5 py-0.5 rounded-full text-[10px] bg-gradient-to-r from-purple-500/20 to-pink-500/20 border border-purple-500/30 text-purple-700 dark:text-purple-200">
                           '{friend.year.slice(-2)}
                         </span>
                       </div>
@@ -1299,7 +1299,7 @@ export default function AboutPage() {
                 </li>
                 <li className="flex items-center gap-2.5">
                   <FiX className="text-red-400 shrink-0" size={14} /> Grades and
-                  GPA are <strong className="text-red-300">NEVER</strong> shared
+                  GPA are <strong className="text-red-600 dark:text-red-300">NEVER</strong> shared
                 </li>
               </ul>
             </motion.div>
@@ -1456,7 +1456,7 @@ export default function AboutPage() {
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8 }}
-          className="bg-gradient-to-br from-blue-900/30 via-purple-900/20 to-pink-900/30 backdrop-blur-2xl rounded-2xl p-6 border border-white/[0.1] shadow-[0_8px_48px_rgba(0,0,0,0.4),0_0_100px_rgba(139,92,246,0.1),inset_0_1px_0_rgba(255,255,255,0.1)] ring-1 ring-purple-500/20 text-center"
+          className="bg-gradient-to-br from-pink-50 via-purple-50 to-blue-50 dark:from-blue-900/30 dark:via-purple-900/20 dark:to-pink-900/30 backdrop-blur-2xl rounded-xl p-6 border border-pink-200/60 dark:border-white/[0.1] shadow-neu text-center"
         >
           <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-3">
             Want to contribute?
@@ -1514,7 +1514,7 @@ export default function AboutPage() {
           <span>Not affiliated with Yale University.</span>
         </p>
         <p className="mt-2 text-gray-400 dark:text-gray-500 flex flex-wrap items-center justify-center gap-1.5">
-          <span className="px-1.5 py-0.5 rounded-full text-[10px] bg-gradient-to-r from-purple-500/20 to-pink-500/20 border border-purple-500/30 text-purple-300">
+          <span className="px-1.5 py-0.5 rounded-full text-[10px] bg-gradient-to-r from-purple-500/20 to-pink-500/20 border border-purple-500/30 text-purple-700 dark:text-purple-300">
             v3.0
           </span>
           <span>© {new Date().getFullYear()} DegreeIntelligence</span>

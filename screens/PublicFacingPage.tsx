@@ -247,50 +247,33 @@ export default function AboutPage() {
 
   return (
     <div className="min-h-screen bg-[#fafafa] dark:bg-[#0a0a0b] font-louize overflow-x-hidden">
-      {/* Welcome Banner */}
-      <div className="relative mb-8 mt-14 z-30 bg-gradient-to-r from-emerald-50 via-blue-50 to-purple-50 dark:from-emerald-900/20 dark:via-blue-900/20 dark:to-purple-900/20 backdrop-blur-xl border-b border-gray-200 dark:border-white/[0.08] shadow-sm dark:shadow-[0_8px_32px_rgba(0,0,0,0.3),inset_0_1px_0_rgba(255,255,255,0.1)]">
-        <div className="max-w-7xl mx-auto px-4 lg:px-6 py-2.5 flex items-center justify-center gap-2">
-          <span className="px-2.5 py-1 text-[10px] sm:text-xs font-semibold rounded-full bg-gradient-to-r from-emerald-500/20 to-emerald-600/20 border border-emerald-500/30 text-emerald-700 dark:text-emerald-300 shadow-[inset_0_1px_0_rgba(255,255,255,0.1),0_2px_8px_rgba(52,211,153,0.2)] flex items-center gap-1 shrink-0">
-            <HiSparkles className="w-3 h-3" />{" "}
-            <span className="hidden sm:inline">News</span>
-          </span>
-          <p className="text-[11px] sm:text-sm text-emerald-800 dark:text-emerald-100">
-            <span className="sm:hidden">The YDN featured us.</span>
-            <span className="hidden sm:inline">
-              The Yale Daily News featured us.
-            </span>{" "}
-            <a
-              href="https://yaledailynews.com/blog/2025/09/23/new-student-run-platform-aims-to-simplify-degree-planning/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-blue-600 dark:text-blue-300 font-medium hover:text-gray-900 dark:hover:text-white hover:underline transition-colors"
-            >
-              Read it!
-            </a>
-          </p>
-        </div>
-      </div>
-
-      {/* Sticky Navbar */}
-      <motion.nav
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="fixed top-0 left-0 right-0 z-50 bg-white/80 dark:bg-gray-950/80 backdrop-blur-xl border-b border-black/[0.06] dark:border-white/[0.06] shadow-[0_4px_24px_rgba(0,0,0,0.3)]"
-      >
-        <div className="max-w-7xl mx-auto px-3 lg:px-6 py-2.5 sm:py-3 flex items-center justify-between">
+      {/* Nav */}
+      <nav className="sticky top-0 z-50 h-14 backdrop-blur-xl bg-white/70 dark:bg-[#0a0a0b]/70 border-b border-black/[0.05] dark:border-white/[0.06]">
+        <div className="max-w-7xl mx-auto h-full px-4 lg:px-6 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <LogoIcon width={22} height={22} className="sm:w-6 sm:h-6" />
-            <span className="text-sm font-medium text-gray-800 dark:text-gray-200 hidden sm:inline">
+            <LogoIcon width={22} height={22} />
+            <span className="text-sm font-medium text-gray-900 dark:text-white hidden sm:inline">
               DegreeIntelligence
             </span>
           </div>
-          <div className="flex items-center gap-1.5 sm:gap-2">
+          <div className="flex items-center gap-3 sm:gap-5">
+            <Link
+              href="/changelog"
+              className="hidden sm:inline text-sm text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white transition-colors"
+            >
+              Changelog
+            </Link>
+            <Link
+              href="/mission"
+              className="hidden sm:inline text-sm text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white transition-colors"
+            >
+              Mission
+            </Link>
             <button
               type="button"
               onClick={toggleTheme}
               aria-label="Toggle theme"
-              className="rounded-xl border border-black/[0.06] p-2 text-gray-600 transition-colors hover:bg-black/[0.04] dark:border-white/[0.08] dark:text-gray-300 dark:hover:bg-white/[0.06]"
+              className="rounded-full p-2 text-gray-500 transition-colors hover:bg-black/[0.04] hover:text-gray-900 dark:text-gray-400 dark:hover:bg-white/[0.06] dark:hover:text-white"
             >
               {resolvedTheme === "dark" ? (
                 <FiSun size={14} />
@@ -298,19 +281,14 @@ export default function AboutPage() {
                 <FiMoon size={14} />
               )}
             </button>
-            <motion.button
-              className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm bg-gradient-to-r from-pink-500/20 via-purple-500/20 to-blue-500/20 hover:from-pink-500/30 hover:via-purple-500/30 hover:to-blue-500/30 backdrop-blur-xl rounded-lg sm:rounded-xl text-gray-900 dark:text-white font-medium transition-all shadow-[0_4px_20px_rgba(139,92,246,0.2),inset_0_1px_0_rgba(255,255,255,0.1)] border border-black/[0.08] dark:border-white/[0.1]"
-              whileHover={{ y: -1 }}
-              whileTap={{ scale: 0.98 }}
-              onClick={() => setLogInFlow(true)}
-            >
+            <MonoCTA onClick={() => setLogInFlow(true)}>
               <span className="sm:hidden">Log in</span>
               <span className="hidden sm:inline">Log in with CAS</span>
-              <FiArrowRight size={14} className="opacity-70" />
-            </motion.button>
+              <span aria-hidden>→</span>
+            </MonoCTA>
           </div>
         </div>
-      </motion.nav>
+      </nav>
 
       {/* Hero Section */}
       <div className="relative pt-6 sm:pt-8">

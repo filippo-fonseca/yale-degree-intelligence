@@ -1335,7 +1335,7 @@ export default function AboutPage() {
       </section>
 
       {/* Mission Section */}
-      <div className="relative max-w-7xl mx-auto px-4 lg:px-6 py-24">
+      <div className="relative max-w-7xl mx-auto px-4 lg:px-6 py-32">
         <motion.div
           viewport={{ once: true }}
           transition={{ duration: 0.8 }}

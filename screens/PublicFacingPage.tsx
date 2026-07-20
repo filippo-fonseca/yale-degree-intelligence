@@ -148,27 +148,6 @@ export default function AboutPage() {
   const cardsRef = useRef<HTMLDivElement | null>(null);
   const cardsInView = useInView(cardsRef, lookAhead);
 
-  const features = [
-    {
-      title: "No more spreadsheet nightmares.",
-      description:
-        "We automated the tedious parts of academic planning so you don't have to maintain those fragile Google Sheets formulas.",
-      icon: <FiBarChart2 className="w-5 h-5" />,
-    },
-    {
-      title: "Major (and even concentration) reqs at a glance.",
-      description:
-        "See exactly what you've completed and what remains for your major—no more digging through PDF requirements or five different poorly organized websites 4 clicks deep.",
-      icon: <FiSearch className="w-5 h-5" />,
-    },
-    {
-      title: "Built by Yalies, for Yalies.",
-      description:
-        "Born from our own frustrations with double major planning. We're solving the problems we actually faced. Rather than gatekeeping, we decided to make it clean and publish it.",
-      icon: <GraduationCap className="w-5 h-5" />,
-    },
-  ];
-
   // --- mock for public preview ---
   const demoTotals = { completed: 5, inProgress: 3, total: 12 };
 
@@ -1176,176 +1155,78 @@ export default function AboutPage() {
         }
       />
 
-      {/* Mission Section */}
-      <div className="relative max-w-7xl mx-auto px-4 lg:px-6 py-32">
-        <motion.div
-          viewport={{ once: true }}
-          transition={{ duration: 0.8 }}
-          className="bg-white/70 dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/70 dark:via-gray-900/50 dark:to-gray-950/70 backdrop-blur-2xl rounded-xl p-6 border border-gray-200 dark:border-gray-800/50 shadow-neu"
-        >
-          <div className="text-center mb-8">
-            <SectionEyebrow centered icon={<FiHeart />} label="Mission" />
-            <h2 className="text-2xl font-medium leading-[0.98] tracking-[-0.02em] text-balance text-gray-900 dark:text-white mb-3">
-              What it is and
-              <br />
-              <span className="text-gray-500 dark:text-gray-400">why we built this.</span>
-            </h2>
-            <p className="text-sm text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
-              Trying to plan our majors, we kept running into the same problem:
-              Yale's requirements are complex, scattered across PDFs and
-              websites, and nearly impossible to track manually. So we built the
-              tool we wish we had. We sincerely hope it helps :)
+      {/* §8 Mission + team, one band */}
+      <section id="team" className="scroll-mt-20 px-4 py-28 lg:px-6">
+        <motion.div {...reveal} className="mx-auto max-w-3xl text-center">
+          <Kicker>Mission</Kicker>
+          <h2 className="mt-4 text-balance text-4xl font-medium leading-[1.02] tracking-[-0.015em] text-gray-900 dark:text-white md:text-5xl">
+            Built at Yale, because
+            <br />
+            <span className="text-gray-400 dark:text-gray-500">
+              we needed it.
+            </span>
+          </h2>
+
+          <div className="mt-8 space-y-5 font-sf text-base leading-relaxed text-gray-500 dark:text-gray-400 md:text-lg">
+            <p>
+              Trying to plan our own majors, we kept hitting the same wall.
+              Yale's requirements are complex, scattered across PDFs and half a
+              dozen poorly organized websites, and nearly impossible to track by
+              hand. Planning a double major turned that into a second job.
+            </p>
+            <p>
+              So we built the tool we wish we had: the tedious parts automated,
+              every major and concentration requirement in one place, and no
+              fragile spreadsheet formulas to maintain. Rather than keep it to
+              ourselves, we cleaned it up and published it. We sincerely hope it
+              helps.
             </p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-4">
-            {features.map((feature, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: i * 0.1 }}
-                className="bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 p-4 rounded-xl border border-gray-200 dark:border-gray-800/50 hover:border-gray-300 dark:hover:border-gray-700/60 transition-all duration-300 shadow-neu backdrop-blur-sm"
+          {/* Team, a single row, no cards */}
+          <div className="mt-16 flex flex-wrap items-start justify-center gap-x-14 gap-y-10 font-sf">
+            {[
+              {
+                name: "Filippo Fonseca",
+                line: "Founder · MechE (ABET) & EECS '28",
+                photoRoute: "/team/filippo.jpeg",
+              },
+              {
+                name: "Emir Ahmed",
+                line: "Development · EECS '28",
+                photoRoute: "/team/emir.JPG",
+              },
+            ].map((person) => (
+              <div
+                key={person.name}
+                className="flex max-w-[15rem] flex-col items-center"
               >
-                <div className="p-2.5 rounded-xl bg-gradient-to-br from-black/[0.04] via-transparent to-black/10 dark:from-white/[0.08] border border-black/[0.06] dark:border-white/[0.08] text-blue-600 dark:text-blue-300 mb-3 w-fit shadow-[inset_0_1px_0_rgba(255,255,255,0.1)]">
-                  {feature.icon}
-                </div>
-                <h3 className="text-base font-medium text-blue-700 dark:text-blue-200 mb-1.5">
-                  {feature.title}
-                </h3>
-                <p className="text-gray-700 dark:text-gray-300 text-sm">{feature.description}</p>
-              </motion.div>
+                <img
+                  src={person.photoRoute}
+                  alt={person.name}
+                  className="h-14 w-14 rounded-full object-cover ring-1 ring-black/[0.08] dark:ring-white/[0.12]"
+                />
+                <p className="mt-3 text-sm font-medium text-gray-900 dark:text-white">
+                  {person.name}
+                </p>
+                <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                  {person.line}
+                </p>
+              </div>
             ))}
           </div>
-        </motion.div>
-      </div>
 
-      {/* Team Section */}
-      <div
-        id="team"
-        className="max-w-7xl mx-auto px-4 lg:px-6 py-24 scroll-mt-20"
-      >
-        <div className="text-center mb-8">
-          <SectionEyebrow centered icon={<FiUsers />} label="Team" />
-          <h2 className="text-2xl font-medium leading-[0.98] tracking-[-0.02em] text-balance text-gray-900 dark:text-white mb-3">
-            It's nice to
-            <br />
-            <span className="text-gray-500 dark:text-gray-400">meet you!</span>
-          </h2>
-          <p className="text-sm text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
-            We're just two Yale students who got tired of spreadsheet hell and
-            decided to do something about it.
-          </p>
-        </div>
-
-        <div className="flex flex-col md:flex-row justify-center gap-4">
-          {[
-            {
-              name: "Filippo Fonseca",
-              role: "Founder | Mechanical Engineering (ABET) & EECS '28",
-              bio: "Built the first version as a shell script after one too many long sessions trying to plan courses. Talks too much.",
-              contact: "filippo.fonseca@yale.edu",
-              photoRoute: "/team/filippo.jpeg",
-              github: "https://github.com/filippo-fonseca",
-              website: "https://filippofonseca.com",
-            },
-            {
-              name: "Emir Ahmed",
-              role: "Development | Electrical Engineering & CS (EECS) '28",
-              bio: "Joined forces to continue scaling the platform and make it more robust.",
-              contact: "emir.ahmed@yale.edu",
-              photoRoute: "/team/emir.JPG",
-              github: "https://github.com/EmirataG",
-              website: "",
-            },
-          ].map((person, i) => (
-            <motion.div
-              key={i}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: i * 0.1 }}
-              className="bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 backdrop-blur-xl p-4 rounded-xl border border-gray-200 dark:border-gray-800/50 hover:border-gray-300 dark:hover:border-gray-700/60 flex-1 max-w-sm transition-all duration-300 shadow-neu"
-            >
-              <div className="flex items-center gap-3 mb-3">
-                <div className="w-11 h-11 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center shadow-[0_4px_16px_rgba(139,92,246,0.3)]">
-                  <img
-                    src={person.photoRoute}
-                    alt={person.name}
-                    className="w-full h-full rounded-full object-cover border-2 border-pink-500/50 shadow-[0_0_20px_rgba(236,72,153,0.3)]"
-                  />
-                </div>
-                <div>
-                  <h3 className="text-base font-medium text-gray-900 dark:text-white">
-                    {person.name}
-                  </h3>
-                  <p className="text-xs text-blue-600 dark:text-blue-300">{person.role}</p>
-                </div>
-              </div>
-              <p className="text-gray-700 dark:text-gray-300 text-sm mb-3">{person.bio}</p>
-              <div className="flex flex-wrap gap-2">
-                <a
-                  href={`mailto:${person.contact}`}
-                  className="px-2.5 py-1 rounded-lg bg-gradient-to-br from-black/[0.04] to-transparent dark:from-white/[0.06] border border-black/[0.06] dark:border-white/[0.08] text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:border-blue-400/50 dark:hover:border-blue-500/30 text-xs flex items-center gap-1.5 transition-all shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]"
-                >
-                  <FiMail size={12} /> Email
-                </a>
-                <a
-                  href={person.github}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="px-2.5 py-1 rounded-lg bg-gradient-to-br from-black/[0.04] to-transparent dark:from-white/[0.06] border border-black/[0.06] dark:border-white/[0.08] text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:border-blue-400/50 dark:hover:border-blue-500/30 text-xs flex items-center gap-1.5 transition-all shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]"
-                >
-                  <FiGithub size={12} /> GitHub
-                </a>
-                {person.website && (
-                  <a
-                    href={person.website}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="px-2.5 py-1 rounded-lg bg-gradient-to-br from-black/[0.04] to-transparent dark:from-white/[0.06] border border-black/[0.06] dark:border-white/[0.08] text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:border-blue-400/50 dark:hover:border-blue-500/30 text-xs flex items-center gap-1.5 transition-all shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]"
-                  >
-                    <FiExternalLink size={12} /> Website
-                  </a>
-                )}
-              </div>
-            </motion.div>
-          ))}
-        </div>
-      </div>
-
-      {/* CTA Section */}
-      <div className="max-w-7xl mx-auto px-4 lg:px-6 py-32">
-        <motion.div
-          initial={{ opacity: 0.75 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8 }}
-          className="bg-gradient-to-br from-pink-50 via-purple-50 to-blue-50 dark:from-blue-900/30 dark:via-purple-900/20 dark:to-pink-900/30 backdrop-blur-2xl rounded-xl p-6 border border-pink-200/60 dark:border-white/[0.1] shadow-neu text-center"
-        >
-          <SectionEyebrow centered icon={<FiMail />} label="Contribute" />
-          <h2 className="text-xl font-medium leading-[0.98] tracking-[-0.02em] text-balance text-gray-900 dark:text-white mb-3">
-            Want to
-            <br />
-            <span className="text-gray-500 dark:text-gray-400">contribute?</span>
-          </h2>
-          <p className="text-gray-700 dark:text-gray-300 text-sm max-w-xl mx-auto mb-4">
-            This is a project by and for the Yale community. We'd love your
-            feedback and bug reports! Reach out anytime. Also... if you wish you
-            join the team, we're always looking for fellow Yale students to
-            join.
-          </p>
-          <div className="flex justify-center">
+          <p className="mt-14 font-mono text-xs tracking-tight text-gray-400 dark:text-gray-500">
+            want to contribute?{" "}
             <a
               href="mailto:filippo.fonseca@yale.edu,emir.ahmed@yale.edu"
-              className="px-4 py-2 text-sm text-white bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 rounded-xl flex items-center gap-2 transition-all"
+              className="underline underline-offset-4 transition-colors hover:text-gray-900 dark:hover:text-white"
             >
-              <FiMail size={14} /> Email Us
+              → email us
             </a>
-          </div>
+          </p>
         </motion.div>
-      </div>
+      </section>
 
       {/* Footer */}
       <div className="py-6 px-4 text-center text-gray-500 dark:text-gray-400 text-xs border-t border-black/[0.06] dark:border-white/[0.05]">

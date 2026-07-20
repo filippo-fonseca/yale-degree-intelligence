@@ -28,6 +28,8 @@ import {
   FiTrendingUp,
   FiBarChart2,
   FiHeart,
+  FiMoon,
+  FiSun,
 } from "react-icons/fi";
 import { HiSparkles } from "react-icons/hi2";
 import LogoIcon from "@/icons/LogoIcon";
@@ -39,6 +41,7 @@ import dynamic from "next/dynamic";
 import { GraduationCap, BookOpen, Award, Clock } from "lucide-react";
 import CosmicBackground from "@/components/CosmicBackground/page";
 import HeroConstellation from "@/components/landing/HeroConstellation";
+import { useTheme } from "@/context/ThemeContext";
 
 function CountUp({
   to,
@@ -117,6 +120,7 @@ function MajorProgressBar({ percent }: { percent: number }) {
 export default function AboutPage() {
   const [logInFlow, setLogInFlow] = useState(false);
   const [showVideoModal, setShowVideoModal] = useState(false);
+  const { resolvedTheme, toggleTheme } = useTheme();
 
   // Close modal on ESC key
   useEffect(() => {
@@ -283,16 +287,30 @@ export default function AboutPage() {
               DegreeIntelligence
             </span>
           </div>
-          <motion.button
-            className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm bg-gradient-to-r from-pink-500/20 via-purple-500/20 to-blue-500/20 hover:from-pink-500/30 hover:via-purple-500/30 hover:to-blue-500/30 backdrop-blur-xl rounded-lg sm:rounded-xl text-gray-900 dark:text-white font-medium transition-all shadow-[0_4px_20px_rgba(139,92,246,0.2),inset_0_1px_0_rgba(255,255,255,0.1)] border border-black/[0.08] dark:border-white/[0.1]"
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            onClick={() => setLogInFlow(true)}
-          >
-            <span className="sm:hidden">Log in</span>
-            <span className="hidden sm:inline">Log in with CAS</span>
-            <FiArrowRight size={14} className="opacity-70" />
-          </motion.button>
+          <div className="flex items-center gap-1.5 sm:gap-2">
+            <button
+              type="button"
+              onClick={toggleTheme}
+              aria-label="Toggle theme"
+              className="rounded-xl border border-black/[0.06] p-2 text-gray-600 transition-colors hover:bg-black/[0.04] dark:border-white/[0.08] dark:text-gray-300 dark:hover:bg-white/[0.06]"
+            >
+              {resolvedTheme === "dark" ? (
+                <FiSun size={14} />
+              ) : (
+                <FiMoon size={14} />
+              )}
+            </button>
+            <motion.button
+              className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm bg-gradient-to-r from-pink-500/20 via-purple-500/20 to-blue-500/20 hover:from-pink-500/30 hover:via-purple-500/30 hover:to-blue-500/30 backdrop-blur-xl rounded-lg sm:rounded-xl text-gray-900 dark:text-white font-medium transition-all shadow-[0_4px_20px_rgba(139,92,246,0.2),inset_0_1px_0_rgba(255,255,255,0.1)] border border-black/[0.08] dark:border-white/[0.1]"
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={() => setLogInFlow(true)}
+            >
+              <span className="sm:hidden">Log in</span>
+              <span className="hidden sm:inline">Log in with CAS</span>
+              <FiArrowRight size={14} className="opacity-70" />
+            </motion.button>
+          </div>
         </div>
       </motion.nav>
 

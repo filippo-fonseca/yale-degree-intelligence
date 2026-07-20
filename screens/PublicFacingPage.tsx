@@ -252,7 +252,7 @@ export default function AboutPage() {
       <CosmicBackground mode="stars" opacity={0.9} />
       {/* Welcome Banner */}
       <div className="relative mb-8 mt-14 z-30 bg-gradient-to-r from-emerald-50 via-blue-50 to-purple-50 dark:from-emerald-900/20 dark:via-blue-900/20 dark:to-purple-900/20 backdrop-blur-xl border-b border-gray-200 dark:border-white/[0.08] shadow-sm dark:shadow-[0_8px_32px_rgba(0,0,0,0.3),inset_0_1px_0_rgba(255,255,255,0.1)]">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-2.5 flex items-center justify-center gap-2">
+        <div className="max-w-7xl mx-auto px-4 lg:px-6 py-2.5 flex items-center justify-center gap-2">
           <span className="px-2.5 py-1 text-[10px] sm:text-xs font-semibold rounded-full bg-gradient-to-r from-emerald-500/20 to-emerald-600/20 border border-emerald-500/30 text-emerald-700 dark:text-emerald-300 shadow-[inset_0_1px_0_rgba(255,255,255,0.1),0_2px_8px_rgba(52,211,153,0.2)] flex items-center gap-1 shrink-0">
             <HiSparkles className="w-3 h-3" />{" "}
             <span className="hidden sm:inline">News</span>
@@ -281,7 +281,7 @@ export default function AboutPage() {
         transition={{ duration: 0.5 }}
         className="fixed top-0 left-0 right-0 z-50 bg-white/80 dark:bg-gray-950/80 backdrop-blur-xl border-b border-black/[0.06] dark:border-white/[0.06] shadow-[0_4px_24px_rgba(0,0,0,0.3)]"
       >
-        <div className="max-w-6xl mx-auto px-3 sm:px-6 lg:px-8 py-2.5 sm:py-3 flex items-center justify-between">
+        <div className="max-w-7xl mx-auto px-3 lg:px-6 py-2.5 sm:py-3 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <LogoIcon width={22} height={22} className="sm:w-6 sm:h-6" />
             <span className="text-sm font-medium text-gray-800 dark:text-gray-200 hidden sm:inline">
@@ -320,7 +320,7 @@ export default function AboutPage() {
         {/* Cursor-adaptive constellation background (sits behind hero content) */}
         <HeroConstellation />
         {/* increased top padding to fix logo spacing */}
-        <div className="max-w-6xl mx-auto px-4 pb-3 sm:px-6 lg:px-8 relative z-10">
+        <div className="max-w-7xl mx-auto px-4 pb-3 lg:px-6 relative z-10">
           <motion.div
             initial={{ opacity: 1, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -437,7 +437,7 @@ export default function AboutPage() {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.3 }}
-              className="mt-8 pt-6 border-t border-gray-200 dark:border-white/[0.08]"
+              className="mt-8 pt-6"
             >
               <p className="text-xl sm:text-2xl font-medium bg-gradient-to-r from-pink-600 via-purple-600 to-blue-600 dark:from-blue-200 dark:via-purple-200 dark:to-pink-200 bg-clip-text text-transparent leading-relaxed">
                 Have you heard? 1 in 6 Yale undergrads already use DegreeIntelligence.
@@ -515,7 +515,7 @@ export default function AboutPage() {
       </div>
 
       {/* Blueprint Section */}
-      <div className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="relative max-w-7xl mx-auto px-4 lg:px-6 py-24">
         <div className="bg-white/70 dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/70 dark:via-gray-900/50 dark:to-gray-950/70 backdrop-blur-2xl rounded-xl p-6 border border-gray-200 dark:border-gray-800/50 shadow-neu">
           <div className="text-center mb-8">
             <SectionEyebrow
@@ -607,7 +607,7 @@ export default function AboutPage() {
       {/* Simulator Section */}
       <section
         id="simulator"
-        className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8"
+        className="relative max-w-7xl mx-auto px-4 lg:px-6 py-24"
       >
         <div className="relative bg-white/70 dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/70 dark:via-gray-900/50 dark:to-gray-950/70 backdrop-blur-2xl rounded-xl p-6 border border-gray-200 dark:border-gray-800/50 shadow-neu overflow-hidden">
           <div className="absolute -right-24 -top-24 h-64 w-64 rounded-full bg-pink-500/10 blur-3xl" />
@@ -704,7 +704,7 @@ export default function AboutPage() {
       {/* Stats Preview (public) */}
       <section
         id="stats"
-        className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8"
+        className="relative max-w-7xl mx-auto px-4 lg:px-6 py-24"
       >
         <div className="relative bg-white/70 dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/70 dark:via-gray-900/50 dark:to-gray-950/70 backdrop-blur-2xl rounded-xl p-6 border border-gray-200 dark:border-gray-800/50 shadow-neu overflow-hidden">
           <div className="absolute -right-24 -top-24 h-64 w-64 rounded-full bg-purple-500/10 blur-3xl" />
@@ -1010,7 +1010,7 @@ export default function AboutPage() {
       {/* Major Progress — compact bar only */}
       <section
         id="major-progress"
-        className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8"
+        className="relative max-w-7xl mx-auto px-4 lg:px-6 py-24"
       >
         <div className="bg-white/70 dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/70 dark:via-gray-900/50 dark:to-gray-950/70 backdrop-blur-2xl rounded-xl p-6 border border-gray-200 dark:border-gray-800/50 shadow-neu">
           <div className="mb-3">
@@ -1197,7 +1197,7 @@ export default function AboutPage() {
       </section>
 
       {/* Public Profiles & Friends */}
-      <section className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <section className="relative max-w-7xl mx-auto px-4 lg:px-6 py-32">
         <div className="bg-white/70 dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/70 dark:via-gray-900/50 dark:to-gray-950/70 backdrop-blur-2xl rounded-xl p-6 border border-gray-200 dark:border-gray-800/50 shadow-neu">
           <div className="text-center mb-8 flex flex-col gap-2">
             <SectionEyebrow centered icon={<FiUsers />} label="Friends" />
@@ -1335,7 +1335,7 @@ export default function AboutPage() {
       </section>
 
       {/* Mission Section */}
-      <div className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="relative max-w-7xl mx-auto px-4 lg:px-6 py-24">
         <motion.div
           viewport={{ once: true }}
           transition={{ duration: 0.8 }}
@@ -1382,7 +1382,7 @@ export default function AboutPage() {
       {/* Team Section */}
       <div
         id="team"
-        className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 scroll-mt-20"
+        className="max-w-7xl mx-auto px-4 lg:px-6 py-24 scroll-mt-20"
       >
         <div className="text-center mb-8">
           <SectionEyebrow centered icon={<FiUsers />} label="Team" />
@@ -1474,7 +1474,7 @@ export default function AboutPage() {
       </div>
 
       {/* CTA Section */}
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto px-4 lg:px-6 py-32">
         <motion.div
           initial={{ opacity: 0.75 }}
           whileInView={{ opacity: 1 }}

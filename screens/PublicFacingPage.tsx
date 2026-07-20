@@ -1228,48 +1228,72 @@ export default function AboutPage() {
         </motion.div>
       </section>
 
-      {/* Footer */}
-      <div className="py-6 px-4 text-center text-gray-500 dark:text-gray-400 text-xs border-t border-black/[0.06] dark:border-white/[0.05]">
-        <nav className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 mb-4">
-          <Link
-            href="/mission"
-            className="transition hover:text-gray-900 dark:hover:text-white"
-          >
-            Mission
-          </Link>
-          <Link
-            href="/changelog"
-            className="transition hover:text-gray-900 dark:hover:text-white"
-          >
-            Changelog
-          </Link>
-          <Link
-            href="/terms"
-            className="transition hover:text-gray-900 dark:hover:text-white"
-          >
-            Terms
-          </Link>
-          <Link
-            href="/contact"
-            className="transition hover:text-gray-900 dark:hover:text-white"
-          >
-            Contact
-          </Link>
-        </nav>
-        <p className="flex flex-wrap items-center justify-center gap-1.5 max-w-md mx-auto leading-relaxed">
-          <span className="inline-flex items-center gap-1">
-            Made with <FiHeart className="w-3 h-3 text-blue-400" />
-          </span>
-          <span className="hidden sm:inline">|</span>
-          <span>Not affiliated with Yale University.</span>
-        </p>
-        <p className="mt-2 text-gray-400 dark:text-gray-500 flex flex-wrap items-center justify-center gap-1.5">
-          <span className="px-1.5 py-0.5 rounded-full text-[10px] bg-gradient-to-r from-purple-500/20 to-pink-500/20 border border-purple-500/30 text-purple-700 dark:text-purple-300">
-            v3.0
-          </span>
-          <span>© {new Date().getFullYear()} DegreeIntelligence</span>
-        </p>
-      </div>
+      {/* §9 Closing statement */}
+      <section className="px-4 py-32 lg:px-6">
+        <motion.div {...reveal} className="mx-auto max-w-3xl text-center">
+          <h2 className="text-balance text-5xl font-medium leading-[1.02] tracking-[-0.02em] text-gray-900 dark:text-white md:text-6xl lg:text-7xl">
+            Your degree deserves better
+            <br />
+            <span className="text-gray-400 dark:text-gray-500">
+              than a spreadsheet.
+            </span>
+          </h2>
+          <div className="mt-10 flex justify-center font-sf">
+            <BrandCTA onClick={() => setLogInFlow(true)}>
+              Log in with CAS
+            </BrandCTA>
+          </div>
+          <p className="mt-5 font-mono text-xs tracking-tight text-gray-400 dark:text-gray-500">
+            free · instant · yale sso
+          </p>
+        </motion.div>
+      </section>
+
+      {/* §10 Footer */}
+      <footer className="border-t border-black/[0.05] px-4 py-10 dark:border-white/[0.06] lg:px-6">
+        <div className="mx-auto flex max-w-6xl flex-col items-center gap-6 font-sf md:flex-row md:justify-between">
+          <div className="flex items-center gap-2.5">
+            <span className="text-sm font-medium text-gray-900 dark:text-white">
+              DegreeIntelligence
+            </span>
+            <span className="rounded-full border border-black/[0.08] px-2 py-0.5 font-mono text-[10px] text-gray-400 dark:border-white/[0.1] dark:text-gray-500">
+              v3.0
+            </span>
+          </div>
+
+          <nav className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-gray-500 dark:text-gray-400">
+            <Link
+              href="/mission"
+              className="transition-colors hover:text-gray-900 dark:hover:text-white"
+            >
+              Mission
+            </Link>
+            <Link
+              href="/changelog"
+              className="transition-colors hover:text-gray-900 dark:hover:text-white"
+            >
+              Changelog
+            </Link>
+            <Link
+              href="/terms"
+              className="transition-colors hover:text-gray-900 dark:hover:text-white"
+            >
+              Terms
+            </Link>
+            <Link
+              href="/contact"
+              className="transition-colors hover:text-gray-900 dark:hover:text-white"
+            >
+              Contact
+            </Link>
+          </nav>
+
+          <p className="text-center font-mono text-xs tracking-tight text-gray-400 dark:text-gray-500">
+            © {new Date().getFullYear()} DegreeIntelligence · not affiliated
+            with Yale University
+          </p>
+        </div>
+      </footer>
 
       {/* Video Modal */}
       <AnimatePresence>

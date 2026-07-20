@@ -28,6 +28,8 @@ import {
   FiTrendingUp,
   FiBarChart2,
   FiHeart,
+  FiMoon,
+  FiSun,
 } from "react-icons/fi";
 import { HiSparkles } from "react-icons/hi2";
 import LogoIcon from "@/icons/LogoIcon";
@@ -39,6 +41,7 @@ import dynamic from "next/dynamic";
 import { GraduationCap, BookOpen, Award, Clock } from "lucide-react";
 import CosmicBackground from "@/components/CosmicBackground/page";
 import HeroConstellation from "@/components/landing/HeroConstellation";
+import { useTheme } from "@/context/ThemeContext";
 
 function CountUp({
   to,
@@ -54,8 +57,9 @@ function CountUp({
   const mv = useMotionValue(0);
   const sp = useSpring(mv, { stiffness: 120, damping: 20, duration });
   const rounded = useTransform(sp, (v) => v.toFixed(decimals));
-  // start when visible
-  if (inView) mv.set(to);
+  useEffect(() => {
+    if (inView) mv.set(to);
+  }, [inView, to, mv]);
   return <motion.span>{rounded as any}</motion.span>;
 }
 
@@ -117,6 +121,7 @@ function MajorProgressBar({ percent }: { percent: number }) {
 export default function AboutPage() {
   const [logInFlow, setLogInFlow] = useState(false);
   const [showVideoModal, setShowVideoModal] = useState(false);
+  const { resolvedTheme, toggleTheme } = useTheme();
 
   // Close modal on ESC key
   useEffect(() => {
@@ -260,6 +265,7 @@ export default function AboutPage() {
             <a
               href="https://yaledailynews.com/blog/2025/09/23/new-student-run-platform-aims-to-simplify-degree-planning/"
               target="_blank"
+              rel="noopener noreferrer"
               className="text-blue-600 dark:text-blue-300 font-medium hover:text-gray-900 dark:hover:text-white hover:underline transition-colors"
             >
               Read it!
@@ -282,21 +288,35 @@ export default function AboutPage() {
               DegreeIntelligence
             </span>
           </div>
-          <motion.button
-            className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm bg-gradient-to-r from-pink-500/20 via-purple-500/20 to-blue-500/20 hover:from-pink-500/30 hover:via-purple-500/30 hover:to-blue-500/30 backdrop-blur-xl rounded-lg sm:rounded-xl text-gray-900 dark:text-white font-medium transition-all shadow-[0_4px_20px_rgba(139,92,246,0.2),inset_0_1px_0_rgba(255,255,255,0.1)] border border-black/[0.08] dark:border-white/[0.1]"
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            onClick={() => setLogInFlow(true)}
-          >
-            <span className="sm:hidden">Log in</span>
-            <span className="hidden sm:inline">Log in with CAS</span>
-            <FiArrowRight size={14} className="opacity-70" />
-          </motion.button>
+          <div className="flex items-center gap-1.5 sm:gap-2">
+            <button
+              type="button"
+              onClick={toggleTheme}
+              aria-label="Toggle theme"
+              className="rounded-xl border border-black/[0.06] p-2 text-gray-600 transition-colors hover:bg-black/[0.04] dark:border-white/[0.08] dark:text-gray-300 dark:hover:bg-white/[0.06]"
+            >
+              {resolvedTheme === "dark" ? (
+                <FiSun size={14} />
+              ) : (
+                <FiMoon size={14} />
+              )}
+            </button>
+            <motion.button
+              className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm bg-gradient-to-r from-pink-500/20 via-purple-500/20 to-blue-500/20 hover:from-pink-500/30 hover:via-purple-500/30 hover:to-blue-500/30 backdrop-blur-xl rounded-lg sm:rounded-xl text-gray-900 dark:text-white font-medium transition-all shadow-[0_4px_20px_rgba(139,92,246,0.2),inset_0_1px_0_rgba(255,255,255,0.1)] border border-black/[0.08] dark:border-white/[0.1]"
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={() => setLogInFlow(true)}
+            >
+              <span className="sm:hidden">Log in</span>
+              <span className="hidden sm:inline">Log in with CAS</span>
+              <FiArrowRight size={14} className="opacity-70" />
+            </motion.button>
+          </div>
         </div>
       </motion.nav>
 
       {/* Hero Section */}
-      <div className="relative pt-6 sm:pt-8l">
+      <div className="relative pt-6 sm:pt-8">
         {/* Cursor-adaptive constellation background (sits behind hero content) */}
         <HeroConstellation />
         {/* increased top padding to fix logo spacing */}
@@ -317,7 +337,7 @@ export default function AboutPage() {
               <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase bg-gradient-to-r from-blue-500/20 via-purple-500/20 to-pink-500/20 border border-white/[0.15] shadow-[0_4px_20px_rgba(139,92,246,0.25),inset_0_1px_0_rgba(255,255,255,0.15)] backdrop-blur-xl">
                 <span className="w-1.5 h-1.5 rounded-full bg-gradient-to-r from-emerald-400 to-emerald-500 animate-pulse shadow-[0_0_8px_rgba(52,211,153,0.6)]"></span>
                 <span className="bg-gradient-to-r from-blue-300 via-purple-300 to-pink-300 bg-clip-text text-transparent">
-                  Introducing DegreeIntelligence v2
+                  Introducing DegreeIntelligence v3
                 </span>
               </span>
             </motion.div>
@@ -381,7 +401,7 @@ export default function AboutPage() {
                 whileTap={{ scale: 0.98 }}
                 onClick={() => setShowVideoModal(true)}
               >
-                See v2 launch vid
+                See v3 launch vid
                 <FiPlayCircle className="opacity-70" size={14} />
               </motion.button>
               <motion.button
@@ -426,11 +446,11 @@ export default function AboutPage() {
               <p className="text-base text-gray-500 dark:text-gray-400 mt-2">
                 Why don't you? Even if you do...{" "}
                 <span className="text-purple-600 dark:text-purple-300 font-medium">
-                  We just launched v2. Free. Always.
+                  We just launched v3. Free. Always.
                 </span>
               </p>
 
-              {/* V2 Launch Video */}
+              {/* V3 Launch Video */}
               <motion.div
                 initial={{ opacity: 0, y: 15 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -441,7 +461,7 @@ export default function AboutPage() {
                 <div className="mb-4 text-center">
                   <p className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed">
                     <span className="font-semibold bg-gradient-to-r from-pink-300 via-purple-300 to-blue-300 bg-clip-text text-transparent">
-                      OUR V2 LAUNCH — FEB 2026.
+                      OUR V3 LAUNCH, FEB 2026.
                     </span>
                     <br />
                     <span className="text-gray-400 dark:text-gray-500">
@@ -464,7 +484,7 @@ export default function AboutPage() {
                       <div className="w-2.5 h-2.5 rounded-full bg-yellow-500/80" />
                       <div className="w-2.5 h-2.5 rounded-full bg-green-500/80" />
                       <span className="ml-3 text-[10px] text-gray-400 dark:text-gray-500 font-medium tracking-wide">
-                        v2-launch-vid.mp4
+                        v3-launch-vid.mp4
                       </span>
                     </div>
 
@@ -578,7 +598,7 @@ export default function AboutPage() {
         </div>
       </div>
 
-      {/* NEW: Simulator Section */}
+      {/* Simulator Section */}
       <section
         id="simulator"
         className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8"
@@ -649,11 +669,22 @@ export default function AboutPage() {
 
             {/* Right: GIF/video placeholder */}
             <div className="flex-1 w-full px-4">
-              <div className="relative rounded-xl border-2 border-pink-500 bg-black/40 overflow-hidden shadow-2xl">
+              <div className="relative rounded-2xl overflow-hidden border-2 border-black/[0.08] dark:border-white/[0.1] shadow-[0_8px_48px_rgba(0,0,0,0.5),0_0_60px_rgba(139,92,246,0.15),inset_0_1px_0_rgba(255,255,255,0.1)] bg-white/80 dark:bg-gray-950/80 backdrop-blur-xl">
+                <div className="flex items-center gap-1.5 px-4 py-2.5 bg-gradient-to-r from-gray-100/80 to-gray-50/80 dark:from-gray-900/80 dark:to-gray-950/80 border-b border-black/[0.05] dark:border-white/[0.06]">
+                  <div className="w-2.5 h-2.5 rounded-full bg-red-500/80" />
+                  <div className="w-2.5 h-2.5 rounded-full bg-yellow-500/80" />
+                  <div className="w-2.5 h-2.5 rounded-full bg-green-500/80" />
+                  <span className="ml-3 text-[10px] text-gray-400 dark:text-gray-500 font-medium tracking-wide">
+                    simulator-demo.gif
+                  </span>
+                </div>
                 <img
                   src="/demo/simulator.gif"
                   alt="Simulator demo"
-                  className="w-[80%] h-[80%] object-cover aspect-video"
+                  className="w-full aspect-video object-cover"
+                  loading="lazy"
+                  width={860}
+                  height={704}
                 />
               </div>
             </div>
@@ -661,7 +692,7 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* NEW: Stats Preview (public) */}
+      {/* Stats Preview (public) */}
       <section
         id="stats"
         className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8"
@@ -964,7 +995,7 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* NEW: Major Progress — compact bar only */}
+      {/* Major Progress — compact bar only */}
       <section
         id="major-progress"
         className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8"
@@ -1150,7 +1181,7 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* NEW: Public Profiles & Friends */}
+      {/* Public Profiles & Friends */}
       <section className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="bg-white/70 dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/70 dark:via-gray-900/50 dark:to-gray-950/70 backdrop-blur-2xl rounded-2xl p-6 border border-black/[0.06] dark:border-white/[0.08] shadow-[0_8px_48px_rgba(0,0,0,0.4),0_0_100px_rgba(236,72,153,0.08),inset_0_1px_0_rgba(255,255,255,0.1)] ring-1 ring-pink-500/20">
           <div className="text-center mb-8 flex flex-col gap-2">
@@ -1417,60 +1448,6 @@ export default function AboutPage() {
           ))}
         </div>
       </div>
-      {/* Wait... Are You Trying to Replace CourseTable? */}
-      {/* <section className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="bg-gray-900/80 backdrop-blur-lg rounded-2xl p-8 border border-gray-800/50 shadow-xl">
-          <div className="text-center mb-8">
-            <h2 className="text-3xl font-bold text-white">
-              Wait, wait wait... are you trying to replace{" "}
-              <span className="text-blue-300">CourseTable</span>?
-            </h2>
-          </div>
-          <div className="text-gray-300 max-w-4xl mx-auto space-y-4 text-lg leading-relaxed">
-            <p>
-              <strong>No. Not at all.</strong> We <em>love</em> CourseTable 💙.
-              Heck, our founder,{" "}
-              <span className="text-white-300 font-medium">Filippo</span>, is
-              literally on the{" "}
-              <Link
-                href="https://coursetable.com/about"
-                target="_blank"
-                className="text-blue-300"
-              >
-                CourseTable team
-              </Link>
-              .
-            </p>
-            <p>
-              This fulfills{" "}
-              <span className="text-white-300">
-                a completely different need
-              </span>{" "}
-              — one that CourseTable doesn’t aim to cover by design, as we are
-              different products entirely. We’re here for:
-            </p>
-            <ul className="list-disc list-inside space-y-1 text-gray-400">
-              <li>
-                Visualizing your grades and stats in beautiful, digestible ways
-              </li>
-              <li>Planning out your progress toward your degree</li>
-              <li>Getting real-time analysis from our suggestion models</li>
-              <li>Seeing what upperclassmen have done in previous years</li>
-              <li>
-                Exploring different majors and mapping out “what if” scenarios
-              </li>
-            </ul>
-            <p>
-              That’s <strong>not</strong> what CourseTable does — and that’s the
-              point. They help you <em>choose</em> courses, see course reviews,
-              and see friend's worksheets. We don't (and never will) do that. We
-              instead help you <em>make sense of the journey</em> and
-              democratize the complex planning process at Yale with regard to,
-              in particular, your major.
-            </p>
-          </div>
-        </div>
-      </section> */}
 
       {/* CTA Section */}
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -1503,6 +1480,32 @@ export default function AboutPage() {
 
       {/* Footer */}
       <div className="py-6 px-4 text-center text-gray-500 dark:text-gray-400 text-xs border-t border-black/[0.06] dark:border-white/[0.05]">
+        <nav className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 mb-4">
+          <Link
+            href="/mission"
+            className="transition hover:text-gray-900 dark:hover:text-white"
+          >
+            Mission
+          </Link>
+          <Link
+            href="/changelog"
+            className="transition hover:text-gray-900 dark:hover:text-white"
+          >
+            Changelog
+          </Link>
+          <Link
+            href="/terms"
+            className="transition hover:text-gray-900 dark:hover:text-white"
+          >
+            Terms
+          </Link>
+          <Link
+            href="/contact"
+            className="transition hover:text-gray-900 dark:hover:text-white"
+          >
+            Contact
+          </Link>
+        </nav>
         <p className="flex flex-wrap items-center justify-center gap-1.5 max-w-md mx-auto leading-relaxed">
           <span className="inline-flex items-center gap-1">
             Made with <FiHeart className="w-3 h-3 text-blue-400" />
@@ -1512,7 +1515,7 @@ export default function AboutPage() {
         </p>
         <p className="mt-2 text-gray-400 dark:text-gray-500 flex flex-wrap items-center justify-center gap-1.5">
           <span className="px-1.5 py-0.5 rounded-full text-[10px] bg-gradient-to-r from-purple-500/20 to-pink-500/20 border border-purple-500/30 text-purple-300">
-            v2.0
+            v3.0
           </span>
           <span>© {new Date().getFullYear()} DegreeIntelligence</span>
         </p>
@@ -1547,11 +1550,12 @@ export default function AboutPage() {
                   <div className="flex items-center gap-2">
                     <FiPlayCircle className="text-purple-400" size={16} />
                     <span className="text-sm font-medium text-gray-900 dark:text-white">
-                      v2 Launch Video
+                      v3 Launch Video
                     </span>
                   </div>
                   <button
                     onClick={() => setShowVideoModal(false)}
+                    aria-label="Close video"
                     className="p-1.5 rounded-lg bg-black/[0.04] dark:bg-white/[0.05] hover:bg-black/[0.08] dark:hover:bg-white/[0.1] border border-black/[0.06] dark:border-white/[0.08] text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-all"
                   >
                     <FiX size={16} />
@@ -1561,8 +1565,8 @@ export default function AboutPage() {
                 {/* Video embed */}
                 <div className="aspect-video bg-black/50">
                   <iframe
-                    src="https://youtu.be/5H1kjMWQfgs"
-                    title="DegreeIntelligence v2 Launch"
+                    src="https://www.youtube.com/embed/5H1kjMWQfgs"
+                    title="DegreeIntelligence v3 Launch"
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                     allowFullScreen
                     className="w-full h-full"

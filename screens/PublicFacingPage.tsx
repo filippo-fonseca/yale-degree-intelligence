@@ -317,7 +317,7 @@ export default function AboutPage() {
               <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase bg-gradient-to-r from-blue-500/20 via-purple-500/20 to-pink-500/20 border border-white/[0.15] shadow-[0_4px_20px_rgba(139,92,246,0.25),inset_0_1px_0_rgba(255,255,255,0.15)] backdrop-blur-xl">
                 <span className="w-1.5 h-1.5 rounded-full bg-gradient-to-r from-emerald-400 to-emerald-500 animate-pulse shadow-[0_0_8px_rgba(52,211,153,0.6)]"></span>
                 <span className="bg-gradient-to-r from-blue-300 via-purple-300 to-pink-300 bg-clip-text text-transparent">
-                  Introducing DegreeIntelligence v2
+                  Introducing DegreeIntelligence v3
                 </span>
               </span>
             </motion.div>
@@ -381,7 +381,7 @@ export default function AboutPage() {
                 whileTap={{ scale: 0.98 }}
                 onClick={() => setShowVideoModal(true)}
               >
-                See v2 launch vid
+                See v3 launch vid
                 <FiPlayCircle className="opacity-70" size={14} />
               </motion.button>
               <motion.button
@@ -426,11 +426,11 @@ export default function AboutPage() {
               <p className="text-base text-gray-500 dark:text-gray-400 mt-2">
                 Why don't you? Even if you do...{" "}
                 <span className="text-purple-600 dark:text-purple-300 font-medium">
-                  We just launched v2. Free. Always.
+                  We just launched v3. Free. Always.
                 </span>
               </p>
 
-              {/* V2 Launch Video */}
+              {/* V3 Launch Video */}
               <motion.div
                 initial={{ opacity: 0, y: 15 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -441,7 +441,7 @@ export default function AboutPage() {
                 <div className="mb-4 text-center">
                   <p className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed">
                     <span className="font-semibold bg-gradient-to-r from-pink-300 via-purple-300 to-blue-300 bg-clip-text text-transparent">
-                      OUR V2 LAUNCH — FEB 2026.
+                      OUR V3 LAUNCH, FEB 2026.
                     </span>
                     <br />
                     <span className="text-gray-400 dark:text-gray-500">
@@ -464,7 +464,7 @@ export default function AboutPage() {
                       <div className="w-2.5 h-2.5 rounded-full bg-yellow-500/80" />
                       <div className="w-2.5 h-2.5 rounded-full bg-green-500/80" />
                       <span className="ml-3 text-[10px] text-gray-400 dark:text-gray-500 font-medium tracking-wide">
-                        v2-launch-vid.mp4
+                        v3-launch-vid.mp4
                       </span>
                     </div>
 
@@ -1512,7 +1512,7 @@ export default function AboutPage() {
         </p>
         <p className="mt-2 text-gray-400 dark:text-gray-500 flex flex-wrap items-center justify-center gap-1.5">
           <span className="px-1.5 py-0.5 rounded-full text-[10px] bg-gradient-to-r from-purple-500/20 to-pink-500/20 border border-purple-500/30 text-purple-300">
-            v2.0
+            v3.0
           </span>
           <span>© {new Date().getFullYear()} DegreeIntelligence</span>
         </p>
@@ -1547,7 +1547,7 @@ export default function AboutPage() {
                   <div className="flex items-center gap-2">
                     <FiPlayCircle className="text-purple-400" size={16} />
                     <span className="text-sm font-medium text-gray-900 dark:text-white">
-                      v2 Launch Video
+                      v3 Launch Video
                     </span>
                   </div>
                   <button
@@ -1562,7 +1562,7 @@ export default function AboutPage() {
                 <div className="aspect-video bg-black/50">
                   <iframe
                     src="https://www.youtube.com/embed/5H1kjMWQfgs"
-                    title="DegreeIntelligence v2 Launch"
+                    title="DegreeIntelligence v3 Launch"
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                     allowFullScreen
                     className="w-full h-full"

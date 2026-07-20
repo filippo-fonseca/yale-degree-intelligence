@@ -909,6 +909,13 @@ export default function AboutPage() {
                             min: 3,
                             max: 4,
                             tickInterval: [3, 3.25, 3.5, 3.75, 4],
+                            tickLabelStyle: {
+                              fontSize: 10,
+                              fill: axisTickColor,
+                            },
+                            labelStyle: {
+                              fill: axisTickColor,
+                            },
                           },
                         ]}
                         series={[

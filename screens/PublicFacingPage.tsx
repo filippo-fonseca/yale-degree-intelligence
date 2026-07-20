@@ -39,8 +39,6 @@ import { useState, useRef, useEffect } from "react";
 import LoginPage from "@/components/LoginPage";
 import dynamic from "next/dynamic";
 import { GraduationCap, BookOpen, Award, Clock } from "lucide-react";
-import CosmicBackground from "@/components/CosmicBackground/page";
-import HeroConstellation from "@/components/landing/HeroConstellation";
 import { useTheme } from "@/context/ThemeContext";
 
 function CountUp({
@@ -248,8 +246,7 @@ export default function AboutPage() {
   if (logInFlow) return <LoginPage onBackClick={() => setLogInFlow(false)} />;
 
   return (
-    <div className="min-h-screen pt-2 bg-gradient-to-br from-gray-50 via-gray-100 to-white dark:from-gray-950 dark:via-gray-900 dark:to-gray-900 font-louize overflow-x-hidden">
-      <CosmicBackground mode="stars" opacity={0.9} />
+    <div className="min-h-screen bg-[#fafafa] dark:bg-[#0a0a0b] font-louize overflow-x-hidden">
       {/* Welcome Banner */}
       <div className="relative mb-8 mt-14 z-30 bg-gradient-to-r from-emerald-50 via-blue-50 to-purple-50 dark:from-emerald-900/20 dark:via-blue-900/20 dark:to-purple-900/20 backdrop-blur-xl border-b border-gray-200 dark:border-white/[0.08] shadow-sm dark:shadow-[0_8px_32px_rgba(0,0,0,0.3),inset_0_1px_0_rgba(255,255,255,0.1)]">
         <div className="max-w-7xl mx-auto px-4 lg:px-6 py-2.5 flex items-center justify-center gap-2">
@@ -317,8 +314,11 @@ export default function AboutPage() {
 
       {/* Hero Section */}
       <div className="relative pt-6 sm:pt-8">
-        {/* Cursor-adaptive constellation background (sits behind hero content) */}
-        <HeroConstellation />
+        {/* Hero dot grid, faded out by ~55% of the hero band's height */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(circle,rgba(0,0,0,0.05)_1px,transparent_1px)] dark:bg-[radial-gradient(circle,rgba(255,255,255,0.055)_1px,transparent_1px)] [background-size:24px_24px] [mask-image:linear-gradient(to_bottom,black,transparent_55%)]"
+        />
         {/* increased top padding to fix logo spacing */}
         <div className="max-w-7xl mx-auto px-4 pb-3 lg:px-6 relative z-10">
           <motion.div
@@ -1631,27 +1631,71 @@ export default function AboutPage() {
           -ms-overflow-style: none;
           scrollbar-width: none;
         }
-
-        @property --angle {
-          syntax: "<angle>";
-          initial-value: 0deg;
-          inherits: false;
-        }
-
-        @keyframes border-spin {
-          from {
-            --angle: 0deg;
-          }
-          to {
-            --angle: 360deg;
-          }
-        }
-
-        .animate-border-spin {
-          animation: border-spin 3s linear infinite;
-        }
       `}</style>
     </div>
+  );
+}
+
+/* --- The sealed button mix (spec §0). Three treatments, nothing else. --- */
+
+type CTAProps = {
+  children: React.ReactNode;
+  onClick?: () => void;
+  href?: string;
+  className?: string;
+};
+
+/** (a) BRAND primary. Hero CTA and the closing-statement CTA only. */
+function BrandCTA({ children, onClick, href, className = "" }: CTAProps) {
+  const cls = `inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 px-6 py-3 text-sm font-medium text-white shadow-lg shadow-purple-600/25 ${className}`;
+  const body = (
+    <>
+      {children}
+      <span aria-hidden>→</span>
+    </>
+  );
+  if (href)
+    return (
+      <motion.a whileHover={{ y: -1 }} href={href} className={cls}>
+        {body}
+      </motion.a>
+    );
+  return (
+    <motion.button whileHover={{ y: -1 }} onClick={onClick} className={cls}>
+      {body}
+    </motion.button>
+  );
+}
+
+/** (b) MONO primary. Nav CTA and any in-section primary. */
+function MonoCTA({ children, onClick, href, className = "" }: CTAProps) {
+  const cls = `inline-flex items-center gap-1.5 rounded-full bg-gray-900 text-white dark:bg-white dark:text-gray-900 px-4 py-1.5 text-sm font-medium ${className}`;
+  if (href)
+    return (
+      <motion.a whileHover={{ y: -1 }} href={href} className={cls}>
+        {children}
+      </motion.a>
+    );
+  return (
+    <motion.button whileHover={{ y: -1 }} onClick={onClick} className={cls}>
+      {children}
+    </motion.button>
+  );
+}
+
+/** (c) Ghost secondary. */
+function GhostCTA({ children, onClick, href, className = "" }: CTAProps) {
+  const cls = `inline-flex items-center gap-2 rounded-full px-6 py-3 text-sm font-medium bg-white text-gray-900 ring-1 ring-black/10 dark:bg-white/[0.06] dark:text-white dark:ring-white/15 ${className}`;
+  if (href)
+    return (
+      <motion.a whileHover={{ y: -1 }} href={href} className={cls}>
+        {children}
+      </motion.a>
+    );
+  return (
+    <motion.button whileHover={{ y: -1 }} onClick={onClick} className={cls}>
+      {children}
+    </motion.button>
   );
 }
 

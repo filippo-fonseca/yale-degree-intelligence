@@ -1561,7 +1561,7 @@ export default function AboutPage() {
                 {/* Video embed */}
                 <div className="aspect-video bg-black/50">
                   <iframe
-                    src="https://youtu.be/5H1kjMWQfgs"
+                    src="https://www.youtube.com/embed/5H1kjMWQfgs"
                     title="DegreeIntelligence v2 Launch"
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                     allowFullScreen

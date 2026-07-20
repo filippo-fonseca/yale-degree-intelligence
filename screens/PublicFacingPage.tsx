@@ -93,7 +93,7 @@ function MajorProgressBar({ percent }: { percent: number }) {
       <motion.div
         initial={{ width: 0 }}
         whileInView={{ width: `${Math.min(Math.max(percent, 0), 100)}%` }}
-        viewport={{ once: true, amount: 0.4 }}
+        viewport={mockViewport}
         transition={{ duration: 1, ease: "easeOut" }}
         className="h-3 rounded-full bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 shadow-[0_0_12px_rgba(139,92,246,0.4),inset_0_1px_0_rgba(255,255,255,0.3)]"
       />
@@ -121,20 +121,29 @@ export default function AboutPage() {
     };
   }, [showVideoModal]);
 
-  // The same look-ahead the `reveal` constant uses: these gate whether the
-  // charts mount at all, so without it they stay unmounted in a static
-  // full-page capture where nothing ever scrolls.
-  const lookAhead = {
-    once: true,
-    amount: 0.35,
-    margin: "0px 0px 100% 0px",
-  } as const;
+  // These drive the entrance motion only. Spec §0: content is never hidden by
+  // default, so the charts and counters below mount and settle on their own
+  // rather than waiting on an intersection that never fires in a static
+  // full-page capture. A viewport look-ahead is not enough here, because the
+  // stats mock sits several screens below the fold.
+  const lookAhead = { once: true, amount: 0.35 } as const;
   const lineRef = useRef<HTMLDivElement | null>(null);
   const lineInView = useInView(lineRef, lookAhead);
   const pieRef = useRef<HTMLDivElement | null>(null);
   const pieInView = useInView(pieRef, lookAhead);
   const cardsRef = useRef<HTMLDivElement | null>(null);
   const cardsInView = useInView(cardsRef, lookAhead);
+
+  // Flips shortly after mount so nothing depends on a scroll that may never
+  // happen. Entrances still fire on intersection for anyone who does scroll.
+  const [settled, setSettled] = useState(false);
+  useEffect(() => {
+    const t = setTimeout(() => setSettled(true), 300);
+    return () => clearTimeout(t);
+  }, []);
+  const cardsShown = cardsInView || settled;
+  const lineShown = lineInView || settled;
+  const pieShown = pieInView || settled;
 
   // --- mock for public preview ---
   const demoTotals = { completed: 5, inProgress: 3, total: 12 };
@@ -570,7 +579,7 @@ export default function AboutPage() {
                   {/* Cumulative GPA */}
                   <motion.div
                     initial={{ opacity: 0, y: 16 }}
-                    animate={cardsInView ? { opacity: 1, y: 0 } : {}}
+                    animate={cardsShown ? { opacity: 1, y: 0 } : {}}
                     transition={{ duration: 0.5 }}
                     className="p-4 rounded-xl bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 backdrop-blur-sm border border-gray-200 dark:border-gray-800/50 shadow-neu"
                   >
@@ -585,7 +594,7 @@ export default function AboutPage() {
                     <p className="text-2xl font-medium text-emerald-400 mt-1.5 drop-shadow-[0_0_12px_rgba(52,211,153,0.3)]">
                       <CountUp
                         to={statsMock.gpa}
-                        inView={cardsInView}
+                        inView={cardsShown}
                         decimals={2}
                       />
                     </p>
@@ -594,7 +603,7 @@ export default function AboutPage() {
                   {/* Total Credits */}
                   <motion.div
                     initial={{ opacity: 0, y: 16 }}
-                    animate={cardsInView ? { opacity: 1, y: 0 } : {}}
+                    animate={cardsShown ? { opacity: 1, y: 0 } : {}}
                     transition={{ duration: 0.5, delay: 0.05 }}
                     className="p-4 rounded-xl bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 backdrop-blur-sm border border-gray-200 dark:border-gray-800/50 shadow-neu"
                   >
@@ -609,7 +618,7 @@ export default function AboutPage() {
                     <p className="text-2xl font-medium text-blue-400 mt-1.5 drop-shadow-[0_0_12px_rgba(59,130,246,0.3)]">
                       <CountUp
                         to={statsMock.totalCredits}
-                        inView={cardsInView}
+                        inView={cardsShown}
                       />
                     </p>
                     <p className="text-[10px] text-gray-500 dark:text-gray-400 mt-0.5">
@@ -620,7 +629,7 @@ export default function AboutPage() {
                   {/* Courses Completed */}
                   <motion.div
                     initial={{ opacity: 0, y: 16 }}
-                    animate={cardsInView ? { opacity: 1, y: 0 } : {}}
+                    animate={cardsShown ? { opacity: 1, y: 0 } : {}}
                     transition={{ duration: 0.5, delay: 0.1 }}
                     className="p-4 rounded-xl bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 backdrop-blur-sm border border-gray-200 dark:border-gray-800/50 shadow-neu"
                   >
@@ -635,7 +644,7 @@ export default function AboutPage() {
                     <p className="text-2xl font-medium text-purple-600 dark:text-purple-300 mt-1.5 drop-shadow-[0_0_12px_rgba(216,180,254,0.3)]">
                       <CountUp
                         to={statsMock.coursesCompleted}
-                        inView={cardsInView}
+                        inView={cardsShown}
                       />
                     </p>
                     <p className="text-[10px] text-gray-500 dark:text-gray-400 mt-0.5">
@@ -646,7 +655,7 @@ export default function AboutPage() {
                   {/* Average Credits / Semester */}
                   <motion.div
                     initial={{ opacity: 0, y: 16 }}
-                    animate={cardsInView ? { opacity: 1, y: 0 } : {}}
+                    animate={cardsShown ? { opacity: 1, y: 0 } : {}}
                     transition={{ duration: 0.5, delay: 0.15 }}
                     className="p-4 rounded-xl bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 backdrop-blur-sm border border-gray-200 dark:border-gray-800/50 shadow-neu"
                   >
@@ -661,7 +670,7 @@ export default function AboutPage() {
                     <p className="text-2xl font-medium text-blue-600 dark:text-blue-300 mt-1.5 drop-shadow-[0_0_12px_rgba(147,197,253,0.3)]">
                       <CountUp
                         to={statsMock.avgCreditsPerSem}
-                        inView={cardsInView}
+                        inView={cardsShown}
                         decimals={1}
                       />
                     </p>
@@ -677,7 +686,7 @@ export default function AboutPage() {
                 <motion.div
                   initial={{ opacity: 0, y: 16 }}
                   whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, amount: 0.35 }}
+                  viewport={mockViewport}
                   transition={{ duration: 0.6 }}
                   className="p-4 rounded-xl bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 backdrop-blur-sm border border-gray-200 dark:border-gray-800/50 shadow-neu"
                 >
@@ -712,7 +721,7 @@ export default function AboutPage() {
                       {/* Wipe reveal overlay */}
                       <motion.div
                         initial={{ x: 0 }}
-                        animate={lineInView ? { x: "100%" } : {}}
+                        animate={lineShown ? { x: "100%" } : {}}
                         transition={{
                           duration: 0.9,
                           ease: "easeOut",
@@ -721,7 +730,7 @@ export default function AboutPage() {
                         className="pointer-events-none absolute inset-0 bg-white/50 dark:bg-gray-900/50"
                         style={{ mixBlendMode: "multiply" }}
                       />
-                      {lineInView && (
+                      {lineShown && (
                         <LineChart
                           key="cum-line-mounted"
                           height={280}
@@ -797,7 +806,7 @@ export default function AboutPage() {
                 <motion.div
                   initial={{ opacity: 0, y: 16 }}
                   whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, amount: 0.35 }}
+                  viewport={mockViewport}
                   transition={{ duration: 0.6, delay: 0.05 }}
                   className="p-4 rounded-xl bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 backdrop-blur-sm border border-gray-200 dark:border-gray-800/50 shadow-neu"
                 >
@@ -829,11 +838,11 @@ export default function AboutPage() {
                   <div ref={pieRef} className="h-[260px] w-full">
                     <motion.div
                       initial={{ scale: 0.9, opacity: 0 }}
-                      animate={pieInView ? { scale: 1, opacity: 1 } : {}}
+                      animate={pieShown ? { scale: 1, opacity: 1 } : {}}
                       transition={{ duration: 0.5, ease: "easeOut" }}
                       className="w-full h-full"
                     >
-                      {pieInView && (
+                      {pieShown && (
                         <PieChartWrapper
                           key="pie-mounted"
                           data={{
@@ -964,7 +973,7 @@ export default function AboutPage() {
                         key={req.name}
                         initial={{ opacity: 0, y: 12 }}
                         whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true, amount: 0.4 }}
+                        viewport={mockViewport}
                         transition={{ duration: 0.45, delay: i * 0.08 }}
                         className={`p-3 rounded-xl backdrop-blur-md border transition-all relative shadow-neu-sm ${
                           inProgress
@@ -1043,7 +1052,7 @@ export default function AboutPage() {
                       key={i}
                       initial={{ opacity: 0, scale: 0.6 }}
                       whileInView={{ opacity: 1, scale: 1 }}
-                      viewport={{ once: true, amount: 0.4 }}
+                      viewport={mockViewport}
                       transition={{ duration: 0.3, delay: i * 0.03 }}
                       title={
                         cell === "complete"
@@ -1131,7 +1140,7 @@ export default function AboutPage() {
                     key={friend.name}
                     initial={{ opacity: 0, y: 10 }}
                     whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
+                    viewport={mockViewport}
                     transition={{ duration: 0.4, delay: i * 0.1 }}
                     className="flex items-center justify-between p-5 rounded-xl bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 border border-gray-200 dark:border-gray-800/50 hover:border-pink-500/30 dark:hover:border-pink-500/30 transition-all duration-300 shadow-neu group"
                   >
@@ -1263,8 +1272,10 @@ export default function AboutPage() {
 
       {/* §9 Closing statement */}
       <section className="px-4 py-32 lg:px-6">
-        <motion.div {...reveal} className="mx-auto max-w-3xl text-center">
-          <h2 className="text-balance text-5xl font-medium leading-[1.02] tracking-[-0.02em] text-gray-900 dark:text-white md:text-6xl lg:text-7xl">
+        <motion.div {...reveal} className="mx-auto max-w-4xl text-center">
+          {/* Hero scale minus one step (spec §9). Any larger and line 1 wraps,
+              which turns the two-tone break into three ragged lines. */}
+          <h2 className="text-balance text-4xl font-medium leading-[1.02] tracking-[-0.02em] text-gray-900 dark:text-white md:text-5xl lg:text-6xl">
             Your degree deserves better
             <br />
             <span className="text-gray-400 dark:text-gray-500">
@@ -1408,15 +1419,32 @@ export default function AboutPage() {
 /**
  * The one entrance treatment (spec §0): opacity 0.001 -> 1, y 10 -> 0, once.
  *
- * The viewport look-ahead of a full extra screen matters. Without it a band
- * that starts just below the fold stays at opacity 0.001 in a static full-page
- * capture, because the observer never fires when nothing scrolls. Content is
- * never hidden by default, so the entrance has to resolve on its own.
+ * The viewport look-ahead matters. Without it a band that starts below the fold
+ * stays at opacity 0.001 in a static full-page capture, because the observer
+ * never fires when nothing scrolls. Content is never hidden by default, so the
+ * entrance has to resolve on its own.
+ *
+ * The look-ahead is deliberately taller than the page rather than the single
+ * extra screen unit 4 needed: once §6 through §10 landed, the page runs about
+ * eight viewports, and every section past the first screen stayed invisible in
+ * the capture. rootMargin percentages resolve against the viewport, so 1000%
+ * covers the whole document.
  */
+/**
+ * The entrance viewport for motion inside the mocks. Same look-ahead reason as
+ * `reveal`: these elements sit deep in the page, and a mock that fades in only
+ * on scroll is a mock that is blank in a static capture.
+ */
+const mockViewport = {
+  once: true,
+  amount: 0.2,
+  margin: "0px 0px 1000% 0px",
+} as const;
+
 const reveal = {
   initial: { opacity: 0.001, y: 10 },
   whileInView: { opacity: 1, y: 0 },
-  viewport: { once: true, amount: 0.2, margin: "0px 0px 100% 0px" },
+  viewport: { once: true, amount: 0.2, margin: "0px 0px 1000% 0px" },
   transition: { duration: 0.6 },
 } as const;
 

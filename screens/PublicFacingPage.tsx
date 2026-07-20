@@ -295,6 +295,62 @@ export default function AboutPage() {
           className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(circle,rgba(0,0,0,0.05)_1px,transparent_1px)] dark:bg-[radial-gradient(circle,rgba(255,255,255,0.055)_1px,transparent_1px)] [background-size:24px_24px] [mask-image:linear-gradient(to_bottom,black,transparent_55%)]"
         />
 
+        {/* §3 Floating course tiles. Framed around the headline, md+ only. */}
+        <div className="pointer-events-none absolute inset-0 -z-[1]">
+          <FloatingTile
+            className="top-[11%] left-[2%] lg:left-[6%]"
+            rotate={-6}
+            delay={0}
+          >
+            <span className="font-mono text-xs text-gray-900 dark:text-white">
+              CPSC 323
+            </span>
+            <span className="rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] font-medium text-emerald-600 dark:text-emerald-400">
+              A-
+            </span>
+          </FloatingTile>
+
+          <FloatingTile
+            className="top-[14%] right-[2%] lg:right-[7%]"
+            rotate={5}
+            delay={1.5}
+          >
+            <span className="text-xs text-gray-500 dark:text-gray-400">GPA</span>
+            <span className="font-mono text-xs font-medium text-gray-900 dark:text-white">
+              3.87
+            </span>
+            <span className="text-[10px] text-emerald-600 dark:text-emerald-400">
+              ↑
+            </span>
+          </FloatingTile>
+
+          <FloatingTile
+            className="bottom-[13%] left-[4%] lg:left-[9%] !flex-col !items-start !gap-1.5"
+            rotate={4}
+            delay={3}
+          >
+            <span className="font-mono text-[10px] text-gray-500 dark:text-gray-400">
+              Core 7/9
+            </span>
+            <span className="block h-1 w-20 overflow-hidden rounded-full bg-gray-200 dark:bg-white/10">
+              <span className="block h-full w-[78%] rounded-full bg-gradient-to-r from-pink-500 to-purple-600" />
+            </span>
+          </FloatingTile>
+
+          <FloatingTile
+            className="bottom-[10%] right-[3%] lg:right-[8%]"
+            rotate={-4}
+            delay={4.5}
+          >
+            <span className="font-mono text-xs text-gray-900 dark:text-white">
+              ECON 121
+            </span>
+            <span className="rounded-full bg-black/[0.05] px-2 py-0.5 text-[10px] font-medium text-gray-500 dark:bg-white/10 dark:text-gray-400">
+              Hum
+            </span>
+          </FloatingTile>
+        </div>
+
         <div className="relative max-w-5xl mx-auto px-4 lg:px-6 text-center">
           {/* 1. The one hero pill */}
           <div className="flex justify-center">
@@ -1468,6 +1524,39 @@ export default function AboutPage() {
         }
       `}</style>
     </div>
+  );
+}
+
+/**
+ * A small hero tile that drifts on a gentle 6s loop. Positioned by the caller
+ * against the hero band; sits behind the headline text but above the canvas.
+ */
+function FloatingTile({
+  className,
+  rotate,
+  delay,
+  children,
+}: {
+  className: string;
+  rotate: number;
+  delay: number;
+  children: React.ReactNode;
+}) {
+  return (
+    <motion.div
+      aria-hidden
+      animate={{ y: [0, -4, 0] }}
+      transition={{
+        duration: 6,
+        delay,
+        repeat: Infinity,
+        ease: "easeInOut",
+      }}
+      style={{ rotate: `${rotate}deg` }}
+      className={`absolute hidden md:flex items-center gap-2 rounded-xl border border-black/[0.08] dark:border-white/[0.09] bg-white/90 dark:bg-white/[0.05] backdrop-blur px-3 py-2 shadow-lg font-sf dark:opacity-90 ${className}`}
+    >
+      {children}
+    </motion.div>
   );
 }
 

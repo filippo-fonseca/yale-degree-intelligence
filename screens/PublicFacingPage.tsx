@@ -55,7 +55,7 @@ function CountUp({
   duration?: number;
 }) {
   const mv = useMotionValue(0);
-  const sp = useSpring(mv, { stiffness: 120, damping: 20, duration });
+  const sp = useSpring(mv, { stiffness: 480, damping: 35, duration });
   const rounded = useTransform(sp, (v) => v.toFixed(decimals));
   useEffect(() => {
     if (inView) mv.set(to);
@@ -303,7 +303,7 @@ export default function AboutPage() {
             </button>
             <motion.button
               className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm bg-gradient-to-r from-pink-500/20 via-purple-500/20 to-blue-500/20 hover:from-pink-500/30 hover:via-purple-500/30 hover:to-blue-500/30 backdrop-blur-xl rounded-lg sm:rounded-xl text-gray-900 dark:text-white font-medium transition-all shadow-[0_4px_20px_rgba(139,92,246,0.2),inset_0_1px_0_rgba(255,255,255,0.1)] border border-black/[0.08] dark:border-white/[0.1]"
-              whileHover={{ scale: 1.02 }}
+              whileHover={{ y: -1 }}
               whileTap={{ scale: 0.98 }}
               onClick={() => setLogInFlow(true)}
             >
@@ -396,7 +396,7 @@ export default function AboutPage() {
             <motion.div className="flex flex-wrap justify-center gap-3">
               <motion.button
                 className="px-5 py-2.5 text-sm bg-gradient-to-br from-black/[0.04] to-transparent dark:from-white/[0.06] hover:from-black/[0.08] dark:hover:from-white/[0.1] backdrop-blur-xl rounded-xl text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white font-medium flex items-center gap-2 transition-all shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] border border-black/[0.06] dark:border-white/[0.08] hover:border-black/[0.12] dark:hover:border-white/[0.15]"
-                whileHover={{ scale: 1.03, y: -2 }}
+                whileHover={{ y: -1 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={() => setShowVideoModal(true)}
               >
@@ -405,7 +405,7 @@ export default function AboutPage() {
               </motion.button>
               <motion.button
                 className="group relative px-5 py-2.5 text-sm rounded-xl text-white font-medium flex items-center gap-2 transition-all overflow-hidden"
-                whileHover={{ scale: 1.03, y: -2 }}
+                whileHover={{ y: -1 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={() => setLogInFlow(true)}
               >

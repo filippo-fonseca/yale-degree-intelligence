@@ -1461,6 +1461,32 @@ export default function AboutPage() {
 
       {/* Footer */}
       <div className="py-6 px-4 text-center text-gray-500 dark:text-gray-400 text-xs border-t border-black/[0.06] dark:border-white/[0.05]">
+        <nav className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 mb-4">
+          <Link
+            href="/mission"
+            className="transition hover:text-gray-900 dark:hover:text-white"
+          >
+            Mission
+          </Link>
+          <Link
+            href="/changelog"
+            className="transition hover:text-gray-900 dark:hover:text-white"
+          >
+            Changelog
+          </Link>
+          <Link
+            href="/terms"
+            className="transition hover:text-gray-900 dark:hover:text-white"
+          >
+            Terms
+          </Link>
+          <Link
+            href="/contact"
+            className="transition hover:text-gray-900 dark:hover:text-white"
+          >
+            Contact
+          </Link>
+        </nav>
         <p className="flex flex-wrap items-center justify-center gap-1.5 max-w-md mx-auto leading-relaxed">
           <span className="inline-flex items-center gap-1">
             Made with <FiHeart className="w-3 h-3 text-blue-400" />

@@ -260,6 +260,7 @@ export default function AboutPage() {
             <a
               href="https://yaledailynews.com/blog/2025/09/23/new-student-run-platform-aims-to-simplify-degree-planning/"
               target="_blank"
+              rel="noopener noreferrer"
               className="text-blue-600 dark:text-blue-300 font-medium hover:text-gray-900 dark:hover:text-white hover:underline transition-colors"
             >
               Read it!
@@ -296,7 +297,7 @@ export default function AboutPage() {
       </motion.nav>
 
       {/* Hero Section */}
-      <div className="relative pt-6 sm:pt-8l">
+      <div className="relative pt-6 sm:pt-8">
         {/* Cursor-adaptive constellation background (sits behind hero content) */}
         <HeroConstellation />
         {/* increased top padding to fix logo spacing */}
@@ -1552,6 +1553,7 @@ export default function AboutPage() {
                   </div>
                   <button
                     onClick={() => setShowVideoModal(false)}
+                    aria-label="Close video"
                     className="p-1.5 rounded-lg bg-black/[0.04] dark:bg-white/[0.05] hover:bg-black/[0.08] dark:hover:bg-white/[0.1] border border-black/[0.06] dark:border-white/[0.08] text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-all"
                   >
                     <FiX size={16} />

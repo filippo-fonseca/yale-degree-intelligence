@@ -579,7 +579,7 @@ export default function AboutPage() {
         </div>
       </div>
 
-      {/* NEW: Simulator Section */}
+      {/* Simulator Section */}
       <section
         id="simulator"
         className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8"
@@ -673,7 +673,7 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* NEW: Stats Preview (public) */}
+      {/* Stats Preview (public) */}
       <section
         id="stats"
         className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8"
@@ -976,7 +976,7 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* NEW: Major Progress — compact bar only */}
+      {/* Major Progress — compact bar only */}
       <section
         id="major-progress"
         className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8"
@@ -1162,7 +1162,7 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* NEW: Public Profiles & Friends */}
+      {/* Public Profiles & Friends */}
       <section className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="bg-white/70 dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/70 dark:via-gray-900/50 dark:to-gray-950/70 backdrop-blur-2xl rounded-2xl p-6 border border-black/[0.06] dark:border-white/[0.08] shadow-[0_8px_48px_rgba(0,0,0,0.4),0_0_100px_rgba(236,72,153,0.08),inset_0_1px_0_rgba(255,255,255,0.1)] ring-1 ring-pink-500/20">
           <div className="text-center mb-8 flex flex-col gap-2">
@@ -1429,60 +1429,6 @@ export default function AboutPage() {
           ))}
         </div>
       </div>
-      {/* Wait... Are You Trying to Replace CourseTable? */}
-      {/* <section className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="bg-gray-900/80 backdrop-blur-lg rounded-2xl p-8 border border-gray-800/50 shadow-xl">
-          <div className="text-center mb-8">
-            <h2 className="text-3xl font-bold text-white">
-              Wait, wait wait... are you trying to replace{" "}
-              <span className="text-blue-300">CourseTable</span>?
-            </h2>
-          </div>
-          <div className="text-gray-300 max-w-4xl mx-auto space-y-4 text-lg leading-relaxed">
-            <p>
-              <strong>No. Not at all.</strong> We <em>love</em> CourseTable 💙.
-              Heck, our founder,{" "}
-              <span className="text-white-300 font-medium">Filippo</span>, is
-              literally on the{" "}
-              <Link
-                href="https://coursetable.com/about"
-                target="_blank"
-                className="text-blue-300"
-              >
-                CourseTable team
-              </Link>
-              .
-            </p>
-            <p>
-              This fulfills{" "}
-              <span className="text-white-300">
-                a completely different need
-              </span>{" "}
-              — one that CourseTable doesn’t aim to cover by design, as we are
-              different products entirely. We’re here for:
-            </p>
-            <ul className="list-disc list-inside space-y-1 text-gray-400">
-              <li>
-                Visualizing your grades and stats in beautiful, digestible ways
-              </li>
-              <li>Planning out your progress toward your degree</li>
-              <li>Getting real-time analysis from our suggestion models</li>
-              <li>Seeing what upperclassmen have done in previous years</li>
-              <li>
-                Exploring different majors and mapping out “what if” scenarios
-              </li>
-            </ul>
-            <p>
-              That’s <strong>not</strong> what CourseTable does — and that’s the
-              point. They help you <em>choose</em> courses, see course reviews,
-              and see friend's worksheets. We don't (and never will) do that. We
-              instead help you <em>make sense of the journey</em> and
-              democratize the complex planning process at Yale with regard to,
-              in particular, your major.
-            </p>
-          </div>
-        </div>
-      </section> */}
 
       {/* CTA Section */}
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">

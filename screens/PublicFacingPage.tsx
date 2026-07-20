@@ -405,6 +405,49 @@ export default function AboutPage() {
         </div>
       </section>
 
+      {/* §4 The product window: the launch film */}
+      <section className="relative px-4 lg:px-6">
+        {/* The page's one glow */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0 -z-10 flex items-start justify-center"
+        >
+          <div className="h-[28rem] w-[52rem] max-w-full rounded-full bg-gradient-to-r from-pink-500/15 to-purple-600/15 blur-[120px]" />
+        </div>
+
+        <motion.div
+          initial={{ opacity: 0.001, y: 10 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.2 }}
+          transition={{ duration: 0.6 }}
+          className="relative mx-auto max-w-6xl [mask-image:linear-gradient(to_bottom,black_85%,transparent)]"
+        >
+          <div className="overflow-hidden rounded-2xl border border-black/[0.08] dark:border-white/[0.09] bg-white dark:bg-[#101013] shadow-[0_32px_80px_-24px_rgba(0,0,0,0.35)]">
+            {/* Title bar */}
+            <div className="relative flex items-center gap-1.5 border-b border-black/[0.05] px-4 py-2.5 dark:border-white/[0.06]">
+              <span className="h-2.5 w-2.5 rounded-full bg-red-500/80" />
+              <span className="h-2.5 w-2.5 rounded-full bg-yellow-500/80" />
+              <span className="h-2.5 w-2.5 rounded-full bg-green-500/80" />
+              <span className="pointer-events-none absolute inset-x-0 text-center font-mono text-[10px] text-gray-400 dark:text-gray-500">
+                v3-launch-film.mp4
+              </span>
+            </div>
+
+            {/* Film, edge to edge under the title bar */}
+            <div className="aspect-video">
+              <iframe
+                src="https://www.youtube.com/embed/5H1kjMWQfgs?si=F9mSXs1G_Wy1Fkx-"
+                title="DegreeIntelligence v3 launch film"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                referrerPolicy="strict-origin-when-cross-origin"
+                allowFullScreen
+                className="h-full w-full border-0"
+              />
+            </div>
+          </div>
+        </motion.div>
+      </section>
+
       {/* Blueprint Section */}
       <div className="relative max-w-7xl mx-auto px-4 lg:px-6 py-24">
         <div className="bg-white/70 dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/70 dark:via-gray-900/50 dark:to-gray-950/70 backdrop-blur-2xl rounded-xl p-6 border border-gray-200 dark:border-gray-800/50 shadow-neu">

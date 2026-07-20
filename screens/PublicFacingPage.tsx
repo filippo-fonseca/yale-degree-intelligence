@@ -9,24 +9,12 @@ import {
   AnimatePresence,
 } from "framer-motion";
 import {
-  FiGithub,
-  FiMail,
-  FiExternalLink,
-  FiChevronRight,
   FiUsers,
-  FiSearch,
-  FiSave,
-  FiShare2,
   FiPlayCircle,
   FiUserPlus,
   FiCheck,
   FiX,
   FiUser,
-  FiAlertCircle,
-  FiZap,
-  FiTrendingUp,
-  FiBarChart2,
-  FiHeart,
   FiMoon,
   FiSun,
 } from "react-icons/fi";
@@ -289,58 +277,60 @@ export default function AboutPage() {
             the tiles orbit the type instead of hugging the viewport edges. */}
         <div className="pointer-events-none absolute inset-0 -z-[1]">
           <div className="relative mx-auto h-full max-w-5xl px-4 lg:px-6">
-          <FloatingTile
-            className="top-[11%] left-[1%] lg:left-[3%]"
-            rotate={-6}
-            delay={0}
-          >
-            <span className="font-mono text-xs text-gray-900 dark:text-white">
-              CPSC 323
-            </span>
-            <span className="rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] font-medium text-emerald-600 dark:text-emerald-400">
-              A-
-            </span>
-          </FloatingTile>
+            <FloatingTile
+              className="top-[11%] left-[1%] lg:left-[3%]"
+              rotate={-6}
+              delay={0}
+            >
+              <span className="font-mono text-xs text-gray-900 dark:text-white">
+                CPSC 323
+              </span>
+              <span className="rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] font-medium text-emerald-600 dark:text-emerald-400">
+                A-
+              </span>
+            </FloatingTile>
 
-          <FloatingTile
-            className="top-[14%] right-[1%] lg:right-[4%]"
-            rotate={5}
-            delay={1.5}
-          >
-            <span className="text-xs text-gray-500 dark:text-gray-400">GPA</span>
-            <span className="font-mono text-xs font-medium text-gray-900 dark:text-white">
-              3.87
-            </span>
-            <span className="text-[10px] text-emerald-600 dark:text-emerald-400">
-              ↑
-            </span>
-          </FloatingTile>
+            <FloatingTile
+              className="top-[14%] right-[1%] lg:right-[4%]"
+              rotate={5}
+              delay={1.5}
+            >
+              <span className="text-xs text-gray-500 dark:text-gray-400">
+                GPA
+              </span>
+              <span className="font-mono text-xs font-medium text-gray-900 dark:text-white">
+                3.87
+              </span>
+              <span className="text-[10px] text-emerald-600 dark:text-emerald-400">
+                ↑
+              </span>
+            </FloatingTile>
 
-          <FloatingTile
-            className="bottom-[13%] left-[2%] lg:left-[5%] !flex-col !items-start !gap-1.5"
-            rotate={4}
-            delay={3}
-          >
-            <span className="font-mono text-[10px] text-gray-500 dark:text-gray-400">
-              Core 7/9
-            </span>
-            <span className="block h-1 w-20 overflow-hidden rounded-full bg-gray-200 dark:bg-white/10">
-              <span className="block h-full w-[78%] rounded-full bg-gradient-to-r from-pink-500 to-purple-600" />
-            </span>
-          </FloatingTile>
+            <FloatingTile
+              className="bottom-[13%] left-[2%] lg:left-[5%] !flex-col !items-start !gap-1.5"
+              rotate={4}
+              delay={3}
+            >
+              <span className="font-mono text-[10px] text-gray-500 dark:text-gray-400">
+                Core 7/9
+              </span>
+              <span className="block h-1 w-20 overflow-hidden rounded-full bg-gray-200 dark:bg-white/10">
+                <span className="block h-full w-[78%] rounded-full bg-gradient-to-r from-pink-500 to-purple-600" />
+              </span>
+            </FloatingTile>
 
-          <FloatingTile
-            className="bottom-[10%] right-[2%] lg:right-[5%]"
-            rotate={-4}
-            delay={4.5}
-          >
-            <span className="font-mono text-xs text-gray-900 dark:text-white">
-              ECON 121
-            </span>
-            <span className="rounded-full bg-black/[0.05] px-2 py-0.5 text-[10px] font-medium text-gray-500 dark:bg-white/10 dark:text-gray-400">
-              Hum
-            </span>
-          </FloatingTile>
+            <FloatingTile
+              className="bottom-[10%] right-[2%] lg:right-[5%]"
+              rotate={-4}
+              delay={4.5}
+            >
+              <span className="font-mono text-xs text-gray-900 dark:text-white">
+                ECON 121
+              </span>
+              <span className="rounded-full bg-black/[0.05] px-2 py-0.5 text-[10px] font-medium text-gray-500 dark:bg-white/10 dark:text-gray-400">
+                Hum
+              </span>
+            </FloatingTile>
           </div>
         </div>
 
@@ -559,289 +549,320 @@ export default function AboutPage() {
           </>
         }
         checks={[
-          <CheckRow key="a">Cumulative GPA, tracked semester by semester</CheckRow>,
-          <CheckRow key="b">Credits and pace against your graduation target</CheckRow>,
+          <CheckRow key="a">
+            Cumulative GPA, tracked semester by semester
+          </CheckRow>,
+          <CheckRow key="b">
+            Credits and pace against your graduation target
+          </CheckRow>,
           <CheckRow key="c">Your grade distribution at a glance</CheckRow>,
         ]}
         actions={
-          <MonoCTA onClick={() => setLogInFlow(true)}>See my full stats</MonoCTA>
+          <MonoCTA onClick={() => setLogInFlow(true)}>
+            See my full stats
+          </MonoCTA>
         }
         mock={
           <MockWindow filename="stats.tsx">
             <div className="p-4">
-          <div ref={cardsRef} className="mb-4">
-            <div className="grid grid-cols-2 gap-3">
-              {/* Cumulative GPA */}
-              <motion.div
-                initial={{ opacity: 0, y: 16 }}
-                animate={cardsInView ? { opacity: 1, y: 0 } : {}}
-                transition={{ duration: 0.5 }}
-                className="p-4 rounded-xl bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 backdrop-blur-sm border border-gray-200 dark:border-gray-800/50 shadow-neu"
-              >
-                <div className="flex items-center justify-between">
-                  <p className="text-xs text-gray-500 dark:text-gray-400">Cumulative GPA</p>
-                  <div className="text-emerald-400 drop-shadow-[0_0_8px_rgba(52,211,153,0.5)]">
-                    <GraduationCap className="h-4 w-4" />
-                  </div>
-                </div>
-                <p className="text-2xl font-medium text-emerald-400 mt-1.5 drop-shadow-[0_0_12px_rgba(52,211,153,0.3)]">
-                  <CountUp
-                    to={statsMock.gpa}
-                    inView={cardsInView}
-                    decimals={2}
-                  />
-                </p>
-              </motion.div>
-
-              {/* Total Credits */}
-              <motion.div
-                initial={{ opacity: 0, y: 16 }}
-                animate={cardsInView ? { opacity: 1, y: 0 } : {}}
-                transition={{ duration: 0.5, delay: 0.05 }}
-                className="p-4 rounded-xl bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 backdrop-blur-sm border border-gray-200 dark:border-gray-800/50 shadow-neu"
-              >
-                <div className="flex items-center justify-between">
-                  <p className="text-xs text-gray-500 dark:text-gray-400">Total Credits</p>
-                  <div className="text-blue-400 drop-shadow-[0_0_8px_rgba(59,130,246,0.5)]">
-                    <BookOpen className="h-4 w-4" />
-                  </div>
-                </div>
-                <p className="text-2xl font-medium text-blue-400 mt-1.5 drop-shadow-[0_0_12px_rgba(59,130,246,0.3)]">
-                  <CountUp to={statsMock.totalCredits} inView={cardsInView} />
-                </p>
-                <p className="text-[10px] text-gray-500 dark:text-gray-400 mt-0.5">
-                  {statsMock.progressToGradPct}% to graduation
-                </p>
-              </motion.div>
-
-              {/* Courses Completed */}
-              <motion.div
-                initial={{ opacity: 0, y: 16 }}
-                animate={cardsInView ? { opacity: 1, y: 0 } : {}}
-                transition={{ duration: 0.5, delay: 0.1 }}
-                className="p-4 rounded-xl bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 backdrop-blur-sm border border-gray-200 dark:border-gray-800/50 shadow-neu"
-              >
-                <div className="flex items-center justify-between">
-                  <p className="text-xs text-gray-500 dark:text-gray-400">Courses Completed</p>
-                  <div className="text-purple-600 dark:text-purple-300 drop-shadow-[0_0_8px_rgba(216,180,254,0.5)]">
-                    <Award className="h-4 w-4" />
-                  </div>
-                </div>
-                <p className="text-2xl font-medium text-purple-600 dark:text-purple-300 mt-1.5 drop-shadow-[0_0_12px_rgba(216,180,254,0.3)]">
-                  <CountUp
-                    to={statsMock.coursesCompleted}
-                    inView={cardsInView}
-                  />
-                </p>
-                <p className="text-[10px] text-gray-500 dark:text-gray-400 mt-0.5">
-                  & 5 courses in progress right now
-                </p>
-              </motion.div>
-
-              {/* Average Credits / Semester */}
-              <motion.div
-                initial={{ opacity: 0, y: 16 }}
-                animate={cardsInView ? { opacity: 1, y: 0 } : {}}
-                transition={{ duration: 0.5, delay: 0.15 }}
-                className="p-4 rounded-xl bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 backdrop-blur-sm border border-gray-200 dark:border-gray-800/50 shadow-neu"
-              >
-                <div className="flex items-center justify-between">
-                  <p className="text-xs text-gray-500 dark:text-gray-400">
-                    Average Credits/Semester
-                  </p>
-                  <div className="text-blue-600 dark:text-blue-300 drop-shadow-[0_0_8px_rgba(147,197,253,0.5)]">
-                    <Clock className="h-4 w-4" />
-                  </div>
-                </div>
-                <p className="text-2xl font-medium text-blue-600 dark:text-blue-300 mt-1.5 drop-shadow-[0_0_12px_rgba(147,197,253,0.3)]">
-                  <CountUp
-                    to={statsMock.avgCreditsPerSem}
-                    inView={cardsInView}
-                    decimals={1}
-                  />
-                </p>
-                <p className="text-[10px] text-gray-500 dark:text-gray-400 mt-0.5">
-                  across 6 semesters
-                </p>
-              </motion.div>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 gap-4">
-            {/* Cumulative GPA */}
-            <motion.div
-              initial={{ opacity: 0, y: 16 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.35 }}
-              transition={{ duration: 0.6 }}
-              className="p-4 rounded-xl bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 backdrop-blur-sm border border-gray-200 dark:border-gray-800/50 shadow-neu"
-            >
-              <div className="flex items-start justify-between mb-3">
-                <div>
-                  <h4 className="font-medium text-base text-gray-900 dark:text-white">
-                    Cumulative GPA
-                  </h4>
-                  <p className="text-[10px] text-gray-500 dark:text-gray-400 mt-0.5">
-                    Watch your GPA evolve semester by semester.
-                  </p>
-                </div>
-                <div className="p-1.5 rounded-full bg-gray-100 dark:bg-gray-800/50 text-purple-600 dark:text-purple-300">
-                  {/* icon-ish sparkline */}
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                    <path
-                      d="M3 20L9 12l4 3 8-9"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                    />
-                  </svg>
-                </div>
-              </div>
-              <div className="h-[280px] w-full">
-                <div ref={lineRef} className="relative">
-                  {/* Wipe reveal overlay */}
+              <div ref={cardsRef} className="mb-4">
+                <div className="grid grid-cols-2 gap-3">
+                  {/* Cumulative GPA */}
                   <motion.div
-                    initial={{ x: 0 }}
-                    animate={lineInView ? { x: "100%" } : {}}
-                    transition={{ duration: 0.9, ease: "easeOut", delay: 0.15 }}
-                    className="pointer-events-none absolute inset-0 bg-white/50 dark:bg-gray-900/50"
-                    style={{ mixBlendMode: "multiply" }}
-                  />
-                  {lineInView && (
-                    <LineChart
-                      key="cum-line-mounted"
-                      height={280}
-                      xAxis={[
-                        {
-                          scaleType: "point",
-                          data: statsDemo.semesters,
-                          tickLabelStyle: {
-                            angle: 45,
-                            textAnchor: "start",
-                            fontSize: 12,
-                            fill: "#9CA3AF",
-                          },
-                        },
-                      ]}
-                      yAxis={[
-                        {
-                          label: "GPA",
-                          min: Math.max(
-                            0,
-                            Math.floor(
-                              Math.min(...statsDemo.cumulativeGpa) * 2,
-                            ) / 2,
-                          ),
-                          max: 4,
-                        },
-                      ]}
-                      series={[
-                        {
-                          data: statsDemo.cumulativeGpa,
-                          showMark: true,
-                          color: "#ed64a6",
-                          area: true,
-                          curve: "natural",
-                        },
-                      ]}
-                      grid={{ vertical: true, horizontal: true }}
-                      margin={{ left: 60, right: 20, top: 20, bottom: 80 }}
-                      slotProps={{
-                        tooltip: {
-                          sx: {
-                            backgroundColor: "#1F2937",
-                            borderColor: "#374151",
-                            color: "#F3F4F6",
-                            borderRadius: "0.5rem",
-                          },
-                        },
-                      }}
-                      sx={{
-                        "& .MuiChartsAxis-left .MuiChartsAxis-tickLabel": {
-                          fill: "#9CA3AF",
-                        },
-                        "& .MuiChartsAxis-bottom .MuiChartsAxis-tickLabel": {
-                          fill: "#9CA3AF",
-                        },
-                        "& .MuiChartsAxis-left .MuiChartsAxis-label": {
-                          fill: "#9CA3AF",
-                        },
-                        "& .MuiChartsAxis-left .MuiChartsAxis-line, & .MuiChartsAxis-bottom .MuiChartsAxis-line":
-                          {
-                            stroke: "#374151",
-                            opacity: 0.4,
-                          },
-                      }}
-                    />
-                  )}
-                </div>
-              </div>
-            </motion.div>
+                    initial={{ opacity: 0, y: 16 }}
+                    animate={cardsInView ? { opacity: 1, y: 0 } : {}}
+                    transition={{ duration: 0.5 }}
+                    className="p-4 rounded-xl bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 backdrop-blur-sm border border-gray-200 dark:border-gray-800/50 shadow-neu"
+                  >
+                    <div className="flex items-center justify-between">
+                      <p className="text-xs text-gray-500 dark:text-gray-400">
+                        Cumulative GPA
+                      </p>
+                      <div className="text-emerald-400 drop-shadow-[0_0_8px_rgba(52,211,153,0.5)]">
+                        <GraduationCap className="h-4 w-4" />
+                      </div>
+                    </div>
+                    <p className="text-2xl font-medium text-emerald-400 mt-1.5 drop-shadow-[0_0_12px_rgba(52,211,153,0.3)]">
+                      <CountUp
+                        to={statsMock.gpa}
+                        inView={cardsInView}
+                        decimals={2}
+                      />
+                    </p>
+                  </motion.div>
 
-            {/* Grade Distribution (Pie) */}
-            <motion.div
-              initial={{ opacity: 0, y: 16 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.35 }}
-              transition={{ duration: 0.6, delay: 0.05 }}
-              className="p-4 rounded-xl bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 backdrop-blur-sm border border-gray-200 dark:border-gray-800/50 shadow-neu"
-            >
-              <div className="flex items-start justify-between mb-3">
-                <div>
-                  <h4 className="font-medium text-base text-gray-900 dark:text-white">
-                    Grade distribution
-                  </h4>
-                  <p className="text-[10px] text-gray-500 dark:text-gray-400 mt-0.5">
-                    Your percentage mix of A's, A-'s, B+'s, and beyond.
-                  </p>
-                </div>
-                <div className="p-1.5 rounded-full bg-gray-100 dark:bg-gray-800/50 text-blue-600 dark:text-blue-300">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                    <path
-                      d="M11 2a10 10 0 1 0 10 10h-10V2Z"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                    />
-                  </svg>
+                  {/* Total Credits */}
+                  <motion.div
+                    initial={{ opacity: 0, y: 16 }}
+                    animate={cardsInView ? { opacity: 1, y: 0 } : {}}
+                    transition={{ duration: 0.5, delay: 0.05 }}
+                    className="p-4 rounded-xl bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 backdrop-blur-sm border border-gray-200 dark:border-gray-800/50 shadow-neu"
+                  >
+                    <div className="flex items-center justify-between">
+                      <p className="text-xs text-gray-500 dark:text-gray-400">
+                        Total Credits
+                      </p>
+                      <div className="text-blue-400 drop-shadow-[0_0_8px_rgba(59,130,246,0.5)]">
+                        <BookOpen className="h-4 w-4" />
+                      </div>
+                    </div>
+                    <p className="text-2xl font-medium text-blue-400 mt-1.5 drop-shadow-[0_0_12px_rgba(59,130,246,0.3)]">
+                      <CountUp
+                        to={statsMock.totalCredits}
+                        inView={cardsInView}
+                      />
+                    </p>
+                    <p className="text-[10px] text-gray-500 dark:text-gray-400 mt-0.5">
+                      {statsMock.progressToGradPct}% to graduation
+                    </p>
+                  </motion.div>
+
+                  {/* Courses Completed */}
+                  <motion.div
+                    initial={{ opacity: 0, y: 16 }}
+                    animate={cardsInView ? { opacity: 1, y: 0 } : {}}
+                    transition={{ duration: 0.5, delay: 0.1 }}
+                    className="p-4 rounded-xl bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 backdrop-blur-sm border border-gray-200 dark:border-gray-800/50 shadow-neu"
+                  >
+                    <div className="flex items-center justify-between">
+                      <p className="text-xs text-gray-500 dark:text-gray-400">
+                        Courses Completed
+                      </p>
+                      <div className="text-purple-600 dark:text-purple-300 drop-shadow-[0_0_8px_rgba(216,180,254,0.5)]">
+                        <Award className="h-4 w-4" />
+                      </div>
+                    </div>
+                    <p className="text-2xl font-medium text-purple-600 dark:text-purple-300 mt-1.5 drop-shadow-[0_0_12px_rgba(216,180,254,0.3)]">
+                      <CountUp
+                        to={statsMock.coursesCompleted}
+                        inView={cardsInView}
+                      />
+                    </p>
+                    <p className="text-[10px] text-gray-500 dark:text-gray-400 mt-0.5">
+                      & 5 courses in progress right now
+                    </p>
+                  </motion.div>
+
+                  {/* Average Credits / Semester */}
+                  <motion.div
+                    initial={{ opacity: 0, y: 16 }}
+                    animate={cardsInView ? { opacity: 1, y: 0 } : {}}
+                    transition={{ duration: 0.5, delay: 0.15 }}
+                    className="p-4 rounded-xl bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 backdrop-blur-sm border border-gray-200 dark:border-gray-800/50 shadow-neu"
+                  >
+                    <div className="flex items-center justify-between">
+                      <p className="text-xs text-gray-500 dark:text-gray-400">
+                        Average Credits/Semester
+                      </p>
+                      <div className="text-blue-600 dark:text-blue-300 drop-shadow-[0_0_8px_rgba(147,197,253,0.5)]">
+                        <Clock className="h-4 w-4" />
+                      </div>
+                    </div>
+                    <p className="text-2xl font-medium text-blue-600 dark:text-blue-300 mt-1.5 drop-shadow-[0_0_12px_rgba(147,197,253,0.3)]">
+                      <CountUp
+                        to={statsMock.avgCreditsPerSem}
+                        inView={cardsInView}
+                        decimals={1}
+                      />
+                    </p>
+                    <p className="text-[10px] text-gray-500 dark:text-gray-400 mt-0.5">
+                      across 6 semesters
+                    </p>
+                  </motion.div>
                 </div>
               </div>
 
-              <div ref={pieRef} className="h-[260px] w-full">
+              <div className="grid grid-cols-1 gap-4">
+                {/* Cumulative GPA */}
                 <motion.div
-                  initial={{ scale: 0.9, opacity: 0 }}
-                  animate={pieInView ? { scale: 1, opacity: 1 } : {}}
-                  transition={{ duration: 0.5, ease: "easeOut" }}
-                  className="w-full h-full"
+                  initial={{ opacity: 0, y: 16 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, amount: 0.35 }}
+                  transition={{ duration: 0.6 }}
+                  className="p-4 rounded-xl bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 backdrop-blur-sm border border-gray-200 dark:border-gray-800/50 shadow-neu"
                 >
-                  {pieInView && (
-                    <PieChartWrapper
-                      key="pie-mounted"
-                      data={{
-                        labels: statsDemo.gradeDistribution.map((g) => g.label),
-                        datasets: [
-                          {
-                            data: statsDemo.gradeDistribution.map(
-                              (g) => g.count,
+                  <div className="flex items-start justify-between mb-3">
+                    <div>
+                      <h4 className="font-medium text-base text-gray-900 dark:text-white">
+                        Cumulative GPA
+                      </h4>
+                      <p className="text-[10px] text-gray-500 dark:text-gray-400 mt-0.5">
+                        Watch your GPA evolve semester by semester.
+                      </p>
+                    </div>
+                    <div className="p-1.5 rounded-full bg-gray-100 dark:bg-gray-800/50 text-purple-600 dark:text-purple-300">
+                      {/* icon-ish sparkline */}
+                      <svg
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                      >
+                        <path
+                          d="M3 20L9 12l4 3 8-9"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                        />
+                      </svg>
+                    </div>
+                  </div>
+                  <div className="h-[280px] w-full">
+                    <div ref={lineRef} className="relative">
+                      {/* Wipe reveal overlay */}
+                      <motion.div
+                        initial={{ x: 0 }}
+                        animate={lineInView ? { x: "100%" } : {}}
+                        transition={{
+                          duration: 0.9,
+                          ease: "easeOut",
+                          delay: 0.15,
+                        }}
+                        className="pointer-events-none absolute inset-0 bg-white/50 dark:bg-gray-900/50"
+                        style={{ mixBlendMode: "multiply" }}
+                      />
+                      {lineInView && (
+                        <LineChart
+                          key="cum-line-mounted"
+                          height={280}
+                          xAxis={[
+                            {
+                              scaleType: "point",
+                              data: statsDemo.semesters,
+                              tickLabelStyle: {
+                                angle: 45,
+                                textAnchor: "start",
+                                fontSize: 12,
+                                fill: "#9CA3AF",
+                              },
+                            },
+                          ]}
+                          yAxis={[
+                            {
+                              label: "GPA",
+                              min: Math.max(
+                                0,
+                                Math.floor(
+                                  Math.min(...statsDemo.cumulativeGpa) * 2,
+                                ) / 2,
+                              ),
+                              max: 4,
+                            },
+                          ]}
+                          series={[
+                            {
+                              data: statsDemo.cumulativeGpa,
+                              showMark: true,
+                              color: "#ed64a6",
+                              area: true,
+                              curve: "natural",
+                            },
+                          ]}
+                          grid={{ vertical: true, horizontal: true }}
+                          margin={{ left: 60, right: 20, top: 20, bottom: 80 }}
+                          slotProps={{
+                            tooltip: {
+                              sx: {
+                                backgroundColor: "#1F2937",
+                                borderColor: "#374151",
+                                color: "#F3F4F6",
+                                borderRadius: "0.5rem",
+                              },
+                            },
+                          }}
+                          sx={{
+                            "& .MuiChartsAxis-left .MuiChartsAxis-tickLabel": {
+                              fill: "#9CA3AF",
+                            },
+                            "& .MuiChartsAxis-bottom .MuiChartsAxis-tickLabel":
+                              {
+                                fill: "#9CA3AF",
+                              },
+                            "& .MuiChartsAxis-left .MuiChartsAxis-label": {
+                              fill: "#9CA3AF",
+                            },
+                            "& .MuiChartsAxis-left .MuiChartsAxis-line, & .MuiChartsAxis-bottom .MuiChartsAxis-line":
+                              {
+                                stroke: "#374151",
+                                opacity: 0.4,
+                              },
+                          }}
+                        />
+                      )}
+                    </div>
+                  </div>
+                </motion.div>
+
+                {/* Grade Distribution (Pie) */}
+                <motion.div
+                  initial={{ opacity: 0, y: 16 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, amount: 0.35 }}
+                  transition={{ duration: 0.6, delay: 0.05 }}
+                  className="p-4 rounded-xl bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 backdrop-blur-sm border border-gray-200 dark:border-gray-800/50 shadow-neu"
+                >
+                  <div className="flex items-start justify-between mb-3">
+                    <div>
+                      <h4 className="font-medium text-base text-gray-900 dark:text-white">
+                        Grade distribution
+                      </h4>
+                      <p className="text-[10px] text-gray-500 dark:text-gray-400 mt-0.5">
+                        Your percentage mix of A's, A-'s, B+'s, and beyond.
+                      </p>
+                    </div>
+                    <div className="p-1.5 rounded-full bg-gray-100 dark:bg-gray-800/50 text-blue-600 dark:text-blue-300">
+                      <svg
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                      >
+                        <path
+                          d="M11 2a10 10 0 1 0 10 10h-10V2Z"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                        />
+                      </svg>
+                    </div>
+                  </div>
+
+                  <div ref={pieRef} className="h-[260px] w-full">
+                    <motion.div
+                      initial={{ scale: 0.9, opacity: 0 }}
+                      animate={pieInView ? { scale: 1, opacity: 1 } : {}}
+                      transition={{ duration: 0.5, ease: "easeOut" }}
+                      className="w-full h-full"
+                    >
+                      {pieInView && (
+                        <PieChartWrapper
+                          key="pie-mounted"
+                          data={{
+                            labels: statsDemo.gradeDistribution.map(
+                              (g) => g.label,
                             ),
-                            backgroundColor: CHART_COLORS.slice(
-                              0,
-                              statsDemo.gradeDistribution.length,
-                            ),
-                            borderColor: Array(
-                              statsDemo.gradeDistribution.length,
-                            ).fill("#1F2937"),
-                            borderWidth: 1,
-                          },
-                        ],
-                      }}
-                      showLegend={true}
-                    />
-                  )}
+                            datasets: [
+                              {
+                                data: statsDemo.gradeDistribution.map(
+                                  (g) => g.count,
+                                ),
+                                backgroundColor: CHART_COLORS.slice(
+                                  0,
+                                  statsDemo.gradeDistribution.length,
+                                ),
+                                borderColor: Array(
+                                  statsDemo.gradeDistribution.length,
+                                ).fill("#1F2937"),
+                                borderWidth: 1,
+                              },
+                            ],
+                          }}
+                          showLegend={true}
+                        />
+                      )}
+                    </motion.div>
+                  </div>
                 </motion.div>
               </div>
-            </motion.div>
-          </div>
-
             </div>
           </MockWindow>
         }
@@ -861,9 +882,15 @@ export default function AboutPage() {
           </>
         }
         checks={[
-          <CheckRow key="a">Progress with and without in-progress credit</CheckRow>,
-          <CheckRow key="b">Every requirement, with the courses that satisfy it</CheckRow>,
-          <CheckRow key="c">A heat map of what is done and what is left</CheckRow>,
+          <CheckRow key="a">
+            Progress with and without in-progress credit
+          </CheckRow>,
+          <CheckRow key="b">
+            Every requirement, with the courses that satisfy it
+          </CheckRow>,
+          <CheckRow key="c">
+            A heat map of what is done and what is left
+          </CheckRow>,
         ]}
         actions={
           <MonoCTA onClick={() => setLogInFlow(true)}>
@@ -873,163 +900,169 @@ export default function AboutPage() {
         mock={
           <MockWindow filename="major-progress.tsx">
             <div className="p-4">
-          <div className="space-y-4">
-            {/* Strict (completed only) */}
-            <div>
-              <div className="flex items-center justify-between text-xs mb-1.5">
-                <span className="text-gray-500 dark:text-gray-400">Completed only</span>
-                <span className="text-blue-600 dark:text-blue-300 font-medium">
-                  {demoStrictPct}%
-                </span>
-              </div>
-              <MajorProgressBar percent={demoStrictPct} />
-              <div className="text-[10px] text-gray-500 dark:text-gray-400 mt-1.5">
-                {demoTotals.completed}/{demoTotals.total} credits
-              </div>
-            </div>
+              <div className="space-y-4">
+                {/* Strict (completed only) */}
+                <div>
+                  <div className="flex items-center justify-between text-xs mb-1.5">
+                    <span className="text-gray-500 dark:text-gray-400">
+                      Completed only
+                    </span>
+                    <span className="text-blue-600 dark:text-blue-300 font-medium">
+                      {demoStrictPct}%
+                    </span>
+                  </div>
+                  <MajorProgressBar percent={demoStrictPct} />
+                  <div className="text-[10px] text-gray-500 dark:text-gray-400 mt-1.5">
+                    {demoTotals.completed}/{demoTotals.total} credits
+                  </div>
+                </div>
 
-            {/* Including in-progress */}
-            <div>
-              <div className="flex items-center justify-between text-xs mb-1.5">
-                <span className="text-gray-500 dark:text-gray-400">Including in-progress</span>
-                <span className="text-purple-600 dark:text-purple-300 font-medium">
-                  {demoWithIPPct}%
-                </span>
+                {/* Including in-progress */}
+                <div>
+                  <div className="flex items-center justify-between text-xs mb-1.5">
+                    <span className="text-gray-500 dark:text-gray-400">
+                      Including in-progress
+                    </span>
+                    <span className="text-purple-600 dark:text-purple-300 font-medium">
+                      {demoWithIPPct}%
+                    </span>
+                  </div>
+                  <MajorProgressBar percent={demoWithIPPct} />
+                  <div className="text-[10px] text-gray-500 dark:text-gray-400 mt-1.5">
+                    {demoTotals.completed + demoTotals.inProgress}/
+                    {demoTotals.total} credits
+                  </div>
+                </div>
               </div>
-              <MajorProgressBar percent={demoWithIPPct} />
-              <div className="text-[10px] text-gray-500 dark:text-gray-400 mt-1.5">
-                {demoTotals.completed + demoTotals.inProgress}/
-                {demoTotals.total} credits
-              </div>
-            </div>
-          </div>
 
-          {/* Requirement cards — mirrors the real MajorProgressView grid */}
-          <div className="mt-6">
-            <div className="flex items-center justify-between mb-2.5">
-              <h4 className="text-sm font-medium text-gray-900 dark:text-white">
-                Requirements
-              </h4>
-              <div className="flex items-center gap-2.5 text-[10px] text-gray-500 dark:text-gray-400">
-                <span className="flex items-center gap-1">
-                  <span className="w-2 h-2 rounded-full bg-emerald-400" /> Complete
-                </span>
-                <span className="flex items-center gap-1">
-                  <span className="w-2 h-2 rounded-full bg-blue-400" /> In progress
-                </span>
-                <span className="flex items-center gap-1">
-                  <span className="w-2 h-2 rounded-full bg-red-400" /> Not taken
-                </span>
-              </div>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-              {demoReqs.map((req, i) => {
-                const inProgress = req.status === "in-progress";
-                return (
-                  <motion.div
-                    key={req.name}
-                    initial={{ opacity: 0, y: 12 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true, amount: 0.4 }}
-                    transition={{ duration: 0.45, delay: i * 0.08 }}
-                    className={`p-3 rounded-xl backdrop-blur-md border transition-all relative shadow-neu-sm ${
-                      inProgress
-                        ? "bg-blue-50 dark:bg-transparent dark:bg-gradient-to-br dark:from-blue-950/40 dark:via-gray-900/50 dark:to-gray-950/50 border-blue-200 dark:border-blue-800/30"
-                        : "bg-red-50 dark:bg-transparent dark:bg-gradient-to-br dark:from-red-950/30 dark:via-gray-900/50 dark:to-gray-950/50 border-red-200 dark:border-red-800/25"
-                    }`}
-                  >
-                    <div className="flex justify-between items-start mb-1.5">
-                      <h5
-                        className={`font-medium text-sm ${
+              {/* Requirement cards — mirrors the real MajorProgressView grid */}
+              <div className="mt-6">
+                <div className="flex items-center justify-between mb-2.5">
+                  <h4 className="text-sm font-medium text-gray-900 dark:text-white">
+                    Requirements
+                  </h4>
+                  <div className="flex items-center gap-2.5 text-[10px] text-gray-500 dark:text-gray-400">
+                    <span className="flex items-center gap-1">
+                      <span className="w-2 h-2 rounded-full bg-emerald-400" />{" "}
+                      Complete
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <span className="w-2 h-2 rounded-full bg-blue-400" /> In
+                      progress
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <span className="w-2 h-2 rounded-full bg-red-400" /> Not
+                      taken
+                    </span>
+                  </div>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                  {demoReqs.map((req, i) => {
+                    const inProgress = req.status === "in-progress";
+                    return (
+                      <motion.div
+                        key={req.name}
+                        initial={{ opacity: 0, y: 12 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true, amount: 0.4 }}
+                        transition={{ duration: 0.45, delay: i * 0.08 }}
+                        className={`p-3 rounded-xl backdrop-blur-md border transition-all relative shadow-neu-sm ${
                           inProgress
-                            ? "text-blue-600 dark:text-blue-300"
-                            : "text-red-600 dark:text-red-300"
+                            ? "bg-blue-50 dark:bg-transparent dark:bg-gradient-to-br dark:from-blue-950/40 dark:via-gray-900/50 dark:to-gray-950/50 border-blue-200 dark:border-blue-800/30"
+                            : "bg-red-50 dark:bg-transparent dark:bg-gradient-to-br dark:from-red-950/30 dark:via-gray-900/50 dark:to-gray-950/50 border-red-200 dark:border-red-800/25"
                         }`}
                       >
-                        {req.name}
-                      </h5>
-                      <span
-                        className={`text-[10px] px-1.5 py-0.5 rounded-md ${
-                          inProgress
-                            ? "bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-300 border border-blue-300 dark:border-blue-700/30"
-                            : "bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-300 border border-red-300 dark:border-red-700/30"
-                        }`}
-                      >
-                        {req.have}/{req.required}
-                      </span>
-                    </div>
-                    <p
-                      className={`text-[11px] mb-2 ${
-                        inProgress
-                          ? "text-blue-500 dark:text-blue-300/70"
-                          : "text-red-500 dark:text-red-300/70"
-                      }`}
-                    >
-                      {req.desc}
-                    </p>
-                    <div className="flex flex-wrap gap-1.5">
-                      {req.pills.map((opt) => (
-                        <div
-                          key={opt.code}
-                          className={`relative px-2 py-0.5 rounded-full text-xs flex items-center ${
-                            opt.status === "complete"
-                              ? "bg-emerald-100 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-700"
-                              : opt.status === "in-progress"
-                                ? "bg-blue-100 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 border border-blue-300 dark:border-blue-700"
-                                : "bg-red-100 dark:bg-red-900/20 text-red-700 dark:text-red-300 border border-red-300 dark:border-red-700"
-                          }`}
-                        >
-                          {opt.code}
-                          <span className="ml-1 text-[0.65rem]">
-                            ({opt.cr}cr
-                            {opt.status === "in-progress"
-                              ? ", in progress"
-                              : opt.status === "complete"
-                                ? ", complete"
-                                : ""}
-                            )
+                        <div className="flex justify-between items-start mb-1.5">
+                          <h5
+                            className={`font-medium text-sm ${
+                              inProgress
+                                ? "text-blue-600 dark:text-blue-300"
+                                : "text-red-600 dark:text-red-300"
+                            }`}
+                          >
+                            {req.name}
+                          </h5>
+                          <span
+                            className={`text-[10px] px-1.5 py-0.5 rounded-md ${
+                              inProgress
+                                ? "bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-300 border border-blue-300 dark:border-blue-700/30"
+                                : "bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-300 border border-red-300 dark:border-red-700/30"
+                            }`}
+                          >
+                            {req.have}/{req.required}
                           </span>
                         </div>
-                      ))}
-                    </div>
-                  </motion.div>
-                );
-              })}
-            </div>
-          </div>
+                        <p
+                          className={`text-[11px] mb-2 ${
+                            inProgress
+                              ? "text-blue-500 dark:text-blue-300/70"
+                              : "text-red-500 dark:text-red-300/70"
+                          }`}
+                        >
+                          {req.desc}
+                        </p>
+                        <div className="flex flex-wrap gap-1.5">
+                          {req.pills.map((opt) => (
+                            <div
+                              key={opt.code}
+                              className={`relative px-2 py-0.5 rounded-full text-xs flex items-center ${
+                                opt.status === "complete"
+                                  ? "bg-emerald-100 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-700"
+                                  : opt.status === "in-progress"
+                                    ? "bg-blue-100 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 border border-blue-300 dark:border-blue-700"
+                                    : "bg-red-100 dark:bg-red-900/20 text-red-700 dark:text-red-300 border border-red-300 dark:border-red-700"
+                              }`}
+                            >
+                              {opt.code}
+                              <span className="ml-1 text-[0.65rem]">
+                                ({opt.cr}cr
+                                {opt.status === "in-progress"
+                                  ? ", in progress"
+                                  : opt.status === "complete"
+                                    ? ", complete"
+                                    : ""}
+                                )
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      </motion.div>
+                    );
+                  })}
+                </div>
+              </div>
 
-          {/* Requirement heat map — color-coded fulfilment grid */}
-          <div className="mt-6">
-            <h4 className="text-sm font-medium text-gray-900 dark:text-white mb-2.5">
-              Requirement heat map
-            </h4>
-            <div className="grid grid-cols-6 sm:grid-cols-12 gap-1.5">
-              {demoHeat.map((cell, i) => (
-                <motion.div
-                  key={i}
-                  initial={{ opacity: 0, scale: 0.6 }}
-                  whileInView={{ opacity: 1, scale: 1 }}
-                  viewport={{ once: true, amount: 0.4 }}
-                  transition={{ duration: 0.3, delay: i * 0.03 }}
-                  title={
-                    cell === "complete"
-                      ? "Complete"
-                      : cell === "in-progress"
-                        ? "In progress"
-                        : "Not taken"
-                  }
-                  className={`aspect-square rounded-md border ${
-                    cell === "complete"
-                      ? "bg-emerald-500/20 border-emerald-500/40 dark:bg-emerald-500/15"
-                      : cell === "in-progress"
-                        ? "bg-blue-500/20 border-blue-500/40 dark:bg-blue-500/15"
-                        : "bg-red-500/15 border-red-500/30 dark:bg-red-500/10"
-                  }`}
-                />
-              ))}
-            </div>
-          </div>
-
+              {/* Requirement heat map — color-coded fulfilment grid */}
+              <div className="mt-6">
+                <h4 className="text-sm font-medium text-gray-900 dark:text-white mb-2.5">
+                  Requirement heat map
+                </h4>
+                <div className="grid grid-cols-6 sm:grid-cols-12 gap-1.5">
+                  {demoHeat.map((cell, i) => (
+                    <motion.div
+                      key={i}
+                      initial={{ opacity: 0, scale: 0.6 }}
+                      whileInView={{ opacity: 1, scale: 1 }}
+                      viewport={{ once: true, amount: 0.4 }}
+                      transition={{ duration: 0.3, delay: i * 0.03 }}
+                      title={
+                        cell === "complete"
+                          ? "Complete"
+                          : cell === "in-progress"
+                            ? "In progress"
+                            : "Not taken"
+                      }
+                      className={`aspect-square rounded-md border ${
+                        cell === "complete"
+                          ? "bg-emerald-500/20 border-emerald-500/40 dark:bg-emerald-500/15"
+                          : cell === "in-progress"
+                            ? "bg-blue-500/20 border-blue-500/40 dark:bg-blue-500/15"
+                            : "bg-red-500/15 border-red-500/30 dark:bg-red-500/10"
+                      }`}
+                    />
+                  ))}
+                </div>
+              </div>
             </div>
           </MockWindow>
         }
@@ -1048,108 +1081,108 @@ export default function AboutPage() {
           </>
         }
         checks={[
-          <CheckRow key="a">Course codes, semesters, and credits are shared</CheckRow>,
+          <CheckRow key="a">
+            Course codes, semesters, and credits are shared
+          </CheckRow>,
           <CheckRow key="b">Major and graduation year are shared</CheckRow>,
           <CheckRow key="c">Grades and GPA are never shared</CheckRow>,
         ]}
         actions={
-          <MonoCTA onClick={() => setLogInFlow(true)}>
-            Enable friends
-          </MonoCTA>
+          <MonoCTA onClick={() => setLogInFlow(true)}>Enable friends</MonoCTA>
         }
         mock={
           <MockWindow filename="friends.tsx">
             <div className="p-4">
-            <div className="flex items-center justify-between mb-5">
-              <h3 className="text-base font-medium text-pink-600 dark:text-pink-200 flex items-center gap-2">
-                <FiUsers size={14} /> Your Friends (3)
-              </h3>
-              <span className="px-3 py-1.5 text-white bg-gradient-to-r from-pink-500 to-purple-600 rounded-lg flex items-center gap-1.5 text-xs font-medium">
-                <FiUserPlus size={12} /> Add Friend
-              </span>
-            </div>
+              <div className="flex items-center justify-between mb-5">
+                <h3 className="text-base font-medium text-pink-600 dark:text-pink-200 flex items-center gap-2">
+                  <FiUsers size={14} /> Your Friends (3)
+                </h3>
+                <span className="px-3 py-1.5 text-white bg-gradient-to-r from-pink-500 to-purple-600 rounded-lg flex items-center gap-1.5 text-xs font-medium">
+                  <FiUserPlus size={12} /> Add Friend
+                </span>
+              </div>
 
-            {/* Mock Friend Cards */}
-            <div className="space-y-4">
-              {[
-                {
-                  name: "Sarah Chen",
-                  major: "CPSC & MATH",
-                  year: "2026",
-                  initials: "SC",
-                  gradient: "from-pink-500 to-purple-600",
-                },
-                {
-                  name: "Alex Rivera",
-                  major: "ECON & S&DS",
-                  year: "2027",
-                  initials: "AR",
-                  gradient: "from-blue-500 to-purple-600",
-                },
-                {
-                  name: "Jordan Kim",
-                  major: "MCDB",
-                  year: "2025",
-                  initials: "JK",
-                  gradient: "from-pink-500 to-purple-600",
-                },
-              ].map((friend, i) => (
-                <motion.div
-                  key={friend.name}
-                  initial={{ opacity: 0, y: 10 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.4, delay: i * 0.1 }}
-                  className="flex items-center justify-between p-5 rounded-xl bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 border border-gray-200 dark:border-gray-800/50 hover:border-pink-500/30 dark:hover:border-pink-500/30 transition-all duration-300 shadow-neu group"
-                >
-                  <div className="flex items-center gap-4">
-                    <div
-                      className={`w-10 h-10 rounded-full bg-gradient-to-br ${friend.gradient} flex items-center justify-center text-white font-medium text-sm border-2 border-gray-300 dark:border-gray-700/50 shadow-[0_4px_12px_rgba(0,0,0,0.3)]`}
-                    >
-                      {friend.initials}
-                    </div>
-                    <div>
-                      <div className="font-medium text-pink-600 dark:text-pink-200 group-hover:text-pink-700 dark:group-hover:text-pink-100 transition-colors">
-                        {friend.name}
+              {/* Mock Friend Cards */}
+              <div className="space-y-4">
+                {[
+                  {
+                    name: "Sarah Chen",
+                    major: "CPSC & MATH",
+                    year: "2026",
+                    initials: "SC",
+                    gradient: "from-pink-500 to-purple-600",
+                  },
+                  {
+                    name: "Alex Rivera",
+                    major: "ECON & S&DS",
+                    year: "2027",
+                    initials: "AR",
+                    gradient: "from-blue-500 to-purple-600",
+                  },
+                  {
+                    name: "Jordan Kim",
+                    major: "MCDB",
+                    year: "2025",
+                    initials: "JK",
+                    gradient: "from-pink-500 to-purple-600",
+                  },
+                ].map((friend, i) => (
+                  <motion.div
+                    key={friend.name}
+                    initial={{ opacity: 0, y: 10 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.4, delay: i * 0.1 }}
+                    className="flex items-center justify-between p-5 rounded-xl bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 border border-gray-200 dark:border-gray-800/50 hover:border-pink-500/30 dark:hover:border-pink-500/30 transition-all duration-300 shadow-neu group"
+                  >
+                    <div className="flex items-center gap-4">
+                      <div
+                        className={`w-10 h-10 rounded-full bg-gradient-to-br ${friend.gradient} flex items-center justify-center text-white font-medium text-sm border-2 border-gray-300 dark:border-gray-700/50 shadow-[0_4px_12px_rgba(0,0,0,0.3)]`}
+                      >
+                        {friend.initials}
                       </div>
-                      <div className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-2">
-                        {friend.major}
-                        <span className="px-1.5 py-0.5 rounded-full text-[10px] bg-gradient-to-r from-purple-500/20 to-pink-500/20 border border-purple-500/30 text-purple-700 dark:text-purple-200">
-                          '{friend.year.slice(-2)}
-                        </span>
+                      <div>
+                        <div className="font-medium text-pink-600 dark:text-pink-200 group-hover:text-pink-700 dark:group-hover:text-pink-100 transition-colors">
+                          {friend.name}
+                        </div>
+                        <div className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-2">
+                          {friend.major}
+                          <span className="px-1.5 py-0.5 rounded-full text-[10px] bg-gradient-to-r from-purple-500/20 to-pink-500/20 border border-purple-500/30 text-purple-700 dark:text-purple-200">
+                            '{friend.year.slice(-2)}
+                          </span>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                  <div className="flex gap-2">
-                    <span className="flex items-center gap-1.5 px-4 py-2 bg-black/[0.04] dark:bg-white/[0.06] text-gray-600 dark:text-gray-300 rounded-xl border border-black/[0.06] dark:border-white/[0.08] text-sm">
-                      <FiUser className="inline-block" size={14} />
-                      Profile
-                    </span>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
+                    <div className="flex gap-2">
+                      <span className="flex items-center gap-1.5 px-4 py-2 bg-black/[0.04] dark:bg-white/[0.06] text-gray-600 dark:text-gray-300 rounded-xl border border-black/[0.06] dark:border-white/[0.08] text-sm">
+                        <FiUser className="inline-block" size={14} />
+                        Profile
+                      </span>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
 
-            {/* What gets shared, kept as the mock's own footer row */}
-            <div className="mt-5 border-t border-black/[0.05] dark:border-white/[0.06] pt-4">
-              <h4 className="text-sm font-medium text-pink-600 dark:text-pink-200 mb-3">
-                What gets shared:
-              </h4>
-              <ul className="text-sm text-gray-500 dark:text-gray-400 space-y-2">
-                <li className="flex items-center gap-2.5">
-                  <FiCheck className="text-emerald-400 shrink-0" size={14} />{" "}
-                  Course codes, semesters, and credits
-                </li>
-                <li className="flex items-center gap-2.5">
-                  <FiCheck className="text-emerald-400 shrink-0" size={14} />{" "}
-                  Major and graduation year
-                </li>
-                <li className="flex items-center gap-2.5">
-                  <FiX className="text-red-400 shrink-0" size={14} /> Grades and
-                  GPA are never shared
-                </li>
-              </ul>
-            </div>
+              {/* What gets shared, kept as the mock's own footer row */}
+              <div className="mt-5 border-t border-black/[0.05] dark:border-white/[0.06] pt-4">
+                <h4 className="text-sm font-medium text-pink-600 dark:text-pink-200 mb-3">
+                  What gets shared:
+                </h4>
+                <ul className="text-sm text-gray-500 dark:text-gray-400 space-y-2">
+                  <li className="flex items-center gap-2.5">
+                    <FiCheck className="text-emerald-400 shrink-0" size={14} />{" "}
+                    Course codes, semesters, and credits
+                  </li>
+                  <li className="flex items-center gap-2.5">
+                    <FiCheck className="text-emerald-400 shrink-0" size={14} />{" "}
+                    Major and graduation year
+                  </li>
+                  <li className="flex items-center gap-2.5">
+                    <FiX className="text-red-400 shrink-0" size={14} /> Grades
+                    and GPA are never shared
+                  </li>
+                </ul>
+              </div>
             </div>
           </MockWindow>
         }
@@ -1368,17 +1401,6 @@ export default function AboutPage() {
           </motion.div>
         )}
       </AnimatePresence>
-
-      {/* Shared components */}
-      <style jsx global>{`
-        .hide-scrollbar::-webkit-scrollbar {
-          display: none;
-        }
-        .hide-scrollbar {
-          -ms-overflow-style: none;
-          scrollbar-width: none;
-        }
-      `}</style>
     </div>
   );
 }
@@ -1494,28 +1516,6 @@ function GhostCTA({ children, onClick, href, className = "" }: CTAProps) {
   );
 }
 
-/* Unit 2 leftover; removed in the cleanup sweep once no section uses it. */
-function SectionEyebrow({
-  icon,
-  label,
-  centered = false,
-}: {
-  icon: React.ReactNode;
-  label: string;
-  centered?: boolean;
-}) {
-  return (
-    <div className={`mb-3 ${centered ? "flex justify-center" : ""}`}>
-      <span className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[13px] font-medium bg-pink-500/[0.06] text-pink-900/70 dark:bg-pink-500/10 dark:text-pink-200/80 border border-pink-500/10">
-        <span className="inline-flex h-3.5 w-3.5 items-center justify-center [&>svg]:h-3.5 [&>svg]:w-3.5">
-          {icon}
-        </span>
-        {label}
-      </span>
-    </div>
-  );
-}
-
 /** Mono kicker above a section statement (spec §6). */
 function Kicker({ children }: { children: React.ReactNode }) {
   return (
@@ -1622,58 +1622,5 @@ function CheckRow({ children }: { children: React.ReactNode }) {
       </span>
       <span>{children}</span>
     </li>
-  );
-}
-
-function Card({
-  children,
-  fade,
-  delay = 0,
-}: {
-  children: React.ReactNode;
-  fade?: boolean;
-  delay?: number;
-}) {
-  const cardClass =
-    "bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 p-4 rounded-xl border border-gray-200 dark:border-gray-800/50 hover:border-gray-300 dark:hover:border-gray-700/60 transition-all duration-300 shadow-neu backdrop-blur-sm";
-
-  if (!fade) return <div className={cardClass}>{children}</div>;
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.6, delay }}
-      className={cardClass}
-    >
-      {children}
-    </motion.div>
-  );
-}
-
-function CardHeader({
-  icon,
-  title,
-  color = "blue",
-}: {
-  icon: React.ReactNode;
-  title: string;
-  color?: "red" | "blue" | "green";
-}) {
-  const colorMap: Record<string, string> = {
-    red: "text-red-400 bg-gradient-to-br from-red-500/25 to-red-600/15 border-red-500/30 shadow-[inset_0_1px_0_rgba(255,255,255,0.1),0_4px_12px_rgba(239,68,68,0.2)]",
-    blue: "text-blue-400 bg-gradient-to-br from-blue-500/25 to-blue-600/15 border-blue-500/30 shadow-[inset_0_1px_0_rgba(255,255,255,0.1),0_4px_12px_rgba(59,130,246,0.2)]",
-    green:
-      "text-green-400 bg-gradient-to-br from-green-500/25 to-green-600/15 border-green-500/30 shadow-[inset_0_1px_0_rgba(255,255,255,0.1),0_4px_12px_rgba(34,197,94,0.2)]",
-  };
-  return (
-    <div className="flex items-center gap-2 mb-3">
-      <div
-        className={`w-9 h-9 rounded-lg flex items-center justify-center border ${colorMap[color]}`}
-      >
-        {icon}
-      </div>
-      <h3 className="text-base font-medium text-gray-900 dark:text-white">{title}</h3>
-    </div>
   );
 }

@@ -718,7 +718,7 @@ export default function AboutPage() {
                 initial={{ opacity: 0, y: 16 }}
                 animate={cardsInView ? { opacity: 1, y: 0 } : {}}
                 transition={{ duration: 0.5 }}
-                className="p-4 rounded-xl bg-gradient-to-br from-white/[0.06] via-transparent to-black/10 backdrop-blur-sm border border-white/[0.08] shadow-[0_4px_24px_rgba(0,0,0,0.2),inset_0_1px_0_rgba(255,255,255,0.1)]"
+                className="p-4 rounded-xl bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 backdrop-blur-sm border border-gray-200 dark:border-gray-800/50 shadow-neu"
               >
                 <div className="flex items-center justify-between">
                   <p className="text-xs text-gray-500 dark:text-gray-400">Cumulative GPA</p>
@@ -740,7 +740,7 @@ export default function AboutPage() {
                 initial={{ opacity: 0, y: 16 }}
                 animate={cardsInView ? { opacity: 1, y: 0 } : {}}
                 transition={{ duration: 0.5, delay: 0.05 }}
-                className="p-4 rounded-xl bg-gradient-to-br from-white/[0.06] via-transparent to-black/10 backdrop-blur-sm border border-white/[0.08] shadow-[0_4px_24px_rgba(0,0,0,0.2),inset_0_1px_0_rgba(255,255,255,0.1)]"
+                className="p-4 rounded-xl bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 backdrop-blur-sm border border-gray-200 dark:border-gray-800/50 shadow-neu"
               >
                 <div className="flex items-center justify-between">
                   <p className="text-xs text-gray-500 dark:text-gray-400">Total Credits</p>
@@ -761,7 +761,7 @@ export default function AboutPage() {
                 initial={{ opacity: 0, y: 16 }}
                 animate={cardsInView ? { opacity: 1, y: 0 } : {}}
                 transition={{ duration: 0.5, delay: 0.1 }}
-                className="p-4 rounded-xl bg-gradient-to-br from-white/[0.06] via-transparent to-black/10 backdrop-blur-sm border border-white/[0.08] shadow-[0_4px_24px_rgba(0,0,0,0.2),inset_0_1px_0_rgba(255,255,255,0.1)]"
+                className="p-4 rounded-xl bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 backdrop-blur-sm border border-gray-200 dark:border-gray-800/50 shadow-neu"
               >
                 <div className="flex items-center justify-between">
                   <p className="text-xs text-gray-500 dark:text-gray-400">Courses Completed</p>
@@ -785,7 +785,7 @@ export default function AboutPage() {
                 initial={{ opacity: 0, y: 16 }}
                 animate={cardsInView ? { opacity: 1, y: 0 } : {}}
                 transition={{ duration: 0.5, delay: 0.15 }}
-                className="p-4 rounded-xl bg-gradient-to-br from-white/[0.06] via-transparent to-black/10 backdrop-blur-sm border border-white/[0.08] shadow-[0_4px_24px_rgba(0,0,0,0.2),inset_0_1px_0_rgba(255,255,255,0.1)]"
+                className="p-4 rounded-xl bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 backdrop-blur-sm border border-gray-200 dark:border-gray-800/50 shadow-neu"
               >
                 <div className="flex items-center justify-between">
                   <p className="text-xs text-gray-500 dark:text-gray-400">
@@ -816,7 +816,7 @@ export default function AboutPage() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, amount: 0.35 }}
               transition={{ duration: 0.6 }}
-              className="p-4 rounded-xl bg-gradient-to-br from-white/[0.06] via-transparent to-black/10 backdrop-blur-sm border border-white/[0.08] shadow-[0_4px_24px_rgba(0,0,0,0.2),inset_0_1px_0_rgba(255,255,255,0.1)]"
+              className="p-4 rounded-xl bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 backdrop-blur-sm border border-gray-200 dark:border-gray-800/50 shadow-neu"
             >
               <div className="flex items-start justify-between mb-3">
                 <div>
@@ -926,7 +926,7 @@ export default function AboutPage() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, amount: 0.35 }}
               transition={{ duration: 0.6, delay: 0.05 }}
-              className="p-4 rounded-xl bg-gradient-to-br from-white/[0.06] via-transparent to-black/10 backdrop-blur-sm border border-white/[0.08] shadow-[0_4px_24px_rgba(0,0,0,0.2),inset_0_1px_0_rgba(255,255,255,0.1)]"
+              className="p-4 rounded-xl bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 backdrop-blur-sm border border-gray-200 dark:border-gray-800/50 shadow-neu"
             >
               <div className="flex items-start justify-between mb-3">
                 <div>
@@ -1244,7 +1244,7 @@ export default function AboutPage() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.4, delay: i * 0.1 }}
-                  className="flex items-center justify-between p-5 rounded-2xl bg-gradient-to-br from-white/[0.06] via-transparent to-black/10 border border-white/[0.08] hover:border-pink-500/30 transition-all duration-300 shadow-[0_4px_24px_rgba(0,0,0,0.2),inset_0_1px_0_rgba(255,255,255,0.1)] group"
+                  className="flex items-center justify-between p-5 rounded-xl bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 border border-gray-200 dark:border-gray-800/50 hover:border-pink-500/30 dark:hover:border-pink-500/30 transition-all duration-300 shadow-neu group"
                 >
                   <div className="flex items-center gap-4">
                     <div
@@ -1283,7 +1283,7 @@ export default function AboutPage() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: 0.3 }}
-              className="mt-8 p-5 rounded-2xl bg-gradient-to-br from-pink-500/10 via-transparent to-purple-500/10 border border-pink-500/20 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]"
+              className="mt-8 p-5 rounded-xl bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-pink-500/10 dark:via-transparent dark:to-purple-500/10 border border-pink-200 dark:border-pink-500/20 shadow-neu"
             >
               <h4 className="text-sm font-medium text-pink-600 dark:text-pink-200 mb-3">
                 What gets shared:
@@ -1343,7 +1343,7 @@ export default function AboutPage() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.6, delay: i * 0.1 }}
-                className="bg-gradient-to-br from-white/[0.08] via-transparent to-black/10 p-4 rounded-xl border border-white/[0.08] hover:border-white/[0.15] transition-all duration-300 hover:scale-[1.02] shadow-[0_4px_24px_rgba(0,0,0,0.2),inset_0_1px_0_rgba(255,255,255,0.1)] backdrop-blur-sm hover:shadow-[0_8px_32px_rgba(0,0,0,0.3),inset_0_1px_0_rgba(255,255,255,0.12)]"
+                className="bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 p-4 rounded-xl border border-gray-200 dark:border-gray-800/50 hover:border-gray-300 dark:hover:border-gray-700/60 transition-all duration-300 shadow-neu backdrop-blur-sm"
               >
                 <div className="p-2.5 rounded-xl bg-gradient-to-br from-black/[0.04] via-transparent to-black/10 dark:from-white/[0.08] border border-black/[0.06] dark:border-white/[0.08] text-blue-600 dark:text-blue-300 mb-3 w-fit shadow-[inset_0_1px_0_rgba(255,255,255,0.1)]">
                   {feature.icon}
@@ -1400,7 +1400,7 @@ export default function AboutPage() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6, delay: i * 0.1 }}
-              className="bg-gradient-to-br from-white/[0.08] via-transparent to-black/10 backdrop-blur-xl p-4 rounded-xl border border-white/[0.08] hover:border-white/[0.15] flex-1 max-w-sm hover:scale-[1.02] transition-all duration-300 shadow-[0_4px_24px_rgba(0,0,0,0.2),inset_0_1px_0_rgba(255,255,255,0.1)] hover:shadow-[0_8px_32px_rgba(0,0,0,0.3),inset_0_1px_0_rgba(255,255,255,0.12)]"
+              className="bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 backdrop-blur-xl p-4 rounded-xl border border-gray-200 dark:border-gray-800/50 hover:border-gray-300 dark:hover:border-gray-700/60 flex-1 max-w-sm transition-all duration-300 shadow-neu"
             >
               <div className="flex items-center gap-3 mb-3">
                 <div className="w-11 h-11 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center shadow-[0_4px_16px_rgba(139,92,246,0.3)]">
@@ -1638,7 +1638,7 @@ function Card({
   delay?: number;
 }) {
   const cardClass =
-    "bg-gradient-to-br from-white/[0.08] via-transparent to-black/10 p-4 rounded-xl border border-white/[0.08] hover:border-white/[0.15] transition-all duration-300 shadow-[0_4px_24px_rgba(0,0,0,0.2),inset_0_1px_0_rgba(255,255,255,0.1)] backdrop-blur-sm hover:shadow-[0_8px_32px_rgba(0,0,0,0.3),inset_0_1px_0_rgba(255,255,255,0.12)]";
+    "bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 p-4 rounded-xl border border-gray-200 dark:border-gray-800/50 hover:border-gray-300 dark:hover:border-gray-700/60 transition-all duration-300 shadow-neu backdrop-blur-sm";
 
   if (!fade) return <div className={cardClass}>{children}</div>;
   return (

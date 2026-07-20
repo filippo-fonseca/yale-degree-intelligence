@@ -868,27 +868,32 @@ export default function AboutPage() {
         }
       />
 
-      {/* Major Progress — compact bar only */}
-      <section
+      {/* §6.3 Major progress */}
+      <FeatureSection
         id="major-progress"
-        className="relative max-w-7xl mx-auto px-4 lg:px-6 py-24"
-      >
-        <div className="bg-white/70 dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/70 dark:via-gray-900/50 dark:to-gray-950/70 backdrop-blur-2xl rounded-xl p-6 border border-gray-200 dark:border-gray-800/50 shadow-neu">
-          <div className="mb-3">
-            <SectionEyebrow icon={<GraduationCap />} label="Major progress" />
-            <h3 className="text-xl font-medium leading-[0.98] tracking-[-0.02em] text-balance text-gray-900 dark:text-white">
-              Your <i>Major</i> progress,
-              <br />
-              <span className="text-gray-500 dark:text-gray-400">visualized.</span>
-            </h3>
-            <p className="text-gray-700 dark:text-gray-300 text-sm mt-1">
-              Track your journey at a glance, complete with a clean progress bar
-              and a full grid of requirements, each showing the courses you’ve
-              taken and smart recommendations for what to take next from us or
-              your DUS. We have it all.
-            </p>
-          </div>
-
+        kicker="Major progress"
+        line1="Your major progress,"
+        line2="visualized."
+        body={
+          <>
+            Track the whole journey at a glance: a clean progress bar, then a
+            full grid of requirements showing the courses you have taken and
+            what to take next.
+          </>
+        }
+        checks={[
+          <CheckRow key="a">Progress with and without in-progress credit</CheckRow>,
+          <CheckRow key="b">Every requirement, with the courses that satisfy it</CheckRow>,
+          <CheckRow key="c">A heat map of what is done and what is left</CheckRow>,
+        ]}
+        actions={
+          <MonoCTA onClick={() => setLogInFlow(true)}>
+            See my major progress
+          </MonoCTA>
+        }
+        mock={
+          <MockWindow filename="major-progress.tsx">
+            <div className="p-4">
           <div className="space-y-4">
             {/* Strict (completed only) */}
             <div>
@@ -1046,50 +1051,43 @@ export default function AboutPage() {
             </div>
           </div>
 
-          <div className="mt-6">
-            <button
-              className="px-4 py-2 text-sm rounded-xl text-white bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 transition-all duration-200"
-              onClick={() => setLogInFlow(true)}
-            >
-              Let's do this
-            </button>
-          </div>
-        </div>
-      </section>
+            </div>
+          </MockWindow>
+        }
+      />
 
-      {/* Public Profiles & Friends */}
-      <section className="relative max-w-7xl mx-auto px-4 lg:px-6 py-32">
-        <div className="bg-white/70 dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/70 dark:via-gray-900/50 dark:to-gray-950/70 backdrop-blur-2xl rounded-xl p-6 border border-gray-200 dark:border-gray-800/50 shadow-neu">
-          <div className="text-center mb-8 flex flex-col gap-2">
-            <SectionEyebrow centered icon={<FiUsers />} label="Friends" />
-            <h2 className="text-2xl font-medium leading-[0.98] tracking-[-0.02em] text-balance text-gray-900 dark:text-white">
-              Friends &
-              <br />
-              <span className="text-gray-500 dark:text-gray-400">Connections</span>
-            </h2>
-            <p className="text-gray-700 dark:text-gray-300 text-sm max-w-2xl mx-auto">
-              Add friends and mutually see each other's academic journeys. Learn
-              from upperclassmen who've walked your path.
-            </p>
-          </div>
-
-          {/* Mock Friends UI */}
-          <div className="max-w-xl mx-auto">
-            {/* Add Friend Button */}
+      {/* §6.4 Friends */}
+      <FeatureSection
+        kicker="Friends"
+        line1="Friends and connections,"
+        line2="not a leaderboard."
+        mockSide="left"
+        body={
+          <>
+            Add friends and mutually see each other's academic journeys. Learn
+            from the upperclassmen who already walked your path.
+          </>
+        }
+        checks={[
+          <CheckRow key="a">Course codes, semesters, and credits are shared</CheckRow>,
+          <CheckRow key="b">Major and graduation year are shared</CheckRow>,
+          <CheckRow key="c">Grades and GPA are never shared</CheckRow>,
+        ]}
+        actions={
+          <MonoCTA onClick={() => setLogInFlow(true)}>
+            Enable friends
+          </MonoCTA>
+        }
+        mock={
+          <MockWindow filename="friends.tsx">
+            <div className="p-4">
             <div className="flex items-center justify-between mb-5">
               <h3 className="text-base font-medium text-pink-600 dark:text-pink-200 flex items-center gap-2">
-                <FiUsers
-                  size={14}
-                  className="drop-shadow-[0_0_6px_rgba(236,72,153,0.5)]"
-                />{" "}
-                Your Friends (3)
+                <FiUsers size={14} /> Your Friends (3)
               </h3>
-              <button
-                className="px-3 py-1.5 text-white bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 rounded-lg transition flex items-center gap-1.5 text-xs font-medium"
-                onClick={() => setLogInFlow(true)}
-              >
+              <span className="px-3 py-1.5 text-white bg-gradient-to-r from-pink-500 to-purple-600 rounded-lg flex items-center gap-1.5 text-xs font-medium">
                 <FiUserPlus size={12} /> Add Friend
-              </button>
+              </span>
             </div>
 
             {/* Mock Friend Cards */}
@@ -1144,26 +1142,17 @@ export default function AboutPage() {
                     </div>
                   </div>
                   <div className="flex gap-2">
-                    <button
-                      onClick={() => setLogInFlow(true)}
-                      className="flex items-center gap-1.5 px-4 py-2 bg-gradient-to-br from-black/[0.04] to-transparent dark:from-white/[0.06] text-gray-600 dark:text-gray-300 rounded-xl border border-black/[0.06] dark:border-white/[0.08] hover:bg-pink-500/20 hover:text-gray-900 dark:hover:text-white hover:border-pink-500/30 transition-all text-sm shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]"
-                    >
+                    <span className="flex items-center gap-1.5 px-4 py-2 bg-black/[0.04] dark:bg-white/[0.06] text-gray-600 dark:text-gray-300 rounded-xl border border-black/[0.06] dark:border-white/[0.08] text-sm">
                       <FiUser className="inline-block" size={14} />
                       Profile
-                    </button>
+                    </span>
                   </div>
                 </motion.div>
               ))}
             </div>
 
-            {/* Info Box */}
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: 0.3 }}
-              className="mt-8 p-5 rounded-xl bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-pink-500/10 dark:via-transparent dark:to-purple-500/10 border border-pink-200 dark:border-pink-500/20 shadow-neu"
-            >
+            {/* What gets shared, kept as the mock's own footer row */}
+            <div className="mt-5 border-t border-black/[0.05] dark:border-white/[0.06] pt-4">
               <h4 className="text-sm font-medium text-pink-600 dark:text-pink-200 mb-3">
                 What gets shared:
               </h4>
@@ -1178,22 +1167,14 @@ export default function AboutPage() {
                 </li>
                 <li className="flex items-center gap-2.5">
                   <FiX className="text-red-400 shrink-0" size={14} /> Grades and
-                  GPA are <strong className="text-red-600 dark:text-red-300">NEVER</strong> shared
+                  GPA are never shared
                 </li>
               </ul>
-            </motion.div>
-
-            <div className="mt-8 text-center">
-              <button
-                className="px-6 py-3 rounded-xl text-white bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 transition-all duration-200 font-medium"
-                onClick={() => setLogInFlow(true)}
-              >
-                Enable Friends Feature
-              </button>
             </div>
-          </div>
-        </div>
-      </section>
+            </div>
+          </MockWindow>
+        }
+      />
 
       {/* Mission Section */}
       <div className="relative max-w-7xl mx-auto px-4 lg:px-6 py-32">

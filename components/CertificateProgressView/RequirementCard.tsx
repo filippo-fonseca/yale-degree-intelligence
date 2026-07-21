@@ -224,16 +224,6 @@ const RequirementCard = React.memo(function RequirementCard({
               <p className="text-[11px] mt-1 text-zinc-500 dark:text-zinc-400">
                 {conflict.reason}
               </p>
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onRemoveManual(conflict.courseCode, req.name);
-                }}
-                className="mt-1 text-[11px] underline underline-offset-2 text-zinc-600 dark:text-zinc-300 hover:text-zinc-800 dark:hover:text-zinc-100 transition-colors"
-              >
-                Remove from certificate
-              </button>
             </div>
           ))}
         </div>

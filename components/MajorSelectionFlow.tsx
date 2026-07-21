@@ -472,8 +472,9 @@ export default function MajorSelectionFlow({
             </div>
 
             <InfoCard className="text-xs">
-              Courses counted toward a certificate cannot also count toward your
-              majors. You can update certificates anytime in Settings.
+              Most certificates let up to two courses also count toward a major,
+              though a few allow none at all. We apply each certificate's own
+              rule as you go. You can update certificates anytime in Settings.
             </InfoCard>
 
             <div className="space-y-3">
@@ -497,6 +498,7 @@ export default function MajorSelectionFlow({
                         (c) => c !== cert,
                       )}
                       defaultOpen={autoOpenCertificateIndex === index}
+                      userMajors={selectedMajors}
                     />
                   </div>
                   <button

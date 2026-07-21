@@ -1113,6 +1113,7 @@ export default function UserSettingsModal({
                           (c) => c !== certificate,
                         )}
                         defaultOpen={autoOpenCertificateIndex === index}
+                        userMajors={localProfile.majors}
                       />
                     </div>
                     <button

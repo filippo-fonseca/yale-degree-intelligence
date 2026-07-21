@@ -699,7 +699,7 @@ export default function CertificateProgressView({
               type="button"
               onClick={() => setView("board")}
               data-tour="certificate-board-toggle"
-              className={`px-3.5 py-1.5 text-sm font-medium rounded-xl transition-all duration-200 ${
+              className={`h-9 px-3.5 text-sm font-medium rounded-xl transition-all duration-200 inline-flex items-center ${
                 view === "board"
                   ? "bg-teal-500/15 text-teal-600 dark:text-teal-200 border border-teal-500/50 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]"
                   : "bg-gray-100 dark:bg-white/[0.06] text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-white/10 hover:text-gray-800 dark:hover:text-white hover:bg-gray-200 dark:hover:bg-white/[0.1]"
@@ -711,14 +711,14 @@ export default function CertificateProgressView({
               type="button"
               onClick={() => setView("heatmap")}
               data-tour="certificate-heatmap-toggle"
-              className={`inline-flex items-center px-3.5 py-1.5 text-sm font-medium rounded-xl transition-all duration-200 ${
+              className={`h-9 px-3.5 text-sm font-medium rounded-xl transition-all duration-200 inline-flex items-center gap-1.5 ${
                 view === "heatmap"
                   ? "bg-teal-500/15 text-teal-600 dark:text-teal-200 border border-teal-500/50 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]"
                   : "bg-gray-100 dark:bg-white/[0.06] text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-white/10 hover:text-gray-800 dark:hover:text-white hover:bg-gray-200 dark:hover:bg-white/[0.1]"
               }`}
             >
               Heat map
-              <span className="ml-1.5 px-1.5 py-0.5 rounded text-[10px] font-semibold uppercase tracking-wide bg-teal-500/20 text-teal-600 dark:text-teal-300 border border-teal-500/40">
+              <span className="px-1.5 py-px rounded text-[10px] leading-none font-semibold uppercase tracking-wide bg-teal-500/20 text-teal-600 dark:text-teal-300 border border-teal-500/40">
                 New
               </span>
             </button>

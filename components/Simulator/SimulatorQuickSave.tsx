@@ -46,7 +46,8 @@ export default function SimulatorQuickSave({
       transition={{ duration: 0.15, ease: "easeOut" }}
       whileHover={saving || saved ? {} : { scale: 1.02 }}
       whileTap={saving || saved ? {} : { scale: 0.98 }}
-      className={`h-10 px-3.5 shrink-0 inline-flex items-center gap-1.5 rounded-xl border text-sm font-medium transition-colors duration-200 ${
+      aria-label={saved ? "Saved" : "Save the canvas into this plan"}
+      className={`h-10 px-3 sm:px-3.5 shrink-0 inline-flex items-center gap-1.5 rounded-xl border text-sm font-medium transition-colors duration-200 ${
         saved
           ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border-emerald-500/50 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]"
           : "bg-emerald-600 text-white border-emerald-600 hover:bg-emerald-500 hover:border-emerald-500 dark:bg-emerald-500/20 dark:text-emerald-200 dark:border-emerald-500/40 dark:hover:bg-emerald-500/30"
@@ -59,7 +60,9 @@ export default function SimulatorQuickSave({
       ) : (
         <FiSave size={14} className="shrink-0" />
       )}
-      <span aria-live="polite">
+      {/* Below sm the plan name needs every pixel, so the label drops and the
+          icon carries it: a disk to save, a check once it landed. */}
+      <span aria-live="polite" className="hidden sm:inline">
         {saved ? "Saved" : saving ? "Saving" : "Save"}
       </span>
     </motion.button>

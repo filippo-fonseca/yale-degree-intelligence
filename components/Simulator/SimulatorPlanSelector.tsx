@@ -54,10 +54,12 @@ export default function SimulatorPlanSelector({
           : "bg-white dark:bg-white/[0.03] border-gray-200 dark:border-white/10 hover:border-gray-300 dark:hover:border-white/20 hover:bg-gray-50 dark:hover:bg-white/[0.06]"
       }`}
     >
-      <span className="text-[10px] font-medium uppercase tracking-wider text-gray-400 dark:text-gray-500 shrink-0">
+      {/* The eyebrow and the DEFAULT badge are the first things to go below sm:
+          with quick save alongside, the plan's own name needs the room. */}
+      <span className="hidden sm:inline text-[10px] font-medium uppercase tracking-wider text-gray-400 dark:text-gray-500 shrink-0">
         Plan
       </span>
-      <span className="w-px h-4 bg-gray-200 dark:bg-white/10 shrink-0" />
+      <span className="hidden sm:inline w-px h-4 bg-gray-200 dark:bg-white/10 shrink-0" />
       <span
         className={`w-2 h-2 rounded-full shrink-0 ${dotClass} ${hasChanges ? "animate-pulse" : ""}`}
       />
@@ -71,7 +73,7 @@ export default function SimulatorPlanSelector({
         {label}
       </span>
       {planName && isDefault && (
-        <span className="text-[9px] font-medium uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 border border-purple-300 dark:border-purple-700/40 shrink-0">
+        <span className="hidden sm:inline text-[9px] font-medium uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 border border-purple-300 dark:border-purple-700/40 shrink-0">
           Default
         </span>
       )}

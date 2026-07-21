@@ -396,7 +396,9 @@ export default function Simulator({
     for (const majorId of majorIds) {
       const major = majorRequirements[majorId];
       if (!major) continue;
-      for (const code of collectRequirementOptionCodes(major.requirements)) {
+      for (const code of Array.from(
+        collectRequirementOptionCodes(major.requirements),
+      )) {
         allOptionCodes.add(code);
       }
     }
@@ -404,7 +406,9 @@ export default function Simulator({
     for (const certId of certificateIds) {
       const cert = certificateRequirements[certId];
       if (!cert) continue;
-      for (const code of collectRequirementOptionCodes(cert.requirements)) {
+      for (const code of Array.from(
+        collectRequirementOptionCodes(cert.requirements),
+      )) {
         allOptionCodes.add(code);
       }
     }

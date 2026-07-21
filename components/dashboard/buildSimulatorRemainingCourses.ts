@@ -11,6 +11,7 @@ import {
   filterCertificateManualEntries,
   type ProgramClaimOptions,
 } from "@/lib/utils/programClaims";
+import { bucketCourses } from "@/lib/utils/courseBuckets";
 
 /**
  * Every requirement option the student has not touched yet, across declared
@@ -29,30 +30,27 @@ export function buildSimulatorRemainingCourses(
     certificateIds: certificates,
   };
 
-  const completedCourseCodes = courses
-    .filter(
-      (course) =>
-        course.status === "completed" &&
-        ((course.grade !== null && course.grade !== "In Progress") ||
-          course.skipped),
-    )
-    .map((course) => course.code);
-
-  const inProgressCourseCodes = courses
-    .filter((course) => course.grade === "In Progress" && !course.skipped)
-    .map((course) => course.code);
-
-  const skippedCourseCodes = courses
-    .filter((course) => course.skipped)
-    .map((course) => course.code);
+  const { completedCourseCodes, inProgressCourseCodes, skippedCourseCodes } =
+    bucketCourses(courses);
 
   const majorBlocked = getMajorBlockedCodes(courses, policyOptions);
 
+  // A requirement the student has already started is still a requirement they
+  // have to finish, and a two-credit requirement with one course under way
+  // still needs its other options offered. Reading only the remaining bucket
+  // dropped every one of them from the pool the moment a single course in the
+  // requirement went in progress.
   const toPoolCourses = (
-    progress: { remainingRequirements: any[] } | null,
+    progress: {
+      remainingRequirements: any[];
+      inProgressRequirements: any[];
+    } | null,
     idSuffix: string,
   ): Course[] =>
-    progress?.remainingRequirements.flatMap((req: any) =>
+    [
+      ...(progress?.remainingRequirements ?? []),
+      ...(progress?.inProgressRequirements ?? []),
+    ].flatMap((req: any) =>
       req.options
         .filter(
           (opt: any) => !opt.completed && !opt.inProgress && !opt.skipped,
@@ -72,7 +70,7 @@ export function buildSimulatorRemainingCourses(
               skipped: false,
             }) as Course,
         ),
-    ) || [];
+    );
 
   const fromMajors = majors.flatMap((major) => {
     const manualRequirements = courses.flatMap((course) =>

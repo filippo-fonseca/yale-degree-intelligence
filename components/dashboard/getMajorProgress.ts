@@ -8,28 +8,7 @@ import {
   filterCertificateManualEntries,
   type ProgramClaimOptions,
 } from "@/lib/utils/programClaims";
-
-/** Course-status buckets both progress calculators need. */
-function bucketCourses(courses: Course[]) {
-  const completedCourseCodes = courses
-    .filter(
-      (course) =>
-        course.status === "completed" &&
-        ((course.grade !== null && course.grade !== "In Progress") ||
-          course.skipped),
-    )
-    .map((course) => course.code);
-
-  const inProgressCourseCodes = courses
-    .filter((course) => course.grade === "In Progress" && !course.skipped)
-    .map((course) => course.code);
-
-  const skippedCourseCodes = courses
-    .filter((course) => course.skipped)
-    .map((course) => course.code);
-
-  return { completedCourseCodes, inProgressCourseCodes, skippedCourseCodes };
-}
+import { bucketCourses } from "@/lib/utils/courseBuckets";
 
 export function getMajorProgress(
   selectedMajor: string,

@@ -35,6 +35,62 @@ export type CertificateRequirementBucket = {
   options: CertificateRequirementOption[];
 };
 
+/**
+ * Per-certificate overlap / eligibility policy, encoded in
+ * `lib/data/certificates/structured/{ID}.json` under `policy` and merged into
+ * `lib/data/all_certificates.json`. See SCHEMA.md for the authoring rules.
+ *
+ * Every field is optional in the data. Anything omitted falls back to
+ * DEFAULT_CERTIFICATE_POLICY, so a certificate with no special rules carries no
+ * `policy` block at all. The policy engine is the only thing that should read
+ * these fields directly; UI and progress calcs go through it.
+ */
+export type CertificatePolicy = {
+  /** Max certificate courses that may also count toward another program. */
+  overlapCap?: number;
+  /** true when no certificate course may count toward any other program. */
+  zeroOverlap?: boolean;
+  /** Only courses at or above this level may overlap (e.g. 3000 for Quantum). */
+  overlapMinLevel?: number | null;
+  /** Max certificate courses that may share one subject prefix. */
+  sameDeptCap?: number | null;
+  /** Advisory minimum grade, e.g. "B-". Warns, never blocks. */
+  minGrade?: string | null;
+  /** Major IDs Yale bars from this certificate. Warns, never blocks. */
+  ineligibleMajors?: string[];
+  /** Forms or applications outside the course plan. Informational only. */
+  extraForms?: string[];
+  /** Non-course obligations (talks, lectures, write-ups). Informational only. */
+  nonCourseRequirements?: string[];
+  /** One line citing the catalog rule this block encodes. */
+  sourceNote?: string;
+};
+
+/**
+ * A CertificatePolicy with every field filled in: what the policy engine works
+ * with after merging a certificate's overrides over the defaults below.
+ */
+export type ResolvedPolicy = Required<CertificatePolicy>;
+
+/**
+ * Applied to any certificate field left unset. `overlapCap: 2` is Yale's
+ * baseline: up to two certificate courses may also count toward the student's
+ * other programs. The university-wide ceiling (a course may count toward at
+ * most two curricular programs, and fills exactly one slot within a
+ * certificate) always applies on top and is not expressible here.
+ */
+export const DEFAULT_CERTIFICATE_POLICY: ResolvedPolicy = {
+  overlapCap: 2,
+  zeroOverlap: false,
+  overlapMinLevel: null,
+  sameDeptCap: null,
+  minGrade: null,
+  ineligibleMajors: [],
+  extraForms: [],
+  nonCourseRequirements: [],
+  sourceNote: "",
+};
+
 export type Certificate = {
   id: string;
   name: string;
@@ -47,6 +103,7 @@ export type Certificate = {
     total: number;
   };
   notes?: string[];
+  policy?: CertificatePolicy;
   requirements: CertificateRequirementBucket[];
 };
 

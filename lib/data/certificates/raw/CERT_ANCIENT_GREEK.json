@@ -1,0 +1,52 @@
+{
+  "id": "CERT_ANCIENT_GREEK",
+  "name": "Ancient Greek",
+  "category": "advanced_language",
+  "source_url": "https://catalog.yale.edu/ycps/subjects-of-instruction/classics/",
+  "page_title": "Classics",
+  "tabs": [
+    {
+      "label": "Overview",
+      "href": "#text",
+      "id": null
+    },
+    {
+      "label": "Summary of Requirements",
+      "href": "#summaryofrequirementstext",
+      "id": null
+    },
+    {
+      "label": "First year",
+      "href": "#firstyearstext",
+      "id": null
+    },
+    {
+      "label": "Certificates",
+      "href": "#certificatestext",
+      "id": null
+    },
+    {
+      "label": "Faculty",
+      "href": "#facultytext",
+      "id": null
+    },
+    {
+      "label": "Courses",
+      "href": "#coursestext",
+      "id": null
+    }
+  ],
+  "extracted_from_container": "certificatestextcontainer",
+  "parent_program": "Classics",
+  "requires_application": false,
+  "full_text": "Certificates of Advanced Language Study\nThe Classics Department offers a Certificate of Advanced Language Study to non-majors in ancient Greek and in Latin. A certificate adviser, typically the director of undergraduate studies (DUS), advises students on the certification process. The Certificate of Advanced Language Study, once certified, is listed on the student transcript.\nRequirements\nStudents seeking to earn the certificate are required to take four courses in ancient Greek or Latin beyond the L4 level (i.e., four L5 courses; 3000- or 4000-level Greek or 3000- or 4000-level Latin courses). All courses must be taken for a letter grade, and students must achieve a grade of B or above. With the approval of the certificate adviser, one course, such as an independent study course (graded pass/fail), a graduate seminar, or an advanced seminar, may count toward certification requirements.\nThe certificate adviser may allow one “language across the curriculum” (LxC) course taught in English to count toward the certification requirements, provided the course includes, at minimum, a weekly discussion section conducted entirely in the target language. The discussion section must enroll a minimum of three students and the course must be designated as LxC in the course description.\nThe adviser may also approve the substitution of up to two credits earned during study abroad and taught in the target language to count toward the certificate requirements. If the adviser approves courses taken outside of Yale for inclusion in the certificate requirements, students must take the necessary steps to ensure those courses appear on their transcripts.\nCredit/D/Fail\nNo courses taken Credit/D/Fail may be counted toward the requirements of the certificate.\nDeclaration of Candidacy\nStudents must declare their intention to earn a Certificate on the\nDeclare Major, Concentration within the Major, Certificate\npage on\nYale Hub\n, as early as possible, but at the very latest, by the 15th of January or September in their last semester at Yale. Once declared, Degree Audit tracks students' progress toward completion of the certificate.",
+  "isolation": null,
+  "sections": {
+    "overview": "Certificates of Advanced Language Study\nThe Classics Department offers a Certificate of Advanced Language Study to non-majors in ancient Greek and in Latin. A certificate adviser, typically the director of undergraduate studies (DUS), advises students on the certification process. The Certificate of Advanced Language Study, once certified, is listed on the student transcript.",
+    "requirements": "Students seeking to earn the certificate are required to take four courses in ancient Greek or Latin beyond the L4 level (i.e., four L5 courses; 3000- or 4000-level Greek or 3000- or 4000-level Latin courses). All courses must be taken for a letter grade, and students must achieve a grade of B or above. With the approval of the certificate adviser, one course, such as an independent study course (graded pass/fail), a graduate seminar, or an advanced seminar, may count toward certification requirements.\nThe certificate adviser may allow one “language across the curriculum” (LxC) course taught in English to count toward the certification requirements, provided the course includes, at minimum, a weekly discussion section conducted entirely in the target language. The discussion section must enroll a minimum of three students and the course must be designated as LxC in the course description.\nThe adviser may also approve the substitution of up to two credits earned during study abroad and taught in the target language to count toward the certificate requirements. If the adviser approves courses taken outside of Yale for inclusion in the certificate requirements, students must take the necessary steps to ensure those courses appear on their transcripts.\nCredit/D/Fail\nNo courses taken Credit/D/Fail may be counted toward the requirements of the certificate.",
+    "declaration": "Students must declare their intention to earn a Certificate on the\nDeclare Major, Concentration within the Major, Certificate\npage on\nYale Hub\n, as early as possible, but at the very latest, by the 15th of January or September in their last semester at Yale. Once declared, Degree Audit tracks students' progress toward completion of the certificate."
+  },
+  "summary_of_requirements_tab": null,
+  "tables": [],
+  "raw_html_length": 55969
+}

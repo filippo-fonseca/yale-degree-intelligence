@@ -1,0 +1,49 @@
+{
+  "id": "CERT_GLOBAL_HEALTH",
+  "name": "Global Health Studies",
+  "description": "Prepares students to critically engage with global health and its multifaceted concerns through interdisciplinary coursework across politics, history, economics, anthropology, ethics, law, sociology, public health, and the biomedical sciences.",
+  "category": "interdisciplinary",
+  "sourceUrl": "https://catalog.yale.edu/ycps/subjects-of-instruction/global-health-studies/",
+  "requiresApplication": true,
+  "creditRequirements": {
+    "total": 6
+  },
+  "notes": [
+    "Students apply to the program, typically in the fall of sophomore year. Accepted students are called Global Health Scholars.",
+    "Four electives must fulfill four of six global health competency areas: Biological & Environmental Influences on Health (YC GLHTH Bio & Env Influences); Health & Societies (YC GLHTH Health & Societies); Historical Approaches (YC GLHTH Hist Approaches); Performance, Representation & Health (YC GLHTH Perf, Rep & Health); Political Economy & Governance in Health (YC GLHTH Polit Econ & Govern); Understanding & Interpreting Quantitative Data (YC GLHTH Quantitative Data).",
+    "Scholars may apply for funding for mentored experiential learning projects the summer after junior year.",
+    "No more than one course taken Credit/D/Fail may count toward the certificate; HLTH 4900 must be taken for a letter grade.",
+    "No more than two courses may overlap with a major, simultaneous degree, or another certificate.",
+    "No course credit may be applied toward the requirements of more than two curricular programs.",
+    "Qualified undergraduates may take graduate courses at the School of Public Health subject to Yale College regulations.",
+    "Courses taken at another institution or during an approved summer or term-time study abroad program may count with DUS approval."
+  ],
+  "policy": {
+    "overlapCap": 2,
+    "sourceNote": "The requirements of the Global Health Studies certificate are subject to Yale College overlap rules, such that no more than two courses may be used simultaneously to fulfill the requirements of a major, a simultaneous degree, or another certificate."
+  },
+  "requirements": [
+    {
+      "name": "Introductory lecture",
+      "required": 1,
+      "description": "Global health introductory lecture course.",
+      "options": [
+        { "type": "course", "code": "HLTH 2300" }
+      ]
+    },
+    {
+      "name": "Competency electives",
+      "required": 4,
+      "description": "Four electives achieving four of the six global health competency areas as indicated by course attributes.",
+      "options": []
+    },
+    {
+      "name": "Senior colloquium",
+      "required": 1,
+      "description": "Senior colloquium integrating skills and knowledge acquired throughout the program. Must be taken for a letter grade.",
+      "options": [
+        { "type": "course", "code": "HLTH 4900" }
+      ]
+    }
+  ]
+}

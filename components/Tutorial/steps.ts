@@ -17,9 +17,10 @@ import {
   Users,
   Command,
   PartyPopper,
+  Award,
 } from "lucide-react";
 
-export type TourAccent = "pink" | "blue" | "purple";
+export type TourAccent = "pink" | "blue" | "purple" | "teal";
 
 export interface TourStep {
   /** Stable key for the step. */
@@ -183,6 +184,22 @@ export const TOUR_STEPS: TourStep[] = [
     description:
       "Add a second major and the conflict manager flags courses that overlap between the two, so a single class can't quietly double-count where Yale won't allow it. You see every shared course and stay compliant.",
     accent: "purple",
+  },
+
+  // ── My certificates ────────────────────────────────────────────────────
+  {
+    id: "certificate-overview",
+    tabId: "certificate",
+    anchor: [
+      '[data-tour="certificate-progress-bar"]',
+      '[data-tour="nav-certificate"]',
+    ],
+    icon: Award,
+    eyebrow: "My certificates",
+    title: "Track certificates like majors",
+    description:
+      "Yale College certificates get the same board, heatmap, manual fulfill, and skip tools as majors — with a hard rule that a course counted for a certificate cannot also count toward your major(s).",
+    accent: "teal",
   },
 
   // ── Simulator (the deep dive) ──────────────────────────────────────────

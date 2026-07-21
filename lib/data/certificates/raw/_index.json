@@ -1,0 +1,629 @@
+{
+  "source": "https://catalog.yale.edu/ycps/programs_certificates/",
+  "edition": "YCPS 2026\u20132027",
+  "scraped_count": 42,
+  "error_count": 0,
+  "results": [
+    {
+      "id": "CERT_ANCIENT_EGYPTIAN",
+      "name": "Ancient Egyptian",
+      "ok": true,
+      "chars": 2923,
+      "container": "certificatetextcontainer",
+      "tabs": [
+        "Overview",
+        "Summary of Requirements",
+        "First year",
+        "Certificates",
+        "Faculty",
+        "Courses"
+      ],
+      "has_summary_section": false,
+      "tables": 0
+    },
+    {
+      "id": "CERT_ANCIENT_GREEK",
+      "name": "Ancient Greek",
+      "ok": true,
+      "chars": 2140,
+      "container": "certificatestextcontainer",
+      "tabs": [
+        "Overview",
+        "Summary of Requirements",
+        "First year",
+        "Certificates",
+        "Faculty",
+        "Courses"
+      ],
+      "has_summary_section": false,
+      "tables": 0
+    },
+    {
+      "id": "CERT_MODERN_ARABIC",
+      "name": "Modern Arabic",
+      "ok": true,
+      "chars": 1829,
+      "container": "certificatetextcontainer",
+      "tabs": [
+        "Overview",
+        "Summary of Requirements",
+        "First year",
+        "Certificates",
+        "Faculty",
+        "Courses"
+      ],
+      "has_summary_section": false,
+      "tables": 0
+    },
+    {
+      "id": "CERT_CHINESE",
+      "name": "Chinese",
+      "ok": true,
+      "chars": 2253,
+      "container": "certificatetextcontainer",
+      "tabs": [
+        "Overview",
+        "Summary of Requirements",
+        "First year",
+        "Certificates",
+        "Faculty",
+        "Courses"
+      ],
+      "has_summary_section": false,
+      "tables": 0
+    },
+    {
+      "id": "CERT_FRENCH",
+      "name": "French",
+      "ok": true,
+      "chars": 2197,
+      "container": "certificatetextcontainer",
+      "tabs": [
+        "Overview",
+        "Summary of Requirements",
+        "First year",
+        "Certificate",
+        "Faculty",
+        "Roadmap",
+        "Courses"
+      ],
+      "has_summary_section": false,
+      "tables": 0
+    },
+    {
+      "id": "CERT_GERMAN",
+      "name": "German",
+      "ok": true,
+      "chars": 2087,
+      "container": "certificatetextcontainer",
+      "tabs": [
+        "Overview",
+        "Summary of Requirements",
+        "First year",
+        "Certificate",
+        "Faculty",
+        "Roadmap",
+        "Courses"
+      ],
+      "has_summary_section": false,
+      "tables": 0
+    },
+    {
+      "id": "CERT_MODERN_HEBREW",
+      "name": "Modern Hebrew",
+      "ok": true,
+      "chars": 1829,
+      "container": "certificatetextcontainer",
+      "tabs": [
+        "Overview",
+        "Summary of Requirements",
+        "First year",
+        "Certificates",
+        "Faculty",
+        "Courses"
+      ],
+      "has_summary_section": false,
+      "tables": 0
+    },
+    {
+      "id": "CERT_HINDI",
+      "name": "Hindi",
+      "ok": true,
+      "chars": 1689,
+      "container": "certificatetextcontainer",
+      "tabs": [
+        "Overview",
+        "Summary of Requirements",
+        "First year",
+        "Certificates",
+        "Faculty",
+        "Courses"
+      ],
+      "has_summary_section": false,
+      "tables": 0
+    },
+    {
+      "id": "CERT_INDONESIAN",
+      "name": "Indonesian",
+      "ok": true,
+      "chars": 2882,
+      "container": "certificatetextcontainer",
+      "tabs": [
+        "Overview",
+        "First year",
+        "Certificates",
+        "Faculty",
+        "Courses"
+      ],
+      "has_summary_section": false,
+      "tables": 0
+    },
+    {
+      "id": "CERT_ISIZULU",
+      "name": "isiZulu",
+      "ok": true,
+      "chars": 2332,
+      "container": "certificatestextcontainer",
+      "tabs": [
+        "Overview",
+        "Summary of Requirements",
+        "First year",
+        "Certificates",
+        "Faculty",
+        "Roadmap",
+        "Courses"
+      ],
+      "has_summary_section": false,
+      "tables": 0
+    },
+    {
+      "id": "CERT_ITALIAN",
+      "name": "Italian",
+      "ok": true,
+      "chars": 2028,
+      "container": "certificatetextcontainer",
+      "tabs": [
+        "Overview",
+        "Summary of Requirements",
+        "First year",
+        "Certificate",
+        "Faculty",
+        "Roadmap",
+        "Courses"
+      ],
+      "has_summary_section": false,
+      "tables": 0
+    },
+    {
+      "id": "CERT_JAPANESE",
+      "name": "Japanese",
+      "ok": true,
+      "chars": 2253,
+      "container": "certificatetextcontainer",
+      "tabs": [
+        "Overview",
+        "Summary of Requirements",
+        "First year",
+        "Certificates",
+        "Faculty",
+        "Courses"
+      ],
+      "has_summary_section": false,
+      "tables": 0
+    },
+    {
+      "id": "CERT_KISWAHILI",
+      "name": "Kiswahili",
+      "ok": true,
+      "chars": 2332,
+      "container": "certificatestextcontainer",
+      "tabs": [
+        "Overview",
+        "Summary of Requirements",
+        "First year",
+        "Certificates",
+        "Faculty",
+        "Roadmap",
+        "Courses"
+      ],
+      "has_summary_section": false,
+      "tables": 0
+    },
+    {
+      "id": "CERT_KOREAN",
+      "name": "Korean",
+      "ok": true,
+      "chars": 2253,
+      "container": "certificatetextcontainer",
+      "tabs": [
+        "Overview",
+        "Summary of Requirements",
+        "First year",
+        "Certificates",
+        "Faculty",
+        "Courses"
+      ],
+      "has_summary_section": false,
+      "tables": 0
+    },
+    {
+      "id": "CERT_LATIN",
+      "name": "Latin",
+      "ok": true,
+      "chars": 2140,
+      "container": "certificatestextcontainer",
+      "tabs": [
+        "Overview",
+        "Summary of Requirements",
+        "First year",
+        "Certificates",
+        "Faculty",
+        "Courses"
+      ],
+      "has_summary_section": false,
+      "tables": 0
+    },
+    {
+      "id": "CERT_PORTUGUESE",
+      "name": "Portuguese",
+      "ok": true,
+      "chars": 1859,
+      "container": "certificatetextcontainer",
+      "tabs": [
+        "Overview",
+        "Summary of Requirements",
+        "First year",
+        "Certificate",
+        "Faculty",
+        "Courses"
+      ],
+      "has_summary_section": false,
+      "tables": 0
+    },
+    {
+      "id": "CERT_RUSSIAN",
+      "name": "Russian",
+      "ok": true,
+      "chars": 2197,
+      "container": "certificatetextcontainer",
+      "tabs": [
+        "Overview",
+        "Summary of Requirements",
+        "First year",
+        "Certificate",
+        "Faculty",
+        "Roadmap",
+        "Courses"
+      ],
+      "has_summary_section": false,
+      "tables": 0
+    },
+    {
+      "id": "CERT_SANSKRIT",
+      "name": "Sanskrit",
+      "ok": true,
+      "chars": 2758,
+      "container": "certificatetextcontainer",
+      "tabs": [
+        "Overview",
+        "Summary of Requirements",
+        "First year",
+        "Certificates",
+        "Faculty",
+        "Courses"
+      ],
+      "has_summary_section": false,
+      "tables": 0
+    },
+    {
+      "id": "CERT_SPANISH",
+      "name": "Spanish",
+      "ok": true,
+      "chars": 1659,
+      "container": "certificatetextcontainer",
+      "tabs": [
+        "Overview",
+        "Summary of Requirements",
+        "First year",
+        "Certificate",
+        "Faculty",
+        "Roadmap",
+        "Courses"
+      ],
+      "has_summary_section": false,
+      "tables": 0
+    },
+    {
+      "id": "CERT_MODERN_TURKISH",
+      "name": "Modern Turkish",
+      "ok": true,
+      "chars": 1829,
+      "container": "certificatetextcontainer",
+      "tabs": [
+        "Overview",
+        "Summary of Requirements",
+        "First year",
+        "Certificates",
+        "Faculty",
+        "Courses"
+      ],
+      "has_summary_section": false,
+      "tables": 0
+    },
+    {
+      "id": "CERT_VIETNAMESE",
+      "name": "Vietnamese",
+      "ok": true,
+      "chars": 1263,
+      "container": "certificatetextcontainer",
+      "tabs": [
+        "Overview",
+        "First year",
+        "Certificates",
+        "Faculty",
+        "Courses"
+      ],
+      "has_summary_section": false,
+      "tables": 0
+    },
+    {
+      "id": "CERT_YORUBA",
+      "name": "Yoruba",
+      "ok": true,
+      "chars": 2332,
+      "container": "certificatestextcontainer",
+      "tabs": [
+        "Overview",
+        "Summary of Requirements",
+        "First year",
+        "Certificates",
+        "Faculty",
+        "Roadmap",
+        "Courses"
+      ],
+      "has_summary_section": false,
+      "tables": 0
+    },
+    {
+      "id": "CERT_CLIMATE_SCIENCE",
+      "name": "Climate Science and Solutions",
+      "ok": true,
+      "chars": 4018,
+      "container": "textcontainer",
+      "tabs": [],
+      "has_summary_section": true,
+      "tables": 0
+    },
+    {
+      "id": "CERT_COMPUTING_CULTURE_SOCIETY",
+      "name": "Computing, Culture & Society",
+      "ok": true,
+      "chars": 3854,
+      "container": "textcontainer",
+      "tabs": [],
+      "has_summary_section": true,
+      "tables": 0
+    },
+    {
+      "id": "CERT_EDUCATION_STUDIES",
+      "name": "Education Studies",
+      "ok": true,
+      "chars": 1977,
+      "container": "certificatetextcontainer",
+      "tabs": [
+        "Overview",
+        "Scholar Intensive Certificate",
+        "Certificate",
+        "Courses"
+      ],
+      "has_summary_section": true,
+      "tables": 0
+    },
+    {
+      "id": "CERT_EDUCATION_STUDIES_SCHOLARS",
+      "name": "Education Studies Scholars Intensive",
+      "ok": true,
+      "chars": 2491,
+      "container": "maptextcontainer",
+      "tabs": [
+        "Overview",
+        "Scholar Intensive Certificate",
+        "Certificate",
+        "Courses"
+      ],
+      "has_summary_section": true,
+      "tables": 0
+    },
+    {
+      "id": "CERT_ENERGY_STUDIES",
+      "name": "Energy Studies",
+      "ok": true,
+      "chars": 3214,
+      "container": "textcontainer",
+      "tabs": [
+        "Overview",
+        "Courses"
+      ],
+      "has_summary_section": true,
+      "tables": 0
+    },
+    {
+      "id": "CERT_FOOD_AG_CLIMATE",
+      "name": "Food, Agriculture, and Climate Change",
+      "ok": true,
+      "chars": 4056,
+      "container": "textcontainer",
+      "tabs": [],
+      "has_summary_section": false,
+      "tables": 0
+    },
+    {
+      "id": "CERT_GLOBAL_HEALTH",
+      "name": "Global Health Studies",
+      "ok": true,
+      "chars": 3833,
+      "container": "textcontainer",
+      "tabs": [
+        "Overview",
+        "Courses"
+      ],
+      "has_summary_section": true,
+      "tables": 0
+    },
+    {
+      "id": "CERT_HUMAN_RIGHTS",
+      "name": "Human Rights Studies",
+      "ok": true,
+      "chars": 1709,
+      "container": "certificatetextcontainer",
+      "tabs": [
+        "Overview",
+        "Intensive Certificate",
+        "Certificate"
+      ],
+      "has_summary_section": true,
+      "tables": 0
+    },
+    {
+      "id": "CERT_HUMAN_RIGHTS_INTENSIVE",
+      "name": "Human Rights Studies Intensive",
+      "ok": true,
+      "chars": 2926,
+      "container": "intensivetextcontainer",
+      "tabs": [
+        "Overview",
+        "Intensive Certificate",
+        "Certificate"
+      ],
+      "has_summary_section": true,
+      "tables": 0
+    },
+    {
+      "id": "CERT_ISLAMIC_STUDIES",
+      "name": "Islamic Studies",
+      "ok": true,
+      "chars": 3290,
+      "container": "textcontainer",
+      "tabs": [],
+      "has_summary_section": true,
+      "tables": 0
+    },
+    {
+      "id": "CERT_MEDIEVAL_STUDIES",
+      "name": "Medieval Studies",
+      "ok": true,
+      "chars": 3896,
+      "container": "textcontainer",
+      "tabs": [],
+      "has_summary_section": true,
+      "tables": 0
+    },
+    {
+      "id": "CERT_NATIVE_AMERICAN_INDIGENOUS",
+      "name": "Native American and Indigenous Studies",
+      "ok": true,
+      "chars": 4218,
+      "container": "textcontainer",
+      "tabs": [],
+      "has_summary_section": false,
+      "tables": 0
+    },
+    {
+      "id": "CERT_PERSIAN_IRANIAN",
+      "name": "Persian and Iranian Studies",
+      "ok": true,
+      "chars": 3999,
+      "container": "textcontainer",
+      "tabs": [],
+      "has_summary_section": true,
+      "tables": 0
+    },
+    {
+      "id": "CERT_TRANSLATION_STUDIES",
+      "name": "Translation Studies",
+      "ok": true,
+      "chars": 2914,
+      "container": "textcontainer",
+      "tabs": [],
+      "has_summary_section": true,
+      "tables": 0
+    },
+    {
+      "id": "CERT_COLLECTIONS",
+      "name": "Collections: Objects, Research, Society",
+      "ok": true,
+      "chars": 4204,
+      "container": "textcontainer",
+      "tabs": [],
+      "has_summary_section": true,
+      "tables": 0
+    },
+    {
+      "id": "CERT_DATA_SCIENCE",
+      "name": "Data Science",
+      "ok": true,
+      "chars": 3235,
+      "container": "certificatetextcontainer",
+      "tabs": [
+        "Overview",
+        "Summary of Requirements",
+        "First year",
+        "Certificate",
+        "Faculty",
+        "Roadmap",
+        "Courses"
+      ],
+      "has_summary_section": true,
+      "tables": 0
+    },
+    {
+      "id": "CERT_ETHNOGRAPHY",
+      "name": "Ethnography",
+      "ok": true,
+      "chars": 2837,
+      "container": "textcontainer",
+      "tabs": [],
+      "has_summary_section": true,
+      "tables": 0
+    },
+    {
+      "id": "CERT_PROGRAMMING",
+      "name": "Programming",
+      "ok": true,
+      "chars": 2453,
+      "container": "certificatetextcontainer",
+      "tabs": [
+        "Overview",
+        "Summary of Requirements",
+        "First year",
+        "Certificate",
+        "Faculty",
+        "Roadmap",
+        "Courses"
+      ],
+      "has_summary_section": true,
+      "tables": 0
+    },
+    {
+      "id": "CERT_QUANTUM",
+      "name": "Quantum Science and Engineering",
+      "ok": true,
+      "chars": 2705,
+      "container": "textcontainer",
+      "tabs": [],
+      "has_summary_section": true,
+      "tables": 0
+    },
+    {
+      "id": "CERT_TECH_ENTREPRENEURSHIP",
+      "name": "Technology Entrepreneurship",
+      "ok": true,
+      "chars": 4159,
+      "container": "textcontainer",
+      "tabs": [],
+      "has_summary_section": true,
+      "tables": 0
+    }
+  ],
+  "errors": []
+}

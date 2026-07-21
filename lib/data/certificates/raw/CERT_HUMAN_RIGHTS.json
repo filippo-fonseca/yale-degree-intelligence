@@ -1,0 +1,37 @@
+{
+  "id": "CERT_HUMAN_RIGHTS",
+  "name": "Human Rights Studies",
+  "category": "interdisciplinary",
+  "source_url": "https://catalog.yale.edu/ycps/subjects-of-instruction/human-rights/",
+  "page_title": "Human Rights Studies Certificates",
+  "tabs": [
+    {
+      "label": "Overview",
+      "href": "#text",
+      "id": null
+    },
+    {
+      "label": "Intensive Certificate",
+      "href": "#intensivetext",
+      "id": null
+    },
+    {
+      "label": "Certificate",
+      "href": "#certificatetext",
+      "id": null
+    }
+  ],
+  "extracted_from_container": "certificatetextcontainer",
+  "parent_program": null,
+  "requires_application": false,
+  "full_text": "CERTIFICATE IN HUMAN RIGHTS\nSee Links\nto the attributes indicating courses approved for the certificate requirements.\nThis certificate, available to all interested Yale Students, provides the opportunity for students to pursue an interdisciplinary study of human rights.\nTo earn the certificate, students must take the gateway course (\nGLBL 3102\nor\nGLBL 3103\n) and 4 electives, with at least one elective chosen from each of the two area categories: (1) Domestic and (2) International. Graduate and professional school courses may count, with approval from the certificate director(s) or if tagged with one of the attributes listed below.\nCredit/D/Fail\nNo courses taken Credit/D/Fail may be applied toward the requirements of the certificate.\nOutside credit\nCourses taken at another institution or during an approved summer or term-time study abroad program may count toward the certificate requirements with the approval of the certificate director(s). An on-topic summer internship can replace one elective, again with the approval\nof the certificate director(s).\nAdditional information is available on the\nHuman Rights program website\n.\nDeclaration of Candidacy\nStudents must declare their intention to earn a Certificate on the\nDeclare Major, Concentration within the Major, Certificate\npage on\nYale Hub\n, as early as possible, but at the very latest, by the 15th of January or September in their last semester at Yale. Once declared, Degree Audit tracks students' progress toward completion of the certificate.\nSUMMARY OF Requirements\nNumber of courses\n5 course credits\nSpecific course required\nGLBL 3102\nor\nGLBL 3103\nDistribution of courses\n4 electives with at least 1 from each of the 2 area categories",
+  "isolation": null,
+  "sections": {
+    "overview": "CERTIFICATE IN HUMAN RIGHTS\nSee Links\nto the attributes indicating courses approved for the certificate requirements.\nThis certificate, available to all interested Yale Students, provides the opportunity for students to pursue an interdisciplinary study of human rights.\nTo earn the certificate, students must take the gateway course (\nGLBL 3102\nor\nGLBL 3103\n) and 4 electives, with at least one elective chosen from each of the two area categories: (1) Domestic and (2) International. Graduate and professional school courses may count, with approval from the certificate director(s) or if tagged with one of the attributes listed below.\nCredit/D/Fail\nNo courses taken Credit/D/Fail may be applied toward the requirements of the certificate.\nOutside credit\nCourses taken at another institution or during an approved summer or term-time study abroad program may count toward the certificate requirements with the approval of the certificate director(s). An on-topic summer internship can replace one elective, again with the approval\nof the certificate director(s).\nAdditional information is available on the\nHuman Rights program website\n.",
+    "declaration": "Students must declare their intention to earn a Certificate on the\nDeclare Major, Concentration within the Major, Certificate\npage on\nYale Hub\n, as early as possible, but at the very latest, by the 15th of January or September in their last semester at Yale. Once declared, Degree Audit tracks students' progress toward completion of the certificate.",
+    "summary_of_requirements": "Number of courses\n5 course credits\nSpecific course required\nGLBL 3102\nor\nGLBL 3103\nDistribution of courses\n4 electives with at least 1 from each of the 2 area categories"
+  },
+  "summary_of_requirements_tab": null,
+  "tables": [],
+  "raw_html_length": 23680
+}

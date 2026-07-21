@@ -22,6 +22,7 @@ import SimulatorManualAssignModal from "./SimulatorManualAssignModal";
 import SimulatorRequirementsBreakdown from "./SimulatorRequirementsBreakdown";
 import CourseGradeControl from "./CourseGradeControl";
 import CourseDistributionalControl from "./CourseDistributionalControl";
+import { effectiveDistributionals } from "./plannedDistributionals";
 import SimulatorProgressPane from "./SimulatorProgressPane";
 import { type SimulatorView } from "./SimulatorViewSwitcher";
 import SimulatorToolbarRow from "./SimulatorToolbarRow";
@@ -1989,7 +1990,7 @@ export default function Simulator({
                                 )}
                                 {showDistributionals && (
                                   <CourseDistributionalControl
-                                    value={course.distributionals ?? []}
+                                    value={effectiveDistributionals(course)}
                                     onChange={(codes) =>
                                       updatePlannedCourse(semester.id, course.code, {
                                         distributionals: codes,

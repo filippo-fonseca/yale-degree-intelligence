@@ -37,7 +37,7 @@ export default function SimulatorToolbarRow({
       data-sim-toolbar-row
     >
       <SimulatorViewSwitcher view={view} setView={setView} />
-      <div className="sm:ml-auto min-w-0 sm:max-w-xs w-full sm:w-auto">
+      <div className="sm:ml-auto min-w-0 sm:max-w-sm w-full sm:w-auto">
         <SimulatorPlanSelector
           planName={planName}
           isDefault={planIsDefault}

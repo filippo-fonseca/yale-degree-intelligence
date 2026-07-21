@@ -46,9 +46,9 @@ export default function SimulatorPlanSelector({
       title={
         disabled
           ? "Sign in to save and switch plans"
-          : "Switch, save, or manage your plans"
+          : `${label}. Switch, save, or manage your plans.`
       }
-      className={`h-10 max-w-full sm:max-w-xs w-full sm:w-auto px-3 flex items-center gap-2 rounded-xl border text-left transition-all duration-200 ${
+      className={`h-10 max-w-full sm:max-w-sm w-full sm:w-auto px-3 flex items-center gap-2 rounded-xl border text-left transition-all duration-200 ${
         disabled
           ? "bg-gray-50 dark:bg-white/[0.02] border-gray-200 dark:border-white/[0.06] cursor-not-allowed opacity-70"
           : "bg-white dark:bg-white/[0.03] border-gray-200 dark:border-white/10 hover:border-gray-300 dark:hover:border-white/20 hover:bg-gray-50 dark:hover:bg-white/[0.06]"

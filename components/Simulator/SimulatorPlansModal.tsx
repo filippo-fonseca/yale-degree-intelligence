@@ -138,17 +138,17 @@ export default function SimulatorPlansModal({
                               {plan.name}
                             </span>
                             {isCurrent && (
-                              <span className="text-[9px] font-medium uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-purple-100 dark:bg-purple-900/40 text-purple-700 dark:text-purple-200 border border-purple-300 dark:border-purple-600/40">
+                              <span className="shrink-0 text-[9px] font-medium uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-purple-100 dark:bg-purple-900/40 text-purple-700 dark:text-purple-200 border border-purple-300 dark:border-purple-600/40">
                                 Current
                               </span>
                             )}
                             {plan.isDefault && (
-                              <span className="text-[9px] font-medium uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-gray-100 dark:bg-white/[0.06] text-gray-600 dark:text-gray-300 border border-gray-300 dark:border-white/[0.12]">
+                              <span className="shrink-0 text-[9px] font-medium uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-gray-100 dark:bg-white/[0.06] text-gray-600 dark:text-gray-300 border border-gray-300 dark:border-white/[0.12]">
                                 Default
                               </span>
                             )}
                           </div>
-                          <p className="text-[11px] text-gray-500 dark:text-gray-400 mt-0.5 truncate">
+                          <p className="text-[11px] text-gray-500 dark:text-gray-400 mt-0.5">
                             {planned} planned course{planned !== 1 ? "s" : ""}
                             {saved ? ` · saved ${saved}` : ""}
                           </p>

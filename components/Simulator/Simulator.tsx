@@ -5,10 +5,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   FiChevronDown,
   FiChevronUp,
-  FiInfo,
   FiPlus,
   FiTrash2,
-  FiRefreshCw,
   FiCheck,
   FiLock,
 } from "react-icons/fi";
@@ -25,10 +23,9 @@ import SimulatorRequirementsBreakdown from "./SimulatorRequirementsBreakdown";
 import CourseGradeControl from "./CourseGradeControl";
 import CourseDistributionalControl from "./CourseDistributionalControl";
 import SimulatorProgressPane from "./SimulatorProgressPane";
-import SimulatorViewSwitcher, {
-  type SimulatorView,
-} from "./SimulatorViewSwitcher";
-import SimulatorPlanSelector from "./SimulatorPlanSelector";
+import { type SimulatorView } from "./SimulatorViewSwitcher";
+import SimulatorToolbarRow from "./SimulatorToolbarRow";
+import SimulatorCanvasActions from "./SimulatorCanvasActions";
 import SimulatorPlansModal from "./SimulatorPlansModal";
 import type { Plan, Semester } from "./planTypes";
 import {
@@ -1553,21 +1550,15 @@ export default function Simulator({
             : "bg-transparent border-b border-transparent"
         }`}
       >
-        {/* One horizontal row: the view switcher and the plan selector as
-            peers. Both live on both tabs, because the Progress readouts are
-            scoped to whichever plan is loaded. */}
-        <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
-          <SimulatorViewSwitcher view={activeView} setView={setActiveView} />
-          <div className="sm:ml-auto min-w-0 sm:max-w-xs w-full sm:w-auto">
-            <SimulatorPlanSelector
-              planName={currentPlanName}
-              isDefault={loadedPlanIsDefault}
-              hasChanges={hasChanges}
-              disabled={!user}
-              onOpen={() => setShowPlansModal(true)}
-            />
-          </div>
-        </div>
+        <SimulatorToolbarRow
+          view={activeView}
+          setView={setActiveView}
+          planName={currentPlanName}
+          planIsDefault={loadedPlanIsDefault}
+          hasChanges={hasChanges}
+          planSelectorDisabled={!user}
+          onOpenPlans={() => setShowPlansModal(true)}
+        />
       </div>
 
       {activeView === "canvas" ? (
@@ -1689,83 +1680,20 @@ export default function Simulator({
             </div>
           </div>
 
-          {/* Per-course editors on the semester cards. These live on the
-              Canvas because that is where the typing happens; what they feed
-              (the GPA timeline, the distributional tally) reads on Progress. */}
-          <div className="flex items-center gap-2 flex-wrap">
-            <span className="text-[10px] text-gray-400 dark:text-gray-500 uppercase tracking-wider">
-              Edit on cards:
-            </span>
-            <button
-              type="button"
-              onClick={() => setShowGrades((v) => !v)}
-              aria-pressed={showGrades}
-              className={`px-2.5 py-1 text-[11px] rounded-lg border transition-all duration-200 ${
-                showGrades
-                  ? "bg-emerald-500/15 text-emerald-600 dark:text-emerald-300 border-emerald-600/40 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]"
-                  : "bg-gray-100 dark:bg-gray-900/50 text-gray-400 dark:text-gray-500 border-gray-200 dark:border-gray-800/50 hover:text-gray-600 dark:hover:text-gray-400"
-              }`}
-            >
-              Grades
-            </button>
-            <button
-              type="button"
-              onClick={() => setShowDistributionals((v) => !v)}
-              aria-pressed={showDistributionals}
-              className={`px-2.5 py-1 text-[11px] rounded-lg border transition-all duration-200 ${
-                showDistributionals
-                  ? "bg-purple-500/15 text-purple-600 dark:text-purple-300 border-purple-600/40 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]"
-                  : "bg-gray-100 dark:bg-gray-900/50 text-gray-400 dark:text-gray-500 border-gray-200 dark:border-gray-800/50 hover:text-gray-600 dark:hover:text-gray-400"
-              }`}
-            >
-              Distributionals
-            </button>
-
-            {/* The canvas verbs: they act on the grid, so they sit with it
-                rather than in the toolbar. Quiet by default, loud on hover. */}
-            <div
-              className="ml-auto flex items-center gap-1"
-              data-sim-canvas-actions
-            >
-              <button
-                type="button"
-                onClick={() => setShowHelp((v) => !v)}
-                aria-pressed={showHelp}
-                className="inline-flex items-center gap-1 px-2 py-1 text-[11px] rounded-lg text-gray-500 dark:text-gray-400 border border-transparent hover:border-gray-200 dark:hover:border-white/10 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-white/[0.06] transition-colors"
-              >
-                <FiInfo size={12} />
-                Help
-              </button>
-              {user && (
-                <button
-                  type="button"
-                  onClick={openSaveModal}
-                  disabled={!hasChanges}
-                  title={
-                    hasChanges
-                      ? "Save what is on the canvas right now"
-                      : "Nothing new on the canvas to save"
-                  }
-                  className={`inline-flex items-center gap-1 px-2 py-1 text-[11px] rounded-lg border border-transparent transition-colors ${
-                    hasChanges
-                      ? "text-emerald-700 dark:text-emerald-300 hover:border-emerald-300 dark:hover:border-emerald-500/30 hover:bg-emerald-50 dark:hover:bg-emerald-500/10"
-                      : "text-gray-400 dark:text-gray-600 cursor-not-allowed"
-                  }`}
-                >
-                  <FiPlus size={12} />
-                  Save
-                </button>
-              )}
-              <button
-                type="button"
-                onClick={resetSimulator}
-                className="inline-flex items-center gap-1 px-2 py-1 text-[11px] rounded-lg text-gray-500 dark:text-gray-400 border border-transparent hover:border-red-300 dark:hover:border-red-500/30 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors"
-              >
-                <FiRefreshCw size={12} />
-                Clear canvas
-              </button>
-            </div>
-          </div>
+          {/* The Canvas control row: the per-course editor toggles and the
+              verbs that act on the grid below it. Canvas only. */}
+          <SimulatorCanvasActions
+            showGrades={showGrades}
+            onToggleGrades={() => setShowGrades((v) => !v)}
+            showDistributionals={showDistributionals}
+            onToggleDistributionals={() => setShowDistributionals((v) => !v)}
+            helpOpen={showHelp}
+            onToggleHelp={() => setShowHelp((v) => !v)}
+            showSave={!!user}
+            canSave={hasChanges}
+            onSave={openSaveModal}
+            onClear={resetSimulator}
+          />
 
           {/* Semesters Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3" data-tour="simulator-board">

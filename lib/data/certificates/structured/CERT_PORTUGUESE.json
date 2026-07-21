@@ -15,6 +15,10 @@
     "With adviser approval, one advanced non-L5 course conducted in Portuguese (e.g., independent study graded pass/fail, graduate seminar, or advanced seminar) may count",
     "One credit from a Yale or Yale-designated study-abroad program taught in Portuguese may be substituted with adviser approval"
   ],
+  "policy": {
+    "minGrade": "B",
+    "sourceNote": "All courses must be taken for a letter grade, and students must achieve a grade of B or above."
+  },
   "requirements": [
     {
       "name": "Courses beyond L4",

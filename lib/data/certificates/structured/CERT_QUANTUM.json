@@ -18,6 +18,12 @@
     "Non-Yale courses may not count",
     "Declare intent by the last day of add/drop in the final term of enrollment on Yale Hub"
   ],
+  "policy": {
+    "overlapCap": 2,
+    "overlapMinLevel": 3000,
+    "minGrade": "C",
+    "sourceNote": "No more than two course credits may overlap in the fulfillment of the requirements of the Quantum Science & Engineering Certificate and of a major, a simultaneous degree, or another certificate. Students earning this certificate may not overlap any 1000/2000 level courses; only two 3000+ level courses may overlap. The minimum grade for all courses is a C."
+  },
   "requirements": [
     {
       "name": "Quantum foundations",

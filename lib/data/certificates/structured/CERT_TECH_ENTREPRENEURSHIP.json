@@ -19,6 +19,17 @@
     "Non-Yale courses may not count without prior director approval",
     "Submit application with major, tentative coursework plan, and faculty evaluators; director adds requirements to Degree Audit upon approval"
   ],
+  "policy": {
+    "overlapCap": 2,
+    "minGrade": "C",
+    "extraForms": [
+      "Certificate application listing your entrepreneurial-emphasis major, a tentative plan of coursework, and a short list of faculty willing to evaluate your project"
+    ],
+    "nonCourseRequirements": [
+      "Attend and participate in three experiential units (entrepreneurial internship, Hillhouse Fellows program, Engineering Dean's Speaker Series, or Tsai City Accelerator) and submit a 1 to 2 page write-up for each"
+    ],
+    "sourceNote": "No more than two course credits may overlap in the fulfillment of the requirements of the Technology Entrepreneurship Certificate and of a major, a simultaneous degree, or another certificate. All courses must be taken for a letter grade, and students must achieve a grade of C or above."
+  },
   "requirements": [
     {
       "name": "Core entrepreneurship course",

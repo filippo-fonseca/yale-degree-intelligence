@@ -17,6 +17,15 @@
     "Courses taken at another institution or during an approved summer or term-time study abroad program may count with certificate director approval. An on-topic summer internship can replace one elective with approval.",
     "Graduate and professional school courses may count with director approval or if tagged with approved attributes."
   ],
+  "policy": {
+    "extraForms": [
+      "Application submitted during the spring term of sophomore year, available via the Human Rights website"
+    ],
+    "nonCourseRequirements": [
+      "Participate in the non-credited senior colloquium"
+    ],
+    "sourceNote": "This certificate accepts students by application during the spring term of their sophomore year only. Students complete a gateway lecture course, five electives, and participate in a non-credited senior colloquium."
+  },
   "requirements": [
     {
       "name": "Gateway",

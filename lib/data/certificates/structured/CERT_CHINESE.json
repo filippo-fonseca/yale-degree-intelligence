@@ -16,6 +16,10 @@
     "One LxC course taught in English may count if it includes a weekly discussion section conducted entirely in Chinese (minimum three students; course designated LxC)",
     "Up to two study-abroad credits taught in Chinese may be substituted with adviser approval"
   ],
+  "policy": {
+    "minGrade": "B",
+    "sourceNote": "All courses must be taken for a letter grade, and students must achieve a grade of B or above."
+  },
   "requirements": [
     {
       "name": "Courses beyond L4",

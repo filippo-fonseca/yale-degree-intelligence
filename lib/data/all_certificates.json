@@ -17,6 +17,10 @@
       "With adviser approval, an advanced texts seminar and/or graduate seminar may count toward requirements",
       "Up to two courses of credit-bearing academic study abroad may be substituted with prior permission"
     ],
+    "policy": {
+      "minGrade": "B",
+      "sourceNote": "All courses must be taken for a letter grade, and students must achieve a grade of B or above."
+    },
     "requirements": [
       {
         "name": "Courses beyond L3",
@@ -46,6 +50,10 @@
       "One LxC course taught in English may count if it includes a weekly discussion section conducted entirely in Greek (minimum three students; course designated LxC)",
       "Up to two study-abroad credits taught in Greek may be substituted with adviser approval"
     ],
+    "policy": {
+      "minGrade": "B",
+      "sourceNote": "All courses must be taken for a letter grade, and students must achieve a grade of B or above."
+    },
     "requirements": [
       {
         "name": "Courses beyond L4",
@@ -75,6 +83,10 @@
       "One LxC course taught in English may count if it includes a weekly discussion section conducted entirely in Chinese (minimum three students; course designated LxC)",
       "Up to two study-abroad credits taught in Chinese may be substituted with adviser approval"
     ],
+    "policy": {
+      "minGrade": "B",
+      "sourceNote": "All courses must be taken for a letter grade, and students must achieve a grade of B or above."
+    },
     "requirements": [
       {
         "name": "Courses beyond L4",
@@ -103,6 +115,11 @@
       "Courses taken at another institution or during an approved summer or term-time study abroad program may count with certificate director approval. An on-topic summer internship can replace one elective.",
       "Declare on Yale Hub by January 15 or September 15 of the final semester at the latest."
     ],
+    "policy": {
+      "overlapCap": 2,
+      "sameDeptCap": 4,
+      "sourceNote": "No more than two course credits fulfilling the requirements of the Climate Science and Solutions certificate may overlap with a major, a simultaneous degree, or another certificate. No more than four credits may come from a single department or school."
+    },
     "requirements": [
       {
         "name": "Basic Climate Science",
@@ -155,6 +172,14 @@
       "Outside credit (study abroad, other institutions) or an on-topic summer internship may count with director approval",
       "Declare on Yale Hub by January 15 or September 15 of the final semester; complete enrollment form on the Collections website"
     ],
+    "policy": {
+      "overlapCap": 2,
+      "minGrade": "C",
+      "extraForms": [
+        "Enrollment form available on the Collections (Materials Histories of the Human Record) website"
+      ],
+      "sourceNote": "No more than two course credits fulfilling the requirements of the certificate may overlap with a major, a simultaneous degree, or another certificate. The minimum grade for all courses is a C."
+    },
     "requirements": [
       {
         "name": "Introductory seminar",
@@ -214,6 +239,14 @@
       "Graduate and professional school courses may count toward the certificate.",
       "Declare on Yale Hub by January 15 or September 15 of the final semester at the latest."
     ],
+    "policy": {
+      "overlapCap": 2,
+      "minGrade": "C",
+      "nonCourseRequirements": [
+        "Attend three critical computing-related lectures or events and submit a brief write-up for each to the certificate director"
+      ],
+      "sourceNote": "No more than two course credits fulfilling the requirements of the certificate may overlap with a major, a simultaneous degree, or another certificate. All courses must be taken for a letter grade, and students must achieve a grade of C or above."
+    },
     "requirements": [
       {
         "name": "Survey course",
@@ -274,6 +307,12 @@
       "Declare intent by the last day of add/drop in the final term of enrollment on Yale Hub",
       "Students are held to the Statistical Methodology and Data Analysis requirements in place when they declared; with DUS approval, updated 2024–2025 requirements may be fulfilled by prior declarers"
     ],
+    "policy": {
+      "overlapCap": 0,
+      "zeroOverlap": true,
+      "minGrade": "B-",
+      "sourceNote": "No course may be applied to satisfy the requirements of both a major and the certificate. No single course may count for two areas of study. Students are required to earn at least a B- for each course."
+    },
     "requirements": [
       {
         "name": "Prerequisite",
@@ -445,6 +484,10 @@
       "Graduate and professional school courses may count with approval from the Education Studies Associate Director.",
       "Declare on Yale Hub once enrolled in EDST 1110; by January 15 or September 15 of the final semester at the latest."
     ],
+    "policy": {
+      "overlapCap": 2,
+      "sourceNote": "No more than two course credits may overlap in the fulfillment of the requirements of the Education Studies Certificate or of a major, a simultaneous degree, or another certificate."
+    },
     "requirements": [
       {
         "name": "Prerequisite",
@@ -497,6 +540,10 @@
       "Graduate and professional school courses may count with approval from the Education Studies Associate Director.",
       "Successful completion of the Scholar Intensive Certificate is noted on transcripts."
     ],
+    "policy": {
+      "overlapCap": 2,
+      "sourceNote": "No more than two course credits may overlap in the fulfillment of the requirements of the Scholar Intensive Certificate or of a major, a simultaneous degree, or another certificate."
+    },
     "requirements": [
       {
         "name": "Prerequisite",
@@ -574,6 +621,10 @@
       "Graduate and professional school courses and non-Yale courses accepted for full course credit by Yale College may count toward the certificate.",
       "Declare on Yale Hub by January 15 or September 15 of the final semester at the latest."
     ],
+    "policy": {
+      "overlapCap": 2,
+      "sourceNote": "No more than two course credits fulfilling the requirements of the Energy Studies Certificate may overlap with a major, a simultaneous degree, or another certificate."
+    },
     "requirements": [
       {
         "name": "Energy Science & Technology",
@@ -623,6 +674,14 @@
       "Other courses may be approved by the certificate director",
       "Declare on Yale Hub by January 15 or September 15 of the final semester"
     ],
+    "policy": {
+      "overlapCap": 2,
+      "minGrade": "C",
+      "nonCourseRequirements": [
+        "Attend two public talks or other events that feature ethnography and submit a one-page critical reflection on each to the certificate director"
+      ],
+      "sourceNote": "No more than two course credits may overlap in the fulfillment of the requirements of the Ethnography certificate and of a major, a simultaneous degree, or another certificate. The minimum grade for all courses is a C."
+    },
     "requirements": [
       {
         "name": "Ethnography methods courses",
@@ -657,6 +716,10 @@
       "Summer or year-abroad courses accepted for full Yale College credit may provisionally count with certificate director approval.",
       "Declare on Yale Hub by January 15 or September 15 of the final semester at the latest."
     ],
+    "policy": {
+      "overlapCap": 2,
+      "sourceNote": "No more than two course credits fulfilling the requirements of the Food, Agriculture, and Climate Change certificate may overlap with a major, a simultaneous degree, or another certificate."
+    },
     "requirements": [
       {
         "name": "Consumption",
@@ -698,6 +761,10 @@
       "One LxC course taught in English may count if it includes a weekly discussion section conducted entirely in French and the student completes all readings and assignments in French",
       "Up to two study-abroad courses taught in French may count as electives with DUS approval"
     ],
+    "policy": {
+      "minGrade": "B",
+      "sourceNote": "All courses must be taken for a letter grade, and students must achieve a grade of B or above."
+    },
     "requirements": [
       {
         "name": "Courses beyond L4",
@@ -726,6 +793,10 @@
       "One LxC course taught in English may count if it includes a weekly discussion section conducted entirely in German (minimum three students; course designated LxC)",
       "Up to two study-abroad credits taught in German may be substituted with adviser approval"
     ],
+    "policy": {
+      "minGrade": "B",
+      "sourceNote": "All courses must be taken for a letter grade, and students must achieve a grade of B or above."
+    },
     "requirements": [
       {
         "name": "Courses beyond L4",
@@ -755,6 +826,10 @@
       "Qualified undergraduates may take graduate courses at the School of Public Health subject to Yale College regulations.",
       "Courses taken at another institution or during an approved summer or term-time study abroad program may count with DUS approval."
     ],
+    "policy": {
+      "overlapCap": 2,
+      "sourceNote": "The requirements of the Global Health Studies certificate are subject to Yale College overlap rules, such that no more than two courses may be used simultaneously to fulfill the requirements of a major, a simultaneous degree, or another certificate."
+    },
     "requirements": [
       {
         "name": "Introductory lecture",
@@ -805,6 +880,10 @@
       "One LxC course taught in English may count if it includes a weekly discussion section conducted entirely in Hindi (minimum three students; course designated LxC)",
       "Up to two study-abroad credits taught in Hindi may be substituted with adviser approval"
     ],
+    "policy": {
+      "minGrade": "B",
+      "sourceNote": "All courses must be taken for a letter grade, and students must achieve a grade of B or above."
+    },
     "requirements": [
       {
         "name": "Courses beyond L4",
@@ -885,6 +964,15 @@
       "Courses taken at another institution or during an approved summer or term-time study abroad program may count with certificate director approval. An on-topic summer internship can replace one elective with approval.",
       "Graduate and professional school courses may count with director approval or if tagged with approved attributes."
     ],
+    "policy": {
+      "extraForms": [
+        "Application submitted during the spring term of sophomore year, available via the Human Rights website"
+      ],
+      "nonCourseRequirements": [
+        "Participate in the non-credited senior colloquium"
+      ],
+      "sourceNote": "This certificate accepts students by application during the spring term of their sophomore year only. Students complete a gateway lecture course, five electives, and participate in a non-credited senior colloquium."
+    },
     "requirements": [
       {
         "name": "Gateway",
@@ -939,6 +1027,10 @@
       "With adviser approval, up to one course conducted in Indonesian at the appropriate advanced level may count (e.g., INDN 4700 or INDN 4710 graded pass/fail, or graduate seminar INDN 5700)",
       "Up to two study-abroad credits taught in Indonesian may be substituted with adviser approval"
     ],
+    "policy": {
+      "minGrade": "B",
+      "sourceNote": "All courses must be taken for a letter grade, and students must achieve a grade of B or above."
+    },
     "requirements": [
       {
         "name": "Courses beyond L4",
@@ -984,6 +1076,10 @@
       "One LxC course taught in English may count if it includes a weekly discussion section conducted entirely in isiZulu (minimum three students; course designated LxC)",
       "Up to two study-abroad credits taught in isiZulu may be substituted with adviser approval"
     ],
+    "policy": {
+      "minGrade": "B",
+      "sourceNote": "All courses must be taken for a letter grade, and students must achieve a grade of B or above."
+    },
     "requirements": [
       {
         "name": "Courses beyond L4",
@@ -1014,6 +1110,14 @@
       "Graduate and professional school courses may count toward the certificate.",
       "Declare on Yale Hub by January 15 or September 15 of the final semester at the latest."
     ],
+    "policy": {
+      "overlapCap": 2,
+      "minGrade": "C",
+      "nonCourseRequirements": [
+        "Attend three lectures on topics relating to Islamic Studies and submit a 1 to 2 page write-up for each"
+      ],
+      "sourceNote": "No more than two course credits fulfilling the requirements of the Islamic Studies certificate may overlap with a major, a simultaneous degree, or another certificate. All courses must be taken for a letter grade, and students must achieve a grade of C or above."
+    },
     "requirements": [
       {
         "name": "Islamic Art, Architecture, Literature",
@@ -1066,6 +1170,10 @@
       "One LxC course taught in English may count if it includes a weekly discussion section conducted entirely in Italian (minimum three students; course designated LxC)",
       "Up to two study-abroad credits taught in Italian may be substituted with adviser approval"
     ],
+    "policy": {
+      "minGrade": "B",
+      "sourceNote": "All courses must be taken for a letter grade, and students must achieve a grade of B or above."
+    },
     "requirements": [
       {
         "name": "Courses beyond L4",
@@ -1095,6 +1203,10 @@
       "One LxC course taught in English may count if it includes a weekly discussion section conducted entirely in Japanese (minimum three students; course designated LxC)",
       "Up to two study-abroad credits taught in Japanese may be substituted with adviser approval"
     ],
+    "policy": {
+      "minGrade": "B",
+      "sourceNote": "All courses must be taken for a letter grade, and students must achieve a grade of B or above."
+    },
     "requirements": [
       {
         "name": "Courses beyond L4",
@@ -1123,6 +1235,10 @@
       "One LxC course taught in English may count if it includes a weekly discussion section conducted entirely in Kiswahili (minimum three students; course designated LxC)",
       "Up to two study-abroad credits taught in Kiswahili may be substituted with adviser approval"
     ],
+    "policy": {
+      "minGrade": "B",
+      "sourceNote": "All courses must be taken for a letter grade, and students must achieve a grade of B or above."
+    },
     "requirements": [
       {
         "name": "Courses beyond L4",
@@ -1151,6 +1267,10 @@
       "One LxC course taught in English may count if it includes a weekly discussion section conducted entirely in Korean (minimum three students; course designated LxC)",
       "Up to two study-abroad credits taught in Korean may be substituted with adviser approval"
     ],
+    "policy": {
+      "minGrade": "B",
+      "sourceNote": "All courses must be taken for a letter grade, and students must achieve a grade of B or above."
+    },
     "requirements": [
       {
         "name": "Courses beyond L4",
@@ -1180,6 +1300,10 @@
       "One LxC course taught in English may count if it includes a weekly discussion section conducted entirely in Latin (minimum three students; course designated LxC)",
       "Up to two study-abroad credits taught in Latin may be substituted with adviser approval"
     ],
+    "policy": {
+      "minGrade": "B",
+      "sourceNote": "All courses must be taken for a letter grade, and students must achieve a grade of B or above."
+    },
     "requirements": [
       {
         "name": "Courses beyond L4",
@@ -1208,6 +1332,13 @@
       "Courses taken at another institution or during an approved summer or term-time study abroad program may count with director approval.",
       "Declare on Yale Hub by January 15 or September 15 of the final semester at the latest."
     ],
+    "policy": {
+      "overlapCap": 2,
+      "nonCourseRequirements": [
+        "Attend three lectures on medieval topics and submit a 1 to 2 page account of each to the certificate director or a certificate advisor"
+      ],
+      "sourceNote": "No more than two course credits may overlap in the fulfillment of the requirements of the Medieval Studies Certificate or of a major, a simultaneous degree, or another certificate."
+    },
     "requirements": [
       {
         "name": "Medieval courses",
@@ -1237,6 +1368,10 @@
       "One LxC course taught in English may count if it includes a weekly discussion section conducted entirely in Arabic (minimum three students; course designated LxC)",
       "Up to two study-abroad credits taught in Arabic may be substituted with adviser approval"
     ],
+    "policy": {
+      "minGrade": "B",
+      "sourceNote": "All courses must be taken for a letter grade, and students must achieve a grade of B or above."
+    },
     "requirements": [
       {
         "name": "Courses beyond L4",
@@ -1265,6 +1400,10 @@
       "One LxC course taught in English may count if it includes a weekly discussion section conducted entirely in Hebrew (minimum three students; course designated LxC)",
       "Up to two study-abroad credits taught in Hebrew may be substituted with adviser approval"
     ],
+    "policy": {
+      "minGrade": "B",
+      "sourceNote": "All courses must be taken for a letter grade, and students must achieve a grade of B or above."
+    },
     "requirements": [
       {
         "name": "Courses beyond L4",
@@ -1293,6 +1432,10 @@
       "One LxC course taught in English may count if it includes a weekly discussion section conducted entirely in Turkish (minimum three students; course designated LxC)",
       "Up to two study-abroad credits taught in Turkish may be substituted with adviser approval"
     ],
+    "policy": {
+      "minGrade": "B",
+      "sourceNote": "All courses must be taken for a letter grade, and students must achieve a grade of B or above."
+    },
     "requirements": [
       {
         "name": "Courses beyond L4",
@@ -1323,6 +1466,13 @@
       "Complete the Qualtrics survey from the Indigenous Studies website as early as fall of sophomore year and no later than the beginning of junior year.",
       "Declare on Yale Hub by January 15 or September 15 of the final semester."
     ],
+    "policy": {
+      "overlapCap": 2,
+      "nonCourseRequirements": [
+        "Participate in at least three Indigenous community events and submit a write-up of 1 to 2 pages per event"
+      ],
+      "sourceNote": "No more than two course credits may overlap in the fulfillment of the requirements of the Indigenous Studies Certificate or of a major, a simultaneous degree, or another certificate."
+    },
     "requirements": [
       {
         "name": "Indigenous studies courses",
@@ -1355,6 +1505,14 @@
       "Courses taken at another institution or during an approved summer or term-time study abroad program may count with DUS approval.",
       "Declare on Yale Hub by January 15 or September 15 of the final semester at the latest."
     ],
+    "policy": {
+      "overlapCap": 2,
+      "minGrade": "B",
+      "nonCourseRequirements": [
+        "Attend three approved Persian and Iranian studies events and submit a 1 to 2 page write-up about each to the certificate director"
+      ],
+      "sourceNote": "No more than two course credits fulfilling the requirements of the Persian and Iranian Studies Certificate may overlap with a major, a simultaneous degree, or another certificate. Courses are drawn from a list of approved courses and must be taken for a letter grade of B or above."
+    },
     "requirements": [
       {
         "name": "Content courses",
@@ -1389,6 +1547,10 @@
       "With adviser approval, one advanced non-L5 course conducted in Portuguese (e.g., independent study graded pass/fail, graduate seminar, or advanced seminar) may count",
       "One credit from a Yale or Yale-designated study-abroad program taught in Portuguese may be substituted with adviser approval"
     ],
+    "policy": {
+      "minGrade": "B",
+      "sourceNote": "All courses must be taken for a letter grade, and students must achieve a grade of B or above."
+    },
     "requirements": [
       {
         "name": "Courses beyond L4",
@@ -1415,6 +1577,24 @@
       "No course may satisfy more than one of the five required courses",
       "Majors in Computer Science, CSEC, CS-EE, CS-Math, CS-Psychology, or Computing and the Arts may not pursue this certificate"
     ],
+    "policy": {
+      "overlapCap": 0,
+      "zeroOverlap": true,
+      "ineligibleMajors": [
+        "CPSC_BA",
+        "CPSC_BS",
+        "CSEC_BS",
+        "EECS",
+        "CPSC_MATH_BS",
+        "CPSC_PSYCH_BS",
+        "COMPUTING_ARTS_ARCH",
+        "COMPUTING_ARTS_ART",
+        "COMPUTING_ARTS_HISTART",
+        "COMPUTING_ARTS_MUSIC",
+        "COMPUTING_ARTS_TDPS"
+      ],
+      "sourceNote": "Students may not use any of the five required courses, indicated below, to satisfy the requirements of any major or other certificate. Majors in Computer Science, and in the joint programs with Economics, Electrical Engineering, Mathematics, and Psychology, or in Computing and the Arts may not pursue the Certificate."
+    },
     "requirements": [
       {
         "name": "Prerequisite",
@@ -1588,6 +1768,12 @@
       "Non-Yale courses may not count",
       "Declare intent by the last day of add/drop in the final term of enrollment on Yale Hub"
     ],
+    "policy": {
+      "overlapCap": 2,
+      "overlapMinLevel": 3000,
+      "minGrade": "C",
+      "sourceNote": "No more than two course credits may overlap in the fulfillment of the requirements of the Quantum Science & Engineering Certificate and of a major, a simultaneous degree, or another certificate. Students earning this certificate may not overlap any 1000/2000 level courses; only two 3000+ level courses may overlap. The minimum grade for all courses is a C."
+    },
     "requirements": [
       {
         "name": "Quantum foundations",
@@ -1632,6 +1818,10 @@
       "One LxC course taught in English may count if it includes a weekly discussion section conducted entirely in Russian (minimum three students; course designated LxC)",
       "Up to two study-abroad credits taught in Russian may be substituted with adviser approval"
     ],
+    "policy": {
+      "minGrade": "B",
+      "sourceNote": "All courses must be taken for a letter grade, and students must achieve a grade of B or above."
+    },
     "requirements": [
       {
         "name": "Courses beyond L4",
@@ -1657,6 +1847,10 @@
       "Letter grade B or above required in all courses",
       "Declare candidacy on Yale Hub as early as possible, no later than January 15 or September 15 of final semester"
     ],
+    "policy": {
+      "minGrade": "B",
+      "sourceNote": "All courses must be taken for a letter grade, and students must achieve a grade of B or above."
+    },
     "requirements": [
       {
         "name": "Courses beyond L3",
@@ -1689,6 +1883,10 @@
       "Yale study-abroad courses designated L5 may count toward the certificate",
       "One credit from a non-Yale study-abroad program taught in Spanish may be substituted with adviser approval"
     ],
+    "policy": {
+      "minGrade": "B",
+      "sourceNote": "All courses must be taken for a letter grade, and students must achieve a grade of B or above."
+    },
     "requirements": [
       {
         "name": "Courses beyond L4",
@@ -1719,6 +1917,17 @@
       "Non-Yale courses may not count without prior director approval",
       "Submit application with major, tentative coursework plan, and faculty evaluators; director adds requirements to Degree Audit upon approval"
     ],
+    "policy": {
+      "overlapCap": 2,
+      "minGrade": "C",
+      "extraForms": [
+        "Certificate application listing your entrepreneurial-emphasis major, a tentative plan of coursework, and a short list of faculty willing to evaluate your project"
+      ],
+      "nonCourseRequirements": [
+        "Attend and participate in three experiential units (entrepreneurial internship, Hillhouse Fellows program, Engineering Dean's Speaker Series, or Tsai City Accelerator) and submit a 1 to 2 page write-up for each"
+      ],
+      "sourceNote": "No more than two course credits may overlap in the fulfillment of the requirements of the Technology Entrepreneurship Certificate and of a major, a simultaneous degree, or another certificate. All courses must be taken for a letter grade, and students must achieve a grade of C or above."
+    },
     "requirements": [
       {
         "name": "Core entrepreneurship course",
@@ -1777,6 +1986,14 @@
       "Courses taken at another institution or during an approved summer or term-time study abroad program may count with DUS approval.",
       "Declare on Yale Hub by January 15 or September 15 of the final semester at the latest."
     ],
+    "policy": {
+      "overlapCap": 2,
+      "sameDeptCap": 3,
+      "nonCourseRequirements": [
+        "Attend three lectures or events listed through the Translation Initiative and submit a brief written response to each to the certificate director"
+      ],
+      "sourceNote": "Of the five credits, no more than three may originate in the same department. No more than two course credits may overlap in the fulfillment of the requirements of the Translation Studies certificate or of a major, a simultaneous degree, or another certificate."
+    },
     "requirements": [
       {
         "name": "Translation-themed courses",
@@ -1804,6 +2021,10 @@
       "With adviser approval, up to two advanced non-L5 Yale courses conducted in Vietnamese may count (e.g., VIET 4700 or VIET 4710 graded pass/fail, or an advanced seminar); only one pass/fail independent study course may count",
       "Up to two study-abroad credits taught in Vietnamese may be substituted with adviser approval"
     ],
+    "policy": {
+      "minGrade": "B",
+      "sourceNote": "All courses must be taken for a letter grade, and students must achieve a grade of B or above."
+    },
     "requirements": [
       {
         "name": "Courses beyond L4",
@@ -1845,6 +2066,10 @@
       "One LxC course taught in English may count if it includes a weekly discussion section conducted entirely in Yoruba (minimum three students; course designated LxC)",
       "Up to two study-abroad credits taught in Yoruba may be substituted with adviser approval"
     ],
+    "policy": {
+      "minGrade": "B",
+      "sourceNote": "All courses must be taken for a letter grade, and students must achieve a grade of B or above."
+    },
     "requirements": [
       {
         "name": "Courses beyond L4",

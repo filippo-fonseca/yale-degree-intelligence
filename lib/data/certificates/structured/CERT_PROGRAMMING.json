@@ -15,6 +15,24 @@
     "No course may satisfy more than one of the five required courses",
     "Majors in Computer Science, CSEC, CS-EE, CS-Math, CS-Psychology, or Computing and the Arts may not pursue this certificate"
   ],
+  "policy": {
+    "overlapCap": 0,
+    "zeroOverlap": true,
+    "ineligibleMajors": [
+      "CPSC_BA",
+      "CPSC_BS",
+      "CSEC_BS",
+      "EECS",
+      "CPSC_MATH_BS",
+      "CPSC_PSYCH_BS",
+      "COMPUTING_ARTS_ARCH",
+      "COMPUTING_ARTS_ART",
+      "COMPUTING_ARTS_HISTART",
+      "COMPUTING_ARTS_MUSIC",
+      "COMPUTING_ARTS_TDPS"
+    ],
+    "sourceNote": "Students may not use any of the five required courses, indicated below, to satisfy the requirements of any major or other certificate. Majors in Computer Science, and in the joint programs with Economics, Electrical Engineering, Mathematics, and Psychology, or in Computing and the Arts may not pursue the Certificate."
+  },
   "requirements": [
     {
       "name": "Prerequisite",

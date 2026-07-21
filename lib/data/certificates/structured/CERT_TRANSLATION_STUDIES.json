@@ -18,6 +18,14 @@
     "Courses taken at another institution or during an approved summer or term-time study abroad program may count with DUS approval.",
     "Declare on Yale Hub by January 15 or September 15 of the final semester at the latest."
   ],
+  "policy": {
+    "overlapCap": 2,
+    "sameDeptCap": 3,
+    "nonCourseRequirements": [
+      "Attend three lectures or events listed through the Translation Initiative and submit a brief written response to each to the certificate director"
+    ],
+    "sourceNote": "Of the five credits, no more than three may originate in the same department. No more than two course credits may overlap in the fulfillment of the requirements of the Translation Studies certificate or of a major, a simultaneous degree, or another certificate."
+  },
   "requirements": [
     {
       "name": "Translation-themed courses",

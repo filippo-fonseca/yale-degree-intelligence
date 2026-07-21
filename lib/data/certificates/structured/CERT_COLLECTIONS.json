@@ -17,6 +17,14 @@
     "Outside credit (study abroad, other institutions) or an on-topic summer internship may count with director approval",
     "Declare on Yale Hub by January 15 or September 15 of the final semester; complete enrollment form on the Collections website"
   ],
+  "policy": {
+    "overlapCap": 2,
+    "minGrade": "C",
+    "extraForms": [
+      "Enrollment form available on the Collections (Materials Histories of the Human Record) website"
+    ],
+    "sourceNote": "No more than two course credits fulfilling the requirements of the certificate may overlap with a major, a simultaneous degree, or another certificate. The minimum grade for all courses is a C."
+  },
   "requirements": [
     {
       "name": "Introductory seminar",

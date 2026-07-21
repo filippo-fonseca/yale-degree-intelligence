@@ -14,6 +14,10 @@
     "With adviser approval, up to two advanced non-L5 Yale courses conducted in Vietnamese may count (e.g., VIET 4700 or VIET 4710 graded pass/fail, or an advanced seminar); only one pass/fail independent study course may count",
     "Up to two study-abroad credits taught in Vietnamese may be substituted with adviser approval"
   ],
+  "policy": {
+    "minGrade": "B",
+    "sourceNote": "All courses must be taken for a letter grade, and students must achieve a grade of B or above."
+  },
   "requirements": [
     {
       "name": "Courses beyond L4",

@@ -12,6 +12,10 @@
     "Letter grade B or above required in all courses",
     "Declare candidacy on Yale Hub as early as possible, no later than January 15 or September 15 of final semester"
   ],
+  "policy": {
+    "minGrade": "B",
+    "sourceNote": "All courses must be taken for a letter grade, and students must achieve a grade of B or above."
+  },
   "requirements": [
     {
       "name": "Courses beyond L3",

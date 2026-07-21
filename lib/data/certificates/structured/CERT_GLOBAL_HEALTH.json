@@ -18,6 +18,10 @@
     "Qualified undergraduates may take graduate courses at the School of Public Health subject to Yale College regulations.",
     "Courses taken at another institution or during an approved summer or term-time study abroad program may count with DUS approval."
   ],
+  "policy": {
+    "overlapCap": 2,
+    "sourceNote": "The requirements of the Global Health Studies certificate are subject to Yale College overlap rules, such that no more than two courses may be used simultaneously to fulfill the requirements of a major, a simultaneous degree, or another certificate."
+  },
   "requirements": [
     {
       "name": "Introductory lecture",

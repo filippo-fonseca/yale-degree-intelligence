@@ -14,6 +14,10 @@
     "Yale study-abroad courses designated L5 may count toward the certificate",
     "One credit from a non-Yale study-abroad program taught in Spanish may be substituted with adviser approval"
   ],
+  "policy": {
+    "minGrade": "B",
+    "sourceNote": "All courses must be taken for a letter grade, and students must achieve a grade of B or above."
+  },
   "requirements": [
     {
       "name": "Courses beyond L4",

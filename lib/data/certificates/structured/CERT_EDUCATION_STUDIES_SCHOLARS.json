@@ -18,6 +18,10 @@
     "Graduate and professional school courses may count with approval from the Education Studies Associate Director.",
     "Successful completion of the Scholar Intensive Certificate is noted on transcripts."
   ],
+  "policy": {
+    "overlapCap": 2,
+    "sourceNote": "No more than two course credits may overlap in the fulfillment of the requirements of the Scholar Intensive Certificate or of a major, a simultaneous degree, or another certificate."
+  },
   "requirements": [
     {
       "name": "Prerequisite",

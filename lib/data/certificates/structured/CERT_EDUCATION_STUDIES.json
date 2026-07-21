@@ -16,6 +16,10 @@
     "Graduate and professional school courses may count with approval from the Education Studies Associate Director.",
     "Declare on Yale Hub once enrolled in EDST 1110; by January 15 or September 15 of the final semester at the latest."
   ],
+  "policy": {
+    "overlapCap": 2,
+    "sourceNote": "No more than two course credits may overlap in the fulfillment of the requirements of the Education Studies Certificate or of a major, a simultaneous degree, or another certificate."
+  },
   "requirements": [
     {
       "name": "Prerequisite",

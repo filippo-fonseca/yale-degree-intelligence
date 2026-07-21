@@ -20,6 +20,14 @@
     "Graduate and professional school courses may count toward the certificate.",
     "Declare on Yale Hub by January 15 or September 15 of the final semester at the latest."
   ],
+  "policy": {
+    "overlapCap": 2,
+    "minGrade": "C",
+    "nonCourseRequirements": [
+      "Attend three critical computing-related lectures or events and submit a brief write-up for each to the certificate director"
+    ],
+    "sourceNote": "No more than two course credits fulfilling the requirements of the certificate may overlap with a major, a simultaneous degree, or another certificate. All courses must be taken for a letter grade, and students must achieve a grade of C or above."
+  },
   "requirements": [
     {
       "name": "Survey course",

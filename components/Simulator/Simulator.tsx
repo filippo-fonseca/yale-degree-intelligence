@@ -24,8 +24,10 @@ import SimulatorManualAssignModal from "./SimulatorManualAssignModal";
 import SimulatorRequirementsBreakdown from "./SimulatorRequirementsBreakdown";
 import CourseGradeControl from "./CourseGradeControl";
 import CourseDistributionalControl from "./CourseDistributionalControl";
-import SimulatorGradesSection from "./SimulatorGradesSection";
-import SimulatorDistributionalsSection from "./SimulatorDistributionalsSection";
+import SimulatorProgressPane from "./SimulatorProgressPane";
+import SimulatorViewSwitcher, {
+  type SimulatorView,
+} from "./SimulatorViewSwitcher";
 import {
   calculatePreviewMajorProgressByMajors,
   MajorProgress,
@@ -341,6 +343,10 @@ function isCurrentSemester(semesterName: string) {
   return isCurrentTerm(semesterName);
 }
 
+// Which of the two predominant views the student was last on. Kept in
+// localStorage so a refresh lands them back where they were.
+const ACTIVE_VIEW_STORAGE_KEY = "simulatorActiveView";
+
 // ----------------- Component -----------------
 export default function Simulator({
   remainingCourses,
@@ -383,6 +389,13 @@ export default function Simulator({
   const [currentPlanName, setCurrentPlanName] = useState<string | null>(null);
   // Track scroll state for sticky nav background
   const [isScrolled, setIsScrolled] = useState(false);
+  // Canvas (build the plan) vs Progress (read the results). Canvas is the
+  // default; the stored preference is applied on mount so SSR stays stable.
+  const [activeView, setActiveView] = useState<SimulatorView>("canvas");
+  // The toolbar grows and shrinks with the view and the viewport, so the pool
+  // below it parks itself against the measured height instead of a magic number.
+  const toolbarRef = useRef<HTMLDivElement | null>(null);
+  const [toolbarHeight, setToolbarHeight] = useState(72);
 
   // Simulator-local manual requirements (plan-scoped, NOT in Firebase courses)
   const [simulatorManualReqs, setSimulatorManualReqs] = useState<
@@ -794,6 +807,38 @@ export default function Simulator({
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  // ------------ Canvas / Progress view preference ------------
+  useEffect(() => {
+    try {
+      const stored = window.localStorage.getItem(ACTIVE_VIEW_STORAGE_KEY);
+      if (stored === "canvas" || stored === "progress") {
+        setActiveView(stored);
+      }
+    } catch {
+      // Private mode or blocked storage: Canvas is a fine default.
+    }
+  }, []);
+
+  useEffect(() => {
+    try {
+      window.localStorage.setItem(ACTIVE_VIEW_STORAGE_KEY, activeView);
+    } catch {
+      // Nothing to do; the choice just will not survive a refresh.
+    }
+  }, [activeView]);
+
+  // ------------ Sticky toolbar height (drives the pool offset) ------------
+  useEffect(() => {
+    const el = toolbarRef.current;
+    if (!el) return;
+    const measure = () => setToolbarHeight(el.offsetHeight);
+    measure();
+    if (typeof ResizeObserver === "undefined") return;
+    const observer = new ResizeObserver(measure);
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [activeView]);
 
   // ------------ Drag & Drop ------------
   const playPopSound = () => {
@@ -1496,528 +1541,493 @@ export default function Simulator({
 
       {/* Sticky Toolbar */}
       <div
+        ref={toolbarRef}
         className={`sticky top-0 z-30 -mx-4 px-6 py-3 mb-4 backdrop-blur-xl transition-all duration-200 ${
           isScrolled
             ? "bg-white/95 dark:bg-transparent dark:bg-gradient-to-r dark:from-gray-900/95 dark:via-gray-950/95 dark:to-gray-900/95 border-b border-gray-200 dark:border-white/[0.06] shadow-[0_4px_20px_rgba(0,0,0,0.08)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.3)]"
             : "bg-transparent border-b border-transparent"
         }`}
       >
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-          {/* Current Plan Status */}
-          <div className="flex items-center gap-3 min-w-0 sm:flex-1">
-            <span className="text-xs text-gray-400 dark:text-gray-500 uppercase tracking-wider shrink-0">
-              Plan:
-            </span>
-            <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-black/[0.04] dark:bg-white/[0.04] border border-black/[0.06] dark:border-white/[0.08] min-w-0 max-w-full">
-              {currentPlanName ? (
-                <>
-                  <div
-                    className={`w-2.5 h-2.5 rounded-full shrink-0 ${hasChanges ? "bg-amber-400 animate-pulse" : "bg-emerald-400"}`}
-                  />
-                  <span
-                    className="text-base font-medium text-gray-800 dark:text-gray-200 truncate"
-                    title={currentPlanName}
+        <div className="flex flex-col gap-3">
+          <SimulatorViewSwitcher view={activeView} setView={setActiveView} />
+
+          {activeView === "canvas" && (
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+              {/* Current Plan Status */}
+              <div className="flex items-center gap-3 min-w-0 sm:flex-1">
+                <span className="text-xs text-gray-400 dark:text-gray-500 uppercase tracking-wider shrink-0">
+                  Plan:
+                </span>
+                <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-black/[0.04] dark:bg-white/[0.04] border border-black/[0.06] dark:border-white/[0.08] min-w-0 max-w-full">
+                  {currentPlanName ? (
+                    <>
+                      <div
+                        className={`w-2.5 h-2.5 rounded-full shrink-0 ${hasChanges ? "bg-amber-400 animate-pulse" : "bg-emerald-400"}`}
+                      />
+                      <span
+                        className="text-base font-medium text-gray-800 dark:text-gray-200 truncate"
+                        title={currentPlanName}
+                      >
+                        {currentPlanName}
+                      </span>
+                      {loadedPlanIsDefault && (
+                        <span className="text-[9px] font-medium uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 border border-purple-300 dark:border-purple-700/40 shrink-0">
+                          Default
+                        </span>
+                      )}
+                      {hasChanges && (
+                        <span className="text-xs text-amber-400 ml-1 px-2 py-0.5 rounded-full bg-amber-400/10 border border-amber-400/20 shrink-0">
+                          unsaved
+                        </span>
+                      )}
+                    </>
+                  ) : (
+                    <>
+                      <div
+                        className={`w-2.5 h-2.5 rounded-full ${hasChanges ? "bg-blue-400 animate-pulse" : "bg-gray-500"}`}
+                      />
+                      <span className="text-sm text-gray-500 dark:text-gray-400">
+                        {hasChanges ? "Unsaved new plan" : "No plan loaded"}
+                      </span>
+                    </>
+                  )}
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex items-center gap-2 flex-wrap shrink-0" data-tour="simulator-plan-actions">
+                <button
+                  onClick={() => setShowHelp((v) => !v)}
+                  className="px-4 py-2 text-sm rounded-xl bg-black/[0.04] dark:bg-white/[0.04] backdrop-blur-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-black/[0.06] dark:hover:bg-white/[0.08] border border-black/[0.06] dark:border-white/[0.08] flex items-center gap-2 transition-all"
+                >
+                  <FiInfo size={14} />
+                  Help
+                </button>
+                {user && (
+                  <>
+                    <button
+                      onClick={() => setShowPlansModal(true)}
+                      className="px-4 py-2 text-sm rounded-xl bg-gradient-to-r from-blue-500/15 to-purple-500/15 backdrop-blur-sm text-blue-300 hover:text-blue-200 hover:from-blue-500/20 hover:to-purple-500/20 border border-blue-500/30 hover:border-blue-400/40 flex items-center gap-2 transition-all"
+                    >
+                      <FiChevronDown size={14} />
+                      Load Plan
+                    </button>
+                    <button
+                      onClick={() => {
+                        // Default to overwriting the currently-loaded plan (if any).
+                        if (loadedPlanIndex >= 0) {
+                          setSelectedPlanToOverwrite(loadedPlanIndex);
+                          setPlanName(savedPlans[loadedPlanIndex]?.name ?? "");
+                        } else {
+                          setSelectedPlanToOverwrite(null);
+                          setPlanName("");
+                        }
+                        setShowSaveModal(true);
+                      }}
+                      className={`px-4 py-2 text-sm rounded-xl backdrop-blur-sm transition-all flex items-center gap-2 ${
+                        hasChanges
+                          ? "bg-gradient-to-r from-emerald-500/20 to-teal-500/20 text-emerald-300 hover:text-emerald-200 hover:from-emerald-500/25 hover:to-teal-500/25 border border-emerald-500/30 hover:border-emerald-400/40"
+                          : "bg-black/[0.02] dark:bg-white/[0.02] text-gray-400 dark:text-gray-600 border border-black/[0.04] dark:border-white/[0.04] cursor-not-allowed"
+                      }`}
+                      disabled={!hasChanges}
+                    >
+                      <FiPlus size={14} />
+                      Save Current
+                    </button>
+                  </>
+                )}
+                <button
+                  onClick={resetSimulator}
+                  className="px-4 py-2 text-sm rounded-xl bg-red-500/10 backdrop-blur-sm text-red-400 hover:text-red-300 hover:bg-red-500/15 border border-red-500/20 hover:border-red-400/30 flex items-center gap-2 transition-all"
+                >
+                  <FiRefreshCw size={14} />
+                  Clear canvas
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {activeView === "canvas" ? (
+        <>
+          {/* Help Panel */}
+          <AnimatePresence>
+            {showHelp && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                exit={{ opacity: 0, height: 0 }}
+                className="overflow-hidden bg-gray-50 dark:bg-transparent dark:bg-gradient-to-br dark:from-white/[0.03] dark:to-transparent backdrop-blur-xl rounded-xl border border-gray-200 dark:border-white/[0.06] p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_4px_20px_rgba(0,0,0,0.08)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_4px_20px_rgba(0,0,0,0.15)]"
+              >
+                <h4 className="font-medium text-sm text-gray-900 dark:text-white mb-2">
+                  How to use the simulator
+                </h4>
+                <ul className="text-xs text-gray-500 dark:text-gray-400 space-y-1.5 list-disc list-inside">
+                  <li>
+                    Use this simulator to plan out your remaining semesters and see
+                    fit.
+                  </li>
+                  <li>
+                    The pool shows remaining courses in your major; you can also add
+                    any course manually.
+                  </li>
+                  <li>
+                    Drag/add courses into any semester (multiple courses per term
+                    work fine).
+                  </li>
+                  <li>
+                    Click the trash icon on a course to remove it (if it's not
+                    completed/in-progress).
+                  </li>
+                  <li>
+                    Completed/in-progress are pre-assigned and cannot be moved.
+                  </li>
+                  <li>Save or load plans to explore what-ifs and revisit later.</li>
+                </ul>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* Available Courses Pool */}
+          <div
+            className="sticky z-20 mb-2"
+            style={{ top: toolbarHeight + 8 }}
+            data-tour="simulator-course-pool"
+          >
+            <div className="bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-pink-950/30 dark:via-gray-900/50 dark:to-gray-950/50 backdrop-blur-md rounded-xl border border-pink-200 dark:border-pink-800/30 shadow-[inset_0_1px_0_rgba(255,255,255,0.04),0_4px_16px_rgba(0,0,0,0.08)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.04),0_4px_16px_rgba(0,0,0,0.25)] overflow-hidden">
+              <button
+                onClick={() => setShowPool(!showPool)}
+                className={`flex items-center justify-between w-full p-3 ${
+                  showPool ? "border-b border-pink-200 dark:border-pink-800/30" : ""
+                } text-gray-700 dark:text-gray-300 hover:bg-black/[0.04] dark:hover:bg-white/[0.06] transition-colors`}
+              >
+                <div className="flex items-center gap-2 font-medium text-sm">
+                  <div>Quick-add: Pool of remaining courses from your major</div>
+                  <div className="relative group">
+                    <Info className="h-3.5 w-3.5 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition-colors cursor-pointer" />
+                    <div className="absolute z-50 bottom-full mt-2 left-1/2 -translate-x-1/2 bg-white dark:bg-gray-900/95 backdrop-blur-sm text-gray-700 dark:text-gray-300 text-[10px] px-2 py-1 rounded-md border border-gray-200 dark:border-gray-800/50 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+                      May not include all. Add manually if not.
+                    </div>
+                  </div>
+                </div>
+                {showPool ? (
+                  <FiChevronUp className="w-3.5 h-3.5 text-gray-500" />
+                ) : (
+                  <FiChevronDown className="w-3.5 h-3.5 text-gray-500" />
+                )}
+              </button>
+
+              <AnimatePresence>
+                {showPool && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: "auto" }}
+                    exit={{ opacity: 0, height: 0 }}
+                    transition={{ duration: 0.2 }}
+                    className="p-3"
                   >
-                    {currentPlanName}
-                  </span>
-                  {loadedPlanIsDefault && (
-                    <span className="text-[9px] font-medium uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 border border-purple-300 dark:border-purple-700/40 shrink-0">
-                      Default
-                    </span>
-                  )}
-                  {hasChanges && (
-                    <span className="text-xs text-amber-400 ml-1 px-2 py-0.5 rounded-full bg-amber-400/10 border border-amber-400/20 shrink-0">
-                      unsaved
-                    </span>
-                  )}
-                </>
-              ) : (
-                <>
-                  <div
-                    className={`w-2.5 h-2.5 rounded-full ${hasChanges ? "bg-blue-400 animate-pulse" : "bg-gray-500"}`}
-                  />
-                  <span className="text-sm text-gray-500 dark:text-gray-400">
-                    {hasChanges ? "Unsaved new plan" : "No plan loaded"}
-                  </span>
-                </>
-              )}
+                    {availableCourses.length === 0 ? (
+                      <p className="text-[11px] text-gray-400 dark:text-gray-500 italic">
+                        All available courses have been scheduled. Remove one from a
+                        semester to add it back.
+                      </p>
+                    ) : (
+                      <div className="max-h-28 overflow-y-auto pr-1 flex flex-wrap gap-1.5">
+                        {availableCourses.map((course) => (
+                          <motion.div
+                            key={course.code}
+                            draggable
+                            onDragStart={() => handleDragStart(course)}
+                            onClick={() =>
+                              setSelectedPoolCourse((prev) =>
+                                prev?.code === course.code ? null : course,
+                              )
+                            }
+                            whileHover={{ scale: 1.02 }}
+                            whileTap={{ scale: 0.98 }}
+                            className={`px-2 py-1 rounded-lg text-xs cursor-grab active:cursor-grabbing select-none shadow-[inset_0_1px_0_rgba(255,255,255,0.05)] border ${
+                              selectedPoolCourse?.code === course.code
+                                ? "bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 border-purple-400 dark:border-purple-600 ring-2 ring-purple-400/50"
+                                : "bg-pink-100 dark:bg-pink-900/25 text-pink-700 dark:text-pink-300 border-pink-300 dark:border-pink-700/40"
+                            }`}
+                          >
+                            {course.code}
+                            <span className="text-[10px] text-pink-500/70 dark:text-pink-200/50 ml-1">
+                              {(getCourseNameFromCode(course.code) ?? "").length > 0
+                                ? ` ${getCourseNameFromCode(course.code)}`
+                                : ""}
+                            </span>
+                          </motion.div>
+                        ))}
+                      </div>
+                    )}
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
           </div>
 
-          {/* Action Buttons */}
-          <div className="flex items-center gap-2 flex-wrap shrink-0" data-tour="simulator-plan-actions">
+          {/* Per-course editors on the semester cards. These live on the
+              Canvas because that is where the typing happens; what they feed
+              (the GPA timeline, the distributional tally) reads on Progress. */}
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="text-[10px] text-gray-400 dark:text-gray-500 uppercase tracking-wider">
+              Edit on cards:
+            </span>
             <button
               type="button"
               onClick={() => setShowGrades((v) => !v)}
               aria-pressed={showGrades}
-              className={`px-4 py-2 text-sm rounded-xl backdrop-blur-sm border flex items-center gap-2 transition-all ${
+              className={`px-2.5 py-1 text-[11px] rounded-lg border transition-all duration-200 ${
                 showGrades
-                  ? "bg-gradient-to-r from-emerald-500/15 to-teal-500/15 text-emerald-600 dark:text-emerald-300 border-emerald-500/30 hover:border-emerald-400/40"
-                  : "bg-black/[0.04] dark:bg-white/[0.04] text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-black/[0.06] dark:hover:bg-white/[0.08] border-black/[0.06] dark:border-white/[0.08]"
+                  ? "bg-emerald-500/15 text-emerald-600 dark:text-emerald-300 border-emerald-600/40 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]"
+                  : "bg-gray-100 dark:bg-gray-900/50 text-gray-400 dark:text-gray-500 border-gray-200 dark:border-gray-800/50 hover:text-gray-600 dark:hover:text-gray-400"
               }`}
             >
-              GPA
+              Grades
             </button>
             <button
               type="button"
               onClick={() => setShowDistributionals((v) => !v)}
               aria-pressed={showDistributionals}
-              className={`px-4 py-2 text-sm rounded-xl backdrop-blur-sm border flex items-center gap-2 transition-all ${
+              className={`px-2.5 py-1 text-[11px] rounded-lg border transition-all duration-200 ${
                 showDistributionals
-                  ? "bg-gradient-to-r from-purple-500/15 to-blue-500/15 text-purple-600 dark:text-purple-300 border-purple-500/30 hover:border-purple-400/40"
-                  : "bg-black/[0.04] dark:bg-white/[0.04] text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-black/[0.06] dark:hover:bg-white/[0.08] border-black/[0.06] dark:border-white/[0.08]"
+                  ? "bg-purple-500/15 text-purple-600 dark:text-purple-300 border-purple-600/40 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]"
+                  : "bg-gray-100 dark:bg-gray-900/50 text-gray-400 dark:text-gray-500 border-gray-200 dark:border-gray-800/50 hover:text-gray-600 dark:hover:text-gray-400"
               }`}
             >
               Distributionals
             </button>
-            <button
-              onClick={() => setShowHelp((v) => !v)}
-              className="px-4 py-2 text-sm rounded-xl bg-black/[0.04] dark:bg-white/[0.04] backdrop-blur-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-black/[0.06] dark:hover:bg-white/[0.08] border border-black/[0.06] dark:border-white/[0.08] flex items-center gap-2 transition-all"
-            >
-              <FiInfo size={14} />
-              Help
-            </button>
-            {user && (
-              <>
-                <button
-                  onClick={() => setShowPlansModal(true)}
-                  className="px-4 py-2 text-sm rounded-xl bg-gradient-to-r from-blue-500/15 to-purple-500/15 backdrop-blur-sm text-blue-300 hover:text-blue-200 hover:from-blue-500/20 hover:to-purple-500/20 border border-blue-500/30 hover:border-blue-400/40 flex items-center gap-2 transition-all"
-                >
-                  <FiChevronDown size={14} />
-                  Load Plan
-                </button>
-                <button
+          </div>
+
+          {/* Semesters Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3" data-tour="simulator-board">
+            {semesters.map((semester) => {
+              const semCredits = getSemesterCredits(semester);
+              const semCreditsLabel = Number.isInteger(semCredits)
+                ? String(semCredits)
+                : semCredits.toFixed(1);
+              const isPast = isPastSemester(semester.name);
+              const isPlaceTarget = !!selectedPoolCourse && !isPast;
+
+              return (
+                <motion.div
+                  key={semester.id}
                   onClick={() => {
-                    // Default to overwriting the currently-loaded plan (if any).
-                    if (loadedPlanIndex >= 0) {
-                      setSelectedPlanToOverwrite(loadedPlanIndex);
-                      setPlanName(savedPlans[loadedPlanIndex]?.name ?? "");
-                    } else {
-                      setSelectedPlanToOverwrite(null);
-                      setPlanName("");
+                    if (selectedPoolCourse && !isPast) {
+                      placeCourseInSemester(selectedPoolCourse, semester.id);
                     }
-                    setShowSaveModal(true);
                   }}
-                  className={`px-4 py-2 text-sm rounded-xl backdrop-blur-sm transition-all flex items-center gap-2 ${
-                    hasChanges
-                      ? "bg-gradient-to-r from-emerald-500/20 to-teal-500/20 text-emerald-300 hover:text-emerald-200 hover:from-emerald-500/25 hover:to-teal-500/25 border border-emerald-500/30 hover:border-emerald-400/40"
-                      : "bg-black/[0.02] dark:bg-white/[0.02] text-gray-400 dark:text-gray-600 border border-black/[0.04] dark:border-white/[0.04] cursor-not-allowed"
-                  }`}
-                  disabled={!hasChanges}
-                >
-                  <FiPlus size={14} />
-                  Save Current
-                </button>
-              </>
-            )}
-            <button
-              onClick={resetSimulator}
-              className="px-4 py-2 text-sm rounded-xl bg-red-500/10 backdrop-blur-sm text-red-400 hover:text-red-300 hover:bg-red-500/15 border border-red-500/20 hover:border-red-400/30 flex items-center gap-2 transition-all"
-            >
-              <FiRefreshCw size={14} />
-              Clear canvas
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* Help Panel */}
-      <AnimatePresence>
-        {showHelp && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-            className="overflow-hidden bg-gray-50 dark:bg-transparent dark:bg-gradient-to-br dark:from-white/[0.03] dark:to-transparent backdrop-blur-xl rounded-xl border border-gray-200 dark:border-white/[0.06] p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_4px_20px_rgba(0,0,0,0.08)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_4px_20px_rgba(0,0,0,0.15)]"
-          >
-            <h4 className="font-medium text-sm text-gray-900 dark:text-white mb-2">
-              How to use the simulator
-            </h4>
-            <ul className="text-xs text-gray-500 dark:text-gray-400 space-y-1.5 list-disc list-inside">
-              <li>
-                Use this simulator to plan out your remaining semesters and see
-                fit.
-              </li>
-              <li>
-                The pool shows remaining courses in your major; you can also add
-                any course manually.
-              </li>
-              <li>
-                Drag/add courses into any semester (multiple courses per term
-                work fine).
-              </li>
-              <li>
-                Click the trash icon on a course to remove it (if it's not
-                completed/in-progress).
-              </li>
-              <li>
-                Completed/in-progress are pre-assigned and cannot be moved.
-              </li>
-              <li>Save or load plans to explore what-ifs and revisit later.</li>
-            </ul>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Live Major Progress Preview */}
-      <div className="space-y-3" data-tour="simulator-live-progress">
-        <button
-          onClick={() => setShowMajorPreview((v) => !v)}
-          className="w-full flex items-start justify-between text-left group"
-          aria-expanded={showMajorPreview}
-        >
-          <div>
-            <h3 className="text-lg font-medium text-gray-900 dark:text-white">
-              Progress toward{" "}
-              {majorIds.length > 0 && certificateIds.length > 0
-                ? "majors & certificates"
-                : certificateIds.length > 0
-                  ? certificateIds.length > 1
-                    ? "certificates"
-                    : "certificate"
-                  : majorIds.length > 1
-                    ? "majors"
-                    : "major"}
-            </h3>
-            <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
-              Live preview — reflects completed, in-progress, and courses placed
-              on the grid.
-            </p>
-          </div>
-          <FiChevronDown
-            className={`mt-1 shrink-0 text-gray-400 dark:text-gray-500 transition-transform ${
-              showMajorPreview ? "rotate-180" : ""
-            }`}
-            size={18}
-          />
-        </button>
-
-        <AnimatePresence initial={false}>
-          {showMajorPreview && (
-            <motion.div
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: "auto", opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
-              transition={{ duration: 0.25, ease: "easeInOut" }}
-              className="overflow-hidden space-y-3"
-            >
-              {isPreviewLoading && (
-                <div className="text-sm text-gray-500 dark:text-gray-400">
-                  Updating preview…
-                </div>
-              )}
-              {previewError && (
-                <div className="text-sm text-red-600 dark:text-red-300">
-                  {previewError}
-                </div>
-              )}
-
-              <SimulatorRequirementsBreakdown
-                majorIds={majorIds}
-                certificateIds={certificateIds}
-                previewProgress={previewProgress}
-                certificatePreviewProgress={certificatePreviewProgress}
-                plannedCodes={plannedCodes}
-                simulatorManualReqs={simulatorManualReqs}
-                courses={completedCourses}
-                policyOptions={policyOptions}
-                onRemoveManualReq={(code, requirement) => {
-                  setSimulatorManualReqs((prev) =>
-                    prev.filter(
-                      (m) => !(m.code === code && m.requirement === requirement),
-                    ),
-                  );
-                }}
-              />
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
-
-      {/* Live GPA / Distributionals add-on sections */}
-      {(showGrades || showDistributionals) && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-          {showGrades && (
-            <SimulatorGradesSection terms={gpaTimelineTerms} />
-          )}
-          {showDistributionals && (
-            <SimulatorDistributionalsSection
-              assignments={[
-                ...completedDistAssignments,
-                ...plannedDistAssignments,
-              ]}
-            />
-          )}
-        </div>
-      )}
-
-      {/* Available Courses Pool */}
-      <div className="sticky top-[72px] z-20 mb-2" data-tour="simulator-course-pool">
-        <div className="bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-pink-950/30 dark:via-gray-900/50 dark:to-gray-950/50 backdrop-blur-md rounded-xl border border-pink-200 dark:border-pink-800/30 shadow-[inset_0_1px_0_rgba(255,255,255,0.04),0_4px_16px_rgba(0,0,0,0.08)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.04),0_4px_16px_rgba(0,0,0,0.25)] overflow-hidden">
-          <button
-            onClick={() => setShowPool(!showPool)}
-            className={`flex items-center justify-between w-full p-3 ${
-              showPool ? "border-b border-pink-200 dark:border-pink-800/30" : ""
-            } text-gray-700 dark:text-gray-300 hover:bg-black/[0.04] dark:hover:bg-white/[0.06] transition-colors`}
-          >
-            <div className="flex items-center gap-2 font-medium text-sm">
-              <div>Quick-add: Pool of remaining courses from your major</div>
-              <div className="relative group">
-                <Info className="h-3.5 w-3.5 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition-colors cursor-pointer" />
-                <div className="absolute z-50 bottom-full mt-2 left-1/2 -translate-x-1/2 bg-white dark:bg-gray-900/95 backdrop-blur-sm text-gray-700 dark:text-gray-300 text-[10px] px-2 py-1 rounded-md border border-gray-200 dark:border-gray-800/50 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
-                  May not include all. Add manually if not.
-                </div>
-              </div>
-            </div>
-            {showPool ? (
-              <FiChevronUp className="w-3.5 h-3.5 text-gray-500" />
-            ) : (
-              <FiChevronDown className="w-3.5 h-3.5 text-gray-500" />
-            )}
-          </button>
-
-          <AnimatePresence>
-            {showPool && (
-              <motion.div
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: "auto" }}
-                exit={{ opacity: 0, height: 0 }}
-                transition={{ duration: 0.2 }}
-                className="p-3"
-              >
-                {availableCourses.length === 0 ? (
-                  <p className="text-[11px] text-gray-400 dark:text-gray-500 italic">
-                    All available courses have been scheduled. Remove one from a
-                    semester to add it back.
-                  </p>
-                ) : (
-                  <div className="max-h-28 overflow-y-auto pr-1 flex flex-wrap gap-1.5">
-                    {availableCourses.map((course) => (
-                      <motion.div
-                        key={course.code}
-                        draggable
-                        onDragStart={() => handleDragStart(course)}
-                        onClick={() =>
-                          setSelectedPoolCourse((prev) =>
-                            prev?.code === course.code ? null : course,
-                          )
-                        }
-                        whileHover={{ scale: 1.02 }}
-                        whileTap={{ scale: 0.98 }}
-                        className={`px-2 py-1 rounded-lg text-xs cursor-grab active:cursor-grabbing select-none shadow-[inset_0_1px_0_rgba(255,255,255,0.05)] border ${
-                          selectedPoolCourse?.code === course.code
-                            ? "bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 border-purple-400 dark:border-purple-600 ring-2 ring-purple-400/50"
-                            : "bg-pink-100 dark:bg-pink-900/25 text-pink-700 dark:text-pink-300 border-pink-300 dark:border-pink-700/40"
-                        }`}
-                      >
-                        {course.code}
-                        <span className="text-[10px] text-pink-500/70 dark:text-pink-200/50 ml-1">
-                          {(getCourseNameFromCode(course.code) ?? "").length > 0
-                            ? ` ${getCourseNameFromCode(course.code)}`
-                            : ""}
-                        </span>
-                      </motion.div>
-                    ))}
-                  </div>
-                )}
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
-      </div>
-
-      {/* Semesters Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3" data-tour="simulator-board">
-        {semesters.map((semester) => {
-          const semCredits = getSemesterCredits(semester);
-          const semCreditsLabel = Number.isInteger(semCredits)
-            ? String(semCredits)
-            : semCredits.toFixed(1);
-          const isPast = isPastSemester(semester.name);
-          const isPlaceTarget = !!selectedPoolCourse && !isPast;
-
-          return (
-            <motion.div
-              key={semester.id}
-              onClick={() => {
-                if (selectedPoolCourse && !isPast) {
-                  placeCourseInSemester(selectedPoolCourse, semester.id);
-                }
-              }}
-              onDragOver={(e) => {
-                e.preventDefault();
-                if (!isPast) setHoveredSemester(semester.id);
-              }}
-              onDragLeave={() => setHoveredSemester(null)}
-              onDrop={() => {
-                if (isPast) return;
-                handleDrop(semester.id);
-                setHoveredSemester(null);
-              }}
-              className={`bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 backdrop-blur-md rounded-xl border p-3 min-h-[160px] flex flex-col transition-all shadow-[inset_0_1px_0_rgba(255,255,255,0.04),0_4px_12px_rgba(0,0,0,0.08)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.04),0_4px_12px_rgba(0,0,0,0.2)]
-                ${
-                  isCurrentSemester(semester.name)
-                    ? "border-blue-700/50 ring-1 ring-blue-500/30"
-                    : isPast
-                      ? "border-gray-300 dark:border-gray-700/60 opacity-80"
-                      : "border-gray-200 dark:border-gray-800/50"
-                }
-                ${
-                  hoveredSemester === semester.id && draggedCourse && !isPast
-                    ? "ring-2 ring-pink-400/60 scale-[0.98] bg-gray-100 dark:bg-gray-800/60"
-                    : ""
-                }
-                ${
-                  isPlaceTarget ? "ring-2 ring-purple-400/50 cursor-pointer" : ""
-                }`}
-            >
-              <div className="flex justify-between items-center mb-2">
-                <h4 className="font-medium text-sm text-gray-700 dark:text-gray-300 flex items-center gap-1.5">
-                  {semester.name}
-                  {isPast && (
-                    <span
-                      className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-md text-[9px] font-medium uppercase tracking-wider bg-gray-200 dark:bg-gray-800/80 text-gray-500 dark:text-gray-400 border border-gray-300 dark:border-gray-700/50"
-                      title="Past semesters are locked"
-                    >
-                      <FiLock size={9} />
-                      Locked
-                    </span>
-                  )}
-                </h4>
-                <div className="flex items-center gap-1.5">
-                  <span
-                    className="px-1.5 py-0.5 rounded-md text-[10px] bg-gray-100 dark:bg-gray-800/60 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-700/40"
-                    title="Sum of credits in this semester"
-                  >
-                    {semCreditsLabel} cr
-                  </span>
-                  {!isPast && (
-                    <button
-                      onClick={() => setLookupSemesterId(semester.id)}
-                      data-tour="simulator-semester-add"
-                      className="px-1.5 py-0.5 text-[10px] rounded-md bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 hover:bg-blue-200 dark:hover:bg-blue-800/40 border border-blue-300 dark:border-blue-800/40 transition-all"
-                      type="button"
-                    >
-                      <FiPlus className="inline-block mr-0.5" size={10} />
-                      Add
-                    </button>
-                  )}
-                </div>
-              </div>
-
-              {semester.courses.length === 0 ? (
-                <div
-                  className={`flex-1 flex items-center justify-center border border-dashed rounded-lg p-3 min-h-[48px] transition-all
+                  onDragOver={(e) => {
+                    e.preventDefault();
+                    if (!isPast) setHoveredSemester(semester.id);
+                  }}
+                  onDragLeave={() => setHoveredSemester(null)}
+                  onDrop={() => {
+                    if (isPast) return;
+                    handleDrop(semester.id);
+                    setHoveredSemester(null);
+                  }}
+                  className={`bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 backdrop-blur-md rounded-xl border p-3 min-h-[160px] flex flex-col transition-all shadow-[inset_0_1px_0_rgba(255,255,255,0.04),0_4px_12px_rgba(0,0,0,0.08)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.04),0_4px_12px_rgba(0,0,0,0.2)]
+                    ${
+                      isCurrentSemester(semester.name)
+                        ? "border-blue-700/50 ring-1 ring-blue-500/30"
+                        : isPast
+                          ? "border-gray-300 dark:border-gray-700/60 opacity-80"
+                          : "border-gray-200 dark:border-gray-800/50"
+                    }
                     ${
                       hoveredSemester === semester.id && draggedCourse && !isPast
-                        ? "border-pink-400/60 bg-pink-50 dark:bg-pink-900/15"
-                        : "border-gray-200 dark:border-gray-700/50"
+                        ? "ring-2 ring-pink-400/60 scale-[0.98] bg-gray-100 dark:bg-gray-800/60"
+                        : ""
+                    }
+                    ${
+                      isPlaceTarget ? "ring-2 ring-purple-400/50 cursor-pointer" : ""
                     }`}
                 >
-                  <p className="text-[11px] text-gray-400 dark:text-gray-500 text-center opacity-70">
-                    {selectedPoolCourse
-                      ? "Tap to place selected course"
-                      : "Drag from pool or add manually"}
-                  </p>
-                </div>
-              ) : (
-                <div className="flex flex-wrap gap-1.5">
-                  {semester.courses.map((course) => (
-                    <motion.div
-                      key={`${semester.id}-${course.code}`}
-                      draggable={course.status === "not-taken"}
-                      onDragStart={
-                        course.status === "not-taken"
-                          ? () => handleDragStart(course, semester.id)
-                          : undefined
-                      }
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      className={`w-full flex ${
-                        course.status === "not-taken" &&
-                        (showGrades || showDistributionals)
-                          ? "flex-col items-stretch"
-                          : "items-center justify-between"
-                      } px-2 py-1 rounded-lg text-xs select-none transition-all border relative group shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]
+                  <div className="flex justify-between items-center mb-2">
+                    <h4 className="font-medium text-sm text-gray-700 dark:text-gray-300 flex items-center gap-1.5">
+                      {semester.name}
+                      {isPast && (
+                        <span
+                          className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-md text-[9px] font-medium uppercase tracking-wider bg-gray-200 dark:bg-gray-800/80 text-gray-500 dark:text-gray-400 border border-gray-300 dark:border-gray-700/50"
+                          title="Past semesters are locked"
+                        >
+                          <FiLock size={9} />
+                          Locked
+                        </span>
+                      )}
+                    </h4>
+                    <div className="flex items-center gap-1.5">
+                      <span
+                        className="px-1.5 py-0.5 rounded-md text-[10px] bg-gray-100 dark:bg-gray-800/60 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-700/40"
+                        title="Sum of credits in this semester"
+                      >
+                        {semCreditsLabel} cr
+                      </span>
+                      {!isPast && (
+                        <button
+                          onClick={() => setLookupSemesterId(semester.id)}
+                          data-tour="simulator-semester-add"
+                          className="px-1.5 py-0.5 text-[10px] rounded-md bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 hover:bg-blue-200 dark:hover:bg-blue-800/40 border border-blue-300 dark:border-blue-800/40 transition-all"
+                          type="button"
+                        >
+                          <FiPlus className="inline-block mr-0.5" size={10} />
+                          Add
+                        </button>
+                      )}
+                    </div>
+                  </div>
+
+                  {semester.courses.length === 0 ? (
+                    <div
+                      className={`flex-1 flex items-center justify-center border border-dashed rounded-lg p-3 min-h-[48px] transition-all
                         ${
-                          course.status === "completed"
-                            ? "bg-emerald-100 dark:bg-emerald-900/25 text-emerald-700 dark:text-emerald-300 border-emerald-300 dark:border-emerald-700/40"
-                            : course.status === "in-progress"
-                              ? "bg-blue-100 dark:bg-blue-900/25 text-blue-700 dark:text-blue-300 border-blue-300 dark:border-blue-700/40"
-                              : "bg-pink-100 dark:bg-pink-900/20 text-pink-700 dark:text-pink-300 border-pink-300 dark:border-pink-700/40 hover:bg-pink-200 dark:hover:bg-pink-800/30 cursor-grab active:cursor-grabbing"
+                          hoveredSemester === semester.id && draggedCourse && !isPast
+                            ? "border-pink-400/60 bg-pink-50 dark:bg-pink-900/15"
+                            : "border-gray-200 dark:border-gray-700/50"
                         }`}
                     >
-                      <div className="flex items-center justify-between w-full">
-                        <div>
-                          {course.code}
-                          <span className="text-[10px] opacity-60 ml-1">
-                            {getCourseNameFromCode(course.code) ?? ""}
-                          </span>
-                        </div>
-                        {course.status === "not-taken" && (
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              removeCourseFromSemester(
-                                semester.id,
-                                course.code,
-                              );
-                            }}
-                            className="ml-1.5 opacity-0 group-hover:opacity-100 transition-opacity text-red-300 hover:text-red-200"
-                          >
-                            <FiTrash2 className="h-3 w-3" />
-                          </button>
-                        )}
-                      </div>
-                      {course.status === "not-taken" &&
-                        (showGrades || showDistributionals) && (
-                          <div
-                            className="w-full mt-1.5 pt-1.5 border-t border-black/[0.06] dark:border-white/[0.08] flex flex-col gap-1.5"
-                            onClick={(e) => e.stopPropagation()}
-                            onMouseDown={(e) => e.stopPropagation()}
-                            draggable
-                            onDragStart={(e) => {
-                              e.preventDefault();
-                              e.stopPropagation();
-                            }}
-                          >
-                            {showGrades && (
-                              <div className="flex items-center gap-1.5">
-                                <span className="text-[10px] opacity-60">
-                                  Grade
-                                </span>
-                                <CourseGradeControl
-                                  value={course.grade}
-                                  onChange={(grade) =>
-                                    updatePlannedCourse(
-                                      semester.id,
-                                      course.code,
-                                      { grade },
-                                    )
-                                  }
-                                />
-                              </div>
-                            )}
-                            {showDistributionals && (
-                              <CourseDistributionalControl
-                                value={course.distributionals ?? []}
-                                onChange={(codes) =>
-                                  updatePlannedCourse(semester.id, course.code, {
-                                    distributionals: codes,
-                                  })
-                                }
-                              />
+                      <p className="text-[11px] text-gray-400 dark:text-gray-500 text-center opacity-70">
+                        {selectedPoolCourse
+                          ? "Tap to place selected course"
+                          : "Drag from pool or add manually"}
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="flex flex-wrap gap-1.5">
+                      {semester.courses.map((course) => (
+                        <motion.div
+                          key={`${semester.id}-${course.code}`}
+                          draggable={course.status === "not-taken"}
+                          onDragStart={
+                            course.status === "not-taken"
+                              ? () => handleDragStart(course, semester.id)
+                              : undefined
+                          }
+                          whileHover={{ scale: 1.02 }}
+                          whileTap={{ scale: 0.98 }}
+                          className={`w-full flex ${
+                            course.status === "not-taken" &&
+                            (showGrades || showDistributionals)
+                              ? "flex-col items-stretch"
+                              : "items-center justify-between"
+                          } px-2 py-1 rounded-lg text-xs select-none transition-all border relative group shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]
+                            ${
+                              course.status === "completed"
+                                ? "bg-emerald-100 dark:bg-emerald-900/25 text-emerald-700 dark:text-emerald-300 border-emerald-300 dark:border-emerald-700/40"
+                                : course.status === "in-progress"
+                                  ? "bg-blue-100 dark:bg-blue-900/25 text-blue-700 dark:text-blue-300 border-blue-300 dark:border-blue-700/40"
+                                  : "bg-pink-100 dark:bg-pink-900/20 text-pink-700 dark:text-pink-300 border-pink-300 dark:border-pink-700/40 hover:bg-pink-200 dark:hover:bg-pink-800/30 cursor-grab active:cursor-grabbing"
+                            }`}
+                        >
+                          <div className="flex items-center justify-between w-full">
+                            <div>
+                              {course.code}
+                              <span className="text-[10px] opacity-60 ml-1">
+                                {getCourseNameFromCode(course.code) ?? ""}
+                              </span>
+                            </div>
+                            {course.status === "not-taken" && (
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  removeCourseFromSemester(
+                                    semester.id,
+                                    course.code,
+                                  );
+                                }}
+                                className="ml-1.5 opacity-0 group-hover:opacity-100 transition-opacity text-red-300 hover:text-red-200"
+                              >
+                                <FiTrash2 className="h-3 w-3" />
+                              </button>
                             )}
                           </div>
-                        )}
-                    </motion.div>
-                  ))}
-                </div>
-              )}
-            </motion.div>
-          );
-        })}
-      </div>
+                          {course.status === "not-taken" &&
+                            (showGrades || showDistributionals) && (
+                              <div
+                                className="w-full mt-1.5 pt-1.5 border-t border-black/[0.06] dark:border-white/[0.08] flex flex-col gap-1.5"
+                                onClick={(e) => e.stopPropagation()}
+                                onMouseDown={(e) => e.stopPropagation()}
+                                draggable
+                                onDragStart={(e) => {
+                                  e.preventDefault();
+                                  e.stopPropagation();
+                                }}
+                              >
+                                {showGrades && (
+                                  <div className="flex items-center gap-1.5">
+                                    <span className="text-[10px] opacity-60">
+                                      Grade
+                                    </span>
+                                    <CourseGradeControl
+                                      value={course.grade}
+                                      onChange={(grade) =>
+                                        updatePlannedCourse(
+                                          semester.id,
+                                          course.code,
+                                          { grade },
+                                        )
+                                      }
+                                    />
+                                  </div>
+                                )}
+                                {showDistributionals && (
+                                  <CourseDistributionalControl
+                                    value={course.distributionals ?? []}
+                                    onChange={(codes) =>
+                                      updatePlannedCourse(semester.id, course.code, {
+                                        distributionals: codes,
+                                      })
+                                    }
+                                  />
+                                )}
+                              </div>
+                            )}
+                        </motion.div>
+                      ))}
+                    </div>
+                  )}
+                </motion.div>
+              );
+            })}
+          </div>
+        </>
+      ) : (
+        <SimulatorProgressPane
+          majorIds={majorIds}
+          certificateIds={certificateIds}
+          expanded={showMajorPreview}
+          onToggleExpanded={() => setShowMajorPreview((v) => !v)}
+          isPreviewLoading={isPreviewLoading}
+          previewError={previewError}
+          breakdown={
+            <SimulatorRequirementsBreakdown
+              majorIds={majorIds}
+              certificateIds={certificateIds}
+              previewProgress={previewProgress}
+              certificatePreviewProgress={certificatePreviewProgress}
+              plannedCodes={plannedCodes}
+              simulatorManualReqs={simulatorManualReqs}
+              courses={completedCourses}
+              policyOptions={policyOptions}
+              onRemoveManualReq={(code, requirement) => {
+                setSimulatorManualReqs((prev) =>
+                  prev.filter(
+                    (m) => !(m.code === code && m.requirement === requirement),
+                  ),
+                );
+              }}
+            />
+          }
+          gpaTimelineTerms={gpaTimelineTerms}
+          distributionalAssignments={[
+            ...completedDistAssignments,
+            ...plannedDistAssignments,
+          ]}
+        />
+      )}
 
       {/* Save Plan Modal */}
       <AnimatePresence>

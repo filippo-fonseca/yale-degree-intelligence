@@ -7,10 +7,10 @@ import { FiChevronDown } from "react-icons/fi";
  *
  * It replaces the old pair (a passive "PLAN: <name>" chip plus a separate
  * "Load Plan" button): one element that reads the plan you are on, carries its
- * default and unsaved badges, and opens the plan manager when clicked. It sits
- * beside the Canvas/Progress switcher as a peer, not as a third segment, so it
- * reads as its own thing. It is present on both views because the Progress
- * numbers are scoped to whichever plan is loaded.
+ * default and unsaved badges, and opens the plan manager when clicked. It leads
+ * the toolbar's top row and takes the width it is given, because the plan is
+ * the structure the views below it look at. It is present on both views because
+ * the Progress numbers are scoped to whichever plan is loaded.
  */
 export default function SimulatorPlanSelector({
   planName,
@@ -48,7 +48,7 @@ export default function SimulatorPlanSelector({
           ? "Sign in to save and switch plans"
           : `${label}. Switch, save, or manage your plans.`
       }
-      className={`h-10 max-w-full sm:max-w-sm w-full sm:w-auto px-3 flex items-center gap-2 rounded-xl border text-left transition-all duration-200 ${
+      className={`h-10 w-full max-w-full px-3 flex items-center gap-2 rounded-xl border text-left transition-all duration-200 ${
         disabled
           ? "bg-gray-50 dark:bg-white/[0.02] border-gray-200 dark:border-white/[0.06] cursor-not-allowed opacity-70"
           : "bg-white dark:bg-white/[0.03] border-gray-200 dark:border-white/10 hover:border-gray-300 dark:hover:border-white/20 hover:bg-gray-50 dark:hover:bg-white/[0.06]"

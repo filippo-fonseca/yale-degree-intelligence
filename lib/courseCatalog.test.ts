@@ -9,8 +9,10 @@ import { describe, it, expect } from "vitest";
 import {
   courseLevel,
   courseSubject,
+  getCourseDistributionalsFromCode,
   normalizeCourseCode,
 } from "@/lib/courseCatalog";
+import type { CourseInfo } from "@/lib/courseCatalog";
 
 describe("SPEC 3: course-code normalization", () => {
   describe("normalizeCourseCode: three-digit legacy numbers expand to four", () => {
@@ -90,5 +92,50 @@ describe("SPEC 3: course-code normalization", () => {
     it("returns null when the code has no separable subject", () => {
       expect(courseSubject("SENIOR ESSAY")).toBeNull();
     });
+  });
+});
+
+describe("getCourseDistributionalsFromCode: catalog tags for a course", () => {
+  // The augmentation that adds `distributionals` to courses.json has not landed
+  // yet, so every case injects its own record and the suite stays green either
+  // way: before the data arrives and after.
+  const record = (distributionals?: string[]): CourseInfo => ({
+    codes: ["TEST 1000"],
+    name: "Injected course",
+    credits: 1,
+    department: "TEST",
+    offered: [],
+    ...(distributionals === undefined ? {} : { distributionals }),
+  });
+
+  it("reads the tags off the record when the catalog carries them", () => {
+    const tags = getCourseDistributionalsFromCode("TEST 1000", () =>
+      record(["QR", "Sc"])
+    );
+    expect(tags).toEqual(["QR", "Sc"]);
+  });
+
+  it("passes an empty catalog list through as empty, not undefined", () => {
+    expect(getCourseDistributionalsFromCode("TEST 1000", () => record([]))).toEqual(
+      []
+    );
+  });
+
+  it("returns undefined when the record carries no distributionals field", () => {
+    expect(
+      getCourseDistributionalsFromCode("TEST 1000", () => record())
+    ).toBeUndefined();
+  });
+
+  it("returns undefined for a code the catalog has never heard of", () => {
+    expect(
+      getCourseDistributionalsFromCode("NOPE 9999", () => undefined)
+    ).toBeUndefined();
+  });
+
+  it("falls back to the real catalog when no lookup is injected", () => {
+    // Nothing ships the field today, so this is undefined now and will start
+    // returning tags on its own once the augmentation lands.
+    expect(() => getCourseDistributionalsFromCode("CPSC 2230")).not.toThrow();
   });
 });

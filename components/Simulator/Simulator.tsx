@@ -39,9 +39,11 @@ import {
 import type { GPAEntry } from "@/lib/gpa";
 import { allocateDistributionals } from "@/lib/distributionalAllocation";
 import {
-  getCertificateBlockedCodes,
+  buildProgramClaimContext,
+  filterCertificateManualEntries,
   getMajorBlockedCodes,
 } from "@/lib/utils/programClaims";
+import type { Allocation } from "@/lib/certificatePolicy";
 
 // ----------------- Types -----------------
 interface Semester {
@@ -77,6 +79,7 @@ type CertificatePreviewProgressMap = Record<string, CertificateProgress>;
 
 type MatchedRequirement = {
   programType: "major" | "certificate";
+  programId: string;
   programName: string;
   requirementName: string;
 };
@@ -157,6 +160,7 @@ function findMatchedRequirements(
       if (found) {
         matches.push({
           programType: "major",
+          programId: majorId,
           programName: major.name,
           requirementName: req.name,
         });
@@ -173,6 +177,7 @@ function findMatchedRequirements(
       if (courseMatchesOptionCodes(courseCode, optionCodes)) {
         matches.push({
           programType: "certificate",
+          programId: certId,
           programName: cert.name,
           requirementName: req.name,
         });
@@ -886,7 +891,7 @@ export default function Simulator({
     const majorAssignedCodes = new Set(
       simulatorMajorManuals.map((m) => getCanonicalCode(m.code) || m.code),
     );
-    const plannedAutoMajorCodes: string[] = [];
+    const plannedAutoMajorAllocations: Allocation[] = [];
     const plannedAutoCertificateOnlyCodes: string[] = [];
     for (const code of plannedCodesLocal) {
       const canon = getCanonicalCode(code) || code;
@@ -898,21 +903,61 @@ export default function Simulator({
         majorIds,
         certificateIds,
       );
-      const hitsMajor = matches.some((m) => m.programType === "major");
-      const hitsCert = matches.some((m) => m.programType === "certificate");
-      if (hitsMajor) plannedAutoMajorCodes.push(canon);
-      else if (hitsCert) plannedAutoCertificateOnlyCodes.push(canon);
+      const majorMatch = matches.find((m) => m.programType === "major");
+      const certMatch = matches.find((m) => m.programType === "certificate");
+      if (majorMatch) {
+        plannedAutoMajorAllocations.push({
+          courseCode: canon,
+          program: { type: "major", id: majorMatch.programId },
+          requirementTitle: majorMatch.requirementName,
+        });
+      } else if (certMatch) {
+        plannedAutoCertificateOnlyCodes.push(canon);
+      }
     }
 
+    // Plan-scoped assignments live only in simulator state, so hand them to the
+    // policy engine as extra allocations. Everything the engine decides for this
+    // preview then rests on the same picture the student is looking at.
+    const policyOptions = {
+      majorIds,
+      certificateIds,
+      extraAllocations: [
+        ...simulatorMajorManuals.map((m) => ({
+          courseCode: m.code,
+          program: {
+            type: "major" as const,
+            id: m.programId ?? majorIds[0] ?? "",
+          },
+          requirementTitle: m.requirement,
+        })),
+        ...simulatorCertificateManuals.map((m) => ({
+          courseCode: m.code,
+          program: {
+            type: "certificate" as const,
+            id: m.programId ?? certificateIds[0] ?? "",
+          },
+          requirementTitle: m.requirement,
+        })),
+        ...plannedAutoMajorAllocations,
+      ],
+    };
+    const claimContext = buildProgramClaimContext(
+      completedCourses,
+      policyOptions,
+    );
+    const violationsFor = (certId: string) =>
+      claimContext.violations.filter(
+        (v) => v.program.type === "certificate" && v.program.id === certId,
+      );
+
+    // A certificate-claimed course only keeps a major off it when the
+    // certificate permits no overlap at all; the engine works that out. Planned
+    // courses that match a certificate and nothing else still cannot count
+    // toward a major, so they stay blocked outright.
     const majorBlockedCodes = [
-      ...getMajorBlockedCodes(completedCourses),
-      ...simulatorCertificateManuals.map((m) => m.code),
+      ...getMajorBlockedCodes(completedCourses, policyOptions),
       ...plannedAutoCertificateOnlyCodes,
-    ];
-    const certificateBlockedCodes = [
-      ...getCertificateBlockedCodes(completedCourses),
-      ...simulatorMajorManuals.map((m) => m.code),
-      ...plannedAutoMajorCodes,
     ];
 
     const majorManualReqs = [
@@ -941,15 +986,29 @@ export default function Simulator({
       }
 
       if (certificateIds.length > 0) {
-        const certAll = calculatePreviewCertificateProgressByCertificates(
-          certificateIds,
-          completedCodes,
-          inProgCodes,
-          skippedCodes,
-          certificateManualReqs,
-          plannedCodesLocal,
-          certificateBlockedCodes,
-        );
+        // One call per certificate: blocking is per certificate now, and a
+        // single shared blocked list would apply the strictest certificate's
+        // rules to all of them.
+        const certAll: CertificatePreviewProgressMap = {};
+        for (const certId of certificateIds) {
+          const violations = violationsFor(certId);
+          Object.assign(
+            certAll,
+            calculatePreviewCertificateProgressByCertificates(
+              [certId],
+              completedCodes,
+              inProgCodes,
+              skippedCodes,
+              filterCertificateManualEntries(
+                certificateManualReqs,
+                certId,
+                violations,
+              ),
+              plannedCodesLocal,
+              violations.map((v) => v.courseCode),
+            ),
+          );
+        }
         setCertificatePreviewProgress(certAll);
       } else {
         setCertificatePreviewProgress({});
@@ -986,14 +1045,19 @@ export default function Simulator({
       const certResult: CertificatePreviewProgressMap = {};
       for (const cid of certificateIds) {
         try {
+          const violations = violationsFor(cid);
           const one = calculatePreviewCertificateProgressByCertificates(
             [cid],
             completedCodes,
             inProgCodes,
             skippedCodes,
-            certificateManualReqs,
+            filterCertificateManualEntries(
+              certificateManualReqs,
+              cid,
+              violations,
+            ),
             plannedCodesLocal,
-            certificateBlockedCodes,
+            violations.map((v) => v.courseCode),
           )[cid];
 
           if (

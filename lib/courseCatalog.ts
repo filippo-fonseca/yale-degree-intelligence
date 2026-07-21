@@ -7,7 +7,9 @@ import courses from "./courses.json";
  * - `offered`: human term labels this course appeared in (see CATALOG_TERMS).
  * - `isFall` / `isSpring`: ONLY Fall 2026 / Spring 2027 (simulator pool). Historical-only
  *   courses omit both flags.
- * - Distributionals are NOT in the catalog — they come from transcript / user override.
+ * - `distributionals`: optional Hu/So/Sc/QR/WR and L1-L5 tags, present only for
+ *   the courses an augmentation pass has covered. Absent for everything else,
+ *   so transcript / user override stays the source of truth.
  */
 export type CourseInfo = {
   codes: string[];
@@ -17,6 +19,7 @@ export type CourseInfo = {
   offered: string[];
   isFall?: boolean;
   isSpring?: boolean;
+  distributionals?: string[];
 };
 
 /** Exact term labels used in courses.json `offered`. */
@@ -191,13 +194,25 @@ export const getCourseDepartmentFromCode = (
 };
 
 /**
- * Catalog no longer ships distributionals. Kept for API compatibility —
- * always returns undefined. Distributionals come from transcript / user override.
+ * Distributional tags the catalog knows for a course (Hu/So/Sc/QR/WR and the
+ * L1-L5 language levels), or undefined when it knows none.
+ *
+ * The catalog only carries `distributionals` for courses an augmentation pass
+ * has covered, so most codes still return undefined and callers must keep
+ * treating the transcript / user override as the real source of truth. An
+ * empty array in the data means "the catalog looked and found nothing", which
+ * is deliberately different from undefined and is passed through as [].
+ *
+ * `lookup` is injectable so tests can hand in a record directly instead of
+ * depending on any particular course shipping the field.
  */
 export const getCourseDistributionalsFromCode = (
-  _code: string,
+  code: string,
+  lookup: (code: string) => CourseInfo | undefined = getCourseInfo,
 ): string[] | undefined => {
-  return undefined;
+  const record = lookup(code);
+  const tags = record?.distributionals;
+  return Array.isArray(tags) ? tags : undefined;
 };
 
 /** All other known codes for a course (excluding the canonical codes[0]). */

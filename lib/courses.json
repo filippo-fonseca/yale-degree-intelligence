@@ -67701,12 +67701,31 @@
   },
   {
     "codes": [
-      "PHYS 2060L",
       "PHYS 2050L",
-      "PHYS 206L",
       "PHYS 205L",
-      "PHYS 206",
       "PHYS 205"
+    ],
+    "name": "Modern Physical Measurement",
+    "credits": 0.5,
+    "department": "PHYS",
+    "offered": [
+      "Fall 2023",
+      "Spring 2024",
+      "Fall 2024",
+      "Spring 2025",
+      "Fall 2025",
+      "Spring 2026",
+      "Fall 2026",
+      "Spring 2027"
+    ],
+    "isFall": true,
+    "isSpring": true
+  },
+  {
+    "codes": [
+      "PHYS 2060L",
+      "PHYS 206L",
+      "PHYS 206"
     ],
     "name": "Modern Physical Measurement",
     "credits": 0.5,

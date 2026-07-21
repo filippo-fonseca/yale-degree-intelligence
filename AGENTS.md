@@ -22,24 +22,32 @@ Dan is the conversational layer over the same actions exposed by the ⌘K comman
 - Auth: verify the Firebase ID token server-side via `adminAuth.verifyIdToken()` and scope every read/write to the caller's `uid`.
 
 <!-- bgsd:managed -->
-## bgsd (this is a bgsd repo)
+## bgsd (this is a bgsd repo) — running from Codex
 
 This repository is orchestrated by **bgsd** (the Conductor, "Kiwi"), an
-autonomous, self-verifying layer on top of GSD.
+autonomous, self-verifying layer on top of GSD. bgsd is primarily a Claude
+Code tool, but it is harness-agnostic: you can run the WHOLE thing from Codex.
 
-**Where the history lives.** Every bgsd session is logged under `.bgsd/`.
-When you need context on what was built or changed, read there, even outside
-a bgsd session:
-- `.bgsd/ledger.md`: an index of every session (the request and the outcome).
-- `.bgsd/seshs/<run-id>/`: the per-session record (RUN.md, AGENTS.md for what
-  each subagent did, plus the aggregated planning markdown).
-- Search it all with `node "${CLAUDE_PLUGIN_ROOT}/scripts/kb.mjs" --query "<terms>"`
-  (for example, "auth middleware").
+**To start a bgsd session from Codex**, run the harness-neutral launcher from
+the repo root:
 
-**Before building.** If the user asks you to build, change, or fix something
-and has NOT already started a session, first ask whether they want to run it
-as a bgsd session (`/bgsd-sesh "<their request>"`) for the full verified,
-parallel pipeline. If yes, start it. If they decline or want something quick,
-just do it directly as normal Claude Code. Default to asking; never silently
-force a session.
+    node bgsd/scripts/conductor.mjs "<what to build>" [--project|--feature|--quick]
+
+It loads the real Conductor instructions (`bgsd/commands/bgsd-sesh.md`), exports
+the plugin root so every `node "${CLAUDE_PLUGIN_ROOT}/scripts/…"` command works,
+and hands them to you (Codex) to drive end to end. If you are reading this while
+already acting as the Conductor, follow `bgsd/commands/bgsd-sesh.md` directly and
+run the node scripts it references (they are plain, harness-agnostic Node).
+
+**Where history lives.** `.bgsd/ledger.md` (index of every session) and
+`.bgsd/seshs/<run-id>/` (per-session records). Search with
+`node bgsd/scripts/kb.mjs --query "<terms>"`.
+
+**The backlog is the bgsd queue, never a file.** "Queue that" / "leave it for
+the next sesh" means `node bgsd/scripts/queue.mjs add --title "<t>" --body "<b>"`
+(the per-repo queue at `.bgsd/queue`). `.planning/` belongs to GSD — never write
+a `.planning/BACKLOG.md`.
+
+**Models.** Spawned workers resolve to Codex model equivalents automatically
+(`harness.mjs`, tunable in `BGSD.md > harness.models`).
 <!-- bgsd:managed -->

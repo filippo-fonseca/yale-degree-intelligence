@@ -1,0 +1,46 @@
+{
+  "id": "CERT_ETHNOGRAPHY",
+  "name": "Ethnography",
+  "description": "Ethnography is both a set of qualitative research methods employed in the humanities and social sciences and a mode of presenting that research—in books and articles, film and video, embodied performance, and digital formats.",
+  "category": "skills_based",
+  "sourceUrl": "https://catalog.yale.edu/ycps/subjects-of-instruction/ethnography/",
+  "requiresApplication": false,
+  "creditRequirements": {
+    "total": 6
+  },
+  "notes": [
+    "Minimum grade C in each course",
+    "No Credit/D/Fail",
+    "At least four of six courses must be at the 3000-level or above",
+    "At least two courses must include substantial methods training and/or a practical ethnographic component, including at least one at the 3000-level or above",
+    "Attend two public talks or events featuring ethnography and submit one-page critical reflections on each",
+    "No more than two course credits may overlap with a major, simultaneous degree, or another certificate",
+    "No course credit may count toward more than two curricular programs",
+    "Approved graduate and professional school courses may count",
+    "Non-Yale courses may not count",
+    "Other courses may be approved by the certificate director",
+    "Declare on Yale Hub by January 15 or September 15 of the final semester"
+  ],
+  "policy": {
+    "overlapCap": 2,
+    "minGrade": "C",
+    "nonCourseRequirements": [
+      "Attend two public talks or other events that feature ethnography and submit a one-page critical reflection on each to the certificate director"
+    ],
+    "sourceNote": "No more than two course credits may overlap in the fulfillment of the requirements of the Ethnography certificate and of a major, a simultaneous degree, or another certificate. The minimum grade for all courses is a C."
+  },
+  "requirements": [
+    {
+      "name": "Ethnography methods courses",
+      "required": 2,
+      "description": "Courses with substantial methods training and/or a practical ethnographic component. Searchable in Yale Course Search with the YC Ethnography Methods attribute. At least one must be at the 3000-level or above.",
+      "options": []
+    },
+    {
+      "name": "Ethnography electives",
+      "required": 4,
+      "description": "Additional ethnography courses. Searchable in Yale Course Search with the YC Ethnography Elective attribute. At least four of the six total certificate courses must be at the 3000-level or above.",
+      "options": []
+    }
+  ]
+}

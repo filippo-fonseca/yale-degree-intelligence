@@ -87,6 +87,8 @@ export function MajorTabPanel({
           progress={progress}
           onRequirementChange={onRequirementChange}
           courses={courses}
+          userMajors={userProfile?.majors ?? []}
+          userCertificates={userProfile?.certificates ?? []}
         />
       ) : (
         <div className="flex flex-col items-center justify-center py-16 text-center">

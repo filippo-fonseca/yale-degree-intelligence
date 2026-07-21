@@ -42,6 +42,15 @@ export const RELEASES: Release[] = [
         ],
       },
       {
+        title: "Certificates, finally",
+        items: [
+          "Track any of Yale's 42 certificates alongside your majors, with a dedicated My Certificates view and full Simulator support.",
+          "A per-certificate rules engine that knows each program's real policy. Most certificates let up to two courses double-count with a major, Data Science and Programming allow none, and Quantum only shares courses at the 3000 level and above.",
+          "Honest conflict handling. Courses your major already counts are grayed out with the reason, an overlap meter shows how much sharing each certificate allows, and a certificate Yale will not award to your major carries a clear warning.",
+          "Certificate math you can trust: a course that breaks a rule drops out of that certificate's progress automatically, and your major always keeps its credit.",
+        ],
+      },
+      {
         title: "Understand your degree",
         items: [
           "More and better academic Stats: GPA trends, credits, and grade distribution that stay legible in light and dark — including F grades that were previously skipped by mistake.",

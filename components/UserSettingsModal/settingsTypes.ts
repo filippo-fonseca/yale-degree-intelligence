@@ -1,12 +1,21 @@
 import { User } from "firebase/auth";
 
+/**
+ * The stored profile as it arrives from the caller. `certificates` is optional
+ * because the Firestore document predates certificates, so older documents
+ * simply do not carry the field.
+ */
 export interface UserProfile {
   majors: string[];
+  certificates?: string[];
   graduationYear: number;
   bio?: string;
   updatedAt: Date;
   danWriteActionsEnabled?: boolean;
 }
+
+/** Local editing state, where the certificate list is always materialized. */
+export type EditableProfile = UserProfile & { certificates: string[] };
 
 export interface UserSettingsModalProps {
   user: User;

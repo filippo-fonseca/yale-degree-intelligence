@@ -7,7 +7,7 @@ import {
   signInWithPopup,
   signOut,
 } from "firebase/auth";
-import { auth, googleProvider } from "@/config/firebase";
+import { auth, googleProvider, isFirebaseConfigured } from "@/config/firebase";
 import { isAdminEmail } from "@/lib/admin";
 
 type AuthContextType = {
@@ -41,6 +41,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   const logout = async () => {
+    if (!isFirebaseConfigured) return;
     try {
       await signOut(auth);
     } catch (error) {
@@ -49,6 +50,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   useEffect(() => {
+    if (!isFirebaseConfigured) {
+      setLoading(false);
+      return;
+    }
+
     const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
       if (firebaseUser) {
         if (isAllowedEmail(firebaseUser.email)) {
@@ -68,6 +74,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const signInWithGoogle = async () => {
+    if (!isFirebaseConfigured) {
+      throw new Error("Firebase is not configured");
+    }
     try {
       const result = await signInWithPopup(auth, googleProvider);
       if (!isAllowedEmail(result.user.email)) {

@@ -56,6 +56,8 @@ export default function UserSettingsModal({
     localProfile,
     setLocalProfile,
     duplicateMajorError,
+    duplicateCertificateError,
+    autoOpenCertificateIndex,
     isSaving,
     isEditingBio,
     setIsEditingBio,
@@ -69,9 +71,13 @@ export default function UserSettingsModal({
     hasChanges,
     isDirty,
     hasDuplicateMajors,
+    hasDuplicateCertificates,
     handleAddMajor,
     handleMajorChange,
     handleRemoveMajor,
+    handleAddCertificate,
+    handleCertificateChange,
+    handleRemoveCertificate,
     handleSaveBio,
     handleCancelBio,
     handleSave,
@@ -84,6 +90,7 @@ export default function UserSettingsModal({
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as HTMLElement;
       if (target.closest('[data-major-dropdown-portal="true"]')) return;
+      if (target.closest('[data-certificate-dropdown-portal="true"]')) return;
       if (modalRef.current && !modalRef.current.contains(target)) {
         if (hasChanges()) {
           setShowDiscardConfirm(true);
@@ -216,9 +223,14 @@ export default function UserSettingsModal({
             <SettingsAcademicSection
               localProfile={localProfile}
               duplicateMajorError={duplicateMajorError}
+              duplicateCertificateError={duplicateCertificateError}
+              autoOpenCertificateIndex={autoOpenCertificateIndex}
               handleAddMajor={handleAddMajor}
               handleMajorChange={handleMajorChange}
               handleRemoveMajor={handleRemoveMajor}
+              handleAddCertificate={handleAddCertificate}
+              handleCertificateChange={handleCertificateChange}
+              handleRemoveCertificate={handleRemoveCertificate}
               setLocalProfile={setLocalProfile}
             />
           </div>
@@ -350,9 +362,17 @@ export default function UserSettingsModal({
               </button>
               <button
                 onClick={handleSave}
-                disabled={isSaving || !isDirty || hasDuplicateMajors()}
+                disabled={
+                  isSaving ||
+                  !isDirty ||
+                  hasDuplicateMajors() ||
+                  hasDuplicateCertificates()
+                }
                 className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 ${
-                  isDirty && !hasDuplicateMajors() && !isSaving
+                  isDirty &&
+                  !hasDuplicateMajors() &&
+                  !hasDuplicateCertificates() &&
+                  !isSaving
                     ? "bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white shadow-[0_4px_16px_rgba(168,85,247,0.35)] ring-1 ring-purple-400/40 animate-pulse"
                     : "bg-gray-100 dark:bg-gray-800/50 text-gray-400 dark:text-gray-500 cursor-not-allowed border border-black/[0.05] dark:border-white/[0.05]"
                 }`}

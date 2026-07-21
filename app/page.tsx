@@ -6,8 +6,11 @@ import CustomLoader from "@/components/ui/CustomLoader";
 import PublicFacingPage from "@/screens/PublicFacingPage";
 import { useAuth } from "@/context/AuthContext";
 import { useTheme } from "@/context/ThemeContext";
-import { createNavItems } from "@/components/dashboard/navItems";
-import { getMajorProgress as computeMajorProgress } from "@/components/dashboard/getMajorProgress";
+import { createNavItems, SHOW_DAN_ADVISOR } from "@/components/dashboard/navItems";
+import {
+  getMajorProgress as computeMajorProgress,
+  getCertificateProgress as computeCertificateProgress,
+} from "@/components/dashboard/getMajorProgress";
 import { useCommandPaletteHotkey } from "@/components/dashboard/useCommandPaletteHotkey";
 import { useSidebarState } from "@/components/dashboard/useSidebarState";
 import { useOnboarding } from "@/components/dashboard/useOnboarding";
@@ -38,6 +41,8 @@ export default function Home() {
     profileLoading,
     selectedMajor,
     setSelectedMajor,
+    selectedCertificate,
+    setSelectedCertificate,
     showMajorSelection,
     setShowMajorSelection,
     isBrandNew,
@@ -84,12 +89,18 @@ export default function Home() {
   );
   friendsEnabledRef.current = friendsEnabled;
 
-  const navItems = createNavItems(userProfile?.majors?.length ?? 0);
-  const cleoaiComingSoon =
-    navItems.find((i) => i.id === "cleoai")?.comingSoon ?? false;
+  const navItems = createNavItems(
+    userProfile?.majors?.length ?? 0,
+    userProfile?.certificates?.length ?? 0,
+  );
+  // Dan is unreachable when its tab is hidden, and also while it is only
+  // flagged "coming soon".
+  const cleoaiUnreachable =
+    !SHOW_DAN_ADVISOR ||
+    (navItems.find((i) => i.id === "cleoai")?.comingSoon ?? false);
 
   const { activeTab, setActiveTab, handleTabChange, setSimulatorNavCheck } =
-    useDashboardNav(cleoaiComingSoon);
+    useDashboardNav(cleoaiUnreachable);
 
   const { welcomeOpen, setWelcomeOpen, tourOpen, setTourOpen } = useOnboarding(
     user,
@@ -113,9 +124,25 @@ export default function Home() {
     setShowManualEntryModal(true);
   };
 
+  // The student's declared programs, handed to the certificate policy engine so
+  // it can resolve eligibility and per-certificate overlap budgets.
+  const programPolicyOptions = {
+    majorIds: userProfile?.majors ?? [],
+    certificateIds: userProfile?.certificates ?? [],
+  };
+
   const getMajorProgress = () => {
     if (!user || !selectedMajor) return null;
-    return computeMajorProgress(selectedMajor, courses);
+    return computeMajorProgress(selectedMajor, courses, programPolicyOptions);
+  };
+
+  const getCertificateProgress = () => {
+    if (!user || !selectedCertificate) return null;
+    return computeCertificateProgress(
+      selectedCertificate,
+      courses,
+      programPolicyOptions,
+    );
   };
 
   const overlayActions = useDashboardOverlayActions({
@@ -147,6 +174,7 @@ export default function Home() {
         userProfile={userProfile}
         courses={courses}
         selectedMajor={selectedMajor}
+        selectedCertificate={selectedCertificate}
         hasData={hasData}
         friendsEnabled={friendsEnabled}
         showMajorSelection={showMajorSelection}
@@ -244,7 +272,7 @@ export default function Home() {
           >
             <DashboardTabPanels
               activeTab={activeTab}
-              cleoaiComingSoon={cleoaiComingSoon}
+              cleoaiUnreachable={cleoaiUnreachable}
               user={user}
               userProfile={userProfile}
               courses={courses}
@@ -252,10 +280,14 @@ export default function Home() {
               coursesLoading={coursesLoading}
               isBrandNew={isBrandNew}
               selectedMajor={selectedMajor}
+              selectedCertificate={selectedCertificate}
               friendsEnabled={friendsEnabled}
               getMajorProgress={getMajorProgress}
+              getCertificateProgress={getCertificateProgress}
               onTabChange={handleTabChange}
               onSelectMajor={setSelectedMajor}
+              onSelectCertificate={setSelectedCertificate}
+              onOpenSettings={() => setShowSettings(true)}
               onManualAdd={openManualEntry}
               onReupload={() => setShowUpdateModal(true)}
               onUploadSuccess={parseAndStoreCourses}

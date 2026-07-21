@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { MAJORS } from "@/lib/majors";
-import type { UserProfile } from "./settingsTypes";
+import { CERTIFICATES } from "@/lib/certificates";
+import type { EditableProfile, UserProfile } from "./settingsTypes";
 
 export const BIO_MAX = 200;
 
@@ -8,10 +9,18 @@ export function useUserProfileForm(
   userProfile: UserProfile | null,
   onSave: (updatedProfile: Partial<UserProfile>) => Promise<void>,
 ) {
-  const [localProfile, setLocalProfile] = useState<UserProfile | null>(null);
+  const [localProfile, setLocalProfile] = useState<EditableProfile | null>(
+    null,
+  );
   const [duplicateMajorError, setDuplicateMajorError] = useState<string | null>(
     null,
   );
+  const [duplicateCertificateError, setDuplicateCertificateError] = useState<
+    string | null
+  >(null);
+  const [autoOpenCertificateIndex, setAutoOpenCertificateIndex] = useState<
+    number | null
+  >(null);
   const [isSaving, setIsSaving] = useState(false);
 
   const [isEditingBio, setIsEditingBio] = useState(false);
@@ -22,7 +31,10 @@ export function useUserProfileForm(
 
   useEffect(() => {
     if (userProfile) {
-      setLocalProfile(userProfile);
+      setLocalProfile({
+        ...userProfile,
+        certificates: userProfile.certificates ?? [],
+      });
       setTempBio(userProfile.bio || "");
       setBioCount((userProfile.bio || "").length);
     }
@@ -42,6 +54,8 @@ export function useUserProfileForm(
     return (
       JSON.stringify(userProfile.majors) !==
         JSON.stringify(localProfile.majors) ||
+      JSON.stringify(userProfile.certificates ?? []) !==
+        JSON.stringify(localProfile.certificates) ||
       userProfile.graduationYear !== localProfile.graduationYear
     );
   };
@@ -52,6 +66,12 @@ export function useUserProfileForm(
     if (!localProfile) return false;
     const uniqueMajors = new Set(localProfile.majors);
     return uniqueMajors.size !== localProfile.majors.length;
+  };
+
+  const hasDuplicateCertificates = () => {
+    if (!localProfile) return false;
+    const uniqueCertificates = new Set(localProfile.certificates);
+    return uniqueCertificates.size !== localProfile.certificates.length;
   };
 
   const handleAddMajor = () => {
@@ -91,6 +111,48 @@ export function useUserProfileForm(
     setDuplicateMajorError(null);
   };
 
+  const handleAddCertificate = () => {
+    if (!localProfile || localProfile.certificates.length >= 3) return;
+    const availableCertificate = Object.keys(CERTIFICATES).find(
+      (cert) => !localProfile.certificates.includes(cert),
+    );
+    if (availableCertificate) {
+      const newIndex = localProfile.certificates.length;
+      setLocalProfile({
+        ...localProfile,
+        certificates: [...localProfile.certificates, availableCertificate],
+      });
+      setDuplicateCertificateError(null);
+      setAutoOpenCertificateIndex(newIndex);
+    }
+  };
+
+  const handleCertificateChange = (index: number, newCertificate: string) => {
+    if (!localProfile) return;
+    if (
+      localProfile.certificates.includes(newCertificate) &&
+      localProfile.certificates[index] !== newCertificate
+    ) {
+      setDuplicateCertificateError(
+        "You can't select the same certificate twice",
+      );
+      return;
+    }
+    setDuplicateCertificateError(null);
+    const newCertificates = [...localProfile.certificates];
+    newCertificates[index] = newCertificate;
+    setLocalProfile({ ...localProfile, certificates: newCertificates });
+    setAutoOpenCertificateIndex(null);
+  };
+
+  const handleRemoveCertificate = (index: number) => {
+    if (!localProfile) return;
+    const newCertificates = [...localProfile.certificates];
+    newCertificates.splice(index, 1);
+    setLocalProfile({ ...localProfile, certificates: newCertificates });
+    setDuplicateCertificateError(null);
+  };
+
   const handleSaveBio = async () => {
     if (!localProfile) return;
     try {
@@ -120,11 +182,18 @@ export function useUserProfileForm(
       setDuplicateMajorError("Please remove duplicate majors before saving");
       return;
     }
+    if (hasDuplicateCertificates()) {
+      setDuplicateCertificateError(
+        "Please remove duplicate certificates before saving",
+      );
+      return;
+    }
     if (!localProfile) return;
     try {
       setIsSaving(true);
       await onSave({
         majors: localProfile.majors,
+        certificates: localProfile.certificates,
         graduationYear: localProfile.graduationYear,
       });
     } finally {
@@ -136,6 +205,8 @@ export function useUserProfileForm(
     localProfile,
     setLocalProfile,
     duplicateMajorError,
+    duplicateCertificateError,
+    autoOpenCertificateIndex,
     isSaving,
     isEditingBio,
     setIsEditingBio,
@@ -150,9 +221,13 @@ export function useUserProfileForm(
     hasChanges,
     isDirty,
     hasDuplicateMajors,
+    hasDuplicateCertificates,
     handleAddMajor,
     handleMajorChange,
     handleRemoveMajor,
+    handleAddCertificate,
+    handleCertificateChange,
+    handleRemoveCertificate,
     handleSaveBio,
     handleCancelBio,
     handleSave,

@@ -23,6 +23,10 @@ export const MajorProgressView = dynamic(
   () => import("@/components/MajorProgressView"),
   { ssr: false, loading: TabFallback },
 );
+export const CertificateProgressView = dynamic(
+  () => import("@/components/CertificateProgressView"),
+  { ssr: false, loading: TabFallback },
+);
 export const DistributionalsView = dynamic(
   () => import("@/components/DistributionalProgress"),
   { ssr: false, loading: TabFallback },

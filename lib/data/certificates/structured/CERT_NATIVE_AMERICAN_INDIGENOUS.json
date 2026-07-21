@@ -1,0 +1,37 @@
+{
+  "id": "CERT_NATIVE_AMERICAN_INDIGENOUS",
+  "name": "Native American and Indigenous Studies",
+  "description": "Offers a curated range of courses across departments and programs in Yale College that center on Indigenous content, strengthening knowledge of Indigenous languages, cultures, sovereignty, history, literatures, and lifeways.",
+  "category": "interdisciplinary",
+  "sourceUrl": "https://catalog.yale.edu/ycps/subjects-of-instruction/native-american-indigenous-studies/",
+  "requiresApplication": false,
+  "creditRequirements": {
+    "total": 5
+  },
+  "notes": [
+    "Courses must be drawn from at least three of five areas of focus, with no more than two courses from any single area.",
+    "Optional capstone project counts as one credit toward the certificate. Capstone may be completed in an independent study (e.g. LING 4710, ENGL 3100, AMST 9000, SOCY 4100) or upper-division core seminar (ER&M 4020) with director approval. Submit a 1-page proposal in spring of junior year or early fall of senior year.",
+    "Students must participate in at least three Indigenous community events and submit a 1–2 page write-up per event.",
+    "No courses taken Credit/D/Fail may be counted toward the certificate.",
+    "No more than two course credits may overlap with a major, simultaneous degree, or another certificate.",
+    "No course credit may be applied toward the requirements of more than two curricular programs.",
+    "Graduate and professional school courses may count toward the certificate.",
+    "Complete the Qualtrics survey from the Indigenous Studies website as early as fall of sophomore year and no later than the beginning of junior year.",
+    "Declare on Yale Hub by January 15 or September 15 of the final semester."
+  ],
+  "policy": {
+    "overlapCap": 2,
+    "nonCourseRequirements": [
+      "Participate in at least three Indigenous community events and submit a write-up of 1 to 2 pages per event"
+    ],
+    "sourceNote": "No more than two course credits may overlap in the fulfillment of the requirements of the Indigenous Studies Certificate or of a major, a simultaneous degree, or another certificate."
+  },
+  "requirements": [
+    {
+      "name": "Indigenous studies courses",
+      "required": 5,
+      "description": "Five courses on Indigenous topics from at least three of five areas: Language & Culture (YC NAIS Language & Culture); Literature & Arts (YC NAIS Literature & Arts); Environment & Politics (YC NAIS Environment & Politics); History, Society & Law (YC NAIS History Society & Law); Science & Education (YC NAIS Science & Education). No more than two courses from any single area.",
+      "options": []
+    }
+  ]
+}

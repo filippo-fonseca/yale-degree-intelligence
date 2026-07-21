@@ -18,6 +18,8 @@ export default function MajorProgressModals({
   reqModal,
   setReqModal,
   courses,
+  userMajors,
+  userCertificates,
   onRequirementChange,
   handleSkip,
   handleUnskip,
@@ -32,6 +34,9 @@ export default function MajorProgressModals({
   reqModal: ReqModalState;
   setReqModal: React.Dispatch<React.SetStateAction<ReqModalState>>;
   courses: Course[];
+  /** Declared programs, so the manual picker can ask the policy engine. */
+  userMajors: string[];
+  userCertificates: string[];
   onRequirementChange: () => void;
   handleSkip: (courseCode: string, courseName: string) => Promise<void>;
   handleUnskip: (courseCode: string) => Promise<void>;
@@ -58,6 +63,8 @@ export default function MajorProgressModals({
         onClose={() => setManualCourseModal({ isOpen: false, requirement: "" })}
         onSuccess={onRequirementChange}
         userCourses={courses}
+        userMajors={userMajors}
+        userCertificates={userCertificates}
       />
 
       <RequirementModal

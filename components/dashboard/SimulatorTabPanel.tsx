@@ -21,6 +21,8 @@ export function SimulatorTabPanel({
   courses,
   onRegisterNavCheck,
 }: SimulatorTabPanelProps) {
+  const certificates = userProfile.certificates ?? [];
+
   return (
     <motion.div
       key="simulator"
@@ -32,6 +34,7 @@ export function SimulatorTabPanel({
       <Simulator
         remainingCourses={buildSimulatorRemainingCourses(
           userProfile.majors,
+          certificates,
           courses,
           userId,
         )}
@@ -40,6 +43,29 @@ export function SimulatorTabPanel({
         )}
         graduationYear={userProfile.graduationYear}
         userMajors={userProfile.majors}
+        userCertificates={certificates}
+        majorPermanentManuals={courses.flatMap((course) =>
+          (course.manualRequirementsFulfilled || [])
+            .filter((m) => m.major_id && !m.certificate_id)
+            .map((m) => ({
+              code: course.code,
+              requirement: m.requirement_title,
+              credits: course.credits || 1,
+              programType: "major" as const,
+              programId: m.major_id,
+            })),
+        )}
+        certificatePermanentManuals={courses.flatMap((course) =>
+          (course.manualRequirementsFulfilled || [])
+            .filter((m) => m.certificate_id)
+            .map((m) => ({
+              code: course.code,
+              requirement: m.requirement_title,
+              credits: course.credits || 1,
+              programType: "certificate" as const,
+              programId: m.certificate_id,
+            })),
+        )}
         onRegisterNavCheck={onRegisterNavCheck}
       />
     </motion.div>

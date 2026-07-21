@@ -1,0 +1,66 @@
+{
+  "id": "CERT_EDUCATION_STUDIES_SCHOLARS",
+  "name": "Education Studies Scholars Intensive",
+  "description": "A structured pathway for students interested in completing an Education Studies capstone project while learning alongside a supportive cohort from sophomore through senior year.",
+  "category": "interdisciplinary",
+  "sourceUrl": "https://catalog.yale.edu/ycps/subjects-of-instruction/education-studies/",
+  "requiresApplication": true,
+  "creditRequirements": {
+    "total": 5
+  },
+  "notes": [
+    "Apply in the fall of sophomore year after completing or while enrolled in EDST 1110.",
+    "Field experience required as described on the Education Studies website.",
+    "Two of the five courses may overlap with the student's major.",
+    "No more than two course credits may overlap with a major, simultaneous degree, or another certificate.",
+    "No course credit may be counted toward the requirements of more than two curricular programs.",
+    "Credit/D/Fail courses may not count toward the certificate.",
+    "Graduate and professional school courses may count with approval from the Education Studies Associate Director.",
+    "Successful completion of the Scholar Intensive Certificate is noted on transcripts."
+  ],
+  "policy": {
+    "overlapCap": 2,
+    "sourceNote": "No more than two course credits may overlap in the fulfillment of the requirements of the Scholar Intensive Certificate or of a major, a simultaneous degree, or another certificate."
+  },
+  "requirements": [
+    {
+      "name": "Prerequisite",
+      "required": 1,
+      "description": "Foundational education studies course counted toward the five-course total.",
+      "options": [
+        { "type": "course", "code": "EDST 1110" }
+      ]
+    },
+    {
+      "name": "Theory and Research",
+      "required": 1,
+      "description": "Theory and Research requirement.",
+      "options": [
+        { "type": "course", "code": "EDST 1261" }
+      ]
+    },
+    {
+      "name": "Policy or Pedagogy",
+      "required": 1,
+      "description": "One course in either Policy or Pedagogy as approved for the certificate.",
+      "options": []
+    },
+    {
+      "name": "Capstone seminar",
+      "required": 1,
+      "description": "Senior capstone seminar.",
+      "options": [
+        { "type": "course", "code": "EDST 4400" }
+      ]
+    },
+    {
+      "name": "Capstone project",
+      "required": 1,
+      "description": "Senior capstone project course.",
+      "options": [
+        { "type": "course", "code": "EDST 4410" },
+        { "type": "course", "code": "EDST 4490" }
+      ]
+    }
+  ]
+}

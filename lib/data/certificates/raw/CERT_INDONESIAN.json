@@ -1,0 +1,52 @@
+{
+  "id": "CERT_INDONESIAN",
+  "name": "Indonesian",
+  "category": "advanced_language",
+  "source_url": "https://catalog.yale.edu/ycps/subjects-of-instruction/southeast-asia-studies/",
+  "page_title": "Southeast Asia Studies",
+  "tabs": [
+    {
+      "label": "Overview",
+      "href": "#text",
+      "id": null
+    },
+    {
+      "label": "First year",
+      "href": "#firstyearstext",
+      "id": null
+    },
+    {
+      "label": "Certificates",
+      "href": "#certificatetext",
+      "id": null
+    },
+    {
+      "label": "Faculty",
+      "href": "#facultytext",
+      "id": null
+    },
+    {
+      "label": "Courses",
+      "href": "#coursestext",
+      "id": null
+    }
+  ],
+  "extracted_from_container": "certificatetextcontainer",
+  "parent_program": "Southeast Asia Studies",
+  "requires_application": false,
+  "full_text": "The Department of Southeast Asian Studies offers Certificates of Advanced Language Study in Vietnamese and Indonesian, which once certified, are listed on student transcripts.\nRequirements for the Vietnamese certificate\nStudents seeking to earn the certificate are required to take four courses beyond the L4 level (\nVIET 1420\n), at least two of which must be Yale courses designated as L5 (\nVIET 1500\n,\n1600\n,\n4600\n). All courses must be taken for a letter grade, and students must achieve a grade of B or above. With the approval of the certificate adviser, up to two advanced non-L5 Yale courses, conducted in the target language, such as an independent study course (\nVIET 4700\nor\n4710\n) (graded Pass/Fail) or an advanced seminar may count toward certification requirements. Only one independent study course with Pass/Fail will be counted toward the certificate requirement.\nThe certificate adviser may also approve the substitution of up to two credits earned during study abroad and taught in the target language to count toward the certificate requirements. If the adviser approves courses taken outside of Yale for inclusion in the certificate requirements, students must take the necessary steps to ensure that those courses appear on their transcripts.\nrequirements for the Indonesian certificate\nStudents seeking to earn the certificate are required to take four courses beyond the L4 level. At least two of the four courses must be Yale advanced language courses, such as\nINDN 1500\n,\nINDN 1600\n,\nINDN 1700\n, or\nINDN 1800\n. All courses must be taken for a letter grade, and students must achieve a grade of B or above. With the approval of the certificate adviser, up to one course, conducted in the target language, at the appropriate advanced level, such as an independent study course (\nINDN 4700\nor\nINDN 4710\n), graded Pass/Fail or a graduate seminar (\nINDN 5700\n) may count toward certification requirements.\nThe certificate adviser may also approve the substitution of up to two credits earned during study abroad and taught in the target language to count toward the certificate requirements. If the adviser approves courses taken outside of Yale for inclusion in the certificate requirements, students must take the necessary steps to ensure that those courses appear on their transcripts.\nCredit/D/Fail\nNo courses taken Credit/D/Fail may be counted toward the requirements of the certificate.\nDeclaration of Candidacy\nStudents must declare their intention to earn a Certificate on the\nDeclare Major, Concentration within the Major, Certificate\npage on\nYale Hub,\nas early as possible, but at the very latest, by the 15th of January or September in their last semester at Yale. Once declared, Degree Audit tracks students' progress toward completion of the certificate.\nFor more information, email the Southeast Asia Language Director at\ndinny.aletheiani@yale.edu",
+  "isolation": {
+    "mode": "isolated_subsection",
+    "text": "The Department of Southeast Asian Studies offers Certificates of Advanced Language Study in Vietnamese and Indonesian, which once certified, are listed on student transcripts.\nRequirements for the Vietnamese certificate\nStudents seeking to earn the certificate are required to take four courses beyond the L4 level (\nVIET 1420\n), at least two of which must be Yale courses designated as L5 (\nVIET 1500\n,\n1600\n,\n4600\n). All courses must be taken for a letter grade, and students must achieve a grade of B or above. With the approval of the certificate adviser, up to two advanced non-L5 Yale courses, conducted in the target language, such as an independent study course (\nVIET 4700\nor\n4710\n) (graded Pass/Fail) or an advanced seminar may count toward certification requirements. Only one independent study course with Pass/Fail will be counted toward the certificate requirement.\nThe certificate adviser may also approve the substitution of up to two credits earned during study abroad and taught in the target language to count toward the certificate requirements. If the adviser approves courses taken outside of Yale for inclusion in the certificate requirements, students must take the necessary steps to ensure that those courses appear on their transcripts.\nrequirements for the Indonesian certificate\nStudents seeking to earn the certificate are required to take four courses beyond the L4 level. At least two of the four courses must be Yale advanced language courses, such as\nINDN 1500\n,\nINDN 1600\n,\nINDN 1700\n, or\nINDN 1800\n. All courses must be taken for a letter grade, and students must achieve a grade of B or above. With the approval of the certificate adviser, up to one course, conducted in the target language, at the appropriate advanced level, such as an independent study course (\nINDN 4700\nor\nINDN 4710\n), graded Pass/Fail or a graduate seminar (\nINDN 5700\n) may count toward certification requirements.\nThe certificate adviser may also approve the substitution of up to two credits earned during study abroad and taught in the target language to count toward the certificate requirements. If the adviser approves courses taken outside of Yale for inclusion in the certificate requirements, students must take the necessary steps to ensure that those courses appear on their transcripts.\nCredit/D/Fail\nNo courses taken Credit/D/Fail may be counted toward the requirements of the certificate.\nDeclaration of Candidacy\nStudents must declare their intention to earn a Certificate on the\nDeclare Major, Concentration within the Major, Certificate\npage on\nYale Hub,\nas early as possible, but at the very latest, by the 15th of January or September in their last semester at Yale. Once declared, Degree Audit tracks students' progress toward completion of the certificate.\nFor more information, email the Southeast Asia Language Director at\ndinny.aletheiani@yale.edu",
+    "start_line": 1,
+    "end_line": 44,
+    "matched_name": "Indonesian"
+  },
+  "sections": {
+    "overview": "The Department of Southeast Asian Studies offers Certificates of Advanced Language Study in Vietnamese and Indonesian, which once certified, are listed on student transcripts.\nRequirements for the Vietnamese certificate\nStudents seeking to earn the certificate are required to take four courses beyond the L4 level (\nVIET 1420\n), at least two of which must be Yale courses designated as L5 (\nVIET 1500\n,\n1600\n,\n4600\n). All courses must be taken for a letter grade, and students must achieve a grade of B or above. With the approval of the certificate adviser, up to two advanced non-L5 Yale courses, conducted in the target language, such as an independent study course (\nVIET 4700\nor\n4710\n) (graded Pass/Fail) or an advanced seminar may count toward certification requirements. Only one independent study course with Pass/Fail will be counted toward the certificate requirement.\nThe certificate adviser may also approve the substitution of up to two credits earned during study abroad and taught in the target language to count toward the certificate requirements. If the adviser approves courses taken outside of Yale for inclusion in the certificate requirements, students must take the necessary steps to ensure that those courses appear on their transcripts.\nrequirements for the Indonesian certificate\nStudents seeking to earn the certificate are required to take four courses beyond the L4 level. At least two of the four courses must be Yale advanced language courses, such as\nINDN 1500\n,\nINDN 1600\n,\nINDN 1700\n, or\nINDN 1800\n. All courses must be taken for a letter grade, and students must achieve a grade of B or above. With the approval of the certificate adviser, up to one course, conducted in the target language, at the appropriate advanced level, such as an independent study course (\nINDN 4700\nor\nINDN 4710\n), graded Pass/Fail or a graduate seminar (\nINDN 5700\n) may count toward certification requirements.\nThe certificate adviser may also approve the substitution of up to two credits earned during study abroad and taught in the target language to count toward the certificate requirements. If the adviser approves courses taken outside of Yale for inclusion in the certificate requirements, students must take the necessary steps to ensure that those courses appear on their transcripts.\nCredit/D/Fail\nNo courses taken Credit/D/Fail may be counted toward the requirements of the certificate.",
+    "declaration": "Students must declare their intention to earn a Certificate on the\nDeclare Major, Concentration within the Major, Certificate\npage on\nYale Hub,\nas early as possible, but at the very latest, by the 15th of January or September in their last semester at Yale. Once declared, Degree Audit tracks students' progress toward completion of the certificate.\nFor more information, email the Southeast Asia Language Director at\ndinny.aletheiani@yale.edu"
+  },
+  "summary_of_requirements_tab": null,
+  "tables": [],
+  "raw_html_length": 27824
+}

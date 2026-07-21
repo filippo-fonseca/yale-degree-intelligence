@@ -14,6 +14,7 @@ import { Course, PublicCourse, DEFAULT_FRIENDS_PROFILE_VISIBILITY } from "@/lib/
 
 interface UserProfile {
   majors: string[];
+  certificates?: string[];
   graduationYear?: number;
   bio?: string;
 }
@@ -107,6 +108,7 @@ export async function syncFriendsPublicData(
       coursesAreEqual(existingCourses, publicCourses) &&
       existingData.displayName === (user.displayName || null) &&
       JSON.stringify(existingData.majors || []) === JSON.stringify(userProfile?.majors || []) &&
+      JSON.stringify(existingData.certificates || []) === JSON.stringify(userProfile?.certificates || []) &&
       existingData.graduationYear === (userProfile?.graduationYear || null) &&
       existingData.bio === (userProfile?.bio || null)
     ) {
@@ -122,6 +124,7 @@ export async function syncFriendsPublicData(
       displayName: user.displayName || null,
       photoURL: user.photoURL || null,
       majors: userProfile?.majors || [],
+      certificates: userProfile?.certificates || [],
       graduationYear: userProfile?.graduationYear ?? null,
       bio: userProfile?.bio || null,
       visibility: existingData.visibility ?? undefined,
@@ -170,6 +173,7 @@ export async function enableFriendsFeature(
     displayName: user.displayName || null,
     photoURL: user.photoURL || null,
     majors: userProfile?.majors || [],
+    certificates: userProfile?.certificates || [],
     graduationYear: userProfile?.graduationYear ?? null,
     bio: userProfile?.bio || null,
     courses: publicCourses,

@@ -18,6 +18,7 @@ interface DashboardOverlaysProps {
   userProfile: UserProfile | null;
   courses: Course[];
   selectedMajor: string;
+  selectedCertificate: string;
   hasData: boolean;
   friendsEnabled: boolean;
   showMajorSelection: boolean;
@@ -74,6 +75,7 @@ export function DashboardOverlays({
   userProfile,
   courses,
   selectedMajor,
+  selectedCertificate,
   hasData,
   friendsEnabled,
   showMajorSelection,
@@ -163,6 +165,7 @@ export function DashboardOverlays({
         onClose={onCloseCommandPalette}
         courses={courses}
         selectedMajor={selectedMajor}
+        selectedCertificate={selectedCertificate}
         hasData={hasData}
         onNavigate={onNavigate}
         onImportTranscript={onImportTranscript}

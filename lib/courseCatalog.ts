@@ -37,8 +37,13 @@ export type CatalogTerm = (typeof CATALOG_TERMS)[number];
 export const SIMULATOR_FALL_TERM: CatalogTerm = "Fall 2026";
 export const SIMULATOR_SPRING_TERM: CatalogTerm = "Spring 2027";
 
-/** Collapse whitespace and uppercase for stable code lookups. */
-export function normalizeCourseCode(code: string): string {
+/**
+ * Collapse whitespace and uppercase for stable catalog map keys. Deliberately
+ * NOT the exported normalizeCourseCode: that one resolves aliases through
+ * getCanonicalCode, which reads the map this builds, so the lookup path has to
+ * stay on a purely structural key or it would recurse.
+ */
+function normalizeCodeKey(code: string): string {
   return code.trim().replace(/\s+/g, " ").toUpperCase();
 }
 
@@ -64,7 +69,7 @@ const COURSES_BY_DEPARTMENT: Map<string, CourseInfo[]> = new Map();
 
 for (const course of ALL_COURSES) {
   for (const code of course.codes ?? []) {
-    COURSE_CODE_MAP.set(normalizeCourseCode(code), course);
+    COURSE_CODE_MAP.set(normalizeCodeKey(code), course);
   }
   const dept = normalizeDepartment(course.department);
   const list = COURSES_BY_DEPARTMENT.get(dept);
@@ -84,7 +89,7 @@ export const SIMULATOR_SPRING_COURSES: CourseInfo[] = ALL_COURSES.filter(
 
 export const getCourseInfo = (code: string): CourseInfo | undefined => {
   if (!code) return undefined;
-  return COURSE_CODE_MAP.get(normalizeCourseCode(code));
+  return COURSE_CODE_MAP.get(normalizeCodeKey(code));
 };
 
 /** Canonical / modern display code (codes[0]), or undefined if unknown. */
@@ -102,7 +107,70 @@ export const resolveCanonicalCode = (code: string): string => {
 };
 
 export const isValidCourseCode = (code: string): boolean => {
-  return COURSE_CODE_MAP.has(normalizeCourseCode(code));
+  return COURSE_CODE_MAP.has(normalizeCodeKey(code));
+};
+
+/**
+ * Splits a course code into its subject prefix, an optional letter prefix on
+ * the number (summer codes such as "CPSC S115"), the digits, and any trailing
+ * letters ("MATH 1200L"). Returns null when the code has no numeric part.
+ */
+const COURSE_CODE_PATTERN = /^(.*?)\s+([A-Z]*)(\d+)([A-Z]*)$/;
+
+const splitCourseCode = (
+  code: string
+): { subject: string; numberPrefix: string; digits: string; suffix: string } | null => {
+  const cleaned = code.toUpperCase().replace(/\s+/g, " ").trim();
+  const match = cleaned.match(COURSE_CODE_PATTERN);
+  if (!match) return null;
+  const [, subject, numberPrefix, digits, suffix] = match;
+  return { subject, numberPrefix, digits, suffix };
+};
+
+/**
+ * Canonical form used by EVERY course comparison in the certificate policy
+ * engine. Two steps, in order:
+ *
+ * 1. Structural: uppercase, collapse whitespace, and expand Yale's legacy
+ *    3-digit numbers to the 4-digit renumbering ("CPSC 223" becomes
+ *    "CPSC 2230"). Trailing letters are preserved.
+ * 2. Catalog: resolve cross-listed aliases through getCanonicalCode, so
+ *    "S&DS 2650" and its CPSC alias collapse to one string.
+ *
+ * Codes the catalog has never heard of fall through to the structural form,
+ * which is still stable enough to compare against itself.
+ */
+export const normalizeCourseCode = (code: string): string => {
+  const cleaned = (code || "").toUpperCase().replace(/\s+/g, " ").trim();
+  const parts = splitCourseCode(cleaned);
+  const structural = parts
+    ? `${parts.subject} ${parts.numberPrefix}${
+        parts.digits.length === 3 ? String(Number(parts.digits) * 10) : parts.digits
+      }${parts.suffix}`
+    : cleaned;
+  return getCanonicalCode(structural) || getCanonicalCode(cleaned) || structural;
+};
+
+/**
+ * Level band of a course, floored to the thousand: courseLevel("CPSC 2230")
+ * is 2000. Returns null when the code carries no parseable number.
+ */
+export const courseLevel = (code: string): number | null => {
+  const parts = splitCourseCode(normalizeCourseCode(code));
+  if (!parts) return null;
+  const value = Number(parts.digits);
+  if (!Number.isFinite(value)) return null;
+  return Math.floor(value / 1000) * 1000;
+};
+
+/**
+ * Subject prefix of a course, used for the per-certificate department caps:
+ * courseSubject("S&DS 2650") is "S&DS". Returns null when the code has no
+ * separable subject.
+ */
+export const courseSubject = (code: string): string | null => {
+  const parts = splitCourseCode(normalizeCourseCode(code));
+  return parts?.subject || null;
 };
 
 export const getCourseNameFromCode = (code: string): string | undefined => {

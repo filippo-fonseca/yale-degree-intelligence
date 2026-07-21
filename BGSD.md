@@ -84,6 +84,119 @@ Notes section and Kiwi will respect them.
     "issues": true,
     "require_remote": true
   },
+  "cursor": {
+    "enabled": true,
+    "models": {
+      "routine": "composer-2.5",
+      "hard": "cursor-grok-4.5-high"
+    }
+  },
+  "harness": {
+    "active": "auto",
+    "models": {
+      "claude": {
+        "opus": "claude-opus-4-8",
+        "sonnet": "sonnet",
+        "haiku": "haiku",
+        "fable": "claude-fable-5"
+      },
+      "codex": {
+        "opus": "gpt-5.5",
+        "sonnet": "gpt-5.4",
+        "haiku": "gpt-5.4-mini",
+        "fable": "gpt-5.5"
+      },
+      "cursor": {
+        "routine": "composer-2.5",
+        "hard": "cursor-grok-4.5-high",
+        "opus": "cursor-grok-4.5-high",
+        "sonnet": "composer-2.5",
+        "haiku": "composer-2.5",
+        "fable": "cursor-grok-4.5-high"
+      }
+    }
+  },
+  "model_contract": {
+    "profile": "claude",
+    "routing": "cursor",
+    "build": {
+      "provider": "cursor",
+      "model": "composer-2.5",
+      "effort": null
+    },
+    "evaluate": {
+      "provider": "cursor",
+      "model": "composer-2.5",
+      "effort": null
+    },
+    "adaptive": {
+      "routine": {
+        "model": "composer-2.5",
+        "effort": null
+      },
+      "hard": {
+        "model": "cursor-grok-4.5-high",
+        "effort": null
+      },
+      "heavy": {
+        "model": "claude-opus-4-8",
+        "effort": "high"
+      },
+      "light": {
+        "model": "sonnet",
+        "effort": "high"
+      }
+    },
+    "transport": "direct",
+    "auth": "subscription-only",
+    "claude_codex": {
+      "profile": "claude",
+      "routing": "fixed",
+      "build": {
+        "provider": "claude",
+        "model": "claude-opus-4-8",
+        "effort": "high"
+      },
+      "evaluate": {
+        "provider": "claude",
+        "model": "claude-opus-4-8",
+        "effort": "high"
+      }
+    }
+  },
+  "verification": {
+    "usage_testing": true,
+    "headless": true
+  },
+  "gui": {
+    "auto": true
+  },
+  "notifications": {
+    "os": true
+  },
+  "remote": {
+    "enabled": false,
+    "host": "loopback",
+    "port": 0
+  },
+  "modes": {
+    "pipeline": "adaptive",
+    "verifier": "adaptive"
+  },
+  "conductor": {
+    "name": "Dan",
+    "emoji": "🐶",
+    "persona": "kiwi",
+    "narrate": true,
+    "suggest_gate_commands": true,
+    "advisor": "auto",
+    "self_compact_at": 0.9
+  },
+  "context": {
+    "max_window_tokens": 1000000,
+    "compact_at": 0.7,
+    "relaunch_at": 0.9
+  },
   "model_posture": {
     "thresholds": {
       "high": 0.4
@@ -103,32 +216,13 @@ Notes section and Kiwi will respect them.
       "model": "haiku",
       "effort": "low"
     }
-  },
-  "verification": {
-    "usage_testing": true,
-    "headless": true
-  },
-  "modes": {
-    "pipeline": "adaptive",
-    "verifier": "adaptive"
-  },
-  "conductor": {
-    "name": "Dan",
-    "emoji": "🐶",
-    "persona": "kiwi",
-    "narrate": true,
-    "suggest_gate_commands": true,
-    "self_compact_at": 0.9
-  },
-  "context": {
-    "max_window_tokens": 1000000,
-    "compact_at": 0.7,
-    "relaunch_at": 0.9
   }
 }
 ```
 
 ## Notes
+
+- Session 2026-07-19: landing polish stages on staging/landing-v3; PR into dev; never write dev or main directly.
 
 - ALWAYS start new feature work / bgsd seshs off of dev (never main, never next). dev is both the base branch to branch from AND the integration branch to merge back into; dev -> main is a separate deliberate human-only promotion.
 

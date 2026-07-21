@@ -5,6 +5,11 @@ import { FiCopy, FiCheck, FiRefreshCw } from "react-icons/fi";
 import type { DanKeyStatus } from "@/lib/dan/client";
 import type { McpTokenStatus } from "@/lib/mcp/client";
 
+// Dan advisor settings hidden for the v3 launch (the section has nested JSX
+// comments, so a guard flag stands in for commenting it out). Flip to true to
+// restore the card. The MCP server card below it is unrelated and stays live.
+const SHOW_DAN_ADVISOR_SETTINGS = false;
+
 interface SettingsIntegrationsSectionProps {
   danKeyStatus: DanKeyStatus;
   danKeyInput: string;
@@ -62,7 +67,10 @@ export function SettingsIntegrationsSection({
 }: SettingsIntegrationsSectionProps) {
   return (
     <>
-      {/* Dan AI Advisor (spans full width) */}
+      {/* Dan AI Advisor (spans full width) — hidden for v3 via the
+          SHOW_DAN_ADVISOR_SETTINGS flag. The MCP card below is unrelated and
+          stays live. */}
+      {SHOW_DAN_ADVISOR_SETTINGS && (
       <div className="lg:col-span-2 rounded-xl border border-black/[0.06] dark:border-white/[0.08] bg-gray-50 dark:bg-transparent dark:bg-gradient-to-br dark:from-white/[0.06] dark:via-transparent dark:to-black/10 shadow-sm dark:shadow-[0_2px_12px_rgba(0,0,0,0.2)] backdrop-blur-sm overflow-hidden">
         <div className="flex items-center justify-between px-3 py-2 border-b border-black/[0.06] dark:border-white/[0.06]">
           <span className="text-xs font-medium text-gray-800 dark:text-gray-200">
@@ -172,6 +180,8 @@ export function SettingsIntegrationsSection({
           </label>
         </div>
       </div>
+
+      )}
 
       {/* MCP server (spans full width) */}
       <div className="lg:col-span-2 rounded-xl border border-black/[0.06] dark:border-white/[0.08] bg-gray-50 dark:bg-transparent dark:bg-gradient-to-br dark:from-white/[0.06] dark:via-transparent dark:to-black/10 shadow-sm dark:shadow-[0_2px_12px_rgba(0,0,0,0.2)] backdrop-blur-sm overflow-hidden">

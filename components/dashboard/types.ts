@@ -1,5 +1,6 @@
 export interface UserProfile {
   majors: string[];
+  certificates?: string[];
   graduationYear: number;
   updatedAt: Date;
   bio?: string;

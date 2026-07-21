@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
 
-export function useDashboardNav(cleoaiComingSoon: boolean) {
+export function useDashboardNav(cleoaiUnreachable: boolean) {
   const [activeTab, setActiveTab] = useLocalStorage(
     "dashboardActiveTab",
     "upload",
@@ -21,11 +21,13 @@ export function useDashboardNav(cleoaiComingSoon: boolean) {
     }
   };
 
+  // Bounce anyone whose persisted tab still points at a tab they cannot reach
+  // (Dan is hidden for the v3 launch) so they do not land on an empty pane.
   useEffect(() => {
-    if (cleoaiComingSoon && activeTab === "cleoai") {
+    if (cleoaiUnreachable && activeTab === "cleoai") {
       setActiveTab("upload");
     }
-  }, [cleoaiComingSoon, activeTab, setActiveTab]);
+  }, [cleoaiUnreachable, activeTab, setActiveTab]);
 
   return {
     activeTab,

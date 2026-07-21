@@ -24,16 +24,22 @@ import {
   BookOpen,
   ListChecks,
   Layers,
+  Award,
 } from "lucide-react";
 import { Course } from "@/lib/types";
 import { ALL_COURSES, getCourseNameFromCode } from "@/lib/courseCatalog";
 import { majorRequirements, MAJORS } from "@/lib/majors";
+import {
+  certificateRequirements,
+  CERTIFICATES,
+} from "@/lib/certificates";
 
 type Group =
   | "Actions"
   | "Jump to"
   | "My courses"
   | "Major requirements"
+  | "Certificate requirements"
   | "Distributionals"
   | "Course catalog";
 
@@ -42,6 +48,7 @@ const GROUP_ORDER: Group[] = [
   "Jump to",
   "My courses",
   "Major requirements",
+  "Certificate requirements",
   "Distributionals",
   "Course catalog",
 ];
@@ -71,6 +78,7 @@ interface CommandPaletteProps {
   onClose: () => void;
   courses: Course[];
   selectedMajor: string;
+  selectedCertificate?: string;
   hasData: boolean;
   onNavigate: (tabId: string) => void;
   onImportTranscript: () => void;
@@ -83,6 +91,7 @@ export default function CommandPalette({
   onClose,
   courses,
   selectedMajor,
+  selectedCertificate = "",
   hasData,
   onNavigate,
   onImportTranscript,
@@ -163,6 +172,11 @@ export default function CommandPalette({
     }[] = [
       { id: "upload", label: "My courses", icon: <FileText size={15} /> },
       { id: "major", label: "My major", icon: <GraduationCap size={15} /> },
+      {
+        id: "certificate",
+        label: "My certificates",
+        icon: <Award size={15} />,
+      },
       { id: "simulator", label: "Simulator", icon: <MonitorCog size={15} /> },
       {
         id: "stats",
@@ -239,6 +253,26 @@ export default function CommandPalette({
       });
     }
 
+    // ---- Certificate requirements ----
+    const certificate = selectedCertificate
+      ? certificateRequirements[selectedCertificate]
+      : undefined;
+    if (certificate) {
+      const certName =
+        CERTIFICATES[selectedCertificate] || certificate.name;
+      certificate.requirements.forEach((req, i) => {
+        out.push({
+          id: `cert-req-${i}`,
+          group: "Certificate requirements",
+          title: req.name,
+          subtitle: `${req.required} course${req.required === 1 ? "" : "s"} · ${certName}`,
+          icon: <Award size={15} />,
+          keywords: `${req.name} ${certName} certificate requirement`.toLowerCase(),
+          onRun: () => run(() => onNavigate("certificate")),
+        });
+      });
+    }
+
     // ---- Distributionals ----
     DISTRIBUTIONALS.forEach((d) => {
       out.push({
@@ -262,6 +296,7 @@ export default function CommandPalette({
     onImportTranscript,
     onManualAdd,
     onToggleTheme,
+    selectedCertificate,
   ]);
 
   // Filter + assemble visible, grouped, flat list

@@ -3,24 +3,36 @@
 import type { Dispatch, SetStateAction } from "react";
 import { FiChevronDown } from "react-icons/fi";
 import { MAJORS } from "@/lib/majors";
+import { CERTIFICATES } from "@/lib/certificates";
 import { MajorDropdown } from "../ui/MajorDropdown";
-import type { UserProfile } from "./settingsTypes";
+import { CertificateDropdown } from "../ui/CertificateDropdown";
+import type { EditableProfile } from "./settingsTypes";
 
 interface SettingsAcademicSectionProps {
-  localProfile: UserProfile;
+  localProfile: EditableProfile;
   duplicateMajorError: string | null;
+  duplicateCertificateError: string | null;
+  autoOpenCertificateIndex: number | null;
   handleAddMajor: () => void;
   handleMajorChange: (index: number, newMajor: string) => void;
   handleRemoveMajor: (index: number) => void;
-  setLocalProfile: Dispatch<SetStateAction<UserProfile | null>>;
+  handleAddCertificate: () => void;
+  handleCertificateChange: (index: number, newCertificate: string) => void;
+  handleRemoveCertificate: (index: number) => void;
+  setLocalProfile: Dispatch<SetStateAction<EditableProfile | null>>;
 }
 
 export function SettingsAcademicSection({
   localProfile,
   duplicateMajorError,
+  duplicateCertificateError,
+  autoOpenCertificateIndex,
   handleAddMajor,
   handleMajorChange,
   handleRemoveMajor,
+  handleAddCertificate,
+  handleCertificateChange,
+  handleRemoveCertificate,
   setLocalProfile,
 }: SettingsAcademicSectionProps) {
   return (
@@ -69,6 +81,62 @@ export function SettingsAcademicSection({
               }
             >
               + Add another major
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* Certificates */}
+      <div className="rounded-xl border border-black/[0.06] dark:border-white/[0.08] bg-gray-50 dark:bg-transparent dark:bg-gradient-to-br dark:from-white/[0.06] dark:via-transparent dark:to-black/10 shadow-sm dark:shadow-[0_2px_12px_rgba(0,0,0,0.2)] backdrop-blur-sm px-3 py-2.5">
+        <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+          Certificates
+        </label>
+        <p className="text-[10px] text-gray-500 dark:text-gray-400 mb-1.5">
+          Optional. Courses counted for a certificate cannot also count toward
+          majors.
+        </p>
+        {duplicateCertificateError && (
+          <div className="mb-1 text-[10px] text-red-400">
+            {duplicateCertificateError}
+          </div>
+        )}
+        <div className="space-y-1.5">
+          {localProfile.certificates.map((certificate, index) => (
+            <div key={index} className="relative z-[60] overflow-visible">
+              <div className="flex items-center gap-1.5">
+                <div className="flex-1">
+                  <CertificateDropdown
+                    value={certificate}
+                    onChange={(newCertificate) =>
+                      handleCertificateChange(index, newCertificate)
+                    }
+                    disabledOptions={localProfile.certificates.filter(
+                      (c) => c !== certificate,
+                    )}
+                    defaultOpen={autoOpenCertificateIndex === index}
+                    userMajors={localProfile.majors}
+                  />
+                </div>
+                <button
+                  onClick={() => handleRemoveCertificate(index)}
+                  className="text-red-400 hover:text-red-300 px-1.5 py-0.5 rounded hover:bg-red-400/10 transition-colors text-xs"
+                  title="Remove certificate"
+                >
+                  ×
+                </button>
+              </div>
+            </div>
+          ))}
+          {localProfile.certificates.length < 3 && (
+            <button
+              onClick={handleAddCertificate}
+              className="text-[11px] text-teal-500 hover:text-teal-400 flex items-center gap-1"
+              disabled={
+                Object.keys(CERTIFICATES).length ===
+                localProfile.certificates.length
+              }
+            >
+              + Add certificate
             </button>
           )}
         </div>

@@ -1,0 +1,58 @@
+{
+  "id": "CERT_COLLECTIONS",
+  "name": "Collections: Objects, Research, Society",
+  "description": "Exposes students to expertise within Yale's special collections libraries, equipping them with analytical skills and methodologies that scholars, librarians, archivists, conservators, and curators employ to preserve and steward the human record across manuscripts, documents, film, audio, and digital formats.",
+  "category": "skills_based",
+  "sourceUrl": "https://catalog.yale.edu/ycps/subjects-of-instruction/collections/",
+  "requiresApplication": false,
+  "creditRequirements": {
+    "total": 5
+  },
+  "notes": [
+    "Minimum grade C in each course",
+    "No Credit/D/Fail",
+    "No more than two course credits may overlap with a major, simultaneous degree, or another certificate",
+    "No course credit may count toward more than two curricular programs",
+    "Approved graduate and professional school courses may count",
+    "Outside credit (study abroad, other institutions) or an on-topic summer internship may count with director approval",
+    "Declare on Yale Hub by January 15 or September 15 of the final semester; complete enrollment form on the Collections website"
+  ],
+  "policy": {
+    "overlapCap": 2,
+    "minGrade": "C",
+    "extraForms": [
+      "Enrollment form available on the Collections (Materials Histories of the Human Record) website"
+    ],
+    "sourceNote": "No more than two course credits fulfilling the requirements of the certificate may overlap with a major, a simultaneous degree, or another certificate. The minimum grade for all courses is a C."
+  },
+  "requirements": [
+    {
+      "name": "Introductory seminar",
+      "required": 1,
+      "description": "Required introductory seminar.",
+      "options": [
+        { "type": "course", "code": "COSM 1001" }
+      ]
+    },
+    {
+      "name": "Capstone",
+      "required": 1,
+      "description": "Mandatory capstone culminating in a project focused on material histories (internship, research project, exhibit work, collections-intensive course, or other hands-on experience).",
+      "options": [
+        { "type": "course", "code": "COSM 4900" }
+      ]
+    },
+    {
+      "name": "Primary collections area",
+      "required": 2,
+      "description": "Two courses in one of three areas: Research with Collections (YC Collections Research), Collections in Society (YC Collections Society), or Creative Critical Engagement with Collections (YC Collections Engagement).",
+      "options": []
+    },
+    {
+      "name": "Secondary collections area",
+      "required": 1,
+      "description": "One course in a different area from the primary area, drawn from the remaining two of: YC Collections Research, YC Collections Society, or YC Collections Engagement.",
+      "options": []
+    }
+  ]
+}

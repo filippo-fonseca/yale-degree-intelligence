@@ -8,6 +8,7 @@ export function useUserProfile(user: User | null) {
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [profileLoading, setProfileLoading] = useState(true);
   const [selectedMajor, setSelectedMajor] = useState<string>("");
+  const [selectedCertificate, setSelectedCertificate] = useState<string>("");
   const [showMajorSelection, setShowMajorSelection] = useState(false);
 
   useEffect(() => {
@@ -23,11 +24,20 @@ export function useUserProfile(user: User | null) {
       (docSnap) => {
         if (docSnap.exists()) {
           const data = docSnap.data() as UserProfile;
-          setUserProfile(data);
+          // Older profile documents predate certificates, so the list is
+          // materialized here and every consumer can treat it as an array.
+          const certificates = data.certificates ?? [];
+          setUserProfile({ ...data, certificates });
           setSelectedMajor((current) => {
             const majors = data.majors || [];
             if (!current || !majors.includes(current)) {
               return majors[0] || "";
+            }
+            return current;
+          });
+          setSelectedCertificate((current) => {
+            if (!current || !certificates.includes(current)) {
+              return certificates[0] || "";
             }
             return current;
           });
@@ -72,9 +82,13 @@ export function useUserProfile(user: User | null) {
       const docRef = doc(db, "users", user.uid);
       const docSnap = await getDoc(docRef);
       if (docSnap.exists()) {
-        setUserProfile(docSnap.data() as UserProfile);
+        const data = docSnap.data() as UserProfile;
+        setUserProfile({ ...data, certificates: data.certificates ?? [] });
         if (updatedProfile.majors) {
           setSelectedMajor(updatedProfile.majors[0] || "");
+        }
+        if (updatedProfile.certificates) {
+          setSelectedCertificate(updatedProfile.certificates[0] || "");
         }
       }
     } catch (error) {
@@ -104,6 +118,8 @@ export function useUserProfile(user: User | null) {
     profileLoading,
     selectedMajor,
     setSelectedMajor,
+    selectedCertificate,
+    setSelectedCertificate,
     showMajorSelection,
     setShowMajorSelection,
     isBrandNew,

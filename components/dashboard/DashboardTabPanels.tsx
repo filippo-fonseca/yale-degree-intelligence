@@ -5,10 +5,12 @@ import { AnimatePresence } from "framer-motion";
 import { Course } from "@/lib/types";
 import { computeAcademicStatsSummary } from "@/lib/utils/academicStats";
 import type { MajorProgress } from "@/lib/majors";
+import type { CertificateProgress } from "@/lib/certificates";
 import type { UserProfile } from "./types";
 import { UploadTabPanel } from "./UploadTabPanel";
 import { StatsTabPanel } from "./StatsTabPanel";
 import { MajorTabPanel } from "./MajorTabPanel";
+import { CertificateTabPanel } from "./CertificateTabPanel";
 import { SimulatorTabPanel } from "./SimulatorTabPanel";
 import { DistributionalsTabPanel } from "./DistributionalsTabPanel";
 import { FriendsTabPanel } from "./FriendsTabPanel";
@@ -16,7 +18,7 @@ import { CleoAITabPanel } from "./CleoAITabPanel";
 
 interface DashboardTabPanelsProps {
   activeTab: string;
-  cleoaiComingSoon: boolean;
+  cleoaiUnreachable: boolean;
   user: User;
   userProfile: UserProfile | null;
   courses: Course[];
@@ -24,10 +26,14 @@ interface DashboardTabPanelsProps {
   coursesLoading: boolean;
   isBrandNew: boolean;
   selectedMajor: string;
+  selectedCertificate: string;
   friendsEnabled: boolean;
   getMajorProgress: () => MajorProgress | null;
+  getCertificateProgress: () => CertificateProgress | null;
   onTabChange: (tab: string) => void;
   onSelectMajor: (major: string) => void;
+  onSelectCertificate: (certificate: string) => void;
+  onOpenSettings: () => void;
   onManualAdd: (semester?: string) => void;
   onReupload: () => void;
   onUploadSuccess: (extractedText: string) => Promise<void>;
@@ -42,7 +48,7 @@ interface DashboardTabPanelsProps {
 
 export function DashboardTabPanels({
   activeTab,
-  cleoaiComingSoon,
+  cleoaiUnreachable,
   user,
   userProfile,
   courses,
@@ -50,10 +56,14 @@ export function DashboardTabPanels({
   coursesLoading,
   isBrandNew,
   selectedMajor,
+  selectedCertificate,
   friendsEnabled,
   getMajorProgress,
+  getCertificateProgress,
   onTabChange,
   onSelectMajor,
+  onSelectCertificate,
+  onOpenSettings,
   onManualAdd,
   onReupload,
   onUploadSuccess,
@@ -100,6 +110,18 @@ export function DashboardTabPanels({
           onTogglePrereqOverride={onTogglePrereqOverride}
         />
       )}
+      {activeTab === "certificate" && (
+        <CertificateTabPanel
+          user={user}
+          userProfile={userProfile}
+          courses={courses}
+          selectedCertificate={selectedCertificate}
+          onSelectCertificate={onSelectCertificate}
+          getCertificateProgress={getCertificateProgress}
+          onRequirementChange={fetchCourses}
+          onOpenSettings={onOpenSettings}
+        />
+      )}
       {activeTab === "simulator" && userProfile && (
         <SimulatorTabPanel
           userId={user.uid}
@@ -125,7 +147,7 @@ export function DashboardTabPanels({
           onToggleFriends={onToggleFriends}
         />
       )}
-      {activeTab === "cleoai" && !cleoaiComingSoon && (
+      {activeTab === "cleoai" && !cleoaiUnreachable && (
         <CleoAITabPanel
           courses={courses}
           selectedMajor={selectedMajor}

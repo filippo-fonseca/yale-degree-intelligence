@@ -1,0 +1,29 @@
+{
+  "id": "CERT_SANSKRIT",
+  "name": "Sanskrit (Advanced Language Study)",
+  "description": "Certificate of Advanced Language Study in Sanskrit offered by the Department of South Asian Studies. A certificate adviser, typically the DUS, advises students on the certification process. The certificate is listed on the student's transcript once certified through Degree Audit.",
+  "category": "advanced_language",
+  "sourceUrl": "https://catalog.yale.edu/ycps/subjects-of-instruction/south-asian-studies/",
+  "requiresApplication": false,
+  "parentProgram": "South Asian Studies",
+  "creditRequirements": { "total": 4 },
+  "notes": [
+    "No Credit/D/Fail",
+    "Letter grade B or above required in all courses",
+    "Declare candidacy on Yale Hub as early as possible, no later than January 15 or September 15 of final semester"
+  ],
+  "policy": {
+    "minGrade": "B",
+    "sourceNote": "All courses must be taken for a letter grade, and students must achieve a grade of B or above."
+  },
+  "requirements": [
+    {
+      "name": "Courses beyond L3",
+      "required": 4,
+      "description": "Four courses beyond the L3 level in Sanskrit. At least two must be Yale courses designated L5. Of the remaining two courses, one must be designated L5 or L4 and one may be SKRT 5570 (directed reading), a course closely related in Old or Middle Indic language (e.g., Vedic or Pali), or a seminar in Sanskrit literature with readings in English.",
+      "options": [
+        { "type": "course", "code": "SKRT 5570" }
+      ]
+    }
+  ]
+}

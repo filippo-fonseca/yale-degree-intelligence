@@ -28,11 +28,16 @@ export default function MajorProgressView({
   progress,
   onRequirementChange,
   courses,
+  userMajors = [],
+  userCertificates = [],
 }: {
   selectedMajor: string;
   progress: MajorProgress;
   onRequirementChange: () => void;
   courses: Course[];
+  /** Declared programs, so the manual picker can ask the policy engine. */
+  userMajors?: string[];
+  userCertificates?: string[];
 }) {
   const { user } = useAuth();
   const {
@@ -146,6 +151,8 @@ export default function MajorProgressView({
         reqModal={reqModal}
         setReqModal={setReqModal}
         courses={courses}
+        userMajors={userMajors}
+        userCertificates={userCertificates}
         onRequirementChange={onRequirementChange}
         handleSkip={handleSkip}
         handleUnskip={handleUnskip}

@@ -94,7 +94,10 @@ export default function RootLayout({
       </head>
       <AuthProvider>
         <ThemeProvider>
-          <body className="bg-white text-gray-900 dark:bg-black dark:text-white transition-colors duration-300">
+          <body
+            className="bg-white text-gray-900 dark:bg-black dark:text-white transition-colors duration-300"
+            suppressHydrationWarning
+          >
             <Toaster
               position="top-center"
               toastOptions={{

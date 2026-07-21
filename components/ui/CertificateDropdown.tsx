@@ -8,6 +8,7 @@ import {
   CERTIFICATE_CATEGORY_LABELS,
   certificateRequirements,
 } from "@/lib/certificates";
+import { certificateEligibility } from "@/lib/certificatePolicy";
 
 interface CertificateDropdownProps {
   value: string;
@@ -19,6 +20,12 @@ interface CertificateDropdownProps {
   emptyLabel?: string;
   /** Open the menu (and focus search) on mount / when flipped true */
   defaultOpen?: boolean;
+  /**
+   * The student's declared majors. Yale does not award a few certificates to
+   * certain majors; those still appear and can still be picked, with the reason
+   * shown, because a student who plans to switch majors needs to see them.
+   */
+  userMajors?: string[];
 }
 
 type MenuPos = { top: number; left: number; width: number; openUp: boolean };
@@ -48,6 +55,7 @@ export function CertificateDropdown({
   allowEmpty = false,
   emptyLabel = "Select a certificate",
   defaultOpen = false,
+  userMajors = [],
 }: CertificateDropdownProps) {
   const [isOpen, setIsOpen] = useState(defaultOpen);
   const [searchTerm, setSearchTerm] = useState("");
@@ -162,13 +170,26 @@ export function CertificateDropdown({
     ? certificateRequirements[value]?.category
     : undefined;
 
+  const majorKey = userMajors.join(",");
+  const warningFor = useMemo(() => {
+    const majorIds = majorKey ? majorKey.split(",") : [];
+    return (certificateId: string) =>
+      certificateEligibility(certificateId, majorIds).warning;
+  }, [majorKey]);
+
+  const selectedWarning = value ? warningFor(value) : undefined;
+
   return (
     <div ref={dropdownRef} className={`relative ${className} w-full`}>
       <button
         ref={buttonRef}
         type="button"
         onClick={() => setIsOpen((v) => !v)}
-        className="w-full text-left px-2.5 py-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800/70 flex justify-between items-center"
+        className={`w-full text-left px-2.5 py-2 rounded-lg border bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800/70 flex justify-between items-center ${
+          selectedWarning
+            ? "border-amber-500/40"
+            : "border-gray-200 dark:border-gray-700"
+        }`}
       >
         <div className="flex items-center min-w-0">
           <div className="w-2.5 h-2.5 rounded-full bg-teal-500 mr-2 flex-shrink-0" />
@@ -202,6 +223,12 @@ export function CertificateDropdown({
           />
         </svg>
       </button>
+
+      {selectedWarning && (
+        <p className="mt-1 text-[10px] leading-snug text-amber-600 dark:text-amber-400">
+          {selectedWarning}
+        </p>
+      )}
 
       {isOpen &&
         createPortal(
@@ -264,7 +291,9 @@ export function CertificateDropdown({
                       <div className="sticky top-0 z-[1] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide text-teal-700 dark:text-teal-300 bg-teal-50/90 dark:bg-teal-950/60 backdrop-blur-sm border-b border-teal-100/60 dark:border-teal-900/40">
                         {group.label}
                       </div>
-                      {group.items.map((c) => (
+                      {group.items.map((c) => {
+                        const warning = warningFor(c.id);
+                        return (
                         <button
                           key={c.id}
                           type="button"
@@ -293,10 +322,16 @@ export function CertificateDropdown({
                                 {c.id}
                                 {c.requiresApplication ? " · application" : ""}
                               </div>
+                              {warning && (
+                                <div className="mt-0.5 text-[10px] leading-snug text-amber-600 dark:text-amber-400">
+                                  {warning}
+                                </div>
+                              )}
                             </div>
                           </div>
                         </button>
-                      ))}
+                        );
+                      })}
                     </div>
                   ))
                 ) : (

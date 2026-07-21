@@ -10,17 +10,27 @@ import {
   getCertificateDescriptionById,
   type CertificateProgress,
 } from "@/lib/certificates";
+import {
+  certificateEligibility,
+  resolvePolicy,
+} from "@/lib/certificatePolicy";
+import {
+  getCertificateOverlapBudget,
+  getCertificateViolations,
+} from "@/lib/utils/programClaims";
 import { useAuth } from "@/context/AuthContext";
 import { skipCourse, unskipCourse } from "@/lib/utils/courseOperations";
 import CourseModal from "./CourseModal";
-import RequirementCard from "./RequirementCard";
+import RequirementCard, {
+  type RequirementConflict,
+} from "./RequirementCard";
 import HeatMapView from "./HeatMapView";
 import { STATUS_CLASSES, type ReqStats } from "./requirementStatus";
 import AddManualCourseModal from "../AddManualCourseModal/AddManualCourseModal";
 import { Course } from "@/lib/types";
 import { db } from "@/config/firebase";
 import { setDoc, doc } from "firebase/firestore";
-import { getCourseInfo } from "@/lib/courseCatalog";
+import { getCourseInfo, normalizeCourseCode } from "@/lib/courseCatalog";
 import { InfoCard } from "../ui/InfoCard";
 import RequirementModal from "./RequirementModal";
 import CertificateTipModal, {
@@ -113,16 +123,64 @@ function CertificateStatCard({
   );
 }
 
+/**
+ * Warn but allow. Yale bars a few major and certificate pairings outright, and
+ * this banner is the single voice for it inside the certificate: the manual
+ * picker stays quiet about eligibility so the reasons it does show are the ones
+ * that differ from course to course.
+ *
+ * The copy is the engine's, split at the sentence break so the finding leads and
+ * the advice follows.
+ */
+function IneligibilityBanner({ warning }: { warning: string }) {
+  const breakAt = warning.indexOf(". ");
+  const lead = breakAt === -1 ? warning : warning.slice(0, breakAt + 1);
+  const rest = breakAt === -1 ? "" : warning.slice(breakAt + 2);
+  return (
+    <div className="rounded-lg bg-amber-500/10 border border-amber-500/20 px-3 py-2.5">
+      <p className="text-sm text-amber-700 dark:text-amber-300">
+        <span className="font-medium">{lead}</span>
+        {rest && (
+          <span className="text-amber-700/80 dark:text-amber-200/80"> {rest}</span>
+        )}
+      </p>
+    </div>
+  );
+}
+
+/** The overlap budget, in the quiet pill idiom the cards already use. */
+function OverlapPill({ label, tooltip }: { label: string; tooltip: string }) {
+  return (
+    <div className="relative group ml-auto">
+      <span className="inline-block px-2 py-1 rounded-lg text-[10px] font-mono bg-gray-100 dark:bg-gray-900/50 text-gray-500 dark:text-gray-400 border border-gray-200 dark:border-gray-800/50 cursor-default">
+        {label}
+      </span>
+      <div className="absolute z-10 right-0 bottom-full mb-1.5 w-52 p-2 text-[11px] text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-900/95 backdrop-blur-sm rounded-lg border border-gray-200 dark:border-gray-800/50 shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
+        {tooltip}
+      </div>
+    </div>
+  );
+}
+
 export default function CertificateProgressView({
   selectedCertificate,
   progress,
   onRequirementChange,
   courses,
+  userMajors = [],
+  userCertificates = [],
 }: {
   selectedCertificate: string;
   progress: CertificateProgress;
   onRequirementChange: () => void;
   courses: Course[];
+  /**
+   * Declared programs. The certificate view is the one surface that has to
+   * reason across programs (eligibility, overlap budget, stored conflicts), and
+   * nothing below app/page.tsx can see the student's majors otherwise.
+   */
+  userMajors?: string[];
+  userCertificates?: string[];
 }) {
   const { user } = useAuth();
   const [showInProgressStats, setShowInProgressStats] = useState(false);
@@ -268,6 +326,99 @@ export default function CertificateProgressView({
       console.error("Error excluding course from requirement:", error);
     }
   };
+
+  // The caller rebuilds these arrays every render, so memoize on their
+  // contents rather than on their identity.
+  const majorKey = userMajors.join(",");
+  const certificateKey = userCertificates.join(",");
+
+  const eligibility = useMemo(
+    () => certificateEligibility(selectedCertificate, majorKey ? majorKey.split(",") : []),
+    [selectedCertificate, majorKey],
+  );
+
+  const zeroOverlap = resolvePolicy(selectedCertificate).zeroOverlap;
+
+  const overlap = useMemo(
+    () =>
+      getCertificateOverlapBudget(courses, selectedCertificate, {
+        majorIds: majorKey ? majorKey.split(",") : [],
+        certificateIds: certificateKey ? certificateKey.split(",") : [],
+      }),
+    [courses, selectedCertificate, majorKey, certificateKey],
+  );
+
+  /**
+   * A certificate that shares nothing always says so. One that has a budget
+   * only speaks once the student has actually spent some of it, otherwise every
+   * language certificate would carry a meter reading zero forever.
+   */
+  const overlapPill = zeroOverlap
+    ? {
+        label: "no overlap",
+        tooltip:
+          "No course may count toward both this certificate and another program.",
+      }
+    : overlap.cap > 0 && overlap.used > 0
+      ? {
+          label: `overlap ${overlap.used}/${overlap.cap}`,
+          tooltip: `Shared with your other programs: ${overlap.courses.join(", ")}.`,
+        }
+      : null;
+
+  /**
+   * Stored assignments this certificate would lose today, keyed by the
+   * requirement they were filed under.
+   *
+   * Only assignments the student actually stored get a chip. The engine also
+   * audits the overlaps it infers from auto-matching, and those have no
+   * document to edit, so offering to remove one would do nothing.
+   */
+  const conflictsByRequirement = useMemo(() => {
+    const stored = new Set<string>();
+    for (const course of courses || []) {
+      for (const manual of course.manualRequirementsFulfilled || []) {
+        if (manual.certificate_id !== selectedCertificate) continue;
+        stored.add(
+          `${normalizeCourseCode(course.code)}::${manual.requirement_title}`,
+        );
+      }
+    }
+
+    const byRequirement = new Map<string, RequirementConflict[]>();
+    const violations = getCertificateViolations(courses, selectedCertificate, {
+      majorIds: majorKey ? majorKey.split(",") : [],
+      certificateIds: certificateKey ? certificateKey.split(",") : [],
+    });
+    for (const violation of violations) {
+      const key = `${violation.courseCode}::${violation.requirementTitle}`;
+      if (!stored.has(key)) continue;
+      const list = byRequirement.get(violation.requirementTitle) || [];
+      list.push({
+        courseCode: violation.courseCode,
+        reason: violation.reason,
+      });
+      byRequirement.set(violation.requirementTitle, list);
+    }
+    return byRequirement;
+  }, [courses, selectedCertificate, majorKey, certificateKey]);
+
+  /**
+   * The parts of a certificate that are not courses: forms, applications, and
+   * the lecture write-ups a few programs ask for. We have no way to observe any
+   * of it, so it is listed and labeled as the student's own to track.
+   */
+  const extraRequirements = useMemo(() => {
+    const policy = resolvePolicy(selectedCertificate);
+    const rows: string[] = [];
+    if (getCertificate(selectedCertificate)?.requiresApplication && policy.extraForms.length === 0) {
+      // Certificates that spell out their application in extraForms describe it
+      // better than this line does, so it only fills in for the ones that do not.
+      rows.push("Apply to the program before you can be enrolled in it.");
+    }
+    rows.push(...policy.extraForms, ...policy.nonCourseRequirements);
+    return rows;
+  }, [selectedCertificate]);
 
   const completedCredits = progress?.completedCredits;
   const inProgressCredits = progress?.inProgressCredits || 0;
@@ -569,6 +720,10 @@ export default function CertificateProgressView({
 
   return (
     <div className="space-y-6 font-louize">
+      {!eligibility.eligible && eligibility.warning && (
+        <IneligibilityBanner warning={eligibility.warning} />
+      )}
+
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
           <p className="text-xs uppercase tracking-wider text-teal-600 dark:text-teal-400 mb-1">
@@ -638,6 +793,12 @@ export default function CertificateProgressView({
           >
             + In Progress
           </button>
+          {overlapPill && (
+            <OverlapPill
+              label={overlapPill.label}
+              tooltip={overlapPill.tooltip}
+            />
+          )}
         </div>
       </div>
 
@@ -787,6 +948,7 @@ export default function CertificateProgressView({
                         key={stats.req.id ?? stats.req.name}
                         stats={stats}
                         handlers={cardHandlers}
+                        conflicts={conflictsByRequirement.get(stats.req.name)}
                       />
                     ))
                   )}
@@ -800,6 +962,32 @@ export default function CertificateProgressView({
       {view === "heatmap" && (
         <div data-tour="certificate-heatmap-view">
           <HeatMapView cells={heatCells} onOpenRequirement={openRequirement} />
+        </div>
+      )}
+
+      {extraRequirements.length > 0 && (
+        <div className="p-3 rounded-xl border border-gray-200 dark:border-gray-800/50 bg-white/40 dark:bg-gray-900/20">
+          <div className="flex items-baseline justify-between gap-3 flex-wrap">
+            <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300">
+              Also required by Yale
+            </h4>
+            <span className="text-[10px] text-gray-400 dark:text-gray-500">
+              tracked by you, not DegreeIntelligence
+            </span>
+          </div>
+          <ul className="mt-2 space-y-1.5">
+            {extraRequirements.map((item) => (
+              <li
+                key={item}
+                className="flex gap-2 text-[11px] text-gray-500 dark:text-gray-400"
+              >
+                <span className="text-gray-300 dark:text-gray-600 select-none">
+                  •
+                </span>
+                <span>{item}</span>
+              </li>
+            ))}
+          </ul>
         </div>
       )}
 
@@ -818,6 +1006,8 @@ export default function CertificateProgressView({
         onSuccess={onRequirementChange}
         userCourses={courses}
         programType="certificate"
+        userMajors={userMajors}
+        userCertificates={userCertificates}
       />
 
       <RequirementModal

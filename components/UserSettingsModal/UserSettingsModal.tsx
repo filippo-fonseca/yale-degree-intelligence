@@ -39,14 +39,22 @@ import {
 } from "@/lib/mcp/client";
 import { isAdminEmail } from "@/lib/admin";
 
+/**
+ * The stored profile as it arrives from the caller. `certificates` is optional
+ * because the Firestore document predates certificates, so older documents
+ * simply do not carry the field.
+ */
 interface UserProfile {
   majors: string[];
-  certificates: string[];
+  certificates?: string[];
   graduationYear: number;
   bio?: string;
   updatedAt: Date;
   danWriteActionsEnabled?: boolean;
 }
+
+/** Local editing state, where the certificate list is always materialized. */
+type EditableProfile = UserProfile & { certificates: string[] };
 
 interface UserSettingsModalProps {
   user: User;
@@ -82,7 +90,7 @@ export default function UserSettingsModal({
   // Owner-gated dev tools. Mirrors the exception in context/AuthContext.tsx.
   const isOwner = isAdminEmail(user.email);
   const [isHoveringLogout, setIsHoveringLogout] = useState(false);
-  const [localProfile, setLocalProfile] = useState<UserProfile | null>(null);
+  const [localProfile, setLocalProfile] = useState<EditableProfile | null>(null);
   const [duplicateMajorError, setDuplicateMajorError] = useState<string | null>(
     null,
   );
@@ -1105,6 +1113,7 @@ export default function UserSettingsModal({
                           (c) => c !== certificate,
                         )}
                         defaultOpen={autoOpenCertificateIndex === index}
+                        userMajors={localProfile.majors}
                       />
                     </div>
                     <button

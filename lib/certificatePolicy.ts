@@ -103,6 +103,14 @@ export const REASONS = {
     `Already counts toward your ${cert} certificate. ${cert} allows no overlap with a major.`,
   overlapCap: (cap: number) =>
     `Overlap limit reached: ${cap} of ${cap} shared courses already used.`,
+  /**
+   * A cap of 0 is not a budget that ran out, so the cap sentence reads wrong
+   * ("0 of 0 shared courses already used"). Certificates that share nothing get
+   * their own sentence. Reached mainly by the certificate-to-certificate case,
+   * where the zero-overlap copy above would name a major that is not involved.
+   */
+  noSharing: (cert: string) =>
+    `${cert} allows no course sharing with another program.`,
   threePrograms: () => `A course can count toward at most two programs at Yale.`,
   levelBand: (cert: string, level: number) =>
     `${cert} only shares ${level}-level or higher courses with a major.`,
@@ -337,7 +345,12 @@ export function evaluateAllocation(input: EvaluateAllocationInput): Verdict {
     const budget = overlapBudget(targetRef.id, input.existing);
     const alreadyCounted = budget.courses.includes(code);
     if (!alreadyCounted && budget.used >= policy.overlapCap) {
-      return blocked("overlap-cap", REASONS.overlapCap(policy.overlapCap));
+      return blocked(
+        "overlap-cap",
+        policy.overlapCap === 0
+          ? REASONS.noSharing(targetName)
+          : REASONS.overlapCap(policy.overlapCap)
+      );
     }
   }
 

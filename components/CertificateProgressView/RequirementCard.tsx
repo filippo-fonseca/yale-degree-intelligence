@@ -11,6 +11,16 @@ import {
   type ReqStats,
 } from "./requirementStatus";
 
+/**
+ * A stored assignment on this requirement that the policy engine refuses. The
+ * numbers already treat it as lost, so the chip explains why and offers the one
+ * action that makes the stored data agree with them.
+ */
+export type RequirementConflict = {
+  courseCode: string;
+  reason: string;
+};
+
 export type RequirementCardHandlers = {
   onOpenCourse: (opt: any, reqName: string) => void;
   onUnskip: (code: string) => void;
@@ -44,9 +54,11 @@ function optionSuffix(opt: any): string {
 const RequirementCard = React.memo(function RequirementCard({
   stats,
   handlers,
+  conflicts,
 }: {
   stats: ReqStats;
   handlers: RequirementCardHandlers;
+  conflicts?: RequirementConflict[];
 }) {
   const { req, reqCompleted, reqInProgress } = stats;
   const status = getReqStatus(reqCompleted, reqInProgress, req.required || 0);
@@ -189,6 +201,39 @@ const RequirementCard = React.memo(function RequirementCard({
           </button>
         )}
       </div>
+
+      {conflicts && conflicts.length > 0 && (
+        <div className="mt-2 space-y-1.5">
+          {conflicts.map((conflict) => (
+            <div
+              key={conflict.courseCode}
+              className="rounded-lg bg-amber-500/10 border border-amber-500/20 px-2 py-1.5"
+            >
+              <div className="flex items-center gap-1.5">
+                <span className="text-[10px] px-1.5 py-0.5 rounded-md bg-amber-500/20 text-amber-700 dark:text-amber-300 border border-amber-500/40">
+                  conflict
+                </span>
+                <span className="text-[11px] font-medium text-amber-700 dark:text-amber-300">
+                  {conflict.courseCode}
+                </span>
+              </div>
+              <p className="text-[11px] mt-1 text-amber-700/80 dark:text-amber-200/80">
+                {conflict.reason}
+              </p>
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onRemoveManual(conflict.courseCode, req.name);
+                }}
+                className="mt-1 text-[11px] underline underline-offset-2 text-amber-700 dark:text-amber-300 hover:text-amber-800 dark:hover:text-amber-200 transition-colors"
+              >
+                Remove from certificate
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
     </motion.div>
   );
 });

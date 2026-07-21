@@ -1113,7 +1113,18 @@
   },
   {
     "codes": [
-      "AFAM 4371",
+      "AFAM 4371"
+    ],
+    "name": "Independent Study: African American Studies",
+    "credits": 1.0,
+    "department": "AFAM",
+    "offered": [
+      "Fall 2025",
+      "Spring 2026"
+    ]
+  },
+  {
+    "codes": [
       "AFAM 4372"
     ],
     "name": "Independent Study: African American Studies",
@@ -4050,10 +4061,25 @@
   },
   {
     "codes": [
-      "AMST 4464",
-      "AMST 4463",
-      "AMST 464",
-      "AMST 463"
+      "AMST 4463"
+    ],
+    "name": "Documentary Film Workshop",
+    "credits": 1.0,
+    "department": "AMST",
+    "offered": [
+      "Fall 2023",
+      "Spring 2024",
+      "Fall 2024",
+      "Spring 2025",
+      "Fall 2025",
+      "Spring 2026",
+      "Fall 2026"
+    ],
+    "isFall": true
+  },
+  {
+    "codes": [
+      "AMST 4464"
     ],
     "name": "Documentary Film Workshop",
     "credits": 1.0,
@@ -4097,10 +4123,27 @@
   },
   {
     "codes": [
-      "AMST 4472",
-      "AMST 4471",
-      "AMST 472",
-      "AMST 471"
+      "AMST 4471"
+    ],
+    "name": "Individual Reading and Research for Juniors and Seniors",
+    "credits": 1.0,
+    "department": "AMST",
+    "offered": [
+      "Fall 2023",
+      "Spring 2024",
+      "Fall 2024",
+      "Spring 2025",
+      "Fall 2025",
+      "Spring 2026",
+      "Fall 2026",
+      "Spring 2027"
+    ],
+    "isFall": true,
+    "isSpring": true
+  },
+  {
+    "codes": [
+      "AMST 4472"
     ],
     "name": "Individual Reading and Research for Juniors and Seniors",
     "credits": 1.0,
@@ -4177,10 +4220,27 @@
   },
   {
     "codes": [
-      "AMST 4494",
-      "AMST 4493",
-      "AMST 494",
-      "AMST 493"
+      "AMST 4493"
+    ],
+    "name": "Senior Project for the Intensive Major",
+    "credits": 1.0,
+    "department": "AMST",
+    "offered": [
+      "Fall 2023",
+      "Spring 2024",
+      "Fall 2024",
+      "Spring 2025",
+      "Fall 2025",
+      "Spring 2026",
+      "Fall 2026",
+      "Spring 2027"
+    ],
+    "isFall": true,
+    "isSpring": true
+  },
+  {
+    "codes": [
+      "AMST 4494"
     ],
     "name": "Senior Project for the Intensive Major",
     "credits": 1.0,
@@ -6456,10 +6516,24 @@
   },
   {
     "codes": [
-      "APHY 1000",
       "APHY 0800",
-      "APHY 100",
       "APHY 080"
+    ],
+    "name": "Energy, Environment, and Public Policy",
+    "credits": 1.0,
+    "department": "APHY",
+    "offered": [
+      "Spring 2024",
+      "Spring 2025",
+      "Spring 2026",
+      "Spring 2027"
+    ],
+    "isSpring": true
+  },
+  {
+    "codes": [
+      "APHY 1000",
+      "APHY 100"
     ],
     "name": "Energy, Environment, and Public Policy",
     "credits": 1.0,
@@ -6742,10 +6816,29 @@
   },
   {
     "codes": [
-      "APHY 4720",
       "APHY 4710",
-      "APHY 472",
       "APHY 471"
+    ],
+    "name": "Senior Special Projects",
+    "credits": 1.0,
+    "department": "APHY",
+    "offered": [
+      "Fall 2023",
+      "Spring 2024",
+      "Fall 2024",
+      "Spring 2025",
+      "Fall 2025",
+      "Spring 2026",
+      "Fall 2026",
+      "Spring 2027"
+    ],
+    "isFall": true,
+    "isSpring": true
+  },
+  {
+    "codes": [
+      "APHY 4720",
+      "APHY 472"
     ],
     "name": "Senior Special Projects",
     "credits": 1.0,
@@ -7674,9 +7767,25 @@
   },
   {
     "codes": [
-      "ARCG 4472",
       "ARCG 4471",
       "ARCG 471"
+    ],
+    "name": "Directed Reading and Research in Archaeology",
+    "credits": 1.0,
+    "department": "ARCG",
+    "offered": [
+      "Fall 2023",
+      "Spring 2024",
+      "Fall 2024",
+      "Fall 2025",
+      "Spring 2026",
+      "Fall 2026"
+    ],
+    "isFall": true
+  },
+  {
+    "codes": [
+      "ARCG 4472"
     ],
     "name": "Directed Reading and Research in Archaeology",
     "credits": 1.0,
@@ -9500,10 +9609,27 @@
   },
   {
     "codes": [
-      "ART 4172",
-      "ART 4171",
-      "ART 472",
-      "ART 471"
+      "ART 4171"
+    ],
+    "name": "Independent Projects",
+    "credits": 1.0,
+    "department": "ART",
+    "offered": [
+      "Fall 2023",
+      "Spring 2024",
+      "Fall 2024",
+      "Spring 2025",
+      "Fall 2025",
+      "Spring 2026",
+      "Fall 2026",
+      "Spring 2027"
+    ],
+    "isFall": true,
+    "isSpring": true
+  },
+  {
+    "codes": [
+      "ART 4172"
     ],
     "name": "Independent Projects",
     "credits": 1.0,
@@ -9666,10 +9792,27 @@
   },
   {
     "codes": [
-      "ART 4943",
-      "ART 4942",
-      "ART 443",
-      "ART 442"
+      "ART 4942"
+    ],
+    "name": "Advanced Film Writing and Directing",
+    "credits": 1.0,
+    "department": "ART",
+    "offered": [
+      "Fall 2023",
+      "Spring 2024",
+      "Fall 2024",
+      "Spring 2025",
+      "Fall 2025",
+      "Spring 2026",
+      "Fall 2026",
+      "Spring 2027"
+    ],
+    "isFall": true,
+    "isSpring": true
+  },
+  {
+    "codes": [
+      "ART 4943"
     ],
     "name": "Advanced Film Writing and Directing",
     "credits": 1.0,
@@ -10249,9 +10392,7 @@
   },
   {
     "codes": [
-      "ASTR 4720",
       "ASTR 4710",
-      "ASTR 472",
       "ASTR 471"
     ],
     "name": "Independent Project in Astronomy",
@@ -10272,10 +10413,50 @@
   },
   {
     "codes": [
-      "ASTR 4910",
+      "ASTR 4720",
+      "ASTR 472"
+    ],
+    "name": "Independent Project in Astronomy",
+    "credits": 1.0,
+    "department": "ASTR",
+    "offered": [
+      "Fall 2023",
+      "Spring 2024",
+      "Fall 2024",
+      "Spring 2025",
+      "Fall 2025",
+      "Spring 2026",
+      "Fall 2026",
+      "Spring 2027"
+    ],
+    "isFall": true,
+    "isSpring": true
+  },
+  {
+    "codes": [
       "ASTR 4900",
-      "ASTR 491",
       "ASTR 490"
+    ],
+    "name": "The Two-Term Senior Project",
+    "credits": 1.0,
+    "department": "ASTR",
+    "offered": [
+      "Fall 2023",
+      "Spring 2024",
+      "Fall 2024",
+      "Spring 2025",
+      "Fall 2025",
+      "Spring 2026",
+      "Fall 2026",
+      "Spring 2027"
+    ],
+    "isFall": true,
+    "isSpring": true
+  },
+  {
+    "codes": [
+      "ASTR 4910",
+      "ASTR 491"
     ],
     "name": "The Two-Term Senior Project",
     "credits": 1.0,
@@ -10957,10 +11138,29 @@
   },
   {
     "codes": [
-      "BENG 4972",
       "BENG 4971",
-      "BENG 472",
       "BENG 471"
+    ],
+    "name": "Senior Project",
+    "credits": 1.0,
+    "department": "BENG",
+    "offered": [
+      "Fall 2023",
+      "Spring 2024",
+      "Fall 2024",
+      "Spring 2025",
+      "Fall 2025",
+      "Spring 2026",
+      "Fall 2026",
+      "Spring 2027"
+    ],
+    "isFall": true,
+    "isSpring": true
+  },
+  {
+    "codes": [
+      "BENG 4972",
+      "BENG 472"
     ],
     "name": "Special Projects",
     "credits": 1.0,
@@ -10980,10 +11180,29 @@
   },
   {
     "codes": [
-      "BENG 4974",
       "BENG 4973",
-      "BENG 474",
       "BENG 473"
+    ],
+    "name": "Senior Project",
+    "credits": 1.0,
+    "department": "BENG",
+    "offered": [
+      "Fall 2023",
+      "Spring 2024",
+      "Fall 2024",
+      "Spring 2025",
+      "Fall 2025",
+      "Spring 2026",
+      "Fall 2026",
+      "Spring 2027"
+    ],
+    "isFall": true,
+    "isSpring": true
+  },
+  {
+    "codes": [
+      "BENG 4974",
+      "BENG 474"
     ],
     "name": "Senior Project",
     "credits": 1.0,
@@ -11159,8 +11378,19 @@
   },
   {
     "codes": [
-      "BLST 2289",
       "BLST 0213"
+    ],
+    "name": "Counternarratives: Black Historical Fictions",
+    "credits": 1.0,
+    "department": "BLST",
+    "offered": [
+      "Fall 2026"
+    ],
+    "isFall": true
+  },
+  {
+    "codes": [
+      "BLST 2289"
     ],
     "name": "Counternarratives: Black Historical Fictions",
     "credits": 1.0,
@@ -12203,9 +12433,7 @@
   },
   {
     "codes": [
-      "CGSC 4720",
       "CGSC 4710",
-      "CGSC 472",
       "CGSC 471"
     ],
     "name": "Directed Research in Cognitive Science",
@@ -12224,9 +12452,45 @@
   },
   {
     "codes": [
-      "CGSC 4740",
+      "CGSC 4720",
+      "CGSC 472"
+    ],
+    "name": "Directed Research in Cognitive Science",
+    "credits": 1.0,
+    "department": "CGSC",
+    "offered": [
+      "Fall 2023",
+      "Spring 2024",
+      "Fall 2024",
+      "Spring 2025",
+      "Fall 2025",
+      "Spring 2026",
+      "Fall 2026"
+    ],
+    "isFall": true
+  },
+  {
+    "codes": [
       "CGSC 4730",
       "CGSC 473"
+    ],
+    "name": "Directed Reading in Cognitive Science",
+    "credits": 1.0,
+    "department": "CGSC",
+    "offered": [
+      "Fall 2023",
+      "Spring 2024",
+      "Fall 2024",
+      "Spring 2025",
+      "Fall 2025",
+      "Spring 2026",
+      "Fall 2026"
+    ],
+    "isFall": true
+  },
+  {
+    "codes": [
+      "CGSC 4740"
     ],
     "name": "Directed Reading in Cognitive Science",
     "credits": 1.0,
@@ -13298,10 +13562,29 @@
   },
   {
     "codes": [
-      "CHNS 1220",
       "CHNS 1120",
-      "CHNS 122",
       "CHNS 112"
+    ],
+    "name": "Elementary Modern Chinese for Heritage Speakers",
+    "credits": 1.5,
+    "department": "CHNS",
+    "offered": [
+      "Fall 2023",
+      "Spring 2024",
+      "Fall 2024",
+      "Spring 2025",
+      "Fall 2025",
+      "Spring 2026",
+      "Fall 2026",
+      "Spring 2027"
+    ],
+    "isFall": true,
+    "isSpring": true
+  },
+  {
+    "codes": [
+      "CHNS 1220",
+      "CHNS 122"
     ],
     "name": "Elementary Modern Chinese for Heritage Speakers",
     "credits": 1.5,
@@ -13353,10 +13636,29 @@
   },
   {
     "codes": [
-      "CHNS 1420",
       "CHNS 1320",
-      "CHNS 142",
       "CHNS 132"
+    ],
+    "name": "Intermediate Modern Chinese for Heritage Speakers",
+    "credits": 1.5,
+    "department": "CHNS",
+    "offered": [
+      "Fall 2023",
+      "Spring 2024",
+      "Fall 2024",
+      "Spring 2025",
+      "Fall 2025",
+      "Spring 2026",
+      "Fall 2026",
+      "Spring 2027"
+    ],
+    "isFall": true,
+    "isSpring": true
+  },
+  {
+    "codes": [
+      "CHNS 1420",
+      "CHNS 142"
     ],
     "name": "Intermediate Modern Chinese for Heritage Speakers",
     "credits": 1.5,
@@ -13408,10 +13710,29 @@
   },
   {
     "codes": [
-      "CHNS 1530",
       "CHNS 1520",
-      "CHNS 153",
       "CHNS 152"
+    ],
+    "name": "Advanced Modern Chinese for Heritage Speakers",
+    "credits": 1.0,
+    "department": "CHNS",
+    "offered": [
+      "Fall 2023",
+      "Spring 2024",
+      "Fall 2024",
+      "Spring 2025",
+      "Fall 2025",
+      "Spring 2026",
+      "Fall 2026",
+      "Spring 2027"
+    ],
+    "isFall": true,
+    "isSpring": true
+  },
+  {
+    "codes": [
+      "CHNS 1530",
+      "CHNS 153"
     ],
     "name": "Advanced Modern Chinese for Heritage Speakers",
     "credits": 1.0,
@@ -13592,9 +13913,7 @@
   },
   {
     "codes": [
-      "CHNS 1670",
       "CHNS 1660",
-      "CHNS 167",
       "CHNS 166"
     ],
     "name": "Chinese for Current Affairs",
@@ -13615,10 +13934,50 @@
   },
   {
     "codes": [
-      "CHNS 1690",
+      "CHNS 1670",
+      "CHNS 167"
+    ],
+    "name": "Chinese for Current Affairs",
+    "credits": 1.0,
+    "department": "CHNS",
+    "offered": [
+      "Fall 2023",
+      "Spring 2024",
+      "Fall 2024",
+      "Spring 2025",
+      "Fall 2025",
+      "Spring 2026",
+      "Fall 2026",
+      "Spring 2027"
+    ],
+    "isFall": true,
+    "isSpring": true
+  },
+  {
+    "codes": [
       "CHNS 1680",
-      "CHNS 169",
       "CHNS 168"
+    ],
+    "name": "Chinese for Global Enterprises",
+    "credits": 1.0,
+    "department": "CHNS",
+    "offered": [
+      "Fall 2023",
+      "Spring 2024",
+      "Fall 2024",
+      "Spring 2025",
+      "Fall 2025",
+      "Spring 2026",
+      "Fall 2026",
+      "Spring 2027"
+    ],
+    "isFall": true,
+    "isSpring": true
+  },
+  {
+    "codes": [
+      "CHNS 1690",
+      "CHNS 169"
     ],
     "name": "Chinese for Global Enterprises",
     "credits": 1.0,
@@ -14345,10 +14704,7 @@
   },
   {
     "codes": [
-      "CLCV 4999",
-      "CLCV 4998",
-      "CLCV 499",
-      "CLCV 498"
+      "CLCV 4998"
     ],
     "name": "Senior Tutorial in Classical Civilization",
     "credits": 1.0,
@@ -14368,10 +14724,47 @@
   },
   {
     "codes": [
-      "CLSS 4999",
-      "CLSS 4998",
-      "CLSS 499",
-      "CLSS 498"
+      "CLCV 4999"
+    ],
+    "name": "Senior Tutorial in Classical Civilization",
+    "credits": 1.0,
+    "department": "CLCV",
+    "offered": [
+      "Fall 2023",
+      "Spring 2024",
+      "Fall 2024",
+      "Spring 2025",
+      "Fall 2025",
+      "Spring 2026",
+      "Fall 2026",
+      "Spring 2027"
+    ],
+    "isFall": true,
+    "isSpring": true
+  },
+  {
+    "codes": [
+      "CLSS 4998"
+    ],
+    "name": "Senior Tutorial in Classics",
+    "credits": 1.0,
+    "department": "CLSS",
+    "offered": [
+      "Fall 2023",
+      "Spring 2024",
+      "Fall 2024",
+      "Spring 2025",
+      "Fall 2025",
+      "Spring 2026",
+      "Fall 2026",
+      "Spring 2027"
+    ],
+    "isFall": true,
+    "isSpring": true
+  },
+  {
+    "codes": [
+      "CLSS 4999"
     ],
     "name": "Senior Tutorial in Classics",
     "credits": 1.0,
@@ -15581,8 +15974,23 @@
   },
   {
     "codes": [
-      "CPLT 4930",
       "CPLT 4920"
+    ],
+    "name": "The Yearlong Senior Essay",
+    "credits": 1.0,
+    "department": "CPLT",
+    "offered": [
+      "Fall 2025",
+      "Spring 2026",
+      "Fall 2026",
+      "Spring 2027"
+    ],
+    "isFall": true,
+    "isSpring": true
+  },
+  {
+    "codes": [
+      "CPLT 4930"
     ],
     "name": "The Yearlong Senior Essay",
     "credits": 1.0,
@@ -17453,8 +17861,20 @@
   },
   {
     "codes": [
-      "CSBK 2320",
       "CSBK 2300"
+    ],
+    "name": "Leadership as Behavior",
+    "credits": 1.0,
+    "department": "CSBK",
+    "offered": [
+      "Fall 2025",
+      "Fall 2026"
+    ],
+    "isFall": true
+  },
+  {
+    "codes": [
+      "CSBK 2320"
     ],
     "name": "Leadership as Behavior",
     "credits": 1.0,
@@ -18642,8 +19062,6 @@
   {
     "codes": [
       "DRST 0001",
-      "DRST 0002",
-      "DRST 002",
       "DRST 001"
     ],
     "name": "Directed Studies: Literature",
@@ -18662,9 +19080,26 @@
   },
   {
     "codes": [
+      "DRST 0002",
+      "DRST 002"
+    ],
+    "name": "Directed Studies: Literature",
+    "credits": 1.0,
+    "department": "DRST",
+    "offered": [
+      "Fall 2023",
+      "Spring 2024",
+      "Fall 2024",
+      "Spring 2025",
+      "Fall 2025",
+      "Spring 2026",
+      "Fall 2026"
+    ],
+    "isFall": true
+  },
+  {
+    "codes": [
       "DRST 0003",
-      "DRST 0004",
-      "DRST 004",
       "DRST 003"
     ],
     "name": "Directed Studies: Philosophy",
@@ -18683,10 +19118,46 @@
   },
   {
     "codes": [
+      "DRST 0004",
+      "DRST 004"
+    ],
+    "name": "Directed Studies: Philosophy",
+    "credits": 1.0,
+    "department": "DRST",
+    "offered": [
+      "Fall 2023",
+      "Spring 2024",
+      "Fall 2024",
+      "Spring 2025",
+      "Fall 2025",
+      "Spring 2026",
+      "Fall 2026"
+    ],
+    "isFall": true
+  },
+  {
+    "codes": [
       "DRST 0005",
-      "DRST 0006",
-      "DRST 006",
       "DRST 005"
+    ],
+    "name": "Directed Studies: Historical and Political Thought",
+    "credits": 1.0,
+    "department": "DRST",
+    "offered": [
+      "Fall 2023",
+      "Spring 2024",
+      "Fall 2024",
+      "Spring 2025",
+      "Fall 2025",
+      "Spring 2026",
+      "Fall 2026"
+    ],
+    "isFall": true
+  },
+  {
+    "codes": [
+      "DRST 0006",
+      "DRST 006"
     ],
     "name": "Directed Studies: Historical and Political Thought",
     "credits": 1.0,
@@ -19949,8 +20420,19 @@
   },
   {
     "codes": [
-      "EALL 3180",
       "EALL 0100"
+    ],
+    "name": "The Story of the Stone (or The Dream of the Red Chamber)",
+    "credits": 1.0,
+    "department": "EALL",
+    "offered": [
+      "Fall 2025",
+      "Spring 2026"
+    ]
+  },
+  {
+    "codes": [
+      "EALL 3180"
     ],
     "name": "The Story of the Stone (or The Dream of the Red Chamber)",
     "credits": 1.0,
@@ -20020,10 +20502,29 @@
   },
   {
     "codes": [
-      "EALL 4710",
       "EALL 4700",
-      "EALL 471",
       "EALL 470"
+    ],
+    "name": "Independent Tutorial",
+    "credits": 1.0,
+    "department": "EALL",
+    "offered": [
+      "Fall 2023",
+      "Spring 2024",
+      "Fall 2024",
+      "Spring 2025",
+      "Fall 2025",
+      "Spring 2026",
+      "Fall 2026",
+      "Spring 2027"
+    ],
+    "isFall": true,
+    "isSpring": true
+  },
+  {
+    "codes": [
+      "EALL 4710",
+      "EALL 471"
     ],
     "name": "Independent Tutorial",
     "credits": 1.0,
@@ -20064,10 +20565,29 @@
   },
   {
     "codes": [
-      "EALL 4930",
       "EALL 4920",
-      "EALL 493",
       "EALL 492"
+    ],
+    "name": "Yearlong Senior Essay",
+    "credits": 1.0,
+    "department": "EALL",
+    "offered": [
+      "Fall 2023",
+      "Spring 2024",
+      "Fall 2024",
+      "Spring 2025",
+      "Fall 2025",
+      "Spring 2026",
+      "Fall 2026",
+      "Spring 2027"
+    ],
+    "isFall": true,
+    "isSpring": true
+  },
+  {
+    "codes": [
+      "EALL 4930",
+      "EALL 493"
     ],
     "name": "Yearlong Senior Essay",
     "credits": 1.0,
@@ -21230,10 +21750,29 @@
   },
   {
     "codes": [
-      "EAST 4920",
       "EAST 4910",
-      "EAST 492",
       "EAST 491"
+    ],
+    "name": "Senior Research Project",
+    "credits": 0.5,
+    "department": "EAST",
+    "offered": [
+      "Fall 2023",
+      "Spring 2024",
+      "Fall 2024",
+      "Spring 2025",
+      "Fall 2025",
+      "Spring 2026",
+      "Fall 2026",
+      "Spring 2027"
+    ],
+    "isFall": true,
+    "isSpring": true
+  },
+  {
+    "codes": [
+      "EAST 4920",
+      "EAST 492"
     ],
     "name": "Senior Research Project",
     "credits": 0.5,
@@ -21317,10 +21856,26 @@
   },
   {
     "codes": [
-      "ECE 2361",
-      "ECE 2350",
-      "EENG 236",
-      "EENG 235"
+      "ECE 2350"
+    ],
+    "name": "Special Projects",
+    "credits": 0.5,
+    "department": "ECE",
+    "offered": [
+      "Fall 2023",
+      "Spring 2024",
+      "Fall 2024",
+      "Spring 2025",
+      "Fall 2025",
+      "Fall 2026",
+      "Spring 2027"
+    ],
+    "isFall": true,
+    "isSpring": true
+  },
+  {
+    "codes": [
+      "ECE 2361"
     ],
     "name": "Special Projects",
     "credits": 0.5,
@@ -21616,10 +22171,7 @@
   },
   {
     "codes": [
-      "ECE 4691",
-      "ECE 4680",
-      "EENG 469",
-      "EENG 468"
+      "ECE 4680"
     ],
     "name": "Advanced Special Projects",
     "credits": 1.0,
@@ -21639,10 +22191,47 @@
   },
   {
     "codes": [
-      "ECE 4721",
-      "ECE 4710",
-      "EENG 472",
-      "EENG 471"
+      "ECE 4691"
+    ],
+    "name": "Advanced Special Projects",
+    "credits": 1.0,
+    "department": "ECE",
+    "offered": [
+      "Fall 2023",
+      "Spring 2024",
+      "Fall 2024",
+      "Spring 2025",
+      "Fall 2025",
+      "Spring 2026",
+      "Fall 2026",
+      "Spring 2027"
+    ],
+    "isFall": true,
+    "isSpring": true
+  },
+  {
+    "codes": [
+      "ECE 4710"
+    ],
+    "name": "Senior Advanced Special Projects",
+    "credits": 1.0,
+    "department": "ECE",
+    "offered": [
+      "Fall 2023",
+      "Spring 2024",
+      "Fall 2024",
+      "Spring 2025",
+      "Fall 2025",
+      "Spring 2026",
+      "Fall 2026",
+      "Spring 2027"
+    ],
+    "isFall": true,
+    "isSpring": true
+  },
+  {
+    "codes": [
+      "ECE 4721"
     ],
     "name": "Senior Advanced Special Projects",
     "credits": 1.0,
@@ -21677,7 +22266,21 @@
   },
   {
     "codes": [
-      "ECE 4810",
+      "ECE 4810"
+    ],
+    "name": "Advanced ABET Projects",
+    "credits": 1.0,
+    "department": "ECE",
+    "offered": [
+      "Spring 2024",
+      "Spring 2025",
+      "Spring 2026",
+      "Fall 2026"
+    ],
+    "isFall": true
+  },
+  {
+    "codes": [
       "ECE 4811",
       "EENG 481"
     ],
@@ -22167,9 +22770,23 @@
   },
   {
     "codes": [
-      "ECON 2244",
       "ECON 2144",
       "ECON 472"
+    ],
+    "name": "Economics of Artificial Intelligence and Innovation",
+    "credits": 1.0,
+    "department": "ECON",
+    "offered": [
+      "Fall 2023",
+      "Fall 2024",
+      "Fall 2025",
+      "Fall 2026"
+    ],
+    "isFall": true
+  },
+  {
+    "codes": [
+      "ECON 2244"
     ],
     "name": "Economics of Artificial Intelligence and Innovation",
     "credits": 1.0,
@@ -22200,9 +22817,25 @@
   },
   {
     "codes": [
-      "ECON 2259",
       "ECON 2159",
       "ECON 159"
+    ],
+    "name": "Game Theory",
+    "credits": 1.0,
+    "department": "ECON",
+    "offered": [
+      "Fall 2023",
+      "Fall 2024",
+      "Spring 2025",
+      "Fall 2025",
+      "Spring 2026",
+      "Fall 2026"
+    ],
+    "isFall": true
+  },
+  {
+    "codes": [
+      "ECON 2259"
     ],
     "name": "Game Theory",
     "credits": 1.0,
@@ -22235,9 +22868,23 @@
   },
   {
     "codes": [
-      "ECON 2270",
       "ECON 2170",
       "ECON 170"
+    ],
+    "name": "Health Economics and Public Policy",
+    "credits": 1.0,
+    "department": "ECON",
+    "offered": [
+      "Fall 2023",
+      "Fall 2024",
+      "Fall 2025",
+      "Fall 2026"
+    ],
+    "isFall": true
+  },
+  {
+    "codes": [
+      "ECON 2270"
     ],
     "name": "Health Economics and Public Policy",
     "credits": 1.0,
@@ -22265,9 +22912,21 @@
   },
   {
     "codes": [
-      "ECON 2285",
-      "ECON 2185",
-      "ECON 185"
+      "ECON 2185"
+    ],
+    "name": "Global Economy",
+    "credits": 1.0,
+    "department": "ECON",
+    "offered": [
+      "Fall 2023",
+      "Fall 2025",
+      "Fall 2026"
+    ],
+    "isFall": true
+  },
+  {
+    "codes": [
+      "ECON 2285"
     ],
     "name": "Global Economy",
     "credits": 1.0,
@@ -22293,10 +22952,22 @@
   },
   {
     "codes": [
-      "ECON 3226",
-      "ECON 3426",
-      "ECON 426",
-      "ECON 475"
+      "ECON 3226"
+    ],
+    "name": "Discrimination in Law, Theory, and Practice",
+    "credits": 1.0,
+    "department": "ECON",
+    "offered": [
+      "Fall 2023",
+      "Fall 2024",
+      "Fall 2025",
+      "Fall 2026"
+    ],
+    "isFall": true
+  },
+  {
+    "codes": [
+      "ECON 3426"
     ],
     "name": "Discrimination in Law, Theory, and Practice",
     "credits": 1.0,
@@ -22461,9 +23132,22 @@
   },
   {
     "codes": [
-      "ECON 3359",
-      "ECON 2160",
-      "ECON 160"
+      "ECON 2160"
+    ],
+    "name": "Games and Information",
+    "credits": 1.0,
+    "department": "ECON",
+    "offered": [
+      "Spring 2024",
+      "Spring 2025",
+      "Spring 2026",
+      "Spring 2027"
+    ],
+    "isSpring": true
+  },
+  {
+    "codes": [
+      "ECON 3359"
     ],
     "name": "Games and Information",
     "credits": 1.0,
@@ -23224,10 +23908,7 @@
   },
   {
     "codes": [
-      "ECON 4492",
-      "ECON 4491",
-      "ECON 492",
-      "ECON 491"
+      "ECON 4491"
     ],
     "name": "The Senior Essay",
     "credits": 1.0,
@@ -23247,10 +23928,47 @@
   },
   {
     "codes": [
-      "ECON 4499",
-      "ECON 4498",
-      "ECON 499",
-      "ECON 498"
+      "ECON 4492"
+    ],
+    "name": "The Senior Essay",
+    "credits": 1.0,
+    "department": "ECON",
+    "offered": [
+      "Fall 2023",
+      "Spring 2024",
+      "Fall 2024",
+      "Spring 2025",
+      "Fall 2025",
+      "Spring 2026",
+      "Fall 2026",
+      "Spring 2027"
+    ],
+    "isFall": true,
+    "isSpring": true
+  },
+  {
+    "codes": [
+      "ECON 4498"
+    ],
+    "name": "Directed Reading",
+    "credits": 1.0,
+    "department": "ECON",
+    "offered": [
+      "Fall 2023",
+      "Spring 2024",
+      "Fall 2024",
+      "Spring 2025",
+      "Fall 2025",
+      "Spring 2026",
+      "Fall 2026",
+      "Spring 2027"
+    ],
+    "isFall": true,
+    "isSpring": true
+  },
+  {
+    "codes": [
+      "ECON 4499"
     ],
     "name": "Directed Reading",
     "credits": 1.0,
@@ -24299,7 +25017,20 @@
   },
   {
     "codes": [
-      "EEB 0106",
+      "EEB 0106"
+    ],
+    "name": "Biology of Malaria, Lyme, and Other Vector-Borne Diseases",
+    "credits": 1.0,
+    "department": "EEB",
+    "offered": [
+      "Fall 2025",
+      "Spring 2026",
+      "Spring 2027"
+    ],
+    "isSpring": true
+  },
+  {
+    "codes": [
       "EEB 1106"
     ],
     "name": "Biology of Malaria, Lyme, and Other Vector-Borne Diseases",
@@ -25012,10 +25743,24 @@
   },
   {
     "codes": [
-      "ENAS 1000",
       "ENAS 0800",
-      "ENAS 100",
       "ENAS 080"
+    ],
+    "name": "Energy, Environment, and Public Policy",
+    "credits": 1.0,
+    "department": "ENAS",
+    "offered": [
+      "Spring 2024",
+      "Spring 2025",
+      "Spring 2026",
+      "Spring 2027"
+    ],
+    "isSpring": true
+  },
+  {
+    "codes": [
+      "ENAS 1000",
+      "ENAS 100"
     ],
     "name": "Energy, Environment, and Public Policy",
     "credits": 1.0,
@@ -28870,8 +29615,20 @@
   },
   {
     "codes": [
-      "ENGL 4889",
       "ENGL 0813"
+    ],
+    "name": "Counternarratives: Black Historical Fictions",
+    "credits": 1.0,
+    "department": "ENGL",
+    "offered": [
+      "Spring 2026",
+      "Fall 2026"
+    ],
+    "isFall": true
+  },
+  {
+    "codes": [
+      "ENGL 4889"
     ],
     "name": "Counternarratives: Black Historical Fictions",
     "credits": 1.0,
@@ -29190,8 +29947,26 @@
   {
     "codes": [
       "ENVE 4710",
-      "ENVE 4720",
       "ENVE 471"
+    ],
+    "name": "Special Projects",
+    "credits": 1.0,
+    "department": "ENVE",
+    "offered": [
+      "Fall 2023",
+      "Spring 2024",
+      "Fall 2024",
+      "Fall 2025",
+      "Spring 2026",
+      "Fall 2026",
+      "Spring 2027"
+    ],
+    "isFall": true,
+    "isSpring": true
+  },
+  {
+    "codes": [
+      "ENVE 4720"
     ],
     "name": "Special Projects",
     "credits": 1.0,
@@ -30253,10 +31028,25 @@
   },
   {
     "codes": [
-      "EP&E 4493",
-      "EP&E 4492",
-      "EP&E 493",
-      "EP&E 492"
+      "EP&E 4492"
+    ],
+    "name": "The Yearlong Senior Essay",
+    "credits": 1.0,
+    "department": "EP&E",
+    "offered": [
+      "Fall 2023",
+      "Spring 2024",
+      "Fall 2024",
+      "Spring 2025",
+      "Fall 2025",
+      "Spring 2026",
+      "Fall 2026"
+    ],
+    "isFall": true
+  },
+  {
+    "codes": [
+      "EP&E 4493"
     ],
     "name": "The Yearlong Senior Essay",
     "credits": 1.0,
@@ -30352,10 +31142,24 @@
   },
   {
     "codes": [
-      "EPS 1050",
       "EPS 0800",
-      "EPS 105",
       "EPS 080"
+    ],
+    "name": "Energy, Environment, and Public Policy",
+    "credits": 1.0,
+    "department": "EPS",
+    "offered": [
+      "Spring 2024",
+      "Spring 2025",
+      "Spring 2026",
+      "Spring 2027"
+    ],
+    "isSpring": true
+  },
+  {
+    "codes": [
+      "EPS 1050",
+      "EPS 105"
     ],
     "name": "Energy, Environment, and Public Policy",
     "credits": 1.0,
@@ -30913,8 +31717,6 @@
   {
     "codes": [
       "EPS 4880",
-      "EPS 4890",
-      "EPS 489",
       "EPS 488"
     ],
     "name": "Research in Earth and Planetary Sciences",
@@ -30932,10 +31734,47 @@
   },
   {
     "codes": [
-      "EPS 4910",
+      "EPS 4890",
+      "EPS 489"
+    ],
+    "name": "Research in Earth and Planetary Sciences",
+    "credits": 1.0,
+    "department": "EPS",
+    "offered": [
+      "Fall 2023",
+      "Spring 2024",
+      "Fall 2024",
+      "Spring 2025",
+      "Spring 2026",
+      "Fall 2026"
+    ],
+    "isFall": true
+  },
+  {
+    "codes": [
       "EPS 4900",
-      "EPS 491",
       "EPS 490"
+    ],
+    "name": "Research and Senior Thesis",
+    "credits": 1.0,
+    "department": "EPS",
+    "offered": [
+      "Fall 2023",
+      "Spring 2024",
+      "Fall 2024",
+      "Spring 2025",
+      "Fall 2025",
+      "Spring 2026",
+      "Fall 2026",
+      "Spring 2027"
+    ],
+    "isFall": true,
+    "isSpring": true
+  },
+  {
+    "codes": [
+      "EPS 4910",
+      "EPS 491"
     ],
     "name": "Research and Senior Thesis",
     "credits": 1.0,
@@ -32238,8 +33077,20 @@
   },
   {
     "codes": [
-      "ER&M 3512",
       "ER&M 3012"
+    ],
+    "name": "Technology, Race and Gender",
+    "credits": 1.0,
+    "department": "ER&M",
+    "offered": [
+      "Fall 2025",
+      "Fall 2026"
+    ],
+    "isFall": true
+  },
+  {
+    "codes": [
+      "ER&M 3512"
     ],
     "name": "Technology, Race and Gender",
     "credits": 1.0,
@@ -33248,10 +34099,24 @@
   },
   {
     "codes": [
-      "EVST 1000",
       "EVST 0080",
-      "EVST 100",
       "EVST 080"
+    ],
+    "name": "Energy, Environment, and Public Policy",
+    "credits": 1.0,
+    "department": "EVST",
+    "offered": [
+      "Spring 2024",
+      "Spring 2025",
+      "Spring 2026",
+      "Spring 2027"
+    ],
+    "isSpring": true
+  },
+  {
+    "codes": [
+      "EVST 1000",
+      "EVST 100"
     ],
     "name": "Energy, Environment, and Public Policy",
     "credits": 1.0,
@@ -34489,10 +35354,27 @@
   },
   {
     "codes": [
-      "EVST 4640",
       "EVST 4630",
-      "EVST 464",
       "EVST 463"
+    ],
+    "name": "Documentary Film Workshop",
+    "credits": 1.0,
+    "department": "EVST",
+    "offered": [
+      "Fall 2023",
+      "Spring 2024",
+      "Fall 2024",
+      "Spring 2025",
+      "Fall 2025",
+      "Spring 2026",
+      "Fall 2026"
+    ],
+    "isFall": true
+  },
+  {
+    "codes": [
+      "EVST 4640",
+      "EVST 464"
     ],
     "name": "Documentary Film Workshop",
     "credits": 1.0,
@@ -35829,10 +36711,27 @@
   },
   {
     "codes": [
-      "FILM 4560",
       "FILM 4550",
-      "FILM 456",
       "FILM 455"
+    ],
+    "name": "Documentary Film Workshop",
+    "credits": 1.0,
+    "department": "FILM",
+    "offered": [
+      "Fall 2023",
+      "Spring 2024",
+      "Fall 2024",
+      "Spring 2025",
+      "Fall 2025",
+      "Spring 2026",
+      "Fall 2026"
+    ],
+    "isFall": true
+  },
+  {
+    "codes": [
+      "FILM 4560",
+      "FILM 456"
     ],
     "name": "Documentary Film Workshop",
     "credits": 1.0,
@@ -35984,9 +36883,7 @@
   },
   {
     "codes": [
-      "FILM 4840",
       "FILM 4830",
-      "FILM 484",
       "FILM 483"
     ],
     "name": "Advanced Film Writing and Directing",
@@ -36007,9 +36904,28 @@
   },
   {
     "codes": [
+      "FILM 4840",
+      "FILM 484"
+    ],
+    "name": "Advanced Film Writing and Directing",
+    "credits": 1.0,
+    "department": "FILM",
+    "offered": [
+      "Fall 2023",
+      "Spring 2024",
+      "Fall 2024",
+      "Spring 2025",
+      "Fall 2025",
+      "Spring 2026",
+      "Fall 2026",
+      "Spring 2027"
+    ],
+    "isFall": true,
+    "isSpring": true
+  },
+  {
+    "codes": [
       "FILM 4870",
-      "FILM 4880",
-      "FILM 488",
       "FILM 487"
     ],
     "name": "Advanced Screenwriting",
@@ -36028,9 +36944,26 @@
   },
   {
     "codes": [
+      "FILM 4880",
+      "FILM 488"
+    ],
+    "name": "Advanced Screenwriting",
+    "credits": 1.0,
+    "department": "FILM",
+    "offered": [
+      "Fall 2023",
+      "Spring 2024",
+      "Fall 2024",
+      "Spring 2025",
+      "Fall 2025",
+      "Spring 2026",
+      "Fall 2026"
+    ],
+    "isFall": true
+  },
+  {
+    "codes": [
       "FILM 4910",
-      "FILM 4920",
-      "FILM 492",
       "FILM 491"
     ],
     "name": "The Senior Essay",
@@ -36049,10 +36982,46 @@
   },
   {
     "codes": [
-      "FILM 4940",
+      "FILM 4920",
+      "FILM 492"
+    ],
+    "name": "The Senior Essay",
+    "credits": 1.0,
+    "department": "FILM",
+    "offered": [
+      "Fall 2023",
+      "Spring 2024",
+      "Fall 2024",
+      "Spring 2025",
+      "Fall 2025",
+      "Spring 2026",
+      "Fall 2026"
+    ],
+    "isFall": true
+  },
+  {
+    "codes": [
       "FILM 4930",
-      "FILM 494",
       "FILM 493"
+    ],
+    "name": "Senior Production Project Contextualizing Essay",
+    "credits": 0.5,
+    "department": "FILM",
+    "offered": [
+      "Fall 2023",
+      "Spring 2024",
+      "Fall 2024",
+      "Spring 2025",
+      "Fall 2025",
+      "Spring 2026",
+      "Fall 2026"
+    ],
+    "isFall": true
+  },
+  {
+    "codes": [
+      "FILM 4940",
+      "FILM 494"
     ],
     "name": "Senior Production Project Contextualizing Essay",
     "credits": 0.5,
@@ -37028,10 +37997,29 @@
   },
   {
     "codes": [
-      "FREN 4710",
       "FREN 4700",
-      "FREN 471",
       "FREN 470"
+    ],
+    "name": "Special Tutorial for Juniors and Seniors",
+    "credits": 1.0,
+    "department": "FREN",
+    "offered": [
+      "Fall 2023",
+      "Spring 2024",
+      "Fall 2024",
+      "Spring 2025",
+      "Fall 2025",
+      "Spring 2026",
+      "Fall 2026",
+      "Spring 2027"
+    ],
+    "isFall": true,
+    "isSpring": true
+  },
+  {
+    "codes": [
+      "FREN 4710",
+      "FREN 471"
     ],
     "name": "Special Tutorial for Juniors and Seniors",
     "credits": 1.0,
@@ -37108,9 +38096,7 @@
   },
   {
     "codes": [
-      "FREN 4940",
       "FREN 4930",
-      "FREN 494",
       "FREN 493"
     ],
     "name": "The Senior Essay in the Intensive Major",
@@ -37131,10 +38117,50 @@
   },
   {
     "codes": [
-      "FREN 4960",
+      "FREN 4940",
+      "FREN 494"
+    ],
+    "name": "The Senior Essay in the Intensive Major",
+    "credits": 1.0,
+    "department": "FREN",
+    "offered": [
+      "Fall 2023",
+      "Spring 2024",
+      "Fall 2024",
+      "Spring 2025",
+      "Fall 2025",
+      "Spring 2026",
+      "Fall 2026",
+      "Spring 2027"
+    ],
+    "isFall": true,
+    "isSpring": true
+  },
+  {
+    "codes": [
       "FREN 4950",
-      "FREN 496",
       "FREN 495"
+    ],
+    "name": "The Senior Essay in the Intensive Major—Translation Concentration",
+    "credits": 1.0,
+    "department": "FREN",
+    "offered": [
+      "Fall 2023",
+      "Spring 2024",
+      "Fall 2024",
+      "Spring 2025",
+      "Fall 2025",
+      "Spring 2026",
+      "Fall 2026",
+      "Spring 2027"
+    ],
+    "isFall": true,
+    "isSpring": true
+  },
+  {
+    "codes": [
+      "FREN 4960",
+      "FREN 496"
     ],
     "name": "The Senior Essay in the Intensive Major—Translation Concentration",
     "credits": 1.0,
@@ -39627,9 +40653,23 @@
   },
   {
     "codes": [
-      "GMAN 4930",
       "GMAN 4920",
       "GMAN 492"
+    ],
+    "name": "The Senior Essay Tutorial",
+    "credits": 1.0,
+    "department": "GMAN",
+    "offered": [
+      "Fall 2023",
+      "Spring 2024",
+      "Fall 2024",
+      "Fall 2025",
+      "Spring 2026"
+    ]
+  },
+  {
+    "codes": [
+      "GMAN 4930"
     ],
     "name": "The Senior Essay Tutorial",
     "credits": 1.0,
@@ -44473,9 +45513,21 @@
   },
   {
     "codes": [
-      "HIST 3344",
-      "HIST 2391",
-      "HIST 391"
+      "HIST 2391"
+    ],
+    "name": "Pandemics in Africa: From the Spanish Influenza to Covid-19 and Ebola",
+    "credits": 1.0,
+    "department": "HIST",
+    "offered": [
+      "Fall 2023",
+      "Fall 2025",
+      "Fall 2026"
+    ],
+    "isFall": true
+  },
+  {
+    "codes": [
+      "HIST 3344"
     ],
     "name": "Pandemics in Africa: From the Spanish Influenza to Covid-19 and Ebola",
     "credits": 1.0,
@@ -45625,10 +46677,25 @@
   },
   {
     "codes": [
-      "HIST 4996",
-      "HIST 4995",
-      "HIST 496",
-      "HIST 495"
+      "HIST 4995"
+    ],
+    "name": "The Senior Essay",
+    "credits": 1.0,
+    "department": "HIST",
+    "offered": [
+      "Fall 2023",
+      "Spring 2024",
+      "Fall 2024",
+      "Spring 2025",
+      "Fall 2025",
+      "Spring 2026",
+      "Fall 2026"
+    ],
+    "isFall": true
+  },
+  {
+    "codes": [
+      "HIST 4996"
     ],
     "name": "The Senior Essay",
     "credits": 1.0,
@@ -46469,8 +47536,19 @@
   },
   {
     "codes": [
-      "HSAR 3257",
       "HSAR 3239"
+    ],
+    "name": "Introduction to Modern Art",
+    "credits": 1.0,
+    "department": "HSAR",
+    "offered": [
+      "Fall 2026"
+    ],
+    "isFall": true
+  },
+  {
+    "codes": [
+      "HSAR 3257"
     ],
     "name": "Introduction to Modern Art",
     "credits": 1.0,
@@ -48670,10 +49748,29 @@
   },
   {
     "codes": [
-      "HSHM 4910",
       "HSHM 4900",
-      "HSHM 491",
       "HSHM 490"
+    ],
+    "name": "Yearlong Senior Project",
+    "credits": 1.0,
+    "department": "HSHM",
+    "offered": [
+      "Fall 2023",
+      "Spring 2024",
+      "Fall 2024",
+      "Spring 2025",
+      "Fall 2025",
+      "Spring 2026",
+      "Fall 2026",
+      "Spring 2027"
+    ],
+    "isFall": true,
+    "isSpring": true
+  },
+  {
+    "codes": [
+      "HSHM 4910",
+      "HSHM 491"
     ],
     "name": "Yearlong Senior Project",
     "credits": 1.0,
@@ -52775,10 +53872,25 @@
   },
   {
     "codes": [
-      "ITAL 4470",
-      "ITAL 4471",
-      "ITAL 471",
-      "ITAL 470"
+      "ITAL 4470"
+    ],
+    "name": "Special Studies in Italian Literature",
+    "credits": 1.0,
+    "department": "ITAL",
+    "offered": [
+      "Fall 2023",
+      "Spring 2024",
+      "Fall 2024",
+      "Spring 2025",
+      "Fall 2025",
+      "Spring 2026",
+      "Fall 2026"
+    ],
+    "isFall": true
+  },
+  {
+    "codes": [
+      "ITAL 4471"
     ],
     "name": "Special Studies in Italian Literature",
     "credits": 1.0,
@@ -53690,10 +54802,7 @@
   },
   {
     "codes": [
-      "JDST 4492",
-      "JDST 4491",
-      "JDST 492",
-      "JDST 491"
+      "JDST 4491"
     ],
     "name": "The Senior Essay",
     "credits": 1.0,
@@ -53713,8 +54822,39 @@
   },
   {
     "codes": [
-      "JDST 8205",
+      "JDST 4492"
+    ],
+    "name": "The Senior Essay",
+    "credits": 1.0,
+    "department": "JDST",
+    "offered": [
+      "Fall 2023",
+      "Spring 2024",
+      "Fall 2024",
+      "Spring 2025",
+      "Fall 2025",
+      "Spring 2026",
+      "Fall 2026",
+      "Spring 2027"
+    ],
+    "isFall": true,
+    "isSpring": true
+  },
+  {
+    "codes": [
       "JDST 4201"
+    ],
+    "name": "Reading Academic Texts in Modern Hebrew",
+    "credits": 1.0,
+    "department": "JDST",
+    "offered": [
+      "Spring 2027"
+    ],
+    "isSpring": true
+  },
+  {
+    "codes": [
+      "JDST 8205"
     ],
     "name": "Reading Academic Texts in Modern Hebrew",
     "credits": 1.0,
@@ -58968,9 +60108,23 @@
   },
   {
     "codes": [
-      "MB&B 3310",
       "MB&B 3300",
       "MB&B 330"
+    ],
+    "name": "Modeling Biological Systems I",
+    "credits": 1.0,
+    "department": "MB&B",
+    "offered": [
+      "Fall 2023",
+      "Fall 2024",
+      "Fall 2025",
+      "Fall 2026"
+    ],
+    "isFall": true
+  },
+  {
+    "codes": [
+      "MB&B 3310"
     ],
     "name": "Modeling Biological Systems I",
     "credits": 1.0,
@@ -59332,7 +60486,22 @@
   },
   {
     "codes": [
-      "MCDB 0600",
+      "MCDB 0600"
+    ],
+    "name": "Biology of Malaria, Lyme, and Other Vector-Borne Diseases",
+    "credits": 1.0,
+    "department": "MCDB",
+    "offered": [
+      "Fall 2023",
+      "Fall 2024",
+      "Fall 2025",
+      "Spring 2026",
+      "Spring 2027"
+    ],
+    "isSpring": true
+  },
+  {
+    "codes": [
       "MCDB 1060",
       "MCDB 106"
     ],
@@ -60148,9 +61317,7 @@
   },
   {
     "codes": [
-      "MCDB 4860",
       "MCDB 4850",
-      "MCDB 486",
       "MCDB 485"
     ],
     "name": "Senior Research",
@@ -60171,10 +61338,50 @@
   },
   {
     "codes": [
-      "MCDB 4960",
+      "MCDB 4860",
+      "MCDB 486"
+    ],
+    "name": "Senior Research",
+    "credits": 1.0,
+    "department": "MCDB",
+    "offered": [
+      "Fall 2023",
+      "Spring 2024",
+      "Fall 2024",
+      "Spring 2025",
+      "Fall 2025",
+      "Spring 2026",
+      "Fall 2026",
+      "Spring 2027"
+    ],
+    "isFall": true,
+    "isSpring": true
+  },
+  {
+    "codes": [
       "MCDB 4950",
-      "MCDB 496",
       "MCDB 495"
+    ],
+    "name": "Senior Research Intensive",
+    "credits": 2.0,
+    "department": "MCDB",
+    "offered": [
+      "Fall 2023",
+      "Spring 2024",
+      "Fall 2024",
+      "Spring 2025",
+      "Fall 2025",
+      "Spring 2026",
+      "Fall 2026",
+      "Spring 2027"
+    ],
+    "isFall": true,
+    "isSpring": true
+  },
+  {
+    "codes": [
+      "MCDB 4960",
+      "MCDB 496"
     ],
     "name": "Senior Research Intensive",
     "credits": 2.0,
@@ -62275,10 +63482,27 @@
   },
   {
     "codes": [
-      "MUSI 2221",
-      "MUSI 2220",
-      "MUSI 221",
-      "MUSI 220"
+      "MUSI 2220"
+    ],
+    "name": "The Performance of Chamber Music",
+    "credits": 0.5,
+    "department": "MUSI",
+    "offered": [
+      "Fall 2023",
+      "Spring 2024",
+      "Fall 2024",
+      "Spring 2025",
+      "Fall 2025",
+      "Spring 2026",
+      "Fall 2026",
+      "Spring 2027"
+    ],
+    "isFall": true,
+    "isSpring": true
+  },
+  {
+    "codes": [
+      "MUSI 2221"
     ],
     "name": "The Performance of Chamber Music",
     "credits": 0.5,
@@ -64703,10 +65927,29 @@
   },
   {
     "codes": [
-      "NELC 4930",
       "NELC 4920",
-      "NELC 493",
       "NELC 492"
+    ],
+    "name": "The Senior Essay",
+    "credits": 1.0,
+    "department": "NELC",
+    "offered": [
+      "Fall 2023",
+      "Spring 2024",
+      "Fall 2024",
+      "Spring 2025",
+      "Fall 2025",
+      "Spring 2026",
+      "Fall 2026",
+      "Spring 2027"
+    ],
+    "isFall": true,
+    "isSpring": true
+  },
+  {
+    "codes": [
+      "NELC 4930",
+      "NELC 493"
     ],
     "name": "The Senior Essay",
     "credits": 1.0,
@@ -64980,9 +66223,23 @@
   },
   {
     "codes": [
-      "NSCI 3245",
       "NSCI 3240",
       "NSCI 324"
+    ],
+    "name": "Modeling Biological Systems I",
+    "credits": 1.0,
+    "department": "NSCI",
+    "offered": [
+      "Fall 2023",
+      "Fall 2024",
+      "Fall 2025",
+      "Fall 2026"
+    ],
+    "isFall": true
+  },
+  {
+    "codes": [
+      "NSCI 3245"
     ],
     "name": "Modeling Biological Systems I",
     "credits": 1.0,
@@ -65193,10 +66450,29 @@
   },
   {
     "codes": [
-      "NSCI 4710",
       "NSCI 4700",
-      "NSCI 471",
       "NSCI 470"
+    ],
+    "name": "Independent Research",
+    "credits": 1.0,
+    "department": "NSCI",
+    "offered": [
+      "Fall 2023",
+      "Spring 2024",
+      "Fall 2024",
+      "Spring 2025",
+      "Fall 2025",
+      "Spring 2026",
+      "Fall 2026",
+      "Spring 2027"
+    ],
+    "isFall": true,
+    "isSpring": true
+  },
+  {
+    "codes": [
+      "NSCI 4710",
+      "NSCI 471"
     ],
     "name": "Independent Research",
     "credits": 1.0,
@@ -65230,9 +66506,7 @@
   },
   {
     "codes": [
-      "NSCI 4810",
       "NSCI 4800",
-      "NSCI 481",
       "NSCI 480"
     ],
     "name": "Senior Non-empirical Research",
@@ -65253,10 +66527,50 @@
   },
   {
     "codes": [
-      "NSCI 4910",
+      "NSCI 4810",
+      "NSCI 481"
+    ],
+    "name": "Senior Non-empirical Research",
+    "credits": 1.0,
+    "department": "NSCI",
+    "offered": [
+      "Fall 2023",
+      "Spring 2024",
+      "Fall 2024",
+      "Spring 2025",
+      "Fall 2025",
+      "Spring 2026",
+      "Fall 2026",
+      "Spring 2027"
+    ],
+    "isFall": true,
+    "isSpring": true
+  },
+  {
+    "codes": [
       "NSCI 4900",
-      "NSCI 491",
       "NSCI 490"
+    ],
+    "name": "Senior Empirical Research",
+    "credits": 1.0,
+    "department": "NSCI",
+    "offered": [
+      "Fall 2023",
+      "Spring 2024",
+      "Fall 2024",
+      "Spring 2025",
+      "Fall 2025",
+      "Spring 2026",
+      "Fall 2026",
+      "Spring 2027"
+    ],
+    "isFall": true,
+    "isSpring": true
+  },
+  {
+    "codes": [
+      "NSCI 4910",
+      "NSCI 491"
     ],
     "name": "Senior Empirical Research",
     "credits": 1.0,
@@ -67195,10 +68509,27 @@
   },
   {
     "codes": [
-      "PHIL 4491",
-      "PHIL 4490",
-      "PHIL 491",
-      "PHIL 490"
+      "PHIL 4490"
+    ],
+    "name": "The Senior Essay",
+    "credits": 1.0,
+    "department": "PHIL",
+    "offered": [
+      "Fall 2023",
+      "Spring 2024",
+      "Fall 2024",
+      "Spring 2025",
+      "Fall 2025",
+      "Spring 2026",
+      "Fall 2026",
+      "Spring 2027"
+    ],
+    "isFall": true,
+    "isSpring": true
+  },
+  {
+    "codes": [
+      "PHIL 4491"
     ],
     "name": "The Senior Essay",
     "credits": 1.0,
@@ -67462,8 +68793,22 @@
   },
   {
     "codes": [
+      "PHYS 0800"
+    ],
+    "name": "Energy, Environment, and Public Policy",
+    "credits": 1.0,
+    "department": "PHYS",
+    "offered": [
+      "Spring 2024",
+      "Spring 2025",
+      "Spring 2026",
+      "Spring 2027"
+    ],
+    "isSpring": true
+  },
+  {
+    "codes": [
       "PHYS 1000",
-      "PHYS 0800",
       "PHYS 100"
     ],
     "name": "Energy, Environment, and Public Policy",
@@ -67609,12 +68954,10 @@
   },
   {
     "codes": [
-      "PHYS 1660L",
       "PHYS 1650L",
-      "PHYS 166L",
       "PHYS 165L"
     ],
-    "name": "General Physics Laboratory",
+    "name": "General Physics Laboratory I",
     "credits": 0.5,
     "department": "PHYS",
     "offered": [
@@ -67632,12 +68975,73 @@
   },
   {
     "codes": [
-      "PHYS 1710",
+      "PHYS 1660L",
+      "PHYS 166L"
+    ],
+    "name": "General Physics Laboratory II",
+    "credits": 0.5,
+    "department": "PHYS",
+    "offered": [
+      "Fall 2023",
+      "Spring 2024",
+      "Fall 2024",
+      "Spring 2025",
+      "Fall 2025",
+      "Spring 2026",
+      "Fall 2026",
+      "Spring 2027"
+    ],
+    "isFall": true,
+    "isSpring": true
+  },
+  {
+    "codes": [
       "PHYS 1700",
-      "PHYS 171",
       "PHYS 170"
     ],
-    "name": "University Physics for the Life Sciences",
+    "name": "University Physics for the Life Sciences I",
+    "credits": 1.0,
+    "department": "PHYS",
+    "offered": [
+      "Fall 2023",
+      "Spring 2024",
+      "Fall 2024",
+      "Spring 2025",
+      "Fall 2025",
+      "Spring 2026",
+      "Fall 2026",
+      "Spring 2027"
+    ],
+    "isFall": true,
+    "isSpring": true
+  },
+  {
+    "codes": [
+      "PHYS 1710",
+      "PHYS 171"
+    ],
+    "name": "University Physics for the Life Sciences II",
+    "credits": 1.0,
+    "department": "PHYS",
+    "offered": [
+      "Fall 2023",
+      "Spring 2024",
+      "Fall 2024",
+      "Spring 2025",
+      "Fall 2025",
+      "Spring 2026",
+      "Fall 2026",
+      "Spring 2027"
+    ],
+    "isFall": true,
+    "isSpring": true
+  },
+  {
+    "codes": [
+      "PHYS 1800",
+      "PHYS 180"
+    ],
+    "name": "University Physics I",
     "credits": 1.0,
     "department": "PHYS",
     "offered": [
@@ -67656,11 +69060,30 @@
   {
     "codes": [
       "PHYS 1810",
-      "PHYS 1800",
-      "PHYS 181",
-      "PHYS 180"
+      "PHYS 181"
     ],
-    "name": "University Physics",
+    "name": "University Physics II",
+    "credits": 1.0,
+    "department": "PHYS",
+    "offered": [
+      "Fall 2023",
+      "Spring 2024",
+      "Fall 2024",
+      "Spring 2025",
+      "Fall 2025",
+      "Spring 2026",
+      "Fall 2026",
+      "Spring 2027"
+    ],
+    "isFall": true,
+    "isSpring": true
+  },
+  {
+    "codes": [
+      "PHYS 2000",
+      "PHYS 200"
+    ],
+    "name": "Fundamentals of Physics I",
     "credits": 1.0,
     "department": "PHYS",
     "offered": [
@@ -67679,11 +69102,9 @@
   {
     "codes": [
       "PHYS 2010",
-      "PHYS 2000",
-      "PHYS 201",
-      "PHYS 200"
+      "PHYS 201"
     ],
-    "name": "Fundamentals of Physics",
+    "name": "Fundamentals of Physics II",
     "credits": 1.0,
     "department": "PHYS",
     "offered": [
@@ -67745,12 +69166,10 @@
   },
   {
     "codes": [
-      "PHYS 2610",
       "PHYS 2600",
-      "PHYS 261",
       "PHYS 260"
     ],
-    "name": "Intensive Introductory Physics",
+    "name": "Intensive Introductory Physics I",
     "credits": 1.0,
     "department": "PHYS",
     "offered": [
@@ -67768,10 +69187,48 @@
   },
   {
     "codes": [
-      "PHYS 2720",
-      "PHYS 2710",
-      "PHYS 470",
-      "PHYS 469"
+      "PHYS 2610",
+      "PHYS 261"
+    ],
+    "name": "Intensive Introductory Physics II",
+    "credits": 1.0,
+    "department": "PHYS",
+    "offered": [
+      "Fall 2023",
+      "Spring 2024",
+      "Fall 2024",
+      "Spring 2025",
+      "Fall 2025",
+      "Spring 2026",
+      "Fall 2026",
+      "Spring 2027"
+    ],
+    "isFall": true,
+    "isSpring": true
+  },
+  {
+    "codes": [
+      "PHYS 2710"
+    ],
+    "name": "Independent Research in Physics",
+    "credits": 1.0,
+    "department": "PHYS",
+    "offered": [
+      "Fall 2023",
+      "Spring 2024",
+      "Fall 2024",
+      "Spring 2025",
+      "Fall 2025",
+      "Spring 2026",
+      "Fall 2026",
+      "Spring 2027"
+    ],
+    "isFall": true,
+    "isSpring": true
+  },
+  {
+    "codes": [
+      "PHYS 2720"
     ],
     "name": "Independent Research in Physics",
     "credits": 1.0,
@@ -67987,10 +69444,29 @@
   },
   {
     "codes": [
-      "PHYS 4020",
       "PHYS 4010",
-      "PHYS 402",
       "PHYS 401"
+    ],
+    "name": "Advanced Classical Physics from Newton to Einstein",
+    "credits": 1.0,
+    "department": "PHYS",
+    "offered": [
+      "Fall 2023",
+      "Spring 2024",
+      "Fall 2024",
+      "Spring 2025",
+      "Fall 2025",
+      "Spring 2026",
+      "Fall 2026",
+      "Spring 2027"
+    ],
+    "isFall": true,
+    "isSpring": true
+  },
+  {
+    "codes": [
+      "PHYS 4020",
+      "PHYS 402"
     ],
     "name": "Advanced Classical Physics from Newton to Einstein",
     "credits": 1.0,
@@ -68227,10 +69703,29 @@
   },
   {
     "codes": [
-      "PHYS 4720",
       "PHYS 4710",
-      "PHYS 472",
       "PHYS 471"
+    ],
+    "name": "Independent Projects in Physics",
+    "credits": 1.0,
+    "department": "PHYS",
+    "offered": [
+      "Fall 2023",
+      "Spring 2024",
+      "Fall 2024",
+      "Spring 2025",
+      "Fall 2025",
+      "Spring 2026",
+      "Fall 2026",
+      "Spring 2027"
+    ],
+    "isFall": true,
+    "isSpring": true
+  },
+  {
+    "codes": [
+      "PHYS 4720",
+      "PHYS 472"
     ],
     "name": "Independent Projects in Physics",
     "credits": 1.0,
@@ -69935,9 +71430,19 @@
   },
   {
     "codes": [
-      "PLSC 3370",
-      "PLSC 3356",
-      "PLSC 333"
+      "PLSC 3356"
+    ],
+    "name": "The Politics of Expertise",
+    "credits": 1.0,
+    "department": "PLSC",
+    "offered": [
+      "Fall 2024",
+      "Fall 2025"
+    ]
+  },
+  {
+    "codes": [
+      "PLSC 3370"
     ],
     "name": "The Politics of Expertise",
     "credits": 1.0,
@@ -70927,10 +72432,24 @@
   },
   {
     "codes": [
-      "PLSC 4701",
-      "PLSC 4700",
-      "PLSC 472",
-      "PLSC 471"
+      "PLSC 4700"
+    ],
+    "name": "Individual Reading for Majors",
+    "credits": 1.0,
+    "department": "PLSC",
+    "offered": [
+      "Fall 2023",
+      "Fall 2024",
+      "Spring 2025",
+      "Fall 2025",
+      "Spring 2026",
+      "Fall 2026"
+    ],
+    "isFall": true
+  },
+  {
+    "codes": [
+      "PLSC 4701"
     ],
     "name": "Individual Reading for Majors",
     "credits": 1.0,
@@ -71574,7 +73093,6 @@
   },
   {
     "codes": [
-      "PORT 4920",
       "PORT 4910",
       "PORT 491"
     ],
@@ -71589,9 +73107,20 @@
   },
   {
     "codes": [
+      "PORT 4920"
+    ],
+    "name": "The Senior Essay",
+    "credits": 1.0,
+    "department": "PORT",
+    "offered": [
+      "Fall 2023",
+      "Fall 2025",
+      "Spring 2026"
+    ]
+  },
+  {
+    "codes": [
       "PRAC 4710",
-      "PRAC 4720",
-      "PRAC 472",
       "PRAC 471"
     ],
     "name": "Fieldwork Practicum Analysis",
@@ -71610,9 +73139,26 @@
   },
   {
     "codes": [
+      "PRAC 4720",
+      "PRAC 472"
+    ],
+    "name": "Fieldwork Practicum Analysis",
+    "credits": 0.5,
+    "department": "PRAC",
+    "offered": [
+      "Fall 2023",
+      "Spring 2024",
+      "Fall 2024",
+      "Spring 2025",
+      "Fall 2025",
+      "Spring 2026",
+      "Fall 2026"
+    ],
+    "isFall": true
+  },
+  {
+    "codes": [
       "PRAC 4810",
-      "PRAC 4820",
-      "PRAC 482",
       "PRAC 481"
     ],
     "name": "Mellon Mays and Edward A. Bouchet Junior Research Practicum",
@@ -71631,10 +73177,46 @@
   },
   {
     "codes": [
+      "PRAC 4820",
+      "PRAC 482"
+    ],
+    "name": "Mellon Mays and Edward A. Bouchet Junior Research Practicum",
+    "credits": 0.5,
+    "department": "PRAC",
+    "offered": [
+      "Fall 2023",
+      "Spring 2024",
+      "Fall 2024",
+      "Spring 2025",
+      "Fall 2025",
+      "Spring 2026",
+      "Fall 2026"
+    ],
+    "isFall": true
+  },
+  {
+    "codes": [
       "PRAC 4830",
-      "PRAC 4840",
-      "PRAC 484",
       "PRAC 483"
+    ],
+    "name": "Mellon Mays and Edward A. Bouchet Senior Research Practicum",
+    "credits": 0.5,
+    "department": "PRAC",
+    "offered": [
+      "Fall 2023",
+      "Spring 2024",
+      "Fall 2024",
+      "Spring 2025",
+      "Fall 2025",
+      "Spring 2026",
+      "Fall 2026"
+    ],
+    "isFall": true
+  },
+  {
+    "codes": [
+      "PRAC 4840",
+      "PRAC 484"
     ],
     "name": "Mellon Mays and Edward A. Bouchet Senior Research Practicum",
     "credits": 0.5,
@@ -74289,10 +75871,29 @@
   },
   {
     "codes": [
-      "RLST 4890",
       "RLST 4880",
-      "RLST 489",
       "RLST 488"
+    ],
+    "name": "Individual Tutorial",
+    "credits": 1.0,
+    "department": "RLST",
+    "offered": [
+      "Fall 2023",
+      "Spring 2024",
+      "Fall 2024",
+      "Spring 2025",
+      "Fall 2025",
+      "Spring 2026",
+      "Fall 2026",
+      "Spring 2027"
+    ],
+    "isFall": true,
+    "isSpring": true
+  },
+  {
+    "codes": [
+      "RLST 4890",
+      "RLST 489"
     ],
     "name": "Individual Tutorial",
     "credits": 1.0,
@@ -74328,10 +75929,29 @@
   },
   {
     "codes": [
-      "RLST 4920",
       "RLST 4910",
-      "RLST 492",
       "RLST 491"
+    ],
+    "name": "The Senior Essay",
+    "credits": 1.0,
+    "department": "RLST",
+    "offered": [
+      "Fall 2023",
+      "Spring 2024",
+      "Fall 2024",
+      "Spring 2025",
+      "Fall 2025",
+      "Spring 2026",
+      "Fall 2026",
+      "Spring 2027"
+    ],
+    "isFall": true,
+    "isSpring": true
+  },
+  {
+    "codes": [
+      "RLST 4920",
+      "RLST 492"
     ],
     "name": "The Senior Essay",
     "credits": 1.0,
@@ -74889,10 +76509,29 @@
   },
   {
     "codes": [
-      "RSEE 4910",
       "RSEE 4900",
-      "RSEE 491",
       "RSEE 490"
+    ],
+    "name": "The Senior Essay",
+    "credits": 1.0,
+    "department": "RSEE",
+    "offered": [
+      "Fall 2023",
+      "Spring 2024",
+      "Fall 2024",
+      "Spring 2025",
+      "Fall 2025",
+      "Spring 2026",
+      "Fall 2026",
+      "Spring 2027"
+    ],
+    "isFall": true,
+    "isSpring": true
+  },
+  {
+    "codes": [
+      "RSEE 4910",
+      "RSEE 491"
     ],
     "name": "The Senior Essay",
     "credits": 1.0,
@@ -75586,10 +77225,29 @@
   },
   {
     "codes": [
-      "RUSS 4910",
       "RUSS 4900",
-      "RUSS 491",
       "RUSS 490"
+    ],
+    "name": "The Senior Essay",
+    "credits": 1.0,
+    "department": "RUSS",
+    "offered": [
+      "Fall 2023",
+      "Spring 2024",
+      "Fall 2024",
+      "Spring 2025",
+      "Fall 2025",
+      "Spring 2026",
+      "Fall 2026",
+      "Spring 2027"
+    ],
+    "isFall": true,
+    "isSpring": true
+  },
+  {
+    "codes": [
+      "RUSS 4910",
+      "RUSS 491"
     ],
     "name": "The Senior Essay",
     "credits": 1.0,
@@ -76308,10 +77966,29 @@
   },
   {
     "codes": [
-      "S&DS 4920",
       "S&DS 4910",
-      "S&DS 492",
       "S&DS 491"
+    ],
+    "name": "Senior Project",
+    "credits": 1.0,
+    "department": "S&DS",
+    "offered": [
+      "Fall 2023",
+      "Spring 2024",
+      "Fall 2024",
+      "Spring 2025",
+      "Fall 2025",
+      "Spring 2026",
+      "Fall 2026",
+      "Spring 2027"
+    ],
+    "isFall": true,
+    "isSpring": true
+  },
+  {
+    "codes": [
+      "S&DS 4920",
+      "S&DS 492"
     ],
     "name": "Senior Project",
     "credits": 1.0,
@@ -77080,8 +78757,6 @@
   {
     "codes": [
       "SCIE 0010",
-      "SCIE 0011",
-      "SCIE 011",
       "SCIE 010"
     ],
     "name": "Perspectives on Biological Research",
@@ -77100,10 +78775,44 @@
   },
   {
     "codes": [
+      "SCIE 0011",
+      "SCIE 011"
+    ],
+    "name": "Perspectives on Biological Research",
+    "credits": 0.5,
+    "department": "SCIE",
+    "offered": [
+      "Fall 2023",
+      "Spring 2024",
+      "Fall 2024",
+      "Spring 2025",
+      "Fall 2025",
+      "Spring 2026",
+      "Fall 2026"
+    ],
+    "isFall": true
+  },
+  {
+    "codes": [
       "SCIE 0020",
-      "SCIE 0021",
-      "SCIE 021",
       "SCIE 020"
+    ],
+    "name": "Perspectives on Research in the Mathematical and Physical Sciences",
+    "credits": 0.5,
+    "department": "SCIE",
+    "offered": [
+      "Fall 2023",
+      "Spring 2024",
+      "Fall 2025",
+      "Spring 2026",
+      "Fall 2026"
+    ],
+    "isFall": true
+  },
+  {
+    "codes": [
+      "SCIE 0021",
+      "SCIE 021"
     ],
     "name": "Perspectives on Research in the Mathematical and Physical Sciences",
     "credits": 0.5,
@@ -78585,10 +80294,7 @@
   },
   {
     "codes": [
-      "SOCY 4200",
-      "SOCY 4201",
-      "SOCY 494",
-      "SOCY 493"
+      "SOCY 4200"
     ],
     "name": "Senior Essay and Colloquium for Intensive Majors",
     "credits": 1.0,
@@ -78606,10 +80312,43 @@
   },
   {
     "codes": [
-      "SOCY 4701",
-      "SOCY 4702",
-      "SOCY 472",
-      "SOCY 471"
+      "SOCY 4201"
+    ],
+    "name": "Senior Essay and Colloquium for Intensive Majors",
+    "credits": 1.0,
+    "department": "SOCY",
+    "offered": [
+      "Fall 2023",
+      "Spring 2024",
+      "Fall 2024",
+      "Spring 2025",
+      "Fall 2025",
+      "Spring 2026",
+      "Fall 2026"
+    ],
+    "isFall": true
+  },
+  {
+    "codes": [
+      "SOCY 4701"
+    ],
+    "name": "Individual Study",
+    "credits": 1.0,
+    "department": "SOCY",
+    "offered": [
+      "Fall 2023",
+      "Spring 2024",
+      "Fall 2024",
+      "Spring 2025",
+      "Fall 2025",
+      "Spring 2026",
+      "Fall 2026"
+    ],
+    "isFall": true
+  },
+  {
+    "codes": [
+      "SOCY 4702"
     ],
     "name": "Individual Study",
     "credits": 1.0,
@@ -79568,10 +81307,25 @@
   },
   {
     "codes": [
-      "SPAN 4903",
-      "SPAN 4904",
-      "SPAN 479",
-      "SPAN 478"
+      "SPAN 4903"
+    ],
+    "name": "Directed Readings and/or Individual Research",
+    "credits": 1.0,
+    "department": "SPAN",
+    "offered": [
+      "Fall 2023",
+      "Spring 2024",
+      "Fall 2024",
+      "Spring 2025",
+      "Fall 2025",
+      "Spring 2026",
+      "Fall 2026"
+    ],
+    "isFall": true
+  },
+  {
+    "codes": [
+      "SPAN 4904"
     ],
     "name": "Directed Readings and/or Individual Research",
     "credits": 1.0,
@@ -79679,10 +81433,25 @@
   },
   {
     "codes": [
-      "SWAH 1170",
-      "SWAH 1171",
-      "SWAH 171",
-      "SWAH 170"
+      "SWAH 1170"
+    ],
+    "name": "Topics in Kiswahili Literature",
+    "credits": 1.0,
+    "department": "SWAH",
+    "offered": [
+      "Fall 2023",
+      "Spring 2024",
+      "Fall 2024",
+      "Spring 2025",
+      "Fall 2025",
+      "Spring 2026",
+      "Fall 2026"
+    ],
+    "isFall": true
+  },
+  {
+    "codes": [
+      "SWAH 1171"
     ],
     "name": "Topics in Kiswahili Literature",
     "credits": 1.0,
@@ -81007,8 +82776,21 @@
   },
   {
     "codes": [
-      "TDPS 4024",
       "TDPS 4023"
+    ],
+    "name": "Documentary Film Workshop",
+    "credits": 1.0,
+    "department": "TDPS",
+    "offered": [
+      "Fall 2025",
+      "Spring 2026",
+      "Fall 2026"
+    ],
+    "isFall": true
+  },
+  {
+    "codes": [
+      "TDPS 4024"
     ],
     "name": "Documentary Film Workshop",
     "credits": 1.0,
@@ -83293,10 +85075,26 @@
   },
   {
     "codes": [
-      "VIET 4710",
       "VIET 4700",
-      "VIET 471",
       "VIET 470"
+    ],
+    "name": "Independent Tutorial",
+    "credits": 1.0,
+    "department": "VIET",
+    "offered": [
+      "Fall 2023",
+      "Spring 2024",
+      "Fall 2024",
+      "Spring 2025",
+      "Fall 2025",
+      "Spring 2027"
+    ],
+    "isSpring": true
+  },
+  {
+    "codes": [
+      "VIET 4710",
+      "VIET 471"
     ],
     "name": "Independent Tutorial",
     "credits": 1.0,

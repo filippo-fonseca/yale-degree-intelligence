@@ -5,10 +5,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   FiChevronDown,
   FiChevronUp,
-  FiInfo,
   FiPlus,
   FiTrash2,
-  FiRefreshCw,
   FiCheck,
   FiLock,
 } from "react-icons/fi";
@@ -25,9 +23,11 @@ import SimulatorRequirementsBreakdown from "./SimulatorRequirementsBreakdown";
 import CourseGradeControl from "./CourseGradeControl";
 import CourseDistributionalControl from "./CourseDistributionalControl";
 import SimulatorProgressPane from "./SimulatorProgressPane";
-import SimulatorViewSwitcher, {
-  type SimulatorView,
-} from "./SimulatorViewSwitcher";
+import { type SimulatorView } from "./SimulatorViewSwitcher";
+import SimulatorToolbarRow from "./SimulatorToolbarRow";
+import SimulatorCanvasActions from "./SimulatorCanvasActions";
+import SimulatorPlansModal from "./SimulatorPlansModal";
+import type { Plan, Semester } from "./planTypes";
 import {
   calculatePreviewMajorProgressByMajors,
   MajorProgress,
@@ -62,11 +62,8 @@ import PlannedCourseBlockedModal from "./PlannedCourseBlockedModal";
 import type { Allocation } from "@/lib/certificatePolicy";
 
 // ----------------- Types -----------------
-interface Semester {
-  id: string;
-  name: string; // e.g. "Fall 2026"
-  courses: Course[];
-}
+// `Semester` and `Plan` live in ./planTypes so the plan chrome components can
+// share them without importing this module back into its own children.
 
 interface SimulatorProps {
   remainingCourses: Course[];
@@ -81,16 +78,6 @@ interface SimulatorProps {
   /** Lets the dashboard ask the simulator to confirm before navigating away. */
   onRegisterNavCheck?: (fn: ((cb: () => void) => void) | null) => void;
 }
-
-type Plan = {
-  name: string;
-  semesters: Semester[];
-  manualRequirements?: ManualRequirementEntry[];
-  createdAt: string; // ISO
-  isDefault?: boolean;
-  showDistributionals?: boolean;
-  showGrades?: boolean;
-};
 
 type PreviewProgressMap = Record<string, MajorProgress>;
 type CertificatePreviewProgressMap = Record<string, CertificateProgress>;
@@ -1425,6 +1412,21 @@ export default function Simulator({
     }
   };
 
+  // The save flow, opened from either the canvas verb row or the plans modal.
+  // It arrives pre-aimed at the plan you are on, so the common case is an
+  // overwrite rather than a stray duplicate.
+  const openSaveModal = () => {
+    if (loadedPlanIndex >= 0) {
+      setSelectedPlanToOverwrite(loadedPlanIndex);
+      setPlanName(savedPlans[loadedPlanIndex]?.name ?? "");
+    } else {
+      setSelectedPlanToOverwrite(null);
+      setPlanName("");
+    }
+    setShowPlansModal(false);
+    setShowSaveModal(true);
+  };
+
   const loadPlan = (planIndex: number) => {
     if (planIndex < 0 || planIndex >= savedPlans.length) return;
     if (
@@ -1548,105 +1550,15 @@ export default function Simulator({
             : "bg-transparent border-b border-transparent"
         }`}
       >
-        <div className="flex flex-col gap-3">
-          <SimulatorViewSwitcher view={activeView} setView={setActiveView} />
-
-          {activeView === "canvas" && (
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-              {/* Current Plan Status */}
-              <div className="flex items-center gap-3 min-w-0 sm:flex-1">
-                <span className="text-xs text-gray-400 dark:text-gray-500 uppercase tracking-wider shrink-0">
-                  Plan:
-                </span>
-                <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-black/[0.04] dark:bg-white/[0.04] border border-black/[0.06] dark:border-white/[0.08] min-w-0 max-w-full">
-                  {currentPlanName ? (
-                    <>
-                      <div
-                        className={`w-2.5 h-2.5 rounded-full shrink-0 ${hasChanges ? "bg-amber-400 animate-pulse" : "bg-emerald-400"}`}
-                      />
-                      <span
-                        className="text-base font-medium text-gray-800 dark:text-gray-200 truncate"
-                        title={currentPlanName}
-                      >
-                        {currentPlanName}
-                      </span>
-                      {loadedPlanIsDefault && (
-                        <span className="text-[9px] font-medium uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 border border-purple-300 dark:border-purple-700/40 shrink-0">
-                          Default
-                        </span>
-                      )}
-                      {hasChanges && (
-                        <span className="text-xs text-amber-400 ml-1 px-2 py-0.5 rounded-full bg-amber-400/10 border border-amber-400/20 shrink-0">
-                          unsaved
-                        </span>
-                      )}
-                    </>
-                  ) : (
-                    <>
-                      <div
-                        className={`w-2.5 h-2.5 rounded-full ${hasChanges ? "bg-blue-400 animate-pulse" : "bg-gray-500"}`}
-                      />
-                      <span className="text-sm text-gray-500 dark:text-gray-400">
-                        {hasChanges ? "Unsaved new plan" : "No plan loaded"}
-                      </span>
-                    </>
-                  )}
-                </div>
-              </div>
-
-              {/* Action Buttons */}
-              <div className="flex items-center gap-2 flex-wrap shrink-0" data-tour="simulator-plan-actions">
-                <button
-                  onClick={() => setShowHelp((v) => !v)}
-                  className="px-4 py-2 text-sm rounded-xl bg-black/[0.04] dark:bg-white/[0.04] backdrop-blur-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-black/[0.06] dark:hover:bg-white/[0.08] border border-black/[0.06] dark:border-white/[0.08] flex items-center gap-2 transition-all"
-                >
-                  <FiInfo size={14} />
-                  Help
-                </button>
-                {user && (
-                  <>
-                    <button
-                      onClick={() => setShowPlansModal(true)}
-                      className="px-4 py-2 text-sm rounded-xl bg-gradient-to-r from-blue-500/15 to-purple-500/15 backdrop-blur-sm text-blue-300 hover:text-blue-200 hover:from-blue-500/20 hover:to-purple-500/20 border border-blue-500/30 hover:border-blue-400/40 flex items-center gap-2 transition-all"
-                    >
-                      <FiChevronDown size={14} />
-                      Load Plan
-                    </button>
-                    <button
-                      onClick={() => {
-                        // Default to overwriting the currently-loaded plan (if any).
-                        if (loadedPlanIndex >= 0) {
-                          setSelectedPlanToOverwrite(loadedPlanIndex);
-                          setPlanName(savedPlans[loadedPlanIndex]?.name ?? "");
-                        } else {
-                          setSelectedPlanToOverwrite(null);
-                          setPlanName("");
-                        }
-                        setShowSaveModal(true);
-                      }}
-                      className={`px-4 py-2 text-sm rounded-xl backdrop-blur-sm transition-all flex items-center gap-2 ${
-                        hasChanges
-                          ? "bg-gradient-to-r from-emerald-500/20 to-teal-500/20 text-emerald-300 hover:text-emerald-200 hover:from-emerald-500/25 hover:to-teal-500/25 border border-emerald-500/30 hover:border-emerald-400/40"
-                          : "bg-black/[0.02] dark:bg-white/[0.02] text-gray-400 dark:text-gray-600 border border-black/[0.04] dark:border-white/[0.04] cursor-not-allowed"
-                      }`}
-                      disabled={!hasChanges}
-                    >
-                      <FiPlus size={14} />
-                      Save Current
-                    </button>
-                  </>
-                )}
-                <button
-                  onClick={resetSimulator}
-                  className="px-4 py-2 text-sm rounded-xl bg-red-500/10 backdrop-blur-sm text-red-400 hover:text-red-300 hover:bg-red-500/15 border border-red-500/20 hover:border-red-400/30 flex items-center gap-2 transition-all"
-                >
-                  <FiRefreshCw size={14} />
-                  Clear canvas
-                </button>
-              </div>
-            </div>
-          )}
-        </div>
+        <SimulatorToolbarRow
+          view={activeView}
+          setView={setActiveView}
+          planName={currentPlanName}
+          planIsDefault={loadedPlanIsDefault}
+          hasChanges={hasChanges}
+          planSelectorDisabled={!user}
+          onOpenPlans={() => setShowPlansModal(true)}
+        />
       </div>
 
       {activeView === "canvas" ? (
@@ -1772,38 +1684,20 @@ export default function Simulator({
             </div>
           </div>
 
-          {/* Per-course editors on the semester cards. These live on the
-              Canvas because that is where the typing happens; what they feed
-              (the GPA timeline, the distributional tally) reads on Progress. */}
-          <div className="flex items-center gap-2 flex-wrap">
-            <span className="text-[10px] text-gray-400 dark:text-gray-500 uppercase tracking-wider">
-              Edit on cards:
-            </span>
-            <button
-              type="button"
-              onClick={() => setShowGrades((v) => !v)}
-              aria-pressed={showGrades}
-              className={`px-2.5 py-1 text-[11px] rounded-lg border transition-all duration-200 ${
-                showGrades
-                  ? "bg-emerald-500/15 text-emerald-600 dark:text-emerald-300 border-emerald-600/40 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]"
-                  : "bg-gray-100 dark:bg-gray-900/50 text-gray-400 dark:text-gray-500 border-gray-200 dark:border-gray-800/50 hover:text-gray-600 dark:hover:text-gray-400"
-              }`}
-            >
-              Grades
-            </button>
-            <button
-              type="button"
-              onClick={() => setShowDistributionals((v) => !v)}
-              aria-pressed={showDistributionals}
-              className={`px-2.5 py-1 text-[11px] rounded-lg border transition-all duration-200 ${
-                showDistributionals
-                  ? "bg-purple-500/15 text-purple-600 dark:text-purple-300 border-purple-600/40 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]"
-                  : "bg-gray-100 dark:bg-gray-900/50 text-gray-400 dark:text-gray-500 border-gray-200 dark:border-gray-800/50 hover:text-gray-600 dark:hover:text-gray-400"
-              }`}
-            >
-              Distributionals
-            </button>
-          </div>
+          {/* The Canvas control row: the per-course editor toggles and the
+              verbs that act on the grid below it. Canvas only. */}
+          <SimulatorCanvasActions
+            showGrades={showGrades}
+            onToggleGrades={() => setShowGrades((v) => !v)}
+            showDistributionals={showDistributionals}
+            onToggleDistributionals={() => setShowDistributionals((v) => !v)}
+            helpOpen={showHelp}
+            onToggleHelp={() => setShowHelp((v) => !v)}
+            showSave={!!user}
+            canSave={hasChanges}
+            onSave={openSaveModal}
+            onClear={resetSimulator}
+          />
 
           {/* Semesters Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3" data-tour="simulator-board">
@@ -2191,144 +2085,18 @@ export default function Simulator({
         )}
       </AnimatePresence>
 
-      {/* Load Plans Modal */}
-      <AnimatePresence>
-        {showPlansModal && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/60 backdrop-blur-md z-50 flex items-center justify-center p-4"
-            onClick={() => setShowPlansModal(false)}
-          >
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95, y: 10 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: 10 }}
-              transition={{ duration: 0.25, ease: "easeOut" }}
-              onClick={(e) => e.stopPropagation()}
-              className="w-full max-w-md p-6 rounded-2xl bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/95 dark:via-gray-900/90 dark:to-gray-950/95 backdrop-blur-2xl border border-gray-200 dark:border-white/[0.08] shadow-[0_8px_48px_rgba(0,0,0,0.1),0_0_80px_rgba(139,92,246,0.02)] dark:shadow-[0_8px_48px_rgba(0,0,0,0.5),0_0_80px_rgba(139,92,246,0.06),inset_0_1px_0_rgba(255,255,255,0.08)] ring-1 ring-black/[0.04] dark:ring-white/[0.05]"
-              style={{ maxHeight: "80vh" }}
-            >
-              {/* Header */}
-              <div className="mb-5">
-                <h3 className="text-lg font-medium text-gray-900 dark:text-white">
-                  Your Saved Plans
-                </h3>
-                <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
-                  Load a previous plan or manage your saved plans.
-                </p>
-              </div>
-
-              {savedPlans.length === 0 ? (
-                <div className="py-12 text-center">
-                  <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-gray-100 dark:bg-transparent dark:bg-gradient-to-br dark:from-white/[0.04] dark:to-transparent border border-gray-200 dark:border-white/[0.06] flex items-center justify-center">
-                    <FiPlus className="w-5 h-5 text-gray-400 dark:text-gray-500" />
-                  </div>
-                  <p className="text-gray-500 dark:text-gray-500 text-sm">No saved plans yet</p>
-                  <p className="text-gray-400 dark:text-gray-600 text-xs mt-1">
-                    Make changes and save to create your first plan.
-                  </p>
-                </div>
-              ) : (
-                <div
-                  className="space-y-2 overflow-y-auto pr-1"
-                  style={{ maxHeight: "calc(80vh - 180px)" }}
-                >
-                  {savedPlans.map((plan, index) => {
-                    const plannedCount = plan.semesters.reduce(
-                      (acc, sem) =>
-                        acc +
-                        sem.courses.filter((c) => c.status === "not-taken")
-                          .length,
-                      0,
-                    );
-                    return (
-                      <motion.div
-                        key={`${plan.createdAt}-${index}`}
-                        initial={{ opacity: 0, y: 5 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: index * 0.05 }}
-                        className="p-4 rounded-xl bg-gray-50 dark:bg-transparent dark:bg-gradient-to-br dark:from-white/[0.04] dark:to-transparent border border-gray-200 dark:border-white/[0.06] hover:border-gray-300 dark:hover:border-white/[0.1] transition-all group"
-                      >
-                        <div className="flex justify-between items-start mb-3">
-                          <div>
-                            <div className="flex items-center gap-2">
-                              <h5 className="font-medium text-sm text-gray-700 dark:text-gray-200 group-hover:text-gray-900 dark:group-hover:text-white transition-colors">
-                                {plan.name}
-                              </h5>
-                              {plan.isDefault && (
-                                <span className="text-[9px] font-medium uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 border border-purple-300 dark:border-purple-700/40">
-                                  Default
-                                </span>
-                              )}
-                            </div>
-                            <p className="text-[11px] text-gray-500 mt-0.5">
-                              {plannedCount} planned course
-                              {plannedCount !== 1 ? "s" : ""} ·{" "}
-                              {new Date(plan.createdAt).toLocaleDateString(
-                                "en-US",
-                                {
-                                  month: "short",
-                                  day: "numeric",
-                                  year: "numeric",
-                                },
-                              )}
-                            </p>
-                          </div>
-                        </div>
-                        <div className="flex justify-between items-center gap-2">
-                          {!plan.isDefault ? (
-                            <button
-                              onClick={() => setDefaultPlan(index)}
-                              className="text-[11px] text-gray-500 dark:text-gray-400 hover:text-purple-600 dark:hover:text-purple-300 transition-colors"
-                            >
-                              Set as default
-                            </button>
-                          ) : (
-                            <span />
-                          )}
-                          <div className="flex gap-2">
-                            <motion.button
-                              onClick={() => deletePlan(index)}
-                              whileHover={{ scale: 1.02 }}
-                              whileTap={{ scale: 0.98 }}
-                              className="px-3 py-1.5 text-xs rounded-lg bg-red-100 dark:bg-red-500/10 text-red-600 dark:text-red-400 hover:bg-red-200 dark:hover:bg-red-500/20 hover:text-red-700 dark:hover:text-red-300 border border-red-300 dark:border-red-500/20 transition-all flex items-center gap-1"
-                            >
-                              <FiTrash2 size={11} />
-                              Delete
-                            </motion.button>
-                            <motion.button
-                              onClick={() => loadPlan(index)}
-                              whileHover={{ scale: 1.02 }}
-                              whileTap={{ scale: 0.98 }}
-                              className="px-3 py-1.5 text-xs rounded-lg bg-gradient-to-r from-blue-500/20 to-purple-500/20 text-blue-700 dark:text-blue-300 hover:text-blue-800 dark:hover:text-blue-200 border border-blue-400/40 dark:border-blue-500/30 hover:border-blue-500/50 dark:hover:border-blue-400/40 transition-all shadow-[0_2px_8px_rgba(59,130,246,0.15),inset_0_1px_0_rgba(255,255,255,0.08)]"
-                            >
-                              Load Plan
-                            </motion.button>
-                          </div>
-                        </div>
-                      </motion.div>
-                    );
-                  })}
-                </div>
-              )}
-
-              {/* Close button */}
-              <div className="mt-5 flex justify-end">
-                <motion.button
-                  onClick={() => setShowPlansModal(false)}
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  className="px-4 py-2 text-sm rounded-xl bg-black/[0.04] dark:bg-white/[0.04] text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-black/[0.06] dark:hover:bg-white/[0.06] border border-black/[0.06] dark:border-white/[0.06] transition-all"
-                >
-                  Close
-                </motion.button>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {/* Plan manager, opened by the toolbar's plan selector */}
+      <SimulatorPlansModal
+        isOpen={showPlansModal}
+        plans={savedPlans}
+        currentPlanName={currentPlanName}
+        canSaveCurrent={!!user && hasChanges}
+        onClose={() => setShowPlansModal(false)}
+        onLoad={loadPlan}
+        onSetDefault={setDefaultPlan}
+        onDelete={deletePlan}
+        onSaveCurrent={openSaveModal}
+      />
 
       {/* Manual Course Lookup Modal */}
       <ManualCourseLookupModal

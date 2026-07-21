@@ -40,6 +40,8 @@ export const RELEASES: Release[] = [
           "A Board and Heat map view of your requirements, so you can read your whole degree at a glance or zoom into a single track.",
           "A full Yale College catalog (Fall 2023 → Spring 2027): 6,500+ courses, 3→4 digit renumbers, EENG→ECE aliases, and Fall 2026 / Spring 2027 flags for the Simulator.",
           "The Simulator is now two tabs instead of one long page. Canvas is where you build the plan (the semester grid, the course pool, saving and loading), and Progress is where you read what it adds up to: your requirement cards, your GPA timeline, and your distributionals. It remembers which tab you were last on.",
+          "One plan control instead of two. The Simulator's toolbar now shows a single plan button that tells you which plan you are on, whether it has unsaved work, and opens a redesigned plan manager where you can switch plans, pick a default, rename by saving over one, or delete. It sits beside the Canvas / Progress tabs on both, since the Progress numbers follow whichever plan is loaded.",
+          "Save, Clear canvas, and Help moved down to the canvas itself, right above your semester grid, as small quiet buttons instead of big pills in the toolbar.",
           "The courses you are taking right now count everywhere they should. \"+ In Progress\" on My Major and My Certificates, your in-progress credits, and the Simulator all pick them up, whether the course came from your transcript or you added it by hand.",
         ],
       },

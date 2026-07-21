@@ -10,6 +10,11 @@ import {
   getCertificateDescriptionById,
   type CertificateProgress,
 } from "@/lib/certificates";
+import {
+  certificateEligibility,
+  resolvePolicy,
+} from "@/lib/certificatePolicy";
+import { getCertificateOverlapBudget } from "@/lib/utils/programClaims";
 import { useAuth } from "@/context/AuthContext";
 import { skipCourse, unskipCourse } from "@/lib/utils/courseOperations";
 import CourseModal from "./CourseModal";
@@ -110,6 +115,45 @@ function CertificateStatCard({
       <p className="text-xs text-gray-400 dark:text-gray-500">{label}</p>
       <p className={`text-lg font-medium mt-0.5 ${color}`}>{value}</p>
     </motion.div>
+  );
+}
+
+/**
+ * Warn but allow. Yale bars a few major and certificate pairings outright, and
+ * this banner is the single voice for it inside the certificate: the manual
+ * picker stays quiet about eligibility so the reasons it does show are the ones
+ * that differ from course to course.
+ *
+ * The copy is the engine's, split at the sentence break so the finding leads and
+ * the advice follows.
+ */
+function IneligibilityBanner({ warning }: { warning: string }) {
+  const breakAt = warning.indexOf(". ");
+  const lead = breakAt === -1 ? warning : warning.slice(0, breakAt + 1);
+  const rest = breakAt === -1 ? "" : warning.slice(breakAt + 2);
+  return (
+    <div className="rounded-lg bg-amber-500/10 border border-amber-500/20 px-3 py-2.5">
+      <p className="text-sm text-amber-700 dark:text-amber-300">
+        <span className="font-medium">{lead}</span>
+        {rest && (
+          <span className="text-amber-700/80 dark:text-amber-200/80"> {rest}</span>
+        )}
+      </p>
+    </div>
+  );
+}
+
+/** The overlap budget, in the quiet pill idiom the cards already use. */
+function OverlapPill({ label, tooltip }: { label: string; tooltip: string }) {
+  return (
+    <div className="relative group ml-auto">
+      <span className="inline-block px-2 py-1 rounded-lg text-[10px] font-mono bg-gray-100 dark:bg-gray-900/50 text-gray-500 dark:text-gray-400 border border-gray-200 dark:border-gray-800/50 cursor-default">
+        {label}
+      </span>
+      <div className="absolute z-10 right-0 bottom-full mb-1.5 w-52 p-2 text-[11px] text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-900/95 backdrop-blur-sm rounded-lg border border-gray-200 dark:border-gray-800/50 shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
+        {tooltip}
+      </div>
+    </div>
   );
 }
 
@@ -277,6 +321,45 @@ export default function CertificateProgressView({
       console.error("Error excluding course from requirement:", error);
     }
   };
+
+  // The caller rebuilds these arrays every render, so memoize on their
+  // contents rather than on their identity.
+  const majorKey = userMajors.join(",");
+  const certificateKey = userCertificates.join(",");
+
+  const eligibility = useMemo(
+    () => certificateEligibility(selectedCertificate, majorKey ? majorKey.split(",") : []),
+    [selectedCertificate, majorKey],
+  );
+
+  const zeroOverlap = resolvePolicy(selectedCertificate).zeroOverlap;
+
+  const overlap = useMemo(
+    () =>
+      getCertificateOverlapBudget(courses, selectedCertificate, {
+        majorIds: majorKey ? majorKey.split(",") : [],
+        certificateIds: certificateKey ? certificateKey.split(",") : [],
+      }),
+    [courses, selectedCertificate, majorKey, certificateKey],
+  );
+
+  /**
+   * A certificate that shares nothing always says so. One that has a budget
+   * only speaks once the student has actually spent some of it, otherwise every
+   * language certificate would carry a meter reading zero forever.
+   */
+  const overlapPill = zeroOverlap
+    ? {
+        label: "no overlap",
+        tooltip:
+          "No course may count toward both this certificate and another program.",
+      }
+    : overlap.cap > 0 && overlap.used > 0
+      ? {
+          label: `overlap ${overlap.used}/${overlap.cap}`,
+          tooltip: `Shared with your other programs: ${overlap.courses.join(", ")}.`,
+        }
+      : null;
 
   const completedCredits = progress?.completedCredits;
   const inProgressCredits = progress?.inProgressCredits || 0;
@@ -578,6 +661,10 @@ export default function CertificateProgressView({
 
   return (
     <div className="space-y-6 font-louize">
+      {!eligibility.eligible && eligibility.warning && (
+        <IneligibilityBanner warning={eligibility.warning} />
+      )}
+
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
           <p className="text-xs uppercase tracking-wider text-teal-600 dark:text-teal-400 mb-1">
@@ -647,6 +734,12 @@ export default function CertificateProgressView({
           >
             + In Progress
           </button>
+          {overlapPill && (
+            <OverlapPill
+              label={overlapPill.label}
+              tooltip={overlapPill.tooltip}
+            />
+          )}
         </div>
       </div>
 

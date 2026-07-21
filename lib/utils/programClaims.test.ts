@@ -27,6 +27,7 @@ import {
   getCertificateBlockedCodes,
   getCertificateOverlapBudget,
   getMajorBlockedCodes,
+  settleAllocations,
   type ProgramClaimOptions,
 } from "@/lib/utils/programClaims";
 import { Course, ManualRequirement } from "@/lib/types";
@@ -81,18 +82,12 @@ const allocationsFor = (
 /**
  * What a picker actually evaluates against. A stored conflict has already been
  * resolved against the certificate, so leaving it in the list would answer
- * "already fills that slot" for a course the certificate has lost.
- * AddManualCourseModal builds exactly this before it calls the engine.
+ * "already fills that slot" for a course the certificate has lost. Both
+ * AddManualCourseModal and SimulatorManualAssignModal build exactly this before
+ * they call the engine.
  */
-const settle = (allocations: Allocation[], violations: Violation[]) => {
-  const key = (a: {
-    courseCode: string;
-    program: { type: string; id: string };
-    requirementTitle: string;
-  }) => `${a.courseCode}::${a.program.type}:${a.program.id}::${a.requirementTitle}`;
-  const lost = new Set(violations.map(key));
-  return allocations.filter((a) => !lost.has(key(a)));
-};
+const settle = (allocations: Allocation[], violations: Violation[]) =>
+  settleAllocations({ allocations, violations });
 
 // ---------------------------------------------------------------------------
 // The user's report
@@ -475,5 +470,122 @@ describe("overlap budgets count auto-matched overlaps", () => {
         reason: "Overlap limit reached: 2 of 2 shared courses already used.",
       },
     ]);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// What a picker hands the engine
+// ---------------------------------------------------------------------------
+
+describe("settleAllocations drops exactly the claims the audit refused", () => {
+  const options: ProgramClaimOptions = {
+    majorIds: ["EECS"],
+    certificateIds: ["CERT_DATA_SCIENCE"],
+  };
+  const courses = [course("CPSC 2230"), course("S&DS 2650")];
+
+  it("removes the violated allocations and keeps every other one", () => {
+    const context = buildProgramClaimContext(courses, options);
+    const settled = settleAllocations(context);
+
+    const key = (a: {
+      courseCode: string;
+      program: { type: string; id: string };
+      requirementTitle: string;
+    }) => `${a.courseCode}|${a.program.type}:${a.program.id}|${a.requirementTitle}`;
+
+    expect(context.violations.length).toBeGreaterThan(0);
+    expect(settled).toHaveLength(
+      context.allocations.length - context.violations.length
+    );
+    expect(settled.map(key)).toEqual(
+      context.allocations
+        .map(key)
+        .filter((k) => !context.violations.map(key).includes(k))
+    );
+  });
+
+  it("leaves a clean list untouched", () => {
+    const clean = buildProgramClaimContext([course("S&DS 2650")], options);
+
+    expect(clean.violations).toEqual([]);
+    expect(settleAllocations(clean)).toEqual(clean.allocations);
+  });
+
+  it("matches a violation across the legacy spelling of the same course", () => {
+    const allocations: Allocation[] = [
+      {
+        courseCode: "CPSC 2230",
+        program: { type: "certificate", id: "CERT_DATA_SCIENCE" },
+        requirementTitle: "Computation and Machine Learning",
+      },
+    ];
+    const violations: Violation[] = [
+      {
+        courseCode: "CPSC 223",
+        program: { type: "certificate", id: "CERT_DATA_SCIENCE" },
+        requirementTitle: "Computation and Machine Learning",
+        code: "zero-overlap",
+        reason: "irrelevant to the identity match",
+      },
+    ];
+
+    expect(settleAllocations({ allocations, violations })).toEqual([]);
+  });
+
+  it("gives the assign modal the zero-overlap sentence instead of same-slot", () => {
+    const context = buildProgramClaimContext(courses, options);
+    const ask = (existing: Allocation[]) =>
+      evaluateAllocation({
+        courseCode: "CPSC 2230",
+        target: {
+          type: "certificate",
+          id: "CERT_DATA_SCIENCE",
+          requirementTitle: "Computation and Machine Learning",
+        },
+        existing,
+        majorIds: context.majorIds,
+        certificateIds: context.certificateIds,
+      });
+
+    expect(ask(context.allocations)).toEqual({
+      allowed: false,
+      kind: "blocked",
+      code: "same-slot",
+      reason: `Already fills "Computation and Machine Learning" in this certificate.`,
+    });
+    expect(ask(settleAllocations(context))).toEqual({
+      allowed: false,
+      kind: "blocked",
+      code: "zero-overlap",
+      reason: `Already counts toward your ${EECS} major. ${DATA_SCIENCE} allows no overlap with a major.`,
+    });
+  });
+
+  it("stops the major reading as refused for a course it keeps", () => {
+    const context = buildProgramClaimContext(courses, options);
+    const ask = (existing: Allocation[]) =>
+      evaluateAllocation({
+        courseCode: "CPSC 2230",
+        target: {
+          type: "major",
+          id: "EECS",
+          requirementTitle: "Data Structures and Programming Techniques",
+        },
+        existing,
+        majorIds: context.majorIds,
+        certificateIds: context.certificateIds,
+      });
+
+    expect(ask(context.allocations)).toEqual({
+      allowed: false,
+      kind: "blocked",
+      code: "zero-overlap",
+      reason: `Already counts toward your ${DATA_SCIENCE} certificate. ${DATA_SCIENCE} allows no overlap with a major.`,
+    });
+    expect(ask(settleAllocations(context))).toEqual({
+      allowed: true,
+      kind: "ok",
+    });
   });
 });

@@ -25,6 +25,7 @@ import CourseDistributionalControl from "./CourseDistributionalControl";
 import SimulatorProgressPane from "./SimulatorProgressPane";
 import { type SimulatorView } from "./SimulatorViewSwitcher";
 import SimulatorToolbarRow from "./SimulatorToolbarRow";
+import { type QuickSaveState } from "./SimulatorQuickSave";
 import SimulatorCanvasActions from "./SimulatorCanvasActions";
 import SimulatorPlansModal from "./SimulatorPlansModal";
 import type { Plan, Semester } from "./planTypes";
@@ -364,6 +365,9 @@ export default function Simulator({
     number | null
   >(null);
   const [hasChanges, setHasChanges] = useState(false);
+  // The header quick save's own transient state, so the button can confirm
+  // ("Saved") for a beat after hasChanges has already cleared.
+  const [quickSaveState, setQuickSaveState] = useState<QuickSaveState>("idle");
   const [showPool, setShowPool] = useState(false);
   const [showMajorPreview, setShowMajorPreview] = useState(true);
   // Optional, independently-toggled live add-ons (both OFF by default).
@@ -432,6 +436,10 @@ export default function Simulator({
   const hasInitializedRef = useRef(false);
   const hasChangesRef = useRef(false);
   const currentPlanNameRef = useRef<string | null>(null);
+  // Holds the "Saved" confirmation on screen, and the always-current quick save
+  // action the Cmd+S listener calls (the listener is bound once).
+  const quickSaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const quickSaveShortcutRef = useRef<() => void>(() => {});
 
   // majors / certificates to compute
   const majorIds = useMemo<string[]>(() => userMajors, [userMajors]);
@@ -785,6 +793,24 @@ export default function Simulator({
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [showPlanSelector, showSaveModal, showPlansModal, blockedDrop]);
+
+  // ------------ Cmd+S / Ctrl+S saves the canvas ------------
+  // The Simulator only mounts while it is the dashboard's active tab, so this
+  // listener lives and dies with the tab and never fires from anywhere else.
+  // The browser's own save dialog is always swallowed here, even when there is
+  // nothing to save: offering to write the page to disk is never what the
+  // shortcut meant on this screen. Bound once; the work is read off a ref so
+  // the handler cannot go stale.
+  useEffect(() => {
+    const handleSaveShortcut = (e: KeyboardEvent) => {
+      if (!(e.metaKey || e.ctrlKey) || e.altKey) return;
+      if (e.key.toLowerCase() !== "s") return;
+      e.preventDefault();
+      quickSaveShortcutRef.current();
+    };
+    window.addEventListener("keydown", handleSaveShortcut);
+    return () => window.removeEventListener("keydown", handleSaveShortcut);
+  }, []);
 
   // ------------ Scroll detection for sticky nav ------------
   useEffect(() => {
@@ -1366,14 +1392,20 @@ export default function Simulator({
     }
   };
 
-  const savePlan = async () => {
-    if (!user || !planName.trim()) return;
+  // The one write path for a plan. The modal and the header's quick save both
+  // come through here with an explicit name and overwrite target, so neither
+  // can drift from the other. Returns whether the write landed.
+  const persistPlan = async (
+    name: string,
+    overwriteIndex: number | null,
+  ): Promise<boolean> => {
+    const savedName = name.trim();
+    if (!user || !savedName) return false;
     try {
-      const savedName = planName.trim();
       // First-ever plan auto-becomes the default; overwrites keep their flag.
       const isDefault =
-        selectedPlanToOverwrite !== null
-          ? (savedPlans[selectedPlanToOverwrite]?.isDefault ?? false)
+        overwriteIndex !== null
+          ? (savedPlans[overwriteIndex]?.isDefault ?? false)
           : savedPlans.length === 0;
       const newPlan: Plan = {
         name: savedName,
@@ -1386,10 +1418,8 @@ export default function Simulator({
       };
 
       const updatedPlans: Plan[] =
-        selectedPlanToOverwrite !== null
-          ? savedPlans.map((p, i) =>
-              i === selectedPlanToOverwrite ? newPlan : p,
-            )
+        overwriteIndex !== null
+          ? savedPlans.map((p, i) => (i === overwriteIndex ? newPlan : p))
           : [...savedPlans, newPlan];
 
       await setDoc(
@@ -1402,14 +1432,21 @@ export default function Simulator({
       // Load the saved plan
       loadPlanData(newPlan);
 
-      setPlanName("");
-      setSelectedPlanToOverwrite(null);
-      setShowSaveModal(false);
       toast.success(`Plan "${savedName}" saved!`);
+      return true;
     } catch (error) {
       console.error("Error saving plan:", error);
       toast.error("Failed to save plan");
+      return false;
     }
+  };
+
+  const savePlan = async () => {
+    const saved = await persistPlan(planName, selectedPlanToOverwrite);
+    if (!saved) return;
+    setPlanName("");
+    setSelectedPlanToOverwrite(null);
+    setShowSaveModal(false);
   };
 
   // The save flow, opened from either the canvas verb row or the plans modal.
@@ -1426,6 +1463,52 @@ export default function Simulator({
     setShowPlansModal(false);
     setShowSaveModal(true);
   };
+
+  // One click, no ceremony. On a loaded plan this writes the canvas straight
+  // back into it; with nothing loaded there is no name to write to yet, so it
+  // falls through to the naming modal exactly as before. Everything that says
+  // "save the canvas" in the header, on the grid, or on the keyboard lands
+  // here, so the shortcuts and the buttons cannot drift apart.
+  const quickSave = async () => {
+    if (!user || !hasChanges || quickSaveState === "saving") return;
+    if (loadedPlanIndex < 0) {
+      openSaveModal();
+      return;
+    }
+    setQuickSaveState("saving");
+    const saved = await persistPlan(
+      savedPlans[loadedPlanIndex].name,
+      loadedPlanIndex,
+    );
+    if (!saved) {
+      // persistPlan already surfaced the failure; drop back to Save so the
+      // canvas still reads as unsaved and the click can be retried.
+      setQuickSaveState("idle");
+      return;
+    }
+    setQuickSaveState("saved");
+    if (quickSaveTimerRef.current) clearTimeout(quickSaveTimerRef.current);
+    quickSaveTimerRef.current = setTimeout(
+      () => setQuickSaveState("idle"),
+      1400,
+    );
+  };
+
+  useEffect(
+    () => () => {
+      if (quickSaveTimerRef.current) clearTimeout(quickSaveTimerRef.current);
+    },
+    [],
+  );
+
+  // Refreshed every render so the keydown listener above always runs the
+  // current action. A modal already owns the keyboard when it is open.
+  useEffect(() => {
+    quickSaveShortcutRef.current = () => {
+      if (showSaveModal || showPlansModal || showPlanSelector) return;
+      void quickSave();
+    };
+  });
 
   const loadPlan = (planIndex: number) => {
     if (planIndex < 0 || planIndex >= savedPlans.length) return;
@@ -1558,6 +1641,9 @@ export default function Simulator({
           hasChanges={hasChanges}
           planSelectorDisabled={!user}
           onOpenPlans={() => setShowPlansModal(true)}
+          showQuickSave={!!user && (hasChanges || quickSaveState !== "idle")}
+          quickSaveState={quickSaveState}
+          onQuickSave={quickSave}
         />
       </div>
 
@@ -1695,7 +1781,7 @@ export default function Simulator({
             onToggleHelp={() => setShowHelp((v) => !v)}
             showSave={!!user}
             canSave={hasChanges}
-            onSave={openSaveModal}
+            onSave={quickSave}
             onClear={resetSimulator}
           />
 

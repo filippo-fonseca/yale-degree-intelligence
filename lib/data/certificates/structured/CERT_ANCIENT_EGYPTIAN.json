@@ -14,6 +14,10 @@
     "With adviser approval, an advanced texts seminar and/or graduate seminar may count toward requirements",
     "Up to two courses of credit-bearing academic study abroad may be substituted with prior permission"
   ],
+  "policy": {
+    "minGrade": "B",
+    "sourceNote": "All courses must be taken for a letter grade, and students must achieve a grade of B or above."
+  },
   "requirements": [
     {
       "name": "Courses beyond L3",

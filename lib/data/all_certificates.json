@@ -17,6 +17,10 @@
       "With adviser approval, an advanced texts seminar and/or graduate seminar may count toward requirements",
       "Up to two courses of credit-bearing academic study abroad may be substituted with prior permission"
     ],
+    "policy": {
+      "minGrade": "B",
+      "sourceNote": "All courses must be taken for a letter grade, and students must achieve a grade of B or above."
+    },
     "requirements": [
       {
         "name": "Courses beyond L3",
@@ -46,6 +50,10 @@
       "One LxC course taught in English may count if it includes a weekly discussion section conducted entirely in Greek (minimum three students; course designated LxC)",
       "Up to two study-abroad credits taught in Greek may be substituted with adviser approval"
     ],
+    "policy": {
+      "minGrade": "B",
+      "sourceNote": "All courses must be taken for a letter grade, and students must achieve a grade of B or above."
+    },
     "requirements": [
       {
         "name": "Courses beyond L4",
@@ -75,6 +83,10 @@
       "One LxC course taught in English may count if it includes a weekly discussion section conducted entirely in Chinese (minimum three students; course designated LxC)",
       "Up to two study-abroad credits taught in Chinese may be substituted with adviser approval"
     ],
+    "policy": {
+      "minGrade": "B",
+      "sourceNote": "All courses must be taken for a letter grade, and students must achieve a grade of B or above."
+    },
     "requirements": [
       {
         "name": "Courses beyond L4",
@@ -749,6 +761,10 @@
       "One LxC course taught in English may count if it includes a weekly discussion section conducted entirely in French and the student completes all readings and assignments in French",
       "Up to two study-abroad courses taught in French may count as electives with DUS approval"
     ],
+    "policy": {
+      "minGrade": "B",
+      "sourceNote": "All courses must be taken for a letter grade, and students must achieve a grade of B or above."
+    },
     "requirements": [
       {
         "name": "Courses beyond L4",
@@ -777,6 +793,10 @@
       "One LxC course taught in English may count if it includes a weekly discussion section conducted entirely in German (minimum three students; course designated LxC)",
       "Up to two study-abroad credits taught in German may be substituted with adviser approval"
     ],
+    "policy": {
+      "minGrade": "B",
+      "sourceNote": "All courses must be taken for a letter grade, and students must achieve a grade of B or above."
+    },
     "requirements": [
       {
         "name": "Courses beyond L4",
@@ -860,6 +880,10 @@
       "One LxC course taught in English may count if it includes a weekly discussion section conducted entirely in Hindi (minimum three students; course designated LxC)",
       "Up to two study-abroad credits taught in Hindi may be substituted with adviser approval"
     ],
+    "policy": {
+      "minGrade": "B",
+      "sourceNote": "All courses must be taken for a letter grade, and students must achieve a grade of B or above."
+    },
     "requirements": [
       {
         "name": "Courses beyond L4",
@@ -1003,6 +1027,10 @@
       "With adviser approval, up to one course conducted in Indonesian at the appropriate advanced level may count (e.g., INDN 4700 or INDN 4710 graded pass/fail, or graduate seminar INDN 5700)",
       "Up to two study-abroad credits taught in Indonesian may be substituted with adviser approval"
     ],
+    "policy": {
+      "minGrade": "B",
+      "sourceNote": "All courses must be taken for a letter grade, and students must achieve a grade of B or above."
+    },
     "requirements": [
       {
         "name": "Courses beyond L4",
@@ -1048,6 +1076,10 @@
       "One LxC course taught in English may count if it includes a weekly discussion section conducted entirely in isiZulu (minimum three students; course designated LxC)",
       "Up to two study-abroad credits taught in isiZulu may be substituted with adviser approval"
     ],
+    "policy": {
+      "minGrade": "B",
+      "sourceNote": "All courses must be taken for a letter grade, and students must achieve a grade of B or above."
+    },
     "requirements": [
       {
         "name": "Courses beyond L4",
@@ -1138,6 +1170,10 @@
       "One LxC course taught in English may count if it includes a weekly discussion section conducted entirely in Italian (minimum three students; course designated LxC)",
       "Up to two study-abroad credits taught in Italian may be substituted with adviser approval"
     ],
+    "policy": {
+      "minGrade": "B",
+      "sourceNote": "All courses must be taken for a letter grade, and students must achieve a grade of B or above."
+    },
     "requirements": [
       {
         "name": "Courses beyond L4",
@@ -1167,6 +1203,10 @@
       "One LxC course taught in English may count if it includes a weekly discussion section conducted entirely in Japanese (minimum three students; course designated LxC)",
       "Up to two study-abroad credits taught in Japanese may be substituted with adviser approval"
     ],
+    "policy": {
+      "minGrade": "B",
+      "sourceNote": "All courses must be taken for a letter grade, and students must achieve a grade of B or above."
+    },
     "requirements": [
       {
         "name": "Courses beyond L4",
@@ -1195,6 +1235,10 @@
       "One LxC course taught in English may count if it includes a weekly discussion section conducted entirely in Kiswahili (minimum three students; course designated LxC)",
       "Up to two study-abroad credits taught in Kiswahili may be substituted with adviser approval"
     ],
+    "policy": {
+      "minGrade": "B",
+      "sourceNote": "All courses must be taken for a letter grade, and students must achieve a grade of B or above."
+    },
     "requirements": [
       {
         "name": "Courses beyond L4",
@@ -1223,6 +1267,10 @@
       "One LxC course taught in English may count if it includes a weekly discussion section conducted entirely in Korean (minimum three students; course designated LxC)",
       "Up to two study-abroad credits taught in Korean may be substituted with adviser approval"
     ],
+    "policy": {
+      "minGrade": "B",
+      "sourceNote": "All courses must be taken for a letter grade, and students must achieve a grade of B or above."
+    },
     "requirements": [
       {
         "name": "Courses beyond L4",
@@ -1252,6 +1300,10 @@
       "One LxC course taught in English may count if it includes a weekly discussion section conducted entirely in Latin (minimum three students; course designated LxC)",
       "Up to two study-abroad credits taught in Latin may be substituted with adviser approval"
     ],
+    "policy": {
+      "minGrade": "B",
+      "sourceNote": "All courses must be taken for a letter grade, and students must achieve a grade of B or above."
+    },
     "requirements": [
       {
         "name": "Courses beyond L4",
@@ -1316,6 +1368,10 @@
       "One LxC course taught in English may count if it includes a weekly discussion section conducted entirely in Arabic (minimum three students; course designated LxC)",
       "Up to two study-abroad credits taught in Arabic may be substituted with adviser approval"
     ],
+    "policy": {
+      "minGrade": "B",
+      "sourceNote": "All courses must be taken for a letter grade, and students must achieve a grade of B or above."
+    },
     "requirements": [
       {
         "name": "Courses beyond L4",
@@ -1344,6 +1400,10 @@
       "One LxC course taught in English may count if it includes a weekly discussion section conducted entirely in Hebrew (minimum three students; course designated LxC)",
       "Up to two study-abroad credits taught in Hebrew may be substituted with adviser approval"
     ],
+    "policy": {
+      "minGrade": "B",
+      "sourceNote": "All courses must be taken for a letter grade, and students must achieve a grade of B or above."
+    },
     "requirements": [
       {
         "name": "Courses beyond L4",
@@ -1372,6 +1432,10 @@
       "One LxC course taught in English may count if it includes a weekly discussion section conducted entirely in Turkish (minimum three students; course designated LxC)",
       "Up to two study-abroad credits taught in Turkish may be substituted with adviser approval"
     ],
+    "policy": {
+      "minGrade": "B",
+      "sourceNote": "All courses must be taken for a letter grade, and students must achieve a grade of B or above."
+    },
     "requirements": [
       {
         "name": "Courses beyond L4",
@@ -1483,6 +1547,10 @@
       "With adviser approval, one advanced non-L5 course conducted in Portuguese (e.g., independent study graded pass/fail, graduate seminar, or advanced seminar) may count",
       "One credit from a Yale or Yale-designated study-abroad program taught in Portuguese may be substituted with adviser approval"
     ],
+    "policy": {
+      "minGrade": "B",
+      "sourceNote": "All courses must be taken for a letter grade, and students must achieve a grade of B or above."
+    },
     "requirements": [
       {
         "name": "Courses beyond L4",
@@ -1750,6 +1818,10 @@
       "One LxC course taught in English may count if it includes a weekly discussion section conducted entirely in Russian (minimum three students; course designated LxC)",
       "Up to two study-abroad credits taught in Russian may be substituted with adviser approval"
     ],
+    "policy": {
+      "minGrade": "B",
+      "sourceNote": "All courses must be taken for a letter grade, and students must achieve a grade of B or above."
+    },
     "requirements": [
       {
         "name": "Courses beyond L4",
@@ -1775,6 +1847,10 @@
       "Letter grade B or above required in all courses",
       "Declare candidacy on Yale Hub as early as possible, no later than January 15 or September 15 of final semester"
     ],
+    "policy": {
+      "minGrade": "B",
+      "sourceNote": "All courses must be taken for a letter grade, and students must achieve a grade of B or above."
+    },
     "requirements": [
       {
         "name": "Courses beyond L3",
@@ -1807,6 +1883,10 @@
       "Yale study-abroad courses designated L5 may count toward the certificate",
       "One credit from a non-Yale study-abroad program taught in Spanish may be substituted with adviser approval"
     ],
+    "policy": {
+      "minGrade": "B",
+      "sourceNote": "All courses must be taken for a letter grade, and students must achieve a grade of B or above."
+    },
     "requirements": [
       {
         "name": "Courses beyond L4",
@@ -1941,6 +2021,10 @@
       "With adviser approval, up to two advanced non-L5 Yale courses conducted in Vietnamese may count (e.g., VIET 4700 or VIET 4710 graded pass/fail, or an advanced seminar); only one pass/fail independent study course may count",
       "Up to two study-abroad credits taught in Vietnamese may be substituted with adviser approval"
     ],
+    "policy": {
+      "minGrade": "B",
+      "sourceNote": "All courses must be taken for a letter grade, and students must achieve a grade of B or above."
+    },
     "requirements": [
       {
         "name": "Courses beyond L4",
@@ -1982,6 +2066,10 @@
       "One LxC course taught in English may count if it includes a weekly discussion section conducted entirely in Yoruba (minimum three students; course designated LxC)",
       "Up to two study-abroad credits taught in Yoruba may be substituted with adviser approval"
     ],
+    "policy": {
+      "minGrade": "B",
+      "sourceNote": "All courses must be taken for a letter grade, and students must achieve a grade of B or above."
+    },
     "requirements": [
       {
         "name": "Courses beyond L4",

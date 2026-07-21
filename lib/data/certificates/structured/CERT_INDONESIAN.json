@@ -14,6 +14,10 @@
     "With adviser approval, up to one course conducted in Indonesian at the appropriate advanced level may count (e.g., INDN 4700 or INDN 4710 graded pass/fail, or graduate seminar INDN 5700)",
     "Up to two study-abroad credits taught in Indonesian may be substituted with adviser approval"
   ],
+  "policy": {
+    "minGrade": "B",
+    "sourceNote": "All courses must be taken for a letter grade, and students must achieve a grade of B or above."
+  },
   "requirements": [
     {
       "name": "Courses beyond L4",

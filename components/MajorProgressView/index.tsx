@@ -626,6 +626,10 @@ export default function MajorProgressView({
         data-tour="major-progress-bar"
         className="p-3 rounded-xl bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 border border-gray-200 dark:border-gray-800/50 shadow-neu"
       >
+        {/* Same light-mode ramp the certificate bar uses: purple-400 sits at
+            2.1:1 on the gray-200 track, which is too faint to show where the
+            in-progress fill ends. Light steps both fills down; dark: keeps the
+            shades this bar has always had. */}
         <div className="relative w-full bg-gray-200 dark:bg-gray-800 rounded-full h-3 overflow-hidden shadow-[inset_0_1px_2px_rgba(0,0,0,0.08)] dark:shadow-[inset_0_1px_2px_rgba(0,0,0,0.3)]">
           {/* Lighter in-progress segment sits behind, only in the +In Progress view. */}
           {showInProgressStats && (
@@ -634,7 +638,7 @@ export default function MajorProgressView({
               initial={{ width: 0 }}
               animate={{ width: `${withInProgressPercentage}%` }}
               transition={{ duration: 1, ease: "easeOut" }}
-              className="absolute inset-y-0 left-0 rounded-full bg-purple-400 dark:bg-purple-500/70"
+              className="absolute inset-y-0 left-0 rounded-full bg-purple-500 dark:bg-purple-500/70"
             />
           )}
           {/* Solid completed segment paints on top. Re-keyed per mode so it
@@ -645,7 +649,7 @@ export default function MajorProgressView({
             initial={{ width: 0 }}
             animate={{ width: `${completionPercentage}%` }}
             transition={{ duration: 1, ease: "easeOut" }}
-            className="absolute inset-y-0 left-0 rounded-full bg-violet-500 shadow-[0_0_10px_rgba(139,92,246,0.6)]"
+            className="absolute inset-y-0 left-0 rounded-full bg-violet-700 dark:bg-violet-500 shadow-[0_0_10px_rgba(139,92,246,0.6)]"
           />
         </div>
 

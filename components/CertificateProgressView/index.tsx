@@ -750,6 +750,11 @@ export default function CertificateProgressView({
         data-tour="certificate-progress-bar"
         className="p-3 rounded-xl bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 border border-gray-200 dark:border-gray-800/50 shadow-neu"
       >
+        {/* Light mode needs its own teal ramp. The dark shades read against a
+            near-black card, but on the light gray-200 track a teal-400 fill is
+            only 1.5:1, so the far edge of the bar (how far along you are) all
+            but disappears. Both fills step down two stops in light mode and
+            keep their original values under dark:. */}
         <div className="relative w-full bg-gray-200 dark:bg-gray-800 rounded-full h-3 overflow-hidden shadow-[inset_0_1px_2px_rgba(0,0,0,0.08)] dark:shadow-[inset_0_1px_2px_rgba(0,0,0,0.3)]">
           {showInProgressStats && (
             <motion.div
@@ -757,7 +762,7 @@ export default function CertificateProgressView({
               initial={{ width: 0 }}
               animate={{ width: `${withInProgressPercentage}%` }}
               transition={{ duration: 1, ease: "easeOut" }}
-              className="absolute inset-y-0 left-0 rounded-full bg-teal-400 dark:bg-teal-500/70"
+              className="absolute inset-y-0 left-0 rounded-full bg-teal-600 dark:bg-teal-500/70"
             />
           )}
           <motion.div
@@ -765,7 +770,7 @@ export default function CertificateProgressView({
             initial={{ width: 0 }}
             animate={{ width: `${completionPercentage}%` }}
             transition={{ duration: 1, ease: "easeOut" }}
-            className="absolute inset-y-0 left-0 rounded-full bg-teal-500 shadow-[0_0_10px_rgba(20,184,166,0.6)]"
+            className="absolute inset-y-0 left-0 rounded-full bg-teal-800 dark:bg-teal-500 shadow-[0_0_10px_rgba(20,184,166,0.6)]"
           />
         </div>
 

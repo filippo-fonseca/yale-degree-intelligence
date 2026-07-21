@@ -771,13 +771,22 @@ function ReqSection({
                   )}
               </div>
 
+              {/* A refused claim is not a warning, it is credit the student
+                  does not have. Amber is reserved for things that still count
+                  (planned, and the engine's warn verdicts), so this reads as
+                  switched off: muted fill, struck code, and the plain words
+                  for what happened. */}
               {conflicts.map((note) => (
                 <div key={`conflict-${note.code}`} className="mt-1">
-                  <span className="inline-flex items-center text-[10px] px-1.5 py-0.5 rounded-full border bg-amber-100 dark:bg-amber-900/20 text-amber-700 dark:text-amber-300 border-amber-300 dark:border-amber-800/50">
-                    {note.code}
-                    <span className="ml-0.5 text-amber-500/80">conflict</span>
+                  <span className="inline-flex items-center text-[10px] px-1.5 py-0.5 rounded-full border bg-zinc-100 dark:bg-zinc-800/40 text-zinc-500 dark:text-zinc-400 border-zinc-300 dark:border-zinc-700/50 opacity-90">
+                    <span className="line-through decoration-zinc-400/70 dark:decoration-zinc-500/70">
+                      {note.code}
+                    </span>
+                    <span className="ml-1 text-zinc-500 dark:text-zinc-400">
+                      not counted
+                    </span>
                   </span>
-                  <div className="text-[10px] text-amber-600 dark:text-amber-400 mt-0.5">
+                  <div className="text-[10px] text-zinc-500 dark:text-zinc-400 mt-0.5">
                     {note.text}
                   </div>
                 </div>

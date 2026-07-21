@@ -118,11 +118,20 @@ export default function CertificateProgressView({
   progress,
   onRequirementChange,
   courses,
+  userMajors = [],
+  userCertificates = [],
 }: {
   selectedCertificate: string;
   progress: CertificateProgress;
   onRequirementChange: () => void;
   courses: Course[];
+  /**
+   * Declared programs. The certificate view is the one surface that has to
+   * reason across programs (eligibility, overlap budget, stored conflicts), and
+   * nothing below app/page.tsx can see the student's majors otherwise.
+   */
+  userMajors?: string[];
+  userCertificates?: string[];
 }) {
   const { user } = useAuth();
   const [showInProgressStats, setShowInProgressStats] = useState(false);
@@ -818,6 +827,8 @@ export default function CertificateProgressView({
         onSuccess={onRequirementChange}
         userCourses={courses}
         programType="certificate"
+        userMajors={userMajors}
+        userCertificates={userCertificates}
       />
 
       <RequirementModal

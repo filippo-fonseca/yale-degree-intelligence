@@ -2109,6 +2109,8 @@ export default function Home() {
                       progress={getMajorProgress()!}
                       onRequirementChange={fetchCourses}
                       courses={courses}
+                      userMajors={programPolicyOptions.majorIds}
+                      userCertificates={programPolicyOptions.certificateIds}
                     />
                   ) : (
                     <div className="flex flex-col items-center justify-center py-16 text-center">
@@ -2194,6 +2196,8 @@ export default function Home() {
                       progress={getCertificateProgress()!}
                       onRequirementChange={fetchCourses}
                       courses={courses}
+                      userMajors={programPolicyOptions.majorIds}
+                      userCertificates={programPolicyOptions.certificateIds}
                     />
                   ) : (
                     <div className="flex flex-col items-center justify-center py-16 text-center">

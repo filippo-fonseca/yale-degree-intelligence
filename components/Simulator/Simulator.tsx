@@ -1695,18 +1695,22 @@ export default function Simulator({
             style={{ top: toolbarHeight + 8 }}
             data-tour="simulator-course-pool"
           >
-            <div className="bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-pink-950/30 dark:via-gray-900/50 dark:to-gray-950/50 backdrop-blur-md rounded-xl border border-pink-200 dark:border-pink-800/30 shadow-[inset_0_1px_0_rgba(255,255,255,0.04),0_4px_16px_rgba(0,0,0,0.08)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.04),0_4px_16px_rgba(0,0,0,0.25)] overflow-hidden">
+            {/* No overflow-hidden here: the info tooltip escapes the card, so
+                corner clipping lives on the button itself instead. */}
+            <div className="bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-pink-950/30 dark:via-gray-900/50 dark:to-gray-950/50 backdrop-blur-md rounded-xl border border-pink-200 dark:border-pink-800/30 shadow-[inset_0_1px_0_rgba(255,255,255,0.04),0_4px_16px_rgba(0,0,0,0.08)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.04),0_4px_16px_rgba(0,0,0,0.25)]">
               <button
                 onClick={() => setShowPool(!showPool)}
                 className={`flex items-center justify-between w-full p-3 ${
-                  showPool ? "border-b border-pink-200 dark:border-pink-800/30" : ""
+                  showPool
+                    ? "rounded-t-xl border-b border-pink-200 dark:border-pink-800/30"
+                    : "rounded-xl"
                 } text-gray-700 dark:text-gray-300 hover:bg-black/[0.04] dark:hover:bg-white/[0.06] transition-colors`}
               >
                 <div className="flex items-center gap-2 font-medium text-sm">
                   <div>Quick-add: Pool of remaining courses from your major</div>
                   <div className="relative group">
                     <Info className="h-3.5 w-3.5 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition-colors cursor-pointer" />
-                    <div className="absolute z-50 bottom-full mt-2 left-1/2 -translate-x-1/2 bg-white dark:bg-gray-900/95 backdrop-blur-sm text-gray-700 dark:text-gray-300 text-[10px] px-2 py-1 rounded-md border border-gray-200 dark:border-gray-800/50 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+                    <div className="absolute z-50 bottom-full mb-1.5 left-1/2 -translate-x-1/2 bg-white dark:bg-gray-900/95 backdrop-blur-sm text-gray-700 dark:text-gray-300 text-[10px] px-2 py-1 rounded-md border border-gray-200 dark:border-gray-800/50 shadow-md opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
                       May not include all. Add manually if not.
                     </div>
                   </div>

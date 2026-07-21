@@ -43,6 +43,7 @@ import {
   buildProgramClaimContext,
   filterCertificateManualEntries,
   getMajorBlockedCodes,
+  type ProgramClaimOptions,
 } from "@/lib/utils/programClaims";
 import type { Allocation } from "@/lib/certificatePolicy";
 
@@ -187,6 +188,94 @@ function findMatchedRequirements(
   }
 
   return matches;
+}
+
+/**
+ * Everything the policy engine needs to judge a plan.
+ *
+ * Plan-scoped assignments live only in simulator state, so they reach the
+ * engine as extra allocations: the preview, the assign modal, and the
+ * requirements breakdown then all rest on the same picture the student is
+ * looking at, and none of them has to work out policy on its own.
+ *
+ * Planned courses that auto-match a major become major allocations, because
+ * auto-matching prefers majors. The ones that only match a certificate are
+ * returned separately: they cannot count toward a major at all, which is a
+ * blocked code rather than an allocation.
+ */
+function buildSimulatorPolicyInputs(
+  majorIds: string[],
+  certificateIds: string[],
+  simulatorManualReqs: ManualRequirementEntry[],
+  plannedCodes: string[],
+): {
+  policyOptions: ProgramClaimOptions;
+  majorManuals: ManualRequirementEntry[];
+  certificateManuals: ManualRequirementEntry[];
+  certificateOnlyPlannedCodes: string[];
+} {
+  const majorManuals = simulatorManualReqs.filter(
+    (m) => m.programType === "major" || !m.programType,
+  );
+  const certificateManuals = simulatorManualReqs.filter(
+    (m) => m.programType === "certificate",
+  );
+
+  // Prefer majors for auto-matched planned courses that hit both catalogs.
+  // Explicit certificate assignment still wins via certificateManuals.
+  const certAssignedCodes = new Set(
+    certificateManuals.map((m) => getCanonicalCode(m.code) || m.code),
+  );
+  const majorAssignedCodes = new Set(
+    majorManuals.map((m) => getCanonicalCode(m.code) || m.code),
+  );
+  const plannedAutoMajorAllocations: Allocation[] = [];
+  const certificateOnlyPlannedCodes: string[] = [];
+  for (const code of plannedCodes) {
+    const canon = getCanonicalCode(code) || code;
+    if (certAssignedCodes.has(canon) || majorAssignedCodes.has(canon)) continue;
+    const matches = findMatchedRequirements(code, majorIds, certificateIds);
+    const majorMatch = matches.find((m) => m.programType === "major");
+    const certMatch = matches.find((m) => m.programType === "certificate");
+    if (majorMatch) {
+      plannedAutoMajorAllocations.push({
+        courseCode: canon,
+        program: { type: "major", id: majorMatch.programId },
+        requirementTitle: majorMatch.requirementName,
+      });
+    } else if (certMatch) {
+      certificateOnlyPlannedCodes.push(canon);
+    }
+  }
+
+  return {
+    policyOptions: {
+      majorIds,
+      certificateIds,
+      extraAllocations: [
+        ...majorManuals.map((m) => ({
+          courseCode: m.code,
+          program: {
+            type: "major" as const,
+            id: m.programId ?? majorIds[0] ?? "",
+          },
+          requirementTitle: m.requirement,
+        })),
+        ...certificateManuals.map((m) => ({
+          courseCode: m.code,
+          program: {
+            type: "certificate" as const,
+            id: m.programId ?? certificateIds[0] ?? "",
+          },
+          requirementTitle: m.requirement,
+        })),
+        ...plannedAutoMajorAllocations,
+      ],
+    },
+    majorManuals,
+    certificateManuals,
+    certificateOnlyPlannedCodes,
+  };
 }
 
 type PlannedCoursePick = Pick<Course, "code" | "status"> & {
@@ -396,7 +485,9 @@ export default function Simulator({
     for (const majorId of majorIds) {
       const major = majorRequirements[majorId];
       if (!major) continue;
-      for (const code of collectRequirementOptionCodes(major.requirements)) {
+      for (const code of Array.from(
+        collectRequirementOptionCodes(major.requirements),
+      )) {
         allOptionCodes.add(code);
       }
     }
@@ -404,7 +495,9 @@ export default function Simulator({
     for (const certId of certificateIds) {
       const cert = certificateRequirements[certId];
       if (!cert) continue;
-      for (const code of collectRequirementOptionCodes(cert.requirements)) {
+      for (const code of Array.from(
+        collectRequirementOptionCodes(cert.requirements),
+      )) {
         allOptionCodes.add(code);
       }
     }
@@ -771,6 +864,20 @@ export default function Simulator({
     [plannedNow],
   );
 
+  // The same engine inputs the preview runs on, handed to the surfaces that
+  // render policy so a verdict in the assign modal can never disagree with the
+  // numbers in the breakdown.
+  const policyOptions = useMemo<ProgramClaimOptions>(
+    () =>
+      buildSimulatorPolicyInputs(
+        majorIds,
+        certificateIds,
+        simulatorManualReqs,
+        plannedCodes,
+      ).policyOptions,
+    [majorIds, certificateIds, simulatorManualReqs, plannedCodes],
+  );
+
   // ------------ Live add-on derived props (no effects) ------------
   // Chronological, term-keyed GPA timeline: completed transcript courses merged
   // with planned sim courses under a shared `${semester} ${year}` key.
@@ -875,74 +982,17 @@ export default function Simulator({
     const plannedCodesLocal = plannedCodes;
     const skippedCodes: string[] = [];
 
-    const simulatorMajorManuals = simulatorManualReqs.filter(
-      (m) => m.programType === "major" || !m.programType,
-    );
-    const simulatorCertificateManuals = simulatorManualReqs.filter(
-      (m) => m.programType === "certificate",
-    );
-
-    // Prefer majors for auto-matched planned courses that hit both catalogs.
-    // Explicit certificate assignment still wins via simulatorCertificateManuals.
-    const certAssignedCodes = new Set(
-      simulatorCertificateManuals.map(
-        (m) => getCanonicalCode(m.code) || m.code,
-      ),
-    );
-    const majorAssignedCodes = new Set(
-      simulatorMajorManuals.map((m) => getCanonicalCode(m.code) || m.code),
-    );
-    const plannedAutoMajorAllocations: Allocation[] = [];
-    const plannedAutoCertificateOnlyCodes: string[] = [];
-    for (const code of plannedCodesLocal) {
-      const canon = getCanonicalCode(code) || code;
-      if (certAssignedCodes.has(canon) || majorAssignedCodes.has(canon)) {
-        continue;
-      }
-      const matches = findMatchedRequirements(
-        code,
-        majorIds,
-        certificateIds,
-      );
-      const majorMatch = matches.find((m) => m.programType === "major");
-      const certMatch = matches.find((m) => m.programType === "certificate");
-      if (majorMatch) {
-        plannedAutoMajorAllocations.push({
-          courseCode: canon,
-          program: { type: "major", id: majorMatch.programId },
-          requirementTitle: majorMatch.requirementName,
-        });
-      } else if (certMatch) {
-        plannedAutoCertificateOnlyCodes.push(canon);
-      }
-    }
-
-    // Plan-scoped assignments live only in simulator state, so hand them to the
-    // policy engine as extra allocations. Everything the engine decides for this
-    // preview then rests on the same picture the student is looking at.
-    const policyOptions = {
+    const {
+      policyOptions,
+      majorManuals: simulatorMajorManuals,
+      certificateManuals: simulatorCertificateManuals,
+      certificateOnlyPlannedCodes: plannedAutoCertificateOnlyCodes,
+    } = buildSimulatorPolicyInputs(
       majorIds,
       certificateIds,
-      extraAllocations: [
-        ...simulatorMajorManuals.map((m) => ({
-          courseCode: m.code,
-          program: {
-            type: "major" as const,
-            id: m.programId ?? majorIds[0] ?? "",
-          },
-          requirementTitle: m.requirement,
-        })),
-        ...simulatorCertificateManuals.map((m) => ({
-          courseCode: m.code,
-          program: {
-            type: "certificate" as const,
-            id: m.programId ?? certificateIds[0] ?? "",
-          },
-          requirementTitle: m.requirement,
-        })),
-        ...plannedAutoMajorAllocations,
-      ],
-    };
+      simulatorManualReqs,
+      plannedCodesLocal,
+    );
     const claimContext = buildProgramClaimContext(
       completedCourses,
       policyOptions,
@@ -1502,6 +1552,8 @@ export default function Simulator({
                 certificatePreviewProgress={certificatePreviewProgress}
                 plannedCodes={plannedCodes}
                 simulatorManualReqs={simulatorManualReqs}
+                courses={completedCourses}
+                policyOptions={policyOptions}
                 onRemoveManualReq={(code, requirement) => {
                   setSimulatorManualReqs((prev) =>
                     prev.filter(
@@ -2108,6 +2160,8 @@ export default function Simulator({
         certificateIds={certificateIds}
         previewProgress={previewProgress}
         certificatePreviewProgress={certificatePreviewProgress}
+        courses={completedCourses}
+        policyOptions={policyOptions}
         onAssign={(entry) => {
           setSimulatorManualReqs((prev) => [...prev, entry]);
           setManualAssignPending(null);

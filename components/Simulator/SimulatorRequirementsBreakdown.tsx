@@ -3,13 +3,55 @@
 import React, { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FiChevronDown, FiChevronUp, FiX } from "react-icons/fi";
-import { getCanonicalCode } from "@/lib/courseCatalog";
+import { getCanonicalCode, normalizeCourseCode } from "@/lib/courseCatalog";
 import { MAJORS, MajorProgress, ManualRequirementEntry } from "@/lib/majors";
 import { CERTIFICATES, type CertificateProgress } from "@/lib/certificates";
+import { Course } from "@/lib/types";
+import { programLabel, resolvePolicy } from "@/lib/certificatePolicy";
+import {
+  buildProgramClaimContext,
+  getCertificateOverlapBudget,
+  getCertificateViolations,
+  type ProgramClaimOptions,
+} from "@/lib/utils/programClaims";
 
 type ProgressData = MajorProgress | CertificateProgress;
 type CompletedRequirement = MajorProgress["completedRequirements"][number];
 type Accent = "purple" | "teal";
+
+/** A conflict or a skipped auto-match, hung on the requirement it affects. */
+type RequirementNote = { code: string; text: string };
+
+type CertificatePolicyView = {
+  /** Mono microcopy for the stat row: `overlap 1/2`, or `no overlap`. */
+  meter: string | null;
+  /** Stored or plan-scoped claims the audit refuses, by requirement name. */
+  conflicts: Map<string, RequirementNote[]>;
+  /** Courses auto-matching handed to another program, by requirement name. */
+  skips: Map<string, RequirementNote[]>;
+};
+
+/**
+ * Catalog program names carry their degree ("Computer Science, B.S."), which
+ * reads badly mid-sentence in the skip note. Only the copy is shortened; every
+ * verdict reason still arrives from the engine untouched.
+ */
+function shortProgramName(name: string): string {
+  return name.replace(/,\s*B\.[AS]\.?.*$/, "").trim();
+}
+
+const noteKey = (code: string, requirement: string) =>
+  `${normalizeCourseCode(code)}::${requirement}`;
+
+function addNote(
+  map: Map<string, RequirementNote[]>,
+  requirement: string,
+  note: RequirementNote,
+) {
+  const existing = map.get(requirement);
+  if (existing) existing.push(note);
+  else map.set(requirement, [note]);
+}
 
 // ---------- SVG ring progress ----------
 function ProgressRing({
@@ -101,6 +143,10 @@ interface SimulatorRequirementsBreakdownProps {
   certificatePreviewProgress: Record<string, CertificateProgress>;
   plannedCodes: string[];
   simulatorManualReqs: ManualRequirementEntry[];
+  /** Stored courses, so the engine sees the claims the student already made. */
+  courses: Course[];
+  /** The plan's engine inputs, built once in the Simulator. */
+  policyOptions: ProgramClaimOptions;
   onRemoveManualReq: (code: string, requirement: string) => void;
 }
 
@@ -111,9 +157,101 @@ export default function SimulatorRequirementsBreakdown({
   certificatePreviewProgress,
   plannedCodes,
   simulatorManualReqs,
+  courses,
+  policyOptions,
   onRemoveManualReq,
 }: SimulatorRequirementsBreakdownProps) {
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
+
+  /**
+   * What the audit says about each certificate in this plan.
+   *
+   * Two different things land on a requirement row and they read differently,
+   * so they are told apart here rather than in the markup. A conflict is a
+   * claim the student made that the audit now refuses. A skip is a course
+   * auto-matching gave to another program, which the student never chose and
+   * should not be scolded for.
+   */
+  const certificatePolicy = useMemo(() => {
+    const byCertificate: Record<string, CertificatePolicyView> = {};
+    if (certificateIds.length === 0) return byCertificate;
+
+    const context = buildProgramClaimContext(courses, policyOptions);
+
+    for (const certId of certificateIds) {
+      const conflicts = new Map<string, RequirementNote[]>();
+      const skips = new Map<string, RequirementNote[]>();
+
+      // Claims the student made by hand, stored or plan-scoped. Anything the
+      // audit refuses that is NOT in here came from auto-matching.
+      const claimed = new Set<string>();
+      for (const course of courses) {
+        for (const manual of course.manualRequirementsFulfilled || []) {
+          if (manual.certificate_id === certId) {
+            claimed.add(noteKey(course.code, manual.requirement_title));
+          }
+        }
+      }
+      for (const allocation of policyOptions.extraAllocations ?? []) {
+        if (
+          allocation.program.type === "certificate" &&
+          allocation.program.id === certId
+        ) {
+          claimed.add(
+            noteKey(allocation.courseCode, allocation.requirementTitle),
+          );
+        }
+      }
+
+      for (const violation of getCertificateViolations(
+        courses,
+        certId,
+        policyOptions,
+      )) {
+        const key = noteKey(violation.courseCode, violation.requirementTitle);
+        if (claimed.has(key)) {
+          addNote(conflicts, violation.requirementTitle, {
+            code: violation.courseCode,
+            text: violation.reason,
+          });
+          continue;
+        }
+        const holder = context.allocations.find(
+          (allocation) =>
+            normalizeCourseCode(allocation.courseCode) ===
+              violation.courseCode &&
+            !(
+              allocation.program.type === "certificate" &&
+              allocation.program.id === certId
+            ),
+        );
+        if (!holder) continue;
+        addNote(skips, violation.requirementTitle, {
+          code: violation.courseCode,
+          text: `${violation.courseCode} not counted: used by your ${shortProgramName(
+            programLabel(holder.program),
+          )} ${holder.program.type}.`,
+        });
+      }
+
+      const policy = resolvePolicy(certId);
+      let meter: string | null = null;
+      if (policy.zeroOverlap) {
+        meter = "no overlap";
+      } else if (policy.overlapCap > 0) {
+        const budget = getCertificateOverlapBudget(
+          courses,
+          certId,
+          policyOptions,
+        );
+        meter = `overlap ${budget.used}/${budget.cap}`;
+      }
+
+      byCertificate[certId] = { meter, conflicts, skips };
+    }
+
+    return byCertificate;
+  }, [certificateIds, courses, policyOptions]);
 
   const toggle = (key: string) =>
     setExpanded((prev) => ({ ...prev, [key]: !prev[key] }));
@@ -208,6 +346,7 @@ export default function SimulatorRequirementsBreakdown({
             onToggle={() => toggle(`cert-${certId}`)}
             isPlanned={isPlanned}
             onRemoveManual={onRemoveManualReq}
+            policy={certificatePolicy[certId]}
           />
         );
       })}
@@ -224,6 +363,7 @@ function ProgramProgressCard({
   onToggle,
   isPlanned,
   onRemoveManual,
+  policy,
 }: {
   programKey: string;
   title: string;
@@ -234,6 +374,7 @@ function ProgramProgressCard({
   onToggle: () => void;
   isPlanned: (code: string) => boolean;
   onRemoveManual: (code: string, requirement: string) => void;
+  policy?: CertificatePolicyView;
 }) {
   const pctCompleted = prog.percentage;
 
@@ -351,6 +492,11 @@ function ProgramProgressCard({
                 </span>
               </span>
             )}
+            {policy?.meter && (
+              <span className="font-mono whitespace-nowrap text-gray-400 dark:text-gray-500">
+                {policy.meter}
+              </span>
+            )}
           </div>
         </div>
 
@@ -398,6 +544,7 @@ function ProgramProgressCard({
                   manualReqs={manualReqs}
                   onRemoveManual={onRemoveManual}
                   isPlanned={isPlanned}
+                  policy={policy}
                 />
               )}
 
@@ -409,6 +556,7 @@ function ProgramProgressCard({
                   manualReqs={manualReqs}
                   onRemoveManual={onRemoveManual}
                   isPlanned={isPlanned}
+                  policy={policy}
                 />
               )}
 
@@ -420,6 +568,7 @@ function ProgramProgressCard({
                   manualReqs={manualReqs}
                   onRemoveManual={onRemoveManual}
                   isPlanned={isPlanned}
+                  policy={policy}
                   showCombinedProgress
                 />
               )}
@@ -432,6 +581,7 @@ function ProgramProgressCard({
                   manualReqs={manualReqs}
                   onRemoveManual={onRemoveManual}
                   isPlanned={isPlanned}
+                  policy={policy}
                 />
               )}
 
@@ -458,6 +608,7 @@ function ReqSection({
   manualReqs,
   onRemoveManual,
   isPlanned,
+  policy,
   showCombinedProgress = false,
 }: {
   title: string;
@@ -466,6 +617,7 @@ function ReqSection({
   manualReqs: ManualRequirementEntry[];
   onRemoveManual: (code: string, requirement: string) => void;
   isPlanned: (code: string) => boolean;
+  policy?: CertificatePolicyView;
   showCombinedProgress?: boolean;
 }) {
   const titleColor: Record<typeof color, string> = {
@@ -492,6 +644,8 @@ function ReqSection({
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
         {reqs.map((req) => {
           const manuals = manualReqs.filter((m) => m.requirement === req.name);
+          const conflicts = policy?.conflicts.get(req.name) ?? [];
+          const skips = policy?.skips.get(req.name) ?? [];
 
           const completedCredits = req.options
             .filter((o) => o.completed)
@@ -586,12 +740,34 @@ function ReqSection({
                   })}
 
                 {req.options.filter((opt) => opt.completed || opt.inProgress)
-                  .length === 0 && (
-                  <span className="text-[10px] text-gray-400 dark:text-gray-600 italic">
-                    none yet
-                  </span>
-                )}
+                  .length === 0 &&
+                  conflicts.length === 0 && (
+                    <span className="text-[10px] text-gray-400 dark:text-gray-600 italic">
+                      none yet
+                    </span>
+                  )}
               </div>
+
+              {conflicts.map((note) => (
+                <div key={`conflict-${note.code}`} className="mt-1">
+                  <span className="inline-flex items-center text-[10px] px-1.5 py-0.5 rounded-full border bg-amber-100 dark:bg-amber-900/20 text-amber-700 dark:text-amber-300 border-amber-300 dark:border-amber-800/50">
+                    {note.code}
+                    <span className="ml-0.5 text-amber-500/80">conflict</span>
+                  </span>
+                  <div className="text-[10px] text-amber-600 dark:text-amber-400 mt-0.5">
+                    {note.text}
+                  </div>
+                </div>
+              ))}
+
+              {skips.map((note) => (
+                <div
+                  key={`skip-${note.code}`}
+                  className="text-[10px] text-zinc-500 dark:text-zinc-400 mt-1"
+                >
+                  {note.text}
+                </div>
+              ))}
             </div>
           );
         })}

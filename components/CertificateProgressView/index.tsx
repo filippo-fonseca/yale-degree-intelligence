@@ -688,21 +688,21 @@ export default function CertificateProgressView({
 
       <div
         data-tour="certificate-view-switcher"
-        className="sticky top-0 z-20 -mx-1 px-1 py-2"
+        className="sticky top-0 z-20 -mx-1 px-1 py-2.5"
       >
         <div className="flex items-center justify-between gap-3 flex-wrap">
-          <div className="flex items-center gap-1.5">
-            <span className="text-[10px] text-gray-400 dark:text-gray-500 uppercase tracking-wider">
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
               View:
             </span>
             <button
               type="button"
               onClick={() => setView("board")}
               data-tour="certificate-board-toggle"
-              className={`px-2.5 py-1 text-[11px] rounded-lg transition-all duration-200 ${
+              className={`px-3.5 py-1.5 text-sm font-medium rounded-xl transition-all duration-200 ${
                 view === "board"
-                  ? "bg-teal-500/15 text-teal-600 dark:text-teal-300 border border-teal-600/40 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]"
-                  : "bg-gray-100 dark:bg-gray-900/50 text-gray-400 dark:text-gray-500 border border-gray-200 dark:border-gray-800/50 hover:text-gray-600 dark:hover:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-800/50"
+                  ? "bg-teal-500/15 text-teal-600 dark:text-teal-200 border border-teal-500/50 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]"
+                  : "bg-gray-100 dark:bg-white/[0.06] text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-white/10 hover:text-gray-800 dark:hover:text-white hover:bg-gray-200 dark:hover:bg-white/[0.1]"
               }`}
             >
               Board
@@ -711,14 +711,14 @@ export default function CertificateProgressView({
               type="button"
               onClick={() => setView("heatmap")}
               data-tour="certificate-heatmap-toggle"
-              className={`inline-flex items-center px-2.5 py-1 text-[11px] rounded-lg transition-all duration-200 ${
+              className={`inline-flex items-center px-3.5 py-1.5 text-sm font-medium rounded-xl transition-all duration-200 ${
                 view === "heatmap"
-                  ? "bg-teal-500/15 text-teal-600 dark:text-teal-300 border border-teal-600/40 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]"
-                  : "bg-gray-100 dark:bg-gray-900/50 text-gray-400 dark:text-gray-500 border border-gray-200 dark:border-gray-800/50 hover:text-gray-600 dark:hover:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-800/50"
+                  ? "bg-teal-500/15 text-teal-600 dark:text-teal-200 border border-teal-500/50 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]"
+                  : "bg-gray-100 dark:bg-white/[0.06] text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-white/10 hover:text-gray-800 dark:hover:text-white hover:bg-gray-200 dark:hover:bg-white/[0.1]"
               }`}
             >
               Heat map
-              <span className="ml-1 px-1 py-0.5 rounded text-[8px] font-semibold uppercase tracking-wide bg-teal-500/20 text-teal-600 dark:text-teal-300 border border-teal-500/40">
+              <span className="ml-1.5 px-1.5 py-0.5 rounded text-[10px] font-semibold uppercase tracking-wide bg-teal-500/20 text-teal-600 dark:text-teal-300 border border-teal-500/40">
                 New
               </span>
             </button>

@@ -136,12 +136,13 @@ export function OnboardingState({
               <span className="font-medium text-gray-700 dark:text-gray-300">
                 By uploading, you voluntarily share your grades.
               </span>{" "}
-              Your transcript PDF is processed locally and is{" "}
+              Your transcript PDF is sent to our server for parsing and is{" "}
               <span className="text-emerald-600 dark:text-emerald-400">
-                never stored
+                not stored
               </span>{" "}
-              on our servers. However, we store your course and grade data in our
-              database (private only to your profile) to provide insights and
+              after extraction. Course text may be sent to OpenAI to extract your
+              courses. We store your course and grade data in our database
+              (private only to your account) to provide insights and
               recommendations for your major. By uploading academic information,
               you confirm that you are providing your own data and consent to its
               storage and processing for academic planning purposes.{" "}

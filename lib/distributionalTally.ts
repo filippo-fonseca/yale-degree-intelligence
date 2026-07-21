@@ -22,11 +22,18 @@ export interface DistTallyResult {
   byRequirement: DistTallyRequirement[];
 }
 
-export function tallyDistributionals(assignments: string[][]): DistTallyResult {
+/** Assignment entry: plain tag list (1 credit each) or tags with explicit credits. */
+export type DistTallyInput = string[] | { codes: string[]; credits?: number };
+
+export function tallyDistributionals(
+  assignments: DistTallyInput[],
+): DistTallyResult {
   const counts: Record<string, number> = {};
-  for (const codes of assignments) {
+  for (const entry of assignments) {
+    const codes = Array.isArray(entry) ? entry : entry.codes;
+    const credits = Array.isArray(entry) ? 1 : entry.credits ?? 1;
     for (const code of codes || []) {
-      counts[code] = (counts[code] || 0) + 1;
+      counts[code] = (counts[code] || 0) + credits;
     }
   }
 

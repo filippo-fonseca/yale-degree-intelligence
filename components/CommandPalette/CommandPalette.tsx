@@ -324,12 +324,20 @@ export default function CommandPalette({
           const hay =
             `${c.codes.join(" ")} ${c.name} ${c.department}`.toLowerCase();
           if (tokens.every((t) => hay.includes(t))) {
+            const offeringBadge =
+              c.isFall && c.isSpring
+                ? "F26 · S27"
+                : c.isFall
+                  ? "F26"
+                  : c.isSpring
+                    ? "S27"
+                    : undefined;
             catalog.push({
               id: `cat-${c.codes[0]}`,
               group: "Course catalog",
               title: c.codes[0],
               subtitle: c.name,
-              badge: c.distributionals?.join(" ") || undefined,
+              badge: offeringBadge,
               icon: <Search size={15} />,
               keywords: hay,
               onRun: () => run(() => onManualAdd()),

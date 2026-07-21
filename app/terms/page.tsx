@@ -51,7 +51,7 @@ export default function TermsOfService() {
           </h2>
           <ul className="list-disc list-inside space-y-1">
             <li>Be a current or former Yale student</li>
-            <li>Log in using your Yale credentials (CAS)</li>
+            <li>Log in using your @yale.edu Google account</li>
             <li>Be at least 13 years old</li>
           </ul>
         </section>

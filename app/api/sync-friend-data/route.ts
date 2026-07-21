@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { adminAuth, adminDb } from "@/config/firebaseAdmin";
+import { requireAuth, isAuthError, rateLimit } from "@/lib/apiAuth";
 import { FieldValue } from "firebase-admin/firestore";
 
 interface PublicCourse {
@@ -10,6 +11,7 @@ interface PublicCourse {
   status: "completed" | "in-progress" | "skipped";
   skipped?: boolean;
   manualRequirementsFulfilled?: { major_id: string; requirement_title: string }[];
+  distributionals?: string[];
 }
 
 /**
@@ -25,14 +27,9 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const authHeader = req.headers.get("Authorization");
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    const idToken = authHeader.split("Bearer ")[1];
-    const decodedToken = await adminAuth.verifyIdToken(idToken);
-    const callerId = decodedToken.uid;
+    const user = await requireAuth(req);
+    if (isAuthError(user)) return user;
+    const callerId = user.uid;
 
     // Get the target user ID from request body
     const { targetUserId } = await req.json();
@@ -42,6 +39,13 @@ export async function POST(req: NextRequest) {
         { status: 400 }
       );
     }
+
+    const limited = rateLimit(
+      `sync-friend:${callerId}:${targetUserId}`,
+      30,
+      60 * 60 * 1000
+    );
+    if (limited) return limited;
 
     // Allow syncing own data or friend's data
     if (callerId !== targetUserId) {
@@ -91,15 +95,23 @@ export async function POST(req: NextRequest) {
 
     // Build public courses array (NO GRADES)
     // Include ALL courses including skipped ones (they count toward requirements)
-    const publicCourses: PublicCourse[] = courses.map((c) => ({
-      code: c.code,
-      semester: c.semester,
-      year: c.year,
-      credits: c.credits,
-      status: c.skipped ? "skipped" : (c.status === "not-taken" ? "completed" : c.status),
-      skipped: c.skipped || false,
-      manualRequirementsFulfilled: c.manualRequirementsFulfilled,
-    }));
+    const publicCourses: PublicCourse[] = courses.map((c) => {
+      const course: PublicCourse = {
+        code: c.code,
+        semester: c.semester,
+        year: c.year,
+        credits: c.credits,
+        status: c.skipped ? "skipped" : (c.status === "not-taken" ? "completed" : c.status),
+        skipped: c.skipped || false,
+      };
+      if (c.manualRequirementsFulfilled?.length) {
+        course.manualRequirementsFulfilled = c.manualRequirementsFulfilled;
+      }
+      if (c.distributionals?.length) {
+        course.distributionals = c.distributionals;
+      }
+      return course;
+    });
 
     // Fetch target user's profile for majors, etc.
     const userDoc = await adminDb.collection("users").doc(targetUserId).get();
@@ -180,6 +192,13 @@ function coursesAreEqual(
       newCourse.manualRequirementsFulfilled || []
     );
     if (existingManual !== newManual) return false;
+    const existingDists = JSON.stringify(
+      [...(existing.distributionals || [])].sort()
+    );
+    const newDists = JSON.stringify(
+      [...(newCourse.distributionals || [])].sort()
+    );
+    if (existingDists !== newDists) return false;
   }
 
   return true;

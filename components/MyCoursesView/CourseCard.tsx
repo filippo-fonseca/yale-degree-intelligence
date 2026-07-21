@@ -137,7 +137,8 @@ export function CourseCard({
         )}
       </div>
 
-      {/* Distributional tags + editor */}
+      {/* Distributional tags + editor (skipped courses don't count) */}
+      {!course.skipped && (
       <div
         className="mt-2.5"
         onClick={(e) => e.stopPropagation()}
@@ -203,6 +204,7 @@ export function CourseCard({
           )}
         </AnimatePresence>
       </div>
+      )}
     </motion.div>
   );
 }

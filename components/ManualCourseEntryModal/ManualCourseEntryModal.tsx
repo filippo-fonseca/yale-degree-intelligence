@@ -3,7 +3,7 @@
 import { useState, useEffect, useMemo, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FiX, FiPlus, FiSearch, FiTrash2, FiCheck, FiEdit3 } from "react-icons/fi";
-import coursesData from "@/lib/new_courses.json";
+import { ALL_COURSES } from "@/lib/courseCatalog";
 import { Course } from "@/lib/types";
 
 interface ManualCourseEntry {
@@ -74,7 +74,7 @@ export default function ManualCourseEntryModal({
 
   // Get all canonical courses for search
   const allCanonicalCourses = useMemo(() => {
-    return (coursesData as any[]).map((course) => ({
+    return ALL_COURSES.map((course) => ({
       ...course,
       canonicalCode: course.codes?.[0],
       allCodes: course.codes,
@@ -240,23 +240,23 @@ export default function ManualCourseEntryModal({
     if (course.isFall && course.isSpring) {
       return (
         <span className="inline-flex items-center gap-1">
-          <span className={boxClasses} title="Offered in Fall">
+          <span className={boxClasses} title="Offered Fall 2026">
             🍁
           </span>
-          <span className={boxClasses} title="Offered in Spring">
+          <span className={boxClasses} title="Offered Spring 2027">
             🌰
           </span>
         </span>
       );
     } else if (course.isFall) {
       return (
-        <span className={boxClasses} title="Offered in Fall">
+        <span className={boxClasses} title="Offered Fall 2026">
           🍁
         </span>
       );
     } else if (course.isSpring) {
       return (
-        <span className={boxClasses} title="Offered in Spring">
+        <span className={boxClasses} title="Offered Spring 2027">
           🌰
         </span>
       );

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
 import { adminAuth, adminDb } from "@/config/firebaseAdmin";
+import { requireAuth, isAuthError, rateLimit } from "@/lib/apiAuth";
 import { loadUserKey, touchKeyUsage } from "@/lib/dan/keyStore";
 import { TOOL_DEFS, executeTool } from "@/lib/dan/tools";
 import { buildStudentData } from "@/lib/dan/studentData";
@@ -34,18 +35,13 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Server configuration error" }, { status: 500 });
   }
 
-  const authHeader = req.headers.get("Authorization");
-  if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const user = await requireAuth(req);
+  if (isAuthError(user)) return user;
 
-  let uid: string;
-  try {
-    const decoded = await adminAuth.verifyIdToken(authHeader.split("Bearer ")[1]);
-    uid = decoded.uid;
-  } catch {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const limited = rateLimit(`dan:${user.uid}`, 60, 60 * 60 * 1000);
+  if (limited) return limited;
+
+  const uid = user.uid;
 
   const apiKey = await loadUserKey(uid);
   if (!apiKey) {

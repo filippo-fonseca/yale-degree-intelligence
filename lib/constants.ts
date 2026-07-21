@@ -1,19 +1,20 @@
 // Distributional pill styling
 export const DIST_PILL_STYLES: Record<string, string> = {
-  Hu: "bg-purple-500/20 text-purple-300 border-purple-500/30",
-  So: "bg-sky-500/20 text-sky-300 border-sky-500/30",
-  Sc: "bg-emerald-500/20 text-emerald-300 border-emerald-500/30",
-  QR: "bg-red-500/20 text-red-300 border-red-500/30",
-  WR: "bg-orange-500/20 text-orange-300 border-orange-500/30",
-  L1: "bg-teal-500/20 text-teal-300 border-teal-500/30",
-  L2: "bg-teal-500/20 text-teal-300 border-teal-500/30",
-  L3: "bg-teal-500/20 text-teal-300 border-teal-500/30",
-  L4: "bg-teal-500/20 text-teal-300 border-teal-500/30",
-  L5: "bg-teal-500/20 text-teal-300 border-teal-500/30",
+  Hu: "bg-purple-500/20 text-purple-700 dark:text-purple-300 border-purple-500/30",
+  So: "bg-sky-500/20 text-sky-700 dark:text-sky-300 border-sky-500/30",
+  Sc: "bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border-emerald-500/30",
+  QR: "bg-red-500/20 text-red-700 dark:text-red-300 border-red-500/30",
+  WR: "bg-orange-500/20 text-orange-700 dark:text-orange-300 border-orange-500/30",
+  L1: "bg-teal-500/20 text-teal-700 dark:text-teal-300 border-teal-500/30",
+  L2: "bg-teal-500/20 text-teal-700 dark:text-teal-300 border-teal-500/30",
+  L3: "bg-teal-500/20 text-teal-700 dark:text-teal-300 border-teal-500/30",
+  L4: "bg-teal-500/20 text-teal-700 dark:text-teal-300 border-teal-500/30",
+  L5: "bg-teal-500/20 text-teal-700 dark:text-teal-300 border-teal-500/30",
 };
 
 export const getDistPillStyle = (code: string) =>
-  DIST_PILL_STYLES[code] || "bg-gray-800/50 text-gray-400 border-gray-700";
+  DIST_PILL_STYLES[code] ||
+  "bg-gray-200/80 dark:bg-gray-800/50 text-gray-600 dark:text-gray-400 border-gray-300 dark:border-gray-700";
 
 // Grade point mapping (Yale's grading scale)
 export const gradePoints: Record<string, number> = {

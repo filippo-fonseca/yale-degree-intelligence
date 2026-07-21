@@ -39,8 +39,12 @@ match /databases/{database}/documents {
       allow create: if isAuthenticated() &&
                       request.resource.data.userId == request.auth.uid;
 
-      allow update, delete: if isAuthenticated() &&
-                              resource.data.userId == request.auth.uid;
+      allow update: if isAuthenticated() &&
+                      resource.data.userId == request.auth.uid &&
+                      request.resource.data.userId == resource.data.userId;
+
+      allow delete: if isAuthenticated() &&
+                      resource.data.userId == request.auth.uid;
     }
 
     // ============================================
@@ -64,10 +68,11 @@ match /databases/{database}/documents {
     // FRIENDS LOOKUP (for efficient rule checks)
     // ============================================
     match /friends_lookup/{friendshipId} {
-      allow read: if isAuthenticated();
+      allow read: if isAuthenticated() &&
+                    request.auth.uid in resource.data.users;
 
-      allow create: if isAuthenticated() &&
-                      request.auth.uid in request.resource.data.users;
+      // Friendship lookup docs must be created via Admin SDK / Cloud Function on accept.
+      allow create: if false;
 
       allow delete: if isAuthenticated() &&
                       request.auth.uid in resource.data.users;
@@ -79,6 +84,9 @@ match /databases/{database}/documents {
     // USERS
     // ============================================
     match /users/{userId} {
+      // Full-collection client reads of users should be avoided; prefer
+      // friends_public_data for discovery and targeted reads for profiles.
+      // Planned restriction: scope reads to own doc or verified friends.
       allow read: if isAuthenticated();
       allow create, update, delete: if isOwner(userId);
     }
@@ -90,8 +98,8 @@ match /databases/{database}/documents {
       allow read, delete: if isAuthenticated() &&
                             request.auth.uid in resource.data.users;
 
-      allow create: if isAuthenticated() &&
-                      request.auth.uid in request.resource.data.users;
+      // Friendship docs must be created via Admin SDK / Cloud Function on accept.
+      allow create: if false;
 
       allow update: if false;
     }

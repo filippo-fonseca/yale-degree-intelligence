@@ -77,10 +77,27 @@ export async function POST(req: NextRequest) {
     );
     await Promise.all(conversationDeletes);
 
-    // 6. Delete friends_public_data for this user
+    // 6. Delete CleoAI conversation history
+    await adminDb.collection("cleoai_conversations").doc(userId).delete();
+
+    // 7. Delete all ai_responses for this user (batched)
+    const aiResponsesSnapshot = await adminDb
+      .collection("ai_responses")
+      .where("userId", "==", userId)
+      .get();
+    const BATCH_SIZE = 500;
+    for (let i = 0; i < aiResponsesSnapshot.docs.length; i += BATCH_SIZE) {
+      const batch = adminDb.batch();
+      aiResponsesSnapshot.docs
+        .slice(i, i + BATCH_SIZE)
+        .forEach((doc) => batch.delete(doc.ref));
+      await batch.commit();
+    }
+
+    // 8. Delete friends_public_data for this user
     await adminDb.collection("friends_public_data").doc(userId).delete();
 
-    // 7. Delete user from Firebase Authentication
+    // 9. Delete user from Firebase Authentication
     await adminAuth.deleteUser(userId);
 
     return NextResponse.json({ success: true });

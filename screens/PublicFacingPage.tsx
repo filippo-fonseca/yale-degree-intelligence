@@ -205,7 +205,7 @@ export default function AboutPage() {
   const gridLineColor = isDark ? "#374151" : "#E5E7EB";
   const pieBorderColor = isDark ? "#0B1120" : "#FFFFFF";
 
-  // §11: no interstitial. Every "Log in with CAS" opens the CAS popup straight
+  // §11: no interstitial. Every login CTA opens the Yale Google popup straight
   // from here. The id tracks which button was pressed so only that one shows a
   // pending state. The yale.edu allowlist stays where it is, inside
   // signInWithGoogle; this layer only reports failures.
@@ -401,7 +401,9 @@ export default function AboutPage() {
               pending={authPendingId === "nav"}
             >
               <span className="sm:hidden">Log in</span>
-              <span className="hidden sm:inline">Log in with CAS</span>
+              <span className="hidden sm:inline">
+                Log in with @yale.edu Google
+              </span>
               <span aria-hidden>→</span>
             </MonoCTA>
           </div>
@@ -576,7 +578,7 @@ export default function AboutPage() {
               onClick={() => startLogin("hero")}
               pending={authPendingId === "hero"}
             >
-              Log in with CAS
+              Log in with @yale.edu Google
             </BrandCTA>
             <GhostCTA onClick={() => setShowVideoModal(true)}>
               Watch the launch film
@@ -1439,11 +1441,11 @@ export default function AboutPage() {
               onClick={() => startLogin("closing")}
               pending={authPendingId === "closing"}
             >
-              Log in with CAS
+              Log in with @yale.edu Google
             </BrandCTA>
           </div>
           <p className="mt-5 font-mono text-xs tracking-tight text-gray-400 dark:text-gray-500">
-            free · instant · yale sso
+            free · instant · yale google
           </p>
         </motion.div>
       </section>
@@ -1709,7 +1711,7 @@ type CTAProps = {
   onClick?: () => void;
   href?: string;
   className?: string;
-  /** §11: the pressed CTA disables itself and says so while CAS is open. */
+  /** §11: the pressed CTA disables itself and says so while the popup is open. */
   pending?: boolean;
 };
 

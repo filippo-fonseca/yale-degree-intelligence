@@ -93,14 +93,17 @@ export const TOOL_DEFS: Anthropic.Tool[] = [
   {
     name: "search_catalog",
     description:
-      "Search the Yale course catalog by free-text query, optionally filtered by department, distributional (Hu/Sc/So/QR/WR/L), or term (fall/spring). Returns matching courses.",
+      "Search the Yale course catalog by free-text query, optionally filtered by department or simulator term (fall = Fall 2026, spring = Spring 2027). Catalog has no distributionals — use list_my_courses for student dists. Returns matching courses.",
     input_schema: {
       type: "object",
       properties: {
         query: { type: "string", description: "Free text matched against code, name, department." },
         dept: { type: "string", description: "Department code filter, e.g. 'CPSC'." },
-        dist: { type: "string", description: "Distributional filter: Hu, Sc, So, QR, WR, or L." },
-        term: { type: "string", enum: ["fall", "spring"], description: "Offering term filter." },
+        term: {
+          type: "string",
+          enum: ["fall", "spring"],
+          description: "Simulator offering filter: fall = Fall 2026, spring = Spring 2027.",
+        },
       },
       required: ["query"],
     },
@@ -108,7 +111,7 @@ export const TOOL_DEFS: Anthropic.Tool[] = [
   {
     name: "get_course",
     description:
-      "Get full details for a single course code: name, credits, department, distributionals, and which terms it is offered next year.",
+      "Get full details for a single course code: name, credits, department, historical offered terms, and whether it is in the Fall 2026 / Spring 2027 simulator pool.",
     input_schema: {
       type: "object",
       properties: { code: { type: "string", description: "Course code, e.g. 'CPSC 223'." } },
@@ -133,15 +136,19 @@ function searchCatalog(input: any) {
   const query = String(input.query || "").toLowerCase().trim();
   const tokens = query.split(/\s+/).filter(Boolean);
   const dept = input.dept ? String(input.dept).toUpperCase() : null;
-  const dist = input.dist ? String(input.dist) : null;
   const term = input.term ? String(input.term) : null;
+
+  const deptNorm = dept === "EENG" ? "ECE" : dept;
 
   const results = ALL_COURSES.filter((c) => {
     const haystack = `${c.codes.join(" ")} ${c.name} ${c.department}`.toLowerCase();
     if (tokens.length && !tokens.every((t) => haystack.includes(t))) return false;
-    if (dept && !c.codes.some((code) => code.toUpperCase().includes(dept)) && c.department.toUpperCase() !== dept)
+    if (
+      deptNorm &&
+      !c.codes.some((code) => code.toUpperCase().includes(deptNorm)) &&
+      c.department.toUpperCase() !== deptNorm
+    )
       return false;
-    if (dist && !(c.distributionals || []).some((d) => d.startsWith(dist))) return false;
     if (term === "fall" && !c.isFall) return false;
     if (term === "spring" && !c.isSpring) return false;
     return true;
@@ -152,8 +159,9 @@ function searchCatalog(input: any) {
     name: c.name,
     credits: c.credits,
     department: c.department,
-    distributionals: c.distributionals || [],
-    terms: [c.isFall ? "fall" : null, c.isSpring ? "spring" : null].filter(Boolean),
+    offered: c.offered,
+    offeredFall: c.isFall === true,
+    offeredSpring: c.isSpring === true,
   }));
 }
 
@@ -206,7 +214,7 @@ export async function executeTool(
           name: info.name,
           credits: info.credits,
           department: info.department,
-          distributionals: info.distributionals || [],
+          offered: info.offered,
           offeredFall: isCourseOfferedInFall(code),
           offeredSpring: isCourseOfferedInSpring(code),
         };

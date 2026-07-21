@@ -10,7 +10,7 @@ import {
   serverTimestamp,
 } from "firebase/firestore";
 import { db } from "@/config/firebase";
-import { Course, PublicCourse } from "@/lib/types";
+import { Course, PublicCourse, DEFAULT_FRIENDS_PROFILE_VISIBILITY } from "@/lib/types";
 
 interface UserProfile {
   majors: string[];
@@ -50,6 +50,9 @@ function coursesAreEqual(
     const existingManual = JSON.stringify(existing.manualRequirementsFulfilled || []);
     const newManual = JSON.stringify(newCourse.manualRequirementsFulfilled || []);
     if (existingManual !== newManual) return false;
+    const existingDists = JSON.stringify([...(existing.distributionals || [])].sort());
+    const newDists = JSON.stringify([...(newCourse.distributionals || [])].sort());
+    if (existingDists !== newDists) return false;
   }
 
   return true;
@@ -93,6 +96,9 @@ export async function syncFriendsPublicData(
       if (c.manualRequirementsFulfilled && c.manualRequirementsFulfilled.length > 0) {
         course.manualRequirementsFulfilled = c.manualRequirementsFulfilled;
       }
+      if (c.distributionals && c.distributionals.length > 0) {
+        course.distributionals = c.distributionals;
+      }
       return course;
     });
 
@@ -103,24 +109,25 @@ export async function syncFriendsPublicData(
       existingData.displayName === (user.displayName || null) &&
       JSON.stringify(existingData.majors || []) === JSON.stringify(userProfile?.majors || []) &&
       JSON.stringify(existingData.certificates || []) === JSON.stringify(userProfile?.certificates || []) &&
-      existingData.graduationYear === (userProfile?.graduationYear || null)
+      existingData.graduationYear === (userProfile?.graduationYear || null) &&
+      existingData.bio === (userProfile?.bio || null)
     ) {
       return; // Data unchanged, skip update
     }
 
-    // Update the public data document
+    // Update the public data document (preserve visibility settings)
     await setDoc(doc(db, "friends_public_data", userId), {
       userId,
       enabled: true,
       enabledAt: existingData.enabledAt || serverTimestamp(),
       updatedAt: serverTimestamp(),
       displayName: user.displayName || null,
-      email: user.email || null,
       photoURL: user.photoURL || null,
       majors: userProfile?.majors || [],
       certificates: userProfile?.certificates || [],
       graduationYear: userProfile?.graduationYear ?? null,
       bio: userProfile?.bio || null,
+      visibility: existingData.visibility ?? undefined,
       courses: publicCourses,
     });
   } catch (error) {
@@ -152,6 +159,9 @@ export async function enableFriendsFeature(
     if (c.manualRequirementsFulfilled && c.manualRequirementsFulfilled.length > 0) {
       course.manualRequirementsFulfilled = c.manualRequirementsFulfilled;
     }
+    if (c.distributionals && c.distributionals.length > 0) {
+      course.distributionals = c.distributionals;
+    }
     return course;
   });
 
@@ -161,13 +171,13 @@ export async function enableFriendsFeature(
     enabledAt: serverTimestamp(),
     updatedAt: serverTimestamp(),
     displayName: user.displayName || null,
-    email: user.email || null,
     photoURL: user.photoURL || null,
     majors: userProfile?.majors || [],
     certificates: userProfile?.certificates || [],
     graduationYear: userProfile?.graduationYear ?? null,
     bio: userProfile?.bio || null,
     courses: publicCourses,
+    visibility: { ...DEFAULT_FRIENDS_PROFILE_VISIBILITY },
   });
 }
 

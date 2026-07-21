@@ -8,6 +8,7 @@ import {
   signOut,
 } from "firebase/auth";
 import { auth, googleProvider, isFirebaseConfigured } from "@/config/firebase";
+import { isAdminEmail } from "@/lib/admin";
 
 type AuthContextType = {
   user: User | null;
@@ -23,9 +24,30 @@ const AuthContext = createContext<AuthContextType>({
   logout: async () => {},
 });
 
+function isAllowedEmail(email: string | null | undefined): boolean {
+  if (!email) return false;
+  if (email.endsWith("@yale.edu")) return true;
+  if (
+    process.env.NODE_ENV === "development" &&
+    isAdminEmail(email)
+  ) {
+    return true;
+  }
+  return false;
+}
+
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+
+  const logout = async () => {
+    if (!isFirebaseConfigured) return;
+    try {
+      await signOut(auth);
+    } catch (error) {
+      console.error("Error signing out", error);
+    }
+  };
 
   useEffect(() => {
     if (!isFirebaseConfigured) {
@@ -33,12 +55,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       return;
     }
 
-    const unsubscribe = onAuthStateChanged(auth, (nextUser) => {
-      if (nextUser) {
-        if (nextUser.email?.endsWith("@yale.edu")) {
-          setUser(nextUser);
+    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+      if (firebaseUser) {
+        if (isAllowedEmail(firebaseUser.email)) {
+          setUser(firebaseUser);
         } else {
           logout();
+          setUser(null);
         }
       } else {
         setUser(null);
@@ -56,25 +79,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
     try {
       const result = await signInWithPopup(auth, googleProvider);
-      if (
-        result.user.email !== "filifonsecacagnazzo@gmail.com" &&
-        !result.user.email?.endsWith("@yale.edu")
-      ) {
+      if (!isAllowedEmail(result.user.email)) {
         await logout();
-        alert("Only valid Yale email addresses are allowed. Sorry!! :)");
+        throw new Error("Only valid Yale email addresses are allowed. Sorry!! :)");
       }
     } catch (error) {
       console.error("Error signing in with Google", error);
-      throw error;
-    }
-  };
-
-  const logout = async () => {
-    if (!isFirebaseConfigured) return;
-    try {
-      await signOut(auth);
-    } catch (error) {
-      console.error("Error signing out", error);
+      if (error instanceof Error && error.message.includes("Yale email")) {
+        throw error;
+      }
+      throw new Error("Sign-in failed. Please try again.");
     }
   };
 

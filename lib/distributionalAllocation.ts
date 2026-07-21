@@ -18,6 +18,15 @@ const TARGET: Record<string, number> = Object.fromEntries(
   ALLOC_REQS.map((r) => [r.code, r.target]),
 );
 
+/** Credits a course contributes toward a distributional requirement. */
+export function courseDistCredits(course: Course): number {
+  return course.credits > 0 ? course.credits : 1;
+}
+
+export function sumCourseCredits(courses: Course[]): number {
+  return courses.reduce((sum, c) => sum + courseDistCredits(c), 0);
+}
+
 export type DistAllocation = {
   /** Stable course key -> the requirement code it is counted toward. */
   reqByCourseKey: Record<string, string>;
@@ -88,7 +97,7 @@ export function allocateDistributionals(
       const ov = overrides[c.code];
       if (ov && optionsByCourseKey[k].includes(ov)) {
         reqByCourseKey[k] = ov;
-        remaining[ov] = Math.max(0, remaining[ov] - 1);
+        remaining[ov] = Math.max(0, remaining[ov] - courseDistCredits(c));
       } else {
         toMatch.push(c);
       }
@@ -97,53 +106,32 @@ export function allocateDistributionals(
     candidates.forEach((c) => toMatch.push(c));
   }
 
-  // --- Maximum bipartite matching with per-requirement capacity (Kuhn's). ---
-  // Each requirement is expanded into `remaining[req]` open slots.
-  const slotKeys: Record<string, string[]> = {};
-  const slotOwner: Record<string, string | null> = {};
-  ALLOC_REQ_CODES.forEach((req) => {
-    slotKeys[req] = [];
-    for (let i = 0; i < remaining[req]; i++) {
-      const key = `${req}#${i}`;
-      slotKeys[req].push(key);
-      slotOwner[key] = null;
-    }
+  // Greedy credit-based assignment: most-constrained courses first.
+  const sorted = [...toMatch].sort((a, b) => {
+    const optsA = optionsByCourseKey[courseKey(a)].length;
+    const optsB = optionsByCourseKey[courseKey(b)].length;
+    return (
+      optsA - optsB ||
+      courseKey(a).localeCompare(courseKey(b))
+    );
   });
 
-  const assignedSlot: Record<string, string> = {};
-
-  const augment = (ck: string, visited: Set<string>): boolean => {
-    for (const req of optionsByCourseKey[ck]) {
-      for (const slot of slotKeys[req]) {
-        if (visited.has(slot)) continue;
-        visited.add(slot);
-        const owner = slotOwner[slot];
-        if (owner === null || augment(owner, visited)) {
-          slotOwner[slot] = ck;
-          assignedSlot[ck] = slot;
-          return true;
-        }
-      }
-    }
-    return false;
-  };
-
-  toMatch.forEach((c) => {
-    augment(courseKey(c), new Set<string>());
-  });
-
-  // Record matched assignments.
-  Object.entries(assignedSlot).forEach(([ck, slot]) => {
-    reqByCourseKey[ck] = slot.split("#")[0];
-  });
-
-  // Anything still unallocated (slots were full) attaches to its first option.
-  toMatch.forEach((c) => {
+  for (const c of sorted) {
     const k = courseKey(c);
-    if (!reqByCourseKey[k]) {
-      reqByCourseKey[k] = optionsByCourseKey[k][0];
+    const opts = optionsByCourseKey[k];
+    const credits = courseDistCredits(c);
+    const open = opts
+      .filter((req) => remaining[req] > 0)
+      .sort((a, b) => remaining[b] - remaining[a]);
+
+    if (open.length > 0) {
+      const req = open[0];
+      reqByCourseKey[k] = req;
+      remaining[req] = Math.max(0, remaining[req] - credits);
+    } else {
+      reqByCourseKey[k] = opts[0];
     }
-  });
+  }
 
   const coursesByReq: Record<string, Course[]> = {};
   ALLOC_REQ_CODES.forEach((c) => {

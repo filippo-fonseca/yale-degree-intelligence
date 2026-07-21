@@ -524,7 +524,9 @@ export default function SimulatorManualAssignModal({
                         }`}
                       >
                         <div className="flex items-center justify-between gap-2">
-                          <span className="font-medium truncate">{pid}</span>
+                          <span className="font-medium truncate">
+                            {programDisplayName(activeProgramType, pid)}
+                          </span>
                           {view?.budgetShort && (
                             <span className="font-mono text-[10px] text-gray-400 dark:text-gray-500 flex-shrink-0">
                               {view.budgetShort}
@@ -532,7 +534,7 @@ export default function SimulatorManualAssignModal({
                           )}
                         </div>
                         <div className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
-                          {programDisplayName(activeProgramType, pid)}
+                          {pid}
                         </div>
                         {isNewReason(presentation?.reason, [noticeReason]) && (
                           <div

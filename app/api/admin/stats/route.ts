@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { adminAuth, adminDb } from "@/config/firebaseAdmin";
 import { isAdminEmail } from "@/lib/admin";
+import { getCourseDepartmentFromCode } from "@/lib/courseCatalog";
 import { gradePoints } from "@/lib/constants";
 
 type AnyRecord = Record<string, any>;
@@ -129,7 +130,13 @@ export async function GET(req: NextRequest) {
     const credits = typeof course.credits === "number" ? course.credits : 0;
     if (!course.skipped) totalCredits += credits;
 
-    const dept = typeof course.code === "string" ? course.code.split(" ")[0] : "Unknown";
+    const prefix =
+      typeof course.code === "string" ? course.code.split(" ")[0] : "Unknown";
+    const dept =
+      typeof course.code === "string"
+        ? getCourseDepartmentFromCode(course.code) ??
+          (prefix === "EENG" ? "ECE" : prefix)
+        : "Unknown";
     departmentCounts[dept] = (departmentCounts[dept] || 0) + 1;
     departmentCredits[dept] = (departmentCredits[dept] || 0) + credits;
 

@@ -10,6 +10,7 @@ import {
   FiTrash2,
   FiRefreshCw,
   FiCheck,
+  FiLock,
 } from "react-icons/fi";
 import { Info } from "lucide-react";
 import { Course } from "@/lib/types";
@@ -75,6 +76,8 @@ interface SimulatorProps {
   majorPermanentManuals?: ManualRequirementEntry[];
   /** Permanent manual fulfillments from Firebase, filtered to certificate_id only. */
   certificatePermanentManuals?: ManualRequirementEntry[];
+  /** Lets the dashboard ask the simulator to confirm before navigating away. */
+  onRegisterNavCheck?: (fn: ((cb: () => void) => void) | null) => void;
 }
 
 type Plan = {
@@ -347,6 +350,7 @@ export default function Simulator({
   userCertificates = [],
   majorPermanentManuals,
   certificatePermanentManuals,
+  onRegisterNavCheck,
 }: SimulatorProps) {
   const { user } = useAuth();
 
@@ -385,6 +389,10 @@ export default function Simulator({
     ManualRequirementEntry[]
   >([]);
   // Manual assignment modal state
+  // Mobile-friendly tap-to-place: select a pool course, then tap a semester
+  const [selectedPoolCourse, setSelectedPoolCourse] = useState<Course | null>(
+    null,
+  );
   const [manualAssignPending, setManualAssignPending] = useState<{
     course: Course;
     semesterId: string;
@@ -421,6 +429,9 @@ export default function Simulator({
   // True once a saved plan has been loaded, so the blank-grid rebuild effect
   // does not clobber the loaded plan when remaining/completed courses change.
   const planLoadedRef = useRef(false);
+  const hasInitializedRef = useRef(false);
+  const hasChangesRef = useRef(false);
+  const currentPlanNameRef = useRef<string | null>(null);
 
   // majors / certificates to compute
   const majorIds = useMemo<string[]>(() => userMajors, [userMajors]);
@@ -538,11 +549,51 @@ export default function Simulator({
     }
   };
 
+  // The dashboard calls this before switching tabs so an unsaved plan is not
+  // silently thrown away.
+  useEffect(() => {
+    if (!onRegisterNavCheck) return;
+    onRegisterNavCheck((proceed) => {
+      if (hasChanges) {
+        if (
+          window.confirm(
+            "You have unsaved simulator changes. Leave without saving?",
+          )
+        ) {
+          proceed();
+        }
+      } else {
+        proceed();
+      }
+    });
+    return () => onRegisterNavCheck(null);
+  }, [onRegisterNavCheck, hasChanges]);
+
+  const confirmDiscardChanges = (message: string): boolean => {
+    if (!hasChanges) return true;
+    return window.confirm(message);
+  };
+
+  useEffect(() => {
+    hasChangesRef.current = hasChanges;
+  }, [hasChanges]);
+
+  useEffect(() => {
+    currentPlanNameRef.current = currentPlanName;
+  }, [currentPlanName]);
+
   // ------------ Build initial semesters & pools ------------
   useEffect(() => {
-    // Once a saved plan is loaded, don't rebuild the blank grid on top of it
-    // (remaining/completed courses can settle after the plan loads).
-    if (planLoadedRef.current) return;
+    // Don't rebuild the blank grid on top of a loaded or dirty plan when
+    // remaining/completed courses settle or refresh.
+    if (
+      hasInitializedRef.current &&
+      (hasChangesRef.current ||
+        currentPlanNameRef.current !== null ||
+        planLoadedRef.current)
+    ) {
+      return;
+    }
     // 1) Build semester list starting from earliest known term or grad - 4y
     let semestersArr: Semester[] = [];
     let startYear = graduationYear - 4;
@@ -605,6 +656,7 @@ export default function Simulator({
           rc.status === "not-taken",
       ),
     );
+    hasInitializedRef.current = true;
   }, [graduationYear, remainingCourses, completedCourses]);
 
   // ------------ Change detection ------------
@@ -778,6 +830,49 @@ export default function Simulator({
       certificateIds: context.certificateIds,
       grade: course.grade,
     });
+  };
+
+  // Tap-to-place path for touch devices. Runs the same admission check the
+  // pool drop does, so the policy engine still has the last word.
+  const placeCourseInSemester = (course: Course, semesterId: string) => {
+    const isDuplicate = semesters.some((s) =>
+      s.courses.some((c) => c.code === course.code),
+    );
+    if (isDuplicate) {
+      toast.error("This course is already on your plan.");
+      return;
+    }
+
+    const admission = admitPlannedCourse(course);
+    if (!admission.admitted) {
+      setBlockedDrop({
+        courseCode: course.code,
+        refusals: admission.refusals,
+      });
+      setSelectedPoolCourse(null);
+      return;
+    }
+
+    playPopSound();
+
+    setSemesters((prev) =>
+      prev.map((sem) =>
+        sem.id === semesterId
+          ? sem.courses.some((c) => c.code === course.code)
+            ? sem
+            : { ...sem, courses: [...sem.courses, course] }
+          : sem,
+      ),
+    );
+
+    setAvailableCourses((prev) => prev.filter((c) => c.code !== course.code));
+    setSelectedPoolCourse(null);
+
+    if (!isCourseInAnyRequirement(course.code)) {
+      setManualAssignPending({ course, semesterId });
+    } else {
+      showAutoMatchToast(course.code);
+    }
   };
 
   const handleDrop = (semesterId: string) => {
@@ -1287,6 +1382,13 @@ export default function Simulator({
 
   const loadPlan = (planIndex: number) => {
     if (planIndex < 0 || planIndex >= savedPlans.length) return;
+    if (
+      !confirmDiscardChanges(
+        "You have unsaved changes. Discard them and load this plan?",
+      )
+    ) {
+      return;
+    }
     const plan = savedPlans[planIndex];
     loadPlanData(plan);
     setShowPlansModal(false);
@@ -1314,6 +1416,12 @@ export default function Simulator({
 
   const deletePlan = async (planIndex: number) => {
     if (!user || planIndex < 0 || planIndex >= savedPlans.length) return;
+    const planName = savedPlans[planIndex].name;
+    if (
+      !window.confirm(`Delete plan "${planName}"? This cannot be undone.`)
+    ) {
+      return;
+    }
     try {
       const updatedPlans = savedPlans.filter((_, i) => i !== planIndex);
       await setDoc(
@@ -1328,14 +1436,22 @@ export default function Simulator({
   };
 
   const resetSimulator = () => {
-    setSemesters((prev) =>
-      prev.map((sem) => ({
-        ...sem,
-        courses: sem.courses.filter(
-          (c) => c.status === "completed" || c.status === "in-progress",
-        ),
-      })),
-    );
+    if (
+      !confirmDiscardChanges(
+        "You have unsaved changes. Clear the canvas and discard them?",
+      )
+    ) {
+      return;
+    }
+
+    const clearedSemesters = semesters.map((sem) => ({
+      ...sem,
+      courses: sem.courses.filter(
+        (c) => c.status === "completed" || c.status === "in-progress",
+      ),
+    }));
+
+    setSemesters(clearedSemesters);
     setAvailableCourses(
       remainingCourses.filter(
         (rc) =>
@@ -1346,8 +1462,15 @@ export default function Simulator({
     setSimulatorManualReqs([]);
     setShowDistributionals(false);
     setShowGrades(false);
+    initialSemestersRef.current = JSON.parse(
+      JSON.stringify(clearedSemesters),
+    ) as Semester[];
+    initialManualReqsRef.current = [];
     initialTogglesRef.current = { dist: false, grades: false };
     setCurrentPlanName(null);
+    planLoadedRef.current = false;
+    setHasChanges(false);
+    setSelectedPoolCourse(null);
   };
 
   // ----------------- Render -----------------
@@ -1674,9 +1797,18 @@ export default function Simulator({
                         key={course.code}
                         draggable
                         onDragStart={() => handleDragStart(course)}
+                        onClick={() =>
+                          setSelectedPoolCourse((prev) =>
+                            prev?.code === course.code ? null : course,
+                          )
+                        }
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.98 }}
-                        className="px-2 py-1 rounded-lg bg-pink-100 dark:bg-pink-900/25 text-pink-700 dark:text-pink-300 border border-pink-300 dark:border-pink-700/40 text-xs cursor-grab active:cursor-grabbing select-none shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]"
+                        className={`px-2 py-1 rounded-lg text-xs cursor-grab active:cursor-grabbing select-none shadow-[inset_0_1px_0_rgba(255,255,255,0.05)] border ${
+                          selectedPoolCourse?.code === course.code
+                            ? "bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 border-purple-400 dark:border-purple-600 ring-2 ring-purple-400/50"
+                            : "bg-pink-100 dark:bg-pink-900/25 text-pink-700 dark:text-pink-300 border-pink-300 dark:border-pink-700/40"
+                        }`}
                       >
                         {course.code}
                         <span className="text-[10px] text-pink-500/70 dark:text-pink-200/50 ml-1">
@@ -1701,18 +1833,24 @@ export default function Simulator({
           const semCreditsLabel = Number.isInteger(semCredits)
             ? String(semCredits)
             : semCredits.toFixed(1);
+          const isPast = isPastSemester(semester.name);
+          const isPlaceTarget = !!selectedPoolCourse && !isPast;
 
           return (
             <motion.div
               key={semester.id}
+              onClick={() => {
+                if (selectedPoolCourse && !isPast) {
+                  placeCourseInSemester(selectedPoolCourse, semester.id);
+                }
+              }}
               onDragOver={(e) => {
                 e.preventDefault();
-                if (!isPastSemester(semester.name))
-                  setHoveredSemester(semester.id);
+                if (!isPast) setHoveredSemester(semester.id);
               }}
               onDragLeave={() => setHoveredSemester(null)}
               onDrop={() => {
-                if (isPastSemester(semester.name)) return;
+                if (isPast) return;
                 handleDrop(semester.id);
                 setHoveredSemester(null);
               }}
@@ -1720,19 +1858,31 @@ export default function Simulator({
                 ${
                   isCurrentSemester(semester.name)
                     ? "border-blue-700/50 ring-1 ring-blue-500/30"
-                    : "border-gray-200 dark:border-gray-800/50"
+                    : isPast
+                      ? "border-gray-300 dark:border-gray-700/60 opacity-80"
+                      : "border-gray-200 dark:border-gray-800/50"
                 }
                 ${
-                  hoveredSemester === semester.id &&
-                  draggedCourse &&
-                  !isPastSemester(semester.name)
+                  hoveredSemester === semester.id && draggedCourse && !isPast
                     ? "ring-2 ring-pink-400/60 scale-[0.98] bg-gray-100 dark:bg-gray-800/60"
                     : ""
+                }
+                ${
+                  isPlaceTarget ? "ring-2 ring-purple-400/50 cursor-pointer" : ""
                 }`}
             >
               <div className="flex justify-between items-center mb-2">
-                <h4 className="font-medium text-sm text-gray-700 dark:text-gray-300">
+                <h4 className="font-medium text-sm text-gray-700 dark:text-gray-300 flex items-center gap-1.5">
                   {semester.name}
+                  {isPast && (
+                    <span
+                      className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-md text-[9px] font-medium uppercase tracking-wider bg-gray-200 dark:bg-gray-800/80 text-gray-500 dark:text-gray-400 border border-gray-300 dark:border-gray-700/50"
+                      title="Past semesters are locked"
+                    >
+                      <FiLock size={9} />
+                      Locked
+                    </span>
+                  )}
                 </h4>
                 <div className="flex items-center gap-1.5">
                   <span
@@ -1741,7 +1891,7 @@ export default function Simulator({
                   >
                     {semCreditsLabel} cr
                   </span>
-                  {!isPastSemester(semester.name) && (
+                  {!isPast && (
                     <button
                       onClick={() => setLookupSemesterId(semester.id)}
                       data-tour="simulator-semester-add"
@@ -1759,15 +1909,15 @@ export default function Simulator({
                 <div
                   className={`flex-1 flex items-center justify-center border border-dashed rounded-lg p-3 min-h-[48px] transition-all
                     ${
-                      hoveredSemester === semester.id &&
-                      draggedCourse &&
-                      !isPastSemester(semester.name)
+                      hoveredSemester === semester.id && draggedCourse && !isPast
                         ? "border-pink-400/60 bg-pink-50 dark:bg-pink-900/15"
                         : "border-gray-200 dark:border-gray-700/50"
                     }`}
                 >
                   <p className="text-[11px] text-gray-400 dark:text-gray-500 text-center opacity-70">
-                    Drag from pool or add manually
+                    {selectedPoolCourse
+                      ? "Tap to place selected course"
+                      : "Drag from pool or add manually"}
                   </p>
                 </div>
               ) : (
@@ -2173,6 +2323,14 @@ export default function Simulator({
         onSelect={(manualCourse) => {
           if (!lookupSemesterId || !manualCourse?.code) return;
 
+          const isDuplicate = semesters.some((s) =>
+            s.courses.some((c) => c.code === manualCourse.code),
+          );
+          if (isDuplicate) {
+            toast.error("This course is already on your plan.");
+            return;
+          }
+
           // Same guard as the pool drop: a course every program refuses would
           // earn nothing on the grid, so it is turned away with the reasons.
           const admission = admitPlannedCourse(manualCourse);
@@ -2191,6 +2349,10 @@ export default function Simulator({
                 ? { ...sem, courses: [...sem.courses, manualCourse] }
                 : sem,
             ),
+          );
+
+          setAvailableCourses((prev) =>
+            prev.filter((c) => c.code !== manualCourse.code),
           );
 
           // Auto-detect: prompt manual assignment if not in any requirement

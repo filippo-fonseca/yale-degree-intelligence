@@ -8,6 +8,7 @@ import { db } from "@/config/firebase";
 import { useAuth } from "@/context/AuthContext";
 import { Course } from "@/lib/types";
 import { getCourseNameFromCode } from "@/lib/courseCatalog";
+import toast from "react-hot-toast";
 import {
   certificateEligibility,
   evaluateAllocation,
@@ -120,10 +121,13 @@ export default function AddManualCourseModal({
     bannerCarriesIneligibility,
   ]);
 
-  // Filter courses based on search query
-  const filteredOptions = options.filter(({ course }) =>
-    course.code.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  // Filter courses based on search query (code or course name)
+  const filteredOptions = options.filter(({ course }) => {
+    const q = searchQuery.toLowerCase();
+    const code = course.code.toLowerCase();
+    const name = (getCourseNameFromCode(course.code) || "").toLowerCase();
+    return code.includes(q) || name.includes(q);
+  });
 
   const handleSubmit = async () => {
     if (!user || !selectedCourse) return;
@@ -155,6 +159,7 @@ export default function AddManualCourseModal({
     } catch (err) {
       console.error("Error updating course:", err);
       setError("Failed to add requirement to course");
+      toast.error("Failed to add manual fulfillment. Please try again.");
     } finally {
       setIsSubmitting(false);
     }

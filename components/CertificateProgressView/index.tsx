@@ -403,6 +403,23 @@ export default function CertificateProgressView({
     return byRequirement;
   }, [courses, selectedCertificate, majorKey, certificateKey]);
 
+  /**
+   * The parts of a certificate that are not courses: forms, applications, and
+   * the lecture write-ups a few programs ask for. We have no way to observe any
+   * of it, so it is listed and labeled as the student's own to track.
+   */
+  const extraRequirements = useMemo(() => {
+    const policy = resolvePolicy(selectedCertificate);
+    const rows: string[] = [];
+    if (getCertificate(selectedCertificate)?.requiresApplication && policy.extraForms.length === 0) {
+      // Certificates that spell out their application in extraForms describe it
+      // better than this line does, so it only fills in for the ones that do not.
+      rows.push("Apply to the program before you can be enrolled in it.");
+    }
+    rows.push(...policy.extraForms, ...policy.nonCourseRequirements);
+    return rows;
+  }, [selectedCertificate]);
+
   const completedCredits = progress?.completedCredits;
   const inProgressCredits = progress?.inProgressCredits || 0;
   const totalCredits = progress?.totalCredits;
@@ -945,6 +962,32 @@ export default function CertificateProgressView({
       {view === "heatmap" && (
         <div data-tour="certificate-heatmap-view">
           <HeatMapView cells={heatCells} onOpenRequirement={openRequirement} />
+        </div>
+      )}
+
+      {extraRequirements.length > 0 && (
+        <div className="p-3 rounded-xl border border-gray-200 dark:border-gray-800/50 bg-white/40 dark:bg-gray-900/20">
+          <div className="flex items-baseline justify-between gap-3 flex-wrap">
+            <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300">
+              Also required by Yale
+            </h4>
+            <span className="text-[10px] text-gray-400 dark:text-gray-500">
+              tracked by you, not DegreeIntelligence
+            </span>
+          </div>
+          <ul className="mt-2 space-y-1.5">
+            {extraRequirements.map((item) => (
+              <li
+                key={item}
+                className="flex gap-2 text-[11px] text-gray-500 dark:text-gray-400"
+              >
+                <span className="text-gray-300 dark:text-gray-600 select-none">
+                  •
+                </span>
+                <span>{item}</span>
+              </li>
+            ))}
+          </ul>
         </div>
       )}
 

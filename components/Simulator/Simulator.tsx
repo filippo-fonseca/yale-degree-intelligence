@@ -1366,14 +1366,20 @@ export default function Simulator({
     }
   };
 
-  const savePlan = async () => {
-    if (!user || !planName.trim()) return;
+  // The one write path for a plan. The modal and the header's quick save both
+  // come through here with an explicit name and overwrite target, so neither
+  // can drift from the other. Returns whether the write landed.
+  const persistPlan = async (
+    name: string,
+    overwriteIndex: number | null,
+  ): Promise<boolean> => {
+    const savedName = name.trim();
+    if (!user || !savedName) return false;
     try {
-      const savedName = planName.trim();
       // First-ever plan auto-becomes the default; overwrites keep their flag.
       const isDefault =
-        selectedPlanToOverwrite !== null
-          ? (savedPlans[selectedPlanToOverwrite]?.isDefault ?? false)
+        overwriteIndex !== null
+          ? (savedPlans[overwriteIndex]?.isDefault ?? false)
           : savedPlans.length === 0;
       const newPlan: Plan = {
         name: savedName,
@@ -1386,10 +1392,8 @@ export default function Simulator({
       };
 
       const updatedPlans: Plan[] =
-        selectedPlanToOverwrite !== null
-          ? savedPlans.map((p, i) =>
-              i === selectedPlanToOverwrite ? newPlan : p,
-            )
+        overwriteIndex !== null
+          ? savedPlans.map((p, i) => (i === overwriteIndex ? newPlan : p))
           : [...savedPlans, newPlan];
 
       await setDoc(
@@ -1402,14 +1406,21 @@ export default function Simulator({
       // Load the saved plan
       loadPlanData(newPlan);
 
-      setPlanName("");
-      setSelectedPlanToOverwrite(null);
-      setShowSaveModal(false);
       toast.success(`Plan "${savedName}" saved!`);
+      return true;
     } catch (error) {
       console.error("Error saving plan:", error);
       toast.error("Failed to save plan");
+      return false;
     }
+  };
+
+  const savePlan = async () => {
+    const saved = await persistPlan(planName, selectedPlanToOverwrite);
+    if (!saved) return;
+    setPlanName("");
+    setSelectedPlanToOverwrite(null);
+    setShowSaveModal(false);
   };
 
   // The save flow, opened from either the canvas verb row or the plans modal.

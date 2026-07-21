@@ -14,18 +14,23 @@ import {
   certificateEligibility,
   resolvePolicy,
 } from "@/lib/certificatePolicy";
-import { getCertificateOverlapBudget } from "@/lib/utils/programClaims";
+import {
+  getCertificateOverlapBudget,
+  getCertificateViolations,
+} from "@/lib/utils/programClaims";
 import { useAuth } from "@/context/AuthContext";
 import { skipCourse, unskipCourse } from "@/lib/utils/courseOperations";
 import CourseModal from "./CourseModal";
-import RequirementCard from "./RequirementCard";
+import RequirementCard, {
+  type RequirementConflict,
+} from "./RequirementCard";
 import HeatMapView from "./HeatMapView";
 import { STATUS_CLASSES, type ReqStats } from "./requirementStatus";
 import AddManualCourseModal from "../AddManualCourseModal/AddManualCourseModal";
 import { Course } from "@/lib/types";
 import { db } from "@/config/firebase";
 import { setDoc, doc } from "firebase/firestore";
-import { getCourseInfo } from "@/lib/courseCatalog";
+import { getCourseInfo, normalizeCourseCode } from "@/lib/courseCatalog";
 import { InfoCard } from "../ui/InfoCard";
 import RequirementModal from "./RequirementModal";
 import CertificateTipModal, {
@@ -360,6 +365,43 @@ export default function CertificateProgressView({
           tooltip: `Shared with your other programs: ${overlap.courses.join(", ")}.`,
         }
       : null;
+
+  /**
+   * Stored assignments this certificate would lose today, keyed by the
+   * requirement they were filed under.
+   *
+   * Only assignments the student actually stored get a chip. The engine also
+   * audits the overlaps it infers from auto-matching, and those have no
+   * document to edit, so offering to remove one would do nothing.
+   */
+  const conflictsByRequirement = useMemo(() => {
+    const stored = new Set<string>();
+    for (const course of courses || []) {
+      for (const manual of course.manualRequirementsFulfilled || []) {
+        if (manual.certificate_id !== selectedCertificate) continue;
+        stored.add(
+          `${normalizeCourseCode(course.code)}::${manual.requirement_title}`,
+        );
+      }
+    }
+
+    const byRequirement = new Map<string, RequirementConflict[]>();
+    const violations = getCertificateViolations(courses, selectedCertificate, {
+      majorIds: majorKey ? majorKey.split(",") : [],
+      certificateIds: certificateKey ? certificateKey.split(",") : [],
+    });
+    for (const violation of violations) {
+      const key = `${violation.courseCode}::${violation.requirementTitle}`;
+      if (!stored.has(key)) continue;
+      const list = byRequirement.get(violation.requirementTitle) || [];
+      list.push({
+        courseCode: violation.courseCode,
+        reason: violation.reason,
+      });
+      byRequirement.set(violation.requirementTitle, list);
+    }
+    return byRequirement;
+  }, [courses, selectedCertificate, majorKey, certificateKey]);
 
   const completedCredits = progress?.completedCredits;
   const inProgressCredits = progress?.inProgressCredits || 0;
@@ -889,6 +931,7 @@ export default function CertificateProgressView({
                         key={stats.req.id ?? stats.req.name}
                         stats={stats}
                         handlers={cardHandlers}
+                        conflicts={conflictsByRequirement.get(stats.req.name)}
                       />
                     ))
                   )}

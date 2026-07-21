@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
 
 export function useDashboardNav(cleoaiUnreachable: boolean) {
@@ -10,6 +10,16 @@ export function useDashboardNav(cleoaiUnreachable: boolean) {
   const [simulatorNavCheck, setSimulatorNavCheck] = useState<
     ((callback: () => void) => void) | null
   >(null);
+
+  // The simulator registers a FUNCTION as the nav check. Passing it straight
+  // into the state setter would make React call it as an updater (with the
+  // previous state as its "proceed" argument), so wrap it.
+  const registerSimulatorNavCheck = useCallback(
+    (check: ((callback: () => void) => void) | null) => {
+      setSimulatorNavCheck(() => check);
+    },
+    [],
+  );
 
   const handleTabChange = (newTab: string) => {
     if (activeTab === "simulator" && simulatorNavCheck) {
@@ -34,6 +44,6 @@ export function useDashboardNav(cleoaiUnreachable: boolean) {
     setActiveTab,
     handleTabChange,
     simulatorNavCheck,
-    setSimulatorNavCheck,
+    registerSimulatorNavCheck,
   };
 }

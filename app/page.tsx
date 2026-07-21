@@ -99,7 +99,7 @@ export default function Home() {
     !SHOW_DAN_ADVISOR ||
     (navItems.find((i) => i.id === "cleoai")?.comingSoon ?? false);
 
-  const { activeTab, setActiveTab, handleTabChange, setSimulatorNavCheck } =
+  const { activeTab, setActiveTab, handleTabChange, registerSimulatorNavCheck } =
     useDashboardNav(cleoaiUnreachable);
 
   const { welcomeOpen, setWelcomeOpen, tourOpen, setTourOpen } = useOnboarding(
@@ -295,7 +295,7 @@ export default function Home() {
               toggleDistributional={toggleDistributional}
               onTogglePrereqOverride={handleTogglePrereqOverride}
               onToggleFriends={handleToggleFriends}
-              onRegisterNavCheck={setSimulatorNavCheck}
+              onRegisterNavCheck={registerSimulatorNavCheck}
             />
           </motion.div>
         </div>

@@ -20,6 +20,7 @@ import { evaluateAllocation, resolvePolicy } from "@/lib/certificatePolicy";
 import {
   buildProgramClaimContext,
   getCertificateOverlapBudget,
+  settleAllocations,
   type ProgramClaimOptions,
 } from "@/lib/utils/programClaims";
 import {
@@ -222,6 +223,9 @@ export default function SimulatorManualAssignModal({
     if (!course) return empty;
 
     const context = buildProgramClaimContext(courses, policyOptions);
+    // The claims the audit already refused are not claims any more, so asking
+    // about a new one has to be asked against what is left.
+    const existing = settleAllocations(context);
     const byProgram: Record<string, ProgramView> = {};
     const all: PolicyPresentation[] = [];
 
@@ -237,7 +241,7 @@ export default function SimulatorManualAssignModal({
           evaluateAllocation({
             courseCode: course.code,
             target: { type, id, requirementTitle: req.name },
-            existing: context.allocations,
+            existing,
             majorIds: context.majorIds,
             certificateIds: context.certificateIds,
             grade: course.grade,

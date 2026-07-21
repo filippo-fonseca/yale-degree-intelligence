@@ -326,6 +326,41 @@ export function buildProgramClaimContext(
   return { allocations, majorIds, certificateIds, violations };
 }
 
+/** One allocation's identity: same course, same program, same slot. */
+function allocationIdentity(allocation: Allocation): string {
+  return `${allocation.program.type}:${allocation.program.id}::${normalizeCourseCode(
+    allocation.courseCode
+  )}::${allocation.requirementTitle}`;
+}
+
+/**
+ * The claims that survive the audit, which is what any picker asking "may this
+ * course go here?" should hand the engine.
+ *
+ * A refused claim has already been resolved against the program that lost it,
+ * so leaving it in the list would report the overlap budget as fuller than it
+ * is and would make a picker answer with the wrong sentence: a course that
+ * auto-matches both a major and a zero-overlap certificate would read as
+ * already filling a slot in that certificate, and the major would read as
+ * refused for a course it in fact keeps.
+ */
+export function settleAllocations(
+  context: Pick<ProgramClaimContext, "allocations" | "violations">
+): Allocation[] {
+  const lost = new Set(
+    context.violations.map((violation) =>
+      allocationIdentity({
+        courseCode: violation.courseCode,
+        program: violation.program,
+        requirementTitle: violation.requirementTitle,
+      })
+    )
+  );
+  return context.allocations.filter(
+    (allocation) => !lost.has(allocationIdentity(allocation))
+  );
+}
+
 /** Every stored conflict, optionally narrowed to one certificate. */
 export function getCertificateViolations(
   courses: Course[],

@@ -7,22 +7,19 @@ import { doc, updateDoc, arrayUnion } from "firebase/firestore";
 import { db } from "@/config/firebase";
 import { useAuth } from "@/context/AuthContext";
 import { Course } from "@/lib/types";
-import { getCourseNameFromCode, normalizeCourseCode } from "@/lib/courseCatalog";
+import { getCourseNameFromCode } from "@/lib/courseCatalog";
 import {
   certificateEligibility,
   evaluateAllocation,
-  type Allocation,
 } from "@/lib/certificatePolicy";
-import { buildProgramClaimContext } from "@/lib/utils/programClaims";
+import {
+  buildProgramClaimContext,
+  settleAllocations,
+} from "@/lib/utils/programClaims";
 import {
   presentVerdict,
   type PolicyPresentation,
 } from "@/lib/utils/policyPresentation";
-
-const allocationKey = (allocation: Allocation) =>
-  `${allocation.program.type}:${allocation.program.id}::${normalizeCourseCode(
-    allocation.courseCode
-  )}::${allocation.requirementTitle}`;
 
 export default function AddManualCourseModal({
   isOpen,
@@ -71,21 +68,11 @@ export default function AddManualCourseModal({
    */
   const settledAllocations = useMemo(() => {
     if (!isOpen) return [];
-    const { allocations, violations } = buildProgramClaimContext(userCourses, {
-      majorIds: majorKey ? majorKey.split(",") : [],
-      certificateIds: certificateKey ? certificateKey.split(",") : [],
-    });
-    const lost = new Set(
-      violations.map((violation) =>
-        allocationKey({
-          courseCode: violation.courseCode,
-          program: violation.program,
-          requirementTitle: violation.requirementTitle,
-        })
-      )
-    );
-    return allocations.filter(
-      (allocation) => !lost.has(allocationKey(allocation))
+    return settleAllocations(
+      buildProgramClaimContext(userCourses, {
+        majorIds: majorKey ? majorKey.split(",") : [],
+        certificateIds: certificateKey ? certificateKey.split(",") : [],
+      })
     );
   }, [isOpen, userCourses, majorKey, certificateKey]);
 

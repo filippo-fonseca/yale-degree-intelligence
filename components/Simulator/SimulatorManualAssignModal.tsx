@@ -16,6 +16,17 @@ import {
   certificateRequirements,
   type CertificateProgress,
 } from "@/lib/certificates";
+import { evaluateAllocation, resolvePolicy } from "@/lib/certificatePolicy";
+import {
+  buildProgramClaimContext,
+  getCertificateOverlapBudget,
+  type ProgramClaimOptions,
+} from "@/lib/utils/programClaims";
+import {
+  presentCertificateEligibility,
+  presentVerdict,
+  type PolicyPresentation,
+} from "@/lib/utils/policyPresentation";
 
 type ProgramType = "major" | "certificate";
 
@@ -26,9 +37,72 @@ interface SimulatorManualAssignModalProps {
   certificateIds: string[];
   previewProgress: Record<string, MajorProgress>;
   certificatePreviewProgress: Record<string, CertificateProgress>;
+  /** Stored courses, so the engine sees the claims the student already made. */
+  courses: Course[];
+  /** The plan's engine inputs, built once in the Simulator. */
+  policyOptions: ProgramClaimOptions;
   onAssign: (entry: ManualRequirementEntry) => void;
   onSkip: () => void;
   onClose: () => void;
+}
+
+type RequirementView = {
+  name: string;
+  description?: string;
+  completed: number;
+  required: number;
+  presentation: PolicyPresentation;
+};
+
+type ProgramView = {
+  presentation: PolicyPresentation | null;
+  requirements: RequirementView[];
+  /** Certificates only: the overlap microcopy for this certificate. */
+  budgetLine: string | null;
+};
+
+/** The most frequent reason in a set, ties broken by first appearance. */
+function dominantReason(items: PolicyPresentation[]): string | undefined {
+  const counts = new Map<string, number>();
+  for (const item of items) {
+    if (!item.reason) continue;
+    counts.set(item.reason, (counts.get(item.reason) ?? 0) + 1);
+  }
+  let best: string | undefined;
+  let bestCount = 0;
+  for (const [reason, count] of Array.from(counts)) {
+    if (count > bestCount) {
+      best = reason;
+      bestCount = count;
+    }
+  }
+  return best;
+}
+
+/**
+ * What a whole program (or a whole program type) says, given what the engine
+ * said about each of its requirements.
+ *
+ * Only two situations are worth stating above the row level: every choice is
+ * refused, which makes the program itself unpickable, and every choice carries
+ * the same warning, which is a fact about the program rather than the slot.
+ * Anything else stays silent and lets the rows speak for themselves.
+ */
+function dominantPresentation(
+  items: PolicyPresentation[],
+): PolicyPresentation | null {
+  if (items.length === 0) return null;
+  if (items.every((item) => item.disabled)) {
+    return { disabled: true, tone: "neutral", reason: dominantReason(items) };
+  }
+  const selectable = items.filter((item) => !item.disabled);
+  const warned = selectable.filter(
+    (item) => item.tone === "amber" && item.reason,
+  );
+  if (warned.length > 0 && warned.length === selectable.length) {
+    return { disabled: false, tone: "amber", reason: dominantReason(warned) };
+  }
+  return null;
 }
 
 function getUnfulfilledRequirements(
@@ -83,6 +157,8 @@ export default function SimulatorManualAssignModal({
   certificateIds,
   previewProgress,
   certificatePreviewProgress,
+  courses,
+  policyOptions,
   onAssign,
   onSkip,
   onClose,
@@ -128,20 +204,137 @@ export default function SimulatorManualAssignModal({
     return selectedProgramId;
   }, [activeProgramType, programIdsForType, selectedProgramId]);
 
-  const unfulfilledReqs = useMemo(() => {
-    if (!activeProgramType || !activeProgramId) return [];
-    return getUnfulfilledRequirements(
-      activeProgramType,
-      activeProgramId,
-      previewProgress,
-      certificatePreviewProgress,
-    );
+  /**
+   * Every verdict this modal could need, asked once.
+   *
+   * Nothing below decides policy: each requirement, each program, and each
+   * program type renders whatever the engine returned for it, mapped through
+   * the shared presentation helper so a blocked row here looks exactly like a
+   * blocked row in My Certificates.
+   */
+  const policyView = useMemo(() => {
+    const empty = {
+      byProgram: {} as Record<string, ProgramView>,
+      byType: {} as Record<ProgramType, PolicyPresentation | null>,
+      notice: null as PolicyPresentation | null,
+    };
+    if (!course) return empty;
+
+    const context = buildProgramClaimContext(courses, policyOptions);
+    const byProgram: Record<string, ProgramView> = {};
+    const all: PolicyPresentation[] = [];
+
+    const buildProgram = (type: ProgramType, id: string): ProgramView => {
+      const requirements = getUnfulfilledRequirements(
+        type,
+        id,
+        previewProgress,
+        certificatePreviewProgress,
+      ).map((req) => ({
+        ...req,
+        presentation: presentVerdict(
+          evaluateAllocation({
+            courseCode: course.code,
+            target: { type, id, requirementTitle: req.name },
+            existing: context.allocations,
+            majorIds: context.majorIds,
+            certificateIds: context.certificateIds,
+            grade: course.grade,
+          }),
+        ),
+      }));
+
+      let presentation = dominantPresentation(
+        requirements.map((req) => req.presentation),
+      );
+      let budgetLine: string | null = null;
+
+      if (type === "certificate") {
+        // A certificate a student is barred from stays selectable, and the
+        // warning belongs to the certificate rather than to any one slot.
+        if (!presentation) {
+          const eligibility = presentCertificateEligibility(id, majorIds);
+          if (eligibility.reason) presentation = eligibility;
+        }
+        const policy = resolvePolicy(id);
+        if (policy.zeroOverlap) {
+          budgetLine = "no overlap";
+        } else if (policy.overlapCap > 0) {
+          const budget = getCertificateOverlapBudget(
+            courses,
+            id,
+            policyOptions,
+          );
+          budgetLine = `overlap ${budget.used}/${budget.cap} used with your majors`;
+        }
+      }
+
+      return { presentation, requirements, budgetLine };
+    };
+
+    for (const id of majorIds) {
+      const view = buildProgram("major", id);
+      byProgram[`major:${id}`] = view;
+      all.push(...view.requirements.map((req) => req.presentation));
+    }
+    for (const id of certificateIds) {
+      const view = buildProgram("certificate", id);
+      byProgram[`certificate:${id}`] = view;
+      all.push(...view.requirements.map((req) => req.presentation));
+    }
+
+    const typePresentation = (type: ProgramType, ids: string[]) =>
+      dominantPresentation(
+        ids.map(
+          (id) =>
+            byProgram[`${type}:${id}`]?.presentation ?? {
+              disabled: false,
+              tone: "neutral" as const,
+            },
+        ),
+      );
+
+    // The one line above the choices: stated only when nothing at all can be
+    // picked, since otherwise the rows already carry the specifics.
+    const dominant = dominantPresentation(all);
+
+    return {
+      byProgram,
+      byType: {
+        major: typePresentation("major", majorIds),
+        certificate: typePresentation("certificate", certificateIds),
+      },
+      notice: dominant?.disabled ? dominant : null,
+    };
   }, [
-    activeProgramType,
-    activeProgramId,
+    course,
+    courses,
+    policyOptions,
+    majorIds,
+    certificateIds,
     previewProgress,
     certificatePreviewProgress,
   ]);
+
+  const activeProgram =
+    activeProgramType && activeProgramId
+      ? (policyView.byProgram[`${activeProgramType}:${activeProgramId}`] ??
+        null)
+      : null;
+
+  const unfulfilledReqs = useMemo<RequirementView[]>(
+    () => activeProgram?.requirements ?? [],
+    [activeProgram],
+  );
+
+  const noticeReason = policyView.notice?.reason;
+  const programReason = activeProgram?.presentation?.reason;
+
+  /** A reason already stated higher up is not worth repeating below it. */
+  const isNewReason = (
+    reason: string | undefined,
+    statedAbove: (string | undefined)[],
+  ): reason is string => !!reason && !statedAbove.includes(reason);
 
   const showTypeStep =
     hasMajors && hasCertificates && selectedProgramType === null;
@@ -153,6 +346,10 @@ export default function SimulatorManualAssignModal({
 
   const handleAssign = (reqName: string) => {
     if (!activeProgramType || !activeProgramId || !course) return;
+    // The button is disabled too; this is the same answer from the engine, so
+    // a stray programmatic click cannot store what the audit would refuse.
+    const target = unfulfilledReqs.find((req) => req.name === reqName);
+    if (target?.presentation.disabled) return;
     onAssign({
       code: course.code,
       requirement: reqName,
@@ -214,10 +411,11 @@ export default function SimulatorManualAssignModal({
                   This course wasn&apos;t auto-detected for any major or
                   certificate requirement.
                 </p>
-                <p className="text-xs text-amber-600/80 dark:text-amber-400/80 mt-2">
-                  Assigning a course to a certificate means it won&apos;t count
-                  toward your major(s), and vice versa.
-                </p>
+                {policyView.notice?.reason && (
+                  <p className="text-[11px] text-zinc-500 dark:text-zinc-400 mt-2">
+                    {policyView.notice.reason}
+                  </p>
+                )}
               </div>
               <button
                 onClick={handleClose}
@@ -233,24 +431,51 @@ export default function SimulatorManualAssignModal({
                   Assign to
                 </p>
                 <div className="flex gap-2">
-                  <button
-                    onClick={() => setSelectedProgramType("major")}
-                    className="flex-1 px-3 py-2.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 text-sm text-gray-700 dark:text-gray-200 hover:border-purple-500 hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-colors text-left"
-                  >
-                    <div className="font-medium">Major</div>
-                    <div className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
-                      {majorIds.length} declared
-                    </div>
-                  </button>
-                  <button
-                    onClick={() => setSelectedProgramType("certificate")}
-                    className="flex-1 px-3 py-2.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 text-sm text-gray-700 dark:text-gray-200 hover:border-teal-500 hover:bg-teal-50 dark:hover:bg-teal-900/20 transition-colors text-left"
-                  >
-                    <div className="font-medium">Certificate</div>
-                    <div className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
-                      {certificateIds.length} declared
-                    </div>
-                  </button>
+                  {[
+                    {
+                      type: "major" as const,
+                      label: "Major",
+                      count: majorIds.length,
+                      hover:
+                        "hover:border-purple-500 hover:bg-purple-50 dark:hover:bg-purple-900/20",
+                    },
+                    {
+                      type: "certificate" as const,
+                      label: "Certificate",
+                      count: certificateIds.length,
+                      hover:
+                        "hover:border-teal-500 hover:bg-teal-50 dark:hover:bg-teal-900/20",
+                    },
+                  ].map(({ type, label, count, hover }) => {
+                    const presentation = policyView.byType[type];
+                    const disabled = !!presentation?.disabled;
+                    return (
+                      <button
+                        key={type}
+                        onClick={() => setSelectedProgramType(type)}
+                        disabled={disabled}
+                        className={`flex-1 px-3 py-2.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 text-sm text-gray-700 dark:text-gray-200 transition-colors text-left ${
+                          disabled ? "opacity-45 cursor-not-allowed" : hover
+                        }`}
+                      >
+                        <div className="font-medium">{label}</div>
+                        <div className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
+                          {count} declared
+                        </div>
+                        {isNewReason(presentation?.reason, [noticeReason]) && (
+                          <div
+                            className={`text-[11px] mt-1 ${
+                              presentation?.tone === "amber"
+                                ? "text-amber-600 dark:text-amber-400"
+                                : "text-zinc-500 dark:text-zinc-400"
+                            }`}
+                          >
+                            {presentation?.reason}
+                          </div>
+                        )}
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
             )}
@@ -272,29 +497,57 @@ export default function SimulatorManualAssignModal({
                   Which {activeProgramType}?
                 </p>
                 <div className="space-y-1.5">
-                  {programIdsForType.map((pid) => (
-                    <button
-                      key={pid}
-                      onClick={() => setSelectedProgramId(pid)}
-                      className={`w-full px-3 py-2.5 rounded-lg border text-sm text-left transition-colors ${
-                        activeProgramType === "certificate"
-                          ? "border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 text-gray-700 dark:text-gray-200 hover:border-teal-500 hover:bg-teal-50 dark:hover:bg-teal-900/20"
-                          : "border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 text-gray-700 dark:text-gray-200 hover:border-purple-500 hover:bg-purple-50 dark:hover:bg-purple-900/20"
-                      }`}
-                    >
-                      <div className="font-medium">{pid}</div>
-                      <div className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
-                        {programDisplayName(activeProgramType, pid)}
-                      </div>
-                    </button>
-                  ))}
+                  {programIdsForType.map((pid) => {
+                    const view =
+                      policyView.byProgram[`${activeProgramType}:${pid}`];
+                    const presentation = view?.presentation ?? null;
+                    const disabled = !!presentation?.disabled;
+                    const hover =
+                      activeProgramType === "certificate"
+                        ? "hover:border-teal-500 hover:bg-teal-50 dark:hover:bg-teal-900/20"
+                        : "hover:border-purple-500 hover:bg-purple-50 dark:hover:bg-purple-900/20";
+                    return (
+                      <button
+                        key={pid}
+                        onClick={() => setSelectedProgramId(pid)}
+                        disabled={disabled}
+                        className={`w-full px-3 py-2.5 rounded-lg border text-sm text-left transition-colors border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 text-gray-700 dark:text-gray-200 ${
+                          disabled ? "opacity-45 cursor-not-allowed" : hover
+                        }`}
+                      >
+                        <div className="flex items-center justify-between gap-2">
+                          <span className="font-medium">{pid}</span>
+                          {view?.budgetLine && (
+                            <span className="font-mono text-[10px] text-gray-400 dark:text-gray-500 flex-shrink-0">
+                              {view.budgetLine}
+                            </span>
+                          )}
+                        </div>
+                        <div className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
+                          {programDisplayName(activeProgramType, pid)}
+                        </div>
+                        {isNewReason(presentation?.reason, [noticeReason]) && (
+                          <div
+                            className={`text-[11px] mt-1 ${
+                              presentation?.tone === "amber"
+                                ? "text-amber-600 dark:text-amber-400"
+                                : "text-zinc-500 dark:text-zinc-400"
+                            }`}
+                          >
+                            {presentation?.reason}
+                          </div>
+                        )}
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
             )}
 
             {showRequirementStep && activeProgramType && activeProgramId && (
               <div className="flex-1 overflow-hidden flex flex-col">
-                {(programIdsForType.length > 1 || (hasMajors && hasCertificates)) && (
+                {(programIdsForType.length > 1 ||
+                  (hasMajors && hasCertificates)) && (
                   <div className="flex items-center gap-2 mb-3">
                     {programIdsForType.length > 1 && (
                       <button
@@ -321,9 +574,28 @@ export default function SimulatorManualAssignModal({
                   </div>
                 )}
 
-                <p className="text-xs text-gray-500 dark:text-gray-400 font-medium uppercase tracking-wide mb-2">
-                  Unfulfilled requirements
-                </p>
+                {isNewReason(programReason, [noticeReason]) && (
+                  <p
+                    className={`text-[11px] mb-2 ${
+                      activeProgram?.presentation?.tone === "amber"
+                        ? "text-amber-600 dark:text-amber-400"
+                        : "text-zinc-500 dark:text-zinc-400"
+                    }`}
+                  >
+                    {programReason}
+                  </p>
+                )}
+
+                <div className="flex items-baseline justify-between gap-2 mb-2">
+                  <p className="text-xs text-gray-500 dark:text-gray-400 font-medium uppercase tracking-wide">
+                    Unfulfilled requirements
+                  </p>
+                  {activeProgram?.budgetLine && (
+                    <span className="font-mono text-[10px] text-gray-400 dark:text-gray-500 flex-shrink-0">
+                      {activeProgram.budgetLine}
+                    </span>
+                  )}
+                </div>
 
                 {unfulfilledReqs.length === 0 ? (
                   <p className="text-sm text-gray-400 dark:text-gray-500 py-4 text-center">
@@ -332,37 +604,59 @@ export default function SimulatorManualAssignModal({
                   </p>
                 ) : (
                   <div className="overflow-y-auto flex-1 -mx-1 px-1 space-y-1.5">
-                    {unfulfilledReqs.map((req) => (
-                      <button
-                        key={req.name}
-                        onClick={() => handleAssign(req.name)}
-                        className={`w-full text-left px-3 py-2.5 rounded-lg border border-gray-200 dark:border-gray-700/60 bg-gray-50/50 dark:bg-gray-800/30 transition-colors group ${
-                          activeProgramType === "certificate"
-                            ? "hover:border-teal-500/60 hover:bg-teal-50 dark:hover:bg-teal-900/20"
-                            : "hover:border-purple-500/60 hover:bg-purple-50 dark:hover:bg-purple-900/20"
-                        }`}
-                      >
-                        <div className="flex items-center justify-between">
-                          <span
-                            className={`text-sm text-gray-700 dark:text-gray-200 transition-colors ${
-                              activeProgramType === "certificate"
-                                ? "group-hover:text-teal-600 dark:group-hover:text-teal-200"
-                                : "group-hover:text-purple-600 dark:group-hover:text-purple-200"
-                            }`}
-                          >
-                            {req.name}
-                          </span>
-                          <span className="text-xs text-gray-400 dark:text-gray-500 ml-2 flex-shrink-0">
-                            {req.completed}/{req.required}
-                          </span>
-                        </div>
-                        {req.description && (
-                          <div className="text-xs text-gray-400 dark:text-gray-500 mt-0.5 line-clamp-1">
-                            {req.description}
+                    {unfulfilledReqs.map((req) => {
+                      const { disabled, tone, reason } = req.presentation;
+                      const hover =
+                        activeProgramType === "certificate"
+                          ? "hover:border-teal-500/60 hover:bg-teal-50 dark:hover:bg-teal-900/20"
+                          : "hover:border-purple-500/60 hover:bg-purple-50 dark:hover:bg-purple-900/20";
+                      const hoverText =
+                        activeProgramType === "certificate"
+                          ? "group-hover:text-teal-600 dark:group-hover:text-teal-200"
+                          : "group-hover:text-purple-600 dark:group-hover:text-purple-200";
+                      return (
+                        <button
+                          key={req.name}
+                          onClick={() => handleAssign(req.name)}
+                          disabled={disabled}
+                          className={`w-full text-left px-3 py-2.5 rounded-lg border border-gray-200 dark:border-gray-700/60 bg-gray-50/50 dark:bg-gray-800/30 transition-colors group ${
+                            disabled ? "opacity-45 cursor-not-allowed" : hover
+                          }`}
+                        >
+                          <div className="flex items-center justify-between">
+                            <span
+                              className={`text-sm text-gray-700 dark:text-gray-200 transition-colors ${
+                                disabled ? "" : hoverText
+                              }`}
+                            >
+                              {req.name}
+                            </span>
+                            <span className="text-xs text-gray-400 dark:text-gray-500 ml-2 flex-shrink-0">
+                              {req.completed}/{req.required}
+                            </span>
                           </div>
-                        )}
-                      </button>
-                    ))}
+                          {req.description && (
+                            <div className="text-xs text-gray-400 dark:text-gray-500 mt-0.5 line-clamp-1">
+                              {req.description}
+                            </div>
+                          )}
+                          {isNewReason(reason, [
+                            noticeReason,
+                            programReason,
+                          ]) && (
+                            <div
+                              className={`text-[11px] mt-1 ${
+                                tone === "amber"
+                                  ? "text-amber-600 dark:text-amber-400"
+                                  : "text-zinc-500 dark:text-zinc-400"
+                              }`}
+                            >
+                              {reason}
+                            </div>
+                          )}
+                        </button>
+                      );
+                    })}
                   </div>
                 )}
               </div>

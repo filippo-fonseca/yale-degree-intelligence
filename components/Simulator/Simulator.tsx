@@ -2158,6 +2158,8 @@ export default function Simulator({
         certificateIds={certificateIds}
         previewProgress={previewProgress}
         certificatePreviewProgress={certificatePreviewProgress}
+        courses={completedCourses}
+        policyOptions={policyOptions}
         onAssign={(entry) => {
           setSimulatorManualReqs((prev) => [...prev, entry]);
           setManualAssignPending(null);

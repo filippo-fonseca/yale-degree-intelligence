@@ -721,7 +721,7 @@ export default function MajorProgressView({
       {/* View switcher (sticky) + tip help */}
       <div
         data-tour="major-view-switcher"
-        className="sticky top-0 z-20 -mx-1 px-1 py-2 bg-gradient-to-b from-white via-white to-white/0 dark:from-gray-950 dark:via-gray-950 dark:to-gray-950/0 backdrop-blur-sm"
+        className="sticky top-0 z-20 -mx-1 px-1 py-2 bg-gradient-to-b from-white/95 via-white/80 to-transparent dark:from-gray-900/70 dark:via-gray-900/35 dark:to-transparent backdrop-blur-md"
       >
         <div className="flex items-center justify-between gap-3 flex-wrap">
           <div className="flex items-center gap-1.5">

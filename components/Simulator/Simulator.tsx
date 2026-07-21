@@ -43,8 +43,14 @@ import {
   buildProgramClaimContext,
   filterCertificateManualEntries,
   getMajorBlockedCodes,
+  settleAllocations,
   type ProgramClaimOptions,
 } from "@/lib/utils/programClaims";
+import {
+  evaluatePlannedCourseAdmission,
+  type SlotRefusal,
+} from "@/lib/utils/plannedCourseAdmission";
+import PlannedCourseBlockedModal from "./PlannedCourseBlockedModal";
 import type { Allocation } from "@/lib/certificatePolicy";
 
 // ----------------- Types -----------------
@@ -390,6 +396,11 @@ export default function Simulator({
     course: Course;
     semesterId: string;
   } | null>(null);
+  // A pool course the engine refused everywhere, held for the error modal.
+  const [blockedDrop, setBlockedDrop] = useState<{
+    courseCode: string;
+    refusals: SlotRefusal[];
+  } | null>(null);
 
   // Preview state
   const [previewProgress, setPreviewProgress] = useState<PreviewProgressMap>(
@@ -723,11 +734,12 @@ export default function Simulator({
           setPlanName("");
         }
         if (showPlansModal) setShowPlansModal(false);
+        if (blockedDrop) setBlockedDrop(null);
       }
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [showPlanSelector, showSaveModal, showPlansModal]);
+  }, [showPlanSelector, showSaveModal, showPlansModal, blockedDrop]);
 
   // ------------ Scroll detection for sticky nav ------------
   useEffect(() => {
@@ -750,6 +762,31 @@ export default function Simulator({
     setDragSourceSemester(sourceSemesterId ?? null);
   };
 
+  /**
+   * What the policy engine says about planning this course at all, asked
+   * against the claims that survive the audit so a course the engine already
+   * took away from a program does not read as still held by it.
+   */
+  const admitPlannedCourse = (course: Course) => {
+    const candidates = findMatchedRequirements(
+      course.code,
+      majorIds,
+      certificateIds,
+    ).map((match) => ({
+      program: { type: match.programType, id: match.programId },
+      requirementTitle: match.requirementName,
+    }));
+    const context = buildProgramClaimContext(completedCourses, policyOptions);
+    return evaluatePlannedCourseAdmission({
+      courseCode: course.code,
+      candidates,
+      existing: settleAllocations(context),
+      majorIds: context.majorIds,
+      certificateIds: context.certificateIds,
+      grade: course.grade,
+    });
+  };
+
   const handleDrop = (semesterId: string) => {
     if (!draggedCourse) return;
 
@@ -758,6 +795,23 @@ export default function Simulator({
       setDraggedCourse(null);
       setDragSourceSemester(null);
       return;
+    }
+
+    // Coming in from the pool, so ask before it lands. A course every program
+    // refuses would sit on the grid earning nothing; anything the major still
+    // wants goes through and the certificate shows it as not counted. Moves
+    // between semesters are already-planned courses and are never re-judged.
+    if (!dragSourceSemester) {
+      const admission = admitPlannedCourse(draggedCourse);
+      if (!admission.admitted) {
+        setBlockedDrop({
+          courseCode: draggedCourse.code,
+          refusals: admission.refusals,
+        });
+        setDraggedCourse(null);
+        setDragSourceSemester(null);
+        return;
+      }
     }
 
     // Play pop sound on successful drop
@@ -2128,6 +2182,19 @@ export default function Simulator({
         onClose={() => setLookupSemesterId(null)}
         onSelect={(manualCourse) => {
           if (!lookupSemesterId || !manualCourse?.code) return;
+
+          // Same guard as the pool drop: a course every program refuses would
+          // earn nothing on the grid, so it is turned away with the reasons.
+          const admission = admitPlannedCourse(manualCourse);
+          if (!admission.admitted) {
+            setBlockedDrop({
+              courseCode: manualCourse.code,
+              refusals: admission.refusals,
+            });
+            setLookupSemesterId(null);
+            return;
+          }
+
           setSemesters((prev) =>
             prev.map((sem) =>
               sem.id === lookupSemesterId
@@ -2150,6 +2217,14 @@ export default function Simulator({
           setLookupSemesterId(null);
         }}
         userId={user?.uid || ""}
+      />
+
+      {/* Refused-drop error modal */}
+      <PlannedCourseBlockedModal
+        isOpen={blockedDrop !== null}
+        courseCode={blockedDrop?.courseCode ?? null}
+        refusals={blockedDrop?.refusals ?? []}
+        onClose={() => setBlockedDrop(null)}
       />
 
       {/* Manual requirement assignment modal */}

@@ -20,7 +20,7 @@ function initializeAdminApp(): App | null {
     const serviceAccount = JSON.parse(serviceAccountKey);
     return initializeApp({
       credential: cert(serviceAccount),
-      projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+      projectId: "yale-degree-intelligence",
     });
   } catch (error) {
     console.error("Failed to initialize Firebase Admin SDK:", error);

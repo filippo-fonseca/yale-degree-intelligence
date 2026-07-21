@@ -62,17 +62,24 @@ function TrendArrow({ curr, prev }: { curr: number | null; prev: number | null }
   );
 }
 
+// The dots live in the rail gutter to the left of each row, so they are sized
+// and spaced to sit inside it: a mixed term shows both dots with a real gap
+// between them instead of one blob pushed against the term name.
 function KindBadge({ kind }: { kind: GPATimelineTerm["kind"] }) {
+  const dot = "inline-block w-1.5 h-1.5 rounded-full";
   if (kind === "mixed") {
     return (
-      <span className="inline-flex items-center gap-0.5">
-        <span className="inline-block w-1.5 h-1.5 rounded-full bg-emerald-400" />
-        <span className="inline-block w-1.5 h-1.5 rounded-full bg-purple-400" />
+      <span className="inline-flex items-center gap-1">
+        <span className={`${dot} bg-emerald-500 dark:bg-emerald-400`} />
+        <span className={`${dot} bg-purple-500 dark:bg-purple-400`} />
       </span>
     );
   }
-  const color = kind === "completed" ? "bg-emerald-400" : "bg-purple-400";
-  return <span className={`inline-block w-1.5 h-1.5 rounded-full ${color}`} />;
+  const color =
+    kind === "completed"
+      ? "bg-emerald-500 dark:bg-emerald-400"
+      : "bg-purple-500 dark:bg-purple-400";
+  return <span className={`${dot} ${color}`} />;
 }
 
 export default function SimulatorGradesSection({
@@ -188,9 +195,12 @@ export default function SimulatorGradesSection({
                     <p className="text-[10px] font-medium uppercase tracking-wide text-gray-400 dark:text-gray-500 mb-1.5">
                       By semester
                     </p>
-                    <div className="relative space-y-1">
+                    {/* The rail and its nodes sit in a 24px gutter of their
+                        own, so no dot lands on a row's border and the rail
+                        runs between node centres instead of past them. */}
+                    <div className="relative space-y-1 pl-6">
                       {/* vertical rail */}
-                      <div className="absolute left-[3px] top-1 bottom-1 w-px bg-gray-200 dark:bg-gray-800/60" />
+                      <div className="absolute left-[11.5px] top-[15px] bottom-[15px] w-px bg-gray-200 dark:bg-gray-800/60" />
                       {timeline.terms.map((t, i) => {
                         const prev =
                           i > 0 ? timeline.terms[i - 1].cumulativeGPA.gpa : null;
@@ -198,14 +208,14 @@ export default function SimulatorGradesSection({
                         return (
                           <div
                             key={t.key}
-                            className={`relative flex items-center gap-2 pl-4 pr-2 py-1.5 rounded-lg border ${
+                            className={`relative flex items-center gap-2 px-2.5 py-1.5 rounded-lg border ${
                               isPlanned
                                 ? "bg-purple-50/60 dark:bg-purple-900/10 border-purple-200 dark:border-purple-800/30"
                                 : "bg-gray-50 dark:bg-gray-800/30 border-gray-200 dark:border-gray-800/40"
                             }`}
                           >
                             {/* rail node */}
-                            <span className="absolute left-0 top-1/2 -translate-y-1/2 flex items-center">
+                            <span className="absolute -left-6 top-1/2 w-6 -translate-y-1/2 flex items-center justify-center">
                               <KindBadge kind={t.kind} />
                             </span>
                             <span

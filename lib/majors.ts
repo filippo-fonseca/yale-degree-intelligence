@@ -76,15 +76,25 @@ export const calculateMajorProgress = (
   inProgressCourseCodes: string[] = [],
   skippedCourseCodes: string[] = [],
   manualRequirements: ManualRequirementEntry[] = [],
-  excludedRequirements: ExcludedRequirementEntry[] = []
+  excludedRequirements: ExcludedRequirementEntry[] = [],
+  /** Courses claimed by certificates (or otherwise blocked from counting toward majors). */
+  blockedCourseCodes: string[] = []
 ): MajorProgress => {
   const major = majorRequirements[majorId];
   if (!major) throw new Error(`Major ${majorId} not found`);
 
   // Normalize all course codes
-  const canonicalCompleted = completedCourseCodes.map(code => getCanonicalCode(code) || code);
-  const canonicalInProgress = inProgressCourseCodes.map(code => getCanonicalCode(code) || code);
-  const canonicalSkipped = skippedCourseCodes.map(code => getCanonicalCode(code) || code);
+  const blockedSet = new Set(
+    blockedCourseCodes.map((code) => getCanonicalCode(code) || code)
+  );
+  const stripBlocked = (codes: string[]) =>
+    codes
+      .map((code) => getCanonicalCode(code) || code)
+      .filter((code) => !blockedSet.has(code));
+
+  const canonicalCompleted = stripBlocked(completedCourseCodes);
+  const canonicalInProgress = stripBlocked(inProgressCourseCodes);
+  const canonicalSkipped = stripBlocked(skippedCourseCodes);
 
   // Build a set of exclusions for quick lookup: "reqName:code"
   const exclusionSet = new Set(
@@ -290,6 +300,9 @@ export type ManualRequirementEntry = {
   requirement: string;
   credits: number;
   isPlanned?: boolean; // true = simulator planning (future), false/undefined = permanent (My Major)
+  /** Optional program context for simulator dual major/certificate assignment. */
+  programType?: "major" | "certificate";
+  programId?: string;
 };
 
 /**
@@ -305,7 +318,8 @@ export function calculatePreviewMajorProgressByMajors(
   inProgressCourseCodes: string[] = [],
   skippedCourseCodes: string[] = [],
   manualRequirements: ManualRequirementEntry[] = [],
-  plannedCourseCodes: string[] = []
+  plannedCourseCodes: string[] = [],
+  blockedCourseCodes: string[] = []
 ): Record<string, MajorProgress> {
   // Canonicalize + dedupe planned into inProgress (without overriding completed/skipped)
   const canon = (arr: string[]) =>
@@ -317,16 +331,28 @@ export function calculatePreviewMajorProgressByMajors(
       )
     );
 
-  const completedCanon = canon(completedCourseCodes);
-  const skippedCanon = canon(skippedCourseCodes);
+  const blockedCanon = canon(blockedCourseCodes);
+  const completedCanon = canon(completedCourseCodes).filter(
+    (c) => !blockedCanon.includes(c)
+  );
+  const skippedCanon = canon(skippedCourseCodes).filter(
+    (c) => !blockedCanon.includes(c)
+  );
 
-  // planned that are not already completed/skipped
+  // planned that are not already completed/skipped/blocked
   const plannedCanon = canon(plannedCourseCodes).filter(
-    (c) => !completedCanon.includes(c) && !skippedCanon.includes(c)
+    (c) =>
+      !completedCanon.includes(c) &&
+      !skippedCanon.includes(c) &&
+      !blockedCanon.includes(c)
   );
 
   const inProgressCanon = Array.from(
-    new Set([...canon(inProgressCourseCodes), ...plannedCanon])
+    new Set(
+      [...canon(inProgressCourseCodes), ...plannedCanon].filter(
+        (c) => !blockedCanon.includes(c)
+      )
+    )
   );
 
   const out: Record<string, MajorProgress> = {};
@@ -337,7 +363,8 @@ export function calculatePreviewMajorProgressByMajors(
       inProgressCanon,
       skippedCanon,
       manualRequirements,
-      [] // excludedRequirements - not used in simulator preview
+      [], // excludedRequirements - not used in simulator preview
+      blockedCanon
     );
   }
   return out;

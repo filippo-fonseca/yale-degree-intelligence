@@ -1,14 +1,18 @@
-import { defineConfig } from "vitest/config";
 import path from "path";
+import { defineConfig } from "vitest/config";
 
+/**
+ * Scoped to the pure library modules on purpose. The policy engine is the only
+ * thing under test here; component and browser tests are out of this suite.
+ */
 export default defineConfig({
-  test: {
-    environment: "node",
-    include: ["lib/**/*.test.ts", "lib/**/*.test.tsx"],
-  },
   resolve: {
     alias: {
       "@": path.resolve(__dirname),
     },
+  },
+  test: {
+    include: ["lib/**/*.test.ts"],
+    environment: "node",
   },
 });

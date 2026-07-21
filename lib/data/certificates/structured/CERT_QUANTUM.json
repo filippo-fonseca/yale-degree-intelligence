@@ -1,0 +1,44 @@
+{
+  "id": "CERT_QUANTUM",
+  "name": "Quantum Science and Engineering",
+  "description": "Explores how quantum mechanics can be harnessed to encode, manipulate, process, learn, and distribute information. Unites experts from physics, computer science, engineering, chemistry, and materials science to develop technologies in computing, simulation, sensing, timing, and networking.",
+  "category": "skills_based",
+  "sourceUrl": "https://catalog.yale.edu/ycps/subjects-of-instruction/quantum-science/",
+  "requiresApplication": false,
+  "creditRequirements": {
+    "total": 5
+  },
+  "notes": [
+    "Minimum grade C in each course",
+    "No Credit/D/Fail",
+    "No more than two course credits may overlap with a major, simultaneous degree, or another certificate",
+    "No overlap of any 1000/2000-level courses; only two 3000+ level courses may overlap",
+    "No course credit may count toward more than two curricular programs",
+    "Approved graduate and professional school courses may count",
+    "Non-Yale courses may not count",
+    "Declare intent by the last day of add/drop in the final term of enrollment on Yale Hub"
+  ],
+  "policy": {
+    "overlapCap": 2,
+    "overlapMinLevel": 3000,
+    "minGrade": "C",
+    "sourceNote": "No more than two course credits may overlap in the fulfillment of the requirements of the Quantum Science & Engineering Certificate and of a major, a simultaneous degree, or another certificate. Students earning this certificate may not overlap any 1000/2000 level courses; only two 3000+ level courses may overlap. The minimum grade for all courses is a C."
+  },
+  "requirements": [
+    {
+      "name": "Quantum foundations",
+      "required": 1,
+      "description": "One required foundations course.",
+      "options": [
+        { "type": "course", "code": "PHYS 3450" },
+        { "type": "course", "code": "CPSC 4470" }
+      ]
+    },
+    {
+      "name": "Quantum electives",
+      "required": 4,
+      "description": "Courses from Applied Physics, Chemistry, Computer Science, Electrical Engineering, Global Affairs, Mathematics, Physics, or Statistics & Data Science that carry the YC Quantum Elective attribute.",
+      "options": []
+    }
+  ]
+}

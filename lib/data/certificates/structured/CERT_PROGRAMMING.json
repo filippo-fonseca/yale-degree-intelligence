@@ -1,0 +1,107 @@
+{
+  "id": "CERT_PROGRAMMING",
+  "name": "Programming",
+  "description": "Prepares students to program computers in support of work in any area of study. A short path to programming literacy that can be completed in four terms. Majors in Computer Science and joint programs with Economics, Electrical Engineering, Mathematics, Psychology, or Computing and the Arts may not pursue this certificate.",
+  "category": "skills_based",
+  "sourceUrl": "https://catalog.yale.edu/ycps/subjects-of-instruction/computer-science/",
+  "requiresApplication": false,
+  "parentProgram": "Computer Science",
+  "creditRequirements": {
+    "total": 5
+  },
+  "notes": [
+    "No Credit/D/Fail",
+    "None of the five required courses may satisfy a major or other certificate; substitute from the same category or a more advanced course if needed",
+    "No course may satisfy more than one of the five required courses",
+    "Majors in Computer Science, CSEC, CS-EE, CS-Math, CS-Psychology, or Computing and the Arts may not pursue this certificate"
+  ],
+  "policy": {
+    "overlapCap": 0,
+    "zeroOverlap": true,
+    "ineligibleMajors": [
+      "CPSC_BA",
+      "CPSC_BS",
+      "CSEC_BS",
+      "EECS",
+      "CPSC_MATH_BS",
+      "CPSC_PSYCH_BS",
+      "COMPUTING_ARTS_ARCH",
+      "COMPUTING_ARTS_ART",
+      "COMPUTING_ARTS_HISTART",
+      "COMPUTING_ARTS_MUSIC",
+      "COMPUTING_ARTS_TDPS"
+    ],
+    "sourceNote": "Students may not use any of the five required courses, indicated below, to satisfy the requirements of any major or other certificate. Majors in Computer Science, and in the joint programs with Economics, Electrical Engineering, Mathematics, and Psychology, or in Computing and the Arts may not pursue the Certificate."
+  },
+  "requirements": [
+    {
+      "name": "Prerequisite",
+      "required": 1,
+      "description": "Introductory programming course. AP Computer Science credit may satisfy this prerequisite.",
+      "options": [
+        { "type": "course", "code": "CPSC 1100" },
+        { "type": "course", "code": "CPSC 1001" },
+        { "type": "course", "code": "CPSC S115" }
+      ]
+    },
+    {
+      "name": "Programming",
+      "required": 1,
+      "description": "Core programming course.",
+      "options": [
+        { "type": "course", "code": "CPSC 2010" },
+        { "type": "course", "code": "CPSC 2000" }
+      ]
+    },
+    {
+      "name": "Data structures",
+      "required": 1,
+      "description": "Required data structures course.",
+      "options": [
+        { "type": "course", "code": "CPSC 2230" }
+      ]
+    },
+    {
+      "name": "Advanced programming",
+      "required": 1,
+      "description": "Advanced programming course.",
+      "options": [
+        { "type": "course", "code": "CPSC 3270" },
+        { "type": "course", "code": "CPSC 3230" }
+      ]
+    },
+    {
+      "name": "Programming elective",
+      "required": 1,
+      "description": "A CPSC course with CPSC 2230 as a listed or implied prerequisite and a primary focus on programming, or a second course that satisfies the advanced programming requirement.",
+      "options": [
+        { "type": "course", "code": "CPSC 4180" },
+        { "type": "course", "code": "CPSC 4210" },
+        { "type": "course", "code": "CPSC 4230" },
+        { "type": "course", "code": "CPSC 4240" },
+        { "type": "course", "code": "CPSC 4330" },
+        { "type": "course", "code": "CPSC 4370" },
+        { "type": "course", "code": "CPSC 4390" },
+        { "type": "course", "code": "CPSC 4460" },
+        { "type": "course", "code": "CPSC 4780" }
+      ]
+    },
+    {
+      "name": "Applications or algorithms elective",
+      "required": 1,
+      "description": "Either a programming-in-context course that requires significant programming, or a course in algorithms.",
+      "options": [
+        { "type": "course", "code": "CPSC 3340" },
+        { "type": "course", "code": "CPSC 3760" },
+        { "type": "course", "code": "CPSC 4310" },
+        { "type": "course", "code": "CPSC 4320" },
+        { "type": "course", "code": "CPSC 4740" },
+        { "type": "course", "code": "CPSC 4770" },
+        { "type": "course", "code": "CPSC 4790" },
+        { "type": "course", "code": "LING 3800" },
+        { "type": "course", "code": "CPSC 3650" },
+        { "type": "course", "code": "CPSC 3660" }
+      ]
+    }
+  ]
+}

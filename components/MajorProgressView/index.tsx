@@ -125,11 +125,16 @@ export default function MajorProgressView({
   progress,
   onRequirementChange,
   courses,
+  userMajors = [],
+  userCertificates = [],
 }: {
   selectedMajor: string;
   progress: MajorProgress;
   onRequirementChange: () => void;
   courses: Course[];
+  /** Declared programs, so the manual picker can ask the policy engine. */
+  userMajors?: string[];
+  userCertificates?: string[];
 }) {
   const { user } = useAuth();
   const [showInProgressStats, setShowInProgressStats] = useState(false);
@@ -621,6 +626,10 @@ export default function MajorProgressView({
         data-tour="major-progress-bar"
         className="p-3 rounded-xl bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 border border-gray-200 dark:border-gray-800/50 shadow-neu"
       >
+        {/* Same light-mode ramp the certificate bar uses: purple-400 sits at
+            2.1:1 on the gray-200 track, which is too faint to show where the
+            in-progress fill ends. Light steps both fills down; dark: keeps the
+            shades this bar has always had. */}
         <div className="relative w-full bg-gray-200 dark:bg-gray-800 rounded-full h-3 overflow-hidden shadow-[inset_0_1px_2px_rgba(0,0,0,0.08)] dark:shadow-[inset_0_1px_2px_rgba(0,0,0,0.3)]">
           {/* Lighter in-progress segment sits behind, only in the +In Progress view. */}
           {showInProgressStats && (
@@ -629,7 +638,7 @@ export default function MajorProgressView({
               initial={{ width: 0 }}
               animate={{ width: `${withInProgressPercentage}%` }}
               transition={{ duration: 1, ease: "easeOut" }}
-              className="absolute inset-y-0 left-0 rounded-full bg-purple-400 dark:bg-purple-500/70"
+              className="absolute inset-y-0 left-0 rounded-full bg-purple-500 dark:bg-purple-500/70"
             />
           )}
           {/* Solid completed segment paints on top. Re-keyed per mode so it
@@ -640,7 +649,7 @@ export default function MajorProgressView({
             initial={{ width: 0 }}
             animate={{ width: `${completionPercentage}%` }}
             transition={{ duration: 1, ease: "easeOut" }}
-            className="absolute inset-y-0 left-0 rounded-full bg-violet-500 shadow-[0_0_10px_rgba(139,92,246,0.6)]"
+            className="absolute inset-y-0 left-0 rounded-full bg-violet-700 dark:bg-violet-500 shadow-[0_0_10px_rgba(139,92,246,0.6)]"
           />
         </div>
 
@@ -721,21 +730,21 @@ export default function MajorProgressView({
       {/* View switcher (sticky) + tip help */}
       <div
         data-tour="major-view-switcher"
-        className="sticky top-0 z-20 -mx-1 px-1 py-2 bg-gradient-to-b from-white via-white to-white/0 dark:from-gray-950 dark:via-gray-950 dark:to-gray-950/0 backdrop-blur-sm"
+        className="sticky top-0 z-20 -mx-1 px-1 py-2.5"
       >
         <div className="flex items-center justify-between gap-3 flex-wrap">
-          <div className="flex items-center gap-1.5">
-            <span className="text-[10px] text-gray-400 dark:text-gray-500 uppercase tracking-wider">
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
               View:
             </span>
             <button
               type="button"
               onClick={() => setView("board")}
               data-tour="major-board-toggle"
-              className={`px-2.5 py-1 text-[11px] rounded-lg transition-all duration-200 ${
+              className={`h-9 px-3.5 text-sm font-medium rounded-xl transition-all duration-200 inline-flex items-center ${
                 view === "board"
-                  ? "bg-purple-500/15 text-purple-600 dark:text-purple-300 border border-purple-600/40 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]"
-                  : "bg-gray-100 dark:bg-gray-900/50 text-gray-400 dark:text-gray-500 border border-gray-200 dark:border-gray-800/50 hover:text-gray-600 dark:hover:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-800/50"
+                  ? "bg-purple-500/15 text-purple-600 dark:text-purple-200 border border-purple-500/50 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]"
+                  : "bg-gray-100 dark:bg-white/[0.06] text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-white/10 hover:text-gray-800 dark:hover:text-white hover:bg-gray-200 dark:hover:bg-white/[0.1]"
               }`}
             >
               Board
@@ -744,14 +753,14 @@ export default function MajorProgressView({
               type="button"
               onClick={() => setView("heatmap")}
               data-tour="major-heatmap-toggle"
-              className={`inline-flex items-center px-2.5 py-1 text-[11px] rounded-lg transition-all duration-200 ${
+              className={`h-9 px-3.5 text-sm font-medium rounded-xl transition-all duration-200 inline-flex items-center gap-1.5 ${
                 view === "heatmap"
-                  ? "bg-purple-500/15 text-purple-600 dark:text-purple-300 border border-purple-600/40 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]"
-                  : "bg-gray-100 dark:bg-gray-900/50 text-gray-400 dark:text-gray-500 border border-gray-200 dark:border-gray-800/50 hover:text-gray-600 dark:hover:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-800/50"
+                  ? "bg-purple-500/15 text-purple-600 dark:text-purple-200 border border-purple-500/50 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]"
+                  : "bg-gray-100 dark:bg-white/[0.06] text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-white/10 hover:text-gray-800 dark:hover:text-white hover:bg-gray-200 dark:hover:bg-white/[0.1]"
               }`}
             >
               Heat map
-              <span className="ml-1 px-1 py-0.5 rounded text-[8px] font-semibold uppercase tracking-wide bg-fuchsia-500/20 text-fuchsia-600 dark:text-fuchsia-300 border border-fuchsia-500/40">
+              <span className="px-1.5 py-px rounded text-[10px] leading-none font-semibold uppercase tracking-wide bg-fuchsia-500/20 text-fuchsia-600 dark:text-fuchsia-300 border border-fuchsia-500/40">
                 New
               </span>
             </button>
@@ -854,6 +863,8 @@ export default function MajorProgressView({
         onClose={() => setManualCourseModal({ isOpen: false, requirement: "" })}
         onSuccess={onRequirementChange}
         userCourses={courses}
+        userMajors={userMajors}
+        userCertificates={userCertificates}
       />
       {/* Requirement Modal */}
       <RequirementModal

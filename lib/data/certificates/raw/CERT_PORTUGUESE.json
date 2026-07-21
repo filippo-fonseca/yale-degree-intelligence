@@ -1,0 +1,58 @@
+{
+  "id": "CERT_PORTUGUESE",
+  "name": "Portuguese",
+  "category": "advanced_language",
+  "source_url": "https://catalog.yale.edu/ycps/subjects-of-instruction/portuguese/",
+  "page_title": "Portuguese",
+  "tabs": [
+    {
+      "label": "Overview",
+      "href": "#text",
+      "id": null
+    },
+    {
+      "label": "Summary of Requirements",
+      "href": "#summaryofrequirementstext",
+      "id": null
+    },
+    {
+      "label": "First year",
+      "href": "#firstyearstext",
+      "id": null
+    },
+    {
+      "label": "Certificate",
+      "href": "#certificatetext",
+      "id": null
+    },
+    {
+      "label": "Faculty",
+      "href": "#facultytext",
+      "id": null
+    },
+    {
+      "label": "Courses",
+      "href": "#coursestext",
+      "id": null
+    }
+  ],
+  "extracted_from_container": "certificatetextcontainer",
+  "parent_program": "Portuguese",
+  "requires_application": false,
+  "full_text": "The Department of Spanish and Portuguese offers a Certificate of Advanced Language Study in Portuguese. A certificate adviser, typically the director of undergraduate studies (DUS), advises students on the certification process and certifies to the University Registrar's Office that students have completed the stated requirements before the end of eight terms of study. The Certificate of Advanced Language Study, once certified, is listed on the student transcript.\nRequirements\nStudents seeking to earn the certificate are required to take four courses, all beyond the L4 level in Portuguese, at least two of which must be Yale courses designated as L5. All courses must be taken for a letter grade, and students must achieve a grade of B or above. With the approval of the certificate adviser, one advanced non-L5 course, conducted in Portuguese, such as an independent study course (graded pass/fail), a graduate seminar, or an advanced seminar may count toward certification requirements.\nThe adviser may approve the substitution of one credit earned as part of a Yale or Yale-designated study abroad program and taught in Portuguese to count toward the certificate requirements. If the adviser approves courses taken outside of Yale for inclusion in the certificate requirements, students must take the necessary steps to ensure those courses appear on their transcripts.\nCredit/D/Fail\nNo courses taken Credit/D/Fail may be counted toward the requirements of the certificate.\nDeclaration of Candidacy\nStudents must declare their intention to earn a Certificate on the\nDeclare Major, Concentration within the Major, Certificate\npage on\nYale Hub\n, as early as possible, but at the very latest, by the 15th of January or September in their last semester at Yale. Once declared, Degree Audit tracks students' progress toward completion of the certificate.",
+  "isolation": {
+    "mode": "isolated_subsection",
+    "text": "The Department of Spanish and Portuguese offers a Certificate of Advanced Language Study in Portuguese. A certificate adviser, typically the director of undergraduate studies (DUS), advises students on the certification process and certifies to the University Registrar's Office that students have completed the stated requirements before the end of eight terms of study. The Certificate of Advanced Language Study, once certified, is listed on the student transcript.\nRequirements\nStudents seeking to earn the certificate are required to take four courses, all beyond the L4 level in Portuguese, at least two of which must be Yale courses designated as L5. All courses must be taken for a letter grade, and students must achieve a grade of B or above. With the approval of the certificate adviser, one advanced non-L5 course, conducted in Portuguese, such as an independent study course (graded pass/fail), a graduate seminar, or an advanced seminar may count toward certification requirements.\nThe adviser may approve the substitution of one credit earned as part of a Yale or Yale-designated study abroad program and taught in Portuguese to count toward the certificate requirements. If the adviser approves courses taken outside of Yale for inclusion in the certificate requirements, students must take the necessary steps to ensure those courses appear on their transcripts.\nCredit/D/Fail\nNo courses taken Credit/D/Fail may be counted toward the requirements of the certificate.\nDeclaration of Candidacy\nStudents must declare their intention to earn a Certificate on the\nDeclare Major, Concentration within the Major, Certificate\npage on\nYale Hub\n, as early as possible, but at the very latest, by the 15th of January or September in their last semester at Yale. Once declared, Degree Audit tracks students' progress toward completion of the certificate.",
+    "start_line": 1,
+    "end_line": 13,
+    "matched_name": "Portuguese"
+  },
+  "sections": {
+    "overview": "The Department of Spanish and Portuguese offers a Certificate of Advanced Language Study in Portuguese. A certificate adviser, typically the director of undergraduate studies (DUS), advises students on the certification process and certifies to the University Registrar's Office that students have completed the stated requirements before the end of eight terms of study. The Certificate of Advanced Language Study, once certified, is listed on the student transcript.",
+    "requirements": "Students seeking to earn the certificate are required to take four courses, all beyond the L4 level in Portuguese, at least two of which must be Yale courses designated as L5. All courses must be taken for a letter grade, and students must achieve a grade of B or above. With the approval of the certificate adviser, one advanced non-L5 course, conducted in Portuguese, such as an independent study course (graded pass/fail), a graduate seminar, or an advanced seminar may count toward certification requirements.\nThe adviser may approve the substitution of one credit earned as part of a Yale or Yale-designated study abroad program and taught in Portuguese to count toward the certificate requirements. If the adviser approves courses taken outside of Yale for inclusion in the certificate requirements, students must take the necessary steps to ensure those courses appear on their transcripts.\nCredit/D/Fail\nNo courses taken Credit/D/Fail may be counted toward the requirements of the certificate.",
+    "declaration": "Students must declare their intention to earn a Certificate on the\nDeclare Major, Concentration within the Major, Certificate\npage on\nYale Hub\n, as early as possible, but at the very latest, by the 15th of January or September in their last semester at Yale. Once declared, Degree Audit tracks students' progress toward completion of the certificate."
+  },
+  "summary_of_requirements_tab": null,
+  "tables": [],
+  "raw_html_length": 26468
+}

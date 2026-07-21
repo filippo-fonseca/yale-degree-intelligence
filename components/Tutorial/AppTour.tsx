@@ -31,6 +31,11 @@ const ACCENTS: Record<
       "bg-purple-100 text-purple-600 dark:bg-purple-500/15 dark:text-purple-300 border-purple-200 dark:border-purple-500/30",
     dot: "bg-purple-500 dark:bg-purple-400",
   },
+  teal: {
+    chip:
+      "bg-teal-100 text-teal-600 dark:bg-teal-500/15 dark:text-teal-300 border-teal-200 dark:border-teal-500/30",
+    dot: "bg-teal-500 dark:bg-teal-400",
+  },
 };
 
 type Rect = { top: number; left: number; width: number; height: number };

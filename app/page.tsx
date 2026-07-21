@@ -47,8 +47,19 @@ import {
 import { gradePoints, getDistPillStyle } from "@/lib/constants";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
 import { calculateMajorProgress, MAJORS } from "@/lib/majors";
+import {
+  calculateCertificateProgress,
+  CERTIFICATES,
+  certificateRequirements,
+} from "@/lib/certificates";
+import {
+  getCertificateBlockedCodes,
+  getCertificateViolations,
+  getMajorBlockedCodes,
+  filterCertificateManualEntries,
+} from "@/lib/utils/programClaims";
 import { HiDocumentDuplicate } from "react-icons/hi";
-import { RiProgress3Fill } from "react-icons/ri";
+import { RiProgress3Fill, RiAwardFill } from "react-icons/ri";
 import CompoundLogo from "@/components/ui/CompoundLogo";
 import { getCourseNameFromCode } from "@/lib/courseCatalog";
 import { FaBuildingCircleCheck, FaHeart } from "react-icons/fa6";
@@ -95,6 +106,10 @@ const MajorProgressView = dynamic(
   () => import("@/components/MajorProgressView"),
   { ssr: false, loading: TabFallback },
 );
+const CertificateProgressView = dynamic(
+  () => import("@/components/CertificateProgressView"),
+  { ssr: false, loading: TabFallback },
+);
 const DistributionalsView = dynamic(
   () => import("@/components/DistributionalProgress"),
   { ssr: false, loading: TabFallback },
@@ -118,6 +133,7 @@ const MajorSelectionFlow = dynamic(
 
 interface UserProfile {
   majors: string[];
+  certificates?: string[];
   graduationYear: number;
   updatedAt: Date;
   // Shared courses the user has manually marked as prerequisites, which are
@@ -135,6 +151,7 @@ export default function Home() {
   const [courses, setCourses] = useState<Course[]>([]);
   const [hasData, setHasData] = useState(false);
   const [selectedMajor, setSelectedMajor] = useState<string>("");
+  const [selectedCertificate, setSelectedCertificate] = useState<string>("");
   const [showMajorSelection, setShowMajorSelection] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -308,6 +325,14 @@ export default function Home() {
       // badge: "2029 can use!",
     },
     {
+      id: "certificate",
+      icon: RiAwardFill,
+      label:
+        (userProfile?.certificates?.length ?? 0) === 1
+          ? "My certificate"
+          : "My certificates",
+    },
+    {
       id: "simulator",
       icon: MonitorCog,
       label: "Simulator",
@@ -350,8 +375,12 @@ export default function Home() {
       (docSnap) => {
         if (docSnap.exists()) {
           const data = docSnap.data() as UserProfile;
-          setUserProfile(data);
+          setUserProfile({
+            ...data,
+            certificates: data.certificates ?? [],
+          });
           setSelectedMajor(data.majors?.[0] || "");
+          setSelectedCertificate(data.certificates?.[0] || "");
           setShowMajorSelection(false); // auto-close once profile exists
         } else {
           setUserProfile(null);
@@ -403,6 +432,13 @@ export default function Home() {
     }
   }, [user, userProfile, onboardChecked]);
 
+  // The student's declared programs, handed to the certificate policy engine so
+  // it can resolve eligibility and per-certificate overlap budgets.
+  const programPolicyOptions = {
+    majorIds: userProfile?.majors ?? [],
+    certificateIds: userProfile?.certificates ?? [],
+  };
+
   // Replace your current getMajorProgress with this:
   const getMajorProgress = () => {
     if (!user || !selectedMajor) return null;
@@ -426,7 +462,7 @@ export default function Home() {
 
     const manualRequirements = courses.flatMap((course) =>
       (course.manualRequirementsFulfilled || [])
-        .filter((m) => m.major_id === selectedMajor)
+        .filter((m) => m.major_id === selectedMajor && !m.certificate_id)
         .map((m) => ({
           code: course.code,
           requirement: m.requirement_title,
@@ -436,7 +472,7 @@ export default function Home() {
 
     const excludedRequirements = courses.flatMap((course) =>
       (course.excludedFromRequirements || [])
-        .filter((m) => m.major_id === selectedMajor)
+        .filter((m) => m.major_id === selectedMajor && !m.certificate_id)
         .map((m) => ({
           code: course.code,
           requirement: m.requirement_title,
@@ -451,6 +487,74 @@ export default function Home() {
       skippedCourseCodes,
       manualRequirements,
       excludedRequirements,
+      getMajorBlockedCodes(courses, programPolicyOptions),
+    );
+  };
+
+  const getCertificateProgress = () => {
+    if (!user || !selectedCertificate) return null;
+
+    const completedCourseCodes = courses
+      .filter(
+        (course) =>
+          course.status === "completed" &&
+          ((course.grade !== null && course.grade !== "In Progress") ||
+            course.skipped),
+      )
+      .map((course) => course.code);
+
+    const inProgressCourseCodes = courses
+      .filter((course) => course.grade === "In Progress" && !course.skipped)
+      .map((course) => course.code);
+
+    const skippedCourseCodes = courses
+      .filter((course) => course.skipped)
+      .map((course) => course.code);
+
+    const manualRequirements = courses.flatMap((course) =>
+      (course.manualRequirementsFulfilled || [])
+        .filter((m) => m.certificate_id === selectedCertificate)
+        .map((m) => ({
+          code: course.code,
+          requirement: m.requirement_title,
+          credits: course.credits || 1,
+        })),
+    );
+
+    const excludedRequirements = courses.flatMap((course) =>
+      (course.excludedFromRequirements || [])
+        .filter((m) => m.certificate_id === selectedCertificate)
+        .map((m) => ({
+          code: course.code,
+          requirement: m.requirement_title,
+        })),
+    );
+
+    // Manual fulfillments bypass the blocked-code filter inside the
+    // calculation, so a conflicting manual has to be dropped here or it would
+    // always win. The certificate side loses; the major keeps the course.
+    const violations = getCertificateViolations(
+      courses,
+      selectedCertificate,
+      programPolicyOptions,
+    );
+
+    return calculateCertificateProgress(
+      selectedCertificate,
+      completedCourseCodes,
+      inProgressCourseCodes,
+      skippedCourseCodes,
+      filterCertificateManualEntries(
+        manualRequirements,
+        selectedCertificate,
+        violations,
+      ),
+      excludedRequirements,
+      getCertificateBlockedCodes(
+        courses,
+        selectedCertificate,
+        programPolicyOptions,
+      ),
     );
   };
 
@@ -845,9 +949,15 @@ export default function Home() {
       const docRef = doc(db, "users", user.uid);
       const docSnap = await getDoc(docRef);
       if (docSnap.exists()) {
-        setUserProfile(docSnap.data() as UserProfile);
+        setUserProfile({
+          ...(docSnap.data() as UserProfile),
+          certificates: (docSnap.data() as UserProfile).certificates ?? [],
+        });
         if (updatedProfile.majors) {
           setSelectedMajor(updatedProfile.majors[0] || "");
+        }
+        if (updatedProfile.certificates) {
+          setSelectedCertificate(updatedProfile.certificates[0] || "");
         }
       }
       setShowSettings(false);
@@ -2006,6 +2116,8 @@ export default function Home() {
                       progress={getMajorProgress()!}
                       onRequirementChange={fetchCourses}
                       courses={courses}
+                      userMajors={programPolicyOptions.majorIds}
+                      userCertificates={programPolicyOptions.certificateIds}
                     />
                   ) : (
                     <div className="flex flex-col items-center justify-center py-16 text-center">
@@ -2013,6 +2125,93 @@ export default function Home() {
                         {!selectedMajor
                           ? "Please select a major to view your progress."
                           : "Loading your major progress..."}
+                      </p>
+                    </div>
+                  )}
+                </motion.div>
+              )}
+              {activeTab === "certificate" && (
+                <motion.div
+                  key="certificate"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  {user && userProfile && (
+                    <div className="mb-6">
+                      <h2 className="text-3xl font-medium text-gray-900 dark:text-white">
+                        {(userProfile.certificates?.length ?? 0) > 0
+                          ? `Your certificate progress, ${user?.displayName?.split(" ")[0]}.`
+                          : `Certificates are optional — add yours anytime.`}
+                      </h2>
+                      <p className="text-gray-600 dark:text-gray-300">
+                        Track Yale College certificates alongside your major.
+                        Courses counted toward a certificate cannot also count
+                        toward your major(s).
+                      </p>
+                    </div>
+                  )}
+
+                  {userProfile &&
+                    (userProfile.certificates?.length ?? 0) > 1 && (
+                      <div className="mb-4">
+                        <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1.5 uppercase tracking-wider">
+                          Viewing Progress For
+                        </label>
+                        <div className="flex flex-wrap items-center gap-1.5">
+                          {userProfile.certificates!.map((certificate) => (
+                            <button
+                              key={certificate}
+                              onClick={() =>
+                                setSelectedCertificate(certificate)
+                              }
+                              className={`px-3 py-1.5 rounded-xl text-sm transition-all duration-200 ${
+                                selectedCertificate === certificate
+                                  ? "bg-gradient-to-br from-teal-500/20 via-teal-600/15 to-emerald-500/20 text-teal-200 border border-teal-500/40 shadow-[inset_0_1px_0_rgba(255,255,255,0.1),0_2px_8px_rgba(20,184,166,0.15)]"
+                                  : "bg-gray-50 dark:bg-gray-900/40 text-gray-500 dark:text-gray-400 border border-gray-200 dark:border-gray-800/60 hover:border-gray-300 dark:hover:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800/50 hover:text-gray-700 dark:hover:text-gray-300 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)]"
+                              }`}
+                            >
+                              {CERTIFICATES[certificate] || certificate}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                  {(userProfile?.certificates?.length ?? 0) === 0 ? (
+                    <div className="flex flex-col items-center justify-center py-16 text-center rounded-2xl border border-dashed border-teal-300/50 dark:border-teal-800/50 bg-teal-50/40 dark:bg-teal-950/20 px-6">
+                      <RiAwardFill className="text-teal-500 mb-3" size={36} />
+                      <p className="text-gray-700 dark:text-gray-200 text-lg font-medium">
+                        No certificates yet
+                      </p>
+                      <p className="text-sm text-gray-500 dark:text-gray-400 mt-2 max-w-md">
+                        Add up to three Yale College certificates in Settings.
+                        We&apos;ll track requirement progress the same way we
+                        do for majors — including manual fulfill and skip.
+                      </p>
+                      <button
+                        onClick={() => setShowSettings(true)}
+                        className="mt-5 px-4 py-2 rounded-xl bg-teal-600 text-white text-sm hover:bg-teal-700 transition-colors"
+                      >
+                        Add certificates in Settings
+                      </button>
+                    </div>
+                  ) : getCertificateProgress() ? (
+                    <CertificateProgressView
+                      selectedCertificate={selectedCertificate}
+                      progress={getCertificateProgress()!}
+                      onRequirementChange={fetchCourses}
+                      courses={courses}
+                      userMajors={programPolicyOptions.majorIds}
+                      userCertificates={programPolicyOptions.certificateIds}
+                    />
+                  ) : (
+                    <div className="flex flex-col items-center justify-center py-16 text-center">
+                      <p className="text-gray-500 dark:text-gray-400 text-lg">
+                        {!selectedCertificate
+                          ? "Please select a certificate to view your progress."
+                          : "Loading your certificate progress..."}
                       </p>
                     </div>
                   )}
@@ -2028,37 +2227,44 @@ export default function Home() {
                 >
                   {userProfile && (
                     <Simulator
-                      remainingCourses={
-                        // 1. Aggregate all remaining courses across ALL majors
-                        userProfile.majors
-                          .flatMap((major) => {
-                            // You'll need to compute progress for each major
-                            const completedCourseCodes = courses
-                              .filter(
-                                (course) =>
-                                  course.status === "completed" &&
-                                  ((course.grade !== null &&
-                                    course.grade !== "In Progress") ||
-                                    course.skipped),
-                              )
-                              .map((course) => course.code);
+                      remainingCourses={(() => {
+                        const completedCourseCodes = courses
+                          .filter(
+                            (course) =>
+                              course.status === "completed" &&
+                              ((course.grade !== null &&
+                                course.grade !== "In Progress") ||
+                                course.skipped),
+                          )
+                          .map((course) => course.code);
 
-                            const inProgressCourseCodes = courses
-                              .filter(
-                                (course) =>
-                                  course.grade === "In Progress" &&
-                                  !course.skipped,
-                              )
-                              .map((course) => course.code);
+                        const inProgressCourseCodes = courses
+                          .filter(
+                            (course) =>
+                              course.grade === "In Progress" &&
+                              !course.skipped,
+                          )
+                          .map((course) => course.code);
 
-                            const skippedCourseCodes = courses
-                              .filter((course) => course.skipped)
-                              .map((course) => course.code);
+                        const skippedCourseCodes = courses
+                          .filter((course) => course.skipped)
+                          .map((course) => course.code);
 
+                        const majorBlocked = getMajorBlockedCodes(
+                          courses,
+                          programPolicyOptions,
+                        );
+
+                        const fromMajors = userProfile.majors.flatMap(
+                          (major) => {
                             const manualRequirements = courses.flatMap(
                               (course) =>
                                 (course.manualRequirementsFulfilled || [])
-                                  .filter((m) => m.major_id === major)
+                                  .filter(
+                                    (m) =>
+                                      m.major_id === major &&
+                                      !m.certificate_id,
+                                  )
                                   .map((m) => ({
                                     code: course.code,
                                     requirement: m.requirement_title,
@@ -2069,14 +2275,17 @@ export default function Home() {
                             const excludedRequirements = courses.flatMap(
                               (course) =>
                                 (course.excludedFromRequirements || [])
-                                  .filter((m) => m.major_id === major)
+                                  .filter(
+                                    (m) =>
+                                      m.major_id === major &&
+                                      !m.certificate_id,
+                                  )
                                   .map((m) => ({
                                     code: course.code,
                                     requirement: m.requirement_title,
                                   })),
                             );
 
-                            // Get progress for this major
                             const progress = calculateMajorProgress(
                               major,
                               completedCourseCodes,
@@ -2084,9 +2293,9 @@ export default function Home() {
                               skippedCourseCodes,
                               manualRequirements,
                               excludedRequirements,
+                              majorBlocked,
                             );
 
-                            // Extract all "not taken" requirements
                             return (
                               progress?.remainingRequirements.flatMap((req) =>
                                 req.options
@@ -2106,20 +2315,107 @@ export default function Home() {
                                         semester: "TBD",
                                         year: 0,
                                         userId: user?.uid || "",
-                                        status: "not-taken" as const, // This is the key fix
+                                        status: "not-taken" as const,
                                         credits: opt.credits,
                                         skipped: false,
                                       }) as Course,
                                   ),
                               ) || []
                             );
-                          })
-                          .filter(
-                            (course, idx, arr) =>
-                              arr.findIndex((c) => c.code === course.code) ===
-                              idx,
-                          )
-                      }
+                          },
+                        );
+
+                        const fromCertificates = (
+                          userProfile.certificates || []
+                        ).flatMap((certificateId) => {
+                          if (!certificateRequirements[certificateId]) {
+                            return [];
+                          }
+                          const manualRequirements = courses.flatMap(
+                            (course) =>
+                              (course.manualRequirementsFulfilled || [])
+                                .filter(
+                                  (m) =>
+                                    m.certificate_id === certificateId,
+                                )
+                                .map((m) => ({
+                                  code: course.code,
+                                  requirement: m.requirement_title,
+                                  credits: course.credits || 1,
+                                })),
+                          );
+
+                          const excludedRequirements = courses.flatMap(
+                            (course) =>
+                              (course.excludedFromRequirements || [])
+                                .filter(
+                                  (m) =>
+                                    m.certificate_id === certificateId,
+                                )
+                                .map((m) => ({
+                                  code: course.code,
+                                  requirement: m.requirement_title,
+                                })),
+                          );
+
+                          const violations = getCertificateViolations(
+                            courses,
+                            certificateId,
+                            programPolicyOptions,
+                          );
+
+                          const progress = calculateCertificateProgress(
+                            certificateId,
+                            completedCourseCodes,
+                            inProgressCourseCodes,
+                            skippedCourseCodes,
+                            filterCertificateManualEntries(
+                              manualRequirements,
+                              certificateId,
+                              violations,
+                            ),
+                            excludedRequirements,
+                            getCertificateBlockedCodes(
+                              courses,
+                              certificateId,
+                              programPolicyOptions,
+                            ),
+                          );
+
+                          return (
+                            progress?.remainingRequirements.flatMap((req) =>
+                              req.options
+                                .filter(
+                                  (opt) =>
+                                    !opt.completed &&
+                                    !opt.inProgress &&
+                                    !opt.skipped,
+                                )
+                                .map(
+                                  (opt) =>
+                                    ({
+                                      id: `${opt.code}-sim-cert-${certificateId}`,
+                                      code: opt.code,
+                                      name: opt.name,
+                                      grade: null,
+                                      semester: "TBD",
+                                      year: 0,
+                                      userId: user?.uid || "",
+                                      status: "not-taken" as const,
+                                      credits: opt.credits,
+                                      skipped: false,
+                                    }) as Course,
+                                ),
+                            ) || []
+                          );
+                        });
+
+                        return [...fromMajors, ...fromCertificates].filter(
+                          (course, idx, arr) =>
+                            arr.findIndex((c) => c.code === course.code) ===
+                            idx,
+                        );
+                      })()}
                       completedCourses={courses.filter(
                         (c) =>
                           c.status === "completed" ||
@@ -2127,6 +2423,30 @@ export default function Home() {
                       )}
                       graduationYear={userProfile.graduationYear}
                       userMajors={userProfile.majors}
+                      userCertificates={userProfile.certificates ?? []}
+                      majorPermanentManuals={courses.flatMap((course) =>
+                        (course.manualRequirementsFulfilled || [])
+                          .filter((m) => m.major_id && !m.certificate_id)
+                          .map((m) => ({
+                            code: course.code,
+                            requirement: m.requirement_title,
+                            credits: course.credits || 1,
+                            programType: "major" as const,
+                            programId: m.major_id,
+                          })),
+                      )}
+                      certificatePermanentManuals={courses.flatMap(
+                        (course) =>
+                          (course.manualRequirementsFulfilled || [])
+                            .filter((m) => m.certificate_id)
+                            .map((m) => ({
+                              code: course.code,
+                              requirement: m.requirement_title,
+                              credits: course.credits || 1,
+                              programType: "certificate" as const,
+                              programId: m.certificate_id,
+                            })),
+                      )}
                     />
                   )}
                 </motion.div>
@@ -2207,6 +2527,7 @@ export default function Home() {
         onClose={() => setCommandPaletteOpen(false)}
         courses={courses}
         selectedMajor={selectedMajor}
+        selectedCertificate={selectedCertificate}
         hasData={hasData}
         onNavigate={handleTabChange}
         onImportTranscript={() => {

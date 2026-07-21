@@ -54,6 +54,6 @@
     "uuid": "^9.0.0"
   },
   "devDependencies": {
-    "vitest": "^3.2.7"
+    "vitest": "^2.1.9"
   }
 }

@@ -1,0 +1,46 @@
+{
+  "id": "CERT_HUMAN_RIGHTS",
+  "name": "Human Rights Studies",
+  "description": "Available to all interested Yale students, this certificate provides the opportunity to pursue an interdisciplinary study of human rights.",
+  "category": "interdisciplinary",
+  "sourceUrl": "https://catalog.yale.edu/ycps/subjects-of-instruction/human-rights/",
+  "requiresApplication": false,
+  "creditRequirements": {
+    "total": 5
+  },
+  "notes": [
+    "No courses taken Credit/D/Fail may be applied toward the certificate.",
+    "Courses taken at another institution or during an approved summer or term-time study abroad program may count with certificate director approval. An on-topic summer internship can replace one elective with approval.",
+    "Graduate and professional school courses may count with director approval or if tagged with approved attributes.",
+    "Declare on Yale Hub by January 15 or September 15 of the final semester at the latest."
+  ],
+  "requirements": [
+    {
+      "name": "Gateway",
+      "required": 1,
+      "description": "Gateway course introducing theoretical tools for studying human rights.",
+      "options": [
+        { "type": "course", "code": "GLBL 3102" },
+        { "type": "course", "code": "GLBL 3103" }
+      ]
+    },
+    {
+      "name": "Domestic elective",
+      "required": 1,
+      "description": "Elective with YC Human Rights Domestic attribute that substantially engages with human rights language, ideas, and methods.",
+      "options": []
+    },
+    {
+      "name": "International elective",
+      "required": 1,
+      "description": "Elective with YC Human Rights International attribute that substantially engages with human rights language, ideas, and methods.",
+      "options": []
+    },
+    {
+      "name": "Additional electives",
+      "required": 2,
+      "description": "Additional human rights electives approved for the certificate.",
+      "options": []
+    }
+  ]
+}

@@ -212,6 +212,12 @@ export default function Home() {
     "upload",
   );
 
+  // Dan advisor is hidden for the v3 launch; bounce anyone whose persisted
+  // tab still points at it so they do not land on an empty pane.
+  useEffect(() => {
+    if (activeTab === "cleoai") setActiveTab("upload");
+  }, [activeTab, setActiveTab]);
+
   // Simulator unsaved changes check
   const [simulatorNavCheck, setSimulatorNavCheck] = useState<
     ((callback: () => void) => void) | null
@@ -344,12 +350,13 @@ export default function Home() {
       label: "Friends",
       disabled: !hasData,
     },
-    {
-      id: "cleoai",
-      icon: LogoIcon,
-      label: "Dan",
-      comingSoon: true,
-    },
+    // Dan advisor hidden for the v3 launch. Uncomment to restore the tab.
+    // {
+    //   id: "cleoai",
+    //   icon: LogoIcon,
+    //   label: "Dan",
+    //   comingSoon: true,
+    // },
     {
       id: "distributionals",
       icon: FaBuildingCircleCheck,
@@ -2469,7 +2476,10 @@ export default function Home() {
                   />
                 </motion.div>
               )}
-              {activeTab === "cleoai" && (
+              {/* Dan advisor hidden for the v3 launch. The false && guard
+                  keeps this pane compiled but unreachable; drop the guard and
+                  restore the sidebar tab above to bring Dan back. */}
+              {false && activeTab === "cleoai" && (
                 <motion.div
                   key="cleoai"
                   initial={{ opacity: 0 }}

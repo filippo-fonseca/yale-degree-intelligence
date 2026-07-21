@@ -250,7 +250,7 @@ export default function LoginPage({
           </a>
         </p>
         <p className="text-[10px] mt-0.5 text-gray-400 dark:text-gray-600">
-          v2.0 · Not affiliated with Yale University. Any data you upload is
+          v3.0 · Not affiliated with Yale University. Any data you upload is
           from your own volition and you agree to our storage practices. We will
           NOT store your transcript.
         </p>

@@ -302,72 +302,135 @@ export default function SimulatorRequirementsBreakdown({
     );
   }
 
+  const majorCards = majorIds
+    .map((majorId) => {
+      const prog = previewProgress[majorId];
+      if (!prog) return null;
+
+      const manualForProgram = simulatorManualReqs.filter((m) => {
+        const isMajorManual =
+          m.programType === "major" || m.programType === undefined;
+        if (!isMajorManual) return false;
+        if (m.programId && m.programId !== majorId) return false;
+        const allReqs = [
+          ...prog.completedRequirements,
+          ...prog.inProgressRequirements,
+          ...prog.remainingRequirements,
+        ];
+        return allReqs.some((r) => r.name === m.requirement);
+      });
+
+      return (
+        <ProgramProgressCard
+          key={`major-${majorId}`}
+          programKey={`major-${majorId}`}
+          title={MAJORS[majorId] ?? majorId}
+          prog={prog}
+          accent="purple"
+          manualReqs={manualForProgram}
+          isOpen={!!expanded[`major-${majorId}`]}
+          onToggle={() => toggle(`major-${majorId}`)}
+          isPlanned={isPlanned}
+          onRemoveManual={onRemoveManualReq}
+        />
+      );
+    })
+    .filter(Boolean);
+
+  const certificateCards = certificateIds
+    .map((certId) => {
+      const prog = certificatePreviewProgress[certId];
+      if (!prog) return null;
+
+      const manualForProgram = simulatorManualReqs.filter((m) => {
+        if (m.programType !== "certificate") return false;
+        if (m.programId && m.programId !== certId) return false;
+        const allReqs = [
+          ...prog.completedRequirements,
+          ...prog.inProgressRequirements,
+          ...prog.remainingRequirements,
+        ];
+        return allReqs.some((r) => r.name === m.requirement);
+      });
+
+      return (
+        <ProgramProgressCard
+          key={`cert-${certId}`}
+          programKey={`cert-${certId}`}
+          title={CERTIFICATES[certId] ?? certId}
+          prog={prog}
+          accent="teal"
+          manualReqs={manualForProgram}
+          isOpen={!!expanded[`cert-${certId}`]}
+          onToggle={() => toggle(`cert-${certId}`)}
+          isPlanned={isPlanned}
+          onRemoveManual={onRemoveManualReq}
+          policy={certificatePolicy[certId]}
+        />
+      );
+    })
+    .filter(Boolean);
+
+  // Majors and certificates are different kinds of thing and follow different
+  // rules, so they get labeled groups instead of one flat list. A student with
+  // only one kind sees no label, since there is nothing to tell apart.
+  const showGroupLabels =
+    majorCards.length > 0 && certificateCards.length > 0;
+
   return (
-    <div className="space-y-3">
-      {majorIds.map((majorId) => {
-        const prog = previewProgress[majorId];
-        if (!prog) return null;
+    <div className="space-y-4">
+      {majorCards.length > 0 && (
+        <div className="space-y-3">
+          {showGroupLabels && (
+            <GroupLabel accent="purple">
+              {majorCards.length > 1 ? "Majors" : "Major"}
+            </GroupLabel>
+          )}
+          {majorCards}
+        </div>
+      )}
 
-        const manualForProgram = simulatorManualReqs.filter((m) => {
-          const isMajorManual =
-            m.programType === "major" || m.programType === undefined;
-          if (!isMajorManual) return false;
-          if (m.programId && m.programId !== majorId) return false;
-          const allReqs = [
-            ...prog.completedRequirements,
-            ...prog.inProgressRequirements,
-            ...prog.remainingRequirements,
-          ];
-          return allReqs.some((r) => r.name === m.requirement);
-        });
+      {certificateCards.length > 0 && (
+        <div className="space-y-3">
+          {showGroupLabels && (
+            <GroupLabel accent="teal">
+              {certificateCards.length > 1 ? "Certificates" : "Certificate"}
+            </GroupLabel>
+          )}
+          {certificateCards}
+        </div>
+      )}
+    </div>
+  );
+}
 
-        return (
-          <ProgramProgressCard
-            key={`major-${majorId}`}
-            programKey={`major-${majorId}`}
-            title={MAJORS[majorId] ?? majorId}
-            prog={prog}
-            accent="purple"
-            manualReqs={manualForProgram}
-            isOpen={!!expanded[`major-${majorId}`]}
-            onToggle={() => toggle(`major-${majorId}`)}
-            isPlanned={isPlanned}
-            onRemoveManual={onRemoveManualReq}
-          />
-        );
-      })}
-
-      {certificateIds.map((certId) => {
-        const prog = certificatePreviewProgress[certId];
-        if (!prog) return null;
-
-        const manualForProgram = simulatorManualReqs.filter((m) => {
-          if (m.programType !== "certificate") return false;
-          if (m.programId && m.programId !== certId) return false;
-          const allReqs = [
-            ...prog.completedRequirements,
-            ...prog.inProgressRequirements,
-            ...prog.remainingRequirements,
-          ];
-          return allReqs.some((r) => r.name === m.requirement);
-        });
-
-        return (
-          <ProgramProgressCard
-            key={`cert-${certId}`}
-            programKey={`cert-${certId}`}
-            title={CERTIFICATES[certId] ?? certId}
-            prog={prog}
-            accent="teal"
-            manualReqs={manualForProgram}
-            isOpen={!!expanded[`cert-${certId}`]}
-            onToggle={() => toggle(`cert-${certId}`)}
-            isPlanned={isPlanned}
-            onRemoveManual={onRemoveManualReq}
-            policy={certificatePolicy[certId]}
-          />
-        );
-      })}
+/** The one-line heading over a group of program cards. */
+function GroupLabel({
+  accent,
+  children,
+}: {
+  accent: Accent;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="flex items-center gap-2">
+      <span
+        className={`text-[10px] font-medium uppercase tracking-wide ${
+          accent === "teal"
+            ? "text-teal-600 dark:text-teal-400"
+            : "text-purple-600 dark:text-purple-400"
+        }`}
+      >
+        {children}
+      </span>
+      <span
+        className={`h-px flex-1 ${
+          accent === "teal"
+            ? "bg-teal-200 dark:bg-teal-800/40"
+            : "bg-purple-200 dark:bg-purple-900/40"
+        }`}
+        aria-hidden
+      />
     </div>
   );
 }
@@ -771,13 +834,22 @@ function ReqSection({
                   )}
               </div>
 
+              {/* A refused claim is not a warning, it is credit the student
+                  does not have. Amber is reserved for things that still count
+                  (planned, and the engine's warn verdicts), so this reads as
+                  switched off: muted fill, struck code, and the plain words
+                  for what happened. */}
               {conflicts.map((note) => (
                 <div key={`conflict-${note.code}`} className="mt-1">
-                  <span className="inline-flex items-center text-[10px] px-1.5 py-0.5 rounded-full border bg-amber-100 dark:bg-amber-900/20 text-amber-700 dark:text-amber-300 border-amber-300 dark:border-amber-800/50">
-                    {note.code}
-                    <span className="ml-0.5 text-amber-500/80">conflict</span>
+                  <span className="inline-flex items-center text-[10px] px-1.5 py-0.5 rounded-full border bg-zinc-100 dark:bg-zinc-800/40 text-zinc-500 dark:text-zinc-400 border-zinc-300 dark:border-zinc-700/50 opacity-90">
+                    <span className="line-through decoration-zinc-400/70 dark:decoration-zinc-500/70">
+                      {note.code}
+                    </span>
+                    <span className="ml-1 text-zinc-500 dark:text-zinc-400">
+                      not counted
+                    </span>
                   </span>
-                  <div className="text-[10px] text-amber-600 dark:text-amber-400 mt-0.5">
+                  <div className="text-[10px] text-zinc-500 dark:text-zinc-400 mt-0.5">
                     {note.text}
                   </div>
                 </div>

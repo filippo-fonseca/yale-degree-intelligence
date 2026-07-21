@@ -202,22 +202,26 @@ const RequirementCard = React.memo(function RequirementCard({
         )}
       </div>
 
+      {/* Refused claims are credit this certificate does not have, so they get
+          the neutral blocked treatment rather than the amber one warnings use.
+          Same convention as the simulator breakdown: struck code, plain words,
+          reduced emphasis. */}
       {conflicts && conflicts.length > 0 && (
         <div className="mt-2 space-y-1.5">
           {conflicts.map((conflict) => (
             <div
               key={conflict.courseCode}
-              className="rounded-lg bg-amber-500/10 border border-amber-500/20 px-2 py-1.5"
+              className="rounded-lg bg-zinc-100 dark:bg-zinc-800/40 border border-zinc-300 dark:border-zinc-700/50 px-2 py-1.5"
             >
               <div className="flex items-center gap-1.5">
-                <span className="text-[10px] px-1.5 py-0.5 rounded-md bg-amber-500/20 text-amber-700 dark:text-amber-300 border border-amber-500/40">
-                  conflict
+                <span className="text-[10px] px-1.5 py-0.5 rounded-md bg-zinc-200 dark:bg-zinc-700/40 text-zinc-600 dark:text-zinc-300 border border-zinc-300 dark:border-zinc-600/50">
+                  not counted
                 </span>
-                <span className="text-[11px] font-medium text-amber-700 dark:text-amber-300">
+                <span className="text-[11px] font-medium text-zinc-500 dark:text-zinc-400 line-through decoration-zinc-400/70 dark:decoration-zinc-500/70">
                   {conflict.courseCode}
                 </span>
               </div>
-              <p className="text-[11px] mt-1 text-amber-700/80 dark:text-amber-200/80">
+              <p className="text-[11px] mt-1 text-zinc-500 dark:text-zinc-400">
                 {conflict.reason}
               </p>
               <button
@@ -226,7 +230,7 @@ const RequirementCard = React.memo(function RequirementCard({
                   e.stopPropagation();
                   onRemoveManual(conflict.courseCode, req.name);
                 }}
-                className="mt-1 text-[11px] underline underline-offset-2 text-amber-700 dark:text-amber-300 hover:text-amber-800 dark:hover:text-amber-200 transition-colors"
+                className="mt-1 text-[11px] underline underline-offset-2 text-zinc-600 dark:text-zinc-300 hover:text-zinc-800 dark:hover:text-zinc-100 transition-colors"
               >
                 Remove from certificate
               </button>

@@ -78,12 +78,15 @@ function ProgressRing({
       className="flex-shrink-0 -rotate-90"
       viewBox={`0 0 ${size} ${size}`}
     >
+      {/* The 15% gray reads as a ring against a near-black card but nearly
+          vanishes on a white one, so light mode gets a heavier track. */}
       <circle
         cx={size / 2}
         cy={size / 2}
         r={radius}
         fill="none"
         stroke="rgba(100,100,100,0.15)"
+        className="[stroke:rgba(100,100,100,0.35)] dark:[stroke:rgba(100,100,100,0.15)]"
         strokeWidth={strokeWidth}
       />
       <circle
@@ -98,16 +101,31 @@ function ProgressRing({
         strokeLinecap="round"
       />
       <defs>
+        {/* Same story as the bar fills: the 400-level stops sit at 1.5:1 (teal)
+            and 2.2:1 (indigo) on a light card, so light mode walks them down
+            the same ramp. The dark: stops are the ones that shipped. */}
         <linearGradient id={gradientId} x1="0" y1="0" x2="1" y2="1">
           {accent === "teal" ? (
             <>
-              <stop offset="0%" stopColor="#2dd4bf" />
-              <stop offset="100%" stopColor="#14b8a6" />
+              <stop
+                offset="0%"
+                className="[stop-color:#0d9488] dark:[stop-color:#2dd4bf]"
+              />
+              <stop
+                offset="100%"
+                className="[stop-color:#0f766e] dark:[stop-color:#14b8a6]"
+              />
             </>
           ) : (
             <>
-              <stop offset="0%" stopColor="#818cf8" />
-              <stop offset="100%" stopColor="#a78bfa" />
+              <stop
+                offset="0%"
+                className="[stop-color:#6366f1] dark:[stop-color:#818cf8]"
+              />
+              <stop
+                offset="100%"
+                className="[stop-color:#8b5cf6] dark:[stop-color:#a78bfa]"
+              />
             </>
           )}
         </linearGradient>
@@ -427,18 +445,23 @@ function ProgramProgressCard({
   const pctWithPlanned =
     totalReqs > 0 ? (withPlannedCount / totalReqs) * 100 : 0;
 
+  // Three fills stack on one gray-200 track, and in light mode the 300-level
+  // planned tint measured 1.19:1 (teal) and 1.43:1 (purple) against it: the
+  // outermost segment, the one that says how far along the program is, was
+  // effectively invisible. Light mode gets a darker ramp so each band clears
+  // its neighbour; every dark: value is the one that shipped.
   const plannedBarClass =
     accent === "teal"
-      ? "bg-teal-300 dark:bg-teal-500/40"
-      : "bg-purple-300 dark:bg-purple-500/40";
+      ? "bg-teal-600 dark:bg-teal-500/40"
+      : "bg-purple-500 dark:bg-purple-500/40";
   const plannedTextClass =
     accent === "teal"
       ? "text-teal-600 dark:text-teal-300"
       : "text-purple-600 dark:text-purple-300";
   const completedBarClass =
     accent === "teal"
-      ? "bg-gradient-to-r from-teal-500 via-cyan-500 to-emerald-500 shadow-[0_0_10px_rgba(20,184,166,0.75)]"
-      : "bg-gradient-to-r from-blue-500 via-violet-500 to-fuchsia-500 shadow-[0_0_10px_rgba(168,85,247,0.75)]";
+      ? "bg-gradient-to-r from-teal-700 via-cyan-700 to-emerald-700 dark:from-teal-500 dark:via-cyan-500 dark:to-emerald-500 shadow-[0_0_10px_rgba(20,184,166,0.75)]"
+      : "bg-gradient-to-r from-blue-700 via-violet-700 to-fuchsia-700 dark:from-blue-500 dark:via-violet-500 dark:to-fuchsia-500 shadow-[0_0_10px_rgba(168,85,247,0.75)]";
 
   return (
     <div
@@ -515,7 +538,7 @@ function ProgramProgressCard({
             aria-hidden
           />
           <div
-            className="absolute inset-y-0 left-0 bg-blue-400 dark:bg-blue-500/60 rounded-full"
+            className="absolute inset-y-0 left-0 bg-blue-600 dark:bg-blue-500/60 rounded-full"
             style={{ width: `${Math.min(100, pctWithIP)}%` }}
             aria-hidden
           />

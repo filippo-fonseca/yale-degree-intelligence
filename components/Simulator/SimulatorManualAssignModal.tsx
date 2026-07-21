@@ -57,8 +57,9 @@ type RequirementView = {
 type ProgramView = {
   presentation: PolicyPresentation | null;
   requirements: RequirementView[];
-  /** Certificates only: the overlap microcopy for this certificate. */
+  /** Certificates only: the overlap budget, said in full and said compactly. */
   budgetLine: string | null;
+  budgetShort: string | null;
 };
 
 /** The most frequent reason in a set, ties broken by first appearance. */
@@ -248,6 +249,7 @@ export default function SimulatorManualAssignModal({
         requirements.map((req) => req.presentation),
       );
       let budgetLine: string | null = null;
+      let budgetShort: string | null = null;
 
       if (type === "certificate") {
         // A certificate a student is barred from stays selectable, and the
@@ -259,17 +261,19 @@ export default function SimulatorManualAssignModal({
         const policy = resolvePolicy(id);
         if (policy.zeroOverlap) {
           budgetLine = "no overlap";
+          budgetShort = "no overlap";
         } else if (policy.overlapCap > 0) {
           const budget = getCertificateOverlapBudget(
             courses,
             id,
             policyOptions,
           );
-          budgetLine = `overlap ${budget.used}/${budget.cap} used with your majors`;
+          budgetShort = `overlap ${budget.used}/${budget.cap}`;
+          budgetLine = `${budgetShort} used with your majors`;
         }
       }
 
-      return { presentation, requirements, budgetLine };
+      return { presentation, requirements, budgetLine, budgetShort };
     };
 
     for (const id of majorIds) {
@@ -516,10 +520,10 @@ export default function SimulatorManualAssignModal({
                         }`}
                       >
                         <div className="flex items-center justify-between gap-2">
-                          <span className="font-medium">{pid}</span>
-                          {view?.budgetLine && (
+                          <span className="font-medium truncate">{pid}</span>
+                          {view?.budgetShort && (
                             <span className="font-mono text-[10px] text-gray-400 dark:text-gray-500 flex-shrink-0">
-                              {view.budgetLine}
+                              {view.budgetShort}
                             </span>
                           )}
                         </div>
@@ -586,12 +590,12 @@ export default function SimulatorManualAssignModal({
                   </p>
                 )}
 
-                <div className="flex items-baseline justify-between gap-2 mb-2">
+                <div className="mb-2">
                   <p className="text-xs text-gray-500 dark:text-gray-400 font-medium uppercase tracking-wide">
                     Unfulfilled requirements
                   </p>
                   {activeProgram?.budgetLine && (
-                    <span className="font-mono text-[10px] text-gray-400 dark:text-gray-500 flex-shrink-0">
+                    <span className="block font-mono text-[10px] text-gray-400 dark:text-gray-500 mt-0.5">
                       {activeProgram.budgetLine}
                     </span>
                   )}

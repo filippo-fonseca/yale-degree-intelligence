@@ -39,6 +39,7 @@ export const RELEASES: Release[] = [
           "Better My Major(s) with a double-major conflict manager that flags shared courses, overlaps, and prerequisite conflicts across both majors.",
           "A Board and Heat map view of your requirements, so you can read your whole degree at a glance or zoom into a single track.",
           "A full Yale College catalog (Fall 2023 → Spring 2027): 6,500+ courses, 3→4 digit renumbers, EENG→ECE aliases, and Fall 2026 / Spring 2027 flags for the Simulator.",
+          "The Simulator is now two tabs instead of one long page. Canvas is where you build the plan (the semester grid, the course pool, saving and loading), and Progress is where you read what it adds up to: your requirement cards, your GPA timeline, and your distributionals. It remembers which tab you were last on.",
           "The courses you are taking right now count everywhere they should. \"+ In Progress\" on My Major and My Certificates, your in-progress credits, and the Simulator all pick them up, whether the course came from your transcript or you added it by hand.",
         ],
       },

@@ -1,5 +1,6 @@
 import { Course } from "@/lib/types";
 import { calculateMajorProgress, MAJORS } from "@/lib/majors";
+import { bucketCourses } from "@/lib/utils/courseBuckets";
 
 interface UserProfile {
   majors: string[];
@@ -45,22 +46,8 @@ export function getSharedCourses(
   > = {};
 
   for (const major of userProfile.majors) {
-    const completedCourseCodes = courses
-      .filter(
-        (course) =>
-          course.status === "completed" &&
-          ((course.grade !== null && course.grade !== "In Progress") ||
-            course.skipped)
-      )
-      .map((course) => course.code);
-
-    const inProgressCourseCodes = courses
-      .filter((course) => course.grade === "In Progress" && !course.skipped)
-      .map((course) => course.code);
-
-    const skippedCourseCodes = courses
-      .filter((course) => course.skipped)
-      .map((course) => course.code);
+    const { completedCourseCodes, inProgressCourseCodes, skippedCourseCodes } =
+      bucketCourses(courses);
 
     const manualRequirements = courses.flatMap((course) =>
       (course.manualRequirementsFulfilled || [])

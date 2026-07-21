@@ -11,6 +11,7 @@ import {
   filterCertificateManualEntries,
   type ProgramClaimOptions,
 } from "@/lib/utils/programClaims";
+import { bucketCourses } from "@/lib/utils/courseBuckets";
 
 /**
  * Every requirement option the student has not touched yet, across declared
@@ -29,22 +30,8 @@ export function buildSimulatorRemainingCourses(
     certificateIds: certificates,
   };
 
-  const completedCourseCodes = courses
-    .filter(
-      (course) =>
-        course.status === "completed" &&
-        ((course.grade !== null && course.grade !== "In Progress") ||
-          course.skipped),
-    )
-    .map((course) => course.code);
-
-  const inProgressCourseCodes = courses
-    .filter((course) => course.grade === "In Progress" && !course.skipped)
-    .map((course) => course.code);
-
-  const skippedCourseCodes = courses
-    .filter((course) => course.skipped)
-    .map((course) => course.code);
+  const { completedCourseCodes, inProgressCourseCodes, skippedCourseCodes } =
+    bucketCourses(courses);
 
   const majorBlocked = getMajorBlockedCodes(courses, policyOptions);
 

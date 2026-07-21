@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import OpenAI from "openai";
+import { getCurrentTerm } from "@/lib/academicTerm";
 
 const genAI = new GoogleGenerativeAI(process.env.GOOGLE_AI_API_KEY || "");
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
@@ -17,12 +18,8 @@ function buildContext(userContext: any): string {
 
   // Determine year and semesters from graduation
   const gradYear = u.graduationYear;
-  const now = new Date();
-  const currentYear = now.getFullYear();
-  const currentMonth = now.getMonth();
-  // Cutoff is June 1st: from June onward the current term is Fall.
-  const isSpring = currentMonth < 5;
-  const currentSemester = isSpring ? "Spring" : "Fall";
+  const { term: currentSemester, year: currentYear } = getCurrentTerm();
+  const isSpring = currentSemester === "Spring";
 
   const yearsLeft = gradYear ? gradYear - currentYear : null;
   let yearLabel = "";

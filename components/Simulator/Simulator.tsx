@@ -39,6 +39,11 @@ import {
 import type { GPAEntry } from "@/lib/gpa";
 import { allocateDistributionals } from "@/lib/distributionalAllocation";
 import {
+  compareTermNames,
+  isCurrentTerm,
+  isPastTerm,
+} from "@/lib/academicTerm";
+import {
   blockedCodesFromViolations,
   buildProgramClaimContext,
   filterCertificateManualEntries,
@@ -316,33 +321,21 @@ const getSemesterCredits = (sem: Semester): number =>
     0,
   );
 
-function compareSemesters(a: string, b: string) {
-  const [semA, yearA] = a.split(" ");
-  const [semB, yearB] = b.split(" ");
-  const yA = parseInt(yearA, 10);
-  const yB = parseInt(yearB, 10);
-  if (yA !== yB) return yA - yB;
-  const order: Record<"Spring" | "Fall", number> = { Spring: 0, Fall: 1 };
-  return order[semA as "Spring" | "Fall"] - order[semB as "Spring" | "Fall"];
+const compareSemesters = compareTermNames;
+
+// A semester is locked once it is strictly earlier than the calendar's current
+// term, so you can't drag courses into a term you already finished. The month
+// math lives in lib/academicTerm.ts; the editability rule is unchanged (Spring
+// locks on June 1, Fall locks on January 1).
+function isPastSemester(semesterName: string) {
+  return isPastTerm(semesterName);
 }
 
-function isPastSemester(semesterName: string) {
-  const [sem, yearStr] = semesterName.split(" ");
-  const year = parseInt(yearStr, 10);
-  const now = new Date();
-  const currentYear = now.getFullYear();
-  const currentMonth = now.getMonth(); // 0 = Jan
-
-  if (year < currentYear) return true;
-  if (year > currentYear) return false;
-
-  // Coarse cutoffs so you can't alter clearly past terms:
-  // Fall of current year is editable until January of the next year
-  // (at which point year < currentYear catches it)
-  // Spring is past once it ends (June+)
-  if (sem === "Fall" && currentMonth > 11) return true; // > Dec (never true, handled by next year check)
-  if (sem === "Spring" && currentMonth >= 5) return true; // June 1+ (Spring ended)
-  return false;
+// The current term comes from the calendar, never from stored course status.
+// A transcript that still lists spring courses as in-progress does not keep
+// Spring current once June arrives.
+function isCurrentSemester(semesterName: string) {
+  return isCurrentTerm(semesterName);
 }
 
 // ----------------- Component -----------------
@@ -1357,9 +1350,6 @@ export default function Simulator({
     setCurrentPlanName(null);
   };
 
-  const hasInProgress = (semester: Semester) =>
-    semester.courses.some((c) => c.status === "in-progress");
-
   // ----------------- Render -----------------
   return (
     <div
@@ -1728,7 +1718,7 @@ export default function Simulator({
               }}
               className={`bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 backdrop-blur-md rounded-xl border p-3 min-h-[160px] flex flex-col transition-all shadow-[inset_0_1px_0_rgba(255,255,255,0.04),0_4px_12px_rgba(0,0,0,0.08)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.04),0_4px_12px_rgba(0,0,0,0.2)]
                 ${
-                  hasInProgress(semester)
+                  isCurrentSemester(semester.name)
                     ? "border-blue-700/50 ring-1 ring-blue-500/30"
                     : "border-gray-200 dark:border-gray-800/50"
                 }

@@ -1,4 +1,5 @@
 import type { Course } from "@/lib/types";
+import { getCurrentTerm } from "@/lib/academicTerm";
 import {
   getCourseNameFromCode,
   getCourseCreditsFromCode,
@@ -29,11 +30,6 @@ export interface Plan {
 
 const TERMS = ["Spring", "Fall"] as const;
 
-// June 1 cutoff: from June onward the current term is Fall.
-function currentTerm(date = new Date()): { term: "Spring" | "Fall"; year: number } {
-  return { term: date.getMonth() < 5 ? "Spring" : "Fall", year: date.getFullYear() };
-}
-
 function semesterId(term: string, year: number): string {
   return `${term}-${year}`;
 }
@@ -43,7 +39,7 @@ export function generateFutureSemesters(
   graduationYear: number,
   fromDate = new Date()
 ): PlanSemester[] {
-  const { term, year } = currentTerm(fromDate);
+  const { term, year } = getCurrentTerm(fromDate);
   const out: PlanSemester[] = [];
   let y = year;
   let tIdx = TERMS.indexOf(term);

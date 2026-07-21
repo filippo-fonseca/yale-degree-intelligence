@@ -54,7 +54,9 @@ import {
 } from "@/lib/certificates";
 import {
   getCertificateBlockedCodes,
+  getCertificateViolations,
   getMajorBlockedCodes,
+  filterCertificateManualEntries,
 } from "@/lib/utils/programClaims";
 import { HiDocumentDuplicate } from "react-icons/hi";
 import { RiProgress3Fill, RiAwardFill } from "react-icons/ri";
@@ -423,6 +425,13 @@ export default function Home() {
     }
   }, [user, userProfile, onboardChecked]);
 
+  // The student's declared programs, handed to the certificate policy engine so
+  // it can resolve eligibility and per-certificate overlap budgets.
+  const programPolicyOptions = {
+    majorIds: userProfile?.majors ?? [],
+    certificateIds: userProfile?.certificates ?? [],
+  };
+
   // Replace your current getMajorProgress with this:
   const getMajorProgress = () => {
     if (!user || !selectedMajor) return null;
@@ -471,7 +480,7 @@ export default function Home() {
       skippedCourseCodes,
       manualRequirements,
       excludedRequirements,
-      getMajorBlockedCodes(courses),
+      getMajorBlockedCodes(courses, programPolicyOptions),
     );
   };
 
@@ -514,14 +523,31 @@ export default function Home() {
         })),
     );
 
+    // Manual fulfillments bypass the blocked-code filter inside the
+    // calculation, so a conflicting manual has to be dropped here or it would
+    // always win. The certificate side loses; the major keeps the course.
+    const violations = getCertificateViolations(
+      courses,
+      selectedCertificate,
+      programPolicyOptions,
+    );
+
     return calculateCertificateProgress(
       selectedCertificate,
       completedCourseCodes,
       inProgressCourseCodes,
       skippedCourseCodes,
-      manualRequirements,
+      filterCertificateManualEntries(
+        manualRequirements,
+        selectedCertificate,
+        violations,
+      ),
       excludedRequirements,
-      getCertificateBlockedCodes(courses),
+      getCertificateBlockedCodes(
+        courses,
+        selectedCertificate,
+        programPolicyOptions,
+      ),
     );
   };
 
@@ -2213,8 +2239,10 @@ export default function Home() {
                           .filter((course) => course.skipped)
                           .map((course) => course.code);
 
-                        const majorBlocked = getMajorBlockedCodes(courses);
-                        const certBlocked = getCertificateBlockedCodes(courses);
+                        const majorBlocked = getMajorBlockedCodes(
+                          courses,
+                          programPolicyOptions,
+                        );
 
                         const fromMajors = userProfile.majors.flatMap(
                           (major) => {
@@ -2319,14 +2347,28 @@ export default function Home() {
                                 })),
                           );
 
+                          const violations = getCertificateViolations(
+                            courses,
+                            certificateId,
+                            programPolicyOptions,
+                          );
+
                           const progress = calculateCertificateProgress(
                             certificateId,
                             completedCourseCodes,
                             inProgressCourseCodes,
                             skippedCourseCodes,
-                            manualRequirements,
+                            filterCertificateManualEntries(
+                              manualRequirements,
+                              certificateId,
+                              violations,
+                            ),
                             excludedRequirements,
-                            certBlocked,
+                            getCertificateBlockedCodes(
+                              courses,
+                              certificateId,
+                              programPolicyOptions,
+                            ),
                           );
 
                           return (

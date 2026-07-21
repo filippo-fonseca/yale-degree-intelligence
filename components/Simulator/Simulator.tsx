@@ -1552,6 +1552,8 @@ export default function Simulator({
                 certificatePreviewProgress={certificatePreviewProgress}
                 plannedCodes={plannedCodes}
                 simulatorManualReqs={simulatorManualReqs}
+                courses={completedCourses}
+                policyOptions={policyOptions}
                 onRemoveManualReq={(code, requirement) => {
                   setSimulatorManualReqs((prev) =>
                     prev.filter(

@@ -16,6 +16,12 @@
     "Declare intent by the last day of add/drop in the final term of enrollment on Yale Hub",
     "Students are held to the Statistical Methodology and Data Analysis requirements in place when they declared; with DUS approval, updated 2024–2025 requirements may be fulfilled by prior declarers"
   ],
+  "policy": {
+    "overlapCap": 0,
+    "zeroOverlap": true,
+    "minGrade": "B-",
+    "sourceNote": "No course may be applied to satisfy the requirements of both a major and the certificate. No single course may count for two areas of study. Students are required to earn at least a B- for each course."
+  },
   "requirements": [
     {
       "name": "Prerequisite",

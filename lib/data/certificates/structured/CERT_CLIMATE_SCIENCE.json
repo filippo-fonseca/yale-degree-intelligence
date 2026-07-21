@@ -17,6 +17,11 @@
     "Courses taken at another institution or during an approved summer or term-time study abroad program may count with certificate director approval. An on-topic summer internship can replace one elective.",
     "Declare on Yale Hub by January 15 or September 15 of the final semester at the latest."
   ],
+  "policy": {
+    "overlapCap": 2,
+    "sameDeptCap": 4,
+    "sourceNote": "No more than two course credits fulfilling the requirements of the Climate Science and Solutions certificate may overlap with a major, a simultaneous degree, or another certificate. No more than four credits may come from a single department or school."
+  },
   "requirements": [
     {
       "name": "Basic Climate Science",

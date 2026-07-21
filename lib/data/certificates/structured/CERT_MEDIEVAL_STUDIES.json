@@ -17,6 +17,13 @@
     "Courses taken at another institution or during an approved summer or term-time study abroad program may count with director approval.",
     "Declare on Yale Hub by January 15 or September 15 of the final semester at the latest."
   ],
+  "policy": {
+    "overlapCap": 2,
+    "nonCourseRequirements": [
+      "Attend three lectures on medieval topics and submit a 1 to 2 page account of each to the certificate director or a certificate advisor"
+    ],
+    "sourceNote": "No more than two course credits may overlap in the fulfillment of the requirements of the Medieval Studies Certificate or of a major, a simultaneous degree, or another certificate."
+  },
   "requirements": [
     {
       "name": "Medieval courses",

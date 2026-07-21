@@ -103,6 +103,11 @@
       "Courses taken at another institution or during an approved summer or term-time study abroad program may count with certificate director approval. An on-topic summer internship can replace one elective.",
       "Declare on Yale Hub by January 15 or September 15 of the final semester at the latest."
     ],
+    "policy": {
+      "overlapCap": 2,
+      "sameDeptCap": 4,
+      "sourceNote": "No more than two course credits fulfilling the requirements of the Climate Science and Solutions certificate may overlap with a major, a simultaneous degree, or another certificate. No more than four credits may come from a single department or school."
+    },
     "requirements": [
       {
         "name": "Basic Climate Science",
@@ -155,6 +160,14 @@
       "Outside credit (study abroad, other institutions) or an on-topic summer internship may count with director approval",
       "Declare on Yale Hub by January 15 or September 15 of the final semester; complete enrollment form on the Collections website"
     ],
+    "policy": {
+      "overlapCap": 2,
+      "minGrade": "C",
+      "extraForms": [
+        "Enrollment form available on the Collections (Materials Histories of the Human Record) website"
+      ],
+      "sourceNote": "No more than two course credits fulfilling the requirements of the certificate may overlap with a major, a simultaneous degree, or another certificate. The minimum grade for all courses is a C."
+    },
     "requirements": [
       {
         "name": "Introductory seminar",
@@ -214,6 +227,14 @@
       "Graduate and professional school courses may count toward the certificate.",
       "Declare on Yale Hub by January 15 or September 15 of the final semester at the latest."
     ],
+    "policy": {
+      "overlapCap": 2,
+      "minGrade": "C",
+      "nonCourseRequirements": [
+        "Attend three critical computing-related lectures or events and submit a brief write-up for each to the certificate director"
+      ],
+      "sourceNote": "No more than two course credits fulfilling the requirements of the certificate may overlap with a major, a simultaneous degree, or another certificate. All courses must be taken for a letter grade, and students must achieve a grade of C or above."
+    },
     "requirements": [
       {
         "name": "Survey course",
@@ -274,6 +295,12 @@
       "Declare intent by the last day of add/drop in the final term of enrollment on Yale Hub",
       "Students are held to the Statistical Methodology and Data Analysis requirements in place when they declared; with DUS approval, updated 2024–2025 requirements may be fulfilled by prior declarers"
     ],
+    "policy": {
+      "overlapCap": 0,
+      "zeroOverlap": true,
+      "minGrade": "B-",
+      "sourceNote": "No course may be applied to satisfy the requirements of both a major and the certificate. No single course may count for two areas of study. Students are required to earn at least a B- for each course."
+    },
     "requirements": [
       {
         "name": "Prerequisite",
@@ -445,6 +472,10 @@
       "Graduate and professional school courses may count with approval from the Education Studies Associate Director.",
       "Declare on Yale Hub once enrolled in EDST 1110; by January 15 or September 15 of the final semester at the latest."
     ],
+    "policy": {
+      "overlapCap": 2,
+      "sourceNote": "No more than two course credits may overlap in the fulfillment of the requirements of the Education Studies Certificate or of a major, a simultaneous degree, or another certificate."
+    },
     "requirements": [
       {
         "name": "Prerequisite",
@@ -497,6 +528,10 @@
       "Graduate and professional school courses may count with approval from the Education Studies Associate Director.",
       "Successful completion of the Scholar Intensive Certificate is noted on transcripts."
     ],
+    "policy": {
+      "overlapCap": 2,
+      "sourceNote": "No more than two course credits may overlap in the fulfillment of the requirements of the Scholar Intensive Certificate or of a major, a simultaneous degree, or another certificate."
+    },
     "requirements": [
       {
         "name": "Prerequisite",
@@ -574,6 +609,10 @@
       "Graduate and professional school courses and non-Yale courses accepted for full course credit by Yale College may count toward the certificate.",
       "Declare on Yale Hub by January 15 or September 15 of the final semester at the latest."
     ],
+    "policy": {
+      "overlapCap": 2,
+      "sourceNote": "No more than two course credits fulfilling the requirements of the Energy Studies Certificate may overlap with a major, a simultaneous degree, or another certificate."
+    },
     "requirements": [
       {
         "name": "Energy Science & Technology",
@@ -623,6 +662,14 @@
       "Other courses may be approved by the certificate director",
       "Declare on Yale Hub by January 15 or September 15 of the final semester"
     ],
+    "policy": {
+      "overlapCap": 2,
+      "minGrade": "C",
+      "nonCourseRequirements": [
+        "Attend two public talks or other events that feature ethnography and submit a one-page critical reflection on each to the certificate director"
+      ],
+      "sourceNote": "No more than two course credits may overlap in the fulfillment of the requirements of the Ethnography certificate and of a major, a simultaneous degree, or another certificate. The minimum grade for all courses is a C."
+    },
     "requirements": [
       {
         "name": "Ethnography methods courses",
@@ -657,6 +704,10 @@
       "Summer or year-abroad courses accepted for full Yale College credit may provisionally count with certificate director approval.",
       "Declare on Yale Hub by January 15 or September 15 of the final semester at the latest."
     ],
+    "policy": {
+      "overlapCap": 2,
+      "sourceNote": "No more than two course credits fulfilling the requirements of the Food, Agriculture, and Climate Change certificate may overlap with a major, a simultaneous degree, or another certificate."
+    },
     "requirements": [
       {
         "name": "Consumption",
@@ -755,6 +806,10 @@
       "Qualified undergraduates may take graduate courses at the School of Public Health subject to Yale College regulations.",
       "Courses taken at another institution or during an approved summer or term-time study abroad program may count with DUS approval."
     ],
+    "policy": {
+      "overlapCap": 2,
+      "sourceNote": "The requirements of the Global Health Studies certificate are subject to Yale College overlap rules, such that no more than two courses may be used simultaneously to fulfill the requirements of a major, a simultaneous degree, or another certificate."
+    },
     "requirements": [
       {
         "name": "Introductory lecture",
@@ -885,6 +940,15 @@
       "Courses taken at another institution or during an approved summer or term-time study abroad program may count with certificate director approval. An on-topic summer internship can replace one elective with approval.",
       "Graduate and professional school courses may count with director approval or if tagged with approved attributes."
     ],
+    "policy": {
+      "extraForms": [
+        "Application submitted during the spring term of sophomore year, available via the Human Rights website"
+      ],
+      "nonCourseRequirements": [
+        "Participate in the non-credited senior colloquium"
+      ],
+      "sourceNote": "This certificate accepts students by application during the spring term of their sophomore year only. Students complete a gateway lecture course, five electives, and participate in a non-credited senior colloquium."
+    },
     "requirements": [
       {
         "name": "Gateway",
@@ -1014,6 +1078,14 @@
       "Graduate and professional school courses may count toward the certificate.",
       "Declare on Yale Hub by January 15 or September 15 of the final semester at the latest."
     ],
+    "policy": {
+      "overlapCap": 2,
+      "minGrade": "C",
+      "nonCourseRequirements": [
+        "Attend three lectures on topics relating to Islamic Studies and submit a 1 to 2 page write-up for each"
+      ],
+      "sourceNote": "No more than two course credits fulfilling the requirements of the Islamic Studies certificate may overlap with a major, a simultaneous degree, or another certificate. All courses must be taken for a letter grade, and students must achieve a grade of C or above."
+    },
     "requirements": [
       {
         "name": "Islamic Art, Architecture, Literature",
@@ -1208,6 +1280,13 @@
       "Courses taken at another institution or during an approved summer or term-time study abroad program may count with director approval.",
       "Declare on Yale Hub by January 15 or September 15 of the final semester at the latest."
     ],
+    "policy": {
+      "overlapCap": 2,
+      "nonCourseRequirements": [
+        "Attend three lectures on medieval topics and submit a 1 to 2 page account of each to the certificate director or a certificate advisor"
+      ],
+      "sourceNote": "No more than two course credits may overlap in the fulfillment of the requirements of the Medieval Studies Certificate or of a major, a simultaneous degree, or another certificate."
+    },
     "requirements": [
       {
         "name": "Medieval courses",
@@ -1323,6 +1402,13 @@
       "Complete the Qualtrics survey from the Indigenous Studies website as early as fall of sophomore year and no later than the beginning of junior year.",
       "Declare on Yale Hub by January 15 or September 15 of the final semester."
     ],
+    "policy": {
+      "overlapCap": 2,
+      "nonCourseRequirements": [
+        "Participate in at least three Indigenous community events and submit a write-up of 1 to 2 pages per event"
+      ],
+      "sourceNote": "No more than two course credits may overlap in the fulfillment of the requirements of the Indigenous Studies Certificate or of a major, a simultaneous degree, or another certificate."
+    },
     "requirements": [
       {
         "name": "Indigenous studies courses",
@@ -1355,6 +1441,14 @@
       "Courses taken at another institution or during an approved summer or term-time study abroad program may count with DUS approval.",
       "Declare on Yale Hub by January 15 or September 15 of the final semester at the latest."
     ],
+    "policy": {
+      "overlapCap": 2,
+      "minGrade": "B",
+      "nonCourseRequirements": [
+        "Attend three approved Persian and Iranian studies events and submit a 1 to 2 page write-up about each to the certificate director"
+      ],
+      "sourceNote": "No more than two course credits fulfilling the requirements of the Persian and Iranian Studies Certificate may overlap with a major, a simultaneous degree, or another certificate. Courses are drawn from a list of approved courses and must be taken for a letter grade of B or above."
+    },
     "requirements": [
       {
         "name": "Content courses",
@@ -1415,6 +1509,24 @@
       "No course may satisfy more than one of the five required courses",
       "Majors in Computer Science, CSEC, CS-EE, CS-Math, CS-Psychology, or Computing and the Arts may not pursue this certificate"
     ],
+    "policy": {
+      "overlapCap": 0,
+      "zeroOverlap": true,
+      "ineligibleMajors": [
+        "CPSC_BA",
+        "CPSC_BS",
+        "CSEC_BS",
+        "EECS",
+        "CPSC_MATH_BS",
+        "CPSC_PSYCH_BS",
+        "COMPUTING_ARTS_ARCH",
+        "COMPUTING_ARTS_ART",
+        "COMPUTING_ARTS_HISTART",
+        "COMPUTING_ARTS_MUSIC",
+        "COMPUTING_ARTS_TDPS"
+      ],
+      "sourceNote": "Students may not use any of the five required courses, indicated below, to satisfy the requirements of any major or other certificate. Majors in Computer Science, and in the joint programs with Economics, Electrical Engineering, Mathematics, and Psychology, or in Computing and the Arts may not pursue the Certificate."
+    },
     "requirements": [
       {
         "name": "Prerequisite",
@@ -1588,6 +1700,12 @@
       "Non-Yale courses may not count",
       "Declare intent by the last day of add/drop in the final term of enrollment on Yale Hub"
     ],
+    "policy": {
+      "overlapCap": 2,
+      "overlapMinLevel": 3000,
+      "minGrade": "C",
+      "sourceNote": "No more than two course credits may overlap in the fulfillment of the requirements of the Quantum Science & Engineering Certificate and of a major, a simultaneous degree, or another certificate. Students earning this certificate may not overlap any 1000/2000 level courses; only two 3000+ level courses may overlap. The minimum grade for all courses is a C."
+    },
     "requirements": [
       {
         "name": "Quantum foundations",
@@ -1719,6 +1837,17 @@
       "Non-Yale courses may not count without prior director approval",
       "Submit application with major, tentative coursework plan, and faculty evaluators; director adds requirements to Degree Audit upon approval"
     ],
+    "policy": {
+      "overlapCap": 2,
+      "minGrade": "C",
+      "extraForms": [
+        "Certificate application listing your entrepreneurial-emphasis major, a tentative plan of coursework, and a short list of faculty willing to evaluate your project"
+      ],
+      "nonCourseRequirements": [
+        "Attend and participate in three experiential units (entrepreneurial internship, Hillhouse Fellows program, Engineering Dean's Speaker Series, or Tsai City Accelerator) and submit a 1 to 2 page write-up for each"
+      ],
+      "sourceNote": "No more than two course credits may overlap in the fulfillment of the requirements of the Technology Entrepreneurship Certificate and of a major, a simultaneous degree, or another certificate. All courses must be taken for a letter grade, and students must achieve a grade of C or above."
+    },
     "requirements": [
       {
         "name": "Core entrepreneurship course",
@@ -1777,6 +1906,14 @@
       "Courses taken at another institution or during an approved summer or term-time study abroad program may count with DUS approval.",
       "Declare on Yale Hub by January 15 or September 15 of the final semester at the latest."
     ],
+    "policy": {
+      "overlapCap": 2,
+      "sameDeptCap": 3,
+      "nonCourseRequirements": [
+        "Attend three lectures or events listed through the Translation Initiative and submit a brief written response to each to the certificate director"
+      ],
+      "sourceNote": "Of the five credits, no more than three may originate in the same department. No more than two course credits may overlap in the fulfillment of the requirements of the Translation Studies certificate or of a major, a simultaneous degree, or another certificate."
+    },
     "requirements": [
       {
         "name": "Translation-themed courses",

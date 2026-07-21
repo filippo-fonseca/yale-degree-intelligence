@@ -21,6 +21,14 @@
     "Other courses may be approved by the certificate director",
     "Declare on Yale Hub by January 15 or September 15 of the final semester"
   ],
+  "policy": {
+    "overlapCap": 2,
+    "minGrade": "C",
+    "nonCourseRequirements": [
+      "Attend two public talks or other events that feature ethnography and submit a one-page critical reflection on each to the certificate director"
+    ],
+    "sourceNote": "No more than two course credits may overlap in the fulfillment of the requirements of the Ethnography certificate and of a major, a simultaneous degree, or another certificate. The minimum grade for all courses is a C."
+  },
   "requirements": [
     {
       "name": "Ethnography methods courses",

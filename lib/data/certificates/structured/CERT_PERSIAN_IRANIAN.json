@@ -21,6 +21,14 @@
     "Courses taken at another institution or during an approved summer or term-time study abroad program may count with DUS approval.",
     "Declare on Yale Hub by January 15 or September 15 of the final semester at the latest."
   ],
+  "policy": {
+    "overlapCap": 2,
+    "minGrade": "B",
+    "nonCourseRequirements": [
+      "Attend three approved Persian and Iranian studies events and submit a 1 to 2 page write-up about each to the certificate director"
+    ],
+    "sourceNote": "No more than two course credits fulfilling the requirements of the Persian and Iranian Studies Certificate may overlap with a major, a simultaneous degree, or another certificate. Courses are drawn from a list of approved courses and must be taken for a letter grade of B or above."
+  },
   "requirements": [
     {
       "name": "Content courses",

@@ -18,6 +18,10 @@
     "Graduate and professional school courses and non-Yale courses accepted for full course credit by Yale College may count toward the certificate.",
     "Declare on Yale Hub by January 15 or September 15 of the final semester at the latest."
   ],
+  "policy": {
+    "overlapCap": 2,
+    "sourceNote": "No more than two course credits fulfilling the requirements of the Energy Studies Certificate may overlap with a major, a simultaneous degree, or another certificate."
+  },
   "requirements": [
     {
       "name": "Energy Science & Technology",

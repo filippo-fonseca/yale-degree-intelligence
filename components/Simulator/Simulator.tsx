@@ -39,6 +39,7 @@ import {
 import type { GPAEntry } from "@/lib/gpa";
 import { allocateDistributionals } from "@/lib/distributionalAllocation";
 import {
+  blockedCodesFromViolations,
   buildProgramClaimContext,
   filterCertificateManualEntries,
   getMajorBlockedCodes,
@@ -1005,7 +1006,7 @@ export default function Simulator({
                 violations,
               ),
               plannedCodesLocal,
-              violations.map((v) => v.courseCode),
+              blockedCodesFromViolations(violations),
             ),
           );
         }
@@ -1057,7 +1058,7 @@ export default function Simulator({
               violations,
             ),
             plannedCodesLocal,
-            violations.map((v) => v.courseCode),
+            blockedCodesFromViolations(violations),
           )[cid];
 
           if (

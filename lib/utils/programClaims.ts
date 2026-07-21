@@ -275,6 +275,10 @@ export function getMajorBlockedCodes(
  * Pass `certificateId` whenever it is known: blocking is per certificate now,
  * and the union across every certificate over-blocks. The union is kept only so
  * the legacy single-argument call shape still means something sensible.
+ *
+ * same-slot conflicts are left out. They mean one course was assigned to two
+ * requirements of the same certificate, which is resolved by dropping the
+ * duplicate entry, not by taking the course away from the certificate.
  */
 export function getCertificateBlockedCodes(
   courses: Course[],
@@ -282,12 +286,21 @@ export function getCertificateBlockedCodes(
   options: ProgramClaimOptions = {}
 ): string[] {
   const { violations } = buildProgramClaimContext(courses, options);
+  return blockedCodesFromViolations(violations, certificateId);
+}
+
+/** The blocked-code list a set of violations implies. See the note above. */
+export function blockedCodesFromViolations(
+  violations: Violation[],
+  certificateId?: string
+): string[] {
   return Array.from(
     new Set(
       violations
         .filter(
           (v) =>
             v.program.type === "certificate" &&
+            v.code !== "same-slot" &&
             (!certificateId || v.program.id === certificateId)
         )
         .map((v) => v.courseCode)

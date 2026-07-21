@@ -458,14 +458,22 @@ export default function CertificateProgressView({
       const skipped = !!opt.skipped;
       const manual = !!opt.manual;
 
+      // The stored status fills in what the calculation left unsaid, but it
+      // never overrules it. A course this certificate may not claim comes back
+      // explicitly false, and saying otherwise here would put a blue chip on
+      // credit the certificate does not have: the card would read 2/1 while
+      // the in-progress credits below it stayed at zero. Completed options
+      // already worked this way; in progress did not.
       if (status === "in-progress") {
-        inProgress = true;
-        completed = false;
+        if (opt.inProgress !== false) {
+          inProgress = true;
+          completed = false;
+        }
       } else if (status === "completed") {
         if (opt.completed !== false) {
           completed = true;
+          inProgress = false;
         }
-        inProgress = false;
       }
       return { ...opt, inProgress, completed, skipped, manual };
     },

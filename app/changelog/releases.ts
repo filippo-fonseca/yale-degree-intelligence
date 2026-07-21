@@ -39,6 +39,7 @@ export const RELEASES: Release[] = [
           "Better My Major(s) with a double-major conflict manager that flags shared courses, overlaps, and prerequisite conflicts across both majors.",
           "A Board and Heat map view of your requirements, so you can read your whole degree at a glance or zoom into a single track.",
           "A full Yale College catalog (Fall 2023 → Spring 2027): 6,500+ courses, 3→4 digit renumbers, EENG→ECE aliases, and Fall 2026 / Spring 2027 flags for the Simulator.",
+          "The courses you are taking right now count everywhere they should. \"+ In Progress\" on My Major and My Certificates, your in-progress credits, and the Simulator all pick them up, whether the course came from your transcript or you added it by hand.",
         ],
       },
       {
@@ -48,6 +49,7 @@ export const RELEASES: Release[] = [
           "A per-certificate rules engine that knows each program's real policy. Most certificates let up to two courses double-count with a major, Data Science and Programming allow none, and Quantum only shares courses at the 3000 level and above.",
           "Honest conflict handling. Courses your major already counts are grayed out with the reason, an overlap meter shows how much sharing each certificate allows, and a certificate Yale will not award to your major carries a clear warning.",
           "Certificate math you can trust: a course that breaks a rule drops out of that certificate's progress automatically, and your major always keeps its credit.",
+          "The certificate board and its numbers now say the same thing. A course your major already claims no longer shows as in progress on a certificate it cannot count toward.",
         ],
       },
       {

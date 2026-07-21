@@ -33,6 +33,9 @@ export default function MajorSelectionFlow({
   const [selectedCertificates, setSelectedCertificates] = useState<string[]>(
     [],
   );
+  const [autoOpenCertificateIndex, setAutoOpenCertificateIndex] = useState<
+    number | null
+  >(null);
   const [graduationYear, setGraduationYear] = useState<string>("2029");
   const [bio, setBio] = useState<string>("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -488,10 +491,12 @@ export default function MajorSelectionFlow({
                         const next = [...selectedCertificates];
                         next[index] = newCert;
                         setSelectedCertificates(next);
+                        setAutoOpenCertificateIndex(null);
                       }}
                       disabledOptions={selectedCertificates.filter(
                         (c) => c !== cert,
                       )}
+                      defaultOpen={autoOpenCertificateIndex === index}
                     />
                   </div>
                   <button
@@ -517,10 +522,12 @@ export default function MajorSelectionFlow({
                       (id) => !selectedCertificates.includes(id),
                     );
                     if (available) {
+                      const newIndex = selectedCertificates.length;
                       setSelectedCertificates([
                         ...selectedCertificates,
                         available,
                       ]);
+                      setAutoOpenCertificateIndex(newIndex);
                     }
                   }}
                   className="w-full py-2.5 px-4 rounded-xl border border-dashed border-gray-300 dark:border-gray-700/60 hover:border-teal-500/40 bg-gradient-to-br from-black/[0.02] to-transparent dark:from-white/[0.02] dark:to-transparent hover:from-teal-500/5 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 flex items-center justify-center gap-1.5 transition-all"

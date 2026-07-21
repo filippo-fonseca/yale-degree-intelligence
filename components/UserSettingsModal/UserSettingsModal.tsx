@@ -89,6 +89,9 @@ export default function UserSettingsModal({
   const [duplicateCertificateError, setDuplicateCertificateError] = useState<
     string | null
   >(null);
+  const [autoOpenCertificateIndex, setAutoOpenCertificateIndex] = useState<
+    number | null
+  >(null);
   const [isSaving, setIsSaving] = useState(false);
 
   // Bio edit flow
@@ -286,11 +289,13 @@ export default function UserSettingsModal({
       (cert) => !localProfile.certificates.includes(cert),
     );
     if (availableCertificate) {
+      const newIndex = localProfile.certificates.length;
       setLocalProfile({
         ...localProfile,
         certificates: [...localProfile.certificates, availableCertificate],
       });
       setDuplicateCertificateError(null);
+      setAutoOpenCertificateIndex(newIndex);
     }
   };
 
@@ -309,6 +314,7 @@ export default function UserSettingsModal({
     const newCertificates = [...localProfile.certificates];
     newCertificates[index] = newCertificate;
     setLocalProfile({ ...localProfile, certificates: newCertificates });
+    setAutoOpenCertificateIndex(null);
   };
 
   const handleRemoveCertificate = (index: number) => {
@@ -1098,6 +1104,7 @@ export default function UserSettingsModal({
                         disabledOptions={localProfile.certificates.filter(
                           (c) => c !== certificate,
                         )}
+                        defaultOpen={autoOpenCertificateIndex === index}
                       />
                     </div>
                     <button

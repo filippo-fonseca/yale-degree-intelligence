@@ -17,6 +17,8 @@ interface CertificateDropdownProps {
   /** Allow clearing selection (shows empty option) */
   allowEmpty?: boolean;
   emptyLabel?: string;
+  /** Open the menu (and focus search) on mount / when flipped true */
+  defaultOpen?: boolean;
 }
 
 type MenuPos = { top: number; left: number; width: number; openUp: boolean };
@@ -45,8 +47,9 @@ export function CertificateDropdown({
   className = "",
   allowEmpty = false,
   emptyLabel = "Select a certificate",
+  defaultOpen = false,
 }: CertificateDropdownProps) {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(defaultOpen);
   const [searchTerm, setSearchTerm] = useState("");
   const [pos, setPos] = useState<MenuPos | null>(null);
 
@@ -54,6 +57,11 @@ export function CertificateDropdown({
   const buttonRef = useRef<HTMLButtonElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
+
+  // Re-open when parent requests it (e.g. "+ Add certificate")
+  useEffect(() => {
+    if (defaultOpen) setIsOpen(true);
+  }, [defaultOpen]);
 
   const selectedName = value ? CERTIFICATES[value] || "" : emptyLabel;
 
@@ -144,7 +152,8 @@ export function CertificateDropdown({
 
   useEffect(() => {
     if (!isOpen) return;
-    const t = setTimeout(() => searchInputRef.current?.focus(), 0);
+    // Wait a tick so the portaled menu mounts before focusing search
+    const t = setTimeout(() => searchInputRef.current?.focus(), 30);
     setSearchTerm("");
     return () => clearTimeout(t);
   }, [isOpen]);

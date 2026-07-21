@@ -35,6 +35,7 @@ export default function SimulatorCanvasActions({
   /** Hidden without a session, the same gate the old toolbar button used. */
   showSave: boolean;
   canSave: boolean;
+  /** The header's quick save, shared verbatim so the two cannot diverge. */
   onSave: () => void;
   onClear: () => void;
 }) {

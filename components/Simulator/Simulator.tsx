@@ -62,6 +62,22 @@ import {
 import PlannedCourseBlockedModal from "./PlannedCourseBlockedModal";
 import type { Allocation } from "@/lib/certificatePolicy";
 
+/**
+ * The sticky "Quick-add: Pool of remaining courses from your major" card is
+ * hidden for clarity: it sat between the toolbar and the grid, ate vertical
+ * room, and gave a second way to do what the per-semester Add button and the
+ * assign modal already do. Every other add path is untouched, and so is
+ * dragging a course from one semester to another.
+ *
+ * Flip this back to true to restore it. Nothing was deleted: the pool card,
+ * the tap-to-place flow it feeds (select a pool course, then tap a semester),
+ * and its tour anchor all still compile and read this one flag. The pool's
+ * data (availableCourses) keeps being computed either way, because the
+ * remove-from-semester path puts courses back into it and the plan load /
+ * reset paths rebuild it.
+ */
+const SHOW_QUICK_ADD_POOL = false;
+
 // ----------------- Types -----------------
 // `Semester` and `Plan` live in ./planTypes so the plan chrome components can
 // share them without importing this module back into its own children.
@@ -1666,13 +1682,18 @@ export default function Simulator({
                     Use this simulator to plan out your remaining semesters and see
                     fit.
                   </li>
+                  {SHOW_QUICK_ADD_POOL && (
+                    <li>
+                      The pool shows remaining courses in your major; you can also
+                      add any course manually.
+                    </li>
+                  )}
                   <li>
-                    The pool shows remaining courses in your major; you can also add
-                    any course manually.
+                    Use Add on any semester to put a course in it, and drag a
+                    planned course between semesters to move it.
                   </li>
                   <li>
-                    Drag/add courses into any semester (multiple courses per term
-                    work fine).
+                    Multiple courses per term work fine.
                   </li>
                   <li>
                     Click the trash icon on a course to remove it (if it's not
@@ -1687,7 +1708,10 @@ export default function Simulator({
             )}
           </AnimatePresence>
 
-          {/* Available Courses Pool */}
+          {/* Available Courses Pool. Hidden behind SHOW_QUICK_ADD_POOL; see
+              the flag's comment at the top of this file for why and how to
+              bring it back. */}
+          {SHOW_QUICK_ADD_POOL && (
           <div
             className="sticky z-20 mb-2"
             style={{ top: toolbarHeight + 8 }}
@@ -1769,6 +1793,7 @@ export default function Simulator({
               </AnimatePresence>
             </div>
           </div>
+          )}
 
           {/* The Canvas control row: the per-course editor toggles and the
               verbs that act on the grid below it. Canvas only. */}
@@ -1793,13 +1818,16 @@ export default function Simulator({
                 ? String(semCredits)
                 : semCredits.toFixed(1);
               const isPast = isPastSemester(semester.name);
-              const isPlaceTarget = !!selectedPoolCourse && !isPast;
+              // Tap-to-place only exists to land a course picked out of the
+              // pool, so it goes quiet with the pool.
+              const isPlaceTarget =
+                SHOW_QUICK_ADD_POOL && !!selectedPoolCourse && !isPast;
 
               return (
                 <motion.div
                   key={semester.id}
                   onClick={() => {
-                    if (selectedPoolCourse && !isPast) {
+                    if (isPlaceTarget && selectedPoolCourse) {
                       placeCourseInSemester(selectedPoolCourse, semester.id);
                     }
                   }}
@@ -1874,9 +1902,11 @@ export default function Simulator({
                         }`}
                     >
                       <p className="text-[11px] text-gray-400 dark:text-gray-500 text-center opacity-70">
-                        {selectedPoolCourse
+                        {isPlaceTarget
                           ? "Tap to place selected course"
-                          : "Drag from pool or add manually"}
+                          : SHOW_QUICK_ADD_POOL
+                            ? "Drag from pool or add manually"
+                            : "Add a course, or drag one in from another semester"}
                       </p>
                     </div>
                   ) : (

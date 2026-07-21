@@ -627,20 +627,34 @@ export default function SimulatorManualAssignModal({
                           key={req.name}
                           onClick={() => handleAssign(req.name)}
                           disabled={disabled}
-                          className={`w-full text-left px-3 py-2.5 rounded-lg border border-gray-200 dark:border-gray-700/60 bg-gray-50/50 dark:bg-gray-800/30 transition-colors group ${
-                            disabled ? "opacity-45 cursor-not-allowed" : hover
+                          className={`w-full text-left px-3 py-2.5 rounded-lg border transition-colors group ${
+                            disabled
+                              ? "cursor-not-allowed border-zinc-300 dark:border-zinc-700/50 bg-zinc-100 dark:bg-zinc-800/40"
+                              : `border-gray-200 dark:border-gray-700/60 bg-gray-50/50 dark:bg-gray-800/30 ${hover}`
                           }`}
                         >
                           <div className="flex items-center justify-between">
+                            {/* A row the engine refuses says so in words, not
+                                in opacity alone: when every row is refused
+                                there is nothing to compare a dimmed one to. */}
                             <span
-                              className={`text-sm text-gray-700 dark:text-gray-200 transition-colors ${
-                                disabled ? "" : hoverText
+                              className={`text-sm transition-colors ${
+                                disabled
+                                  ? "text-zinc-500 dark:text-zinc-400 line-through decoration-zinc-400/70 dark:decoration-zinc-500/70"
+                                  : `text-gray-700 dark:text-gray-200 ${hoverText}`
                               }`}
                             >
                               {req.name}
                             </span>
-                            <span className="text-xs text-gray-400 dark:text-gray-500 ml-2 flex-shrink-0">
-                              {req.completed}/{req.required}
+                            <span className="flex items-center gap-1.5 ml-2 flex-shrink-0">
+                              {disabled && (
+                                <span className="text-[10px] px-1.5 py-0.5 rounded-md bg-zinc-200 dark:bg-zinc-700/40 text-zinc-600 dark:text-zinc-300 border border-zinc-300 dark:border-zinc-600/50">
+                                  cannot count
+                                </span>
+                              )}
+                              <span className="text-xs text-gray-400 dark:text-gray-500">
+                                {req.completed}/{req.required}
+                              </span>
                             </span>
                           </div>
                           {req.description && (

@@ -84,8 +84,10 @@ export const RELEASES: Release[] = [
         items: [
           "Transcript upload and AI features only work when you’re signed in, with basic spam protection.",
           "Friend connections go through the server — nobody can fake a friendship to peek at your courses.",
-          "Deleting your account also clears your Dan chat history.",
+          "Deleting your account also clears your Dan chat history, encrypted API keys, and MCP tokens.",
           "Honest copy: login says Yale Google (not CAS), and we no longer claim your transcript is processed only on your device.",
+          "Clearer disclaimers everywhere: you voluntarily share courses and grades (upload or manual), those records are stored on our servers for your account, we are not affiliated with Yale, and DegreeIntelligence is free forever — we will never charge a dime.",
+          "Tighter account security for v3: APIs only accept @yale.edu sessions, private profile docs are owner-only, and demo AI keys cannot be shared with every user by accident.",
         ],
       },
       {
@@ -94,6 +96,7 @@ export const RELEASES: Release[] = [
           "Light mode. A full, carefully tuned light theme that matches the dark one, with a system-default option.",
           "A guided in-app tutorial that walks new students through uploading a transcript and reading their plan.",
           "An overall UI and UX polish: a collapsible sidebar, smoother transitions, and a more consistent look everywhere.",
+          "A Class of 2030 welcome: no grades needed to start, a one-click path into the Simulator, and step-by-step YHub instructions so you can import in-progress courses after registration.",
         ],
       },
       {

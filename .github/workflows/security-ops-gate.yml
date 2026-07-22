@@ -1,0 +1,51 @@
+# Fails open PRs that still need manual security ops (Firestore rules + env).
+# Add label `needs-security-ops` to block; add `security-ops-complete` to allow.
+# Also blocks when the PR title contains [BLOCKED: security ops].
+
+name: Security ops gate
+
+on:
+  pull_request:
+    types:
+      [
+        opened,
+        edited,
+        synchronize,
+        reopened,
+        labeled,
+        unlabeled,
+        ready_for_review,
+      ]
+
+jobs:
+  security-ops-required:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check security-ops labels / title
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const pr = context.payload.pull_request;
+            const labels = (pr.labels || []).map((l) => l.name);
+            const title = pr.title || "";
+            const blockedByTitle = /\[BLOCKED:\s*security ops\]/i.test(title);
+            const needsOps = labels.includes("needs-security-ops") || blockedByTitle;
+            const complete = labels.includes("security-ops-complete");
+
+            if (!needsOps) {
+              core.info("No security-ops gate on this PR.");
+              return;
+            }
+
+            if (complete) {
+              core.info("Label security-ops-complete present — gate passed.");
+              return;
+            }
+
+            core.setFailed(
+              "SECURITY OPS BLOCKER: Do not merge yet.\n\n" +
+                "1) Deploy docs/firestore-rules.md in Firebase Console\n" +
+                "2) Confirm prod DAN_FALLBACK_ANTHROPIC_KEY is unset OR DAN_FALLBACK_UIDS is set\n" +
+                "3) Add label `security-ops-complete` (and remove `needs-security-ops` if you want)\n" +
+                "4) Mark the PR ready for review only after that"
+            );

@@ -451,7 +451,7 @@ export default function AboutPage() {
               rotate={4}
               delay={3}
             >
-              <AnimatedCoreBar />
+              <AnimatedDistribBar />
             </FloatingTile>
 
             <FloatingTile
@@ -1753,27 +1753,56 @@ function AnimatedGpaChip() {
   );
 }
 
-/** Core progress bar that fills, holds, then restarts. */
-function AnimatedCoreBar() {
+const DIST_SEGMENTS = [
+  { code: "Hu", color: "#a855f7", target: 1 },
+  { code: "So", color: "#38bdf8", target: 1 },
+  { code: "Sc", color: "#34d399", target: 1 },
+  { code: "WR", color: "#fb923c", target: 1 },
+  { code: "QR", color: "#f87171", target: 0.5 },
+] as const;
+
+/** Distributionals progress: five colored pips fill in, 4/5 complete. */
+function AnimatedDistribBar() {
   return (
     <>
-      <span className="font-mono text-[10px] text-gray-500 dark:text-gray-400">
-        Core 7/9
-      </span>
-      <span className="block h-1 w-20 overflow-hidden rounded-full bg-gray-200 dark:bg-white/10">
-        <motion.span
-          className="block h-full rounded-full bg-gradient-to-r from-pink-500 to-purple-600"
-          initial={{ width: "0%" }}
-          animate={{ width: ["0%", "78%", "78%", "0%"] }}
-          transition={{
-            duration: 5.5,
-            times: [0, 0.45, 0.8, 1],
-            repeat: Infinity,
-            ease: "easeInOut",
-            repeatDelay: 0.8,
-          }}
-        />
-      </span>
+      <div className="flex w-full items-center justify-between gap-3">
+        <span className="font-mono text-[10px] text-gray-500 dark:text-gray-400">
+          Distribs
+        </span>
+        <span className="font-mono text-[10px] font-medium tabular-nums text-gray-900 dark:text-white">
+          4/5
+        </span>
+      </div>
+      <div className="flex items-center gap-1">
+        {DIST_SEGMENTS.map((seg, i) => (
+          <div
+            key={seg.code}
+            className="relative h-1.5 w-5 overflow-hidden rounded-full bg-gray-200 dark:bg-white/10"
+          >
+            <motion.div
+              className="absolute inset-y-0 left-0 rounded-full"
+              style={{ backgroundColor: seg.color }}
+              initial={{ width: "0%" }}
+              animate={{
+                width: [
+                  "0%",
+                  `${seg.target * 100}%`,
+                  `${seg.target * 100}%`,
+                  "0%",
+                ],
+              }}
+              transition={{
+                duration: 5.5,
+                times: [0, 0.4, 0.8, 1],
+                delay: i * 0.1,
+                repeat: Infinity,
+                ease: "easeInOut",
+                repeatDelay: 0.8,
+              }}
+            />
+          </div>
+        ))}
+      </div>
     </>
   );
 }

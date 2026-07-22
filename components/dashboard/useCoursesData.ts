@@ -18,6 +18,7 @@ import {
 import { db } from "@/config/firebase";
 import { syncFriendsPublicData } from "@/lib/syncFriendsPublicData";
 import { toggleDistributionalTag } from "@/lib/distributionalTags";
+import { distributionalEditBase } from "@/lib/utils/effectiveDistributionals";
 import type { UserProfile } from "./types";
 
 const VALID_DIST_TAGS = new Set([
@@ -45,11 +46,20 @@ function parseDistributionalsFromBracket(
   return tags;
 }
 
+/**
+ * What an imported course stores for distributionals.
+ *
+ * Only real tags are written down. An empty bracket is silence, not a
+ * statement: the extraction prompt itself treats "omit the brackets entirely
+ * or use []" as the same instruction, so storing [] would freeze the course at
+ * "no distributionals" and lock out the catalog's own tags. Leaving the field
+ * off lets the course pick them up, and the student can still override.
+ */
 function distributionalFields(
   raw: string | undefined,
 ): Pick<Course, "distributionals"> | Record<string, never> {
   const distributionals = parseDistributionalsFromBracket(raw);
-  if (distributionals === undefined) return {};
+  if (!distributionals || distributionals.length === 0) return {};
   return { distributionals };
 }
 
@@ -388,8 +398,14 @@ export function useCoursesData({
   const toggleDistributional = async (courseId: string, dist: string) => {
     const course = courses.find((c) => c.id === courseId);
     if (!course) return;
-    const current = course.distributionals || [];
-    const updated = toggleDistributionalTag(current, dist);
+    // Editing materializes: a course that was still riding the catalog's tags
+    // gets them written down first, so removing one keeps the others and the
+    // removal survives the next reload.
+    const updated = toggleDistributionalTag(
+      distributionalEditBase(course),
+      dist,
+    );
+    const stored = course.distributionals;
     setCourses((prev) =>
       prev.map((c) =>
         c.id === courseId ? { ...c, distributionals: updated } : c,
@@ -403,7 +419,7 @@ export function useCoursesData({
       console.error("Error updating distributionals:", error);
       setCourses((prev) =>
         prev.map((c) =>
-          c.id === courseId ? { ...c, distributionals: current } : c,
+          c.id === courseId ? { ...c, distributionals: stored } : c,
         ),
       );
     }

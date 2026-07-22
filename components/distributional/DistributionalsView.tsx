@@ -9,7 +9,8 @@ import {
   sumCourseCredits,
 } from "@/lib/distributionalAllocation";
 import { effectiveDistributionals } from "@/lib/utils/effectiveDistributionals";
-import { AREA_REQS, SKILL_REQS, LANG_LEVELS } from "./constants";
+import { primaryLanguageTrack } from "@/lib/languageRequirement";
+import { AREA_REQS, SKILL_REQS } from "./constants";
 import { DistPieChart } from "./DistPieChart";
 import { DistStatCard, DistributionalsLoadingSkeleton } from "./DistStatCard";
 import { DistHeatMap } from "./DistHeatMap";
@@ -82,31 +83,16 @@ const DistributionalsView = ({
     (r) => allocCredits(r.code) === 0,
   ).length;
 
-  // Language progress for stat card
-  const taggedLevels = LANG_LEVELS.filter((l) => getCount(l) > 0);
-  const placementLevel =
-    taggedLevels.length > 0
-      ? Math.min(...taggedLevels.map((l) => parseInt(l.slice(1))))
-      : null;
-  const getRequiredLevels = (placement: number): string[] => {
-    switch (placement) {
-      case 1: return ["L1", "L2", "L3"];
-      case 2: return ["L2", "L3", "L4"];
-      case 3: return ["L3", "L4"];
-      case 4: return ["L4"];
-      case 5: return ["L5"];
-      default: return [];
-    }
-  };
-  const requiredLevels = placementLevel ? getRequiredLevels(placementLevel) : [];
-  const completedRequired = requiredLevels.filter((l) => getCount(l) > 0);
-  const langComplete = requiredLevels.length > 0 && completedRequired.length === requiredLevels.length;
+  // Language progress for stat card, scored per language (see
+  // lib/languageRequirement) and reported from the language that gets furthest.
+  const langTrack = primaryLanguageTrack(distMap);
+  const langComplete = langTrack?.isComplete ?? false;
   const langStatusText =
-    placementLevel === null
+    langTrack === null
       ? "Not started"
       : langComplete
       ? "Complete"
-      : `${completedRequired.length}/${requiredLevels.length} levels`;
+      : `${langTrack.completedRequired.length}/${langTrack.requiredLevels.length} levels`;
 
   return (
     <motion.div

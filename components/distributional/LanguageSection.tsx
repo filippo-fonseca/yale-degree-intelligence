@@ -2,8 +2,10 @@
 
 import { Course } from "@/lib/types";
 import { motion } from "framer-motion";
+import { useMemo, useState } from "react";
 import { FiCheck, FiInfo } from "react-icons/fi";
 import { STATUS_CLASSES } from "../MajorProgressView/requirementStatus";
+import { buildLanguageTracks } from "@/lib/languageRequirement";
 import { LANG_LEVELS } from "./constants";
 
 // ─── Language section ─────────────────────────────────────────────────────────
@@ -13,34 +15,25 @@ export function LanguageSection({
 }: {
   distMap: Record<string, Course[]>;
 }) {
-  const getCount = (code: string) => (distMap[code] || []).length;
-  const getCoursesFor = (code: string): Course[] => distMap[code] || [];
+  // The requirement is satisfied inside one language, so every number below is
+  // scoped to the selected track. Tracks arrive best-first, so the default
+  // selection is the language that takes the student furthest.
+  const tracks = useMemo(() => buildLanguageTracks(distMap), [distMap]);
+  const [selectedSubject, setSelectedSubject] = useState<string | null>(null);
+  const track =
+    tracks.find((t) => t.subject === selectedSubject) || tracks[0] || null;
 
-  const taggedLevels = LANG_LEVELS.filter((l) => getCount(l) > 0);
-  const placementLevel =
-    taggedLevels.length > 0
-      ? Math.min(...taggedLevels.map((l) => parseInt(l.slice(1))))
-      : null;
+  const getCount = (code: string) => (track?.coursesByLevel[code] || []).length;
+  const getCoursesFor = (code: string): Course[] =>
+    track?.coursesByLevel[code] || [];
 
-  const getRequiredLevels = (placement: number): string[] => {
-    switch (placement) {
-      case 1: return ["L1", "L2", "L3"];
-      case 2: return ["L2", "L3", "L4"];
-      case 3: return ["L3", "L4"];
-      case 4: return ["L4"];
-      case 5: return ["L5"];
-      default: return [];
-    }
-  };
-
-  const requiredLevels = placementLevel ? getRequiredLevels(placementLevel) : [];
-  const completedRequired = requiredLevels.filter((l) => getCount(l) > 0);
-  const progress =
-    requiredLevels.length > 0 ? completedRequired.length / requiredLevels.length : 0;
-  const isComplete =
-    requiredLevels.length > 0 &&
-    completedRequired.length === requiredLevels.length;
-  const nextNeeded = requiredLevels.find((l) => getCount(l) === 0);
+  const placementLevel = track?.placement ?? null;
+  const requiredLevels = track?.requiredLevels ?? [];
+  const completedRequired = track?.completedRequired ?? [];
+  const progress = track?.progress ?? 0;
+  const isComplete = track?.isComplete ?? false;
+  const nextNeeded = track?.nextNeeded ?? undefined;
+  const satisfyingTrack = tracks.find((t) => t.isComplete) || null;
 
   // Derive status for header card styling
   const langStatus = isComplete
@@ -57,12 +50,37 @@ export function LanguageSection({
       </h3>
 
       <div className={`p-4 rounded-xl border transition-all backdrop-blur-md shadow-neu ${langStatusClasses.card}`}>
+        {/* Language switcher, only when more than one language is tagged */}
+        {tracks.length > 1 && (
+          <div className="flex flex-wrap gap-1.5 mb-3">
+            {tracks.map((t) => {
+              const active = t.subject === track?.subject;
+              return (
+                <button
+                  key={t.subject}
+                  onClick={() => setSelectedSubject(t.subject)}
+                  className={`flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-lg border transition-all ${
+                    active
+                      ? "bg-teal-500/15 border-teal-400/50 text-teal-700 dark:text-teal-300"
+                      : "bg-gray-100/60 dark:bg-gray-800/40 border-gray-200 dark:border-gray-700/50 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
+                  }`}
+                >
+                  {t.label}
+                  {t.isComplete && (
+                    <FiCheck size={12} strokeWidth={3} className="text-emerald-500 dark:text-emerald-400" />
+                  )}
+                </button>
+              );
+            })}
+          </div>
+        )}
+
         {/* Placement + progress */}
         {placementLevel !== null && (
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
               <span className="text-sm text-gray-500 dark:text-gray-400">
-                Placed into{" "}
+                {track ? `${track.label}: placed into ` : "Placed into "}
                 <span className="text-teal-600 dark:text-teal-300 font-semibold">
                   L{placementLevel}
                 </span>
@@ -178,23 +196,37 @@ export function LanguageSection({
         {placementLevel === null ? (
           <div className="p-3 rounded-lg bg-blue-500/10 border border-blue-500/20 mb-3">
             <p className="text-xs text-blue-600 dark:text-blue-300">
-              Tag your first language course to track your progress. Your placement level will be inferred from the lowest L-level you tag.
+              Tag your first language course to track your progress. Your placement level will be inferred from the lowest L-level you tag in that language.
             </p>
           </div>
         ) : !isComplete && nextNeeded ? (
-          <div className="p-3 rounded-lg bg-amber-500/10 border border-amber-500/20 mb-3">
-            <p className="text-xs text-amber-600 dark:text-amber-300">
-              <strong>Next up:</strong> Complete an{" "}
-              <span className="font-semibold">{nextNeeded}</span> course.
-              {requiredLevels.length - completedRequired.length > 1 && (
-                <> Then: {requiredLevels.filter((l) => getCount(l) === 0 && l !== nextNeeded).join(", ")}.</>
-              )}
-            </p>
-          </div>
+          satisfyingTrack ? (
+            <div className="p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/20 mb-3">
+              <p className="text-xs text-emerald-600 dark:text-emerald-300">
+                Your language requirement is already satisfied by{" "}
+                <span className="font-semibold">{satisfyingTrack.label}</span> (L
+                {satisfyingTrack.placement} placement).{" "}
+                {track?.label} is extra: the next course in that sequence would be{" "}
+                <span className="font-semibold">{nextNeeded}</span>.
+              </p>
+            </div>
+          ) : (
+            <div className="p-3 rounded-lg bg-amber-500/10 border border-amber-500/20 mb-3">
+              <p className="text-xs text-amber-600 dark:text-amber-300">
+                <strong>Next up:</strong> Complete an{" "}
+                <span className="font-semibold">{nextNeeded}</span> course
+                {track ? ` in ${track.label}` : ""}.
+                {requiredLevels.length - completedRequired.length > 1 && (
+                  <> Then: {requiredLevels.filter((l) => getCount(l) === 0 && l !== nextNeeded).join(", ")}.</>
+                )}
+              </p>
+            </div>
+          )
         ) : isComplete ? (
           <div className="p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/20 mb-3">
             <p className="text-xs text-emerald-600 dark:text-emerald-300">
-              Language requirement complete for your L{placementLevel} placement.
+              Language requirement complete{track ? ` in ${track.label}` : ""} for
+              your L{placementLevel} placement.
             </p>
           </div>
         ) : null}
@@ -212,7 +244,10 @@ export function LanguageSection({
               <span className="text-gray-600 dark:text-gray-400">L3 → L3–L4</span>{" "}
               |{" "}
               <span className="text-gray-600 dark:text-gray-400">L4/L5 → just that course</span>.
-              Placement is inferred from your lowest tagged level. Verify with your dean or DUS.
+              Progress is tracked per language, and placement is inferred from
+              the lowest level you tagged in that language, so starting a new
+              language later does not undo a sequence you already finished.
+              Verify with your dean or DUS.
             </p>
           </div>
         </div>

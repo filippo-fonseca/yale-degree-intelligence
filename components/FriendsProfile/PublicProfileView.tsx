@@ -21,6 +21,7 @@ import {
   sumCourseCredits,
 } from "@/lib/distributionalAllocation";
 import { effectiveDistributionals } from "@/lib/utils/effectiveDistributionals";
+import { primaryLanguageTrack } from "@/lib/languageRequirement";
 import {
   getCompletedCoursesCount,
   getInProgressCount,
@@ -63,8 +64,6 @@ const SKILL_REQS = [
   { code: "QR", name: "QR", color: "red" },
   { code: "WR", name: "Writing", color: "orange" },
 ] as const;
-
-const LANG_LEVELS = ["L1", "L2", "L3", "L4", "L5"] as const;
 
 const CARD_SURFACE =
   "rounded-xl bg-gradient-to-br from-gray-900/60 via-gray-900/40 to-gray-950/60 backdrop-blur-md border border-gray-800/50 shadow-[inset_0_1px_0_rgba(255,255,255,0.04),0_4px_16px_rgba(0,0,0,0.25)]";
@@ -196,34 +195,12 @@ function CompactDistributionalProgress({ courses }: { courses: Course[] }) {
       distMap[d].push(course);
     });
   });
-  const getCount = (code: string) => (distMap[code] || []).length;
-
-  const taggedLevels = LANG_LEVELS.filter((l) => getCount(l) > 0);
-  const placementLevel =
-    taggedLevels.length > 0
-      ? Math.min(...taggedLevels.map((l) => parseInt(l.slice(1))))
-      : null;
-
-  const getRequiredLevels = (placement: number): string[] => {
-    switch (placement) {
-      case 1:
-        return ["L1", "L2", "L3"];
-      case 2:
-        return ["L2", "L3", "L4"];
-      case 3:
-        return ["L3", "L4"];
-      case 4:
-        return ["L4"];
-      case 5:
-        return ["L5"];
-      default:
-        return [];
-    }
-  };
-  const requiredLevels = placementLevel
-    ? getRequiredLevels(placementLevel)
-    : [];
-  const completedRequired = requiredLevels.filter((l) => getCount(l) > 0);
+  // Language progress belongs to one language at a time, so report the track
+  // that gets furthest rather than mixing every L-tag together.
+  const langTrack = primaryLanguageTrack(distMap);
+  const placementLevel = langTrack?.placement ?? null;
+  const requiredLevels = langTrack?.requiredLevels ?? [];
+  const completedRequired = langTrack?.completedRequired ?? [];
 
   const allReqs = [...AREA_REQS, ...SKILL_REQS];
 
@@ -268,7 +245,9 @@ function CompactDistributionalProgress({ courses }: { courses: Course[] }) {
       {placementLevel !== null && (
         <div className="p-3 rounded-lg bg-gray-800/30 border border-gray-700/40">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-xs text-gray-400">Language</span>
+            <span className="text-xs text-gray-400">
+              {langTrack ? langTrack.label : "Language"}
+            </span>
             <span className="text-[10px] text-teal-300">
               Placement L{placementLevel}
             </span>

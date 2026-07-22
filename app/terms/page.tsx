@@ -28,20 +28,30 @@ export default function TermsOfService() {
 
       <div className="max-w-4xl mx-auto space-y-8">
         <h1 className="text-4xl font-bold text-blue-200">Terms of Service</h1>
-        <p className="text-sm text-gray-400">Last updated: July 29, 2025</p>
+        <p className="text-sm text-gray-400">Last updated: July 22, 2026</p>
 
         <section>
           <h2 className="text-2xl font-semibold text-purple-300">
             1. About the App
           </h2>
           <p>
-            DegreeIntelligence is a student-built, free tool designed to help
-            Yale students visualize and plan their academic trajectories. It
-            allows users to upload transcript data, which we parse into course
-            and grade records to track academic progress. This app is
-            student-run, free to use, and{" "}
-            <strong>not officially affiliated with Yale University</strong> in
-            any way, shape, or form.
+            DegreeIntelligence is a fun, open, student-built tool designed to
+            help Yale students visualize and plan their academic trajectories.
+            We built it because we use it ourselves and decided to share it with
+            the Yale community. It lets you upload a transcript and/or write in
+            courses and grades by hand so you can track progress and plan ahead.
+          </p>
+          <p className="mt-3">
+            This app is{" "}
+            <strong>not affiliated with Yale University, Yale College, or
+            DegreeAudit</strong>{" "}
+            in any way, shape, or form. It is not an official Yale student group
+            or university service.
+          </p>
+          <p className="mt-3">
+            <strong>DegreeIntelligence is free forever.</strong> We stand to
+            make no money from this — in fact we lose money running it — and we
+            will never charge a dime for it.
           </p>
         </section>
 
@@ -74,19 +84,27 @@ export default function TermsOfService() {
           <p>We take your data seriously. Here's what you should know:</p>
           <ul className="list-disc list-inside space-y-1">
             <li>
-              <strong>We do NOT store your raw transcript documents.</strong>
+              By uploading a transcript or writing in courses and grades, you{" "}
+              <strong>voluntarily</strong> share that academic data with us.
+            </li>
+            <li>
+              <strong>We do NOT store your raw transcript PDF</strong> after
+              parsing.
             </li>
             <li>
               <strong>
-                We DO store structured data extracted from transcripts
+                We DO store structured course and grade data on our servers
               </strong>
-              , such as courses, semesters, grades, and majors, as it's
-              essential for the platform's operation and we have no other
-              choice.
+              (private to your account). That storage is essential for progress
+              tracking, the Simulator, and related planning features.
+            </li>
+            <li>
+              Course text from a transcript upload may be sent to OpenAI solely
+              to extract structured course records.
             </li>
             <li>
               This information is used solely to provide insights and planning
-              tools within the app.
+              tools within the app. We do not sell your data.
             </li>
           </ul>
           <p>

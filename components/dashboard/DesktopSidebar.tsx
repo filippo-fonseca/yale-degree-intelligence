@@ -292,9 +292,8 @@ export function DesktopSidebar({
 
           <div className="px-1 pb-1">
             <p className="text-[10px] text-gray-400 dark:text-gray-600 leading-tight text-justify">
-              DegreeIntelligence is a student-built tool. Data may be
-              inaccurate. Verify with your DUS. NOT AFFILIATED AS A YALE STUDENT
-              GROUP.
+              Student-built, not affiliated with Yale. Free forever — we will
+              never charge a dime. Data may be inaccurate; verify with your DUS.
             </p>
           </div>
         </div>

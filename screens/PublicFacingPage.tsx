@@ -1457,9 +1457,9 @@ export default function AboutPage() {
             </Link>
           </nav>
 
-          <p className="text-center font-mono text-xs tracking-tight text-gray-400 dark:text-gray-500">
+          <p className="text-center font-mono text-xs tracking-tight text-gray-400 dark:text-gray-500 max-w-lg mx-auto">
             © {new Date().getFullYear()} DegreeIntelligence · not affiliated
-            with Yale University
+            with Yale University · free forever, never a dime
           </p>
         </div>
       </footer>

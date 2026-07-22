@@ -26,6 +26,7 @@ import toast from "react-hot-toast";
 import { GraduationCap, BookOpen, Award, Clock } from "lucide-react";
 import { useTheme } from "@/context/ThemeContext";
 import { useAuth } from "@/context/AuthContext";
+import { getDistPillStyle } from "@/lib/constants";
 import { UserAvatar } from "@/components/ui/UserAvatar";
 
 function CountUp({
@@ -476,21 +477,24 @@ export default function AboutPage() {
               <AnimatedGpaTrend />
             </FloatingTile>
 
-            {/* Distributionals, using the app's own chip colors */}
+            {/* Distributionals, the whole set, in the app's own chip colors */}
             <FloatingTile
-              className="top-[47%] left-[0%] lg:left-[1%]"
+              className="top-[45%] left-[0%] lg:left-[1%]"
               rotate={5}
               delay={5.2}
             >
-              <span className="rounded-full border border-purple-500/30 bg-purple-500/20 px-2 py-0.5 text-[10px] font-medium text-purple-700 dark:text-purple-300">
-                Hu ✓
-              </span>
-              <span className="rounded-full border border-sky-500/30 bg-sky-500/20 px-2 py-0.5 text-[10px] font-medium text-sky-700 dark:text-sky-300">
-                So ✓
-              </span>
-              <span className="rounded-full border border-red-500/30 bg-red-500/20 px-2 py-0.5 text-[10px] font-medium text-red-700 dark:text-red-300">
-                QR 1/2
-              </span>
+              {/* Two rows, so the full set stays as narrow as the old three
+                  chips and keeps clear of the headline. */}
+              <div className="flex w-[9.25rem] flex-wrap gap-1">
+                {HERO_DIST_CHIPS.map((chip) => (
+                  <span
+                    key={chip.code}
+                    className={`rounded-full border px-1.5 py-0.5 text-[10px] font-medium ${chip.className}`}
+                  >
+                    {chip.code} {chip.status}
+                  </span>
+                ))}
+              </div>
             </FloatingTile>
 
             {/* A friend, the one social note in the orbit */}
@@ -1761,6 +1765,13 @@ const DIST_SEGMENTS = [
   { code: "QR", color: "#f87171", target: 0.5 },
 ] as const;
 
+/** The full distributional set for the hero tile, in the app's own chip colors. */
+const HERO_DIST_CHIPS = DIST_SEGMENTS.map((seg) => ({
+  code: seg.code,
+  status: seg.target === 1 ? "✓" : "1/2",
+  className: getDistPillStyle(seg.code),
+}));
+
 /** Distributionals progress: five colored pips fill in, 4/5 complete. */
 function AnimatedDistribBar() {
   return (
@@ -1775,13 +1786,19 @@ function AnimatedDistribBar() {
       </div>
       <div className="flex items-center gap-1">
         {DIST_SEGMENTS.map((seg, i) => (
+          // Each pip carries its own letter, so the tile reads as the five
+          // distributionals rather than five anonymous bars. The fill sits
+          // behind the label at low opacity to keep the letter legible in
+          // both themes.
           <div
             key={seg.code}
-            className="relative h-1.5 w-5 overflow-hidden rounded-full bg-gray-200 dark:bg-white/10"
+            className={`relative flex h-[18px] w-[26px] items-center justify-center overflow-hidden rounded-md border ${getDistPillStyle(
+              seg.code,
+            )}`}
           >
             <motion.div
-              className="absolute inset-y-0 left-0 rounded-full"
-              style={{ backgroundColor: seg.color }}
+              className="absolute inset-y-0 left-0"
+              style={{ backgroundColor: seg.color, opacity: 0.3 }}
               initial={{ width: "0%" }}
               animate={{
                 width: [
@@ -1800,6 +1817,9 @@ function AnimatedDistribBar() {
                 repeatDelay: 0.8,
               }}
             />
+            <span className="relative font-sf text-[9px] font-medium leading-none">
+              {seg.code}
+            </span>
           </div>
         ))}
       </div>

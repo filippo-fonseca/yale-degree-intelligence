@@ -96,11 +96,18 @@ export function DistPieChart({ distMap }: { distMap: Record<string, Course[]> })
             }}
             sx={{
               fontFamily: CHART_FONT,
-              "& .MuiChartsLegend-root text, & .MuiChartsLegend-series text, & .MuiChartsLegend-label, & .MuiChartsLegend-label text":
+              // The legend is HTML, not SVG, so it takes `color` and ignores
+              // `fill`; without this it inherits MUI's light-theme black and
+              // disappears against the dark card.
+              "& .MuiChartsLegend-root, & .MuiChartsLegend-series, & .MuiChartsLegend-label, & .MuiChartsLabel-root":
                 {
                   fontFamily: `${CHART_FONT} !important`,
-                  fill: `${isDark ? "#D1D5DB" : "#4B5563"} !important`,
+                  color: `${isDark ? "#D1D5DB" : "#4B5563"} !important`,
                 },
+              "& .MuiChartsLegend-root text, & .MuiChartsLegend-label text": {
+                fontFamily: `${CHART_FONT} !important`,
+                fill: `${isDark ? "#D1D5DB" : "#4B5563"} !important`,
+              },
             }}
           />
         </div>

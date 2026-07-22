@@ -11,6 +11,7 @@ import {
   getCourseCreditsFromCode,
   getOtherCodesForCourse,
 } from "@/lib/courseCatalog";
+import { effectiveDistributionals } from "@/lib/utils/effectiveDistributionals";
 import { useEffect, useRef, useState } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { db } from "@/config/firebase";
@@ -152,10 +153,12 @@ export default function CourseModal({
     return () => document.removeEventListener("mousedown", handleClick);
   }, [dropdownOpen]);
 
-  // Sync local distributionals with course prop and reset editor state
+  // Sync local distributionals with course prop and reset editor state. A
+  // course nobody has tagged by hand shows the catalog's tags rather than
+  // "none assigned".
   useEffect(() => {
     if (course) {
-      setLocalDistributionals(course.distributionals || []);
+      setLocalDistributionals(effectiveDistributionals(course));
     }
     setShowDistEditor(false);
   }, [course, isOpen]);

@@ -6,6 +6,7 @@ import { Course } from "@/lib/types";
 import { getDistPillStyle } from "@/lib/constants";
 import { getGPAColor } from "@/lib/utils/utils";
 import { getCourseNameFromCode } from "@/lib/courseCatalog";
+import { effectiveDistributionals } from "@/lib/utils/effectiveDistributionals";
 
 interface CourseCardProps {
   course: Course;
@@ -80,7 +81,7 @@ export function CourseCard({
       ? getGPAColor(course.grade)
       : "";
 
-  const distributionals = course.distributionals || [];
+  const distributionals = effectiveDistributionals(course);
   const selectorOpen = distSelectorCourseId === course.id;
 
   return (

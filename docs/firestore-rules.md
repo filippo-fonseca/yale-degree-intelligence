@@ -49,14 +49,13 @@ match /databases/{database}/documents {
 
     // ============================================
     // FRIENDS PUBLIC DATA
+    // Grades are NEVER stored here. Enabled profiles are discoverable
+    // so Yalies can find each other in Friends search; full course lists
+    // are only shown in-app after a friendship check on the profile page.
     // ============================================
     match /friends_public_data/{userId} {
-      // Owner can always read/write
-      // Friends can read IF enabled AND actually friends
       allow read: if isOwner(userId) ||
-                    (isAuthenticated() &&
-                     hasFriendsEnabled(userId) &&
-                     areFriends(request.auth.uid, userId));
+                    (isAuthenticated() && resource.data.enabled == true);
 
       allow create, update: if isOwner(userId) &&
                               request.resource.data.userId == userId;
@@ -81,14 +80,11 @@ match /databases/{database}/documents {
     }
 
     // ============================================
-    // USERS
+    // USERS — owner only (emails, bio, private prefs)
+    // Friend-facing profile fields live in friends_public_data.
     // ============================================
     match /users/{userId} {
-      // Full-collection client reads of users should be avoided; prefer
-      // friends_public_data for discovery and targeted reads for profiles.
-      // Planned restriction: scope reads to own doc or verified friends.
-      allow read: if isAuthenticated();
-      allow create, update, delete: if isOwner(userId);
+      allow read, create, update, delete: if isOwner(userId);
     }
 
     // ============================================
@@ -132,6 +128,28 @@ match /databases/{database}/documents {
 
     match /cleoai_conversations/{userId} {
       allow read, write: if isOwner(userId);
+    }
+
+    match /conversations/{docId} {
+      allow read, update, delete: if isAuthenticated() &&
+                                    resource.data.userId == request.auth.uid;
+      allow create: if isAuthenticated() &&
+                      request.resource.data.userId == request.auth.uid;
+    }
+
+    // ============================================
+    // SECRETS — Admin SDK only (client deny)
+    // ============================================
+    match /dan_keys/{userId} {
+      allow read, write: if false;
+    }
+
+    match /mcp_tokens/{userId} {
+      allow read, write: if false;
+    }
+
+    match /contact_messages/{docId} {
+      allow read, write: if false;
     }
 
 }

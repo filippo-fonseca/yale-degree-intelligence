@@ -1,4 +1,5 @@
 import { Course } from "@/lib/types";
+import { effectiveDistributionals } from "@/lib/utils/effectiveDistributionals";
 
 // The five Yale area + skill distributional requirements that compete for a
 // single course. A course tagged with more than one of these may only count
@@ -45,7 +46,7 @@ function courseKey(course: Course): string {
 
 /** The area/skill requirement codes a course is tagged with (intersection). */
 function eligibleOptions(course: Course): string[] {
-  const tags = course.distributionals || [];
+  const tags = effectiveDistributionals(course);
   return ALLOC_REQ_CODES.filter((c) => tags.includes(c));
 }
 

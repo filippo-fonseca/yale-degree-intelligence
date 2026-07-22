@@ -2,6 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { adminAuth, adminDb } from "@/config/firebaseAdmin";
 import { requireAuth, isAuthError, rateLimit } from "@/lib/apiAuth";
 import { FieldValue } from "firebase-admin/firestore";
+import {
+  effectiveDistributionals,
+  hasStoredDistributionals,
+} from "@/lib/utils/effectiveDistributionals";
 
 interface PublicCourse {
   code: string;
@@ -107,8 +111,16 @@ export async function POST(req: NextRequest) {
       if (c.manualRequirementsFulfilled?.length) {
         course.manualRequirementsFulfilled = c.manualRequirementsFulfilled;
       }
-      if (c.distributionals?.length) {
-        course.distributionals = c.distributionals;
+      // Friends see the same effective tags the owner does, catalog defaults
+      // included. Omitting the key means "nobody has said anything", so the
+      // reader can fall back to the catalog itself; an explicit empty array
+      // means the owner cleared every tag and must not be overridden.
+      const tagged = { code: c.code as string, distributionals: c.distributionals };
+      const dists = effectiveDistributionals(tagged);
+      if (dists.length > 0) {
+        course.distributionals = dists;
+      } else if (hasStoredDistributionals(tagged)) {
+        course.distributionals = [];
       }
       return course;
     });

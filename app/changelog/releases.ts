@@ -63,7 +63,7 @@ export const RELEASES: Release[] = [
         items: [
           "More and better academic Stats: GPA trends, credits, and grade distribution that stay legible in light and dark — including F grades that were previously skipped by mistake.",
           "Distributional-requirement tracking that counts real credits, clearer progress cards, and a course can only sit at one language level.",
-          "Distributionals come from your transcript when we can read them — you can still override any course by hand.",
+          "Your distributionals fill themselves in. Every course you have taken, added, or planned now starts with the tags Yale publishes for it, so the Distributionals tab shows real progress even if you have never tagged a single course. Your transcript still wins where it lists them, and anything you set by hand always wins over both. Change one tag and the rest stay put.",
           "Clearer empty states: Stats, Friends, and Distributionals invite you to upload a transcript instead of sitting greyed out.",
         ],
       },

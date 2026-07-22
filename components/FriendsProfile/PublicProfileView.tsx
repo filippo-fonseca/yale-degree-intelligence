@@ -20,6 +20,7 @@ import {
   allocateDistributionals,
   sumCourseCredits,
 } from "@/lib/distributionalAllocation";
+import { effectiveDistributionals } from "@/lib/utils/effectiveDistributionals";
 import {
   getCompletedCoursesCount,
   getInProgressCount,
@@ -190,7 +191,7 @@ function CompactDistributionalProgress({ courses }: { courses: Course[] }) {
   const distMap: Record<string, Course[]> = {};
   courses.forEach((course) => {
     if (course.skipped) return;
-    (course.distributionals || []).forEach((d) => {
+    effectiveDistributionals(course).forEach((d) => {
       if (!distMap[d]) distMap[d] = [];
       distMap[d].push(course);
     });
@@ -464,7 +465,7 @@ export function PublicProfileView({
 
   const coursesWithIds = courses.map(toCourseWithId);
   const hasDistributionals = coursesWithIds.some(
-    (c) => !c.skipped && (c.distributionals || []).length > 0,
+    (c) => !c.skipped && effectiveDistributionals(c).length > 0,
   );
 
   const showCourseContent = !friendsFeatureDisabled && vis.showCourses;

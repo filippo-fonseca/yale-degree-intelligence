@@ -6,6 +6,7 @@ import { FiPlus, FiRefreshCw } from "react-icons/fi";
 import { Course } from "@/lib/types";
 import { toggleDistributionalTag } from "@/lib/distributionalTags";
 import { getCourseNameFromCode } from "@/lib/courseCatalog";
+import { effectiveDistributionals } from "@/lib/utils/effectiveDistributionals";
 import { StatCard } from "./StatCard";
 import { CoursesLoadingSkeleton } from "./CoursesLoadingSkeleton";
 import { OnboardingState } from "./OnboardingState";
@@ -94,7 +95,7 @@ export default function MyCoursesView({
         name: getCourseNameFromCode(course.code) ?? "Course",
         status: course.status,
         skipped: course.skipped || false,
-        distributionals: course.distributionals || [],
+        distributionals: effectiveDistributionals(course),
       },
     });
   };

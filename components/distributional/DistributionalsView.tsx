@@ -8,6 +8,7 @@ import {
   allocateDistributionals,
   sumCourseCredits,
 } from "@/lib/distributionalAllocation";
+import { effectiveDistributionals } from "@/lib/utils/effectiveDistributionals";
 import { AREA_REQS, SKILL_REQS, LANG_LEVELS } from "./constants";
 import { DistPieChart } from "./DistPieChart";
 import { DistStatCard, DistributionalsLoadingSkeleton } from "./DistStatCard";
@@ -41,7 +42,7 @@ const DistributionalsView = ({
   const distMap: Record<string, Course[]> = {};
   courses.forEach((course) => {
     if (course.skipped) return;
-    (course.distributionals || []).forEach((d) => {
+    effectiveDistributionals(course).forEach((d) => {
       if (!distMap[d]) distMap[d] = [];
       distMap[d].push(course);
     });
@@ -67,7 +68,7 @@ const DistributionalsView = ({
   );
 
   const hasAnyDistributionals = courses.some(
-    (c) => !c.skipped && (c.distributionals || []).length > 0,
+    (c) => !c.skipped && effectiveDistributionals(c).length > 0,
   );
 
   // Summary stats (based on the single-allocation, not raw tags)
@@ -313,7 +314,8 @@ const DistributionalsView = ({
               each course's requirement yourself with the dropdowns on the cards.
             </p>
             <p className="text-xs text-gray-400 dark:text-gray-500 mt-2">
-              This data is based on your manual tagging. Always verify with your dean or DUS.
+              Tags come from Yale's course catalog by default, and anything you
+              set by hand on a course wins. Always verify with your dean or DUS.
             </p>
           </div>
         </div>

@@ -116,7 +116,9 @@ const RequirementCard = React.memo(function RequirementCard({
           >
             {isCompletedCard
               ? "✓"
-              : `${reqInProgress + reqCompleted}/${req.required}`}
+              : (req.required || 0) > 0
+                ? `${reqInProgress + reqCompleted}/${req.required}`
+                : "suggested"}
           </span>
           {breakdown && (
             <span className={`text-[10px] whitespace-nowrap ${classes.accent}`}>

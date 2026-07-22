@@ -29018,7 +29018,10 @@
     ],
     "isFall": false,
     "isSpring": false,
-    "distributionals": []
+    "distributionals": [
+      "Sc",
+      "QR"
+    ]
   },
   {
     "codes": [
@@ -72624,7 +72627,9 @@
     ],
     "isFall": false,
     "isSpring": false,
-    "distributionals": []
+    "distributionals": [
+      "L5"
+    ]
   },
   {
     "codes": [
@@ -89000,7 +89005,9 @@
     ],
     "isFall": true,
     "isSpring": false,
-    "distributionals": []
+    "distributionals": [
+      "So"
+    ]
   },
   {
     "codes": [
@@ -99394,7 +99401,9 @@
     ],
     "isFall": true,
     "isSpring": false,
-    "distributionals": []
+    "distributionals": [
+      "So"
+    ]
   },
   {
     "codes": [

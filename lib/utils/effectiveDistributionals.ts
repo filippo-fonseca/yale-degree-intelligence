@@ -15,13 +15,19 @@ export interface DistributionalCourseLike {
  * The distributional tags a course actually has, app-wide.
  *
  * Precedence, highest first:
- *   1. What is stored on the course. An empty array counts: a transcript that
- *      spelled the tags out, or a student who cleared every one of them, is an
- *      answer, not a blank, so it must not fall through to the catalog and have
- *      the tags reappear on the next render.
- *   2. What the catalog knows about the code, resolved through code aliases, so
- *      a course the student never touched still carries Yale's own tags.
+ *   1. NON-EMPTY stored tags on the course (a transcript that spelled them
+ *      out, or a student's own assignment).
+ *   2. What the catalog knows about the code, resolved through code aliases,
+ *      so any course, however old its document, carries Yale's own tags in
+ *      realtime.
  *   3. Nothing.
+ *
+ * A stored EMPTY array falls through to the catalog on purpose: years of
+ * imports wrote `distributionals: []` for every untagged transcript row, and
+ * treating that debris as "deliberately none" left existing students blank.
+ * The cost is that a course cannot be pinned to zero tags against a catalog
+ * that says otherwise; My Courses is read-only for tags, so that state has no
+ * remaining author.
  *
  * Catalog tags are ordinary tags, not a separate visual state, and they count
  * toward the degree audit exactly like stored ones. That is the point: the
@@ -31,7 +37,9 @@ export function effectiveDistributionals(
   course: DistributionalCourseLike | null | undefined,
 ): string[] {
   if (!course) return [];
-  if (Array.isArray(course.distributionals)) return course.distributionals;
+  if (Array.isArray(course.distributionals) && course.distributionals.length > 0) {
+    return course.distributionals;
+  }
   return getCourseDistributionalsFromCode(course.code) ?? [];
 }
 

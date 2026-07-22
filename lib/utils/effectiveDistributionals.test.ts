@@ -48,9 +48,9 @@ describe("catalog distributionals are the default for every course", () => {
   });
 
   // Probe (b)
-  it("a stored empty array stays empty and never falls back", () => {
+  it("a stored empty array falls back to the catalog (import debris rule)", () => {
     const c = course({ code: MULTI_TAG_CODE, distributionals: [] });
-    expect(effectiveDistributionals(c)).toEqual([]);
+    expect(effectiveDistributionals(c)).toEqual(MULTI_TAG_TAGS);
     expect(hasStoredDistributionals(c)).toBe(true);
   });
 
@@ -97,17 +97,19 @@ describe("catalog distributionals are the default for every course", () => {
       expect(stored).toEqual(["QR", "Sc"]);
     });
 
-    it("clearing every tag persists as an explicit empty array", () => {
+    it("clearing every tag stores empty, which resolves back to the catalog", () => {
       let stored = distributionalEditBase(course({ code: MULTI_TAG_CODE }));
       for (const tag of MULTI_TAG_TAGS) {
         stored = toggleDistributionalTag(stored, tag);
       }
       expect(stored).toEqual([]);
+      // Empty is not authoritative under the import-debris rule: the catalog
+      // wins again. A course cannot be pinned to zero tags, by design.
       expect(
         effectiveDistributionals(
           course({ code: MULTI_TAG_CODE, distributionals: stored }),
         ),
-      ).toEqual([]);
+      ).toEqual(MULTI_TAG_TAGS);
     });
 
     it("does not hand back the catalog's own array to mutate", () => {
@@ -144,11 +146,11 @@ describe("catalog distributionals are the default for every course", () => {
     expect(allocation.reqByCourseKey["b"]).toBe("QR");
   });
 
-  it("a course the student emptied is left out of the allocation", () => {
+  it("a course with import-debris empty tags still enters the allocation", () => {
     const allocation = allocateDistributionals(
       [course({ code: MULTI_TAG_CODE, id: "a", distributionals: [] })],
       { auto: true, overrides: {} },
     );
-    expect(allocation.reqByCourseKey["a"]).toBeUndefined();
+    expect(allocation.reqByCourseKey["a"]).toBeDefined();
   });
 });

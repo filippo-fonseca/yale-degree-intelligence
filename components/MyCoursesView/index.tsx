@@ -277,20 +277,14 @@ export default function MyCoursesView({
       </div>
 
       {/* ---- Modals ---- */}
+      {/* Distributional editing retired here 2026-07-21: tags resolve in
+          realtime from the catalog, so the modal is read-only for them
+          (onToggleDistributional deliberately not passed). */}
       <CourseModal
         isOpen={modalState.isOpen}
         course={modalState.course}
         onClose={() => setModalState({ isOpen: false, course: null })}
         allowSkip={false}
-        onToggleDistributional={async (courseId, dist) => {
-          await onToggleDistributional(courseId, dist);
-          setModalState((prev) => {
-            if (!prev.course || prev.course.id !== courseId) return prev;
-            const cur = prev.course.distributionals || [];
-            const next = toggleDistributionalTag(cur, dist);
-            return { ...prev, course: { ...prev.course, distributionals: next } };
-          });
-        }}
       />
 
       <ConfirmDeleteModal

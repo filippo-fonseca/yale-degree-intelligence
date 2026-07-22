@@ -138,73 +138,23 @@ export function CourseCard({
         )}
       </div>
 
-      {/* Distributional tags + editor (skipped courses don't count) */}
-      {!course.skipped && (
-      <div
-        className="mt-2.5"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div className="flex flex-wrap items-center gap-1.5">
-          {distributionals.map((d, dIdx) => (
-            <span
-              key={`${d}-${dIdx}`}
-              className={`text-[10px] px-2 py-0.5 rounded-full border font-medium ${getDistPillStyle(d)}`}
-            >
-              {d}
-            </span>
-          ))}
-          {distributionals.length === 0 ? (
-            <button
-              onClick={() => onDistSelectorToggle(course.id)}
-              className="text-[10px] px-2 py-0.5 rounded-full bg-gradient-to-r from-purple-500/20 via-pink-500/20 to-blue-500/20 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white border border-purple-500/50 hover:border-purple-400/70 transition-all"
-            >
-              + assign distributional
-            </button>
-          ) : (
-            <button
-              onClick={() => onDistSelectorToggle(course.id)}
-              className="text-[10px] px-2 py-0.5 rounded-full bg-gray-100 dark:bg-gray-800/50 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700/50 border border-dashed border-gray-300 dark:border-gray-700/50 transition-all"
-            >
-              edit distribs.
-            </button>
-          )}
+      {/* Distributional tags, display-only (skipped courses don't count).
+          Tags resolve in realtime from the catalog with stored non-empty
+          overrides; the inline editor was retired 2026-07-21 because the
+          catalog is the source of truth here. */}
+      {!course.skipped && distributionals.length > 0 && (
+        <div className="mt-2.5" onClick={(e) => e.stopPropagation()}>
+          <div className="flex flex-wrap items-center gap-1.5">
+            {distributionals.map((d, dIdx) => (
+              <span
+                key={`${d}-${dIdx}`}
+                className={`text-[10px] px-2 py-0.5 rounded-full border font-medium ${getDistPillStyle(d)}`}
+              >
+                {d}
+              </span>
+            ))}
+          </div>
         </div>
-
-        <AnimatePresence>
-          {selectorOpen && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: "auto" }}
-              exit={{ opacity: 0, height: 0 }}
-              className="overflow-hidden"
-            >
-              <div className="mt-2 p-3 rounded-lg bg-gray-100 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700/50 space-y-2.5">
-                <DistSection
-                  label="Areas"
-                  items={[...DIST_AREAS]}
-                  selected={distributionals}
-                  courseId={course.id}
-                  onToggle={onToggleDistributional}
-                />
-                <DistSection
-                  label="Skills"
-                  items={[...DIST_SKILLS]}
-                  selected={distributionals}
-                  courseId={course.id}
-                  onToggle={onToggleDistributional}
-                />
-                <DistSection
-                  label="Language"
-                  items={[...DIST_LANGS]}
-                  selected={distributionals}
-                  courseId={course.id}
-                  onToggle={onToggleDistributional}
-                />
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
       )}
     </motion.div>
   );

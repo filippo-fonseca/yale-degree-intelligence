@@ -47,6 +47,7 @@ export const RELEASES: Release[] = [
           "Distributionals fill themselves in. Turn the Distributionals editor on and a course you have planned starts with the tags Yale lists for it already selected, so you only change the ones you disagree with. Anything you set yourself always wins.",
           "Those tags now come from Yale's own course listings. We checked every course in the catalog against the Yale College Programs of Study bulletin, going back through four years of editions to find courses that are no longer offered, and they agree on more than 98 percent of the courses that carry tags. Where the bulletin proved a course had tags we were missing, we added them.",
           "The courses you are taking right now count everywhere they should. \"+ In Progress\" on My Major and My Certificates, your in-progress credits, and the Simulator all pick them up, whether the course came from your transcript or you added it by hand.",
+          "Planned courses in the Simulator's Progress tab now say when they are coming. Open a major or certificate card and each planned course pill shows the semester your plan schedules it for (for example, planned · Fall '26), so you can read what fills a requirement and when without flipping back to the Canvas.",
         ],
       },
       {

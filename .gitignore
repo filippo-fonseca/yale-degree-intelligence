@@ -45,3 +45,4 @@ next-env.d.ts
 !.bgsd/ledger.md
 !.bgsd/config.json
 .bgsd-tmp/
+ycps-cache/

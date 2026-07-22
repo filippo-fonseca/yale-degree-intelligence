@@ -1,29 +1,19 @@
 import { NextRequest, NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
-import { adminAuth, adminDb } from "@/config/firebaseAdmin";
+import { adminDb } from "@/config/firebaseAdmin";
 import { encryptSecret } from "@/lib/serverCrypto";
+import { isAuthError, requireAuth } from "@/lib/apiAuth";
 
 const KEYS_COLLECTION = "dan_keys";
 
-async function getUid(req: NextRequest): Promise<string | null> {
-  if (!adminAuth) return null;
-  const authHeader = req.headers.get("Authorization");
-  if (!authHeader || !authHeader.startsWith("Bearer ")) return null;
-  try {
-    const decoded = await adminAuth.verifyIdToken(authHeader.split("Bearer ")[1]);
-    return decoded.uid;
-  } catch {
-    return null;
-  }
-}
-
 // Save (and validate) the user's Anthropic API key.
 export async function POST(req: NextRequest) {
-  if (!adminAuth || !adminDb) {
+  if (!adminDb) {
     return NextResponse.json({ error: "Server configuration error" }, { status: 500 });
   }
-  const uid = await getUid(req);
-  if (!uid) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const auth = await requireAuth(req, { checkRevoked: true });
+  if (isAuthError(auth)) return auth;
+  const uid = auth.uid;
 
   const { apiKey } = await req.json().catch(() => ({ apiKey: undefined }));
   if (typeof apiKey !== "string" || !apiKey.startsWith("sk-ant-")) {
@@ -61,11 +51,12 @@ export async function POST(req: NextRequest) {
 
 // Report connection status (never returns the key itself).
 export async function GET(req: NextRequest) {
-  if (!adminAuth || !adminDb) {
+  if (!adminDb) {
     return NextResponse.json({ error: "Server configuration error" }, { status: 500 });
   }
-  const uid = await getUid(req);
-  if (!uid) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const auth = await requireAuth(req);
+  if (isAuthError(auth)) return auth;
+  const uid = auth.uid;
 
   const snap = await adminDb.collection(KEYS_COLLECTION).doc(uid).get();
   if (!snap.exists) return NextResponse.json({ connected: false });
@@ -79,11 +70,12 @@ export async function GET(req: NextRequest) {
 
 // Remove the stored key.
 export async function DELETE(req: NextRequest) {
-  if (!adminAuth || !adminDb) {
+  if (!adminDb) {
     return NextResponse.json({ error: "Server configuration error" }, { status: 500 });
   }
-  const uid = await getUid(req);
-  if (!uid) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const auth = await requireAuth(req, { checkRevoked: true });
+  if (isAuthError(auth)) return auth;
+  const uid = auth.uid;
 
   await adminDb.collection(KEYS_COLLECTION).doc(uid).delete();
   return NextResponse.json({ connected: false });

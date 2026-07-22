@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { adminAuth, adminDb } from "@/config/firebaseAdmin";
 import { isAdminEmail } from "@/lib/admin";
+import { isAuthError, requireAuth } from "@/lib/apiAuth";
 import { getCourseDepartmentFromCode } from "@/lib/courseCatalog";
 import { gradePoints } from "@/lib/constants";
 
@@ -28,19 +29,10 @@ const sortEntries = (data: Record<string, number>, limit?: number) => {
 };
 
 async function requireAdmin(req: NextRequest) {
-  if (!adminAuth) return null;
-  const authHeader = req.headers.get("Authorization");
-  if (!authHeader?.startsWith("Bearer ")) return null;
-
-  try {
-    const decoded = await adminAuth.verifyIdToken(authHeader.split("Bearer ")[1]);
-    if (isAdminEmail(decoded.email)) return decoded;
-
-    const user = await adminAuth.getUser(decoded.uid);
-    return isAdminEmail(user.email) ? decoded : null;
-  } catch {
-    return null;
-  }
+  const auth = await requireAuth(req, { checkRevoked: true });
+  if (isAuthError(auth)) return null;
+  if (!isAdminEmail(auth.email)) return null;
+  return auth;
 }
 
 export async function GET(req: NextRequest) {

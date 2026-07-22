@@ -13,7 +13,14 @@ export function getReqStatus(
   reqInProgress: number,
   required: number,
 ): ReqStatus {
-  if (required > 0 && reqCompleted >= required) return "completed";
+  // A 0-credit requirement (a "suggested" prerequisite) is only done once a
+  // course actually satisfies it; 0 >= 0 must not read as completed.
+  if (required <= 0) {
+    if (reqCompleted > 0) return "completed";
+    if (reqInProgress > 0) return "inProgress";
+    return "notStarted";
+  }
+  if (reqCompleted >= required) return "completed";
   if (reqInProgress > 0) return "inProgress";
   if (reqCompleted > 0) return "partial";
   return "notStarted";

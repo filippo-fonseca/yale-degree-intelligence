@@ -1081,6 +1081,21 @@ export default function Simulator({
     [plannedNow],
   );
 
+  // Which semester each planned course sits in, so the requirement pills can
+  // say when a course is coming, not just that it is. First placement wins,
+  // matching the dedupe in plannedNow.
+  const plannedSemesterByCode = useMemo<Record<string, string>>(() => {
+    const byCode: Record<string, string> = {};
+    semesters.forEach((s) => {
+      s.courses.forEach((c) => {
+        if (c?.code && c.status === "not-taken" && !(c.code in byCode)) {
+          byCode[c.code] = s.name;
+        }
+      });
+    });
+    return byCode;
+  }, [semesters]);
+
   // The same engine inputs the preview runs on, handed to the surfaces that
   // render policy so a verdict in the assign modal can never disagree with the
   // numbers in the breakdown.
@@ -2024,6 +2039,7 @@ export default function Simulator({
               previewProgress={previewProgress}
               certificatePreviewProgress={certificatePreviewProgress}
               plannedCodes={plannedCodes}
+              plannedSemesterByCode={plannedSemesterByCode}
               simulatorManualReqs={simulatorManualReqs}
               courses={completedCourses}
               policyOptions={policyOptions}

@@ -43,6 +43,11 @@ function shortProgramName(name: string): string {
 const noteKey = (code: string, requirement: string) =>
   `${normalizeCourseCode(code)}::${requirement}`;
 
+/** "Fall 2026" → "Fall '26", so the term fits inside a 10px pill. */
+function shortTermName(name: string): string {
+  return name.replace(/\b(?:19|20)(\d{2})\b/, "'$1");
+}
+
 function addNote(
   map: Map<string, RequirementNote[]>,
   requirement: string,
@@ -160,6 +165,8 @@ interface SimulatorRequirementsBreakdownProps {
   previewProgress: Record<string, MajorProgress>;
   certificatePreviewProgress: Record<string, CertificateProgress>;
   plannedCodes: string[];
+  /** Which plan semester each planned course sits in, by course code. */
+  plannedSemesterByCode: Record<string, string>;
   simulatorManualReqs: ManualRequirementEntry[];
   /** Stored courses, so the engine sees the claims the student already made. */
   courses: Course[];
@@ -174,6 +181,7 @@ export default function SimulatorRequirementsBreakdown({
   previewProgress,
   certificatePreviewProgress,
   plannedCodes,
+  plannedSemesterByCode,
   simulatorManualReqs,
   courses,
   policyOptions,
@@ -290,6 +298,25 @@ export default function SimulatorRequirementsBreakdown({
     return canon ? plannedSet.has(canon) : false;
   };
 
+  // The engine may hand back a canonical code while the plan stored the raw
+  // one (or vice versa), so the semester map is keyed under both spellings.
+  const plannedSemesterLookup = useMemo(() => {
+    const byCode = new Map<string, string>();
+    for (const [code, semesterName] of Object.entries(plannedSemesterByCode)) {
+      if (!byCode.has(code)) byCode.set(code, semesterName);
+      const canon = getCanonicalCode(code);
+      if (canon && !byCode.has(canon)) byCode.set(canon, semesterName);
+    }
+    return byCode;
+  }, [plannedSemesterByCode]);
+
+  const plannedSemesterFor = (code: string): string | null => {
+    const direct = plannedSemesterLookup.get(code);
+    if (direct) return direct;
+    const canon = getCanonicalCode(code);
+    return (canon && plannedSemesterLookup.get(canon)) || null;
+  };
+
   const hasAnyProgress =
     majorIds.some((id) => previewProgress[id]) ||
     certificateIds.some((id) => certificatePreviewProgress[id]);
@@ -331,6 +358,7 @@ export default function SimulatorRequirementsBreakdown({
           isOpen={!!expanded[`major-${majorId}`]}
           onToggle={() => toggle(`major-${majorId}`)}
           isPlanned={isPlanned}
+          plannedSemesterFor={plannedSemesterFor}
           onRemoveManual={onRemoveManualReq}
         />
       );
@@ -364,6 +392,7 @@ export default function SimulatorRequirementsBreakdown({
           isOpen={!!expanded[`cert-${certId}`]}
           onToggle={() => toggle(`cert-${certId}`)}
           isPlanned={isPlanned}
+          plannedSemesterFor={plannedSemesterFor}
           onRemoveManual={onRemoveManualReq}
           policy={certificatePolicy[certId]}
         />
@@ -443,6 +472,7 @@ function ProgramProgressCard({
   isOpen,
   onToggle,
   isPlanned,
+  plannedSemesterFor,
   onRemoveManual,
   policy,
 }: {
@@ -454,6 +484,7 @@ function ProgramProgressCard({
   isOpen: boolean;
   onToggle: () => void;
   isPlanned: (code: string) => boolean;
+  plannedSemesterFor: (code: string) => string | null;
   onRemoveManual: (code: string, requirement: string) => void;
   policy?: CertificatePolicyView;
 }) {
@@ -630,6 +661,7 @@ function ProgramProgressCard({
                   manualReqs={manualReqs}
                   onRemoveManual={onRemoveManual}
                   isPlanned={isPlanned}
+                  plannedSemesterFor={plannedSemesterFor}
                   policy={policy}
                 />
               )}
@@ -642,6 +674,7 @@ function ProgramProgressCard({
                   manualReqs={manualReqs}
                   onRemoveManual={onRemoveManual}
                   isPlanned={isPlanned}
+                  plannedSemesterFor={plannedSemesterFor}
                   policy={policy}
                 />
               )}
@@ -654,6 +687,7 @@ function ProgramProgressCard({
                   manualReqs={manualReqs}
                   onRemoveManual={onRemoveManual}
                   isPlanned={isPlanned}
+                  plannedSemesterFor={plannedSemesterFor}
                   policy={policy}
                   showCombinedProgress
                 />
@@ -667,6 +701,7 @@ function ProgramProgressCard({
                   manualReqs={manualReqs}
                   onRemoveManual={onRemoveManual}
                   isPlanned={isPlanned}
+                  plannedSemesterFor={plannedSemesterFor}
                   policy={policy}
                 />
               )}
@@ -694,6 +729,7 @@ function ReqSection({
   manualReqs,
   onRemoveManual,
   isPlanned,
+  plannedSemesterFor,
   policy,
   showCombinedProgress = false,
 }: {
@@ -703,6 +739,7 @@ function ReqSection({
   manualReqs: ManualRequirementEntry[];
   onRemoveManual: (code: string, requirement: string) => void;
   isPlanned: (code: string) => boolean;
+  plannedSemesterFor: (code: string) => string | null;
   policy?: CertificatePolicyView;
   showCombinedProgress?: boolean;
 }) {
@@ -801,8 +838,13 @@ function ReqSection({
                       >
                         {opt.code}
                         {planned && (
-                          <span className="text-[9px] text-amber-400/70 ml-0.5">
-                            planned
+                          <span className="text-[9px] text-amber-400/70 ml-0.5 whitespace-nowrap">
+                            {(() => {
+                              const term = plannedSemesterFor(opt.code);
+                              return term
+                                ? `planned · ${shortTermName(term)}`
+                                : "planned";
+                            })()}
                           </span>
                         )}
                         {opt.completed && opt.manual && (

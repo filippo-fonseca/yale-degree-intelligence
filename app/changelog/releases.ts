@@ -67,6 +67,8 @@ export const RELEASES: Release[] = [
           "Distributional-requirement tracking that counts real credits, clearer progress cards, and a course can only sit at one language level.",
           "Your distributionals fill themselves in. Every course you have taken, added, or planned now starts with the tags Yale publishes for it, so the Distributionals tab shows real progress even if you have never tagged a single course. Your transcript still wins where it lists them, and anything you set by hand always wins over both. Change one tag and the rest stay put.",
           "Clearer empty states: Stats, Friends, and Distributionals invite you to upload a transcript instead of sitting greyed out.",
+          "The language requirement is now tracked one language at a time. Picking up a new language at L1 for fun no longer undoes a sequence you already finished in another one, so a completed French track stays complete and your public page shows the level you actually reached. When you have courses in more than one language, the card lets you switch between them and says when a second language is extra rather than owed.",
+          "The distributional breakdown chart's legend is readable in dark mode again.",
         ],
       },
       {

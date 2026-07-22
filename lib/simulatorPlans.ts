@@ -86,7 +86,10 @@ export function makePlannedCourse(
     userId: uid,
     status: "not-taken",
     credits: getCourseCreditsFromCode(code) ?? 1,
-    distributionals: [],
+    // No `distributionals` key on purpose: absent means "nobody has said
+    // anything yet", so the course picks up the catalog's tags. Writing an
+    // empty array here would be an explicit "this course has none" and would
+    // leave a Dan-planned course blank where a hand-planned one fills in.
   };
 }
 

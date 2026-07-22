@@ -22,7 +22,7 @@ import SimulatorManualAssignModal from "./SimulatorManualAssignModal";
 import SimulatorRequirementsBreakdown from "./SimulatorRequirementsBreakdown";
 import CourseGradeControl from "./CourseGradeControl";
 import CourseDistributionalControl from "./CourseDistributionalControl";
-import { effectiveDistributionals } from "./plannedDistributionals";
+import { effectiveDistributionals } from "@/lib/utils/effectiveDistributionals";
 import SimulatorProgressPane from "./SimulatorProgressPane";
 import { type SimulatorView } from "./SimulatorViewSwitcher";
 import SimulatorToolbarRow from "./SimulatorToolbarRow";
@@ -691,7 +691,7 @@ export default function Simulator({
     // Placement key folds semester, code, projected grade, and (order-insensitive)
     // distributionals so edits to any of those enable "Save Current".
     const placementKey = (s: Semester, c: Course) =>
-      `${s.id}:${c.code}:${c.grade ?? ""}:${[...(c.distributionals ?? [])]
+      `${s.id}:${c.code}:${c.grade ?? ""}:${[...effectiveDistributionals(c)]
         .sort()
         .join("+")}`;
 
@@ -1153,7 +1153,7 @@ export default function Simulator({
       semesters.flatMap((s) =>
         s.courses
           .filter((c) => c.status === "not-taken")
-          .map((c) => c.distributionals ?? []),
+          .map((c) => effectiveDistributionals(c)),
       ),
     [semesters],
   );

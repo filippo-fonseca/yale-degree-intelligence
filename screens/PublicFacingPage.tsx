@@ -300,8 +300,8 @@ export default function AboutPage() {
           badge: "\u2713",
           desc: "Two foundational courses.",
           pills: [
-            { code: "CPSC 201", cr: 1, status: "complete" },
-            { code: "CPSC 202", cr: 1, status: "complete" },
+            { code: "CPSC 2010", cr: 1, status: "complete" },
+            { code: "CPSC 2020", cr: 1, status: "complete" },
           ],
         },
       ],
@@ -316,9 +316,9 @@ export default function AboutPage() {
           badge: "1/3",
           desc: "Three systems-level courses.",
           pills: [
-            { code: "CPSC 223", cr: 1, status: "complete" },
-            { code: "CPSC 323", cr: 1, status: "in-progress" },
-            { code: "CPSC 365", cr: 1, status: "not-taken" },
+            { code: "CPSC 2230", cr: 1, status: "complete" },
+            { code: "CPSC 3230", cr: 1, status: "in-progress" },
+            { code: "CPSC 3650", cr: 1, status: "not-taken" },
           ],
         },
       ],
@@ -333,8 +333,8 @@ export default function AboutPage() {
           badge: "0/2",
           desc: "Two math electives.",
           pills: [
-            { code: "MATH 222", cr: 1, status: "not-taken" },
-            { code: "MATH 241", cr: 1, status: "not-taken" },
+            { code: "MATH 2220", cr: 1, status: "not-taken" },
+            { code: "MATH 2410", cr: 1, status: "not-taken" },
           ],
         },
       ],
@@ -431,7 +431,7 @@ export default function AboutPage() {
               delay={0}
             >
               <span className="font-mono text-xs text-gray-900 dark:text-white">
-                CPSC 323
+                CPSC 3230
               </span>
               <span className="rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] font-medium text-emerald-600 dark:text-emerald-400">
                 A-
@@ -443,15 +443,7 @@ export default function AboutPage() {
               rotate={5}
               delay={1.5}
             >
-              <span className="text-xs text-gray-500 dark:text-gray-400">
-                GPA
-              </span>
-              <span className="font-mono text-xs font-medium text-gray-900 dark:text-white">
-                3.87
-              </span>
-              <span className="text-[10px] text-emerald-600 dark:text-emerald-400">
-                ↑
-              </span>
+              <AnimatedGpaChip />
             </FloatingTile>
 
             <FloatingTile
@@ -459,12 +451,7 @@ export default function AboutPage() {
               rotate={4}
               delay={3}
             >
-              <span className="font-mono text-[10px] text-gray-500 dark:text-gray-400">
-                Core 7/9
-              </span>
-              <span className="block h-1 w-20 overflow-hidden rounded-full bg-gray-200 dark:bg-white/10">
-                <span className="block h-full w-[78%] rounded-full bg-gradient-to-r from-pink-500 to-purple-600" />
-              </span>
+              <AnimatedCoreBar />
             </FloatingTile>
 
             <FloatingTile
@@ -473,7 +460,7 @@ export default function AboutPage() {
               delay={4.5}
             >
               <span className="font-mono text-xs text-gray-900 dark:text-white">
-                ECON 121
+                ECON 1210
               </span>
               <span className="rounded-full bg-black/[0.05] px-2 py-0.5 text-[10px] font-medium text-gray-500 dark:bg-white/10 dark:text-gray-400">
                 Hum
@@ -486,30 +473,7 @@ export default function AboutPage() {
               rotate={-5}
               delay={2.2}
             >
-              <span className="font-mono text-[10px] text-gray-500 dark:text-gray-400">
-                GPA trend
-              </span>
-              <svg
-                width="64"
-                height="18"
-                viewBox="0 0 64 18"
-                fill="none"
-                aria-hidden
-              >
-                <path
-                  d="M1 14L13 11L25 13L37 7L49 8L63 2"
-                  stroke="url(#tileSpark)"
-                  strokeWidth="1.75"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-                <defs>
-                  <linearGradient id="tileSpark" x1="0" y1="0" x2="64" y2="0">
-                    <stop stopColor="#ec4899" />
-                    <stop offset="1" stopColor="#9333ea" />
-                  </linearGradient>
-                </defs>
-              </svg>
+              <AnimatedGpaTrend />
             </FloatingTile>
 
             {/* Distributionals, using the app's own chip colors */}
@@ -558,7 +522,7 @@ export default function AboutPage() {
           </div>
 
           {/* 2. Headline */}
-          <h1 className="mt-8 font-medium text-balance text-6xl md:text-7xl lg:text-[5.5rem] leading-[0.95] tracking-[-0.02em] text-gray-900 dark:text-white">
+          <h1 className="mt-8 font-medium text-balance text-6xl md:text-7xl lg:text-[5.5rem] leading-[1.05] tracking-[-0.02em] text-gray-900 dark:text-white">
             The control plane
             <br />
             <span className="text-gray-400 dark:text-gray-500">
@@ -1672,8 +1636,8 @@ function YdnBanner() {
 }
 
 /**
- * A small hero tile that drifts on a gentle 6s loop. Positioned by the caller
- * against the hero band; sits behind the headline text but above the canvas.
+ * A small hero tile that drifts and tilts on a looping path. Positioned by the
+ * caller against the hero band; sits behind the headline text but above the canvas.
  */
 function FloatingTile({
   className,
@@ -1686,21 +1650,175 @@ function FloatingTile({
   delay: number;
   children: React.ReactNode;
 }) {
+  // Direction of lateral drift flips with the tile's resting tilt so left/right
+  // tiles don't all sway the same way.
+  const driftX = rotate >= 0 ? 10 : -10;
+
   return (
     <motion.div
       aria-hidden
-      animate={{ y: [0, -4, 0] }}
+      animate={{
+        y: [0, -14, 4, -10, 0],
+        x: [0, driftX, driftX * -0.4, driftX * 0.6, 0],
+        rotate: [rotate, rotate + 5, rotate - 4, rotate + 3, rotate],
+      }}
       transition={{
-        duration: 6,
+        duration: 8.5,
         delay,
         repeat: Infinity,
         ease: "easeInOut",
       }}
-      style={{ rotate: `${rotate}deg` }}
       className={`absolute hidden md:flex items-center gap-2 rounded-xl border border-black/[0.08] dark:border-white/[0.09] bg-white/90 dark:bg-white/[0.05] backdrop-blur px-3 py-2 shadow-lg font-sf dark:opacity-90 ${className}`}
     >
       {children}
     </motion.div>
+  );
+}
+
+const GPA_START = 3.71;
+const GPA_END = 3.87;
+
+/** Hero GPA chip: counts up, then resets; arrow flips red→green with the climb. */
+function AnimatedGpaChip() {
+  const [gpa, setGpa] = useState(GPA_START);
+  const [rising, setRising] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    let raf = 0;
+    let timeoutId = 0;
+
+    const sleep = (ms: number) =>
+      new Promise<void>((resolve) => {
+        timeoutId = window.setTimeout(resolve, ms);
+      });
+
+    const run = async () => {
+      while (!cancelled) {
+        setGpa(GPA_START);
+        setRising(false);
+        await sleep(900);
+        if (cancelled) break;
+
+        setRising(true);
+        const duration = 1700;
+        const t0 = performance.now();
+        await new Promise<void>((resolve) => {
+          const tick = (now: number) => {
+            if (cancelled) {
+              resolve();
+              return;
+            }
+            const t = Math.min(1, (now - t0) / duration);
+            const eased = 1 - (1 - t) ** 3;
+            setGpa(GPA_START + (GPA_END - GPA_START) * eased);
+            if (t < 1) {
+              raf = requestAnimationFrame(tick);
+            } else {
+              resolve();
+            }
+          };
+          raf = requestAnimationFrame(tick);
+        });
+
+        await sleep(2400);
+      }
+    };
+
+    void run();
+    return () => {
+      cancelled = true;
+      cancelAnimationFrame(raf);
+      window.clearTimeout(timeoutId);
+    };
+  }, []);
+
+  return (
+    <>
+      <span className="text-xs text-gray-500 dark:text-gray-400">GPA</span>
+      <span className="font-mono text-xs font-medium tabular-nums text-gray-900 dark:text-white">
+        {gpa.toFixed(2)}
+      </span>
+      <motion.span
+        className="text-[10px] font-medium"
+        animate={{
+          color: rising ? "#10b981" : "#ef4444",
+          rotate: rising ? 0 : 180,
+        }}
+        transition={{ duration: 0.45, ease: "easeOut" }}
+      >
+        ↑
+      </motion.span>
+    </>
+  );
+}
+
+/** Core progress bar that fills, holds, then restarts. */
+function AnimatedCoreBar() {
+  return (
+    <>
+      <span className="font-mono text-[10px] text-gray-500 dark:text-gray-400">
+        Core 7/9
+      </span>
+      <span className="block h-1 w-20 overflow-hidden rounded-full bg-gray-200 dark:bg-white/10">
+        <motion.span
+          className="block h-full rounded-full bg-gradient-to-r from-pink-500 to-purple-600"
+          initial={{ width: "0%" }}
+          animate={{ width: ["0%", "78%", "78%", "0%"] }}
+          transition={{
+            duration: 5.5,
+            times: [0, 0.45, 0.8, 1],
+            repeat: Infinity,
+            ease: "easeInOut",
+            repeatDelay: 0.8,
+          }}
+        />
+      </span>
+    </>
+  );
+}
+
+/** Sparkline that redraws every few seconds. */
+function AnimatedGpaTrend() {
+  return (
+    <>
+      <span className="font-mono text-[10px] text-gray-500 dark:text-gray-400">
+        GPA trend
+      </span>
+      <svg
+        width="64"
+        height="18"
+        viewBox="0 0 64 18"
+        fill="none"
+        aria-hidden
+      >
+        <motion.path
+          d="M1 14L13 11L25 13L37 7L49 8L63 2"
+          stroke="url(#tileSpark)"
+          strokeWidth="1.75"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          initial={{ pathLength: 0, opacity: 0.35 }}
+          animate={{
+            pathLength: [0, 1, 1, 0],
+            opacity: [0.35, 1, 1, 0.2],
+          }}
+          transition={{
+            duration: 4.2,
+            times: [0, 0.5, 0.78, 1],
+            repeat: Infinity,
+            ease: "easeInOut",
+            repeatDelay: 1.6,
+          }}
+        />
+        <defs>
+          <linearGradient id="tileSpark" x1="0" y1="0" x2="64" y2="0">
+            <stop stopColor="#ec4899" />
+            <stop offset="1" stopColor="#9333ea" />
+          </linearGradient>
+        </defs>
+      </svg>
+    </>
   );
 }
 

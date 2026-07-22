@@ -129,8 +129,8 @@ export function HeroAppMock() {
               </span>
             </div>
             <div className="flex flex-wrap gap-1">
-              <RequirementPill label="CPSC 201" credits={1} status="complete" />
-              <RequirementPill label="CPSC 202" credits={1} status="complete" />
+              <RequirementPill label="CPSC 2010" credits={1} status="complete" />
+              <RequirementPill label="CPSC 2020" credits={1} status="complete" />
             </div>
           </div>
           <div className="rounded-xl border border-blue-200 bg-blue-50/80 p-2.5 shadow-neu-sm dark:border-blue-800/40 dark:bg-blue-950/25">
@@ -143,13 +143,13 @@ export function HeroAppMock() {
               </span>
             </div>
             <div className="flex flex-wrap gap-1">
-              <RequirementPill label="CPSC 223" credits={1} status="complete" />
+              <RequirementPill label="CPSC 2230" credits={1} status="complete" />
               <RequirementPill
-                label="CPSC 323"
+                label="CPSC 3230"
                 credits={1}
                 status="in-progress"
               />
-              <RequirementPill label="CPSC 365" credits={1} status="not-taken" />
+              <RequirementPill label="CPSC 3650" credits={1} status="not-taken" />
             </div>
           </div>
         </div>

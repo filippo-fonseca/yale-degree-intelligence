@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { adminAuth, adminDb } from "@/config/firebaseAdmin";
+import { isAuthError, requireAuth } from "@/lib/apiAuth";
 
 export async function POST(req: NextRequest) {
   try {
@@ -10,16 +11,9 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const authHeader = req.headers.get("Authorization");
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    const idToken = authHeader.split("Bearer ")[1];
-
-    // Verify the token and get the user ID
-    const decodedToken = await adminAuth.verifyIdToken(idToken);
-    const userId = decodedToken.uid;
+    const auth = await requireAuth(req, { checkRevoked: true });
+    if (isAuthError(auth)) return auth;
+    const userId = auth.uid;
 
     // Delete all user data from Firestore collections
 
@@ -97,7 +91,11 @@ export async function POST(req: NextRequest) {
     // 8. Delete friends_public_data for this user
     await adminDb.collection("friends_public_data").doc(userId).delete();
 
-    // 9. Delete user from Firebase Authentication
+    // 9. Delete encrypted Dan API key + MCP token (never leave secrets orphaned)
+    await adminDb.collection("dan_keys").doc(userId).delete();
+    await adminDb.collection("mcp_tokens").doc(userId).delete();
+
+    // 10. Delete user from Firebase Authentication
     await adminAuth.deleteUser(userId);
 
     return NextResponse.json({ success: true });

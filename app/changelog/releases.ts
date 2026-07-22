@@ -45,6 +45,7 @@ export const RELEASES: Release[] = [
           "Save, Clear canvas, and Help moved down to the canvas itself, right above your semester grid, as small quiet buttons instead of big pills in the toolbar.",
           "A calmer Canvas that is easier to drag on. The quick-add course pool is gone from the top of the grid, and the grade and distributional editors on each course card are now off until you turn them on with the Grades and Distributionals buttons. Course cards stay one line tall by default, so dragging between semesters is much easier. Add still works from any semester, and the editors remember whichever way you saved a plan.",
           "Distributionals fill themselves in. Turn the Distributionals editor on and a course you have planned starts with the tags Yale lists for it already selected, so you only change the ones you disagree with. Anything you set yourself always wins.",
+          "Those tags now come from Yale's own course listings. We checked every course in the catalog against the Yale College Programs of Study bulletin, going back through four years of editions to find courses that are no longer offered, and they agree on more than 98 percent of the courses that carry tags. Where the bulletin proved a course had tags we were missing, we added them.",
           "The courses you are taking right now count everywhere they should. \"+ In Progress\" on My Major and My Certificates, your in-progress credits, and the Simulator all pick them up, whether the course came from your transcript or you added it by hand.",
         ],
       },

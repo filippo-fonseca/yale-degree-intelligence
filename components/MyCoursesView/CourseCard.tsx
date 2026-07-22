@@ -89,7 +89,7 @@ export function CourseCard({
       whileHover={{ y: -1 }}
       whileTap={{ scale: 0.99 }}
       transition={{ duration: 0.12 }}
-      className={`relative p-4 cursor-pointer rounded-xl backdrop-blur-sm border transition-all shadow-sm dark:shadow-none ${card}`}
+      className={`relative p-4 cursor-pointer rounded-xl backdrop-blur-sm border transition-all shadow-sm dark:shadow-none h-full flex flex-col ${card}`}
       onClick={() => onCardClick(course)}
     >
       {/* Top row */}
@@ -141,18 +141,29 @@ export function CourseCard({
       {/* Distributional tags, display-only (skipped courses don't count).
           Tags resolve in realtime from the catalog with stored non-empty
           overrides; the inline editor was retired 2026-07-21 because the
-          catalog is the source of truth here. */}
-      {!course.skipped && distributionals.length > 0 && (
-        <div className="mt-2.5" onClick={(e) => e.stopPropagation()}>
+          catalog is the source of truth here. The row always renders (with a
+          quiet pill when Yale awards none, a bulletin-verified fact) so cards
+          in a grid row stay the same height. */}
+      {!course.skipped && (
+        <div
+          className="mt-auto pt-2.5"
+          onClick={(e) => e.stopPropagation()}
+        >
           <div className="flex flex-wrap items-center gap-1.5">
-            {distributionals.map((d, dIdx) => (
-              <span
-                key={`${d}-${dIdx}`}
-                className={`text-[10px] px-2 py-0.5 rounded-full border font-medium ${getDistPillStyle(d)}`}
-              >
-                {d}
+            {distributionals.length > 0 ? (
+              distributionals.map((d, dIdx) => (
+                <span
+                  key={`${d}-${dIdx}`}
+                  className={`text-[10px] px-2 py-0.5 rounded-full border font-medium ${getDistPillStyle(d)}`}
+                >
+                  {d}
+                </span>
+              ))
+            ) : (
+              <span className="text-[10px] px-2 py-0.5 rounded-full border border-dashed border-gray-300 dark:border-gray-700/60 text-gray-400 dark:text-gray-500">
+                no distributionals
               </span>
-            ))}
+            )}
           </div>
         </div>
       )}

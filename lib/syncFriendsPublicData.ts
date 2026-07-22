@@ -11,6 +11,25 @@ import {
 } from "firebase/firestore";
 import { db } from "@/config/firebase";
 import { Course, PublicCourse, DEFAULT_FRIENDS_PROFILE_VISIBILITY } from "@/lib/types";
+import {
+  effectiveDistributionals,
+  hasStoredDistributionals,
+} from "@/lib/utils/effectiveDistributionals";
+
+/**
+ * Distributionals as they should land in the public projection.
+ *
+ * Friends see the same effective tags the owner does, catalog defaults
+ * included. The one thing that has to survive the trip is the difference
+ * between "nobody has said anything" (omit the key, so the reader falls back to
+ * the catalog itself) and "the owner cleared every tag" (an explicit empty
+ * array, which the reader must not override).
+ */
+function publicDistributionals(course: Course): string[] | undefined {
+  const dists = effectiveDistributionals(course);
+  if (dists.length > 0) return dists;
+  return hasStoredDistributionals(course) ? [] : undefined;
+}
 
 interface UserProfile {
   majors: string[];
@@ -96,8 +115,9 @@ export async function syncFriendsPublicData(
       if (c.manualRequirementsFulfilled && c.manualRequirementsFulfilled.length > 0) {
         course.manualRequirementsFulfilled = c.manualRequirementsFulfilled;
       }
-      if (c.distributionals && c.distributionals.length > 0) {
-        course.distributionals = c.distributionals;
+      const dists = publicDistributionals(c);
+      if (dists !== undefined) {
+        course.distributionals = dists;
       }
       return course;
     });
@@ -159,8 +179,9 @@ export async function enableFriendsFeature(
     if (c.manualRequirementsFulfilled && c.manualRequirementsFulfilled.length > 0) {
       course.manualRequirementsFulfilled = c.manualRequirementsFulfilled;
     }
-    if (c.distributionals && c.distributionals.length > 0) {
-      course.distributionals = c.distributionals;
+    const dists = publicDistributionals(c);
+    if (dists !== undefined) {
+      course.distributionals = dists;
     }
     return course;
   });

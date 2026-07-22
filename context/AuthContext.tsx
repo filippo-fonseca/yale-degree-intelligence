@@ -8,7 +8,7 @@ import {
   signOut,
 } from "firebase/auth";
 import { auth, googleProvider, isFirebaseConfigured } from "@/config/firebase";
-import { isAdminEmail } from "@/lib/admin";
+import { isAllowedEmail } from "@/lib/allowedEmail";
 
 type AuthContextType = {
   user: User | null;
@@ -23,18 +23,6 @@ const AuthContext = createContext<AuthContextType>({
   signInWithGoogle: async () => {},
   logout: async () => {},
 });
-
-function isAllowedEmail(email: string | null | undefined): boolean {
-  if (!email) return false;
-  if (email.endsWith("@yale.edu")) return true;
-  if (
-    process.env.NODE_ENV === "development" &&
-    isAdminEmail(email)
-  ) {
-    return true;
-  }
-  return false;
-}
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);

@@ -12,6 +12,8 @@ export interface NavItem {
   label: string;
   disabled?: boolean;
   comingSoon?: boolean;
+  /** Short chip shown for Class of 2030 (and similar) welcome nudges. */
+  badge?: string;
 }
 
 /**
@@ -23,7 +25,9 @@ export const SHOW_DAN_ADVISOR = false;
 export function createNavItems(
   majorsCount: number,
   certificatesCount: number,
+  options?: { isBrandNew?: boolean },
 ): NavItem[] {
+  const brandNewBadge = options?.isBrandNew ? "2030 can use!" : undefined;
   return [
     {
       id: "upload",
@@ -35,6 +39,7 @@ export function createNavItems(
       id: "major",
       icon: RiProgress3Fill,
       label: majorsCount > 1 ? "My majors" : "My major",
+      badge: brandNewBadge,
     },
     {
       id: "certificate",
@@ -45,6 +50,7 @@ export function createNavItems(
       id: "simulator",
       icon: MonitorCog,
       label: "Simulator",
+      badge: brandNewBadge,
     },
     {
       id: "stats",

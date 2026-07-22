@@ -89,6 +89,7 @@ export function DashboardTabPanels({
           onUploadSuccess={onUploadSuccess}
           fetchCourses={fetchCourses}
           toggleDistributional={toggleDistributional}
+          onOpenSimulator={() => onTabChange("simulator")}
         />
       )}
       {activeTab === "stats" && (

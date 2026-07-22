@@ -1,6 +1,6 @@
 "use client";
 
-import { Printer } from "lucide-react";
+import { Printer, MonitorCog } from "lucide-react";
 import FileUpload from "@/components/file-upload";
 import { AcademicDataDisclaimerCard } from "@/components/disclaimers/AcademicDataDisclaimer";
 
@@ -9,6 +9,7 @@ interface OnboardingStateProps {
   isBrandNew: boolean;
   onManualEntry: () => void;
   onUploadSuccess: (text: string) => Promise<void>;
+  onOpenSimulator?: () => void;
 }
 
 export function OnboardingState({
@@ -16,21 +17,46 @@ export function OnboardingState({
   isBrandNew,
   onManualEntry,
   onUploadSuccess,
+  onOpenSimulator,
 }: OnboardingStateProps) {
   const firstName = userName?.split(" ")[0] ?? "there";
 
   return (
     <div className="flex flex-col items-center justify-center py-8">
       {/* Header */}
-      <div className="text-center mb-6">
+      <div className="text-center mb-6 max-w-xl">
         <h2 className="text-2xl font-medium text-gray-900 dark:text-white mb-2">
-          Let's get your courses loaded, {firstName}.
-        </h2>
-        <p className="text-gray-500 dark:text-gray-400 text-sm">
           {isBrandNew
-            ? "After registration, we'll parse your classes and fill in grades when they post."
-            : "Upload your unofficial transcript to see your academic journey. We won't store the file."}
+            ? `Welcome to Yale, ${firstName}.`
+            : `Let's get your courses loaded, ${firstName}.`}
+        </h2>
+        <p className="text-gray-500 dark:text-gray-400 text-sm leading-relaxed">
+          {isBrandNew ? (
+            <>
+              You&apos;re Class of 2030 — you do{" "}
+              <span className="font-medium text-gray-700 dark:text-gray-300">
+                not need grades
+              </span>{" "}
+              to start. Jump into the Simulator to map your trajectory now, or
+              after course registration import your unofficial transcript from
+              YHub (even with &quot;i&quot; / in-progress courses and no grades
+              yet). We&apos;ll show what you&apos;re taking and fill grades in
+              when they post.
+            </>
+          ) : (
+            "Upload your unofficial transcript to see your academic journey. We won't store the PDF file."
+          )}
         </p>
+        {isBrandNew && onOpenSimulator && (
+          <button
+            type="button"
+            onClick={onOpenSimulator}
+            className="mt-4 inline-flex items-center gap-2 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-2 text-sm font-medium text-emerald-700 dark:text-emerald-300 hover:bg-emerald-500/15 transition-colors"
+          >
+            <MonitorCog size={14} />
+            Open the Simulator — no grades needed
+          </button>
+        )}
       </div>
 
       {/* Tutorial Steps */}
@@ -40,8 +66,18 @@ export function OnboardingState({
             <span className="p-1.5 rounded-lg bg-pink-500/10 border border-pink-500/20">
               <Printer size={14} className="text-pink-400" />
             </span>
-            How to get your transcript
+            {isBrandNew
+              ? "How to import from YHub (no grades is totally fine)"
+              : "How to get your transcript"}
           </h3>
+          {isBrandNew && (
+            <p className="text-xs text-gray-500 dark:text-gray-400 mb-3 leading-relaxed">
+              After you register for classes, grab your unofficial transcript
+              even if every course still shows as in progress. We parse those
+              &quot;i&quot; courses so My Courses and the Simulator can start
+              mapping your path right away.
+            </p>
+          )}
           <div className="space-y-3">
             {[
               <>
@@ -52,9 +88,9 @@ export function OnboardingState({
                   rel="noopener noreferrer"
                   className="text-pink-600 dark:text-pink-400 hover:text-pink-700 dark:hover:text-pink-300 underline underline-offset-2"
                 >
-                  Yale Hub
+                  Yale Hub (yub.yale.edu)
                 </a>{" "}
-                and sign in
+                and sign in with CAS
               </>,
               <>
                 Navigate to{" "}
@@ -63,7 +99,7 @@ export function OnboardingState({
                 </span>{" "}
                 →{" "}
                 <span className="px-1.5 py-0.5 rounded bg-gray-100 dark:bg-gray-800/60 border border-gray-300 dark:border-gray-700/50 text-gray-800 dark:text-gray-200 font-mono text-xs">
-                  Unofficial Transcript
+                  Unofficial Transcript — Undergraduate
                 </span>
               </>,
               <>
@@ -71,7 +107,10 @@ export function OnboardingState({
                 <span className="px-1.5 py-0.5 rounded bg-blue-500/20 border border-blue-500/30 text-blue-600 dark:text-blue-300 font-medium text-xs">
                   Print
                 </span>{" "}
-                and save as PDF. Then upload it here.
+                , save as PDF, then upload it here
+                {isBrandNew
+                  ? " — in-progress courses with no grades are supported."
+                  : "."}
               </>,
             ].map((step, i) => (
               <div key={i} className="flex items-start gap-3">

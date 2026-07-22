@@ -11,6 +11,7 @@ import { UserAvatar } from "@/components/ui/UserAvatar";
 interface DashboardHeaderProps {
   user: User;
   resolvedTheme: string;
+  isBrandNew?: boolean;
   onOpenSidebar: () => void;
   onGoHome: () => void;
   onOpenCommandPalette: () => void;
@@ -21,6 +22,7 @@ interface DashboardHeaderProps {
 export function DashboardHeader({
   user,
   resolvedTheme,
+  isBrandNew = false,
   onOpenSidebar,
   onGoHome,
   onOpenCommandPalette,
@@ -56,6 +58,17 @@ export function DashboardHeader({
       </div>
 
       <div className="flex items-center gap-2 lg:gap-3">
+        {isBrandNew && (
+          <span
+            className="hidden md:inline-flex items-center px-2.5 py-1 text-[11px] rounded-full border border-emerald-500/30 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300"
+            title="Welcome to Yale — no grades needed to start"
+          >
+            New Bulldog
+            {user.displayName
+              ? ` — welcome to Yale, ${user.displayName.split(" ")[0]}!`
+              : " — welcome to Yale!"}
+          </span>
+        )}
         <button
           onClick={onOpenCommandPalette}
           className="lg:hidden p-1.5 rounded-xl hover:bg-black/[0.04] dark:hover:bg-white/[0.06] transition-all border border-black/[0.06] dark:border-white/[0.08] hover:border-black/[0.09] dark:hover:border-white/[0.12] text-gray-600 dark:text-gray-300"

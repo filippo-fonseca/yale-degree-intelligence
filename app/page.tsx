@@ -92,6 +92,7 @@ export default function Home() {
   const navItems = createNavItems(
     userProfile?.majors?.length ?? 0,
     userProfile?.certificates?.length ?? 0,
+    { isBrandNew },
   );
   // Dan is unreachable when its tab is hidden, and also while it is only
   // flagged "coming soon".
@@ -233,6 +234,7 @@ export default function Home() {
         <DashboardHeader
           user={user}
           resolvedTheme={resolvedTheme}
+          isBrandNew={isBrandNew}
           onOpenSidebar={() => setSidebarOpen(true)}
           onGoHome={() => setActiveTab("upload")}
           onOpenCommandPalette={() => setCommandPaletteOpen(true)}

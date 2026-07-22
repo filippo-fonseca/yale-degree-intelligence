@@ -560,8 +560,8 @@ export default function AboutPage() {
 
           {/* 6. Class of 2030 welcome chip */}
           <p className="mt-6 inline-flex items-center gap-2 rounded-full border border-pink-500/15 bg-pink-500/[0.07] px-4 py-1.5 font-sf text-xs font-medium text-pink-900/80 dark:bg-pink-500/10 dark:text-pink-200/80">
-            🎓 Class of 2030: welcome to Yale. No transcript needed, plan from
-            day one.
+            🎓 Class of 2030: welcome to Yale. No grades needed — use the
+            Simulator now, import from YHub after registration.
           </p>
         </div>
       </section>

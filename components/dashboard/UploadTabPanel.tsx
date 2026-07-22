@@ -18,6 +18,7 @@ interface UploadTabPanelProps {
   onUploadSuccess: (extractedText: string) => Promise<void>;
   fetchCourses: () => Promise<void>;
   toggleDistributional: (courseId: string, dist: string) => Promise<void>;
+  onOpenSimulator?: () => void;
 }
 
 export function UploadTabPanel({
@@ -31,6 +32,7 @@ export function UploadTabPanel({
   onUploadSuccess,
   fetchCourses,
   toggleDistributional,
+  onOpenSimulator,
 }: UploadTabPanelProps) {
   return (
     <motion.div
@@ -58,6 +60,7 @@ export function UploadTabPanel({
         onToggleDistributional={async (courseId, dist) => {
           await toggleDistributional(courseId, dist);
         }}
+        onOpenSimulator={onOpenSimulator}
       />
     </motion.div>
   );

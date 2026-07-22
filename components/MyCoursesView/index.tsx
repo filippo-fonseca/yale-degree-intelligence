@@ -38,6 +38,7 @@ export default function MyCoursesView({
   onUploadSuccess,
   onDeleteCourse,
   onToggleDistributional,
+  onOpenSimulator,
 }: MyCoursesViewProps) {
   const [distSelectorCourseId, setDistSelectorCourseId] = useState<
     string | null
@@ -130,6 +131,7 @@ export default function MyCoursesView({
           isBrandNew={isBrandNew}
           onManualEntry={onManualAdd}
           onUploadSuccess={onUploadSuccess}
+          onOpenSimulator={onOpenSimulator}
         />
         <ConfirmDeleteModal
           isOpen={confirmDelete.open}

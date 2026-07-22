@@ -1,5 +1,6 @@
 import { adminDb } from "@/config/firebaseAdmin";
 import { getCourseNameFromCode } from "@/lib/courseCatalog";
+import { effectiveDistributionals } from "@/lib/utils/effectiveDistributionals";
 import type { StudentData } from "@/lib/dan/tools";
 
 // Assembles the server-trusted student snapshot from Firestore. Shared by the
@@ -27,7 +28,12 @@ export async function buildStudentData(uid: string): Promise<{
       name: getCourseNameFromCode(c.code) || c.code,
       status: (c.status as string) || "completed",
       credits: (c.credits as number) ?? 1,
-      distributionals: (c.distributionals as string[]) || [],
+      // Same precedence the app shows the student: what they stored wins, and
+      // an untouched course carries the catalog's tags.
+      distributionals: effectiveDistributionals({
+        code: c.code as string,
+        distributionals: c.distributionals as string[] | undefined,
+      }),
       skipped: c.skipped === true || c.status === "skipped",
     };
   });

@@ -1,6 +1,6 @@
 "use client";
 
-import { Printer, MonitorCog } from "lucide-react";
+import { Printer, MonitorCog, PenLine } from "lucide-react";
 import FileUpload from "@/components/file-upload";
 import { AcademicDataDisclaimerCard } from "@/components/disclaimers/AcademicDataDisclaimer";
 
@@ -33,29 +33,41 @@ export function OnboardingState({
         <p className="text-gray-500 dark:text-gray-400 text-sm leading-relaxed">
           {isBrandNew ? (
             <>
-              You&apos;re Class of 2030 — you do{" "}
+              You&apos;re Class of 2030. You do{" "}
               <span className="font-medium text-gray-700 dark:text-gray-300">
                 not need grades
               </span>{" "}
-              to start. Jump into the Simulator to map your trajectory now, or
-              after course registration import your unofficial transcript from
-              YHub (even with &quot;i&quot; / in-progress courses and no grades
-              yet). We&apos;ll show what you&apos;re taking and fill grades in
-              when they post.
+              to start. Since you&apos;ve already registered for fall courses,
+              your unofficial transcript is ready on YHub right now; import it
+              even though everything is still in progress with no grades, or
+              jump into the Simulator to map your trajectory. We&apos;ll show
+              what you&apos;re taking and fill grades in when they post.
             </>
           ) : (
             "Upload your unofficial transcript to see your academic journey. We won't store the PDF file."
           )}
         </p>
-        {isBrandNew && onOpenSimulator && (
-          <button
-            type="button"
-            onClick={onOpenSimulator}
-            className="mt-4 inline-flex items-center gap-2 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-2 text-sm font-medium text-emerald-700 dark:text-emerald-300 hover:bg-emerald-500/15 transition-colors"
-          >
-            <MonitorCog size={14} />
-            Open the Simulator — no grades needed
-          </button>
+        {isBrandNew && (
+          <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
+            {onOpenSimulator && (
+              <button
+                type="button"
+                onClick={onOpenSimulator}
+                className="inline-flex items-center gap-2 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-2 text-sm font-medium text-emerald-700 dark:text-emerald-300 hover:bg-emerald-500/15 transition-colors"
+              >
+                <MonitorCog size={14} />
+                Open the Simulator
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={onManualEntry}
+              className="inline-flex items-center gap-2 rounded-xl border border-pink-500/30 bg-pink-500/10 px-4 py-2 text-sm font-medium text-pink-700 dark:text-pink-300 hover:bg-pink-500/15 transition-colors"
+            >
+              <PenLine size={14} />
+              Add courses manually
+            </button>
+          </div>
         )}
       </div>
 
@@ -72,10 +84,10 @@ export function OnboardingState({
           </h3>
           {isBrandNew && (
             <p className="text-xs text-gray-500 dark:text-gray-400 mb-3 leading-relaxed">
-              After you register for classes, grab your unofficial transcript
-              even if every course still shows as in progress. We parse those
-              &quot;i&quot; courses so My Courses and the Simulator can start
-              mapping your path right away.
+              You already registered for fall courses, so your unofficial
+              transcript is on YHub now, even though every course still shows
+              as in progress. We parse those in-progress courses so My Courses
+              and the Simulator can start mapping your path right away.
             </p>
           )}
           <div className="space-y-3">
@@ -109,7 +121,7 @@ export function OnboardingState({
                 </span>{" "}
                 , save as PDF, then upload it here
                 {isBrandNew
-                  ? " — in-progress courses with no grades are supported."
+                  ? ". In-progress courses with no grades are supported."
                   : "."}
               </>,
             ].map((step, i) => (

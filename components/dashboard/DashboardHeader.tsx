@@ -61,12 +61,12 @@ export function DashboardHeader({
         {isBrandNew && (
           <span
             className="hidden md:inline-flex items-center px-2.5 py-1 text-[11px] rounded-full border border-emerald-500/30 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300"
-            title="Welcome to Yale — no grades needed to start"
+            title="Welcome to Yale: no grades needed to start"
           >
             New Bulldog
             {user.displayName
-              ? ` — welcome to Yale, ${user.displayName.split(" ")[0]}!`
-              : " — welcome to Yale!"}
+              ? ` · welcome to Yale, ${user.displayName.split(" ")[0]}!`
+              : " · welcome to Yale!"}
           </span>
         )}
         <button

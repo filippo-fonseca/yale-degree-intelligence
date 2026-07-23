@@ -46,7 +46,7 @@ export function AcademicDataDisclaimerText({
         or form with Yale University, Yale College, or DegreeAudit. This is a
         fun, open, student-built tool we made because we use it ourselves and
         wanted to share it with the Yale community. We stand to make no money
-        from this — in fact we lose money running it — and we will never charge
+        from this (in fact we lose money running it) and we will never charge
         a dime for it.
       </p>
     </>

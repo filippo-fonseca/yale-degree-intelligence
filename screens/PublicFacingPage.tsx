@@ -448,7 +448,7 @@ export default function AboutPage() {
             </FloatingTile>
 
             <FloatingTile
-              className="bottom-[13%] left-[2%] lg:left-[5%] !flex-col !items-start !gap-1.5"
+              className="bottom-[13%] left-[0%] !flex-col !items-start !gap-1.5"
               rotate={4}
               delay={3}
             >
@@ -456,7 +456,7 @@ export default function AboutPage() {
             </FloatingTile>
 
             <FloatingTile
-              className="bottom-[10%] right-[2%] lg:right-[5%]"
+              className="bottom-[10%] right-[0%] lg:right-[1%]"
               rotate={-4}
               delay={4.5}
             >
@@ -560,8 +560,8 @@ export default function AboutPage() {
 
           {/* 6. Class of 2030 welcome chip */}
           <p className="mt-6 inline-flex items-center gap-2 rounded-full border border-pink-500/15 bg-pink-500/[0.07] px-4 py-1.5 font-sf text-xs font-medium text-pink-900/80 dark:bg-pink-500/10 dark:text-pink-200/80">
-            🎓 Class of 2030: welcome to Yale. No grades needed — use the
-            Simulator now, import from YHub after registration.
+            🎓 Class of 2030: welcome to Yale. No grades needed. Use the
+            Simulator now, or import your YHub unofficial transcript.
           </p>
         </div>
       </section>

@@ -14,6 +14,14 @@ match /databases/{database}/documents {
       return isAuthenticated() && request.auth.uid == userId;
     }
 
+    // Mirrors lib/allowedEmail.ts: Yale accounts, plus the creator's
+    // personal Gmail so they can test with a separate account.
+    function isAllowedUser() {
+      return isAuthenticated() &&
+             (request.auth.token.email.matches('.*@yale[.]edu') ||
+              request.auth.token.email == 'filifonsecacagnazzo@gmail.com');
+    }
+
     function getFriendshipId(uid1, uid2) {
       return uid1 < uid2 ? uid1 + '_' + uid2 : uid2 + '_' + uid1;
     }
@@ -52,10 +60,13 @@ match /databases/{database}/documents {
     // Grades are NEVER stored here. Enabled profiles are discoverable
     // so Yalies can find each other in Friends search; full course lists
     // are only shown in-app after a friendship check on the profile page.
+    // Discovery reads require a Yale (or creator) email: Firebase issues
+    // tokens to any Google account, so isAuthenticated() alone is not
+    // enough to keep non-Yale accounts out of direct Firestore reads.
     // ============================================
     match /friends_public_data/{userId} {
       allow read: if isOwner(userId) ||
-                    (isAuthenticated() && resource.data.enabled == true);
+                    (isAllowedUser() && resource.data.enabled == true);
 
       allow create, update: if isOwner(userId) &&
                               request.resource.data.userId == userId;

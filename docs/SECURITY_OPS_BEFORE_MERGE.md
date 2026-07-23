@@ -19,7 +19,7 @@ Key changes:
 
 - `users/{userId}` → **owner only**
 - `dan_keys`, `mcp_tokens`, `contact_messages` → **deny all client access**
-- `friends_public_data` enabled docs readable for discovery (no grades there)
+- `friends_public_data` enabled docs readable for discovery (no grades there), gated to Yale emails + the creator's test Gmail via `isAllowedUser()`
 
 ## 2. Confirm Dan fallback env in Vercel (prod + preview)
 

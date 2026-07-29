@@ -39,10 +39,6 @@ export const Simulator = dynamic(() => import("@/components/Simulator/Simulator"
   ssr: false,
   loading: TabFallback,
 });
-export const CleoAITab = dynamic(() => import("@/components/CleoAITab/CleoAITab"), {
-  ssr: false,
-  loading: TabFallback,
-});
 export const MajorSelectionFlow = dynamic(
   () => import("@/components/MajorSelectionFlow"),
   { ssr: false },

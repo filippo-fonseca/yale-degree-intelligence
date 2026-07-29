@@ -1,74 +1,266 @@
-import courses from './new_courses.json';
+import courses from "./courses.json";
 
+/**
+ * Yale College catalog (Fall 2023 → Spring 2027).
+ *
+ * - `codes`: every known alias; newest / modern code is first (e.g. CPSC 2230, ECE 2000).
+ * - `offered`: human term labels this course appeared in (see CATALOG_TERMS).
+ * - `isFall` / `isSpring`: ONLY Fall 2026 / Spring 2027 (simulator pool). Historical-only
+ *   courses omit both flags.
+ * - `distributionals`: optional Hu/So/Sc/QR/WR and L1-L5 tags, present only for
+ *   the courses an augmentation pass has covered. Absent for everything else,
+ *   so transcript / user override stays the source of truth.
+ */
 export type CourseInfo = {
-  codes: string[]; // First code (i.e. codes[0]) is the canonical/default
+  codes: string[];
   name: string;
   credits: number;
   department: string;
-  distributionals?: string[];
+  offered: string[];
   isFall?: boolean;
   isSpring?: boolean;
+  distributionals?: string[];
 };
 
-// Create a lookup map from all codes to their canonical course info
-const COURSE_CODE_MAP: Record<string, CourseInfo> = {};
+/** Exact term labels used in courses.json `offered`. */
+export const CATALOG_TERMS = [
+  "Fall 2023",
+  "Spring 2024",
+  "Fall 2024",
+  "Spring 2025",
+  "Fall 2025",
+  "Spring 2026",
+  "Fall 2026",
+  "Spring 2027",
+] as const;
 
-(courses as CourseInfo[]).forEach(course => {
-  course.codes?.forEach(code => {
-    COURSE_CODE_MAP[code] = course;
-  });
-});
+export type CatalogTerm = (typeof CATALOG_TERMS)[number];
+
+/** Simulator planning horizon encoded by isFall / isSpring flags. */
+export const SIMULATOR_FALL_TERM: CatalogTerm = "Fall 2026";
+export const SIMULATOR_SPRING_TERM: CatalogTerm = "Spring 2027";
+
+/**
+ * Collapse whitespace and uppercase for stable catalog map keys. Deliberately
+ * NOT the exported normalizeCourseCode: that one resolves aliases through
+ * getCanonicalCode, which reads the map this builds, so the lookup path has to
+ * stay on a purely structural key or it would recurse.
+ */
+function normalizeCodeKey(code: string): string {
+  return code.trim().replace(/\s+/g, " ").toUpperCase();
+}
+
+/**
+ * Canonical department identity. EENG was renamed to ECE before Fall 2025;
+ * the catalog always stores department as ECE, but callers may still pass EENG.
+ */
+export function normalizeDepartment(dept: string): string {
+  const d = dept.trim().toUpperCase();
+  return d === "EENG" ? "ECE" : d;
+}
+
+// Full catalog as a flat array (for search/listing)
+export const ALL_COURSES: CourseInfo[] = (courses as CourseInfo[]).map((c) => ({
+  ...c,
+  department: normalizeDepartment(c.department),
+  offered: Array.isArray(c.offered) ? c.offered : [],
+}));
+
+// Lookup map from every normalized code → course
+const COURSE_CODE_MAP: Map<string, CourseInfo> = new Map();
+const COURSES_BY_DEPARTMENT: Map<string, CourseInfo[]> = new Map();
+
+for (const course of ALL_COURSES) {
+  for (const code of course.codes ?? []) {
+    COURSE_CODE_MAP.set(normalizeCodeKey(code), course);
+  }
+  const dept = normalizeDepartment(course.department);
+  const list = COURSES_BY_DEPARTMENT.get(dept);
+  if (list) list.push(course);
+  else COURSES_BY_DEPARTMENT.set(dept, [course]);
+}
+
+/** Courses flagged for Fall 2026 simulator pool. */
+export const SIMULATOR_FALL_COURSES: CourseInfo[] = ALL_COURSES.filter(
+  (c) => c.isFall === true,
+);
+
+/** Courses flagged for Spring 2027 simulator pool. */
+export const SIMULATOR_SPRING_COURSES: CourseInfo[] = ALL_COURSES.filter(
+  (c) => c.isSpring === true,
+);
 
 export const getCourseInfo = (code: string): CourseInfo | undefined => {
-  return COURSE_CODE_MAP[code];
+  if (!code) return undefined;
+  return COURSE_CODE_MAP.get(normalizeCodeKey(code));
 };
 
-// Get the canonical code (first in array) for a given code
+/** Canonical / modern display code (codes[0]), or undefined if unknown. */
 export const getCanonicalCode = (code: string): string | undefined => {
   const course = getCourseInfo(code);
   return course?.codes[0];
 };
 
-// Check if a code is valid (exists in our catalog)
+/**
+ * Prefer canonical catalog code when known; otherwise return the normalized input.
+ * Use on transcript ingest / plan writes to collapse 3-digit ↔ 4-digit and EENG ↔ ECE.
+ */
+export const resolveCanonicalCode = (code: string): string => {
+  return getCanonicalCode(code) ?? normalizeCourseCode(code);
+};
+
 export const isValidCourseCode = (code: string): boolean => {
-  return code in COURSE_CODE_MAP;
+  return COURSE_CODE_MAP.has(normalizeCodeKey(code));
+};
+
+/**
+ * Splits a course code into its subject prefix, an optional letter prefix on
+ * the number (summer codes such as "CPSC S115"), the digits, and any trailing
+ * letters ("MATH 1200L"). Returns null when the code has no numeric part.
+ */
+const COURSE_CODE_PATTERN = /^(.*?)\s+([A-Z]*)(\d+)([A-Z]*)$/;
+
+const splitCourseCode = (
+  code: string
+): { subject: string; numberPrefix: string; digits: string; suffix: string } | null => {
+  const cleaned = code.toUpperCase().replace(/\s+/g, " ").trim();
+  const match = cleaned.match(COURSE_CODE_PATTERN);
+  if (!match) return null;
+  const [, subject, numberPrefix, digits, suffix] = match;
+  return { subject, numberPrefix, digits, suffix };
+};
+
+/**
+ * Canonical form used by EVERY course comparison in the certificate policy
+ * engine. Two steps, in order:
+ *
+ * 1. Structural: uppercase, collapse whitespace, and expand Yale's legacy
+ *    3-digit numbers to the 4-digit renumbering ("CPSC 223" becomes
+ *    "CPSC 2230"). Trailing letters are preserved.
+ * 2. Catalog: resolve cross-listed aliases through getCanonicalCode, so
+ *    "S&DS 2650" and its CPSC alias collapse to one string.
+ *
+ * Codes the catalog has never heard of fall through to the structural form,
+ * which is still stable enough to compare against itself.
+ */
+export const normalizeCourseCode = (code: string): string => {
+  const cleaned = (code || "").toUpperCase().replace(/\s+/g, " ").trim();
+  const parts = splitCourseCode(cleaned);
+  const structural = parts
+    ? `${parts.subject} ${parts.numberPrefix}${
+        parts.digits.length === 3 ? String(Number(parts.digits) * 10) : parts.digits
+      }${parts.suffix}`
+    : cleaned;
+  return getCanonicalCode(structural) || getCanonicalCode(cleaned) || structural;
+};
+
+/**
+ * Level band of a course, floored to the thousand: courseLevel("CPSC 2230")
+ * is 2000. Returns null when the code carries no parseable number.
+ */
+export const courseLevel = (code: string): number | null => {
+  const parts = splitCourseCode(normalizeCourseCode(code));
+  if (!parts) return null;
+  const value = Number(parts.digits);
+  if (!Number.isFinite(value)) return null;
+  return Math.floor(value / 1000) * 1000;
+};
+
+/**
+ * Subject prefix of a course, used for the per-certificate department caps:
+ * courseSubject("S&DS 2650") is "S&DS". Returns null when the code has no
+ * separable subject.
+ */
+export const courseSubject = (code: string): string | null => {
+  const parts = splitCourseCode(normalizeCourseCode(code));
+  return parts?.subject || null;
 };
 
 export const getCourseNameFromCode = (code: string): string | undefined => {
   const course = getCourseInfo(code);
   return course ? course.name : "Course";
-}
+};
 
-export const getCourseCreditsFromCode = (code: string): number | undefined => { 
+export const getCourseCreditsFromCode = (code: string): number | undefined => {
   const course = getCourseInfo(code);
   return course?.credits;
-}
+};
 
-export const getCourseDistributionalsFromCode = (code: string): string[] | undefined => {
+export const getCourseDepartmentFromCode = (
+  code: string,
+): string | undefined => {
   const course = getCourseInfo(code);
-  return course?.distributionals;
-}
+  return course ? normalizeDepartment(course.department) : undefined;
+};
 
-//get all OTHER codes for a course (excluding the canonical one)
+/**
+ * Distributional tags the catalog knows for a course (Hu/So/Sc/QR/WR and the
+ * L1-L5 language levels), or undefined when it knows none.
+ *
+ * The catalog only carries `distributionals` for courses an augmentation pass
+ * has covered, so most codes still return undefined and callers must keep
+ * treating the transcript / user override as the real source of truth. An
+ * empty array in the data means "the catalog looked and found nothing", which
+ * is deliberately different from undefined and is passed through as [].
+ *
+ * `lookup` is injectable so tests can hand in a record directly instead of
+ * depending on any particular course shipping the field.
+ */
+export const getCourseDistributionalsFromCode = (
+  code: string,
+  lookup: (code: string) => CourseInfo | undefined = getCourseInfo,
+): string[] | undefined => {
+  const record = lookup(code);
+  const tags = record?.distributionals;
+  return Array.isArray(tags) ? tags : undefined;
+};
+
+/** All other known codes for a course (excluding the canonical codes[0]). */
 export const getOtherCodesForCourse = (code: string): string[] => {
   const course = getCourseInfo(code);
   return course ? course.codes.slice(1) : [];
-}
+};
 
-// Check if a course is offered next year (has isFall or isSpring)
+/** True if the course appears in the given catalog term label (e.g. "Fall 2024"). */
+export const wasCourseOfferedInTerm = (
+  code: string,
+  term: string,
+): boolean => {
+  const course = getCourseInfo(code);
+  return course ? course.offered.includes(term) : false;
+};
+
+/** True if offered Fall 2026 and/or Spring 2027 (simulator pool). */
 export const isCourseOfferedNextYear = (code: string): boolean => {
   const course = getCourseInfo(code);
-  return course ? (course.isFall === true || course.isSpring === true) : false;
-}
+  return course
+    ? course.isFall === true || course.isSpring === true
+    : false;
+};
 
-// Check if a course is offered in Fall
+/** True if offered Fall 2026 (simulator). */
 export const isCourseOfferedInFall = (code: string): boolean => {
   const course = getCourseInfo(code);
   return course?.isFall === true;
-}
+};
 
-// Check if a course is offered in Spring
+/** True if offered Spring 2027 (simulator). */
 export const isCourseOfferedInSpring = (code: string): boolean => {
   const course = getCourseInfo(code);
   return course?.isSpring === true;
-}
+};
+
+export const getCoursesByDepartment = (dept: string): CourseInfo[] => {
+  return COURSES_BY_DEPARTMENT.get(normalizeDepartment(dept)) ?? [];
+};
+
+/**
+ * True if two course codes refer to the same catalog entry
+ * (handles 3↔4 digit and EENG↔ECE aliases).
+ */
+export const codesReferToSameCourse = (a: string, b: string): boolean => {
+  const ca = getCourseInfo(a);
+  const cb = getCourseInfo(b);
+  if (ca && cb) return ca === cb;
+  return normalizeCourseCode(a) === normalizeCourseCode(b);
+};

@@ -3,7 +3,7 @@
 import { useState, useEffect, useMemo, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FiX, FiPlus, FiSearch, FiTrash2, FiCheck, FiEdit3 } from "react-icons/fi";
-import coursesData from "@/lib/new_courses.json";
+import { ALL_COURSES } from "@/lib/courseCatalog";
 import { Course } from "@/lib/types";
 
 interface ManualCourseEntry {
@@ -23,6 +23,26 @@ interface ManualCourseEntryModalProps {
   onClose: () => void;
   onSubmit: (courses: Omit<Course, "id">[]) => Promise<void>;
   userId: string;
+  /**
+   * Optional semester key (e.g. "Fall 2026") to preselect when opened from a
+   * specific semester header. When omitted, defaults to the current Fall term.
+   */
+  initialSemester?: string;
+}
+
+/** Split a "Fall 2026" style key into a valid {semester, year} default. */
+function parseInitialSemester(initialSemester?: string): {
+  semester: string;
+  year: number;
+} {
+  const fallback = { semester: "Fall", year: CURRENT_YEAR };
+  if (!initialSemester) return fallback;
+  const [sem, yearStr] = initialSemester.split(" ");
+  const year = parseInt(yearStr, 10);
+  return {
+    semester: SEMESTERS.includes(sem) ? sem : fallback.semester,
+    year: Number.isFinite(year) ? year : fallback.year,
+  };
 }
 
 const GRADES = [
@@ -40,6 +60,7 @@ export default function ManualCourseEntryModal({
   onClose,
   onSubmit,
   userId,
+  initialSemester,
 }: ManualCourseEntryModalProps) {
   const [entries, setEntries] = useState<ManualCourseEntry[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -53,7 +74,7 @@ export default function ManualCourseEntryModal({
 
   // Get all canonical courses for search
   const allCanonicalCourses = useMemo(() => {
-    return (coursesData as any[]).map((course) => ({
+    return ALL_COURSES.map((course) => ({
       ...course,
       canonicalCode: course.codes?.[0],
       allCodes: course.codes,
@@ -80,14 +101,16 @@ export default function ManualCourseEntryModal({
 
   useEffect(() => {
     if (isOpen) {
-      // Start with one empty entry ready to go
+      // Start with one empty entry ready to go, preselecting the semester the
+      // add flow was launched from (if any).
+      const preselect = parseInitialSemester(initialSemester);
       const initialEntry: ManualCourseEntry = {
         id: `entry-${Date.now()}`,
         code: "",
         courseName: "",
         grade: "In Progress",
-        semester: "Fall",
-        year: CURRENT_YEAR,
+        semester: preselect.semester,
+        year: preselect.year,
         credits: 1,
         status: "in-progress",
         isCustom: false,
@@ -100,7 +123,7 @@ export default function ManualCourseEntryModal({
       setCustomCodeInput("");
       setCustomNameInput("");
     }
-  }, [isOpen]);
+  }, [isOpen, initialSemester]);
 
   useEffect(() => {
     if (searchingEntryId && searchInputRef.current) {
@@ -217,23 +240,23 @@ export default function ManualCourseEntryModal({
     if (course.isFall && course.isSpring) {
       return (
         <span className="inline-flex items-center gap-1">
-          <span className={boxClasses} title="Offered in Fall">
+          <span className={boxClasses} title="Offered Fall 2026">
             🍁
           </span>
-          <span className={boxClasses} title="Offered in Spring">
+          <span className={boxClasses} title="Offered Spring 2027">
             🌰
           </span>
         </span>
       );
     } else if (course.isFall) {
       return (
-        <span className={boxClasses} title="Offered in Fall">
+        <span className={boxClasses} title="Offered Fall 2026">
           🍁
         </span>
       );
     } else if (course.isSpring) {
       return (
-        <span className={boxClasses} title="Offered in Spring">
+        <span className={boxClasses} title="Offered Spring 2027">
           🌰
         </span>
       );
@@ -495,7 +518,21 @@ export default function ManualCourseEntryModal({
 
             {/* Footer */}
             {entries.length > 0 && (
-              <div className="px-5 py-3 border-t border-gray-200 dark:border-gray-800/80 flex items-center justify-between">
+              <div className="px-5 py-3 border-t border-gray-200 dark:border-gray-800/80 space-y-2">
+                <p className="text-[10px] text-gray-400 dark:text-gray-500 leading-relaxed">
+                  By adding courses, you voluntarily store course and grade data
+                  on our servers (private to your account). Not affiliated with
+                  Yale. Free forever — we will never charge a dime.{" "}
+                  <a
+                    href="/terms"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="underline underline-offset-2 text-blue-500 dark:text-blue-400"
+                  >
+                    Terms
+                  </a>
+                </p>
+                <div className="flex items-center justify-between">
                 <span className="text-xs text-gray-400 dark:text-gray-500">
                   {validCount} course{validCount !== 1 ? "s" : ""} ready
                 </span>
@@ -526,6 +563,7 @@ export default function ManualCourseEntryModal({
                       </>
                     )}
                   </button>
+                </div>
                 </div>
               </div>
             )}

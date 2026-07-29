@@ -1,0 +1,42 @@
+{
+  "id": "CERT_EDUCATION_STUDIES_SCHOLARS",
+  "name": "Education Studies Scholars Intensive",
+  "category": "interdisciplinary",
+  "source_url": "https://catalog.yale.edu/ycps/subjects-of-instruction/education-studies/",
+  "page_title": "Education Studies Certificates",
+  "tabs": [
+    {
+      "label": "Overview",
+      "href": "#text",
+      "id": null
+    },
+    {
+      "label": "Scholar Intensive Certificate",
+      "href": "#maptext",
+      "id": null
+    },
+    {
+      "label": "Certificate",
+      "href": "#certificatetext",
+      "id": null
+    },
+    {
+      "label": "Courses",
+      "href": "#coursestext",
+      "id": null
+    }
+  ],
+  "extracted_from_container": "maptextcontainer",
+  "parent_program": null,
+  "requires_application": true,
+  "full_text": "Scholar Intensive certificate in Education studies\nThe Education Studies Scholar Intensive Certificate in Yale College provides a structured pathway for students interested in completing an Education Studies capstone project while learning alongside a supportive cohort from sophomore through senior year.\nIn the fall of their sophomore year, students who have successfully completed or are currently enrolled in\nEDST 1110\nmay\napply to the Scholar Intensive Certificate\nalongside their major. Selected students join a close-knit cohort, engaging in small seminars and exploring through collaborative learning. With guidance from faculty advisers and peers, they pursue educational research opportunities tailored to their individual interests. Scholar Intensive Certificate students gain practical field experience through an academic-year or summer field placement.\nRequirements\nSee Links\nto the attributes indicating courses approved for the Theory and Research, Policy, and Pedagogy\nrequirements.\nTo complete the Scholar Intensive Certificate program, students must take five courses including\nEDST 1110\nand\nEDST 1261\nto fulfill the Theory and Research requirement; one course in Policy or Pedagogy, two capstone courses including\nEDST 4400\nand either\nEDST 4410\nor\n4490\n. Students must also fulfill a field experience.\nTwo of the five courses may overlap with the student's major.\nNo more than two course credits may overlap in the fulfillment of the requirements of the Scholar Intensive Certificate or of a major, a simultaneous degree, or another certificate.\nN\no course credit may be counted toward the requirements of more than two curricular programs.\nFor example, the same course credit may not be used to fulfill the requirements of two certificates and a major.\nGraduate and professional school courses may count, with approval from the Education Studies Associate Director.\nFor a listing of courses in the area categories, see the\nEducation Studies website\n.\nCredit/D/Fail\ncourses may not count toward the certificate requirements.\nSuccessful completion of the Scholar Intensive Certificate is noted on transcripts.\nSummary of Requirements\nPrerequisite\nEDST 1110\nNumber of courses\n5 courses (including the prereq and senior req)\nDistribution of courses\n1 course credit in Theory and Research (\nEDST 1261\n); 1 course credit in either Policy or Pedagogy\nOther requirement\nField experience as described on the\nEDST website\nSenior requirement\nEDST 4400\nwith either\nEDST 4410\nor\n4490",
+  "isolation": null,
+  "sections": {
+    "overview": "Scholar Intensive certificate in Education studies\nThe Education Studies Scholar Intensive Certificate in Yale College provides a structured pathway for students interested in completing an Education Studies capstone project while learning alongside a supportive cohort from sophomore through senior year.\nIn the fall of their sophomore year, students who have successfully completed or are currently enrolled in\nEDST 1110\nmay\napply to the Scholar Intensive Certificate\nalongside their major. Selected students join a close-knit cohort, engaging in small seminars and exploring through collaborative learning. With guidance from faculty advisers and peers, they pursue educational research opportunities tailored to their individual interests. Scholar Intensive Certificate students gain practical field experience through an academic-year or summer field placement.",
+    "requirements": "See Links\nto the attributes indicating courses approved for the Theory and Research, Policy, and Pedagogy\nrequirements.\nTo complete the Scholar Intensive Certificate program, students must take five courses including\nEDST 1110\nand\nEDST 1261\nto fulfill the Theory and Research requirement; one course in Policy or Pedagogy, two capstone courses including\nEDST 4400\nand either\nEDST 4410\nor\n4490\n. Students must also fulfill a field experience.\nTwo of the five courses may overlap with the student's major.\nNo more than two course credits may overlap in the fulfillment of the requirements of the Scholar Intensive Certificate or of a major, a simultaneous degree, or another certificate.\nN\no course credit may be counted toward the requirements of more than two curricular programs.\nFor example, the same course credit may not be used to fulfill the requirements of two certificates and a major.\nGraduate and professional school courses may count, with approval from the Education Studies Associate Director.\nFor a listing of courses in the area categories, see the\nEducation Studies website\n.\nCredit/D/Fail\ncourses may not count toward the certificate requirements.\nSuccessful completion of the Scholar Intensive Certificate is noted on transcripts.",
+    "summary_of_requirements": "Prerequisite\nEDST 1110\nNumber of courses\n5 courses (including the prereq and senior req)\nDistribution of courses\n1 course credit in Theory and Research (\nEDST 1261\n); 1 course credit in either Policy or Pedagogy\nOther requirement\nField experience as described on the\nEDST website\nSenior requirement\nEDST 4400\nwith either\nEDST 4410\nor\n4490"
+  },
+  "summary_of_requirements_tab": null,
+  "tables": [],
+  "raw_html_length": 25535
+}

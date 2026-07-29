@@ -13,6 +13,7 @@ export type ReqOption = {
   inProgress?: boolean;
   skipped?: boolean;
   manual?: boolean;
+  excluded?: boolean;
 };
 
 export type Requirement = {
@@ -172,7 +173,9 @@ export default function RequirementModal({
                 {requirement.options.map((opt) => {
                   const base =
                     "relative px-3 py-1.5 rounded-full text-sm flex items-center gap-2 border transition-all";
-                  const style = opt.manual
+                  const style = opt.excluded
+                    ? "bg-amber-100 dark:bg-amber-900/20 text-amber-700 dark:text-amber-300 border-amber-300 dark:border-amber-700 border-dashed"
+                    : opt.manual
                     ? "bg-purple-100 dark:bg-purple-900/20 text-purple-700 dark:text-purple-300 border-purple-300 dark:border-purple-700"
                     : opt.completed
                     ? "bg-emerald-100 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-300 border-emerald-300 dark:border-emerald-700"
@@ -182,7 +185,7 @@ export default function RequirementModal({
                     ? "bg-gray-200 dark:bg-gray-900/20 text-gray-600 dark:text-gray-300 border-dashed border-gray-400 dark:border-gray-600"
                     : "bg-red-100 dark:bg-red-900/20 text-red-700 dark:text-red-300 border-red-300 dark:border-red-700";
 
-                  const canExpand = !opt.completed && !opt.skipped;
+                  const canExpand = !opt.skipped;
 
                   // precise skip handler — closes modal after calling onSkip
                   const handleSkip = async (e: React.MouseEvent) => {
@@ -206,6 +209,8 @@ export default function RequirementModal({
                           ({opt.credits ?? 0}cr
                           {opt.manual
                             ? ", manual"
+                            : opt.excluded
+                            ? ", excluded"
                             : opt.skipped
                             ? ", skipped"
                             : opt.inProgress
@@ -298,6 +303,7 @@ export default function RequirementModal({
                   fulfilling this requirement. Make sure your DUS agrees!
                 </p>
                 <button
+                  data-tour="major-fulfill-manual-button"
                   onClick={(e) => {
                     e.stopPropagation();
                     onAddManual(requirement.name);

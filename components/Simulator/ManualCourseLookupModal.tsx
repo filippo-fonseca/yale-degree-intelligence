@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FiSearch, FiX, FiPlus } from "react-icons/fi";
-import coursesData from "@/lib/new_courses.json";
+import { ALL_COURSES } from "@/lib/courseCatalog";
 import { Course } from "@/lib/types";
 import { Panda } from "lucide-react";
 import Link from "next/link";
@@ -44,7 +44,7 @@ export default function ManualCourseLookupModal({
   // Build a map of every code (canonical and aliases) to their canonical course entry
   const courseLookupMap = useMemo(() => {
     const map: Record<string, any> = {};
-    (coursesData as any[]).forEach((course) => {
+    ALL_COURSES.forEach((course) => {
       course.codes?.forEach((code: string) => {
         map[code] = course;
       });
@@ -54,7 +54,7 @@ export default function ManualCourseLookupModal({
 
   // For display: array of all canonical course objects
   const allCanonicalCourses = useMemo(() => {
-    return (coursesData as any[]).map((course) => ({
+    return ALL_COURSES.map((course) => ({
       ...course,
       canonicalCode: course.codes?.[0],
       allCodes: course.codes,
@@ -164,13 +164,13 @@ export default function ManualCourseLookupModal({
                           <span className="inline-flex items-center gap-1">
                             <span
                               className="inline-flex items-center px-1.5 py-0.5 rounded-md bg-gray-200/80 dark:bg-gray-700/50 shadow-[inset_1px_1px_2px_rgba(0,0,0,0.1),inset_-1px_-1px_2px_rgba(255,255,255,0.05)] text-[11px]"
-                              title="Offered in Fall"
+                              title="Offered Fall 2026"
                             >
                               🍁
                             </span>
                             <span
                               className="inline-flex items-center px-1.5 py-0.5 rounded-md bg-gray-200/80 dark:bg-gray-700/50 shadow-[inset_1px_1px_2px_rgba(0,0,0,0.1),inset_-1px_-1px_2px_rgba(255,255,255,0.05)] text-[11px]"
-                              title="Offered in Spring"
+                              title="Offered Spring 2027"
                             >
                               🌰
                             </span>
@@ -178,14 +178,14 @@ export default function ManualCourseLookupModal({
                         ) : c.isFall ? (
                           <span
                             className="inline-flex items-center px-1.5 py-0.5 rounded-md bg-gray-200/80 dark:bg-gray-700/50 shadow-[inset_1px_1px_2px_rgba(0,0,0,0.1),inset_-1px_-1px_2px_rgba(255,255,255,0.05)] text-[11px]"
-                            title="Offered in Fall"
+                            title="Offered Fall 2026"
                           >
                             🍁
                           </span>
                         ) : c.isSpring ? (
                           <span
                             className="inline-flex items-center px-1.5 py-0.5 rounded-md bg-gray-200/80 dark:bg-gray-700/50 shadow-[inset_1px_1px_2px_rgba(0,0,0,0.1),inset_-1px_-1px_2px_rgba(255,255,255,0.05)] text-[11px]"
-                            title="Offered in Spring"
+                            title="Offered Spring 2027"
                           >
                             🌰
                           </span>

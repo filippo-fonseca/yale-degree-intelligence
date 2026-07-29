@@ -1,0 +1,57 @@
+{
+  "id": "CERT_DATA_SCIENCE",
+  "name": "Data Science",
+  "category": "skills_based",
+  "source_url": "https://catalog.yale.edu/ycps/subjects-of-instruction/statistics/",
+  "page_title": "Statistics and Data Science",
+  "tabs": [
+    {
+      "label": "Overview",
+      "href": "#text",
+      "id": null
+    },
+    {
+      "label": "Summary of Requirements",
+      "href": "#summaryofrequirementstext",
+      "id": null
+    },
+    {
+      "label": "First year",
+      "href": "#firstyearstext",
+      "id": null
+    },
+    {
+      "label": "Certificate",
+      "href": "#certificatetext",
+      "id": null
+    },
+    {
+      "label": "Faculty",
+      "href": "#facultytext",
+      "id": null
+    },
+    {
+      "label": "Roadmap",
+      "href": "#roadmaptext",
+      "id": null
+    },
+    {
+      "label": "Courses",
+      "href": "#coursestext",
+      "id": null
+    }
+  ],
+  "extracted_from_container": "certificatetextcontainer",
+  "parent_program": "Statistics & Data Science",
+  "requires_application": false,
+  "full_text": "Certificate in Data Science\nThe Certificate in Data Science is designed for students majoring in disciplines other than Statistics and Data Science to acquire the knowledge to promote mature use of data analysis throughout society. Students gain the necessary knowledge base and useful skills to tackle real-world data analysis challenges. Students who complete the requirements for the certificate are prepared to engage in data analysis in the humanities, social sciences, and sciences and engineering and are able to manage and investigate quantitative data research and report on that data.\nRefer to the\nS&DS website\nfor more information. Students must declare their intent to earn a certificate by the last day of add/drop period in their final term of enrollment. This is done on the\nDeclare Major, Concentration within the Major, Certificate\npage on\nYale Hub\n. Once declared, Degree Audit will track students' progress toward completion of the certificate.\nPrerequisite\nThe suggested prerequisite for the certificate is an introductory course, selected from one of the following courses:\nS&DS 1000\n,\n1080\n,\n1090\n, or\n1230\n, or an introductory data analysis course from another department.\nRequirements of the Certificate\nSee Links\nto courses approved for the statistical data analysis requirements.\nTo fulfill the requirements of the certificate, students must take five courses from four different areas of statistical data analysis. No course may be applied to satisfy the requirements of both a major and the certificate. No single course may count for two areas of study. Students are required to earn at least a B– for each course.\nProbability and Statistical Theory\nOne from\nS&DS 2380\n,\nS&DS 2400\n,\nS&DS 2410\n,\nS&DS 2420\n. Advanced students may substitute\nS&DS 3510\nor\nS&DS 3640\nor\nECE 4310\n.\nStudents are\nheld to\nthe Statistical Methodology and Data Analysis\nrequirements\nthat were in place when they\ndeclared their intent to earn the Certificate in Data Science\n.\nHowever, with approval from the director\nof\nundergraduate studies (DUS), the following requirements, updated for the academic year 2024-2025,\nmay be\nfulfilled by students who declared their intent to earn the certificate\nin a prior term.\nStatistical Methodology and Data Analysis\nTwo from\nS&DS 2200\nor\nS&DS 2300\n(but not both),\nS&DS 2420\n,\nS&DS 3120\n,\nS&DS 3610\n,\nS&DS 3630\n,\nPLSC 2501\n.\nECON 2136\nmay be substituted for\nS&DS 2420\n.\nComputation & Machine Learning\nOne from\nS&DS 2620\n,\nS&DS 2650\n,\nS&DS 3170\n,\nS&DS 3650\n,\nCPSC 2230\n,\nCPSC 3810\n,\nCPSC 4770\n,\nPHYS 3780\n,\nPLSC 5060\n,\nCPSC 3230\nmay be substituted for\nCPSC 2230\n.\nData Analysis in a Discipline Area\nOne course from those approved for this requirement and listed on the\nS&DS website\n.\nAdvising\nMore information about the certificate, including how to register, is available on the\nS&DS website\n.\nSummary of Requirements\nPrerequisite\n1 term course from\nS&DS 1000\n,\n1080\n,\n1090\n, or\n1230\n(or an introductory data analysis course in another department)\nNumber of courses\n5 term courses\nDistribution of courses\n1 probability and statistical theory course; 2 statistical methodology and data analysis courses; 1 computational and machine learning course; and 1 course in discipline area, as specified",
+  "isolation": null,
+  "sections": {
+    "overview": "Certificate in Data Science\nThe Certificate in Data Science is designed for students majoring in disciplines other than Statistics and Data Science to acquire the knowledge to promote mature use of data analysis throughout society. Students gain the necessary knowledge base and useful skills to tackle real-world data analysis challenges. Students who complete the requirements for the certificate are prepared to engage in data analysis in the humanities, social sciences, and sciences and engineering and are able to manage and investigate quantitative data research and report on that data.\nRefer to the\nS&DS website\nfor more information. Students must declare their intent to earn a certificate by the last day of add/drop period in their final term of enrollment. This is done on the\nDeclare Major, Concentration within the Major, Certificate\npage on\nYale Hub\n. Once declared, Degree Audit will track students' progress toward completion of the certificate.\nPrerequisite\nThe suggested prerequisite for the certificate is an introductory course, selected from one of the following courses:\nS&DS 1000\n,\n1080\n,\n1090\n, or\n1230\n, or an introductory data analysis course from another department.",
+    "requirements": "See Links\nto courses approved for the statistical data analysis requirements.\nTo fulfill the requirements of the certificate, students must take five courses from four different areas of statistical data analysis. No course may be applied to satisfy the requirements of both a major and the certificate. No single course may count for two areas of study. Students are required to earn at least a B– for each course.\nProbability and Statistical Theory\nOne from\nS&DS 2380\n,\nS&DS 2400\n,\nS&DS 2410\n,\nS&DS 2420\n. Advanced students may substitute\nS&DS 3510\nor\nS&DS 3640\nor\nECE 4310\n.\nStudents are\nheld to\nthe Statistical Methodology and Data Analysis\nrequirements\nthat were in place when they\ndeclared their intent to earn the Certificate in Data Science\n.\nHowever, with approval from the director\nof\nundergraduate studies (DUS), the following requirements, updated for the academic year 2024-2025,\nmay be\nfulfilled by students who declared their intent to earn the certificate\nin a prior term.\nStatistical Methodology and Data Analysis\nTwo from\nS&DS 2200\nor\nS&DS 2300\n(but not both),\nS&DS 2420\n,\nS&DS 3120\n,\nS&DS 3610\n,\nS&DS 3630\n,\nPLSC 2501\n.\nECON 2136\nmay be substituted for\nS&DS 2420\n.\nComputation & Machine Learning\nOne from\nS&DS 2620\n,\nS&DS 2650\n,\nS&DS 3170\n,\nS&DS 3650\n,\nCPSC 2230\n,\nCPSC 3810\n,\nCPSC 4770\n,\nPHYS 3780\n,\nPLSC 5060\n,\nCPSC 3230\nmay be substituted for\nCPSC 2230\n.\nData Analysis in a Discipline Area\nOne course from those approved for this requirement and listed on the\nS&DS website\n.\nAdvising\nMore information about the certificate, including how to register, is available on the\nS&DS website\n.",
+    "summary_of_requirements": "Prerequisite\n1 term course from\nS&DS 1000\n,\n1080\n,\n1090\n, or\n1230\n(or an introductory data analysis course in another department)\nNumber of courses\n5 term courses\nDistribution of courses\n1 probability and statistical theory course; 2 statistical methodology and data analysis courses; 1 computational and machine learning course; and 1 course in discipline area, as specified"
+  },
+  "summary_of_requirements_tab": null,
+  "tables": [],
+  "raw_html_length": 64889
+}

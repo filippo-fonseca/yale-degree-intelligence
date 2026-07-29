@@ -1,0 +1,62 @@
+{
+  "id": "CERT_ISLAMIC_STUDIES",
+  "name": "Islamic Studies",
+  "description": "Encompasses the study of Muslim and Islamic artistic, cultural, historical, intellectual, linguistic, literary, philosophical, political, religious, sociological, and scientific presence and impact on human society over the past one and a half millennia.",
+  "category": "interdisciplinary",
+  "sourceUrl": "https://catalog.yale.edu/ycps/subjects-of-instruction/islamic-studies/",
+  "requiresApplication": false,
+  "creditRequirements": {
+    "total": 5
+  },
+  "notes": [
+    "No more than two courses may represent the same area of study.",
+    "Each student must attend three lectures on topics relating to Islamic Studies and submit a brief 1–2 page write-up for each.",
+    "All courses must be taken for a letter grade with a grade of C or above.",
+    "No courses taken Credit/D/Fail may be applied toward the certificate.",
+    "Language courses and non-Yale courses may not count toward the certificate.",
+    "No more than two course credits may overlap with a major, simultaneous degree, or another certificate.",
+    "No course credit may be applied toward the requirements of more than two curricular programs.",
+    "Graduate and professional school courses may count toward the certificate.",
+    "Declare on Yale Hub by January 15 or September 15 of the final semester at the latest."
+  ],
+  "policy": {
+    "overlapCap": 2,
+    "minGrade": "C",
+    "nonCourseRequirements": [
+      "Attend three lectures on topics relating to Islamic Studies and submit a 1 to 2 page write-up for each"
+    ],
+    "sourceNote": "No more than two course credits fulfilling the requirements of the Islamic Studies certificate may overlap with a major, a simultaneous degree, or another certificate. All courses must be taken for a letter grade, and students must achieve a grade of C or above."
+  },
+  "requirements": [
+    {
+      "name": "Islamic Art, Architecture, Literature",
+      "required": 1,
+      "description": "One approved course in Islamic Art, Architecture, and Literature.",
+      "options": []
+    },
+    {
+      "name": "Islamic History",
+      "required": 1,
+      "description": "One approved course in Islamic History.",
+      "options": []
+    },
+    {
+      "name": "Islamic Religion",
+      "required": 1,
+      "description": "One approved course in Islamic Religion.",
+      "options": []
+    },
+    {
+      "name": "Islamic Society",
+      "required": 1,
+      "description": "One approved course in Islamic Society.",
+      "options": []
+    },
+    {
+      "name": "Elective",
+      "required": 1,
+      "description": "One additional course from any of the four content areas.",
+      "options": []
+    }
+  ]
+}

@@ -44,15 +44,12 @@ const CustomLoader = ({ fullScreen = true }: CustomLoaderProps) => {
       <div
         className={`flex items-center justify-center ${
           fullScreen ? "min-h-screen" : "min-h-[200px]"
-        } bg-white dark:bg-gray-950 overflow-hidden`}
+        } bg-theme overflow-hidden`}
       >
         <div className="relative w-72 h-72">
           <div className="absolute inset-0 flex items-center justify-center">
-            <div className="w-28 h-28 rounded-full bg-gradient-to-br from-gray-900 to-gray-800 border-2 border-gray-700 shadow-inner" />
+            <div className="w-28 h-28 rounded-full bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-900 dark:to-gray-800 border-2 border-purple-300/40 dark:border-purple-500/30 shadow-inner" />
           </div>
-          {/* <div className="absolute bottom-0 left-0 right-0 text-center text-sm text-gray-400 mt-4">
-            cooking here...
-          </div> */}
         </div>
       </div>
     );
@@ -62,17 +59,18 @@ const CustomLoader = ({ fullScreen = true }: CustomLoaderProps) => {
     <div
       className={`flex items-center justify-center ${
         fullScreen ? "min-h-screen" : "min-h-[200px]"
-      } bg-white dark:bg-gray-950 overflow-hidden`}
+      } bg-theme overflow-hidden`}
     >
       <div className="relative w-96 h-64">
-        {/* The hole */}
+        {/* The landing circle */}
         <div className="absolute inset-0 flex items-center justify-center">
-          <div className="w-28 h-28 rounded-full bg-gradient-to-br from-gray-900 to-gray-800 border-2 border-gray-700 shadow-inner" />
+          <div className="w-28 h-28 rounded-full bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-900 dark:to-gray-800 border-2 border-purple-300/40 dark:border-purple-500/30 shadow-md dark:shadow-inner" />
         </div>
+        {/* Falling drops */}
         {[...Array(8)].map((_, i) => (
           <motion.div
             key={i}
-            className="absolute top-0 left-1/2 w-6 h-6 bg-gradient-to-br from-blue-400 to-purple-500 rounded-lg shadow-md"
+            className="absolute top-0 left-1/2 w-5 h-5 bg-gradient-to-br from-blue-400 to-purple-500 rounded-md shadow-md"
             initial={{
               x: -3,
               y: -50,
@@ -86,11 +84,11 @@ const CustomLoader = ({ fullScreen = true }: CustomLoaderProps) => {
               rotate: 360,
             }}
             transition={{
-              delay: i * 0.15,
-              duration: 0.8,
+              delay: i * 0.09,
+              duration: 0.6,
               repeat: Infinity,
-              repeatDelay: 3,
-              ease: "easeInOut",
+              repeatDelay: 0.4,
+              ease: "easeIn",
             }}
             style={{
               originX: 0.5,
@@ -98,10 +96,11 @@ const CustomLoader = ({ fullScreen = true }: CustomLoaderProps) => {
             }}
           />
         ))}
+        {/* Impact burst */}
         {[...Array(5)].map((_, i) => (
           <motion.div
             key={`pack-${i}`}
-            className="absolute top-1/2 left-1/2 w-6 h-6 bg-gradient-to-br from-blue-400 to-purple-500 rounded-lg shadow-md"
+            className="absolute top-1/2 left-1/2 w-5 h-5 bg-gradient-to-br from-blue-400 to-purple-500 rounded-md shadow-md"
             initial={{
               x: Math.random() * 40 - 20,
               y: -50,
@@ -115,10 +114,10 @@ const CustomLoader = ({ fullScreen = true }: CustomLoaderProps) => {
               y: 0,
             }}
             transition={{
-              delay: 0.5 + i * 0.1,
-              duration: 0.6,
+              delay: 0.4 + i * 0.07,
+              duration: 0.45,
               repeat: Infinity,
-              repeatDelay: 3,
+              repeatDelay: 0.4,
               ease: "anticipate",
             }}
           />
@@ -128,23 +127,25 @@ const CustomLoader = ({ fullScreen = true }: CustomLoaderProps) => {
           className="absolute inset-0 flex items-center justify-center"
           initial={{ scale: 0.5, opacity: 0 }}
           animate={{
-            scale: [1, 1.2, 1],
-            opacity: [0, 0.3, 0],
+            scale: [1, 1.25, 1],
+            opacity: [0, 0.35, 0],
           }}
           transition={{
-            duration: 2,
+            delay: 0.45,
+            duration: 0.8,
             repeat: Infinity,
+            repeatDelay: 0.15,
             ease: "easeOut",
           }}
         >
-          <div className="w-24 h-24 rounded-full border-2 border-blue-400/30" />
+          <div className="w-24 h-24 rounded-full border-2 border-blue-400/40 dark:border-blue-400/30" />
         </motion.div>
-        {/* Text */}
+        {/* Subtitle text */}
         <motion.div
-          className={`absolute bottom-0 left-0 right-0 text-center text-sm text-gray-500 dark:text-gray-400`}
+          className="absolute bottom-0 left-0 right-0 text-center text-sm text-muted"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5 }}
+          transition={{ delay: 0.3 }}
         >
           {randomPhrase}
         </motion.div>

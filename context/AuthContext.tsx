@@ -7,7 +7,8 @@ import {
   signInWithPopup,
   signOut,
 } from "firebase/auth";
-import { auth, googleProvider } from "@/config/firebase";
+import { auth, googleProvider, isFirebaseConfigured } from "@/config/firebase";
+import { isAllowedEmail } from "@/lib/allowedEmail";
 
 type AuthContextType = {
   user: User | null;
@@ -27,50 +28,55 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
+  const logout = async () => {
+    if (!isFirebaseConfigured) return;
+    try {
+      await signOut(auth);
+    } catch (error) {
+      console.error("Error signing out", error);
+    }
+  };
+
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (user) {
-        // Verify email domain
-        if (user.email?.endsWith("@yale.edu")) {
-          setUser(user);
+    if (!isFirebaseConfigured) {
+      setLoading(false);
+      return;
+    }
+
+    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+      if (firebaseUser) {
+        if (isAllowedEmail(firebaseUser.email)) {
+          setUser(firebaseUser);
         } else {
-          // If not Yale email, log them out
           logout();
+          setUser(null);
         }
       } else {
         setUser(null);
       }
 
-      setTimeout(() => {
-        setLoading(false);
-      }, 1000); // Put the loading animation there a bit for aesthetics
+      setLoading(false);
     });
 
     return () => unsubscribe();
   }, []);
 
   const signInWithGoogle = async () => {
+    if (!isFirebaseConfigured) {
+      throw new Error("Firebase is not configured");
+    }
     try {
       const result = await signInWithPopup(auth, googleProvider);
-      if (
-        result.user.email !== "filifonsecacagnazzo@gmail.com" &&
-        !result.user.email?.endsWith("@yale.edu")
-      ) {
+      if (!isAllowedEmail(result.user.email)) {
         await logout();
-        alert("Only valid Yale email addresses are allowed. Sorry!! :)");
-        // throw new Error("Only Yale email addresses are allowed");
+        throw new Error("Only valid Yale email addresses are allowed. Sorry!! :)");
       }
     } catch (error) {
       console.error("Error signing in with Google", error);
-      throw error;
-    }
-  };
-
-  const logout = async () => {
-    try {
-      await signOut(auth);
-    } catch (error) {
-      console.error("Error signing out", error);
+      if (error instanceof Error && error.message.includes("Yale email")) {
+        throw error;
+      }
+      throw new Error("Sign-in failed. Please try again.");
     }
   };
 

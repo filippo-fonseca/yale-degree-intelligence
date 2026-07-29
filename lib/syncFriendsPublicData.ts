@@ -10,10 +10,30 @@ import {
   serverTimestamp,
 } from "firebase/firestore";
 import { db } from "@/config/firebase";
-import { Course, PublicCourse } from "@/lib/types";
+import { Course, PublicCourse, DEFAULT_FRIENDS_PROFILE_VISIBILITY } from "@/lib/types";
+import {
+  effectiveDistributionals,
+  hasStoredDistributionals,
+} from "@/lib/utils/effectiveDistributionals";
+
+/**
+ * Distributionals as they should land in the public projection.
+ *
+ * Friends see the same effective tags the owner does, catalog defaults
+ * included. The one thing that has to survive the trip is the difference
+ * between "nobody has said anything" (omit the key, so the reader falls back to
+ * the catalog itself) and "the owner cleared every tag" (an explicit empty
+ * array, which the reader must not override).
+ */
+function publicDistributionals(course: Course): string[] | undefined {
+  const dists = effectiveDistributionals(course);
+  if (dists.length > 0) return dists;
+  return hasStoredDistributionals(course) ? [] : undefined;
+}
 
 interface UserProfile {
   majors: string[];
+  certificates?: string[];
   graduationYear?: number;
   bio?: string;
 }
@@ -49,6 +69,9 @@ function coursesAreEqual(
     const existingManual = JSON.stringify(existing.manualRequirementsFulfilled || []);
     const newManual = JSON.stringify(newCourse.manualRequirementsFulfilled || []);
     if (existingManual !== newManual) return false;
+    const existingDists = JSON.stringify([...(existing.distributionals || [])].sort());
+    const newDists = JSON.stringify([...(newCourse.distributionals || [])].sort());
+    if (existingDists !== newDists) return false;
   }
 
   return true;
@@ -92,6 +115,10 @@ export async function syncFriendsPublicData(
       if (c.manualRequirementsFulfilled && c.manualRequirementsFulfilled.length > 0) {
         course.manualRequirementsFulfilled = c.manualRequirementsFulfilled;
       }
+      const dists = publicDistributionals(c);
+      if (dists !== undefined) {
+        course.distributionals = dists;
+      }
       return course;
     });
 
@@ -101,23 +128,26 @@ export async function syncFriendsPublicData(
       coursesAreEqual(existingCourses, publicCourses) &&
       existingData.displayName === (user.displayName || null) &&
       JSON.stringify(existingData.majors || []) === JSON.stringify(userProfile?.majors || []) &&
-      existingData.graduationYear === (userProfile?.graduationYear || null)
+      JSON.stringify(existingData.certificates || []) === JSON.stringify(userProfile?.certificates || []) &&
+      existingData.graduationYear === (userProfile?.graduationYear || null) &&
+      existingData.bio === (userProfile?.bio || null)
     ) {
       return; // Data unchanged, skip update
     }
 
-    // Update the public data document
+    // Update the public data document (preserve visibility settings)
     await setDoc(doc(db, "friends_public_data", userId), {
       userId,
       enabled: true,
       enabledAt: existingData.enabledAt || serverTimestamp(),
       updatedAt: serverTimestamp(),
       displayName: user.displayName || null,
-      email: user.email || null,
       photoURL: user.photoURL || null,
       majors: userProfile?.majors || [],
+      certificates: userProfile?.certificates || [],
       graduationYear: userProfile?.graduationYear ?? null,
       bio: userProfile?.bio || null,
+      visibility: existingData.visibility ?? undefined,
       courses: publicCourses,
     });
   } catch (error) {
@@ -149,6 +179,10 @@ export async function enableFriendsFeature(
     if (c.manualRequirementsFulfilled && c.manualRequirementsFulfilled.length > 0) {
       course.manualRequirementsFulfilled = c.manualRequirementsFulfilled;
     }
+    const dists = publicDistributionals(c);
+    if (dists !== undefined) {
+      course.distributionals = dists;
+    }
     return course;
   });
 
@@ -158,12 +192,13 @@ export async function enableFriendsFeature(
     enabledAt: serverTimestamp(),
     updatedAt: serverTimestamp(),
     displayName: user.displayName || null,
-    email: user.email || null,
     photoURL: user.photoURL || null,
     majors: userProfile?.majors || [],
+    certificates: userProfile?.certificates || [],
     graduationYear: userProfile?.graduationYear ?? null,
     bio: userProfile?.bio || null,
     courses: publicCourses,
+    visibility: { ...DEFAULT_FRIENDS_PROFILE_VISIBILITY },
   });
 }
 

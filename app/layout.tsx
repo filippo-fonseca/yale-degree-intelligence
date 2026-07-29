@@ -5,6 +5,8 @@ import { AuthProvider } from "@/context/AuthContext";
 import { ThemeProvider } from "@/context/ThemeContext";
 import { Toaster } from "react-hot-toast";
 import Script from "next/script";
+import { Analytics } from "@vercel/analytics/next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 export const metadata: Metadata = {
   title: "Yale DegreeIntelligence",
@@ -86,13 +88,16 @@ export default function RootLayout({
       <head>
         <script
           dangerouslySetInnerHTML={{
-            __html: `(function(){try{var t=localStorage.getItem('di-theme');var d=t!=='light';document.documentElement.classList.toggle('dark',d);document.documentElement.style.colorScheme=d?'dark':'light';}catch(e){document.documentElement.classList.add('dark');}})();`,
+            __html: `(function(){try{var t=localStorage.getItem('di-theme');var d=t?t==='dark':window.matchMedia('(prefers-color-scheme: dark)').matches;document.documentElement.classList.toggle('dark',d);document.documentElement.style.colorScheme=d?'dark':'light';}catch(e){document.documentElement.classList.add('dark');}})();`,
           }}
         />
       </head>
       <AuthProvider>
         <ThemeProvider>
-          <body className="bg-white text-gray-900 dark:bg-black dark:text-white transition-colors duration-300">
+          <body
+            className="bg-white text-gray-900 dark:bg-black dark:text-white transition-colors duration-300"
+            suppressHydrationWarning
+          >
             <Toaster
               position="top-center"
               toastOptions={{
@@ -137,6 +142,8 @@ export default function RootLayout({
                 })();
               `}
             </Script>
+            <Analytics />
+            <SpeedInsights />
           </body>
         </ThemeProvider>
       </AuthProvider>

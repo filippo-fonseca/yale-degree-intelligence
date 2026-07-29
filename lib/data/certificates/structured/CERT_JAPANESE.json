@@ -1,0 +1,31 @@
+{
+  "id": "CERT_JAPANESE",
+  "name": "Japanese (Advanced Language Study)",
+  "description": "Certificate of Advanced Language Study in Japanese offered by the Department of East Asian Languages and Literatures. A certificate adviser, typically the DUS, advises students on the certification process. The certificate is listed on the student's transcript once certified.",
+  "category": "advanced_language",
+  "sourceUrl": "https://catalog.yale.edu/ycps/subjects-of-instruction/east-asian-languages-literatures/",
+  "requiresApplication": false,
+  "parentProgram": "East Asian Languages and Literatures",
+  "creditRequirements": { "total": 4 },
+  "notes": [
+    "No Credit/D/Fail",
+    "Letter grade B or above required in all courses",
+    "Courses conducted in English (e.g., JAPN 1700 and JAPN 1710) do not count",
+    "Declare candidacy on Yale Hub as early as possible, no later than January 15 or September 15 of final semester",
+    "With adviser approval, one advanced non-L5 course conducted in Japanese (e.g., independent study graded pass/fail, graduate seminar, or advanced seminar) may count",
+    "One LxC course taught in English may count if it includes a weekly discussion section conducted entirely in Japanese (minimum three students; course designated LxC)",
+    "Up to two study-abroad credits taught in Japanese may be substituted with adviser approval"
+  ],
+  "policy": {
+    "minGrade": "B",
+    "sourceNote": "All courses must be taken for a letter grade, and students must achieve a grade of B or above."
+  },
+  "requirements": [
+    {
+      "name": "Courses beyond L4",
+      "required": 4,
+      "description": "Four courses beyond the L4 level in Japanese. At least two must be Yale courses designated L5.",
+      "options": []
+    }
+  ]
+}

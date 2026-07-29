@@ -2,36 +2,71 @@ import { NextRequest, NextResponse } from 'next/server';
 import { promises as fs } from 'fs';
 import { v4 as uuidv4 } from 'uuid';
 import PDFParser from 'pdf2json';
+import { requireAuth, isAuthError, rateLimit } from '@/lib/apiAuth';
+
+const MAX_FILE_SIZE = 5 * 1024 * 1024;
 
 export async function POST(req: NextRequest) {
+  const user = await requireAuth(req);
+  if (isAuthError(user)) return user;
+
+  const limited = rateLimit(`upload:${user.uid}`, 20, 60 * 60 * 1000);
+  if (limited) return limited;
+
   const formData: FormData = await req.formData();
   const uploadedFiles = formData.getAll('filepond');
   let fileName = '';
   let parsedText = '';
 
-  if (uploadedFiles && uploadedFiles.length > 0) {
-    const uploadedFile = uploadedFiles[0]; // use [0] not [1] for the first file
+  if (!uploadedFiles || uploadedFiles.length === 0) {
+    return NextResponse.json({ error: 'No file uploaded' }, { status: 400 });
+  }
 
-    if (uploadedFile instanceof File) {
-      fileName = uuidv4();
-      const tempFilePath = `/tmp/${fileName}.pdf`;
-      const fileBuffer = Buffer.from(await uploadedFile.arrayBuffer());
-      await fs.writeFile(tempFilePath, new Uint8Array(fileBuffer));
+  const uploadedFile = uploadedFiles[0];
+  if (!(uploadedFile instanceof File)) {
+    return NextResponse.json({ error: 'Invalid file' }, { status: 400 });
+  }
 
-      const pdfParser = new (PDFParser as any)(null, 1);
+  const fileBuffer = Buffer.from(await uploadedFile.arrayBuffer());
 
-      // Wrap the parser in a Promise so we can wait for it to finish
-      parsedText = await new Promise((resolve, reject) => {
-        pdfParser.on('pdfParser_dataError', (errData: any) => {
-          reject(errData.parserError);
-        });
+  if (fileBuffer.length > MAX_FILE_SIZE) {
+    return NextResponse.json(
+      { error: 'File too large. Maximum size is 5MB.' },
+      { status: 413 }
+    );
+  }
 
-        pdfParser.on('pdfParser_dataReady', () => {
-          resolve((pdfParser as any).getRawTextContent());
-        });
+  if (!fileBuffer.subarray(0, 4).toString('ascii').startsWith('%PDF')) {
+    return NextResponse.json({ error: 'Invalid PDF file' }, { status: 400 });
+  }
 
-        pdfParser.loadPDF(tempFilePath);
+  fileName = uuidv4();
+  const tempFilePath = `/tmp/${fileName}.pdf`;
+
+  try {
+    await fs.writeFile(tempFilePath, new Uint8Array(fileBuffer));
+
+    const pdfParser = new (PDFParser as any)(null, 1);
+
+    parsedText = await new Promise((resolve, reject) => {
+      pdfParser.on('pdfParser_dataError', (errData: any) => {
+        reject(errData.parserError);
       });
+
+      pdfParser.on('pdfParser_dataReady', () => {
+        resolve((pdfParser as any).getRawTextContent());
+      });
+
+      pdfParser.loadPDF(tempFilePath);
+    });
+  } catch (error) {
+    console.error('PDF parse error:', error);
+    return NextResponse.json({ error: 'Failed to parse PDF' }, { status: 500 });
+  } finally {
+    try {
+      await fs.unlink(tempFilePath);
+    } catch {
+      // temp file may not exist
     }
   }
 

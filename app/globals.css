@@ -131,35 +131,49 @@
   box-shadow: var(--neumorphic-shadow-inset);
 }
 
-/* Custom scrollbar - Light mode */
+/* Custom scrollbar - accent (cool purple -> blue), theme-aware */
 ::-webkit-scrollbar {
-  width: 8px;
+  width: 10px;
+  height: 10px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #f3f4f6;
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #d1d5db;
-  border-radius: 4px;
+  border-radius: 9999px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+  background-color: rgba(var(--accent-purple), 0.55);
+  background-image: linear-gradient(
+    180deg,
+    rgba(var(--accent-purple), 0.85),
+    rgba(var(--accent-blue), 0.85)
+  );
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #9ca3af;
+  background-image: linear-gradient(
+    180deg,
+    rgb(var(--accent-purple)),
+    rgb(var(--accent-blue))
+  );
 }
 
-/* Custom scrollbar - Dark mode */
-.dark ::-webkit-scrollbar-track {
-  background: #1F2937;
-}
-
+/* Dark mode keeps the accent but brightens the gradient for contrast */
 .dark ::-webkit-scrollbar-thumb {
-  background: #4B5563;
+  background-image: linear-gradient(
+    180deg,
+    rgba(var(--accent-purple), 0.9),
+    rgba(var(--accent-blue), 0.9)
+  );
 }
 
-.dark ::-webkit-scrollbar-thumb:hover {
-  background: #6B7280;
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgb(var(--accent-purple)) transparent;
 }
 
 .shadow-neumorph {
@@ -221,6 +235,31 @@ body {
   @apply bg-white dark:bg-black text-gray-900 dark:text-white transition-colors duration-300;
 }
 
+/* MUI x-charts tooltips are portaled outside component containers, so local
+   sx rules can miss dark-mode backgrounds and text color inheritance. */
+.dark .MuiChartsTooltip-root,
+.dark .MuiChartsTooltip-paper,
+.dark .MuiChartsTooltip-table,
+.dark .MuiChartsTooltip-cell,
+.dark .MuiChartsTooltip-labelCell,
+.dark .MuiChartsTooltip-valueCell,
+.dark .MuiChartsTooltip-axisValueCell {
+  background-color: #0f172a !important;
+  background-image: none !important;
+  color: #f3f4f6 !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
+}
+
+.dark .MuiChartsTooltip-root *,
+.dark .MuiChartsTooltip-paper *,
+.dark .MuiChartsTooltip-table * {
+  color: #f3f4f6 !important;
+}
+
+.dark .MuiChartsTooltip-labelCell {
+  color: #d1d5db !important;
+}
+
 /* Animated gradient border */
 @property --angle {
   syntax: "<angle>";
@@ -240,3 +279,214 @@ body {
 .animate-border-spin {
   animation: border-spin 3s linear infinite;
 }
+
+@keyframes skeleton-shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.animate-skeleton-shimmer {
+  animation: skeleton-shimmer 1.4s ease-in-out infinite;
+}
+
+/* =========================================================
+   Raycast-style landing ("rc-") — pink/magenta accent
+   Light-mode base values + dark overrides. Scoped utilities
+   used by screens/PublicFacingPage.tsx.
+   ========================================================= */
+
+/* Light-shard hero backdrop: sharp diagonal beams + soft blooms.
+   Works on both themes — the shards are semi-transparent and show
+   against either the white or near-black page background. */
+.rc-shards-beams {
+  background-image: repeating-linear-gradient(
+    118deg,
+    transparent 0 46px,
+    rgba(236, 72, 153, 0.16) 50px,
+    rgba(236, 72, 153, 0) 60px,
+    transparent 60px 120px,
+    rgba(168, 85, 247, 0.12) 124px,
+    rgba(168, 85, 247, 0) 136px
+  );
+  -webkit-mask-image: radial-gradient(
+    62% 70% at 52% 34%,
+    #000 0%,
+    rgba(0, 0, 0, 0.55) 45%,
+    transparent 78%
+  );
+  mask-image: radial-gradient(
+    62% 70% at 52% 34%,
+    #000 0%,
+    rgba(0, 0, 0, 0.55) 45%,
+    transparent 78%
+  );
+}
+
+/* In light mode the bloom is slightly more saturated to read against white. */
+.rc-bloom {
+  background:
+    radial-gradient(42% 60% at 50% 28%, rgba(236, 72, 153, 0.28), transparent 70%),
+    radial-gradient(34% 52% at 70% 16%, rgba(168, 85, 247, 0.20), transparent 72%),
+    radial-gradient(34% 50% at 30% 22%, rgba(59, 130, 246, 0.15), transparent 72%);
+  filter: blur(14px);
+}
+.dark .rc-bloom {
+  background:
+    radial-gradient(42% 60% at 50% 28%, rgba(236, 72, 153, 0.34), transparent 70%),
+    radial-gradient(34% 52% at 70% 16%, rgba(168, 85, 247, 0.24), transparent 72%),
+    radial-gradient(34% 50% at 30% 22%, rgba(59, 130, 246, 0.18), transparent 72%);
+}
+
+/* Faint technical grid — dark lines on light, light lines on dark */
+.rc-grid-lines {
+  background-image:
+    linear-gradient(rgba(0, 0, 0, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 0, 0, 0.04) 1px, transparent 1px);
+  background-size: 56px 56px;
+  -webkit-mask-image: radial-gradient(70% 60% at 50% 40%, #000, transparent 85%);
+  mask-image: radial-gradient(70% 60% at 50% 40%, #000, transparent 85%);
+}
+.dark .rc-grid-lines {
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.045) 1px, transparent 1px);
+}
+
+/* Glass surfaces — light-mode: dark tint; dark-mode: white tint */
+.rc-glass {
+  background: rgba(0, 0, 0, 0.03);
+  border: 1px solid rgba(0, 0, 0, 0.07);
+  backdrop-filter: blur(18px) saturate(140%);
+  -webkit-backdrop-filter: blur(18px) saturate(140%);
+}
+.dark .rc-glass {
+  background: rgba(255, 255, 255, 0.035);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+.rc-glass-strong {
+  background: linear-gradient(
+    180deg,
+    rgba(0, 0, 0, 0.05),
+    rgba(0, 0, 0, 0.015)
+  );
+  border: 1px solid rgba(0, 0, 0, 0.09);
+  backdrop-filter: blur(22px) saturate(150%);
+  -webkit-backdrop-filter: blur(22px) saturate(150%);
+}
+.dark .rc-glass-strong {
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.06),
+    rgba(255, 255, 255, 0.015)
+  );
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Signature gradient text: blue -> purple -> pink.
+   The pastel values (#93c5fd etc.) are too light on white, so in light
+   mode we shift to saturated mid-range tones that still read clearly. */
+.rc-gradient-text {
+  background-image: linear-gradient(100deg, #3b82f6, #8b5cf6 45%, #ec4899);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.dark .rc-gradient-text {
+  background-image: linear-gradient(100deg, #93c5fd, #c4b5fd 45%, #f9a8d4);
+}
+
+/* Product-window chrome shadow + pink halo.
+   Light mode: softer black shadow, no need for a near-black halo. */
+.rc-window {
+  box-shadow:
+    0 20px 70px -20px rgba(0, 0, 0, 0.18),
+    0 0 80px -20px rgba(236, 72, 153, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+.dark .rc-window {
+  box-shadow:
+    0 40px 120px -30px rgba(0, 0, 0, 0.9),
+    0 0 140px -20px rgba(236, 72, 153, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.rc-card-hover {
+  transition: transform 0.35s cubic-bezier(0.2, 0.7, 0.2, 1),
+    border-color 0.35s ease, box-shadow 0.35s ease;
+}
+/* Light-mode hover: keep lift but soften the shadow */
+.rc-card-hover:hover {
+  transform: translateY(-6px);
+  border-color: rgba(236, 72, 153, 0.35);
+  box-shadow:
+    0 14px 40px -16px rgba(0, 0, 0, 0.15),
+    0 0 40px -16px rgba(236, 72, 153, 0.3);
+}
+.dark .rc-card-hover:hover {
+  box-shadow:
+    0 24px 60px -28px rgba(0, 0, 0, 0.8),
+    0 0 60px -24px rgba(236, 72, 153, 0.5);
+}
+
+/* Glowing keyboard key — light-mode uses light gray key surface */
+.rc-key {
+  background: linear-gradient(180deg, #f4f4f5, #e4e4e7);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.8),
+    0 2px 0 rgba(0, 0, 0, 0.12);
+}
+.dark .rc-key {
+  background: linear-gradient(180deg, #18181b, #101013);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    0 2px 0 rgba(0, 0, 0, 0.6);
+}
+/* rc-key-lit keeps the pink glow in both themes */
+.rc-key-lit {
+  background:
+    radial-gradient(120% 120% at 50% 0%, rgba(236, 72, 153, 0.35), transparent 70%),
+    linear-gradient(180deg, #2a1020, #160810);
+  border: 1px solid rgba(236, 72, 153, 0.55);
+  color: #fbcfe8;
+  animation: rc-pulse-key 2.8s ease-in-out infinite;
+}
+
+@keyframes rc-pulse-key {
+  0%, 100% {
+    box-shadow:
+      0 0 0 1px rgba(236, 72, 153, 0.5),
+      0 0 26px 2px rgba(236, 72, 153, 0.4),
+      inset 0 0 18px rgba(236, 72, 153, 0.3);
+  }
+  50% {
+    box-shadow:
+      0 0 0 1px rgba(236, 72, 153, 0.85),
+      0 0 50px 8px rgba(236, 72, 153, 0.65),
+      inset 0 0 28px rgba(236, 72, 153, 0.5);
+  }
+}
+
+@keyframes rc-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-12px); }
+}
+.rc-float { animation: rc-float 7s ease-in-out infinite; }
+
+@keyframes rc-drift {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+  50% { transform: translate3d(1.5%, -2.5%, 0) scale(1.05); }
+}
+.rc-drift { animation: rc-drift 16s ease-in-out infinite; }
+
+@keyframes rc-marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+.rc-marquee { animation: rc-marquee 34s linear infinite; }
+
+/* Hide scrollbar utility for in-card scroll demos */
+.rc-no-scrollbar::-webkit-scrollbar { display: none; }
+.rc-no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }

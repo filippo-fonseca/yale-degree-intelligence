@@ -4,38 +4,21 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import {
   FiLogOut,
-  FiEdit2,
   FiMoreVertical,
   FiTrash2,
-  FiChevronDown,
   FiX,
 } from "react-icons/fi";
-import { User } from "firebase/auth";
-import { MAJORS } from "@/lib/majors";
-import { MajorDropdown } from "../ui/MajorDropdown";
-import { YearBadge } from "../ui/YearBadge";
 import Link from "next/link";
-import { Info, Sun, Moon } from "lucide-react";
+import { toast } from "react-hot-toast";
+import { Info } from "lucide-react";
 import { UserAvatar } from "../ui/UserAvatar";
-import { useTheme } from "@/context/ThemeContext";
-
-interface UserProfile {
-  majors: string[];
-  graduationYear: number;
-  bio?: string;
-  updatedAt: Date;
-}
-
-interface UserSettingsModalProps {
-  user: User;
-  userProfile: UserProfile | null;
-  friendsEnabled: boolean;
-  onClose: () => void;
-  onSave: (updatedProfile: Partial<UserProfile>) => Promise<void>;
-  onToggleFriends: (enabled: boolean) => Promise<void>;
-  onLogout: () => void;
-  onDeleteAccount: () => Promise<void>;
-}
+import { YearBadge } from "../ui/YearBadge";
+import { isAdminEmail } from "@/lib/admin";
+import type { UserSettingsModalProps } from "./settingsTypes";
+import { useUserProfileForm } from "./useUserProfileForm";
+import { SettingsProfileSection } from "./SettingsProfileSection";
+import { SettingsAcademicSection } from "./SettingsAcademicSection";
+import { SettingsConfirmModals } from "./SettingsConfirmModals";
 
 export default function UserSettingsModal({
   user,
@@ -46,59 +29,74 @@ export default function UserSettingsModal({
   onToggleFriends,
   onLogout,
   onDeleteAccount,
+  onReplayTour,
+  onReplayWelcome,
+  onReplayTutorial,
 }: UserSettingsModalProps) {
-  const { resolvedTheme, toggleTheme } = useTheme();
-  const isDark = resolvedTheme === "dark";
+  const isOwner = isAdminEmail(user.email);
   const [isHoveringLogout, setIsHoveringLogout] = useState(false);
-  const [localProfile, setLocalProfile] = useState<UserProfile | null>(null);
-  const [duplicateMajorError, setDuplicateMajorError] = useState<string | null>(
-    null,
-  );
-  const [isSaving, setIsSaving] = useState(false);
 
-  // Bio edit flow
-  const [isEditingBio, setIsEditingBio] = useState(false);
-  const [tempBio, setTempBio] = useState("");
-  const [isSavingBio, setIsSavingBio] = useState(false);
-  const [bioJustSaved, setBioJustSaved] = useState(false);
-  const [bioCount, setBioCount] = useState(0);
-
-  // More menu and delete account
   const [showMoreMenu, setShowMoreMenu] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const moreMenuRef = useRef<HTMLDivElement>(null);
 
-  // Friends feature toggle
   const [isTogglingFriends, setIsTogglingFriends] = useState(false);
   const [showDisableFriendsConfirm, setShowDisableFriendsConfirm] =
     useState(false);
+  const [showDiscardConfirm, setShowDiscardConfirm] = useState(false);
 
   const modalRef = useRef<HTMLDivElement>(null);
 
-  const BIO_MAX = 200;
+  const profileForm = useUserProfileForm(userProfile, onSave);
+  const {
+    localProfile,
+    setLocalProfile,
+    duplicateMajorError,
+    duplicateCertificateError,
+    autoOpenCertificateIndex,
+    isSaving,
+    isEditingBio,
+    setIsEditingBio,
+    tempBio,
+    setTempBio,
+    isSavingBio,
+    bioJustSaved,
+    setBioJustSaved,
+    bioCount,
+    setBioCount,
+    hasChanges,
+    isDirty,
+    hasDuplicateMajors,
+    hasDuplicateCertificates,
+    handleAddMajor,
+    handleMajorChange,
+    handleRemoveMajor,
+    handleAddCertificate,
+    handleCertificateChange,
+    handleRemoveCertificate,
+    handleSaveBio,
+    handleCancelBio,
+    handleSave,
+  } = profileForm;
 
-  // Initialize local profile state
-  useEffect(() => {
-    if (userProfile) {
-      setLocalProfile(userProfile);
-      setTempBio(userProfile.bio || "");
-      setBioCount((userProfile.bio || "").length);
-    }
-  }, [userProfile]);
-
-  // Close modal when clicking outside (but ignore portaled dropdowns)
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as HTMLElement;
       if (target.closest('[data-major-dropdown-portal="true"]')) return;
-      if (modalRef.current && !modalRef.current.contains(target)) onClose();
+      if (target.closest('[data-certificate-dropdown-portal="true"]')) return;
+      if (modalRef.current && !modalRef.current.contains(target)) {
+        if (hasChanges()) {
+          setShowDiscardConfirm(true);
+        } else {
+          onClose();
+        }
+      }
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [onClose]);
+  }, [onClose, userProfile, localProfile]);
 
-  // Close more menu when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -121,115 +119,29 @@ export default function UserSettingsModal({
       await onDeleteAccount();
     } catch (error) {
       console.error("Failed to delete account:", error);
+      toast.error(
+        error instanceof Error ? error.message : "Failed to delete account",
+      );
       setIsDeleting(false);
-      setShowDeleteConfirm(false);
     }
   };
 
-  const getYearStatus = (graduationYear: number): string => {
-    // Direct mapping based on graduation year
-    if (graduationYear >= 2031) return "High School";
-    if (graduationYear === 2030) return "Freshman";
-    if (graduationYear === 2029) return "Sophomore";
-    if (graduationYear === 2028) return "Junior";
-    if (graduationYear <= 2027) return "Senior";
-    return "Unknown";
-  };
-
-  // Exclude bio from hasChanges so bio saving is independent
-  const hasChanges = () => {
-    if (!userProfile || !localProfile) return false;
-    return (
-      JSON.stringify(userProfile.majors) !==
-        JSON.stringify(localProfile.majors) ||
-      userProfile.graduationYear !== localProfile.graduationYear
-    );
-  };
-
-  const hasDuplicateMajors = () => {
-    if (!localProfile) return false;
-    const uniqueMajors = new Set(localProfile.majors);
-    return uniqueMajors.size !== localProfile.majors.length;
-  };
-
-  const handleAddMajor = () => {
-    if (!localProfile || localProfile.majors.length >= 3) return;
-    const availableMajor = Object.keys(MAJORS).find(
-      (major) => !localProfile.majors.includes(major),
-    );
-    if (availableMajor) {
-      setLocalProfile({
-        ...localProfile,
-        majors: [...localProfile.majors, availableMajor],
-      });
-      setDuplicateMajorError(null);
-    }
-  };
-
-  const handleMajorChange = (index: number, newMajor: string) => {
-    if (!localProfile) return;
-    if (
-      localProfile.majors.includes(newMajor) &&
-      localProfile.majors[index] !== newMajor
-    ) {
-      setDuplicateMajorError("You can't select the same major twice");
-      return;
-    }
-    setDuplicateMajorError(null);
-    const newMajors = [...localProfile.majors];
-    newMajors[index] = newMajor;
-    setLocalProfile({ ...localProfile, majors: newMajors });
-  };
-
-  const handleRemoveMajor = (index: number) => {
-    if (!localProfile || localProfile.majors.length <= 1) return;
-    const newMajors = [...localProfile.majors];
-    newMajors.splice(index, 1);
-    setLocalProfile({ ...localProfile, majors: newMajors });
-    setDuplicateMajorError(null);
-  };
-
-  // Save bio immediately (does not affect hasChanges()); KEEP EDIT MODE
-  const handleSaveBio = async () => {
-    if (!localProfile) return;
+  const handleEnableFriends = async () => {
+    setIsTogglingFriends(true);
     try {
-      setIsSavingBio(true);
-      setBioJustSaved(false);
-      const trimmed = tempBio.trim();
-      await onSave({ bio: trimmed });
-      setLocalProfile({ ...localProfile, bio: trimmed }); // sync local
-      // stay in edit mode; show "Saved" on button for a moment
-      setBioJustSaved(true);
-      setTimeout(() => setBioJustSaved(false), 1500);
-      // update counter to trimmed value
-      setBioCount(trimmed.length);
+      await onToggleFriends(true);
     } finally {
-      setIsSavingBio(false);
+      setIsTogglingFriends(false);
     }
   };
 
-  const handleCancelBio = () => {
-    if (!localProfile) return;
-    setTempBio(localProfile.bio || "");
-    setBioCount((localProfile.bio || "").length);
-    setIsEditingBio(false);
-    setBioJustSaved(false);
-  };
-
-  const handleSave = async () => {
-    if (hasDuplicateMajors()) {
-      setDuplicateMajorError("Please remove duplicate majors before saving");
-      return;
-    }
-    if (!localProfile) return;
+  const handleConfirmDisableFriends = async () => {
+    setIsTogglingFriends(true);
     try {
-      setIsSaving(true);
-      await onSave({
-        majors: localProfile.majors,
-        graduationYear: localProfile.graduationYear,
-      });
+      await onToggleFriends(false);
+      setShowDisableFriendsConfirm(false);
     } finally {
-      setIsSaving(false);
+      setIsTogglingFriends(false);
     }
   };
 
@@ -242,7 +154,7 @@ export default function UserSettingsModal({
         initial={{ opacity: 0, y: 15, scale: 0.98 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         transition={{ type: "spring", damping: 25, stiffness: 300 }}
-        className="relative w-full max-w-md bg-white/95 dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/90 dark:via-gray-900/80 dark:to-gray-950/90 rounded-2xl border border-black/[0.06] dark:border-white/[0.08] shadow-[0_24px_80px_rgba(0,0,0,0.18)] dark:shadow-[0_24px_80px_rgba(0,0,0,0.5),0_0_120px_rgba(139,92,246,0.08),inset_0_1px_0_rgba(255,255,255,0.1),inset_0_-1px_0_rgba(0,0,0,0.3)] backdrop-blur-2xl ring-1 ring-black/[0.04] dark:ring-white/[0.05] overflow-visible"
+        className="relative w-full max-w-3xl bg-white/95 dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/90 dark:via-gray-900/80 dark:to-gray-950/90 rounded-2xl border border-black/[0.06] dark:border-white/[0.08] shadow-[0_24px_80px_rgba(0,0,0,0.18)] dark:shadow-[0_24px_80px_rgba(0,0,0,0.5),0_0_120px_rgba(139,92,246,0.08),inset_0_1px_0_rgba(255,255,255,0.1),inset_0_-1px_0_rgba(0,0,0,0.3)] backdrop-blur-2xl ring-1 ring-black/[0.04] dark:ring-white/[0.05] overflow-visible"
       >
         <button
           onClick={onClose}
@@ -251,346 +163,85 @@ export default function UserSettingsModal({
         >
           <FiX size={18} />
         </button>
-        <div className="p-4 max-h-[85vh] overflow-y-auto">
+        <div className="p-5 max-h-[85vh] overflow-y-auto">
           {/* Header */}
-          <div className="flex flex-col items-center mb-3">
-            <div className="relative mb-2">
-              <UserAvatar
-                photoURL={user.photoURL}
-                displayName={user.displayName}
-                email={user.email}
-                size={48}
-                className="shadow-[0_4px_16px_rgba(0,0,0,0.4)] ring-1 ring-purple-500/20 border-white/20"
-              />
-            </div>
-            <h2 className="text-base font-semibold text-center text-gray-900 dark:text-gray-100">
-              {user.displayName || "User"}
-            </h2>
-            <p className="text-gray-500 dark:text-gray-400 text-xs">
-              {user.email}
-            </p>
-            {localProfile.graduationYear && (
-              <div className="mt-1">
-                <YearBadge graduationYear={localProfile.graduationYear} />
-              </div>
-            )}
-          </div>
-
-          {/* Bio */}
-          <div className="mb-3 rounded-xl border border-black/[0.06] dark:border-white/[0.08] bg-gray-50 dark:bg-transparent dark:bg-gradient-to-br dark:from-white/[0.06] dark:via-transparent dark:to-black/10 shadow-sm dark:shadow-[0_2px_12px_rgba(0,0,0,0.2)] backdrop-blur-sm">
-            <div className="flex items-center justify-between px-3 py-2 border-b border-black/[0.06] dark:border-white/[0.06]">
-              <span className="text-xs font-medium text-gray-800 dark:text-gray-200">
-                Bio
-              </span>
-              {!isEditingBio && (
-                <button
-                  onClick={() => setIsEditingBio(true)}
-                  className="inline-flex items-center gap-1 text-[11px] px-2 py-1 rounded-lg border border-black/[0.06] dark:border-white/[0.08] hover:border-pink-500/50 hover:bg-black/[0.03] dark:hover:bg-white/[0.04] text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-all duration-200"
-                  title="Edit bio"
-                >
-                  <FiEdit2 className="h-3 w-3" />
-                  Edit
-                </button>
-              )}
-            </div>
-            {!isEditingBio ? (
-              <div className="px-3 py-2">
-                {localProfile.bio ? (
-                  <p className="text-gray-700 dark:text-gray-300 text-xs leading-snug">
-                    {localProfile.bio}
-                  </p>
-                ) : (
-                  <p className="text-gray-400 dark:text-gray-500 text-xs italic">
-                    No bio yet
-                  </p>
+          <div className="flex items-center gap-3 mb-5">
+            <UserAvatar
+              photoURL={user.photoURL}
+              displayName={user.displayName}
+              email={user.email}
+              size={52}
+              className="shadow-[0_4px_16px_rgba(0,0,0,0.4)] ring-1 ring-purple-500/20 border-white/20 shrink-0"
+            />
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center gap-2 flex-wrap">
+                <h2 className="text-base font-semibold text-gray-900 dark:text-gray-100 truncate">
+                  {user.displayName || "User"}
+                </h2>
+                {localProfile.graduationYear && (
+                  <YearBadge graduationYear={localProfile.graduationYear} />
                 )}
               </div>
-            ) : (
-              <div className="px-3 py-2 space-y-2">
-                <div className="relative">
-                  <textarea
-                    autoFocus
-                    value={tempBio}
-                    onChange={(e) => {
-                      setTempBio(e.target.value);
-                      setBioCount(e.target.value.length);
-                      if (bioJustSaved) setBioJustSaved(false);
-                    }}
-                    placeholder="Tell us about yourself..."
-                    maxLength={BIO_MAX}
-                    rows={2}
-                    className="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg px-3 py-2 pr-10 focus:outline-none focus:ring-1 focus:ring-pink-500/40 focus:border-pink-500/50 text-gray-900 dark:text-gray-200 placeholder:text-gray-400 dark:placeholder:text-gray-500 text-xs resize-none transition-all duration-200"
-                  />
-                  <div className="absolute bottom-1 right-2 text-[10px] text-gray-400 dark:text-gray-500">
-                    {bioCount}/{BIO_MAX}
-                  </div>
-                </div>
-                <div className="flex justify-end gap-1.5">
-                  <button
-                    onClick={handleCancelBio}
-                    disabled={isSavingBio}
-                    className="px-2 py-1 text-[11px] rounded-lg border border-black/[0.06] dark:border-white/[0.08] hover:border-gray-300 dark:hover:border-white/[0.15] hover:bg-black/[0.03] dark:hover:bg-white/[0.04] text-gray-600 dark:text-gray-300 disabled:opacity-70 transition-all duration-200"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    onClick={handleSaveBio}
-                    disabled={isSavingBio}
-                    className={`px-2 py-1 text-[11px] rounded-lg text-white disabled:opacity-70 transition-all duration-200 ${
-                      bioJustSaved
-                        ? "bg-gradient-to-r from-emerald-500 to-emerald-600"
-                        : "bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700"
-                    }`}
-                  >
-                    {isSavingBio ? "..." : bioJustSaved ? "Saved" : "Save"}
-                  </button>
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* Appearance + Friends toggles (side by side) */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
-            {/* Appearance / Theme Toggle */}
-            <div className="rounded-xl border border-black/[0.06] dark:border-white/[0.08] bg-gray-50 dark:bg-transparent dark:bg-gradient-to-br dark:from-white/[0.06] dark:via-transparent dark:to-black/10 shadow-sm dark:shadow-[0_2px_12px_rgba(0,0,0,0.2)] backdrop-blur-sm">
-            <div className="flex items-center justify-between px-3 py-2.5">
-              <div className="flex items-center gap-2">
-                <div className="p-1.5 rounded-lg bg-black/[0.04] dark:bg-white/[0.06] text-amber-500 dark:text-amber-300">
-                  {isDark ? (
-                    <Moon className="h-3.5 w-3.5" />
-                  ) : (
-                    <Sun className="h-3.5 w-3.5" />
-                  )}
-                </div>
-                <div>
-                  <span className="text-xs font-medium text-gray-800 dark:text-gray-200">
-                    Appearance
-                  </span>
-                  <p className="text-[10px] text-gray-500 dark:text-gray-400 mt-0.5">
-                    {isDark ? "Dark mode" : "Light mode"}
-                  </p>
-                </div>
-              </div>
-              <button
-                type="button"
-                role="switch"
-                aria-checked={isDark}
-                aria-label="Toggle dark mode"
-                onClick={toggleTheme}
-                className={`relative inline-flex w-11 h-6 rounded-full transition-colors duration-200 ${
-                  isDark
-                    ? "bg-gradient-to-r from-indigo-500 to-purple-600 shadow-[inset_0_1px_2px_rgba(0,0,0,0.35)]"
-                    : "bg-gray-300 shadow-[inset_0_1px_3px_rgba(0,0,0,0.22)]"
-                }`}
-              >
-                <span
-                  className={`absolute top-[3px] left-[3px] h-[18px] w-[18px] rounded-full bg-white shadow-[0_1px_3px_rgba(0,0,0,0.45)] transition-transform duration-200 ${
-                    isDark ? "translate-x-5" : "translate-x-0"
-                  }`}
-                />
-              </button>
+              <p className="text-gray-500 dark:text-gray-400 text-xs truncate">
+                {user.email}
+              </p>
             </div>
           </div>
 
-            {/* Friends Feature Toggle */}
-            <div className="rounded-xl border border-black/[0.06] dark:border-white/[0.08] bg-gray-50 dark:bg-transparent dark:bg-gradient-to-br dark:from-white/[0.06] dark:via-transparent dark:to-black/10 shadow-sm dark:shadow-[0_2px_12px_rgba(0,0,0,0.2)] backdrop-blur-sm">
-            <div className="flex items-center justify-between px-3 py-2.5">
-              <div className="flex-1 mr-2">
-                <span className="text-xs font-medium text-gray-800 dark:text-gray-200">
-                  Friends Feature
-                </span>
-                <p className="text-[10px] text-gray-500 dark:text-gray-400 mt-0.5">
-                  Let friends see your courses (grades are always hidden, ofc).
-                </p>
-              </div>
-              <label className="relative inline-flex items-center cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={friendsEnabled}
-                  disabled={isTogglingFriends}
-                  onChange={async (e) => {
-                    if (!e.target.checked && friendsEnabled) {
-                      setShowDisableFriendsConfirm(true);
-                    } else {
-                      setIsTogglingFriends(true);
-                      try {
-                        await onToggleFriends(true);
-                      } finally {
-                        setIsTogglingFriends(false);
-                      }
-                    }
-                  }}
-                  className="sr-only peer"
-                />
-                <div className="w-11 h-6 rounded-full peer transition-colors bg-gray-300 dark:bg-gray-600 shadow-[inset_0_1px_3px_rgba(0,0,0,0.22)] dark:shadow-[inset_0_1px_3px_rgba(0,0,0,0.5)] peer-focus:ring-2 peer-focus:ring-pink-500/40 peer-checked:bg-gradient-to-r peer-checked:from-pink-500 peer-checked:to-purple-600 peer-disabled:opacity-50 after:content-[''] after:absolute after:top-[3px] after:left-[3px] after:h-[18px] after:w-[18px] after:rounded-full after:bg-white after:shadow-[0_1px_3px_rgba(0,0,0,0.45)] after:transition-transform peer-checked:after:translate-x-5"></div>
-              </label>
-            </div>
-            {friendsEnabled && (
-              <div className="px-3 pb-2 -mt-1">
-                <p className="text-[10px] text-emerald-600 dark:text-emerald-400">
-                  Course list is visible to friends.
-                </p>
-              </div>
-            )}
-            </div>
-          </div>
+          {/* Two-column section grid */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+            <SettingsProfileSection
+              localProfile={localProfile}
+              isEditingBio={isEditingBio}
+              setIsEditingBio={setIsEditingBio}
+              tempBio={tempBio}
+              setTempBio={setTempBio}
+              bioCount={bioCount}
+              setBioCount={setBioCount}
+              bioJustSaved={bioJustSaved}
+              setBioJustSaved={setBioJustSaved}
+              isSavingBio={isSavingBio}
+              handleCancelBio={handleCancelBio}
+              handleSaveBio={handleSaveBio}
+              friendsEnabled={friendsEnabled}
+              isTogglingFriends={isTogglingFriends}
+              onRequestDisableFriends={() => setShowDisableFriendsConfirm(true)}
+              onEnableFriends={handleEnableFriends}
+            />
 
-          {/* Disable Friends Confirmation Modal */}
-          <AnimatePresence>
-            {showDisableFriendsConfirm && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="fixed inset-0 bg-black/70 backdrop-blur-md z-[9999] flex items-center justify-center p-4"
-                onClick={(e) => {
-                  if (e.target === e.currentTarget && !isTogglingFriends) {
-                    setShowDisableFriendsConfirm(false);
-                  }
-                }}
-              >
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.95, y: 10 }}
-                  animate={{ opacity: 1, scale: 1, y: 0 }}
-                  exit={{ opacity: 0, scale: 0.95, y: 10 }}
-                  className="bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/95 dark:via-gray-900/90 dark:to-gray-950/95 border border-gray-200 dark:border-white/[0.1] rounded-2xl p-4 max-w-xs w-full shadow-[0_16px_48px_rgba(0,0,0,0.5)] backdrop-blur-2xl"
-                >
-                  <div className="flex items-center gap-2 mb-3">
-                    <div className="p-2 bg-gradient-to-br from-red-500/20 to-red-600/10 rounded-xl border border-red-500/20">
-                      <FiTrash2 className="text-red-400" size={16} />
-                    </div>
-                    <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">
-                      Disable Friends?
-                    </h3>
-                  </div>
-                  <p className="text-gray-500 dark:text-gray-400 text-xs mb-3">
-                    This will{" "}
-                    <strong className="text-red-400">remove all friends</strong>{" "}
-                    and hide your courses.
-                  </p>
-                  <div className="flex justify-end gap-2">
-                    <button
-                      onClick={() => setShowDisableFriendsConfirm(false)}
-                      disabled={isTogglingFriends}
-                      className="px-3 py-1.5 rounded-lg bg-gray-100 dark:bg-white/[0.04] border border-gray-200 dark:border-white/[0.08] hover:bg-gray-200 dark:hover:bg-white/[0.08] hover:border-gray-300 dark:hover:border-white/[0.15] text-gray-700 dark:text-gray-300 text-xs disabled:opacity-50 transition-all duration-200"
-                    >
-                      Cancel
-                    </button>
-                    <button
-                      onClick={async () => {
-                        setIsTogglingFriends(true);
-                        try {
-                          await onToggleFriends(false);
-                          setShowDisableFriendsConfirm(false);
-                        } finally {
-                          setIsTogglingFriends(false);
-                        }
-                      }}
-                      disabled={isTogglingFriends}
-                      className="px-3 py-1.5 rounded-lg bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white text-xs disabled:opacity-50 flex items-center gap-1.5 transition-all duration-200"
-                    >
-                      {isTogglingFriends ? (
-                        <>
-                          <span className="animate-spin h-2.5 w-2.5 border-2 border-white/30 border-t-white rounded-full" />
-                          ...
-                        </>
-                      ) : (
-                        "Disable"
-                      )}
-                    </button>
-                  </div>
-                </motion.div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-
-          {/* Majors */}
-          <div className="mb-3">
-            <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Majors
-            </label>
-            {duplicateMajorError && (
-              <div className="mb-1 text-[10px] text-red-400">
-                {duplicateMajorError}
-              </div>
-            )}
-            <div className="space-y-1.5">
-              {localProfile.majors.map((major, index) => (
-                <div key={index} className="relative z-[60] overflow-visible">
-                  <div className="flex items-center gap-1.5">
-                    <div className="flex-1">
-                      <MajorDropdown
-                        value={major}
-                        onChange={(newMajor) =>
-                          handleMajorChange(index, newMajor)
-                        }
-                        disabledOptions={localProfile.majors.filter(
-                          (m) => m !== major,
-                        )}
-                      />
-                    </div>
-                    {index > 0 && (
-                      <button
-                        onClick={() => handleRemoveMajor(index)}
-                        className="text-red-400 hover:text-red-300 px-1.5 py-0.5 rounded hover:bg-red-400/10 transition-colors text-xs"
-                        title="Remove major"
-                      >
-                        ×
-                      </button>
-                    )}
-                  </div>
-                </div>
-              ))}
-              {localProfile.majors.length < 2 && (
-                <button
-                  onClick={handleAddMajor}
-                  className="text-[11px] text-pink-400 hover:text-pink-300 flex items-center gap-1"
-                  disabled={
-                    Object.keys(MAJORS).length === localProfile.majors.length
-                  }
-                >
-                  + Add another major
-                </button>
-              )}
-            </div>
+            <SettingsAcademicSection
+              localProfile={localProfile}
+              duplicateMajorError={duplicateMajorError}
+              duplicateCertificateError={duplicateCertificateError}
+              autoOpenCertificateIndex={autoOpenCertificateIndex}
+              handleAddMajor={handleAddMajor}
+              handleMajorChange={handleMajorChange}
+              handleRemoveMajor={handleRemoveMajor}
+              handleAddCertificate={handleAddCertificate}
+              handleCertificateChange={handleCertificateChange}
+              handleRemoveCertificate={handleRemoveCertificate}
+              setLocalProfile={setLocalProfile}
+            />
           </div>
-
-          {/* Year */}
-          <div className="mb-3">
-            <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Graduation Year
-            </label>
-            <div className="relative">
-              <select
-                value={localProfile.graduationYear}
-                onChange={(e) =>
-                  setLocalProfile({
-                    ...localProfile,
-                    graduationYear: parseInt(e.target.value),
-                  })
-                }
-                className="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-pink-500/40 focus:border-pink-500/50 text-gray-900 dark:text-gray-200 text-xs transition-all duration-200 appearance-none cursor-pointer"
-              >
-                {[2027, 2028, 2029, 2030, 2031].map((year) => (
-                  <option key={year} value={year}>
-                    {year}
-                  </option>
-                ))}
-              </select>
-              <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-500 dark:text-gray-400">
-                <FiChevronDown size={14} />
-              </div>
-            </div>
-          </div>
+          {/* end two-column section grid */}
 
           {/* Footer links */}
-          <div className="mt-2 flex items-center justify-center gap-1.5 relative">
+          <div className="mt-4 flex items-center justify-center gap-1.5 relative">
             <Link
               href={`/user/${user.uid}`}
+              target="_blank"
               className="cursor-pointer text-[11px] px-3 py-1.5 rounded-lg border border-black/[0.06] dark:border-white/[0.08] hover:border-pink-500/50 hover:bg-black/[0.03] dark:hover:bg-white/[0.04] text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-all duration-200"
             >
-              View public profile
+              Open my page
             </Link>
+            {onReplayTour && (
+              <button
+                onClick={onReplayTour}
+                className="cursor-pointer text-[11px] px-3 py-1.5 rounded-lg border border-black/[0.06] dark:border-white/[0.08] hover:border-pink-500/50 hover:bg-black/[0.03] dark:hover:bg-white/[0.04] text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-all duration-200"
+              >
+                Replay tutorial
+              </button>
+            )}
             <div className="relative group">
               <Info className="h-3 w-3 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors cursor-pointer" />
               <div className="absolute top-full mt-1 left-1/2 -translate-x-1/2 bg-gray-900 dark:bg-gray-800 text-gray-100 text-[10px] px-1.5 py-0.5 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-[70] pointer-events-none border border-gray-700">
@@ -598,6 +249,42 @@ export default function UserSettingsModal({
               </div>
             </div>
           </div>
+
+          {/* Owner-only dev tools */}
+          {isOwner && (onReplayWelcome || onReplayTutorial) && (
+            <div className="mt-4 rounded-xl border border-amber-400/30 bg-amber-50/60 dark:border-amber-400/20 dark:bg-amber-500/[0.06] px-3.5 py-3">
+              <div className="flex items-center gap-1.5">
+                <span className="text-[9px] font-semibold uppercase tracking-widest text-amber-600 dark:text-amber-400">
+                  Dev
+                </span>
+                <span className="text-[10px] font-medium text-amber-700/80 dark:text-amber-300/70">
+                  Onboarding replay
+                </span>
+              </div>
+              <div className="mt-2 flex flex-wrap gap-1.5">
+                {onReplayWelcome && (
+                  <button
+                    onClick={onReplayWelcome}
+                    className="cursor-pointer text-[11px] px-2.5 py-1.5 rounded-lg border border-amber-400/40 bg-white/70 dark:bg-white/[0.04] hover:border-amber-500/70 hover:bg-amber-100/60 dark:hover:bg-amber-500/10 text-amber-700 dark:text-amber-300 transition-all duration-200"
+                  >
+                    Replay welcome + tutorial (new-user v3)
+                  </button>
+                )}
+                {onReplayTutorial && (
+                  <button
+                    onClick={onReplayTutorial}
+                    className="cursor-pointer text-[11px] px-2.5 py-1.5 rounded-lg border border-amber-400/40 bg-white/70 dark:bg-white/[0.04] hover:border-amber-500/70 hover:bg-amber-100/60 dark:hover:bg-amber-500/10 text-amber-700 dark:text-amber-300 transition-all duration-200"
+                  >
+                    Replay tutorial only
+                  </button>
+                )}
+              </div>
+              <p className="mt-2 text-[10px] leading-relaxed text-amber-700/70 dark:text-amber-300/60">
+                Dev only. Resets onboarding flags. Does not delete plans or
+                courses.
+              </p>
+            </div>
+          )}
 
           {/* Actions */}
           <div className="flex justify-between mt-3">
@@ -617,7 +304,6 @@ export default function UserSettingsModal({
                 </motion.div>
               </motion.button>
 
-              {/* More menu */}
               <div className="relative" ref={moreMenuRef}>
                 <button
                   onClick={() => setShowMoreMenu(!showMoreMenu)}
@@ -650,7 +336,13 @@ export default function UserSettingsModal({
                 </AnimatePresence>
               </div>
             </div>
-            <div className="flex gap-1.5">
+            <div className="flex items-center gap-1.5">
+              {isDirty && (
+                <span className="hidden sm:flex items-center gap-1.5 text-[11px] text-amber-600 dark:text-amber-400">
+                  <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
+                  Unsaved changes
+                </span>
+              )}
               <button
                 onClick={onClose}
                 className="px-3 py-1.5 rounded-lg border border-black/[0.06] dark:border-white/[0.08] hover:border-gray-300 dark:hover:border-white/[0.15] hover:bg-black/[0.03] dark:hover:bg-white/[0.04] text-gray-600 dark:text-gray-300 text-xs transition-all duration-200"
@@ -659,10 +351,18 @@ export default function UserSettingsModal({
               </button>
               <button
                 onClick={handleSave}
-                disabled={isSaving || !hasChanges() || hasDuplicateMajors()}
-                className={`px-3 py-1.5 rounded-lg text-xs transition-all duration-200 ${
-                  hasChanges() && !hasDuplicateMajors() && !isSaving
-                    ? "bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white"
+                disabled={
+                  isSaving ||
+                  !isDirty ||
+                  hasDuplicateMajors() ||
+                  hasDuplicateCertificates()
+                }
+                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 ${
+                  isDirty &&
+                  !hasDuplicateMajors() &&
+                  !hasDuplicateCertificates() &&
+                  !isSaving
+                    ? "bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white shadow-[0_4px_16px_rgba(168,85,247,0.35)] ring-1 ring-purple-400/40 animate-pulse"
                     : "bg-gray-100 dark:bg-gray-800/50 text-gray-400 dark:text-gray-500 cursor-not-allowed border border-black/[0.05] dark:border-white/[0.05]"
                 }`}
               >
@@ -671,65 +371,19 @@ export default function UserSettingsModal({
             </div>
           </div>
 
-          {/* Delete Account Confirmation Modal */}
-          <AnimatePresence>
-            {showDeleteConfirm && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="fixed inset-0 bg-black/70 backdrop-blur-md z-[9999] flex items-center justify-center p-4"
-                onClick={(e) => {
-                  if (e.target === e.currentTarget && !isDeleting) {
-                    setShowDeleteConfirm(false);
-                  }
-                }}
-              >
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.95, y: 10 }}
-                  animate={{ opacity: 1, scale: 1, y: 0 }}
-                  exit={{ opacity: 0, scale: 0.95, y: 10 }}
-                  className="bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/95 dark:via-gray-900/90 dark:to-gray-950/95 border border-gray-200 dark:border-white/[0.1] rounded-2xl p-4 max-w-xs w-full shadow-[0_16px_48px_rgba(0,0,0,0.5)] backdrop-blur-2xl"
-                >
-                  <div className="flex items-center gap-2 mb-3">
-                    <div className="p-2 bg-gradient-to-br from-red-500/20 to-red-600/10 rounded-xl border border-red-500/20">
-                      <FiTrash2 className="text-red-400" size={16} />
-                    </div>
-                    <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">
-                      Delete Account
-                    </h3>
-                  </div>
-                  <p className="text-gray-500 dark:text-gray-400 text-xs mb-3">
-                    Permanently remove all data including courses, friends, and
-                    conversations. Cannot be undone.
-                  </p>
-                  <div className="flex justify-end gap-2">
-                    <button
-                      onClick={() => setShowDeleteConfirm(false)}
-                      disabled={isDeleting}
-                      className="px-3 py-1.5 rounded-lg bg-gray-100 dark:bg-white/[0.04] border border-gray-200 dark:border-white/[0.08] hover:bg-gray-200 dark:hover:bg-white/[0.08] hover:border-gray-300 dark:hover:border-white/[0.15] text-gray-700 dark:text-gray-300 text-xs disabled:opacity-50 transition-all duration-200"
-                    >
-                      Cancel
-                    </button>
-                    <button
-                      onClick={handleDeleteAccount}
-                      disabled={isDeleting}
-                      className="px-3 py-1.5 rounded-lg bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white text-xs disabled:opacity-50 flex items-center gap-1.5 transition-all duration-200"
-                    >
-                      {isDeleting ? (
-                        <>
-                          <span className="animate-spin h-2.5 w-2.5 border-2 border-white/30 border-t-white rounded-full" />
-                          ...
-                        </>
-                      ) : (
-                        "Delete"
-                      )}
-                    </button>
-                  </div>
-                </motion.div>
-              </motion.div>
-            )}
-          </AnimatePresence>
+          <SettingsConfirmModals
+            showDisableFriendsConfirm={showDisableFriendsConfirm}
+            setShowDisableFriendsConfirm={setShowDisableFriendsConfirm}
+            isTogglingFriends={isTogglingFriends}
+            onConfirmDisableFriends={handleConfirmDisableFriends}
+            showDiscardConfirm={showDiscardConfirm}
+            setShowDiscardConfirm={setShowDiscardConfirm}
+            onClose={onClose}
+            showDeleteConfirm={showDeleteConfirm}
+            setShowDeleteConfirm={setShowDeleteConfirm}
+            isDeleting={isDeleting}
+            onDeleteAccount={handleDeleteAccount}
+          />
         </div>
       </motion.div>
     </div>

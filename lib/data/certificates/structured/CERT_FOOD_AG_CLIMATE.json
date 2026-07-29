@@ -1,0 +1,44 @@
+{
+  "id": "CERT_FOOD_AG_CLIMATE",
+  "name": "Food, Agriculture, and Climate Change",
+  "description": "Prepares Yale College students for creative, critical, and unconventional engagement with pressing challenges facing food and agriculture at local and global scales, supported by the Yale Sustainable Food Program and Yale Farm.",
+  "category": "interdisciplinary",
+  "sourceUrl": "https://catalog.yale.edu/ycps/subjects-of-instruction/food_agriculture_climate_change/",
+  "requiresApplication": false,
+  "creditRequirements": {
+    "total": 5
+  },
+  "notes": [
+    "Students must participate in five co-curricular events identified by the YSFP and write a 6–8 page (double-spaced) summary reflecting a recurring theme, an area of controversy, and a proposed resolution.",
+    "No course taken Credit/D/Fail may be applied toward the certificate.",
+    "No more than two course credits may overlap with a major, simultaneous degree, or another certificate.",
+    "No course credit may be applied toward the requirements of more than two curricular programs.",
+    "Graduate and professional school courses may count toward the certificate.",
+    "Summer or year-abroad courses accepted for full Yale College credit may provisionally count with certificate director approval.",
+    "Declare on Yale Hub by January 15 or September 15 of the final semester at the latest."
+  ],
+  "policy": {
+    "overlapCap": 2,
+    "sourceNote": "No more than two course credits fulfilling the requirements of the Food, Agriculture, and Climate Change certificate may overlap with a major, a simultaneous degree, or another certificate."
+  },
+  "requirements": [
+    {
+      "name": "Consumption",
+      "required": 2,
+      "description": "Two courses with YC Food Consumption attribute. Concerned with the broad practices of eating, nutrition and health, and cultural, historical, political, and economic dimensions of food.",
+      "options": []
+    },
+    {
+      "name": "Environment",
+      "required": 1,
+      "description": "One course with YC Food Environment attribute. Concerned with substrates and surroundings of food and agriculture, particularly those linked to processes of climate change.",
+      "options": []
+    },
+    {
+      "name": "Production",
+      "required": 2,
+      "description": "Two courses with YC Food Production attribute. Concerned with cultivation of plants for harvest as food, feed, fiber, and fuel, and husbandry or harvest of non-human animals destined for human consumption.",
+      "options": []
+    }
+  ]
+}

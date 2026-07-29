@@ -6,7 +6,10 @@ import { motion, AnimatePresence } from "framer-motion";
 import CompoundLogo from "./ui/CompoundLogo";
 import LogoIcon from "@/icons/LogoIcon";
 import { FiArrowRight, FiArrowLeft } from "react-icons/fi";
+import { BarChart2, Layers } from "lucide-react";
+import { HiSparkles } from "react-icons/hi2";
 import CosmicBackground from "@/components/CosmicBackground/page";
+import Link from "next/link";
 
 export default function LoginPage({
   onBackClick,
@@ -16,20 +19,30 @@ export default function LoginPage({
   const { signInWithGoogle, loading } = useAuth();
   const [isHovering, setIsHovering] = useState(false);
   const [activeFeature, setActiveFeature] = useState(0);
+  const [loginError, setLoginError] = useState<string | null>(null);
 
   const features = [
     {
       title: "AI Academic Planning",
       description:
         "Intelligent, personalized course suggestions from your transcript.",
+      icon: HiSparkles,
+      gradient: "from-pink-500 to-purple-600",
+      shadow: "shadow-[0_4px_12px_rgba(168,85,247,0.45)]",
     },
     {
       title: "Major & Distributional Tracking",
       description: "Real-time progress tracking for all your requirements.",
+      icon: BarChart2,
+      gradient: "from-blue-500 to-cyan-500",
+      shadow: "shadow-[0_4px_12px_rgba(59,130,246,0.45)]",
     },
     {
       title: "Goodbye Spreadsheets",
-      description: "No more broken formulas — this is DegreeIntelligence.",
+      description: "No more broken formulas. This is DegreeIntelligence.",
+      icon: Layers,
+      gradient: "from-violet-500 to-indigo-600",
+      shadow: "shadow-[0_4px_12px_rgba(99,102,241,0.45)]",
     },
   ];
 
@@ -99,7 +112,7 @@ export default function LoginPage({
             transition={{ delay: 0.3 }}
             className="mb-5"
           >
-            <div className="h-[72px] flex items-center justify-center p-4 rounded-xl bg-gradient-to-br from-black/[0.03] to-transparent dark:from-white/[0.04] border border-black/[0.05] dark:border-white/[0.06] shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]">
+            <div className="h-[80px] flex items-center justify-center px-4 py-3 rounded-xl bg-gradient-to-br from-black/[0.03] to-transparent dark:from-white/[0.04] border border-black/[0.05] dark:border-white/[0.06] shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]">
               <AnimatePresence mode="wait">
                 <motion.div
                   key={activeFeature}
@@ -107,14 +120,29 @@ export default function LoginPage({
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -8 }}
                   transition={{ duration: 0.3 }}
-                  className="text-center"
+                  className="flex items-center gap-3 w-full"
                 >
-                  <h3 className="text-sm font-medium text-gray-900 dark:text-white mb-0.5">
-                    {features[activeFeature].title}
-                  </h3>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">
-                    {features[activeFeature].description}
-                  </p>
+                  {(() => {
+                    const f = features[activeFeature];
+                    const Icon = f.icon;
+                    return (
+                      <>
+                        <div
+                          className={`shrink-0 w-9 h-9 rounded-lg bg-gradient-to-br ${f.gradient} ${f.shadow} flex items-center justify-center`}
+                        >
+                          <Icon size={16} className="text-white" />
+                        </div>
+                        <div className="text-left">
+                          <h3 className="text-sm font-medium text-gray-900 dark:text-white leading-tight">
+                            {f.title}
+                          </h3>
+                          <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 leading-snug">
+                            {f.description}
+                          </p>
+                        </div>
+                      </>
+                    );
+                  })()}
                 </motion.div>
               </AnimatePresence>
             </div>
@@ -135,14 +163,30 @@ export default function LoginPage({
             </div>
           </motion.div>
 
-          {/* CAS Login button */}
+          {/* Yale Google login button */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.4 }}
           >
+            {loginError && (
+              <p className="mb-3 text-xs text-red-500 dark:text-red-400 text-center bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2">
+                {loginError}
+              </p>
+            )}
             <motion.button
-              onClick={signInWithGoogle}
+              onClick={async () => {
+                setLoginError(null);
+                try {
+                  await signInWithGoogle();
+                } catch (err) {
+                  setLoginError(
+                    err instanceof Error
+                      ? err.message
+                      : "Sign-in failed. Please try again.",
+                  );
+                }
+              }}
               disabled={loading}
               onHoverStart={() => setIsHovering(true)}
               onHoverEnd={() => setIsHovering(false)}
@@ -160,7 +204,7 @@ export default function LoginPage({
                 </motion.span>
               ) : (
                 <>
-                  <span>Log in with Yale CAS</span>
+                  <span>Sign in with Yale Google</span>
                   <motion.span
                     animate={isHovering ? { x: [0, 3, 0] } : {}}
                     transition={{ duration: 0.4 }}
@@ -224,9 +268,15 @@ export default function LoginPage({
           </a>
         </p>
         <p className="text-[10px] mt-0.5 text-gray-400 dark:text-gray-600">
-          v2.0 · Not affiliated with Yale University. Any data you upload is
-          from your own volition and you agree to our storage practices. We will
-          NOT store your transcript.
+          v3.0.0 · Not affiliated with Yale University. We store parsed course data
+          from uploads, not your raw transcript file. See our{" "}
+          <Link
+            href="/terms"
+            className="text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white underline underline-offset-2 transition-colors"
+          >
+            Terms
+          </Link>
+          .
         </p>
       </motion.div>
     </div>

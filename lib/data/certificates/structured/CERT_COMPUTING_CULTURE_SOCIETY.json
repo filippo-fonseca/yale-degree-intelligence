@@ -1,0 +1,66 @@
+{
+  "id": "CERT_COMPUTING_CULTURE_SOCIETY",
+  "name": "Computing, Culture & Society",
+  "description": "Prepares students to understand the social, political, and historical implications of computing technology through a curated roadmap of courses across a dozen departments.",
+  "category": "interdisciplinary",
+  "sourceUrl": "https://catalog.yale.edu/ycps/subjects-of-instruction/critical-computing/",
+  "requiresApplication": false,
+  "creditRequirements": {
+    "total": 5
+  },
+  "notes": [
+    "Computer Science majors: in addition to the survey course, take four courses with at least one from each of categories 2–4 (categories 1 is for students without a computing background).",
+    "Non-Computer Science majors: in addition to the survey course, take one course from each of categories 1–4.",
+    "Each student must attend three critical computing-related lectures or events and submit a brief write-up to the certificate director.",
+    "CPSC 2265 / AMST 2265 may be replaced with another certificate-eligible course at the discretion of the certificate director.",
+    "All courses must be taken for a letter grade with a grade of C or above.",
+    "No courses taken Credit/D/Fail may be applied toward the certificate.",
+    "No more than two course credits may overlap with a major, simultaneous degree, or another certificate.",
+    "No course credit may be applied toward the requirements of more than two curricular programs.",
+    "Graduate and professional school courses may count toward the certificate.",
+    "Declare on Yale Hub by January 15 or September 15 of the final semester at the latest."
+  ],
+  "policy": {
+    "overlapCap": 2,
+    "minGrade": "C",
+    "nonCourseRequirements": [
+      "Attend three critical computing-related lectures or events and submit a brief write-up for each to the certificate director"
+    ],
+    "sourceNote": "No more than two course credits fulfilling the requirements of the certificate may overlap with a major, a simultaneous degree, or another certificate. All courses must be taken for a letter grade, and students must achieve a grade of C or above."
+  },
+  "requirements": [
+    {
+      "name": "Survey course",
+      "required": 1,
+      "description": "Topics in Critical Computing.",
+      "options": [
+        { "type": "course", "code": "CPSC 2265" },
+        { "type": "course", "code": "AMST 2265" }
+      ]
+    },
+    {
+      "name": "Introduction to computing",
+      "required": 1,
+      "description": "Non-Computer Science majors only. Course with YC CSOC Introduction attribute.",
+      "options": []
+    },
+    {
+      "name": "Social research, politics, law, and economics",
+      "required": 1,
+      "description": "Course with YC CSOC Rsrch, Pltc, Law, Econ attribute.",
+      "options": []
+    },
+    {
+      "name": "History, digital media, and culture",
+      "required": 1,
+      "description": "Course with YC CSOC Hist, Media, Culture attribute.",
+      "options": []
+    },
+    {
+      "name": "Broader intersections in science, technology, and society",
+      "required": 1,
+      "description": "Course with YC CSOC Intersections attribute.",
+      "options": []
+    }
+  ]
+}

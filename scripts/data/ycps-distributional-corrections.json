@@ -1,0 +1,45 @@
+{
+  "source": "catalog.yale.edu YCPS bulletin, parsed by scripts/parse-ycps-designations.mjs",
+  "editions": [
+    "2026-2027",
+    "2025-2026",
+    "2024-2025",
+    "2023-2024"
+  ],
+  "agreementRate": 98.2724,
+  "corrections": [
+    {
+      "code": "ECE 4061",
+      "name": "Photovoltaic Energy",
+      "distributionals": [
+        "Sc",
+        "QR"
+      ],
+      "edition": "2024-2025"
+    },
+    {
+      "code": "JAPN 1710",
+      "name": "Readings in Literary Japanese",
+      "distributionals": [
+        "L5"
+      ],
+      "edition": "2025-2026"
+    },
+    {
+      "code": "NSCI 4430",
+      "name": "Topics in the Neuroscience of Memory",
+      "distributionals": [
+        "So"
+      ],
+      "edition": "2026-2027"
+    },
+    {
+      "code": "PSYC 4430",
+      "name": "Topics in the Neuroscience of Memory",
+      "distributionals": [
+        "So"
+      ],
+      "edition": "2026-2027"
+    }
+  ]
+}

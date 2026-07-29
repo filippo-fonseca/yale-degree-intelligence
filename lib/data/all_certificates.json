@@ -1,0 +1,2082 @@
+{
+  "CERT_ANCIENT_EGYPTIAN": {
+    "id": "CERT_ANCIENT_EGYPTIAN",
+    "name": "Ancient Egyptian (Advanced Language Study)",
+    "description": "Certificate of Advanced Language Study in Ancient Egyptian offered by the Department of Near Eastern Languages and Civilizations. A certificate adviser advises students on the certification process. The certificate is listed on the student's transcript once completed.",
+    "category": "advanced_language",
+    "sourceUrl": "https://catalog.yale.edu/ycps/subjects-of-instruction/near-eastern-languages-civilizations/",
+    "requiresApplication": false,
+    "parentProgram": "Near Eastern Languages and Civilizations",
+    "creditRequirements": {
+      "total": 4
+    },
+    "notes": [
+      "No Credit/D/Fail",
+      "Letter grade B or above required in all courses",
+      "Declare candidacy on Yale Hub as early as possible, no later than January 15 or September 15 of final semester",
+      "With adviser approval, an advanced texts seminar and/or graduate seminar may count toward requirements",
+      "Up to two courses of credit-bearing academic study abroad may be substituted with prior permission"
+    ],
+    "policy": {
+      "minGrade": "B",
+      "sourceNote": "All courses must be taken for a letter grade, and students must achieve a grade of B or above."
+    },
+    "requirements": [
+      {
+        "name": "Courses beyond L3",
+        "required": 4,
+        "description": "Four courses beyond the L3 level in Ancient Egyptian. At least two must be Yale courses designated L5.",
+        "options": []
+      }
+    ]
+  },
+  "CERT_ANCIENT_GREEK": {
+    "id": "CERT_ANCIENT_GREEK",
+    "name": "Ancient Greek (Advanced Language Study)",
+    "description": "Certificate of Advanced Language Study in ancient Greek offered by the Classics Department to non-majors. A certificate adviser, typically the DUS, advises students on the certification process. The certificate is listed on the student transcript once certified.",
+    "category": "advanced_language",
+    "sourceUrl": "https://catalog.yale.edu/ycps/subjects-of-instruction/classics/",
+    "requiresApplication": false,
+    "parentProgram": "Classics",
+    "creditRequirements": {
+      "total": 4
+    },
+    "notes": [
+      "For non-majors only",
+      "No Credit/D/Fail",
+      "Letter grade B or above required in all courses",
+      "Declare candidacy on Yale Hub as early as possible, no later than January 15 or September 15 of final semester",
+      "With adviser approval, one course such as an independent study (graded pass/fail), graduate seminar, or advanced seminar may count",
+      "One LxC course taught in English may count if it includes a weekly discussion section conducted entirely in Greek (minimum three students; course designated LxC)",
+      "Up to two study-abroad credits taught in Greek may be substituted with adviser approval"
+    ],
+    "policy": {
+      "minGrade": "B",
+      "sourceNote": "All courses must be taken for a letter grade, and students must achieve a grade of B or above."
+    },
+    "requirements": [
+      {
+        "name": "Courses beyond L4",
+        "required": 4,
+        "description": "Four courses in ancient Greek beyond the L4 level (i.e., four L5 courses; 3000- or 4000-level Greek courses).",
+        "options": []
+      }
+    ]
+  },
+  "CERT_CHINESE": {
+    "id": "CERT_CHINESE",
+    "name": "Chinese (Advanced Language Study)",
+    "description": "Certificate of Advanced Language Study in Chinese offered by the Department of East Asian Languages and Literatures. A certificate adviser, typically the DUS, advises students on the certification process. The certificate is listed on the student's transcript once certified.",
+    "category": "advanced_language",
+    "sourceUrl": "https://catalog.yale.edu/ycps/subjects-of-instruction/east-asian-languages-literatures/",
+    "requiresApplication": false,
+    "parentProgram": "East Asian Languages and Literatures",
+    "creditRequirements": {
+      "total": 4
+    },
+    "notes": [
+      "No Credit/D/Fail",
+      "Letter grade B or above required in all courses",
+      "Courses conducted in English (e.g., CHNS 1700 and CHNS 1710) do not count",
+      "Declare candidacy on Yale Hub as early as possible, no later than January 15 or September 15 of final semester",
+      "With adviser approval, one advanced non-L5 course conducted in Chinese (e.g., independent study graded pass/fail, graduate seminar, or advanced seminar) may count",
+      "One LxC course taught in English may count if it includes a weekly discussion section conducted entirely in Chinese (minimum three students; course designated LxC)",
+      "Up to two study-abroad credits taught in Chinese may be substituted with adviser approval"
+    ],
+    "policy": {
+      "minGrade": "B",
+      "sourceNote": "All courses must be taken for a letter grade, and students must achieve a grade of B or above."
+    },
+    "requirements": [
+      {
+        "name": "Courses beyond L4",
+        "required": 4,
+        "description": "Four courses beyond the L4 level in Chinese. At least two must be Yale courses designated L5.",
+        "options": []
+      }
+    ]
+  },
+  "CERT_CLIMATE_SCIENCE": {
+    "id": "CERT_CLIMATE_SCIENCE",
+    "name": "Climate Science and Solutions",
+    "description": "Provides students with a foundation in basic climate science, anthropogenic climate change, and solutions, preparing them to be effective and informed leaders on one of humanity's grand challenges.",
+    "category": "interdisciplinary",
+    "sourceUrl": "https://catalog.yale.edu/ycps/subjects-of-instruction/climate-science-and-solutions/",
+    "requiresApplication": false,
+    "creditRequirements": {
+      "total": 6
+    },
+    "notes": [
+      "Three of the six courses must have a science, engineering, or technology focus.",
+      "No more than two course credits may overlap with a major, simultaneous degree, or another certificate.",
+      "No course credit may be applied toward the requirements of more than two curricular programs.",
+      "No more than four credits may come from a single department or school.",
+      "No more than one course taken Credit/D/Fail or one independent study course graded pass/fail may count toward the certificate.",
+      "Courses taken at another institution or during an approved summer or term-time study abroad program may count with certificate director approval. An on-topic summer internship can replace one elective.",
+      "Declare on Yale Hub by January 15 or September 15 of the final semester at the latest."
+    ],
+    "policy": {
+      "overlapCap": 2,
+      "sameDeptCap": 4,
+      "sourceNote": "No more than two course credits fulfilling the requirements of the Climate Science and Solutions certificate may overlap with a major, a simultaneous degree, or another certificate. No more than four credits may come from a single department or school."
+    },
+    "requirements": [
+      {
+        "name": "Basic Climate Science",
+        "required": 1,
+        "description": "Course with YC Climate Basic Climate Sci attribute. Covers components, processes, and feedback of the climate system, including ocean-atmosphere dynamics, the carbon cycle, atmospheric gases, radiative balance, and spatial and temporal climate variability.",
+        "options": []
+      },
+      {
+        "name": "Anthropogenic Climate Change",
+        "required": 1,
+        "description": "Course with YC Climate Anthropogenic attribute. Covers drivers and projections for anthropogenic climate change, feedback and uncertainties in regional-to-global climate models, climate change impacts, mitigation, adaptation, and interactions with other aspects of global societal and environmental change.",
+        "options": []
+      },
+      {
+        "name": "Climate Solutions",
+        "required": 1,
+        "description": "Course with YC Climate Solutions attribute. Covers scientific, technological, and socio-political aspects of natural and technological solutions and strategies.",
+        "options": []
+      },
+      {
+        "name": "Climate seminar",
+        "required": 1,
+        "description": "Seminar on climate science and solutions as approved by the certificate director.",
+        "options": []
+      },
+      {
+        "name": "Additional electives",
+        "required": 2,
+        "description": "Remaining certificate-eligible courses. At least three of the six total courses must have a science, engineering, or technology focus.",
+        "options": []
+      }
+    ]
+  },
+  "CERT_COLLECTIONS": {
+    "id": "CERT_COLLECTIONS",
+    "name": "Collections: Objects, Research, Society",
+    "description": "Exposes students to expertise within Yale's special collections libraries, equipping them with analytical skills and methodologies that scholars, librarians, archivists, conservators, and curators employ to preserve and steward the human record across manuscripts, documents, film, audio, and digital formats.",
+    "category": "skills_based",
+    "sourceUrl": "https://catalog.yale.edu/ycps/subjects-of-instruction/collections/",
+    "requiresApplication": false,
+    "creditRequirements": {
+      "total": 5
+    },
+    "notes": [
+      "Minimum grade C in each course",
+      "No Credit/D/Fail",
+      "No more than two course credits may overlap with a major, simultaneous degree, or another certificate",
+      "No course credit may count toward more than two curricular programs",
+      "Approved graduate and professional school courses may count",
+      "Outside credit (study abroad, other institutions) or an on-topic summer internship may count with director approval",
+      "Declare on Yale Hub by January 15 or September 15 of the final semester; complete enrollment form on the Collections website"
+    ],
+    "policy": {
+      "overlapCap": 2,
+      "minGrade": "C",
+      "extraForms": [
+        "Enrollment form available on the Collections (Materials Histories of the Human Record) website"
+      ],
+      "sourceNote": "No more than two course credits fulfilling the requirements of the certificate may overlap with a major, a simultaneous degree, or another certificate. The minimum grade for all courses is a C."
+    },
+    "requirements": [
+      {
+        "name": "Introductory seminar",
+        "required": 1,
+        "description": "Required introductory seminar.",
+        "options": [
+          {
+            "type": "course",
+            "code": "COSM 1001"
+          }
+        ]
+      },
+      {
+        "name": "Capstone",
+        "required": 1,
+        "description": "Mandatory capstone culminating in a project focused on material histories (internship, research project, exhibit work, collections-intensive course, or other hands-on experience).",
+        "options": [
+          {
+            "type": "course",
+            "code": "COSM 4900"
+          }
+        ]
+      },
+      {
+        "name": "Primary collections area",
+        "required": 2,
+        "description": "Two courses in one of three areas: Research with Collections (YC Collections Research), Collections in Society (YC Collections Society), or Creative Critical Engagement with Collections (YC Collections Engagement).",
+        "options": []
+      },
+      {
+        "name": "Secondary collections area",
+        "required": 1,
+        "description": "One course in a different area from the primary area, drawn from the remaining two of: YC Collections Research, YC Collections Society, or YC Collections Engagement.",
+        "options": []
+      }
+    ]
+  },
+  "CERT_COMPUTING_CULTURE_SOCIETY": {
+    "id": "CERT_COMPUTING_CULTURE_SOCIETY",
+    "name": "Computing, Culture & Society",
+    "description": "Prepares students to understand the social, political, and historical implications of computing technology through a curated roadmap of courses across a dozen departments.",
+    "category": "interdisciplinary",
+    "sourceUrl": "https://catalog.yale.edu/ycps/subjects-of-instruction/critical-computing/",
+    "requiresApplication": false,
+    "creditRequirements": {
+      "total": 5
+    },
+    "notes": [
+      "Computer Science majors: in addition to the survey course, take four courses with at least one from each of categories 2–4 (categories 1 is for students without a computing background).",
+      "Non-Computer Science majors: in addition to the survey course, take one course from each of categories 1–4.",
+      "Each student must attend three critical computing-related lectures or events and submit a brief write-up to the certificate director.",
+      "CPSC 2265 / AMST 2265 may be replaced with another certificate-eligible course at the discretion of the certificate director.",
+      "All courses must be taken for a letter grade with a grade of C or above.",
+      "No courses taken Credit/D/Fail may be applied toward the certificate.",
+      "No more than two course credits may overlap with a major, simultaneous degree, or another certificate.",
+      "No course credit may be applied toward the requirements of more than two curricular programs.",
+      "Graduate and professional school courses may count toward the certificate.",
+      "Declare on Yale Hub by January 15 or September 15 of the final semester at the latest."
+    ],
+    "policy": {
+      "overlapCap": 2,
+      "minGrade": "C",
+      "nonCourseRequirements": [
+        "Attend three critical computing-related lectures or events and submit a brief write-up for each to the certificate director"
+      ],
+      "sourceNote": "No more than two course credits fulfilling the requirements of the certificate may overlap with a major, a simultaneous degree, or another certificate. All courses must be taken for a letter grade, and students must achieve a grade of C or above."
+    },
+    "requirements": [
+      {
+        "name": "Survey course",
+        "required": 1,
+        "description": "Topics in Critical Computing.",
+        "options": [
+          {
+            "type": "course",
+            "code": "CPSC 2265"
+          },
+          {
+            "type": "course",
+            "code": "AMST 2265"
+          }
+        ]
+      },
+      {
+        "name": "Introduction to computing",
+        "required": 1,
+        "description": "Non-Computer Science majors only. Course with YC CSOC Introduction attribute.",
+        "options": []
+      },
+      {
+        "name": "Social research, politics, law, and economics",
+        "required": 1,
+        "description": "Course with YC CSOC Rsrch, Pltc, Law, Econ attribute.",
+        "options": []
+      },
+      {
+        "name": "History, digital media, and culture",
+        "required": 1,
+        "description": "Course with YC CSOC Hist, Media, Culture attribute.",
+        "options": []
+      },
+      {
+        "name": "Broader intersections in science, technology, and society",
+        "required": 1,
+        "description": "Course with YC CSOC Intersections attribute.",
+        "options": []
+      }
+    ]
+  },
+  "CERT_DATA_SCIENCE": {
+    "id": "CERT_DATA_SCIENCE",
+    "name": "Data Science",
+    "description": "Designed for students majoring in disciplines other than Statistics and Data Science to acquire knowledge for mature use of data analysis. Students gain skills to tackle real-world data analysis challenges in the humanities, social sciences, sciences, and engineering.",
+    "category": "skills_based",
+    "sourceUrl": "https://catalog.yale.edu/ycps/subjects-of-instruction/statistics/",
+    "requiresApplication": false,
+    "parentProgram": "Statistics & Data Science",
+    "creditRequirements": {
+      "total": 5
+    },
+    "notes": [
+      "Minimum grade B– in each certificate course",
+      "No course may satisfy both a major and the certificate",
+      "No single course may count toward two certificate areas",
+      "Declare intent by the last day of add/drop in the final term of enrollment on Yale Hub",
+      "Students are held to the Statistical Methodology and Data Analysis requirements in place when they declared; with DUS approval, updated 2024–2025 requirements may be fulfilled by prior declarers"
+    ],
+    "policy": {
+      "overlapCap": 0,
+      "zeroOverlap": true,
+      "minGrade": "B-",
+      "sourceNote": "No course may be applied to satisfy the requirements of both a major and the certificate. No single course may count for two areas of study. Students are required to earn at least a B- for each course."
+    },
+    "requirements": [
+      {
+        "name": "Prerequisite",
+        "required": 0,
+        "description": "Suggested introductory course. An introductory data analysis course from another department may also satisfy this prerequisite.",
+        "options": [
+          {
+            "type": "course",
+            "code": "S&DS 1000"
+          },
+          {
+            "type": "course",
+            "code": "S&DS 1080"
+          },
+          {
+            "type": "course",
+            "code": "S&DS 1090"
+          },
+          {
+            "type": "course",
+            "code": "S&DS 1230"
+          }
+        ]
+      },
+      {
+        "name": "Probability and Statistical Theory",
+        "required": 1,
+        "description": "Advanced students may substitute S&DS 3510, S&DS 3640, or ECE 4310.",
+        "options": [
+          {
+            "type": "course",
+            "code": "S&DS 2380"
+          },
+          {
+            "type": "course",
+            "code": "S&DS 2400"
+          },
+          {
+            "type": "course",
+            "code": "S&DS 2410"
+          },
+          {
+            "type": "course",
+            "code": "S&DS 2420"
+          },
+          {
+            "type": "course",
+            "code": "S&DS 3510"
+          },
+          {
+            "type": "course",
+            "code": "S&DS 3640"
+          },
+          {
+            "type": "course",
+            "code": "ECE 4310"
+          }
+        ]
+      },
+      {
+        "name": "Statistical Methodology and Data Analysis",
+        "required": 2,
+        "description": "S&DS 2200 and S&DS 2300 may not both count. ECON 2136 may be substituted for S&DS 2420.",
+        "options": [
+          {
+            "type": "course",
+            "code": "S&DS 2200"
+          },
+          {
+            "type": "course",
+            "code": "S&DS 2300"
+          },
+          {
+            "type": "course",
+            "code": "S&DS 2420"
+          },
+          {
+            "type": "course",
+            "code": "S&DS 3120"
+          },
+          {
+            "type": "course",
+            "code": "S&DS 3610"
+          },
+          {
+            "type": "course",
+            "code": "S&DS 3630"
+          },
+          {
+            "type": "course",
+            "code": "PLSC 2501"
+          },
+          {
+            "type": "course",
+            "code": "ECON 2136"
+          }
+        ]
+      },
+      {
+        "name": "Computation and Machine Learning",
+        "required": 1,
+        "description": "CPSC 3230 may be substituted for CPSC 2230.",
+        "options": [
+          {
+            "type": "course",
+            "code": "S&DS 2620"
+          },
+          {
+            "type": "course",
+            "code": "S&DS 2650"
+          },
+          {
+            "type": "course",
+            "code": "S&DS 3170"
+          },
+          {
+            "type": "course",
+            "code": "S&DS 3650"
+          },
+          {
+            "type": "course",
+            "code": "CPSC 2230"
+          },
+          {
+            "type": "course",
+            "code": "CPSC 3230"
+          },
+          {
+            "type": "course",
+            "code": "CPSC 3810"
+          },
+          {
+            "type": "course",
+            "code": "CPSC 4770"
+          },
+          {
+            "type": "course",
+            "code": "PHYS 3780"
+          },
+          {
+            "type": "course",
+            "code": "PLSC 5060"
+          }
+        ]
+      },
+      {
+        "name": "Data Analysis in a Discipline Area",
+        "required": 1,
+        "description": "One course approved for this requirement and listed on the S&DS website.",
+        "options": []
+      }
+    ]
+  },
+  "CERT_EDUCATION_STUDIES": {
+    "id": "CERT_EDUCATION_STUDIES",
+    "name": "Education Studies",
+    "description": "Open to all interested Yale students, this certificate provides an opportunity to pursue an interdisciplinary study of education to complement their major.",
+    "category": "interdisciplinary",
+    "sourceUrl": "https://catalog.yale.edu/ycps/subjects-of-instruction/education-studies/",
+    "requiresApplication": false,
+    "creditRequirements": {
+      "total": 5
+    },
+    "notes": [
+      "Successful completion of the certificate is noted on transcripts.",
+      "Courses taken Credit/D/Fail may not be applied toward the certificate.",
+      "No more than two course credits may overlap with a major, simultaneous degree, or another certificate.",
+      "No course credit may be counted toward the requirements of more than two curricular programs.",
+      "Graduate and professional school courses may count with approval from the Education Studies Associate Director.",
+      "Declare on Yale Hub once enrolled in EDST 1110; by January 15 or September 15 of the final semester at the latest."
+    ],
+    "policy": {
+      "overlapCap": 2,
+      "sourceNote": "No more than two course credits may overlap in the fulfillment of the requirements of the Education Studies Certificate or of a major, a simultaneous degree, or another certificate."
+    },
+    "requirements": [
+      {
+        "name": "Prerequisite",
+        "required": 1,
+        "description": "Foundational education studies course counted toward the five-course total.",
+        "options": [
+          {
+            "type": "course",
+            "code": "EDST 1110"
+          }
+        ]
+      },
+      {
+        "name": "Theory and Research",
+        "required": 1,
+        "description": "One course in Theory and Research as approved for the certificate. See Education Studies website for area listings.",
+        "options": []
+      },
+      {
+        "name": "Policy or Pedagogy",
+        "required": 1,
+        "description": "One course in either Policy or Pedagogy as approved for the certificate.",
+        "options": []
+      },
+      {
+        "name": "EDST electives",
+        "required": 2,
+        "description": "Two Education Studies electives as approved for the certificate.",
+        "options": []
+      }
+    ]
+  },
+  "CERT_EDUCATION_STUDIES_SCHOLARS": {
+    "id": "CERT_EDUCATION_STUDIES_SCHOLARS",
+    "name": "Education Studies Scholars Intensive",
+    "description": "A structured pathway for students interested in completing an Education Studies capstone project while learning alongside a supportive cohort from sophomore through senior year.",
+    "category": "interdisciplinary",
+    "sourceUrl": "https://catalog.yale.edu/ycps/subjects-of-instruction/education-studies/",
+    "requiresApplication": true,
+    "creditRequirements": {
+      "total": 5
+    },
+    "notes": [
+      "Apply in the fall of sophomore year after completing or while enrolled in EDST 1110.",
+      "Field experience required as described on the Education Studies website.",
+      "Two of the five courses may overlap with the student's major.",
+      "No more than two course credits may overlap with a major, simultaneous degree, or another certificate.",
+      "No course credit may be counted toward the requirements of more than two curricular programs.",
+      "Credit/D/Fail courses may not count toward the certificate.",
+      "Graduate and professional school courses may count with approval from the Education Studies Associate Director.",
+      "Successful completion of the Scholar Intensive Certificate is noted on transcripts."
+    ],
+    "policy": {
+      "overlapCap": 2,
+      "sourceNote": "No more than two course credits may overlap in the fulfillment of the requirements of the Scholar Intensive Certificate or of a major, a simultaneous degree, or another certificate."
+    },
+    "requirements": [
+      {
+        "name": "Prerequisite",
+        "required": 1,
+        "description": "Foundational education studies course counted toward the five-course total.",
+        "options": [
+          {
+            "type": "course",
+            "code": "EDST 1110"
+          }
+        ]
+      },
+      {
+        "name": "Theory and Research",
+        "required": 1,
+        "description": "Theory and Research requirement.",
+        "options": [
+          {
+            "type": "course",
+            "code": "EDST 1261"
+          }
+        ]
+      },
+      {
+        "name": "Policy or Pedagogy",
+        "required": 1,
+        "description": "One course in either Policy or Pedagogy as approved for the certificate.",
+        "options": []
+      },
+      {
+        "name": "Capstone seminar",
+        "required": 1,
+        "description": "Senior capstone seminar.",
+        "options": [
+          {
+            "type": "course",
+            "code": "EDST 4400"
+          }
+        ]
+      },
+      {
+        "name": "Capstone project",
+        "required": 1,
+        "description": "Senior capstone project course.",
+        "options": [
+          {
+            "type": "course",
+            "code": "EDST 4410"
+          },
+          {
+            "type": "course",
+            "code": "EDST 4490"
+          }
+        ]
+      }
+    ]
+  },
+  "CERT_ENERGY_STUDIES": {
+    "id": "CERT_ENERGY_STUDIES",
+    "name": "Energy Studies",
+    "description": "Provides undergraduates with the knowledge and skills needed for advanced studies, leadership, and success in energy-related fields through coursework in three multidisciplinary tracks.",
+    "category": "interdisciplinary",
+    "sourceUrl": "https://catalog.yale.edu/ycps/subjects-of-instruction/energy-studies/",
+    "requiresApplication": false,
+    "creditRequirements": {
+      "total": 6
+    },
+    "notes": [
+      "ENRG 3000 is required as one of the six course credits (exceptions can be granted by the certificate director) and counts toward the Energy & Society track; take during junior or senior year.",
+      "ENRG 4000 (Senior Capstone Seminar) is optional but can count toward the six required credits in any one of the three tracks depending on project topic.",
+      "Language courses may not count toward the certificate.",
+      "No more than one course taken Credit/D/Fail or one independent study course graded Pass/Fail may count toward the certificate.",
+      "No more than two course credits may overlap with a major, simultaneous degree, or another certificate.",
+      "No course credit may be applied toward the requirements of more than two curricular programs.",
+      "Graduate and professional school courses and non-Yale courses accepted for full course credit by Yale College may count toward the certificate.",
+      "Declare on Yale Hub by January 15 or September 15 of the final semester at the latest."
+    ],
+    "policy": {
+      "overlapCap": 2,
+      "sourceNote": "No more than two course credits fulfilling the requirements of the Energy Studies Certificate may overlap with a major, a simultaneous degree, or another certificate."
+    },
+    "requirements": [
+      {
+        "name": "Energy Science & Technology",
+        "required": 2,
+        "description": "Two courses in the Energy Science & Technology track as approved for the certificate.",
+        "options": []
+      },
+      {
+        "name": "Energy & Environment",
+        "required": 2,
+        "description": "Two courses in the Energy & Environment track as approved for the certificate.",
+        "options": []
+      },
+      {
+        "name": "Energy & Society",
+        "required": 2,
+        "description": "Two courses in the Energy & Society track as approved for the certificate. ENRG 3000 is required as one of the six total credits (exceptions may be granted by the certificate director).",
+        "options": [
+          {
+            "type": "course",
+            "code": "ENRG 3000"
+          }
+        ]
+      }
+    ]
+  },
+  "CERT_ETHNOGRAPHY": {
+    "id": "CERT_ETHNOGRAPHY",
+    "name": "Ethnography",
+    "description": "Ethnography is both a set of qualitative research methods employed in the humanities and social sciences and a mode of presenting that research—in books and articles, film and video, embodied performance, and digital formats.",
+    "category": "skills_based",
+    "sourceUrl": "https://catalog.yale.edu/ycps/subjects-of-instruction/ethnography/",
+    "requiresApplication": false,
+    "creditRequirements": {
+      "total": 6
+    },
+    "notes": [
+      "Minimum grade C in each course",
+      "No Credit/D/Fail",
+      "At least four of six courses must be at the 3000-level or above",
+      "At least two courses must include substantial methods training and/or a practical ethnographic component, including at least one at the 3000-level or above",
+      "Attend two public talks or events featuring ethnography and submit one-page critical reflections on each",
+      "No more than two course credits may overlap with a major, simultaneous degree, or another certificate",
+      "No course credit may count toward more than two curricular programs",
+      "Approved graduate and professional school courses may count",
+      "Non-Yale courses may not count",
+      "Other courses may be approved by the certificate director",
+      "Declare on Yale Hub by January 15 or September 15 of the final semester"
+    ],
+    "policy": {
+      "overlapCap": 2,
+      "minGrade": "C",
+      "nonCourseRequirements": [
+        "Attend two public talks or other events that feature ethnography and submit a one-page critical reflection on each to the certificate director"
+      ],
+      "sourceNote": "No more than two course credits may overlap in the fulfillment of the requirements of the Ethnography certificate and of a major, a simultaneous degree, or another certificate. The minimum grade for all courses is a C."
+    },
+    "requirements": [
+      {
+        "name": "Ethnography methods courses",
+        "required": 2,
+        "description": "Courses with substantial methods training and/or a practical ethnographic component. Searchable in Yale Course Search with the YC Ethnography Methods attribute. At least one must be at the 3000-level or above.",
+        "options": []
+      },
+      {
+        "name": "Ethnography electives",
+        "required": 4,
+        "description": "Additional ethnography courses. Searchable in Yale Course Search with the YC Ethnography Elective attribute. At least four of the six total certificate courses must be at the 3000-level or above.",
+        "options": []
+      }
+    ]
+  },
+  "CERT_FOOD_AG_CLIMATE": {
+    "id": "CERT_FOOD_AG_CLIMATE",
+    "name": "Food, Agriculture, and Climate Change",
+    "description": "Prepares Yale College students for creative, critical, and unconventional engagement with pressing challenges facing food and agriculture at local and global scales, supported by the Yale Sustainable Food Program and Yale Farm.",
+    "category": "interdisciplinary",
+    "sourceUrl": "https://catalog.yale.edu/ycps/subjects-of-instruction/food_agriculture_climate_change/",
+    "requiresApplication": false,
+    "creditRequirements": {
+      "total": 5
+    },
+    "notes": [
+      "Students must participate in five co-curricular events identified by the YSFP and write a 6–8 page (double-spaced) summary reflecting a recurring theme, an area of controversy, and a proposed resolution.",
+      "No course taken Credit/D/Fail may be applied toward the certificate.",
+      "No more than two course credits may overlap with a major, simultaneous degree, or another certificate.",
+      "No course credit may be applied toward the requirements of more than two curricular programs.",
+      "Graduate and professional school courses may count toward the certificate.",
+      "Summer or year-abroad courses accepted for full Yale College credit may provisionally count with certificate director approval.",
+      "Declare on Yale Hub by January 15 or September 15 of the final semester at the latest."
+    ],
+    "policy": {
+      "overlapCap": 2,
+      "sourceNote": "No more than two course credits fulfilling the requirements of the Food, Agriculture, and Climate Change certificate may overlap with a major, a simultaneous degree, or another certificate."
+    },
+    "requirements": [
+      {
+        "name": "Consumption",
+        "required": 2,
+        "description": "Two courses with YC Food Consumption attribute. Concerned with the broad practices of eating, nutrition and health, and cultural, historical, political, and economic dimensions of food.",
+        "options": []
+      },
+      {
+        "name": "Environment",
+        "required": 1,
+        "description": "One course with YC Food Environment attribute. Concerned with substrates and surroundings of food and agriculture, particularly those linked to processes of climate change.",
+        "options": []
+      },
+      {
+        "name": "Production",
+        "required": 2,
+        "description": "Two courses with YC Food Production attribute. Concerned with cultivation of plants for harvest as food, feed, fiber, and fuel, and husbandry or harvest of non-human animals destined for human consumption.",
+        "options": []
+      }
+    ]
+  },
+  "CERT_FRENCH": {
+    "id": "CERT_FRENCH",
+    "name": "French (Advanced Language Study)",
+    "description": "Certificate of Advanced Language Study in French offered by the French Department to Yale College undergraduates who are not French majors.",
+    "category": "advanced_language",
+    "sourceUrl": "https://catalog.yale.edu/ycps/subjects-of-instruction/french/",
+    "requiresApplication": false,
+    "parentProgram": "French",
+    "creditRequirements": {
+      "total": 4
+    },
+    "notes": [
+      "For non-majors only",
+      "No Credit/D/Fail",
+      "Letter grade B or above required in all courses",
+      "Declare candidacy on Yale Hub as early as possible, no later than January 15 or September 15 of final semester",
+      "With DUS approval, one advanced non-L5 course conducted in French (e.g., independent study graded pass/fail or graduate seminar) may count",
+      "One LxC course taught in English may count if it includes a weekly discussion section conducted entirely in French and the student completes all readings and assignments in French",
+      "Up to two study-abroad courses taught in French may count as electives with DUS approval"
+    ],
+    "policy": {
+      "minGrade": "B",
+      "sourceNote": "All courses must be taken for a letter grade, and students must achieve a grade of B or above."
+    },
+    "requirements": [
+      {
+        "name": "Courses beyond L4",
+        "required": 4,
+        "description": "Four courses beyond the L4 level in French. At least two must be Yale courses designated L5. At least one must be a French Department course in French in the FREN 2000–4999 range.",
+        "options": []
+      }
+    ]
+  },
+  "CERT_GERMAN": {
+    "id": "CERT_GERMAN",
+    "name": "German (Advanced Language Study)",
+    "description": "Certificate of Advanced Language Study in German offered by the Department of Germanic Languages and Literatures. A certificate adviser, typically the DUS, advises students on the certification process. The certificate is listed on the student transcript once certified.",
+    "category": "advanced_language",
+    "sourceUrl": "https://catalog.yale.edu/ycps/subjects-of-instruction/german-studies/",
+    "requiresApplication": false,
+    "parentProgram": "German Studies",
+    "creditRequirements": {
+      "total": 4
+    },
+    "notes": [
+      "No Credit/D/Fail",
+      "Letter grade B or above required in all courses",
+      "Declare candidacy on Yale Hub as early as possible, no later than January 15 or September 15 of final semester",
+      "With adviser approval, one advanced non-L5 course conducted in German (e.g., independent study graded pass/fail, graduate seminar, or advanced seminar) may count",
+      "One LxC course taught in English may count if it includes a weekly discussion section conducted entirely in German (minimum three students; course designated LxC)",
+      "Up to two study-abroad credits taught in German may be substituted with adviser approval"
+    ],
+    "policy": {
+      "minGrade": "B",
+      "sourceNote": "All courses must be taken for a letter grade, and students must achieve a grade of B or above."
+    },
+    "requirements": [
+      {
+        "name": "Courses beyond L4",
+        "required": 4,
+        "description": "Four courses beyond the L4 level in German. At least two must be Yale courses designated L5.",
+        "options": []
+      }
+    ]
+  },
+  "CERT_GLOBAL_HEALTH": {
+    "id": "CERT_GLOBAL_HEALTH",
+    "name": "Global Health Studies",
+    "description": "Prepares students to critically engage with global health and its multifaceted concerns through interdisciplinary coursework across politics, history, economics, anthropology, ethics, law, sociology, public health, and the biomedical sciences.",
+    "category": "interdisciplinary",
+    "sourceUrl": "https://catalog.yale.edu/ycps/subjects-of-instruction/global-health-studies/",
+    "requiresApplication": true,
+    "creditRequirements": {
+      "total": 6
+    },
+    "notes": [
+      "Students apply to the program, typically in the fall of sophomore year. Accepted students are called Global Health Scholars.",
+      "Four electives must fulfill four of six global health competency areas: Biological & Environmental Influences on Health (YC GLHTH Bio & Env Influences); Health & Societies (YC GLHTH Health & Societies); Historical Approaches (YC GLHTH Hist Approaches); Performance, Representation & Health (YC GLHTH Perf, Rep & Health); Political Economy & Governance in Health (YC GLHTH Polit Econ & Govern); Understanding & Interpreting Quantitative Data (YC GLHTH Quantitative Data).",
+      "Scholars may apply for funding for mentored experiential learning projects the summer after junior year.",
+      "No more than one course taken Credit/D/Fail may count toward the certificate; HLTH 4900 must be taken for a letter grade.",
+      "No more than two courses may overlap with a major, simultaneous degree, or another certificate.",
+      "No course credit may be applied toward the requirements of more than two curricular programs.",
+      "Qualified undergraduates may take graduate courses at the School of Public Health subject to Yale College regulations.",
+      "Courses taken at another institution or during an approved summer or term-time study abroad program may count with DUS approval."
+    ],
+    "policy": {
+      "overlapCap": 2,
+      "sourceNote": "The requirements of the Global Health Studies certificate are subject to Yale College overlap rules, such that no more than two courses may be used simultaneously to fulfill the requirements of a major, a simultaneous degree, or another certificate."
+    },
+    "requirements": [
+      {
+        "name": "Introductory lecture",
+        "required": 1,
+        "description": "Global health introductory lecture course.",
+        "options": [
+          {
+            "type": "course",
+            "code": "HLTH 2300"
+          }
+        ]
+      },
+      {
+        "name": "Competency electives",
+        "required": 4,
+        "description": "Four electives achieving four of the six global health competency areas as indicated by course attributes.",
+        "options": []
+      },
+      {
+        "name": "Senior colloquium",
+        "required": 1,
+        "description": "Senior colloquium integrating skills and knowledge acquired throughout the program. Must be taken for a letter grade.",
+        "options": [
+          {
+            "type": "course",
+            "code": "HLTH 4900"
+          }
+        ]
+      }
+    ]
+  },
+  "CERT_HINDI": {
+    "id": "CERT_HINDI",
+    "name": "Hindi (Advanced Language Study)",
+    "description": "Certificate of Advanced Language Study in Hindi offered by the Department of South Asian Studies. A certificate adviser, typically the DUS, advises students on the certification process. The certificate is listed on the student's transcript once certified through Degree Audit.",
+    "category": "advanced_language",
+    "sourceUrl": "https://catalog.yale.edu/ycps/subjects-of-instruction/south-asian-studies/",
+    "requiresApplication": false,
+    "parentProgram": "South Asian Studies",
+    "creditRequirements": {
+      "total": 4
+    },
+    "notes": [
+      "No Credit/D/Fail",
+      "Letter grade B or above required in all courses",
+      "Declare candidacy on Yale Hub as early as possible, no later than January 15 or September 15 of final semester",
+      "With adviser approval, one advanced non-L5 Yale course conducted in Hindi (e.g., independent study graded pass/fail, graduate seminar, or advanced seminar) may count",
+      "One LxC course taught in English may count if it includes a weekly discussion section conducted entirely in Hindi (minimum three students; course designated LxC)",
+      "Up to two study-abroad credits taught in Hindi may be substituted with adviser approval"
+    ],
+    "policy": {
+      "minGrade": "B",
+      "sourceNote": "All courses must be taken for a letter grade, and students must achieve a grade of B or above."
+    },
+    "requirements": [
+      {
+        "name": "Courses beyond L4",
+        "required": 4,
+        "description": "Four courses beyond the L4 level in Hindi. At least two must be Yale courses designated L5.",
+        "options": []
+      }
+    ]
+  },
+  "CERT_HUMAN_RIGHTS": {
+    "id": "CERT_HUMAN_RIGHTS",
+    "name": "Human Rights Studies",
+    "description": "Available to all interested Yale students, this certificate provides the opportunity to pursue an interdisciplinary study of human rights.",
+    "category": "interdisciplinary",
+    "sourceUrl": "https://catalog.yale.edu/ycps/subjects-of-instruction/human-rights/",
+    "requiresApplication": false,
+    "creditRequirements": {
+      "total": 5
+    },
+    "notes": [
+      "No courses taken Credit/D/Fail may be applied toward the certificate.",
+      "Courses taken at another institution or during an approved summer or term-time study abroad program may count with certificate director approval. An on-topic summer internship can replace one elective with approval.",
+      "Graduate and professional school courses may count with director approval or if tagged with approved attributes.",
+      "Declare on Yale Hub by January 15 or September 15 of the final semester at the latest."
+    ],
+    "requirements": [
+      {
+        "name": "Gateway",
+        "required": 1,
+        "description": "Gateway course introducing theoretical tools for studying human rights.",
+        "options": [
+          {
+            "type": "course",
+            "code": "GLBL 3102"
+          },
+          {
+            "type": "course",
+            "code": "GLBL 3103"
+          }
+        ]
+      },
+      {
+        "name": "Domestic elective",
+        "required": 1,
+        "description": "Elective with YC Human Rights Domestic attribute that substantially engages with human rights language, ideas, and methods.",
+        "options": []
+      },
+      {
+        "name": "International elective",
+        "required": 1,
+        "description": "Elective with YC Human Rights International attribute that substantially engages with human rights language, ideas, and methods.",
+        "options": []
+      },
+      {
+        "name": "Additional electives",
+        "required": 2,
+        "description": "Additional human rights electives approved for the certificate.",
+        "options": []
+      }
+    ]
+  },
+  "CERT_HUMAN_RIGHTS_INTENSIVE": {
+    "id": "CERT_HUMAN_RIGHTS_INTENSIVE",
+    "name": "Human Rights Studies Intensive",
+    "description": "An intensive pathway for students who wish to engage deeply with the study of human rights, including regular cohort programming throughout the academic year.",
+    "category": "interdisciplinary",
+    "sourceUrl": "https://catalog.yale.edu/ycps/subjects-of-instruction/human-rights/",
+    "requiresApplication": true,
+    "creditRequirements": {
+      "total": 6
+    },
+    "notes": [
+      "Apply during the spring term of sophomore year only via the Human Rights website.",
+      "Students participate in regular (typically weekly) additional programming tailored for the small cohort throughout the academic year.",
+      "Non-credited senior colloquium required.",
+      "Electives must engage with the language, ideas, and methods of human rights with substantial focus (four or more of thirteen, or six to eight of twenty-six, course meetings per syllabus).",
+      "No courses taken Credit/D/Fail may be applied toward the certificate.",
+      "Courses taken at another institution or during an approved summer or term-time study abroad program may count with certificate director approval. An on-topic summer internship can replace one elective with approval.",
+      "Graduate and professional school courses may count with director approval or if tagged with approved attributes."
+    ],
+    "policy": {
+      "extraForms": [
+        "Application submitted during the spring term of sophomore year, available via the Human Rights website"
+      ],
+      "nonCourseRequirements": [
+        "Participate in the non-credited senior colloquium"
+      ],
+      "sourceNote": "This certificate accepts students by application during the spring term of their sophomore year only. Students complete a gateway lecture course, five electives, and participate in a non-credited senior colloquium."
+    },
+    "requirements": [
+      {
+        "name": "Gateway",
+        "required": 1,
+        "description": "Gateway lecture course introducing theoretical tools for studying human rights, their evolution, and their justification.",
+        "options": [
+          {
+            "type": "course",
+            "code": "GLBL 3102"
+          },
+          {
+            "type": "course",
+            "code": "GLBL 3103"
+          }
+        ]
+      },
+      {
+        "name": "Domestic elective",
+        "required": 1,
+        "description": "Elective with YC Human Rights Domestic attribute.",
+        "options": []
+      },
+      {
+        "name": "International elective",
+        "required": 1,
+        "description": "Elective with YC Human Rights International attribute.",
+        "options": []
+      },
+      {
+        "name": "Additional electives",
+        "required": 3,
+        "description": "Additional human rights electives approved for the certificate.",
+        "options": []
+      }
+    ]
+  },
+  "CERT_INDONESIAN": {
+    "id": "CERT_INDONESIAN",
+    "name": "Indonesian (Advanced Language Study)",
+    "description": "Certificate of Advanced Language Study in Indonesian offered by the Department of Southeast Asian Studies. Once certified, the certificate is listed on student transcripts.",
+    "category": "advanced_language",
+    "sourceUrl": "https://catalog.yale.edu/ycps/subjects-of-instruction/southeast-asia-studies/",
+    "requiresApplication": false,
+    "parentProgram": "Southeast Asia Studies",
+    "creditRequirements": {
+      "total": 4
+    },
+    "notes": [
+      "No Credit/D/Fail",
+      "Letter grade B or above required in all courses",
+      "Declare candidacy on Yale Hub as early as possible, no later than January 15 or September 15 of final semester",
+      "With adviser approval, up to one course conducted in Indonesian at the appropriate advanced level may count (e.g., INDN 4700 or INDN 4710 graded pass/fail, or graduate seminar INDN 5700)",
+      "Up to two study-abroad credits taught in Indonesian may be substituted with adviser approval"
+    ],
+    "policy": {
+      "minGrade": "B",
+      "sourceNote": "All courses must be taken for a letter grade, and students must achieve a grade of B or above."
+    },
+    "requirements": [
+      {
+        "name": "Courses beyond L4",
+        "required": 4,
+        "description": "Four courses beyond the L4 level in Indonesian. At least two must be Yale advanced language courses (e.g., INDN 1500, INDN 1600, INDN 1700, or INDN 1800).",
+        "options": [
+          {
+            "type": "course",
+            "code": "INDN 1500"
+          },
+          {
+            "type": "course",
+            "code": "INDN 1600"
+          },
+          {
+            "type": "course",
+            "code": "INDN 1700"
+          },
+          {
+            "type": "course",
+            "code": "INDN 1800"
+          }
+        ]
+      }
+    ]
+  },
+  "CERT_ISIZULU": {
+    "id": "CERT_ISIZULU",
+    "name": "isiZulu (Advanced Language Study)",
+    "description": "Certificate of Advanced Language Study in isiZulu offered by the Department of African Studies. A certificate adviser, typically the DUS, advises students on the certification process and certifies completion before the end of eight terms of study. The certificate is listed on the student's transcript once certified.",
+    "category": "advanced_language",
+    "sourceUrl": "https://catalog.yale.edu/ycps/subjects-of-instruction/african-studies/",
+    "requiresApplication": false,
+    "parentProgram": "African Studies",
+    "creditRequirements": {
+      "total": 4
+    },
+    "notes": [
+      "Letter grade B or above required in all courses",
+      "Must complete requirements before the end of eight terms of study",
+      "Declare candidacy on Yale Hub as early as possible, no later than January 15 or September 15 of final semester",
+      "With adviser approval, one advanced non-L5 Yale course conducted in isiZulu (e.g., independent study graded pass/fail, graduate seminar, or advanced seminar) may count",
+      "One LxC course taught in English may count if it includes a weekly discussion section conducted entirely in isiZulu (minimum three students; course designated LxC)",
+      "Up to two study-abroad credits taught in isiZulu may be substituted with adviser approval"
+    ],
+    "policy": {
+      "minGrade": "B",
+      "sourceNote": "All courses must be taken for a letter grade, and students must achieve a grade of B or above."
+    },
+    "requirements": [
+      {
+        "name": "Courses beyond L4",
+        "required": 4,
+        "description": "Four courses beyond the L4 level in isiZulu. At least two must be Yale courses designated L5.",
+        "options": []
+      }
+    ]
+  },
+  "CERT_ISLAMIC_STUDIES": {
+    "id": "CERT_ISLAMIC_STUDIES",
+    "name": "Islamic Studies",
+    "description": "Encompasses the study of Muslim and Islamic artistic, cultural, historical, intellectual, linguistic, literary, philosophical, political, religious, sociological, and scientific presence and impact on human society over the past one and a half millennia.",
+    "category": "interdisciplinary",
+    "sourceUrl": "https://catalog.yale.edu/ycps/subjects-of-instruction/islamic-studies/",
+    "requiresApplication": false,
+    "creditRequirements": {
+      "total": 5
+    },
+    "notes": [
+      "No more than two courses may represent the same area of study.",
+      "Each student must attend three lectures on topics relating to Islamic Studies and submit a brief 1–2 page write-up for each.",
+      "All courses must be taken for a letter grade with a grade of C or above.",
+      "No courses taken Credit/D/Fail may be applied toward the certificate.",
+      "Language courses and non-Yale courses may not count toward the certificate.",
+      "No more than two course credits may overlap with a major, simultaneous degree, or another certificate.",
+      "No course credit may be applied toward the requirements of more than two curricular programs.",
+      "Graduate and professional school courses may count toward the certificate.",
+      "Declare on Yale Hub by January 15 or September 15 of the final semester at the latest."
+    ],
+    "policy": {
+      "overlapCap": 2,
+      "minGrade": "C",
+      "nonCourseRequirements": [
+        "Attend three lectures on topics relating to Islamic Studies and submit a 1 to 2 page write-up for each"
+      ],
+      "sourceNote": "No more than two course credits fulfilling the requirements of the Islamic Studies certificate may overlap with a major, a simultaneous degree, or another certificate. All courses must be taken for a letter grade, and students must achieve a grade of C or above."
+    },
+    "requirements": [
+      {
+        "name": "Islamic Art, Architecture, Literature",
+        "required": 1,
+        "description": "One approved course in Islamic Art, Architecture, and Literature.",
+        "options": []
+      },
+      {
+        "name": "Islamic History",
+        "required": 1,
+        "description": "One approved course in Islamic History.",
+        "options": []
+      },
+      {
+        "name": "Islamic Religion",
+        "required": 1,
+        "description": "One approved course in Islamic Religion.",
+        "options": []
+      },
+      {
+        "name": "Islamic Society",
+        "required": 1,
+        "description": "One approved course in Islamic Society.",
+        "options": []
+      },
+      {
+        "name": "Elective",
+        "required": 1,
+        "description": "One additional course from any of the four content areas.",
+        "options": []
+      }
+    ]
+  },
+  "CERT_ITALIAN": {
+    "id": "CERT_ITALIAN",
+    "name": "Italian (Advanced Language Study)",
+    "description": "Certificate of Advanced Language Study in Italian offered by the Italian Department. A certificate adviser, typically the DUS, advises students on the certification process. The certificate is listed on the student's official transcript.",
+    "category": "advanced_language",
+    "sourceUrl": "https://catalog.yale.edu/ycps/subjects-of-instruction/italian/",
+    "requiresApplication": false,
+    "parentProgram": "Italian",
+    "creditRequirements": {
+      "total": 4
+    },
+    "notes": [
+      "No Credit/D/Fail",
+      "Letter grade B or above required in all courses",
+      "Declare candidacy on Yale Hub as early as possible, no later than January 15 or September 15 of final semester",
+      "With adviser approval, one advanced non-L5 course conducted in Italian (e.g., independent study graded pass/fail, graduate seminar, or advanced seminar) may count",
+      "One LxC course taught in English may count if it includes a weekly discussion section conducted entirely in Italian (minimum three students; course designated LxC)",
+      "Up to two study-abroad credits taught in Italian may be substituted with adviser approval"
+    ],
+    "policy": {
+      "minGrade": "B",
+      "sourceNote": "All courses must be taken for a letter grade, and students must achieve a grade of B or above."
+    },
+    "requirements": [
+      {
+        "name": "Courses beyond L4",
+        "required": 4,
+        "description": "Four courses beyond the L4 level in Italian. At least three must be Yale courses designated L5.",
+        "options": []
+      }
+    ]
+  },
+  "CERT_JAPANESE": {
+    "id": "CERT_JAPANESE",
+    "name": "Japanese (Advanced Language Study)",
+    "description": "Certificate of Advanced Language Study in Japanese offered by the Department of East Asian Languages and Literatures. A certificate adviser, typically the DUS, advises students on the certification process. The certificate is listed on the student's transcript once certified.",
+    "category": "advanced_language",
+    "sourceUrl": "https://catalog.yale.edu/ycps/subjects-of-instruction/east-asian-languages-literatures/",
+    "requiresApplication": false,
+    "parentProgram": "East Asian Languages and Literatures",
+    "creditRequirements": {
+      "total": 4
+    },
+    "notes": [
+      "No Credit/D/Fail",
+      "Letter grade B or above required in all courses",
+      "Courses conducted in English (e.g., JAPN 1700 and JAPN 1710) do not count",
+      "Declare candidacy on Yale Hub as early as possible, no later than January 15 or September 15 of final semester",
+      "With adviser approval, one advanced non-L5 course conducted in Japanese (e.g., independent study graded pass/fail, graduate seminar, or advanced seminar) may count",
+      "One LxC course taught in English may count if it includes a weekly discussion section conducted entirely in Japanese (minimum three students; course designated LxC)",
+      "Up to two study-abroad credits taught in Japanese may be substituted with adviser approval"
+    ],
+    "policy": {
+      "minGrade": "B",
+      "sourceNote": "All courses must be taken for a letter grade, and students must achieve a grade of B or above."
+    },
+    "requirements": [
+      {
+        "name": "Courses beyond L4",
+        "required": 4,
+        "description": "Four courses beyond the L4 level in Japanese. At least two must be Yale courses designated L5.",
+        "options": []
+      }
+    ]
+  },
+  "CERT_KISWAHILI": {
+    "id": "CERT_KISWAHILI",
+    "name": "Kiswahili (Advanced Language Study)",
+    "description": "Certificate of Advanced Language Study in Kiswahili offered by the Department of African Studies. A certificate adviser, typically the DUS, advises students on the certification process and certifies completion before the end of eight terms of study. The certificate is listed on the student's transcript once certified.",
+    "category": "advanced_language",
+    "sourceUrl": "https://catalog.yale.edu/ycps/subjects-of-instruction/african-studies/",
+    "requiresApplication": false,
+    "parentProgram": "African Studies",
+    "creditRequirements": {
+      "total": 4
+    },
+    "notes": [
+      "Letter grade B or above required in all courses",
+      "Must complete requirements before the end of eight terms of study",
+      "Declare candidacy on Yale Hub as early as possible, no later than January 15 or September 15 of final semester",
+      "With adviser approval, one advanced non-L5 Yale course conducted in Kiswahili (e.g., independent study graded pass/fail, graduate seminar, or advanced seminar) may count",
+      "One LxC course taught in English may count if it includes a weekly discussion section conducted entirely in Kiswahili (minimum three students; course designated LxC)",
+      "Up to two study-abroad credits taught in Kiswahili may be substituted with adviser approval"
+    ],
+    "policy": {
+      "minGrade": "B",
+      "sourceNote": "All courses must be taken for a letter grade, and students must achieve a grade of B or above."
+    },
+    "requirements": [
+      {
+        "name": "Courses beyond L4",
+        "required": 4,
+        "description": "Four courses beyond the L4 level in Kiswahili. At least two must be Yale courses designated L5.",
+        "options": []
+      }
+    ]
+  },
+  "CERT_KOREAN": {
+    "id": "CERT_KOREAN",
+    "name": "Korean (Advanced Language Study)",
+    "description": "Certificate of Advanced Language Study in Korean offered by the Department of East Asian Languages and Literatures. A certificate adviser, typically the DUS, advises students on the certification process. The certificate is listed on the student's transcript once certified.",
+    "category": "advanced_language",
+    "sourceUrl": "https://catalog.yale.edu/ycps/subjects-of-instruction/east-asian-languages-literatures/",
+    "requiresApplication": false,
+    "parentProgram": "East Asian Languages and Literatures",
+    "creditRequirements": {
+      "total": 4
+    },
+    "notes": [
+      "No Credit/D/Fail",
+      "Letter grade B or above required in all courses",
+      "Declare candidacy on Yale Hub as early as possible, no later than January 15 or September 15 of final semester",
+      "With adviser approval, one advanced non-L5 course conducted in Korean (e.g., independent study graded pass/fail, graduate seminar, or advanced seminar) may count",
+      "One LxC course taught in English may count if it includes a weekly discussion section conducted entirely in Korean (minimum three students; course designated LxC)",
+      "Up to two study-abroad credits taught in Korean may be substituted with adviser approval"
+    ],
+    "policy": {
+      "minGrade": "B",
+      "sourceNote": "All courses must be taken for a letter grade, and students must achieve a grade of B or above."
+    },
+    "requirements": [
+      {
+        "name": "Courses beyond L4",
+        "required": 4,
+        "description": "Four courses beyond the L4 level in Korean. At least two must be Yale courses designated L5.",
+        "options": []
+      }
+    ]
+  },
+  "CERT_LATIN": {
+    "id": "CERT_LATIN",
+    "name": "Latin (Advanced Language Study)",
+    "description": "Certificate of Advanced Language Study in Latin offered by the Classics Department to non-majors. A certificate adviser, typically the DUS, advises students on the certification process. The certificate is listed on the student transcript once certified.",
+    "category": "advanced_language",
+    "sourceUrl": "https://catalog.yale.edu/ycps/subjects-of-instruction/classics/",
+    "requiresApplication": false,
+    "parentProgram": "Classics",
+    "creditRequirements": {
+      "total": 4
+    },
+    "notes": [
+      "For non-majors only",
+      "No Credit/D/Fail",
+      "Letter grade B or above required in all courses",
+      "Declare candidacy on Yale Hub as early as possible, no later than January 15 or September 15 of final semester",
+      "With adviser approval, one course such as an independent study (graded pass/fail), graduate seminar, or advanced seminar may count",
+      "One LxC course taught in English may count if it includes a weekly discussion section conducted entirely in Latin (minimum three students; course designated LxC)",
+      "Up to two study-abroad credits taught in Latin may be substituted with adviser approval"
+    ],
+    "policy": {
+      "minGrade": "B",
+      "sourceNote": "All courses must be taken for a letter grade, and students must achieve a grade of B or above."
+    },
+    "requirements": [
+      {
+        "name": "Courses beyond L4",
+        "required": 4,
+        "description": "Four courses in Latin beyond the L4 level (i.e., four L5 courses; 3000- or 4000-level Latin courses).",
+        "options": []
+      }
+    ]
+  },
+  "CERT_MEDIEVAL_STUDIES": {
+    "id": "CERT_MEDIEVAL_STUDIES",
+    "name": "Medieval Studies",
+    "description": "Provides interested Yale College students a focused interdisciplinary curriculum on the histories, languages, and cultures of the medieval period worldwide.",
+    "category": "interdisciplinary",
+    "sourceUrl": "https://catalog.yale.edu/ycps/subjects-of-instruction/medieval_studies/",
+    "requiresApplication": false,
+    "creditRequirements": {
+      "total": 5
+    },
+    "notes": [
+      "No more than three of the five courses may originate in the same geographic zone. Zones: East and Southeast Asia (YC MDVL East & SE Asia); South and Central Asia (YC MDVL S & Central Asia); Near East and North Africa (YC MDVL Nr East & N Africa); Europe, Russia, and the North Atlantic (YC MDVL Eur Russ & N Atlantic). YC MDVL Other MDVL Topics also available.",
+      "Each student must attend three lectures on medieval topics and submit a 1–2 page account of each to the certificate director or an advisor.",
+      "Only one course taken Credit/D/Fail may be applied toward the certificate.",
+      "No more than two course credits may overlap with a major, simultaneous degree, or another certificate.",
+      "No course credit may be applied toward the requirements of more than two curricular programs.",
+      "Courses taken at another institution or during an approved summer or term-time study abroad program may count with director approval.",
+      "Declare on Yale Hub by January 15 or September 15 of the final semester at the latest."
+    ],
+    "policy": {
+      "overlapCap": 2,
+      "nonCourseRequirements": [
+        "Attend three lectures on medieval topics and submit a 1 to 2 page account of each to the certificate director or a certificate advisor"
+      ],
+      "sourceNote": "No more than two course credits may overlap in the fulfillment of the requirements of the Medieval Studies Certificate or of a major, a simultaneous degree, or another certificate."
+    },
+    "requirements": [
+      {
+        "name": "Medieval courses",
+        "required": 5,
+        "description": "Five course credits on medieval topics from the approved course list. No more than three may originate in the same geographic zone among East and Southeast Asia, South and Central Asia, Near East and North Africa, and Europe, Russia, and the North Atlantic.",
+        "options": []
+      }
+    ]
+  },
+  "CERT_MODERN_ARABIC": {
+    "id": "CERT_MODERN_ARABIC",
+    "name": "Modern Arabic (Advanced Language Study)",
+    "description": "Certificate of Advanced Language Study in Modern Arabic offered by the Department of Near Eastern Languages and Civilizations. A certificate adviser advises students on the certification process. The certificate is listed on the student's transcript once completed.",
+    "category": "advanced_language",
+    "sourceUrl": "https://catalog.yale.edu/ycps/subjects-of-instruction/near-eastern-languages-civilizations/",
+    "requiresApplication": false,
+    "parentProgram": "Near Eastern Languages and Civilizations",
+    "creditRequirements": {
+      "total": 4
+    },
+    "notes": [
+      "No Credit/D/Fail",
+      "Letter grade B or above required in all courses",
+      "Declare candidacy on Yale Hub as early as possible, no later than January 15 or September 15 of final semester",
+      "Courses in classical Arabic cannot be counted toward the Modern Arabic certificate",
+      "With adviser approval, one advanced non-L5 Yale course and/or a graduate or advanced seminar may count",
+      "One LxC course taught in English may count if it includes a weekly discussion section conducted entirely in Arabic (minimum three students; course designated LxC)",
+      "Up to two study-abroad credits taught in Arabic may be substituted with adviser approval"
+    ],
+    "policy": {
+      "minGrade": "B",
+      "sourceNote": "All courses must be taken for a letter grade, and students must achieve a grade of B or above."
+    },
+    "requirements": [
+      {
+        "name": "Courses beyond L4",
+        "required": 4,
+        "description": "Four courses beyond the L4 level in Modern Arabic. At least two must be Yale courses designated L5.",
+        "options": []
+      }
+    ]
+  },
+  "CERT_MODERN_HEBREW": {
+    "id": "CERT_MODERN_HEBREW",
+    "name": "Modern Hebrew (Advanced Language Study)",
+    "description": "Certificate of Advanced Language Study in Modern Hebrew offered by the Department of Near Eastern Languages and Civilizations. A certificate adviser advises students on the certification process. The certificate is listed on the student's transcript once completed.",
+    "category": "advanced_language",
+    "sourceUrl": "https://catalog.yale.edu/ycps/subjects-of-instruction/near-eastern-languages-civilizations/",
+    "requiresApplication": false,
+    "parentProgram": "Near Eastern Languages and Civilizations",
+    "creditRequirements": {
+      "total": 4
+    },
+    "notes": [
+      "No Credit/D/Fail",
+      "Letter grade B or above required in all courses",
+      "Declare candidacy on Yale Hub as early as possible, no later than January 15 or September 15 of final semester",
+      "With adviser approval, one advanced non-L5 Yale course and/or a graduate or advanced seminar may count",
+      "One LxC course taught in English may count if it includes a weekly discussion section conducted entirely in Hebrew (minimum three students; course designated LxC)",
+      "Up to two study-abroad credits taught in Hebrew may be substituted with adviser approval"
+    ],
+    "policy": {
+      "minGrade": "B",
+      "sourceNote": "All courses must be taken for a letter grade, and students must achieve a grade of B or above."
+    },
+    "requirements": [
+      {
+        "name": "Courses beyond L4",
+        "required": 4,
+        "description": "Four courses beyond the L4 level in Modern Hebrew. At least two must be Yale courses designated L5.",
+        "options": []
+      }
+    ]
+  },
+  "CERT_MODERN_TURKISH": {
+    "id": "CERT_MODERN_TURKISH",
+    "name": "Modern Turkish (Advanced Language Study)",
+    "description": "Certificate of Advanced Language Study in Modern Turkish offered by the Department of Near Eastern Languages and Civilizations. A certificate adviser advises students on the certification process. The certificate is listed on the student's transcript once completed.",
+    "category": "advanced_language",
+    "sourceUrl": "https://catalog.yale.edu/ycps/subjects-of-instruction/near-eastern-languages-civilizations/",
+    "requiresApplication": false,
+    "parentProgram": "Near Eastern Languages and Civilizations",
+    "creditRequirements": {
+      "total": 4
+    },
+    "notes": [
+      "No Credit/D/Fail",
+      "Letter grade B or above required in all courses",
+      "Declare candidacy on Yale Hub as early as possible, no later than January 15 or September 15 of final semester",
+      "With adviser approval, one advanced non-L5 Yale course and/or a graduate or advanced seminar may count",
+      "One LxC course taught in English may count if it includes a weekly discussion section conducted entirely in Turkish (minimum three students; course designated LxC)",
+      "Up to two study-abroad credits taught in Turkish may be substituted with adviser approval"
+    ],
+    "policy": {
+      "minGrade": "B",
+      "sourceNote": "All courses must be taken for a letter grade, and students must achieve a grade of B or above."
+    },
+    "requirements": [
+      {
+        "name": "Courses beyond L4",
+        "required": 4,
+        "description": "Four courses beyond the L4 level in Modern Turkish. At least two must be Yale courses designated L5.",
+        "options": []
+      }
+    ]
+  },
+  "CERT_NATIVE_AMERICAN_INDIGENOUS": {
+    "id": "CERT_NATIVE_AMERICAN_INDIGENOUS",
+    "name": "Native American and Indigenous Studies",
+    "description": "Offers a curated range of courses across departments and programs in Yale College that center on Indigenous content, strengthening knowledge of Indigenous languages, cultures, sovereignty, history, literatures, and lifeways.",
+    "category": "interdisciplinary",
+    "sourceUrl": "https://catalog.yale.edu/ycps/subjects-of-instruction/native-american-indigenous-studies/",
+    "requiresApplication": false,
+    "creditRequirements": {
+      "total": 5
+    },
+    "notes": [
+      "Courses must be drawn from at least three of five areas of focus, with no more than two courses from any single area.",
+      "Optional capstone project counts as one credit toward the certificate. Capstone may be completed in an independent study (e.g. LING 4710, ENGL 3100, AMST 9000, SOCY 4100) or upper-division core seminar (ER&M 4020) with director approval. Submit a 1-page proposal in spring of junior year or early fall of senior year.",
+      "Students must participate in at least three Indigenous community events and submit a 1–2 page write-up per event.",
+      "No courses taken Credit/D/Fail may be counted toward the certificate.",
+      "No more than two course credits may overlap with a major, simultaneous degree, or another certificate.",
+      "No course credit may be applied toward the requirements of more than two curricular programs.",
+      "Graduate and professional school courses may count toward the certificate.",
+      "Complete the Qualtrics survey from the Indigenous Studies website as early as fall of sophomore year and no later than the beginning of junior year.",
+      "Declare on Yale Hub by January 15 or September 15 of the final semester."
+    ],
+    "policy": {
+      "overlapCap": 2,
+      "nonCourseRequirements": [
+        "Participate in at least three Indigenous community events and submit a write-up of 1 to 2 pages per event"
+      ],
+      "sourceNote": "No more than two course credits may overlap in the fulfillment of the requirements of the Indigenous Studies Certificate or of a major, a simultaneous degree, or another certificate."
+    },
+    "requirements": [
+      {
+        "name": "Indigenous studies courses",
+        "required": 5,
+        "description": "Five courses on Indigenous topics from at least three of five areas: Language & Culture (YC NAIS Language & Culture); Literature & Arts (YC NAIS Literature & Arts); Environment & Politics (YC NAIS Environment & Politics); History, Society & Law (YC NAIS History Society & Law); Science & Education (YC NAIS Science & Education). No more than two courses from any single area.",
+        "options": []
+      }
+    ]
+  },
+  "CERT_PERSIAN_IRANIAN": {
+    "id": "CERT_PERSIAN_IRANIAN",
+    "name": "Persian and Iranian Studies",
+    "description": "Recognizes undergraduates who combine the study of Persian language and literature with wider engagement with the art, philosophy, religion, history, politics, and culture of the Persian-speaking world.",
+    "category": "interdisciplinary",
+    "sourceUrl": "https://catalog.yale.edu/ycps/subjects-of-instruction/persian-and-iranian/",
+    "requiresApplication": false,
+    "creditRequirements": {
+      "total": 5
+    },
+    "notes": [
+      "Students must attend three events (e.g. Iran Colloquium lectures, Persian Circle, Persian-language film screenings, PSA events, CMES/NELC/SASC/CAI events) and submit a 1–2 page write-up for each.",
+      "All courses must be taken for a letter grade of B or above.",
+      "Only two content courses should originate in the same department.",
+      "Persian L5 courses are content-oriented and may count as either a content or language course.",
+      "Premodern Iranian language courses (e.g. Old Persian, Middle Persian, Soghdian) count as content courses.",
+      "No course taken Credit/D/Fail may be applied toward the certificate.",
+      "No more than two course credits may overlap with a major, simultaneous degree, or another certificate.",
+      "No course credit may be applied toward the requirements of more than two curricular programs.",
+      "Graduate and professional school courses may count toward the certificate.",
+      "Courses taken at another institution or during an approved summer or term-time study abroad program may count with DUS approval.",
+      "Declare on Yale Hub by January 15 or September 15 of the final semester at the latest."
+    ],
+    "policy": {
+      "overlapCap": 2,
+      "minGrade": "B",
+      "nonCourseRequirements": [
+        "Attend three approved Persian and Iranian studies events and submit a 1 to 2 page write-up about each to the certificate director"
+      ],
+      "sourceNote": "No more than two course credits fulfilling the requirements of the Persian and Iranian Studies Certificate may overlap with a major, a simultaneous degree, or another certificate. Courses are drawn from a list of approved courses and must be taken for a letter grade of B or above."
+    },
+    "requirements": [
+      {
+        "name": "Content courses",
+        "required": 3,
+        "description": "Three courses with YC Persia & Iran Content attribute covering art, philosophy, religion, history, politics, and culture of the Persian-speaking world.",
+        "options": []
+      },
+      {
+        "name": "Persian language",
+        "required": 2,
+        "description": "Two courses in Persian language (L1–L5).",
+        "options": []
+      }
+    ]
+  },
+  "CERT_PORTUGUESE": {
+    "id": "CERT_PORTUGUESE",
+    "name": "Portuguese (Advanced Language Study)",
+    "description": "Certificate of Advanced Language Study in Portuguese offered by the Department of Spanish and Portuguese. A certificate adviser, typically the DUS, advises students on the certification process and certifies completion before the end of eight terms of study. The certificate is listed on the student transcript once certified.",
+    "category": "advanced_language",
+    "sourceUrl": "https://catalog.yale.edu/ycps/subjects-of-instruction/portuguese/",
+    "requiresApplication": false,
+    "parentProgram": "Portuguese",
+    "creditRequirements": {
+      "total": 4
+    },
+    "notes": [
+      "No Credit/D/Fail",
+      "Letter grade B or above required in all courses",
+      "Must complete requirements before the end of eight terms of study",
+      "Declare candidacy on Yale Hub as early as possible, no later than January 15 or September 15 of final semester",
+      "With adviser approval, one advanced non-L5 course conducted in Portuguese (e.g., independent study graded pass/fail, graduate seminar, or advanced seminar) may count",
+      "One credit from a Yale or Yale-designated study-abroad program taught in Portuguese may be substituted with adviser approval"
+    ],
+    "policy": {
+      "minGrade": "B",
+      "sourceNote": "All courses must be taken for a letter grade, and students must achieve a grade of B or above."
+    },
+    "requirements": [
+      {
+        "name": "Courses beyond L4",
+        "required": 4,
+        "description": "Four courses, all beyond the L4 level in Portuguese. At least two must be Yale courses designated L5.",
+        "options": []
+      }
+    ]
+  },
+  "CERT_PROGRAMMING": {
+    "id": "CERT_PROGRAMMING",
+    "name": "Programming",
+    "description": "Prepares students to program computers in support of work in any area of study. A short path to programming literacy that can be completed in four terms. Majors in Computer Science and joint programs with Economics, Electrical Engineering, Mathematics, Psychology, or Computing and the Arts may not pursue this certificate.",
+    "category": "skills_based",
+    "sourceUrl": "https://catalog.yale.edu/ycps/subjects-of-instruction/computer-science/",
+    "requiresApplication": false,
+    "parentProgram": "Computer Science",
+    "creditRequirements": {
+      "total": 5
+    },
+    "notes": [
+      "No Credit/D/Fail",
+      "None of the five required courses may satisfy a major or other certificate; substitute from the same category or a more advanced course if needed",
+      "No course may satisfy more than one of the five required courses",
+      "Majors in Computer Science, CSEC, CS-EE, CS-Math, CS-Psychology, or Computing and the Arts may not pursue this certificate"
+    ],
+    "policy": {
+      "overlapCap": 0,
+      "zeroOverlap": true,
+      "ineligibleMajors": [
+        "CPSC_BA",
+        "CPSC_BS",
+        "CSEC_BS",
+        "EECS",
+        "CPSC_MATH_BS",
+        "CPSC_PSYCH_BS",
+        "COMPUTING_ARTS_ARCH",
+        "COMPUTING_ARTS_ART",
+        "COMPUTING_ARTS_HISTART",
+        "COMPUTING_ARTS_MUSIC",
+        "COMPUTING_ARTS_TDPS"
+      ],
+      "sourceNote": "Students may not use any of the five required courses, indicated below, to satisfy the requirements of any major or other certificate. Majors in Computer Science, and in the joint programs with Economics, Electrical Engineering, Mathematics, and Psychology, or in Computing and the Arts may not pursue the Certificate."
+    },
+    "requirements": [
+      {
+        "name": "Prerequisite",
+        "required": 1,
+        "description": "Introductory programming course. AP Computer Science credit may satisfy this prerequisite.",
+        "options": [
+          {
+            "type": "course",
+            "code": "CPSC 1100"
+          },
+          {
+            "type": "course",
+            "code": "CPSC 1001"
+          },
+          {
+            "type": "course",
+            "code": "CPSC S115"
+          }
+        ]
+      },
+      {
+        "name": "Programming",
+        "required": 1,
+        "description": "Core programming course.",
+        "options": [
+          {
+            "type": "course",
+            "code": "CPSC 2010"
+          },
+          {
+            "type": "course",
+            "code": "CPSC 2000"
+          }
+        ]
+      },
+      {
+        "name": "Data structures",
+        "required": 1,
+        "description": "Required data structures course.",
+        "options": [
+          {
+            "type": "course",
+            "code": "CPSC 2230"
+          }
+        ]
+      },
+      {
+        "name": "Advanced programming",
+        "required": 1,
+        "description": "Advanced programming course.",
+        "options": [
+          {
+            "type": "course",
+            "code": "CPSC 3270"
+          },
+          {
+            "type": "course",
+            "code": "CPSC 3230"
+          }
+        ]
+      },
+      {
+        "name": "Programming elective",
+        "required": 1,
+        "description": "A CPSC course with CPSC 2230 as a listed or implied prerequisite and a primary focus on programming, or a second course that satisfies the advanced programming requirement.",
+        "options": [
+          {
+            "type": "course",
+            "code": "CPSC 4180"
+          },
+          {
+            "type": "course",
+            "code": "CPSC 4210"
+          },
+          {
+            "type": "course",
+            "code": "CPSC 4230"
+          },
+          {
+            "type": "course",
+            "code": "CPSC 4240"
+          },
+          {
+            "type": "course",
+            "code": "CPSC 4330"
+          },
+          {
+            "type": "course",
+            "code": "CPSC 4370"
+          },
+          {
+            "type": "course",
+            "code": "CPSC 4390"
+          },
+          {
+            "type": "course",
+            "code": "CPSC 4460"
+          },
+          {
+            "type": "course",
+            "code": "CPSC 4780"
+          }
+        ]
+      },
+      {
+        "name": "Applications or algorithms elective",
+        "required": 1,
+        "description": "Either a programming-in-context course that requires significant programming, or a course in algorithms.",
+        "options": [
+          {
+            "type": "course",
+            "code": "CPSC 3340"
+          },
+          {
+            "type": "course",
+            "code": "CPSC 3760"
+          },
+          {
+            "type": "course",
+            "code": "CPSC 4310"
+          },
+          {
+            "type": "course",
+            "code": "CPSC 4320"
+          },
+          {
+            "type": "course",
+            "code": "CPSC 4740"
+          },
+          {
+            "type": "course",
+            "code": "CPSC 4770"
+          },
+          {
+            "type": "course",
+            "code": "CPSC 4790"
+          },
+          {
+            "type": "course",
+            "code": "LING 3800"
+          },
+          {
+            "type": "course",
+            "code": "CPSC 3650"
+          },
+          {
+            "type": "course",
+            "code": "CPSC 3660"
+          }
+        ]
+      }
+    ]
+  },
+  "CERT_QUANTUM": {
+    "id": "CERT_QUANTUM",
+    "name": "Quantum Science and Engineering",
+    "description": "Explores how quantum mechanics can be harnessed to encode, manipulate, process, learn, and distribute information. Unites experts from physics, computer science, engineering, chemistry, and materials science to develop technologies in computing, simulation, sensing, timing, and networking.",
+    "category": "skills_based",
+    "sourceUrl": "https://catalog.yale.edu/ycps/subjects-of-instruction/quantum-science/",
+    "requiresApplication": false,
+    "creditRequirements": {
+      "total": 5
+    },
+    "notes": [
+      "Minimum grade C in each course",
+      "No Credit/D/Fail",
+      "No more than two course credits may overlap with a major, simultaneous degree, or another certificate",
+      "No overlap of any 1000/2000-level courses; only two 3000+ level courses may overlap",
+      "No course credit may count toward more than two curricular programs",
+      "Approved graduate and professional school courses may count",
+      "Non-Yale courses may not count",
+      "Declare intent by the last day of add/drop in the final term of enrollment on Yale Hub"
+    ],
+    "policy": {
+      "overlapCap": 2,
+      "overlapMinLevel": 3000,
+      "minGrade": "C",
+      "sourceNote": "No more than two course credits may overlap in the fulfillment of the requirements of the Quantum Science & Engineering Certificate and of a major, a simultaneous degree, or another certificate. Students earning this certificate may not overlap any 1000/2000 level courses; only two 3000+ level courses may overlap. The minimum grade for all courses is a C."
+    },
+    "requirements": [
+      {
+        "name": "Quantum foundations",
+        "required": 1,
+        "description": "One required foundations course.",
+        "options": [
+          {
+            "type": "course",
+            "code": "PHYS 3450"
+          },
+          {
+            "type": "course",
+            "code": "CPSC 4470"
+          }
+        ]
+      },
+      {
+        "name": "Quantum electives",
+        "required": 4,
+        "description": "Courses from Applied Physics, Chemistry, Computer Science, Electrical Engineering, Global Affairs, Mathematics, Physics, or Statistics & Data Science that carry the YC Quantum Elective attribute.",
+        "options": []
+      }
+    ]
+  },
+  "CERT_RUSSIAN": {
+    "id": "CERT_RUSSIAN",
+    "name": "Russian (Advanced Language Study)",
+    "description": "Certificate of Advanced Language Study in Russian offered by the Department of Slavic Languages and Literatures. A certificate adviser, typically the DUS, advises students on the certification process. The certificate is listed on student transcripts.",
+    "category": "advanced_language",
+    "sourceUrl": "https://catalog.yale.edu/ycps/subjects-of-instruction/slavic-languages-literatures/",
+    "requiresApplication": false,
+    "parentProgram": "Slavic Languages and Literatures",
+    "creditRequirements": {
+      "total": 4
+    },
+    "notes": [
+      "No Credit/D/Fail",
+      "Letter grade B or above required in all courses",
+      "Declare candidacy on Yale Hub as early as possible, no later than January 15 or September 15 of final semester",
+      "L5 content courses should be taken only after completing RUSS 1510 (Third-Year Russian II)",
+      "With adviser approval, one advanced non-L5 course conducted in Russian (e.g., independent study graded pass/fail, graduate seminar, or advanced seminar) may count",
+      "One LxC course taught in English may count if it includes a weekly discussion section conducted entirely in Russian (minimum three students; course designated LxC)",
+      "Up to two study-abroad credits taught in Russian may be substituted with adviser approval"
+    ],
+    "policy": {
+      "minGrade": "B",
+      "sourceNote": "All courses must be taken for a letter grade, and students must achieve a grade of B or above."
+    },
+    "requirements": [
+      {
+        "name": "Courses beyond L4",
+        "required": 4,
+        "description": "Four courses beyond the L4 level in Russian. At least two must be Yale courses designated L5.",
+        "options": []
+      }
+    ]
+  },
+  "CERT_SANSKRIT": {
+    "id": "CERT_SANSKRIT",
+    "name": "Sanskrit (Advanced Language Study)",
+    "description": "Certificate of Advanced Language Study in Sanskrit offered by the Department of South Asian Studies. A certificate adviser, typically the DUS, advises students on the certification process. The certificate is listed on the student's transcript once certified through Degree Audit.",
+    "category": "advanced_language",
+    "sourceUrl": "https://catalog.yale.edu/ycps/subjects-of-instruction/south-asian-studies/",
+    "requiresApplication": false,
+    "parentProgram": "South Asian Studies",
+    "creditRequirements": {
+      "total": 4
+    },
+    "notes": [
+      "No Credit/D/Fail",
+      "Letter grade B or above required in all courses",
+      "Declare candidacy on Yale Hub as early as possible, no later than January 15 or September 15 of final semester"
+    ],
+    "policy": {
+      "minGrade": "B",
+      "sourceNote": "All courses must be taken for a letter grade, and students must achieve a grade of B or above."
+    },
+    "requirements": [
+      {
+        "name": "Courses beyond L3",
+        "required": 4,
+        "description": "Four courses beyond the L3 level in Sanskrit. At least two must be Yale courses designated L5. Of the remaining two courses, one must be designated L5 or L4 and one may be SKRT 5570 (directed reading), a course closely related in Old or Middle Indic language (e.g., Vedic or Pali), or a seminar in Sanskrit literature with readings in English.",
+        "options": [
+          {
+            "type": "course",
+            "code": "SKRT 5570"
+          }
+        ]
+      }
+    ]
+  },
+  "CERT_SPANISH": {
+    "id": "CERT_SPANISH",
+    "name": "Spanish (Advanced Language Study)",
+    "description": "Certificate of Advanced Language Study in Spanish offered by the Department of Spanish and Portuguese. A certificate adviser, typically the DUS, advises students on the certification process. The certificate is listed on the student's transcript once certified.",
+    "category": "advanced_language",
+    "sourceUrl": "https://catalog.yale.edu/ycps/subjects-of-instruction/spanish/",
+    "requiresApplication": false,
+    "parentProgram": "Spanish",
+    "creditRequirements": {
+      "total": 4
+    },
+    "notes": [
+      "No Credit/D/Fail",
+      "Letter grade B or above required in all courses",
+      "Declare candidacy on Yale Hub as early as possible, no later than January 15 or September 15 of final semester",
+      "Yale study-abroad courses designated L5 may count toward the certificate",
+      "One credit from a non-Yale study-abroad program taught in Spanish may be substituted with adviser approval"
+    ],
+    "policy": {
+      "minGrade": "B",
+      "sourceNote": "All courses must be taken for a letter grade, and students must achieve a grade of B or above."
+    },
+    "requirements": [
+      {
+        "name": "Courses beyond L4",
+        "required": 4,
+        "description": "Four courses, all beyond the L4 level in Spanish. At least two must be Yale courses designated L5. At least one must be a Yale 3000-level advanced undergraduate lecture or seminar.",
+        "options": []
+      }
+    ]
+  },
+  "CERT_TECH_ENTREPRENEURSHIP": {
+    "id": "CERT_TECH_ENTREPRENEURSHIP",
+    "name": "Technology Entrepreneurship",
+    "description": "Provides engineering students with training at the interface of engineering and technology development, emphasizing translating technical ideas into practical applications in technology-driven ventures, mission-oriented projects, and innovation within industry, government, and research institutions.",
+    "category": "skills_based",
+    "sourceUrl": "https://catalog.yale.edu/ycps/subjects-of-instruction/technology-entrepreneurship-cert/",
+    "requiresApplication": true,
+    "creditRequirements": {
+      "total": 5
+    },
+    "notes": [
+      "Participating majors: Biomedical Engineering, Computer Science, Electrical Engineering, Electrical Engineering and Computer Science",
+      "Minimum grade C in each course; all courses taken for a letter grade",
+      "No Credit/D/Fail",
+      "Attend and participate in three experiential units (internship, Hillhouse Fellows, Engineering Dean's Speaker Series, or Tsai City Accelerator) with a 1–2 page write-up for each",
+      "No more than two course credits may overlap with a major, simultaneous degree, or another certificate",
+      "No course credit may count toward more than two curricular programs",
+      "Approved graduate and professional school courses may count",
+      "Non-Yale courses may not count without prior director approval",
+      "Submit application with major, tentative coursework plan, and faculty evaluators; director adds requirements to Degree Audit upon approval"
+    ],
+    "policy": {
+      "overlapCap": 2,
+      "minGrade": "C",
+      "extraForms": [
+        "Certificate application listing your entrepreneurial-emphasis major, a tentative plan of coursework, and a short list of faculty willing to evaluate your project"
+      ],
+      "nonCourseRequirements": [
+        "Attend and participate in three experiential units (entrepreneurial internship, Hillhouse Fellows program, Engineering Dean's Speaker Series, or Tsai City Accelerator) and submit a 1 to 2 page write-up for each"
+      ],
+      "sourceNote": "No more than two course credits may overlap in the fulfillment of the requirements of the Technology Entrepreneurship Certificate and of a major, a simultaneous degree, or another certificate. All courses must be taken for a letter grade, and students must achieve a grade of C or above."
+    },
+    "requirements": [
+      {
+        "name": "Core entrepreneurship course",
+        "required": 1,
+        "description": "Required core course.",
+        "options": [
+          {
+            "type": "course",
+            "code": "ENAS 2170"
+          }
+        ]
+      },
+      {
+        "name": "Product Management Foundations",
+        "required": 1,
+        "description": "Courses tagged with the YC Tech Product Management attribute in Yale Course Search.",
+        "options": []
+      },
+      {
+        "name": "Design",
+        "required": 1,
+        "description": "Courses tagged with the YC Tech Design attribute in Yale Course Search.",
+        "options": []
+      },
+      {
+        "name": "Organization/Planning",
+        "required": 1,
+        "description": "Courses tagged with the YC Tech Organization Planning attribute in Yale Course Search.",
+        "options": []
+      },
+      {
+        "name": "Technology",
+        "required": 1,
+        "description": "Technology course with a significant project or lab component. Courses tagged with the YC Tech Technology attribute in Yale Course Search.",
+        "options": []
+      }
+    ]
+  },
+  "CERT_TRANSLATION_STUDIES": {
+    "id": "CERT_TRANSLATION_STUDIES",
+    "name": "Translation Studies",
+    "description": "Promotes the interdisciplinary study of translation and facilitates translation practices encompassing literary, social, political, economic, legal, technological, and medical dimensions.",
+    "category": "interdisciplinary",
+    "sourceUrl": "https://catalog.yale.edu/ycps/subjects-of-instruction/translation_studies/",
+    "requiresApplication": false,
+    "creditRequirements": {
+      "total": 5
+    },
+    "notes": [
+      "No more than three of the five courses may originate in the same department.",
+      "Each student must attend three lectures or events listed through the Translation Initiative and submit a brief written response for each. Other translation activities may count at the director's discretion.",
+      "No course taken Credit/D/Fail may be applied toward the certificate.",
+      "No more than two course credits may overlap with a major, simultaneous degree, or another certificate.",
+      "No course credit may be applied toward the requirements of more than two curricular programs.",
+      "Approved graduate and professional school courses may count toward the certificate.",
+      "Courses taken at another institution or during an approved summer or term-time study abroad program may count with DUS approval.",
+      "Declare on Yale Hub by January 15 or September 15 of the final semester at the latest."
+    ],
+    "policy": {
+      "overlapCap": 2,
+      "sameDeptCap": 3,
+      "nonCourseRequirements": [
+        "Attend three lectures or events listed through the Translation Initiative and submit a brief written response to each to the certificate director"
+      ],
+      "sourceNote": "Of the five credits, no more than three may originate in the same department. No more than two course credits may overlap in the fulfillment of the requirements of the Translation Studies certificate or of a major, a simultaneous degree, or another certificate."
+    },
+    "requirements": [
+      {
+        "name": "Translation-themed courses",
+        "required": 5,
+        "description": "Five course credits on translation-themed topics from the approved course list posted each semester on the Translation Studies Initiative website. No more than three may originate in the same department.",
+        "options": []
+      }
+    ]
+  },
+  "CERT_VIETNAMESE": {
+    "id": "CERT_VIETNAMESE",
+    "name": "Vietnamese (Advanced Language Study)",
+    "description": "Certificate of Advanced Language Study in Vietnamese offered by the Department of Southeast Asian Studies. Once certified, the certificate is listed on student transcripts.",
+    "category": "advanced_language",
+    "sourceUrl": "https://catalog.yale.edu/ycps/subjects-of-instruction/southeast-asia-studies/",
+    "requiresApplication": false,
+    "parentProgram": "Southeast Asia Studies",
+    "creditRequirements": {
+      "total": 4
+    },
+    "notes": [
+      "No Credit/D/Fail",
+      "Letter grade B or above required in all courses",
+      "Declare candidacy on Yale Hub as early as possible, no later than January 15 or September 15 of final semester",
+      "With adviser approval, up to two advanced non-L5 Yale courses conducted in Vietnamese may count (e.g., VIET 4700 or VIET 4710 graded pass/fail, or an advanced seminar); only one pass/fail independent study course may count",
+      "Up to two study-abroad credits taught in Vietnamese may be substituted with adviser approval"
+    ],
+    "policy": {
+      "minGrade": "B",
+      "sourceNote": "All courses must be taken for a letter grade, and students must achieve a grade of B or above."
+    },
+    "requirements": [
+      {
+        "name": "Courses beyond L4",
+        "required": 4,
+        "description": "Four courses beyond the L4 level in Vietnamese (beyond VIET 1420). At least two must be Yale courses designated L5 (e.g., VIET 1500, VIET 1600, or VIET 4600).",
+        "options": [
+          {
+            "type": "course",
+            "code": "VIET 1500"
+          },
+          {
+            "type": "course",
+            "code": "VIET 1600"
+          },
+          {
+            "type": "course",
+            "code": "VIET 4600"
+          }
+        ]
+      }
+    ]
+  },
+  "CERT_YORUBA": {
+    "id": "CERT_YORUBA",
+    "name": "Yoruba (Advanced Language Study)",
+    "description": "Certificate of Advanced Language Study in Yoruba offered by the Department of African Studies. A certificate adviser, typically the DUS, advises students on the certification process and certifies completion before the end of eight terms of study. The certificate is listed on the student's transcript once certified.",
+    "category": "advanced_language",
+    "sourceUrl": "https://catalog.yale.edu/ycps/subjects-of-instruction/african-studies/",
+    "requiresApplication": false,
+    "parentProgram": "African Studies",
+    "creditRequirements": {
+      "total": 4
+    },
+    "notes": [
+      "Letter grade B or above required in all courses",
+      "Must complete requirements before the end of eight terms of study",
+      "Declare candidacy on Yale Hub as early as possible, no later than January 15 or September 15 of final semester",
+      "With adviser approval, one advanced non-L5 Yale course conducted in Yoruba (e.g., independent study graded pass/fail, graduate seminar, or advanced seminar) may count",
+      "One LxC course taught in English may count if it includes a weekly discussion section conducted entirely in Yoruba (minimum three students; course designated LxC)",
+      "Up to two study-abroad credits taught in Yoruba may be substituted with adviser approval"
+    ],
+    "policy": {
+      "minGrade": "B",
+      "sourceNote": "All courses must be taken for a letter grade, and students must achieve a grade of B or above."
+    },
+    "requirements": [
+      {
+        "name": "Courses beyond L4",
+        "required": 4,
+        "description": "Four courses beyond the L4 level in Yoruba. At least two must be Yale courses designated L5.",
+        "options": []
+      }
+    ]
+  }
+}

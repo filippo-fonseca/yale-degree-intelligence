@@ -1,0 +1,58 @@
+{
+  "id": "CERT_HUMAN_RIGHTS_INTENSIVE",
+  "name": "Human Rights Studies Intensive",
+  "description": "An intensive pathway for students who wish to engage deeply with the study of human rights, including regular cohort programming throughout the academic year.",
+  "category": "interdisciplinary",
+  "sourceUrl": "https://catalog.yale.edu/ycps/subjects-of-instruction/human-rights/",
+  "requiresApplication": true,
+  "creditRequirements": {
+    "total": 6
+  },
+  "notes": [
+    "Apply during the spring term of sophomore year only via the Human Rights website.",
+    "Students participate in regular (typically weekly) additional programming tailored for the small cohort throughout the academic year.",
+    "Non-credited senior colloquium required.",
+    "Electives must engage with the language, ideas, and methods of human rights with substantial focus (four or more of thirteen, or six to eight of twenty-six, course meetings per syllabus).",
+    "No courses taken Credit/D/Fail may be applied toward the certificate.",
+    "Courses taken at another institution or during an approved summer or term-time study abroad program may count with certificate director approval. An on-topic summer internship can replace one elective with approval.",
+    "Graduate and professional school courses may count with director approval or if tagged with approved attributes."
+  ],
+  "policy": {
+    "extraForms": [
+      "Application submitted during the spring term of sophomore year, available via the Human Rights website"
+    ],
+    "nonCourseRequirements": [
+      "Participate in the non-credited senior colloquium"
+    ],
+    "sourceNote": "This certificate accepts students by application during the spring term of their sophomore year only. Students complete a gateway lecture course, five electives, and participate in a non-credited senior colloquium."
+  },
+  "requirements": [
+    {
+      "name": "Gateway",
+      "required": 1,
+      "description": "Gateway lecture course introducing theoretical tools for studying human rights, their evolution, and their justification.",
+      "options": [
+        { "type": "course", "code": "GLBL 3102" },
+        { "type": "course", "code": "GLBL 3103" }
+      ]
+    },
+    {
+      "name": "Domestic elective",
+      "required": 1,
+      "description": "Elective with YC Human Rights Domestic attribute.",
+      "options": []
+    },
+    {
+      "name": "International elective",
+      "required": 1,
+      "description": "Elective with YC Human Rights International attribute.",
+      "options": []
+    },
+    {
+      "name": "Additional electives",
+      "required": 3,
+      "description": "Additional human rights electives approved for the certificate.",
+      "options": []
+    }
+  ]
+}

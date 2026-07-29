@@ -1,0 +1,80 @@
+name: Changelog reminder
+
+# Remind authors (and coding agents) to update the public changelog
+# when opening/updating a PR into main. Does not write the changelog —
+# just posts a sticky reminder if app/changelog/ was not touched.
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+    branches: [main]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  changelog-reminder:
+    name: Changelog reminder
+    runs-on: ubuntu-latest
+    # Skip draft PRs — nudge once it's ready for review
+    if: github.event.pull_request.draft == false
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Detect changelog changes
+        id: changelog
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          set -euo pipefail
+          CHANGED=$(git diff --name-only "$BASE_SHA...$HEAD_SHA" || true)
+          echo "Changed files:"
+          echo "$CHANGED"
+
+          if echo "$CHANGED" | grep -Eq '(^|/)app/changelog/'; then
+            echo "updated=true" >> "$GITHUB_OUTPUT"
+            echo "Changelog paths were updated in this PR."
+          else
+            echo "updated=false" >> "$GITHUB_OUTPUT"
+            echo "No changelog updates detected."
+          fi
+
+      - name: Sticky reminder when changelog missing
+        if: steps.changelog.outputs.updated != 'true'
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          header: di-changelog-reminder
+          message: |
+            ## Changelog reminder
+
+            This PR targets **`main`** but does not touch `app/changelog/`.
+
+            Please update the public changelog before merging:
+            1. Edit `app/changelog/releases.ts`
+            2. Add or extend the latest release entry (user-facing language — no internals)
+            3. Keep **Latest** on the newest release (`current: true`)
+
+            Live page: `/changelog`
+
+            <!-- DI_CHANGELOG_REMINDER -->
+            **For Cursor / coding agents:** If you are working this PR, update `app/changelog/releases.ts` now with a short user-facing note for these changes, commit it, and mention it in your summary. Do not invent product features — only document what this PR actually changes.
+
+      - name: Clear reminder when changelog present
+        if: steps.changelog.outputs.updated == 'true'
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          header: di-changelog-reminder
+          delete: true
+
+      - name: Advisory check annotation
+        if: steps.changelog.outputs.updated != 'true'
+        run: |
+          echo "::warning title=Changelog not updated::Update app/changelog/releases.ts with user-facing notes for this PR (see sticky comment)."
+          # Soft fail so it shows red in Checks but is easy to see.
+          # Do not add this job as a required status check unless you want to block merges.
+          exit 1

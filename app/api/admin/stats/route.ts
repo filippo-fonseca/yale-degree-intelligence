@@ -53,13 +53,11 @@ export async function GET(req: NextRequest) {
     coursesSnap,
     friendsPublicSnap,
     friendsSnap,
-    conversationsSnap,
   ] = await Promise.all([
     adminDb.collection("users").get(),
     adminDb.collection("courses").get(),
     adminDb.collection("friends_public_data").get(),
     adminDb.collection("friends").get(),
-    adminDb.collection("conversations").get(),
   ]);
 
   const users: AnyRecord[] = usersSnap.docs.map((doc) => ({
@@ -71,7 +69,6 @@ export async function GET(req: NextRequest) {
     ...(doc.data() as AnyRecord),
   }));
   const friendsPublic = friendsPublicSnap.docs.map((doc) => doc.data() as AnyRecord);
-  const conversations = conversationsSnap.docs.map((doc) => doc.data() as AnyRecord);
 
   // The true user total lives in Firebase Auth, not the Firestore `users`
   // collection (many auth users never create a profile doc). Count ALL auth
@@ -151,7 +148,6 @@ export async function GET(req: NextRequest) {
   let usersWithBio = 0;
   let tutorialSeen = 0;
   let welcomeSeen = 0;
-  let danWriteEnabled = 0;
 
   for (const user of users) {
     const majors = Array.isArray(user.majors) ? user.majors : [];
@@ -166,7 +162,6 @@ export async function GET(req: NextRequest) {
     if (hasBio) usersWithBio += 1;
     if (user.hasSeenTutorial) tutorialSeen += 1;
     if (user.hasSeenV3Welcome) welcomeSeen += 1;
-    if (user.danWriteActionsEnabled) danWriteEnabled += 1;
     if (user.graduationYear) {
       const label = String(user.graduationYear);
       graduationYearCounts[label] = (graduationYearCounts[label] || 0) + 1;
@@ -184,10 +179,6 @@ export async function GET(req: NextRequest) {
   const totalUsers = authUserCount;
   const totalMajorSlots = majorSlotsByUser.reduce((sum, count) => sum + count, 0);
   const friendsEnabledUsers = friendsPublic.filter((doc) => doc.enabled).length;
-  const totalMessages = conversations.reduce(
-    (sum, convo) => sum + (Array.isArray(convo.messages) ? convo.messages.length : 0),
-    0,
-  );
 
   const recentUsers = users
     .map((user) => {
@@ -297,12 +288,9 @@ export async function GET(req: NextRequest) {
       friendsEnabledUsers,
       friendsEnabledRate: round((friendsEnabledUsers / Math.max(profilesCreated, 1)) * 100, 1),
       friendshipCount: friendsSnap.size,
-      conversationCount: conversationsSnap.size,
-      averageMessagesPerConversation: round(totalMessages / Math.max(conversationsSnap.size, 1), 1),
       usersWithBio,
       tutorialSeen,
       welcomeSeen,
-      danWriteEnabled,
     },
     distributions: {
       courseStatuses: sortEntries(courseStatusCounts),

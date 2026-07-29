@@ -11,7 +11,6 @@ export interface UserProfile {
   graduationYear: number;
   bio?: string;
   updatedAt: Date;
-  danWriteActionsEnabled?: boolean;
 }
 
 /** Local editing state, where the certificate list is always materialized. */

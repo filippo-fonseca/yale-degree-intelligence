@@ -16,10 +16,7 @@ import { YearBadge } from "../ui/YearBadge";
 import { isAdminEmail } from "@/lib/admin";
 import type { UserSettingsModalProps } from "./settingsTypes";
 import { useUserProfileForm } from "./useUserProfileForm";
-import { useDanSettings } from "./useDanSettings";
-import { useMcpSettings } from "./useMcpSettings";
 import { SettingsProfileSection } from "./SettingsProfileSection";
-import { SettingsIntegrationsSection } from "./SettingsIntegrationsSection";
 import { SettingsAcademicSection } from "./SettingsAcademicSection";
 import { SettingsConfirmModals } from "./SettingsConfirmModals";
 
@@ -82,9 +79,6 @@ export default function UserSettingsModal({
     handleCancelBio,
     handleSave,
   } = profileForm;
-
-  const danSettings = useDanSettings(userProfile, onSave);
-  const mcpSettings = useMcpSettings();
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -213,11 +207,6 @@ export default function UserSettingsModal({
               isTogglingFriends={isTogglingFriends}
               onRequestDisableFriends={() => setShowDisableFriendsConfirm(true)}
               onEnableFriends={handleEnableFriends}
-            />
-
-            <SettingsIntegrationsSection
-              {...danSettings}
-              {...mcpSettings}
             />
 
             <SettingsAcademicSection

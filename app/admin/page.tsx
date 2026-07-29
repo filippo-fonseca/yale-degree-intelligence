@@ -23,7 +23,6 @@ import {
   ArrowUp,
   BarChart3,
   BookOpen,
-  Brain,
   DownloadCloud,
   GraduationCap,
   Loader2,
@@ -703,12 +702,6 @@ export default function AdminPage() {
                 value={stats.overview.averageGpaAcrossGradedCourses}
                 sub={`${formatNumber(stats.overview.gradedCourses)} graded courses`}
                 icon={<GraduationCap className="h-4 w-4" />}
-              />
-              <StatTile
-                label="Dan usage"
-                value={formatNumber(stats.overview.conversationCount)}
-                sub={`${stats.overview.averageMessagesPerConversation} messages per convo`}
-                icon={<Brain className="h-4 w-4" />}
               />
               </div>
             </section>

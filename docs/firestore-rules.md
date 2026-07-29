@@ -150,6 +150,8 @@ match /databases/{database}/documents {
 
     // ============================================
     // SECRETS — Admin SDK only (client deny)
+    // The Dan advisor and MCP server are retired, but documents from when
+    // they were live can still exist, so these stay locked until purged.
     // ============================================
     match /dan_keys/{userId} {
       allow read, write: if false;

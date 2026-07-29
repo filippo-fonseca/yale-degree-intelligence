@@ -14,11 +14,9 @@ import { CertificateTabPanel } from "./CertificateTabPanel";
 import { SimulatorTabPanel } from "./SimulatorTabPanel";
 import { DistributionalsTabPanel } from "./DistributionalsTabPanel";
 import { FriendsTabPanel } from "./FriendsTabPanel";
-import { CleoAITabPanel } from "./CleoAITabPanel";
 
 interface DashboardTabPanelsProps {
   activeTab: string;
-  cleoaiUnreachable: boolean;
   user: User;
   userProfile: UserProfile | null;
   courses: Course[];
@@ -48,7 +46,6 @@ interface DashboardTabPanelsProps {
 
 export function DashboardTabPanels({
   activeTab,
-  cleoaiUnreachable,
   user,
   userProfile,
   courses,
@@ -146,14 +143,6 @@ export function DashboardTabPanels({
           userProfile={userProfile}
           onGoToCourses={() => onTabChange("upload")}
           onToggleFriends={onToggleFriends}
-        />
-      )}
-      {activeTab === "cleoai" && !cleoaiUnreachable && (
-        <CleoAITabPanel
-          courses={courses}
-          selectedMajor={selectedMajor}
-          userProfile={userProfile}
-          stats={stats}
         />
       )}
     </AnimatePresence>

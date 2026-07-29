@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
 
-export function useDashboardNav(cleoaiUnreachable: boolean) {
+export function useDashboardNav() {
   const [activeTab, setActiveTab] = useLocalStorage(
     "dashboardActiveTab",
     "upload",
@@ -31,13 +31,13 @@ export function useDashboardNav(cleoaiUnreachable: boolean) {
     }
   };
 
-  // Bounce anyone whose persisted tab still points at a tab they cannot reach
-  // (Dan is hidden for the v3 launch) so they do not land on an empty pane.
+  // The AI advisor tab is gone. Anyone whose persisted tab still points at it
+  // gets bounced to My courses instead of landing on an empty pane.
   useEffect(() => {
-    if (cleoaiUnreachable && activeTab === "cleoai") {
+    if (activeTab === "cleoai") {
       setActiveTab("upload");
     }
-  }, [cleoaiUnreachable, activeTab, setActiveTab]);
+  }, [activeTab, setActiveTab]);
 
   return {
     activeTab,

@@ -159,10 +159,9 @@ Simulator:
 ## Known gaps / good follow-ups
 
 1. Expand attribute-tagged elective lists where Yale Course Search attributes can be enumerated  
-2. Deeper Dan AI context for certificate progress (nav exists; rich context optional)  
-3. Friend profile UI display of certificates (data synced; UI may still be majors-only)  
-4. Admin stats for certificate popularity  
-5. Older data-only PR #65 is **superseded** by this integration branch  
+2. Friend profile UI display of certificates (data synced; UI may still be majors-only)  
+3. Admin stats for certificate popularity  
+4. Older data-only PR #65 is **superseded** by this integration branch  
 
 ---
 

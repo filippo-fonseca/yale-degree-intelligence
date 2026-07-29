@@ -4,7 +4,6 @@ import { HiDocumentDuplicate } from "react-icons/hi";
 import { RiProgress3Fill, RiAwardFill } from "react-icons/ri";
 import { FaBuildingCircleCheck } from "react-icons/fa6";
 import { MonitorCog } from "lucide-react";
-import LogoIcon from "@/icons/LogoIcon";
 
 export interface NavItem {
   id: string;
@@ -15,12 +14,6 @@ export interface NavItem {
   /** Short chip shown for Class of 2030 (and similar) welcome nudges. */
   badge?: string;
 }
-
-/**
- * Dan advisor is hidden for the v3 launch. Flip to true to put the tab back;
- * useDashboardNav bounces anyone whose persisted tab still points at it.
- */
-export const SHOW_DAN_ADVISOR = false;
 
 export function createNavItems(
   majorsCount: number,
@@ -62,16 +55,6 @@ export function createNavItems(
       icon: FiUsers,
       label: "Friends",
     },
-    ...(SHOW_DAN_ADVISOR
-      ? [
-          {
-            id: "cleoai",
-            icon: LogoIcon,
-            label: "Dan",
-            comingSoon: true,
-          },
-        ]
-      : []),
     {
       id: "distributionals",
       icon: FaBuildingCircleCheck,

@@ -6,7 +6,7 @@ import CustomLoader from "@/components/ui/CustomLoader";
 import PublicFacingPage from "@/screens/PublicFacingPage";
 import { useAuth } from "@/context/AuthContext";
 import { useTheme } from "@/context/ThemeContext";
-import { createNavItems, SHOW_DAN_ADVISOR } from "@/components/dashboard/navItems";
+import { createNavItems } from "@/components/dashboard/navItems";
 import {
   getMajorProgress as computeMajorProgress,
   getCertificateProgress as computeCertificateProgress,
@@ -92,15 +92,11 @@ export default function Home() {
   const navItems = createNavItems(
     userProfile?.majors?.length ?? 0,
     userProfile?.certificates?.length ?? 0,
+    { isBrandNew },
   );
-  // Dan is unreachable when its tab is hidden, and also while it is only
-  // flagged "coming soon".
-  const cleoaiUnreachable =
-    !SHOW_DAN_ADVISOR ||
-    (navItems.find((i) => i.id === "cleoai")?.comingSoon ?? false);
 
   const { activeTab, setActiveTab, handleTabChange, registerSimulatorNavCheck } =
-    useDashboardNav(cleoaiUnreachable);
+    useDashboardNav();
 
   const { welcomeOpen, setWelcomeOpen, tourOpen, setTourOpen } = useOnboarding(
     user,
@@ -233,6 +229,7 @@ export default function Home() {
         <DashboardHeader
           user={user}
           resolvedTheme={resolvedTheme}
+          isBrandNew={isBrandNew}
           onOpenSidebar={() => setSidebarOpen(true)}
           onGoHome={() => setActiveTab("upload")}
           onOpenCommandPalette={() => setCommandPaletteOpen(true)}
@@ -272,7 +269,6 @@ export default function Home() {
           >
             <DashboardTabPanels
               activeTab={activeTab}
-              cleoaiUnreachable={cleoaiUnreachable}
               user={user}
               userProfile={userProfile}
               courses={courses}

@@ -14,6 +14,14 @@ match /databases/{database}/documents {
       return isAuthenticated() && request.auth.uid == userId;
     }
 
+    // Mirrors lib/allowedEmail.ts: Yale accounts, plus the creator's
+    // personal Gmail so they can test with a separate account.
+    function isAllowedUser() {
+      return isAuthenticated() &&
+             (request.auth.token.email.matches('.*@yale[.]edu') ||
+              request.auth.token.email == 'filifonsecacagnazzo@gmail.com');
+    }
+
     function getFriendshipId(uid1, uid2) {
       return uid1 < uid2 ? uid1 + '_' + uid2 : uid2 + '_' + uid1;
     }
@@ -49,14 +57,16 @@ match /databases/{database}/documents {
 
     // ============================================
     // FRIENDS PUBLIC DATA
+    // Grades are NEVER stored here. Enabled profiles are discoverable
+    // so Yalies can find each other in Friends search; full course lists
+    // are only shown in-app after a friendship check on the profile page.
+    // Discovery reads require a Yale (or creator) email: Firebase issues
+    // tokens to any Google account, so isAuthenticated() alone is not
+    // enough to keep non-Yale accounts out of direct Firestore reads.
     // ============================================
     match /friends_public_data/{userId} {
-      // Owner can always read/write
-      // Friends can read IF enabled AND actually friends
       allow read: if isOwner(userId) ||
-                    (isAuthenticated() &&
-                     hasFriendsEnabled(userId) &&
-                     areFriends(request.auth.uid, userId));
+                    (isAllowedUser() && resource.data.enabled == true);
 
       allow create, update: if isOwner(userId) &&
                               request.resource.data.userId == userId;
@@ -81,14 +91,11 @@ match /databases/{database}/documents {
     }
 
     // ============================================
-    // USERS
+    // USERS — owner only (emails, bio, private prefs)
+    // Friend-facing profile fields live in friends_public_data.
     // ============================================
     match /users/{userId} {
-      // Full-collection client reads of users should be avoided; prefer
-      // friends_public_data for discovery and targeted reads for profiles.
-      // Planned restriction: scope reads to own doc or verified friends.
-      allow read: if isAuthenticated();
-      allow create, update, delete: if isOwner(userId);
+      allow read, create, update, delete: if isOwner(userId);
     }
 
     // ============================================
@@ -132,6 +139,30 @@ match /databases/{database}/documents {
 
     match /cleoai_conversations/{userId} {
       allow read, write: if isOwner(userId);
+    }
+
+    match /conversations/{docId} {
+      allow read, update, delete: if isAuthenticated() &&
+                                    resource.data.userId == request.auth.uid;
+      allow create: if isAuthenticated() &&
+                      request.resource.data.userId == request.auth.uid;
+    }
+
+    // ============================================
+    // SECRETS — Admin SDK only (client deny)
+    // The Dan advisor and MCP server are retired, but documents from when
+    // they were live can still exist, so these stay locked until purged.
+    // ============================================
+    match /dan_keys/{userId} {
+      allow read, write: if false;
+    }
+
+    match /mcp_tokens/{userId} {
+      allow read, write: if false;
+    }
+
+    match /contact_messages/{docId} {
+      allow read, write: if false;
     }
 
 }

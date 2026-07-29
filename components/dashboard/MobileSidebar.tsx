@@ -80,11 +80,16 @@ export function MobileSidebar({
                         : "text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-black/[0.03] dark:hover:bg-white/[0.04]"
                     }`}
                   >
-                    <div className="flex items-center space-x-3">
+                    <div className="flex items-center space-x-3 min-w-0">
                       <item.icon size={item.id === "cleoai" ? 18 : 14} />
                       <span className="text-sm">{item.label}</span>
+                      {item.badge && (
+                        <span className="px-1.5 py-0.5 text-[9px] rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-700 dark:text-emerald-300 whitespace-nowrap">
+                          {item.badge}
+                        </span>
+                      )}
                     </div>
-                    {activeTab === item.id && (
+                    {activeTab === item.id && !item.badge && (
                       <FiChevronRight className="text-blue-400" />
                     )}
                   </motion.button>

@@ -1,14 +1,15 @@
 "use client";
 
-import { Printer } from "lucide-react";
-import Link from "next/link";
+import { Printer, MonitorCog, PenLine } from "lucide-react";
 import FileUpload from "@/components/file-upload";
+import { AcademicDataDisclaimerCard } from "@/components/disclaimers/AcademicDataDisclaimer";
 
 interface OnboardingStateProps {
   userName: string | null;
   isBrandNew: boolean;
   onManualEntry: () => void;
   onUploadSuccess: (text: string) => Promise<void>;
+  onOpenSimulator?: () => void;
 }
 
 export function OnboardingState({
@@ -16,21 +17,58 @@ export function OnboardingState({
   isBrandNew,
   onManualEntry,
   onUploadSuccess,
+  onOpenSimulator,
 }: OnboardingStateProps) {
   const firstName = userName?.split(" ")[0] ?? "there";
 
   return (
     <div className="flex flex-col items-center justify-center py-8">
       {/* Header */}
-      <div className="text-center mb-6">
+      <div className="text-center mb-6 max-w-xl">
         <h2 className="text-2xl font-medium text-gray-900 dark:text-white mb-2">
-          Let's get your courses loaded, {firstName}.
-        </h2>
-        <p className="text-gray-500 dark:text-gray-400 text-sm">
           {isBrandNew
-            ? "After registration, we'll parse your classes and fill in grades when they post."
-            : "Upload your unofficial transcript to see your academic journey. We won't store the file."}
+            ? `Welcome to Yale, ${firstName}.`
+            : `Let's get your courses loaded, ${firstName}.`}
+        </h2>
+        <p className="text-gray-500 dark:text-gray-400 text-sm leading-relaxed">
+          {isBrandNew ? (
+            <>
+              You&apos;re Class of 2030. You do{" "}
+              <span className="font-medium text-gray-700 dark:text-gray-300">
+                not need grades
+              </span>{" "}
+              to start. Since you&apos;ve already registered for fall courses,
+              your unofficial transcript is ready on YHub right now; import it
+              even though everything is still in progress with no grades, or
+              jump into the Simulator to map your trajectory. We&apos;ll show
+              what you&apos;re taking and fill grades in when they post.
+            </>
+          ) : (
+            "Upload your unofficial transcript to see your academic journey. We won't store the PDF file."
+          )}
         </p>
+        {isBrandNew && (
+          <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
+            {onOpenSimulator && (
+              <button
+                type="button"
+                onClick={onOpenSimulator}
+                className="inline-flex items-center gap-2 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-2 text-sm font-medium text-emerald-700 dark:text-emerald-300 hover:bg-emerald-500/15 transition-colors"
+              >
+                <MonitorCog size={14} />
+                Open the Simulator
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={onManualEntry}
+              className="inline-flex items-center gap-2 rounded-xl border border-pink-500/30 bg-pink-500/10 px-4 py-2 text-sm font-medium text-pink-700 dark:text-pink-300 hover:bg-pink-500/15 transition-colors"
+            >
+              <PenLine size={14} />
+              Add courses manually
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Tutorial Steps */}
@@ -40,8 +78,18 @@ export function OnboardingState({
             <span className="p-1.5 rounded-lg bg-pink-500/10 border border-pink-500/20">
               <Printer size={14} className="text-pink-400" />
             </span>
-            How to get your transcript
+            {isBrandNew
+              ? "How to import from YHub (no grades is totally fine)"
+              : "How to get your transcript"}
           </h3>
+          {isBrandNew && (
+            <p className="text-xs text-gray-500 dark:text-gray-400 mb-3 leading-relaxed">
+              You already registered for fall courses, so your unofficial
+              transcript is on YHub now, even though every course still shows
+              as in progress. We parse those in-progress courses so My Courses
+              and the Simulator can start mapping your path right away.
+            </p>
+          )}
           <div className="space-y-3">
             {[
               <>
@@ -52,9 +100,9 @@ export function OnboardingState({
                   rel="noopener noreferrer"
                   className="text-pink-600 dark:text-pink-400 hover:text-pink-700 dark:hover:text-pink-300 underline underline-offset-2"
                 >
-                  Yale Hub
+                  Yale Hub (yub.yale.edu)
                 </a>{" "}
-                and sign in
+                and sign in with CAS
               </>,
               <>
                 Navigate to{" "}
@@ -63,7 +111,7 @@ export function OnboardingState({
                 </span>{" "}
                 →{" "}
                 <span className="px-1.5 py-0.5 rounded bg-gray-100 dark:bg-gray-800/60 border border-gray-300 dark:border-gray-700/50 text-gray-800 dark:text-gray-200 font-mono text-xs">
-                  Unofficial Transcript
+                  Unofficial Transcript — Undergraduate
                 </span>
               </>,
               <>
@@ -71,7 +119,10 @@ export function OnboardingState({
                 <span className="px-1.5 py-0.5 rounded bg-blue-500/20 border border-blue-500/30 text-blue-600 dark:text-blue-300 font-medium text-xs">
                   Print
                 </span>{" "}
-                and save as PDF. Then upload it here.
+                , save as PDF, then upload it here
+                {isBrandNew
+                  ? ". In-progress courses with no grades are supported."
+                  : "."}
               </>,
             ].map((step, i) => (
               <div key={i} className="flex items-start gap-3">
@@ -113,59 +164,11 @@ export function OnboardingState({
         </p>
       </div>
 
-      {/* Privacy disclaimer */}
-      <div className="w-full max-w-xl mt-5 p-4 rounded-xl bg-gradient-to-br from-gray-100/80 via-gray-50/60 to-gray-100/80 dark:from-gray-900/40 dark:via-gray-900/30 dark:to-gray-950/40 border border-gray-200/80 dark:border-gray-800/50 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)]">
-        <div className="flex items-start gap-3">
-          <div className="p-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20 shrink-0 mt-0.5">
-            <svg
-              className="w-3.5 h-3.5 text-emerald-400"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth={2}
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
-              />
-            </svg>
-          </div>
-          <div>
-            <p className="text-[11px] text-gray-500 dark:text-gray-400 leading-relaxed">
-              <span className="font-medium text-gray-700 dark:text-gray-300">
-                By uploading, you voluntarily share your grades.
-              </span>{" "}
-              Your transcript PDF is sent to our server for parsing and is{" "}
-              <span className="text-emerald-600 dark:text-emerald-400">
-                not stored
-              </span>{" "}
-              after extraction. Course text may be sent to OpenAI to extract your
-              courses. We store your course and grade data in our database
-              (private only to your account) to provide insights and
-              recommendations for your major. By uploading academic information,
-              you confirm that you are providing your own data and consent to its
-              storage and processing for academic planning purposes.{" "}
-              <Link
-                href="/terms"
-                target="_blank"
-                className="text-blue-400 hover:text-blue-300 underline underline-offset-2"
-              >
-                Read our full terms
-              </Link>
-              .
-            </p>
-            <p className="text-[10px] text-gray-400 dark:text-gray-600 mt-2 leading-relaxed">
-              DegreeIntelligence is{" "}
-              <span className="font-medium">not affiliated</span> in any way,
-              shape, or form with Yale University, Yale College, or DegreeAudit.
-              We are simply a free, student-built personal project that we wanted
-              to share with the community because we genuinely found it helpful
-              for ourselves.
-            </p>
-          </div>
-        </div>
-      </div>
+      <AcademicDataDisclaimerCard
+        showIcon
+        className="w-full max-w-xl mt-5"
+        lead="By uploading or writing in your courses and grades, you voluntarily share that academic data with DegreeIntelligence."
+      />
     </div>
   );
 }

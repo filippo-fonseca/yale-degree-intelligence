@@ -4,7 +4,6 @@ import { HiDocumentDuplicate } from "react-icons/hi";
 import { RiProgress3Fill, RiAwardFill } from "react-icons/ri";
 import { FaBuildingCircleCheck } from "react-icons/fa6";
 import { MonitorCog } from "lucide-react";
-import LogoIcon from "@/icons/LogoIcon";
 
 export interface NavItem {
   id: string;
@@ -12,18 +11,16 @@ export interface NavItem {
   label: string;
   disabled?: boolean;
   comingSoon?: boolean;
+  /** Short chip shown for Class of 2030 (and similar) welcome nudges. */
+  badge?: string;
 }
-
-/**
- * Dan advisor is hidden for the v3 launch. Flip to true to put the tab back;
- * useDashboardNav bounces anyone whose persisted tab still points at it.
- */
-export const SHOW_DAN_ADVISOR = false;
 
 export function createNavItems(
   majorsCount: number,
   certificatesCount: number,
+  options?: { isBrandNew?: boolean },
 ): NavItem[] {
+  const brandNewBadge = options?.isBrandNew ? "2030 can use!" : undefined;
   return [
     {
       id: "upload",
@@ -35,6 +32,7 @@ export function createNavItems(
       id: "major",
       icon: RiProgress3Fill,
       label: majorsCount > 1 ? "My majors" : "My major",
+      badge: brandNewBadge,
     },
     {
       id: "certificate",
@@ -45,6 +43,7 @@ export function createNavItems(
       id: "simulator",
       icon: MonitorCog,
       label: "Simulator",
+      badge: brandNewBadge,
     },
     {
       id: "stats",
@@ -56,16 +55,6 @@ export function createNavItems(
       icon: FiUsers,
       label: "Friends",
     },
-    ...(SHOW_DAN_ADVISOR
-      ? [
-          {
-            id: "cleoai",
-            icon: LogoIcon,
-            label: "Dan",
-            comingSoon: true,
-          },
-        ]
-      : []),
     {
       id: "distributionals",
       icon: FaBuildingCircleCheck,

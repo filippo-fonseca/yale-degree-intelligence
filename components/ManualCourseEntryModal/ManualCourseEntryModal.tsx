@@ -518,7 +518,21 @@ export default function ManualCourseEntryModal({
 
             {/* Footer */}
             {entries.length > 0 && (
-              <div className="px-5 py-3 border-t border-gray-200 dark:border-gray-800/80 flex items-center justify-between">
+              <div className="px-5 py-3 border-t border-gray-200 dark:border-gray-800/80 space-y-2">
+                <p className="text-[10px] text-gray-400 dark:text-gray-500 leading-relaxed">
+                  By adding courses, you voluntarily store course and grade data
+                  on our servers (private to your account). Not affiliated with
+                  Yale. Free forever — we will never charge a dime.{" "}
+                  <a
+                    href="/terms"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="underline underline-offset-2 text-blue-500 dark:text-blue-400"
+                  >
+                    Terms
+                  </a>
+                </p>
+                <div className="flex items-center justify-between">
                 <span className="text-xs text-gray-400 dark:text-gray-500">
                   {validCount} course{validCount !== 1 ? "s" : ""} ready
                 </span>
@@ -549,6 +563,7 @@ export default function ManualCourseEntryModal({
                       </>
                     )}
                   </button>
+                </div>
                 </div>
               </div>
             )}

@@ -32,6 +32,8 @@ export interface MyCoursesViewProps {
   onUploadSuccess: (text: string) => Promise<void>;
   onDeleteCourse: (course: Course) => Promise<void>;
   onToggleDistributional: (courseId: string, dist: string) => Promise<void>;
+  /** Class of 2030 shortcut into Simulator without a transcript. */
+  onOpenSimulator?: () => void;
 }
 
 export type SortKey = "semester" | "code" | "grade" | "credits";

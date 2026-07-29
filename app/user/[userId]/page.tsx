@@ -104,14 +104,14 @@ export default function UserProfilePage() {
         const isOwn = user.uid === userId;
         setIsOwnProfile(isOwn);
 
-        const userDoc = await getDoc(doc(db, "users", userId as string));
-        if (!userDoc.exists()) {
-          throw new Error("User not found");
-        }
-        const profileData = userDoc.data() as UserProfile;
-        setUserProfile(profileData);
-
         if (isOwn) {
+          const userDoc = await getDoc(doc(db, "users", userId as string));
+          if (!userDoc.exists()) {
+            throw new Error("User not found");
+          }
+          const profileData = userDoc.data() as UserProfile;
+          setUserProfile(profileData);
+
           const coursesSnapshot = await getDocs(
             query(collection(db, "courses"), where("userId", "==", userId)),
           );
@@ -131,6 +131,8 @@ export default function UserProfilePage() {
             setVisibility(resolveFriendsProfileVisibility());
           }
         } else {
+          // Never read users/{otherId} — profiles are owner-only in Firestore.
+          // Friend-facing fields live only in friends_public_data.
           await syncFriendData(userId as string);
 
           const publicDataDoc = await getDoc(
@@ -141,6 +143,7 @@ export default function UserProfilePage() {
             setFriendsFeatureDisabled(true);
             setCourses([]);
             setVisibility(resolveFriendsProfileVisibility());
+            setUserProfile(null);
           } else {
             const publicData = publicDataDoc.data() as FriendsPublicData;
             setVisibility(resolveFriendsProfileVisibility(publicData.visibility));
@@ -150,18 +153,12 @@ export default function UserProfilePage() {
             );
             setCourses(publicCourses);
 
-            // Prefer public profile fields when available (synced from user)
             setUserProfile({
-              displayName:
-                publicData.displayName || profileData.displayName,
-              email: publicData.email || profileData.email,
-              photoURL: publicData.photoURL || profileData.photoURL,
-              majors: publicData.majors?.length
-                ? publicData.majors
-                : profileData.majors,
-              graduationYear:
-                publicData.graduationYear ?? profileData.graduationYear,
-              bio: publicData.bio ?? profileData.bio,
+              displayName: publicData.displayName,
+              photoURL: publicData.photoURL,
+              majors: publicData.majors || [],
+              graduationYear: publicData.graduationYear,
+              bio: publicData.bio,
             });
           }
         }

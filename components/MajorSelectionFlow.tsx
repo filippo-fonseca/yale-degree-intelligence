@@ -37,7 +37,7 @@ export default function MajorSelectionFlow({
   const [autoOpenCertificateIndex, setAutoOpenCertificateIndex] = useState<
     number | null
   >(null);
-  const [graduationYear, setGraduationYear] = useState<string>("2029");
+  const [graduationYear, setGraduationYear] = useState<string>("2030");
   const [bio, setBio] = useState<string>("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showMajorsInfo, setShowMajorsInfo] = useState(false);

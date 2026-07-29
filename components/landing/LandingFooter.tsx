@@ -67,8 +67,9 @@ export default function LandingFooter({ onLogin }: LandingFooterProps) {
               Contact
             </Link>
           </nav>
-          <p className="font-sf text-xs text-gray-400 dark:text-gray-500">
-            Not affiliated with Yale University.
+          <p className="font-sf text-xs text-gray-400 dark:text-gray-500 max-w-md">
+            Not affiliated with Yale University. A free, student-built tool —
+            we will never charge a dime for it.
           </p>
           <div className="flex items-center gap-2 font-sf text-xs text-gray-400 dark:text-gray-500">
             <span className="rounded-full border border-black/[0.06] bg-white/80 px-2 py-0.5 text-[10px] font-medium text-gray-600 dark:border-white/[0.08] dark:bg-white/[0.04] dark:text-gray-300">

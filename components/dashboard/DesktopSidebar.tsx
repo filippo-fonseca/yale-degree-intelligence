@@ -129,7 +129,7 @@ export function DesktopSidebar({
                   className="absolute inset-0 rounded-2xl bg-gray-200/90 dark:bg-white/[0.08] shadow-[0_1px_2px_rgba(0,0,0,0.08),inset_0_1px_0_rgba(255,255,255,0.7)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.1),0_4px_12px_rgba(0,0,0,0.25)]"
                 />
               )}
-              <div className="relative z-10 flex items-center space-x-3">
+              <div className="relative z-10 flex items-center space-x-3 min-w-0">
                 <item.icon
                   size={item.id === "cleoai" ? 18 : 12}
                   opacity={
@@ -139,9 +139,14 @@ export function DesktopSidebar({
                 {sidebarExpanded && (
                   <span className="whitespace-nowrap">{item.label}</span>
                 )}
+                {sidebarExpanded && item.badge && (
+                  <span className="ml-0.5 px-1.5 py-0.5 text-[9px] rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-700 dark:text-emerald-300 whitespace-nowrap">
+                    {item.badge}
+                  </span>
+                )}
               </div>
 
-              {sidebarExpanded && activeTab === item.id && (
+              {sidebarExpanded && activeTab === item.id && !item.badge && (
                 <FiChevronRight className="relative z-10 text-blue-500 dark:text-blue-400" />
               )}
             </motion.button>
@@ -292,9 +297,8 @@ export function DesktopSidebar({
 
           <div className="px-1 pb-1">
             <p className="text-[10px] text-gray-400 dark:text-gray-600 leading-tight text-justify">
-              DegreeIntelligence is a student-built tool. Data may be
-              inaccurate. Verify with your DUS. NOT AFFILIATED AS A YALE STUDENT
-              GROUP.
+              Student-built, not affiliated with Yale. Free forever — we will
+              never charge a dime. Data may be inaccurate; verify with your DUS.
             </p>
           </div>
         </div>

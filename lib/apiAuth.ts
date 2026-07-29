@@ -1,17 +1,25 @@
 import { NextRequest, NextResponse } from "next/server";
 import { adminAuth } from "@/config/firebaseAdmin";
+import { isAllowedEmail } from "@/lib/allowedEmail";
 
 export type AuthedUser = {
   uid: string;
   email?: string;
 };
 
+export type RequireAuthOptions = {
+  /** Reject tokens that were revoked (extra round-trip to Firebase). */
+  checkRevoked?: boolean;
+};
+
 /**
  * Verify Firebase ID token from Authorization: Bearer <token>.
+ * Also enforces the Yale / allowlist email gate server-side.
  * Returns AuthedUser or a NextResponse error to return immediately.
  */
 export async function requireAuth(
-  req: NextRequest | Request
+  req: NextRequest | Request,
+  options: RequireAuthOptions = {}
 ): Promise<AuthedUser | NextResponse> {
   if (!adminAuth) {
     return NextResponse.json(
@@ -27,8 +35,15 @@ export async function requireAuth(
 
   try {
     const decoded = await adminAuth.verifyIdToken(
-      authHeader.split("Bearer ")[1].trim()
+      authHeader.split("Bearer ")[1].trim(),
+      options.checkRevoked === true
     );
+    if (!isAllowedEmail(decoded.email)) {
+      return NextResponse.json(
+        { error: "Only @yale.edu accounts are allowed." },
+        { status: 403 }
+      );
+    }
     return { uid: decoded.uid, email: decoded.email };
   } catch {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

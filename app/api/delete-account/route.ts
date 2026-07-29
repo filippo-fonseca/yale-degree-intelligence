@@ -91,7 +91,9 @@ export async function POST(req: NextRequest) {
     // 8. Delete friends_public_data for this user
     await adminDb.collection("friends_public_data").doc(userId).delete();
 
-    // 9. Delete encrypted Dan API key + MCP token (never leave secrets orphaned)
+    // 9. Delete leftover secrets from the retired Dan advisor and MCP server.
+    // Both features are gone, but old documents can still exist for users who
+    // connected them, and they must never be left orphaned.
     await adminDb.collection("dan_keys").doc(userId).delete();
     await adminDb.collection("mcp_tokens").doc(userId).delete();
 

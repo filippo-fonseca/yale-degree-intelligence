@@ -501,23 +501,27 @@ export default function CertificateProgressView({
     [progress.remainingRequirements, normalizeReq],
   );
 
-  const strictCompletedReqs = useMemo(() => {
-    return completedNorm.filter((req: any) => {
-      const done = req.options
-        .filter((o: any) => o.completed)
-        .reduce((s: number, o: any) => s + (o.credits || 0), 0);
-      return done >= (req.required || 0);
-    });
-  }, [completedNorm]);
+  // The audit calls a 0-credit requirement (a "suggested" prerequisite)
+  // trivially satisfied, since 0 >= 0. The board must not: a card with none of
+  // its courses taken cannot sit in Completed. Zero-required requirements only
+  // count as satisfied once completed credits actually land on them.
+  const reqSatisfied = useCallback((req: any) => {
+    const done = req.options
+      .filter((o: any) => o.completed)
+      .reduce((s: number, o: any) => s + (o.credits || 0), 0);
+    const required = req.required || 0;
+    return required > 0 ? done >= required : done > 0;
+  }, []);
 
-  const demotedFromCompleted = useMemo(() => {
-    return completedNorm.filter((req: any) => {
-      const done = req.options
-        .filter((o: any) => o.completed)
-        .reduce((s: number, o: any) => s + (o.credits || 0), 0);
-      return done < (req.required || 0);
-    });
-  }, [completedNorm]);
+  const strictCompletedReqs = useMemo(
+    () => completedNorm.filter(reqSatisfied),
+    [completedNorm, reqSatisfied],
+  );
+
+  const demotedFromCompleted = useMemo(
+    () => completedNorm.filter((req: any) => !reqSatisfied(req)),
+    [completedNorm, reqSatisfied],
+  );
 
   const reqKeyFn = useCallback((req: any) => req.id ?? req.name, []);
 
@@ -585,17 +589,13 @@ export default function CertificateProgressView({
 
   const inProgressReqs = useMemo(
     () =>
-      withStats.filter(
-        (r) => r.reqInProgress > 0 && r.reqCompleted < (r.req.required || 0),
-      ),
-    [withStats],
+      withStats.filter((r) => r.reqInProgress > 0 && !reqSatisfied(r.req)),
+    [withStats, reqSatisfied],
   );
   const idleReqs = useMemo(
     () =>
-      withStats.filter(
-        (r) => r.reqInProgress === 0 && r.reqCompleted < (r.req.required || 0),
-      ),
-    [withStats],
+      withStats.filter((r) => r.reqInProgress === 0 && !reqSatisfied(r.req)),
+    [withStats, reqSatisfied],
   );
 
   const handleOpenCourse = useCallback((opt: any, reqName: string) => {

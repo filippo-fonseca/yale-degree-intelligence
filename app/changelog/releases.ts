@@ -58,6 +58,7 @@ export const RELEASES: Release[] = [
           "Honest conflict handling. Courses your major already counts are grayed out with the reason, an overlap meter shows how much sharing each certificate allows, and a certificate Yale will not award to your major carries a clear warning.",
           "Certificate math you can trust: a course that breaks a rule drops out of that certificate's progress automatically, and your major always keeps its credit.",
           "The certificate board and its numbers now say the same thing. A course your major already claims no longer shows as in progress on a certificate it cannot count toward.",
+          "Suggested prerequisites now say so. A certificate requirement that asks for zero credits (like Data Science's suggested intro course) no longer appears as Completed before you have taken anything. It stays in Remaining with a small suggested tag until a course actually satisfies it.",
         ],
       },
       {

@@ -24,7 +24,6 @@ DegreeIntelligence (DI) turns your Yale transcript into a live picture of where 
 - **Distributionals** — visualize your skills and disciplinary distributional requirements at a glance.
 - **Academic Stats** — charts for credits, GPA, and credit distribution across your time at Yale.
 - **Friends** — compare progress with friends.
-- **Dan** — an AI advisor for degree questions.
 - Light and dark mode throughout.
 
 ## Tech

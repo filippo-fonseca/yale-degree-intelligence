@@ -45,7 +45,8 @@ jobs:
             core.setFailed(
               "SECURITY OPS BLOCKER: Do not merge yet.\n\n" +
                 "1) Deploy docs/firestore-rules.md in Firebase Console\n" +
-                "2) Confirm prod DAN_FALLBACK_ANTHROPIC_KEY is unset OR DAN_FALLBACK_UIDS is set\n" +
-                "3) Add label `security-ops-complete` (and remove `needs-security-ops` if you want)\n" +
-                "4) Mark the PR ready for review only after that"
+                "2) Delete the retired DAN_FALLBACK_ANTHROPIC_KEY, DAN_FALLBACK_UIDS, and DAN_KEY_ENC_SECRET vars in Vercel\n" +
+                "3) Purge leftover dan_keys and mcp_tokens documents in Firestore\n" +
+                "4) Add label `security-ops-complete` (and remove `needs-security-ops` if you want)\n" +
+                "5) Mark the PR ready for review only after that"
             );

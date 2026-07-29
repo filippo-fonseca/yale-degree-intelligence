@@ -82,12 +82,13 @@ export const RELEASES: Release[] = [
       {
         title: "Safer and more honest",
         items: [
-          "Transcript upload and AI features only work when you’re signed in, with basic spam protection.",
-          "Friend connections go through the server — nobody can fake a friendship to peek at your courses.",
-          "Deleting your account also clears your Dan chat history, encrypted API keys, and MCP tokens.",
+          "Transcript upload only works when you’re signed in, with basic spam protection.",
+          "Friend connections go through the server, so nobody can fake a friendship to peek at your courses.",
+          "No AI advisor and no chatbot. DegreeIntelligence answers you from Yale's own requirement rules, not from a model that might guess, and nothing you enter is sent to one.",
+          "Deleting your account also clears everything left over from the AI features we removed, including any API key or access token you had connected.",
           "Honest copy: login says Yale Google (not CAS), and we no longer claim your transcript is processed only on your device.",
           "Clearer disclaimers everywhere: you voluntarily share courses and grades (upload or manual), those records are stored on our servers for your account, we are not affiliated with Yale, and DegreeIntelligence is free forever — we will never charge a dime.",
-          "Tighter account security for v3: APIs only accept @yale.edu sessions, private profile docs are owner-only, and demo AI keys cannot be shared with every user by accident.",
+          "Tighter account security for v3: APIs only accept @yale.edu sessions, and your private profile is readable only by you.",
         ],
       },
       {

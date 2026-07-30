@@ -22,7 +22,7 @@ export function FriendsOptInPrompt({ onToggleFriends }: FriendsOptInPromptProps)
       <div className="mb-6">
         <h2 className="text-2xl font-medium text-gray-900 dark:text-white">Friends</h2>
         <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-          See how older students in your major built their path — courses and
+          See how older students in your major built their path: courses and
           distributionals, never grades.
         </p>
       </div>

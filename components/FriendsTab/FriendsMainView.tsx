@@ -130,7 +130,7 @@ export function FriendsMainView({
           <MoreOptionsDropdown onDisable={() => setShowDisableConfirm(true)} />
         </div>
         <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-          See how older students in your major built their path — courses and
+          See how older students in your major built their path: courses and
           distributionals, never grades.
         </p>
       </div>

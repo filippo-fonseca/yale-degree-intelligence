@@ -14,7 +14,7 @@ export default function MajorProgressTips({
   setForceMajorTipOpen: (open: boolean) => void;
 }) {
   return (
-    <>
+    <div className="space-y-3">
       <MajorTipHelpButton
         onClick={() => {
           resetMajorTipSeen("myMajorTipModalShown");
@@ -29,7 +29,7 @@ export default function MajorProgressTips({
         onDismiss={() => setForceMajorTipOpen(false)}
       />
 
-      <div className="p-1" data-tour="major-manual-tip">
+      <div className="relative z-[1]" data-tour="major-manual-tip">
         <InfoCard
           autoHide
           previewText="A few tips on how to navigate this page. It's complex at first, we get it!"
@@ -46,6 +46,6 @@ export default function MajorProgressTips({
           platform is modular!
         </InfoCard>
       </div>
-    </>
+    </div>
   );
 }

@@ -22,7 +22,7 @@ export const RELEASES: Release[] = [
     date: "Summer 2026",
     current: true,
     summary:
-      "Our largest update yet — and the public launch of DegreeIntelligence 3. Faster planning, clearer numbers, a friend page worth sharing, tighter privacy, emptier states that actually tell you what to do next, and a cleaned-up codebase so we can keep shipping safely.",
+      "Our largest update yet, and the public launch of DegreeIntelligence 3. Faster planning, clearer numbers, a friend page worth sharing, tighter privacy, emptier states that actually tell you what to do next, and a cleaned-up codebase so we can keep shipping safely.",
     sections: [
       {
         title: "Move faster",
@@ -35,7 +35,7 @@ export const RELEASES: Release[] = [
       {
         title: "Plan with confidence",
         items: [
-          "A much better course Simulator. A cleaner semester layout, a live stat header, and a default-plan system that auto-loads where you left off — plus unsaved-change warnings so you don’t lose work.",
+          "A much better course Simulator. A cleaner semester layout, a live stat header, and a default-plan system that auto-loads where you left off, plus unsaved-change warnings so you don’t lose work.",
           "Better My Major(s) with a double-major conflict manager that flags shared courses, overlaps, and prerequisite conflicts across both majors.",
           "A Board and Heat map view of your requirements, so you can read your whole degree at a glance or zoom into a single track.",
           "A full Yale College catalog (Fall 2023 → Spring 2027): 6,500+ courses, 3→4 digit renumbers, EENG→ECE aliases, and Fall 2026 / Spring 2027 flags for the Simulator.",
@@ -64,7 +64,7 @@ export const RELEASES: Release[] = [
       {
         title: "Understand your degree",
         items: [
-          "More and better academic Stats: GPA trends, credits, and grade distribution that stay legible in light and dark — including F grades that were previously skipped by mistake.",
+          "More and better academic Stats: GPA trends, credits, and grade distribution that stay legible in light and dark, including F grades that were previously skipped by mistake.",
           "Distributional-requirement tracking that counts real credits, clearer progress cards, and a course can only sit at one language level.",
           "Your distributionals fill themselves in. Every course you have taken, added, or planned now starts with the tags Yale publishes for it, so the Distributionals tab shows real progress even if you have never tagged a single course. Your transcript still wins where it lists them, and anything you set by hand always wins over both. Change one tag and the rest stay put.",
           "Clearer empty states: Stats, Friends, and Distributionals invite you to upload a transcript instead of sitting greyed out.",
@@ -75,7 +75,7 @@ export const RELEASES: Release[] = [
       {
         title: "Friends you can actually use",
         items: [
-          "A rebuilt public friend page: who they are, simple stats (no grades), distributional progress, and courses by semester — built for checking out your froco.",
+          "A rebuilt public friend page: who they are, simple stats (no grades), distributional progress, and courses by semester, built for checking out your froco.",
           "The Friends tab always shows a live preview of your public page, plus Copy link, Open my page, and Customize what friends see.",
           "Before you enable Friends, you see a demo of what the page looks like and exactly what’s shared. Grades and GPA are never shared.",
         ],
@@ -88,7 +88,7 @@ export const RELEASES: Release[] = [
           "No AI advisor and no chatbot. DegreeIntelligence answers you from Yale's own requirement rules, not from a model that might guess, and nothing you enter is sent to one.",
           "Deleting your account also clears everything left over from the AI features we removed, including any API key or access token you had connected.",
           "Honest copy: login says Yale Google (not CAS), and we no longer claim your transcript is processed only on your device.",
-          "Clearer disclaimers everywhere: you voluntarily share courses and grades (upload or manual), those records are stored on our servers for your account, we are not affiliated with Yale, and DegreeIntelligence is free forever — we will never charge a dime.",
+          "Clearer disclaimers everywhere: you voluntarily share courses and grades (upload or manual), those records are stored on our servers for your account, we are not affiliated with Yale, and DegreeIntelligence is free forever. We will never charge a dime.",
           "Tighter account security for v3: APIs only accept @yale.edu sessions, and your private profile is readable only by you.",
         ],
       },
@@ -100,13 +100,13 @@ export const RELEASES: Release[] = [
           "An overall UI and UX polish: a collapsible sidebar, smoother transitions, and a more consistent look everywhere.",
           "A warmer Class of 2030 frosh welcome on My Courses: you do not need grades to start using DegreeIntelligence and upload your transcript, plus a one-click path into the Simulator and step-by-step YHub instructions so you can import in-progress courses after registration.",
           "Light-mode polish on onboarding and My Major: YHub import step numbers stay readable, and the tips card keeps a full border instead of looking clipped above the progress bar.",
-          "Save, Confirm, Disable, and other primary modal buttons stay visible in light mode instead of disappearing into white backgrounds — including Settings Save.",
+          "Save, Confirm, Disable, and other primary modal buttons stay visible in light mode instead of disappearing into white backgrounds, including Settings Save.",
         ],
       },
       {
         title: "Built to keep improving",
         items: [
-          "We’re cleaning up the codebase as part of v3 — splitting huge screens and the main dashboard into smaller modules.",
+          "We’re cleaning up the codebase as part of v3, splitting huge screens and the main dashboard into smaller modules.",
           "That work is already underway so future development stays easy, safer, and faster without breaking what you rely on.",
         ],
       },

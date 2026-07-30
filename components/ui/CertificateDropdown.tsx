@@ -204,7 +204,7 @@ export function CertificateDropdown({
                       ? ` · ${CERTIFICATE_CATEGORY_LABELS[category] || category}`
                       : ""
                   }`
-                : "Optional — add any Yale College certificates"}
+                : "Optional. Add any Yale College certificates"}
             </div>
           </div>
         </div>

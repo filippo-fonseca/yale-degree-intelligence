@@ -124,7 +124,7 @@ export default function StatsView({ courses }: { courses: Course[] }) {
         ) : (
           <StatCard
             label="Avg Credits / Semester"
-            value={avgCreditsPerSem > 0 ? avgCreditsPerSem.toFixed(1) : "—"}
+            value={avgCreditsPerSem > 0 ? avgCreditsPerSem.toFixed(1) : "-"}
             color="text-blue-600 dark:text-blue-300"
             icon={<Clock className="h-3.5 w-3.5" />}
             sub={`Across ${nonSummerSems.length} completed semesters`}
@@ -141,7 +141,7 @@ export default function StatsView({ courses }: { courses: Course[] }) {
         >
           <StatCard
             label="Avg Credits / Semester"
-            value={avgCreditsPerSem > 0 ? avgCreditsPerSem.toFixed(1) : "—"}
+            value={avgCreditsPerSem > 0 ? avgCreditsPerSem.toFixed(1) : "-"}
             color="text-blue-600 dark:text-blue-300"
             icon={<Clock className="h-3.5 w-3.5" />}
             sub={`Across ${nonSummerSems.length} semesters`}
@@ -163,7 +163,7 @@ export default function StatsView({ courses }: { courses: Course[] }) {
                     );
                     return `${top.grade} (${top.count}×)`;
                   })()
-                : "—"
+                : "-"
             }
             color="text-emerald-600 dark:text-emerald-300"
             icon={<BarChart2 className="h-3.5 w-3.5" />}

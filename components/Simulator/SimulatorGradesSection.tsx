@@ -19,14 +19,14 @@ interface SimulatorGradesSectionProps {
   }[];
 }
 
-const fmt = (r: GPAResult): string => (r.gpa != null ? r.gpa.toFixed(2) : "—");
+const fmt = (r: GPAResult): string => (r.gpa != null ? r.gpa.toFixed(2) : "-");
 
 // Signed delta pill: green ▲ up, red ▼ down, neutral flat/null.
 function DeltaPill({ delta }: { delta: number | null }) {
   if (delta == null || delta === 0) {
     return (
       <span className="inline-flex items-center gap-0.5 text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-gray-100 dark:bg-gray-800/50 text-gray-500 dark:text-gray-400 border border-gray-200 dark:border-gray-700/50">
-        {delta == null ? "—" : "±0.00"}
+        {delta == null ? "-" : "±0.00"}
       </span>
     );
   }

@@ -13,7 +13,7 @@ const STEPS = [
     number: "01",
     title: "Import your transcript",
     description:
-      "Connect with CAS and pull courses automatically — no more copy-pasting from Yale Hub into a fragile spreadsheet.",
+      "Connect with CAS and pull courses automatically. No more copy-pasting from Yale Hub into a fragile spreadsheet.",
     icon: FiUpload,
     mock: (
       <div className="space-y-3 p-5">
@@ -36,7 +36,7 @@ const STEPS = [
     number: "02",
     title: "See major progress",
     description:
-      "Requirement bars and status-colored cards show what’s done, what’s in flight, and what’s left — at a glance.",
+      "Requirement bars and status-colored cards show what’s done, what’s in flight, and what’s left, at a glance.",
     icon: FiBarChart2,
     mock: (
       <div className="space-y-3 p-5">

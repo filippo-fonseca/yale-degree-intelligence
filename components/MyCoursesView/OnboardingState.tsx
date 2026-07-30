@@ -113,7 +113,7 @@ export function OnboardingState({
                 </span>{" "}
                 →{" "}
                 <span className="px-1.5 py-0.5 rounded bg-gray-100 dark:bg-gray-800/60 border border-gray-300 dark:border-gray-700/50 text-gray-800 dark:text-gray-200 font-mono text-xs">
-                  Unofficial Transcript — Undergraduate
+                  Unofficial Transcript - Undergraduate
                 </span>
               </>,
               <>

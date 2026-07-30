@@ -130,7 +130,7 @@ export default function LandingFeatures({
         reverse
         eyebrow="Stats"
         title="Context, not just grades."
-        description="GPA trajectory, credit pace, and distribution — so you know where you stand, not just what you got."
+        description="GPA trajectory, credit pace, and distribution, so you know where you stand, not just what you got."
         cta={
           <button
             onClick={onLogin}
@@ -200,7 +200,7 @@ export default function LandingFeatures({
         id="major-progress"
         eyebrow="Major"
         title="Requirements, visualized."
-        description="Progress bars plus a grid of requirement cards — each with the courses you’ve taken and what’s still open."
+        description="Progress bars plus a grid of requirement cards, each with the courses you’ve taken and what’s still open."
         cta={
           <button
             onClick={onLogin}
@@ -243,7 +243,7 @@ export default function LandingFeatures({
         reverse
         eyebrow="Friends"
         title="Learn from paths ahead of you."
-        description="Mutually see courses, majors, and years — never grades or GPA. Built for upperclassmen advice without oversharing."
+        description="Mutually see courses, majors, and years, never grades or GPA. Built for upperclassmen advice without oversharing."
         cta={
           <button
             onClick={onLogin}

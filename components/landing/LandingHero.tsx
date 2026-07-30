@@ -32,7 +32,7 @@ export default function LandingHero({
 
           <p className="mx-auto mt-5 max-w-xl font-sf text-base leading-relaxed text-gray-600 dark:text-gray-300 sm:text-lg">
             Import your transcript, see major progress clearly, and plan
-            semesters with the Simulator — built for the mess of Yale
+            semesters with the Simulator, built for the mess of Yale
             requirements.
           </p>
 

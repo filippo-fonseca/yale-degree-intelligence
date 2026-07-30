@@ -524,7 +524,7 @@ export default function ManualCourseEntryModal({
                 <p className="text-[10px] text-gray-400 dark:text-gray-500 leading-relaxed">
                   By adding courses, you voluntarily store course and grade data
                   on our servers (private to your account). Not affiliated with
-                  Yale. Free forever — we will never charge a dime.{" "}
+                  Yale. Free forever. We will never charge a dime.{" "}
                   <a
                     href="/terms"
                     target="_blank"

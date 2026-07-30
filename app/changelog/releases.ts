@@ -100,6 +100,7 @@ export const RELEASES: Release[] = [
           "An overall UI and UX polish: a collapsible sidebar, smoother transitions, and a more consistent look everywhere.",
           "A warmer Class of 2030 frosh welcome on My Courses: you do not need grades to start using DegreeIntelligence and upload your transcript, plus a one-click path into the Simulator and step-by-step YHub instructions so you can import in-progress courses after registration.",
           "Light-mode polish on onboarding and My Major: YHub import step numbers stay readable, and the tips card keeps a full border instead of looking clipped above the progress bar.",
+          "Save, Confirm, Disable, and other primary modal buttons stay visible in light mode instead of disappearing into white backgrounds.",
         ],
       },
       {

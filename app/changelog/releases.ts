@@ -99,6 +99,7 @@ export const RELEASES: Release[] = [
           "A guided in-app tutorial that walks new students through uploading a transcript and reading their plan.",
           "An overall UI and UX polish: a collapsible sidebar, smoother transitions, and a more consistent look everywhere.",
           "A warmer Class of 2030 frosh welcome on My Courses: you do not need grades to start using DegreeIntelligence and upload your transcript, plus a one-click path into the Simulator and step-by-step YHub instructions so you can import in-progress courses after registration.",
+          "Light-mode polish on onboarding and My Major: YHub import step numbers stay readable, and the tips card keeps a full border instead of looking clipped above the progress bar.",
         ],
       },
       {

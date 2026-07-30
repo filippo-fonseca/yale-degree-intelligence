@@ -173,11 +173,11 @@ export default function MajorSelectionFlow({
                   <motion.div
                     initial={{ scale: 0.8 }}
                     animate={{ scale: 1 }}
-                    className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-medium transition-all duration-300 ${
+                    className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-semibold font-sf transition-all duration-300 ${
                       i < currentStepIndex
-                        ? "bg-gradient-to-br from-emerald-500 to-emerald-600 text-white shadow-[0_2px_8px_rgba(16,185,129,0.3)]"
+                        ? "bg-emerald-600 text-white shadow-[0_2px_8px_rgba(16,185,129,0.3)]"
                         : i === currentStepIndex
-                          ? "bg-gradient-to-br from-pink-500 to-purple-600 text-white shadow-[0_2px_8px_rgba(236,72,153,0.3)]"
+                          ? "bg-pink-600 text-white shadow-[0_2px_8px_rgba(236,72,153,0.3)]"
                           : "bg-gray-100 dark:bg-gray-800/60 text-gray-400 dark:text-gray-500 border border-gray-300 dark:border-gray-700/50"
                     }`}
                   >
@@ -281,7 +281,7 @@ export default function MajorSelectionFlow({
             >
               <motion.button
                 onClick={() => setStep("majors")}
-                className="px-5 sm:px-6 py-2.5 sm:py-3 bg-purple-500/10 hover:bg-purple-500/20 rounded-xl text-purple-600 dark:text-purple-200 font-medium flex items-center gap-2 transition-all border border-purple-500/30 hover:border-purple-500/50 shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_4px_16px_rgba(139,92,246,0.15)] text-sm sm:text-base"
+                className="px-5 sm:px-6 py-2.5 sm:py-3 bg-purple-600 hover:bg-purple-700 rounded-xl text-white font-medium flex items-center gap-2 transition-colors border border-purple-600 shadow-[0_4px_16px_rgba(139,92,246,0.25)] text-sm sm:text-base"
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
               >
@@ -473,7 +473,7 @@ export default function MajorSelectionFlow({
                 className={`py-2.5 px-5 rounded-xl font-medium text-sm transition-all ${
                   selectedMajors.length === 0
                     ? "bg-gray-100 dark:bg-gray-800/60 text-gray-400 dark:text-gray-600 cursor-not-allowed border border-gray-200 dark:border-gray-700/40"
-                    : "bg-purple-500/10 hover:bg-purple-500/20 text-purple-600 dark:text-purple-200 border border-purple-500/30 hover:border-purple-500/50 shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_2px_8px_rgba(139,92,246,0.15)]"
+                    : "bg-purple-600 hover:bg-purple-700 text-white border border-purple-600 shadow-[0_2px_8px_rgba(139,92,246,0.25)]"
                 }`}
               >
                 Continue
@@ -589,7 +589,7 @@ export default function MajorSelectionFlow({
               </button>
               <button
                 onClick={() => setStep("bio")}
-                className="py-2.5 px-5 rounded-xl font-medium text-sm bg-purple-500/10 hover:bg-purple-500/20 text-purple-600 dark:text-purple-200 border border-purple-500/30 hover:border-purple-500/50 shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_2px_8px_rgba(139,92,246,0.15)] transition-all"
+                className="py-2.5 px-5 rounded-xl font-medium text-sm bg-purple-600 hover:bg-purple-700 text-white border border-purple-600 shadow-[0_2px_8px_rgba(139,92,246,0.25)] transition-colors"
               >
                 {selectedCertificates.length === 0 ? "Skip" : "Continue"}
               </button>
@@ -649,7 +649,7 @@ export default function MajorSelectionFlow({
               </button>
               <button
                 onClick={() => setStep("year")}
-                className="py-2 sm:py-2.5 px-4 sm:px-5 rounded-xl font-medium text-sm bg-purple-500/10 hover:bg-purple-500/20 text-purple-600 dark:text-purple-200 border border-purple-500/30 hover:border-purple-500/50 shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_2px_8px_rgba(139,92,246,0.15)] transition-all"
+                className="py-2 sm:py-2.5 px-4 sm:px-5 rounded-xl font-medium text-sm bg-purple-600 hover:bg-purple-700 text-white border border-purple-600 shadow-[0_2px_8px_rgba(139,92,246,0.25)] transition-colors"
               >
                 {bio.length === 0 ? "Skip" : "Continue"}
               </button>
@@ -715,15 +715,15 @@ export default function MajorSelectionFlow({
               <button
                 onClick={handleSubmit}
                 disabled={!graduationYear || isSubmitting}
-                className={`py-2 sm:py-2.5 px-4 sm:px-5 rounded-xl font-medium text-sm transition-all flex items-center gap-2 ${
+                className={`py-2 sm:py-2.5 px-4 sm:px-5 rounded-xl font-medium text-sm transition-colors flex items-center gap-2 ${
                   !graduationYear || isSubmitting
                     ? "bg-gray-100 dark:bg-gray-800/60 text-gray-400 dark:text-gray-600 cursor-not-allowed border border-gray-200 dark:border-gray-700/40"
-                    : "bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-600 dark:text-emerald-300 border border-emerald-500/30 hover:border-emerald-500/50 shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_2px_8px_rgba(16,185,129,0.2)]"
+                    : "bg-emerald-600 hover:bg-emerald-700 text-white border border-emerald-600 shadow-[0_2px_8px_rgba(16,185,129,0.25)]"
                 }`}
               >
                 {isSubmitting ? (
                   <>
-                    <span className="animate-spin h-4 w-4 border-2 border-emerald-300/30 border-t-emerald-300 rounded-full" />
+                    <span className="animate-spin h-4 w-4 border-2 border-white/30 border-t-white rounded-full" />
                     Saving...
                   </>
                 ) : (

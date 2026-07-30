@@ -411,10 +411,10 @@ export default function AboutPage() {
         </div>
       </nav>
 
-      {/* §2 Hero */}
+      {/* §2 Hero — slightly denser so the social-proof line + video fit in view */}
       {/* isolate: the dot grid and tiles sit on negative z, so the band needs its
           own stacking context or they paint behind the canvas background. */}
-      <section className="relative isolate pt-24 md:pt-32 pb-16 md:pb-24">
+      <section className="relative isolate pt-20 md:pt-24 pb-10 md:pb-14">
         {/* Hero dot grid, faded out by ~55% of the hero band's height */}
         <div
           aria-hidden
@@ -513,20 +513,26 @@ export default function AboutPage() {
           </div>
         </div>
 
-        <div className="relative max-w-5xl mx-auto px-4 lg:px-6 text-center">
-          {/* 1. The one hero pill */}
+        <div className="relative mx-auto max-w-5xl px-4 text-center lg:px-6">
+          {/* 1. Release + Class of 2030 welcome (stars removed) */}
           <div className="flex justify-center">
-            {/* The banner owns the YDN mention, so the pill is just the release. */}
             <Link
               href="/changelog"
-              className="inline-flex items-center gap-2 rounded-full border border-black/[0.08] dark:border-white/10 bg-white dark:bg-white/[0.04] px-3.5 py-1 text-xs font-medium font-sf text-gray-900 dark:text-white transition-opacity hover:opacity-70"
+              className="inline-flex max-w-2xl flex-wrap items-center justify-center gap-x-2 gap-y-0.5 rounded-full border border-black/[0.08] bg-white px-3.5 py-1.5 text-center font-sf text-[11px] font-medium leading-snug text-gray-900 transition-opacity hover:opacity-70 dark:border-white/10 dark:bg-white/[0.04] dark:text-white sm:text-xs"
             >
-              ✦ v3 is out now
+              <span>v3 is out now</span>
+              <span className="text-gray-300 dark:text-gray-600" aria-hidden>
+                ·
+              </span>
+              <span className="text-gray-600 dark:text-gray-300">
+                Class of 2030: welcome to Yale. No grades needed. Use the
+                Simulator now, or import your YHub unofficial transcript.
+              </span>
             </Link>
           </div>
 
           {/* 2. Headline */}
-          <h1 className="mt-8 font-medium text-balance text-6xl md:text-7xl lg:text-[5.5rem] leading-[1.05] tracking-[-0.02em] text-gray-900 dark:text-white">
+          <h1 className="mt-5 text-balance text-5xl font-medium leading-[1.05] tracking-[-0.02em] text-gray-900 dark:text-white md:mt-6 md:text-6xl lg:text-[4.5rem]">
             The control plane
             <br />
             <span className="text-gray-400 dark:text-gray-500">
@@ -535,13 +541,13 @@ export default function AboutPage() {
           </h1>
 
           {/* 3. Subhead */}
-          <p className="mt-6 mx-auto max-w-[60ch] font-sf text-base md:text-lg text-gray-500 dark:text-gray-400 leading-relaxed">
+          <p className="mx-auto mt-4 max-w-[60ch] font-sf text-sm leading-relaxed text-gray-500 dark:text-gray-400 md:mt-5 md:text-base">
             Plan semesters, track requirements, simulate outcomes, and see
             exactly how your degree is going. Built by Yalies, for Yalies.
           </p>
 
           {/* 4. CTA row */}
-          <div className="mt-8 flex flex-wrap items-center justify-center gap-3 font-sf">
+          <div className="mt-5 flex flex-wrap items-center justify-center gap-3 font-sf md:mt-6">
             <BrandCTA
               onClick={() => startLogin("hero")}
               pending={authPendingId === "hero"}
@@ -554,15 +560,23 @@ export default function AboutPage() {
           </div>
 
           {/* 5. Mono microcopy */}
-          <p className="mt-5 font-mono text-xs tracking-tight text-gray-400 dark:text-gray-500">
-            Free forever · No install · 1 in 6 Yale undergrads already on board
+          <p className="mt-4 font-mono text-xs tracking-tight text-gray-400 dark:text-gray-500">
+            Free forever · No install
           </p>
 
-          {/* 6. Class of 2030 welcome chip */}
-          <p className="mt-6 inline-flex items-center gap-2 rounded-full border border-pink-500/15 bg-pink-500/[0.07] px-4 py-1.5 font-sf text-xs font-medium text-pink-900/80 dark:bg-pink-500/10 dark:text-pink-200/80">
-            🎓 Class of 2030: welcome to Yale. No grades needed. Use the
-            Simulator now, or import your YHub unofficial transcript.
-          </p>
+          {/* 6. Social proof (sits above the launch film) */}
+          <div className="mt-5 md:mt-6">
+            <p className="text-balance text-xl font-medium leading-snug tracking-[-0.015em] text-gray-900 dark:text-white sm:text-2xl md:text-3xl">
+              Used by 1 in 6 Yale undergrads.
+              <br />
+              <span className="text-gray-400 dark:text-gray-500">
+                Some of them even like it.
+              </span>
+            </p>
+            <p className="mt-2 font-mono text-[11px] tracking-tight text-gray-400 dark:text-gray-500 sm:mt-3 sm:text-xs">
+              ~1,200 students · every residential college · zero ads, zero fees
+            </p>
+          </div>
         </div>
       </section>
 
@@ -603,22 +617,6 @@ export default function AboutPage() {
               />
             </div>
           </div>
-        </motion.div>
-      </section>
-
-      {/* §5 Statement band */}
-      <section className="px-4 py-28 lg:px-6">
-        <motion.div {...reveal} className="mx-auto max-w-3xl text-center">
-          <h2 className="font-medium text-balance text-4xl md:text-5xl leading-[1.02] tracking-[-0.015em] text-gray-900 dark:text-white">
-            Used by 1 in 6 Yale undergrads.
-            <br />
-            <span className="text-gray-400 dark:text-gray-500">
-              Some of them even like it.
-            </span>
-          </h2>
-          <p className="mt-6 font-mono text-xs tracking-tight text-gray-400 dark:text-gray-500">
-            ~1,200 students · every residential college · zero ads, zero fees
-          </p>
         </motion.div>
       </section>
 

@@ -52,3 +52,18 @@ a `.planning/BACKLOG.md`.
 **Models.** Spawned workers resolve to Codex model equivalents automatically
 (`harness.mjs`, tunable in `BGSD.md > harness.models`).
 <!-- bgsd:managed -->
+
+## Cursor Cloud specific instructions
+
+Single Next.js 15 app (Yale DegreeIntelligence). Standard commands are in `README.md` / `package.json`: `yarn install`, `yarn dev` (port 3000), `yarn test` (Vitest), `yarn lint`, `yarn build`.
+
+### Services / env
+- Only local process needed: `yarn dev`. Auth and data are live Firebase (no emulator in repo).
+- Copy `.env.example` → `.env.local` for the public `NEXT_PUBLIC_FIREBASE_*` web config. Server secrets (not in the example): `FIREBASE_SERVICE_ACCOUNT_KEY` (Admin SDK / contact persistence / authenticated APIs) and `OPENAI_API_KEY` (`/api/extract` transcript structuring). Email providers for contact are optional.
+- Login is Google OAuth restricted to `@yale.edu`. Dashboard/Simulator/courses flows need a signed-in Yale account (Desktop-pane login is the practical path in Cloud VMs).
+
+### Gotchas
+- Prefer `yarn` (see `yarn.lock` / README). A `package-lock.json` also exists; mixing managers warns.
+- `yarn lint` (`next lint`) has **no ESLint config in the repo**, so a fresh checkout prompts interactively to create one — do not run it non-interactively expecting a clean pass until a config is committed.
+- `yarn build` currently fails if `OPENAI_API_KEY` is unset: `/api/extract` constructs the OpenAI client at module load. A failed build can leave `.next` inconsistent; if `yarn dev` starts returning 500s / missing `routes-manifest.json`, stop the dev server, `rm -rf .next`, and restart `yarn dev`.
+- Unit tests (`yarn test`) exercise the pure degree/catalog/certificate libraries and do not need Firebase or OpenAI.

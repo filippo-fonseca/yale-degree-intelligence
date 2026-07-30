@@ -1121,23 +1121,29 @@ export default function AboutPage() {
                               {req.desc}
                             </p>
                             <div className="flex flex-wrap gap-1.5">
-                              {req.pills.map((opt) => (
-                                <div
-                                  key={opt.code}
-                                  className={`relative flex items-center rounded-full px-2 py-0.5 text-xs ${OPTION_PILL[opt.status]}`}
-                                >
-                                  {opt.code}
-                                  <span className="ml-1 text-[0.65rem]">
-                                    ({opt.cr}cr
-                                    {opt.status === "in-progress"
-                                      ? ", in progress"
-                                      : opt.status === "complete"
-                                        ? ", complete"
-                                        : ""}
-                                    )
-                                  </span>
-                                </div>
-                              ))}
+                              {req.pills.map((opt) => {
+                                const suffix =
+                                  opt.status === "in-progress"
+                                    ? ", in progress"
+                                    : opt.status === "complete"
+                                      ? ", complete"
+                                      : "";
+                                const label = `${opt.code} (${opt.cr}cr${suffix})`;
+                                return (
+                                  <div
+                                    key={opt.code}
+                                    title={label}
+                                    className={`relative inline-flex max-w-full min-w-0 items-center overflow-hidden rounded-full px-2 py-0.5 text-xs ${OPTION_PILL[opt.status]}`}
+                                  >
+                                    <span className="min-w-0 truncate">
+                                      {opt.code}
+                                    </span>
+                                    <span className="ml-1 shrink-0 whitespace-nowrap text-[0.65rem]">
+                                      ({opt.cr}cr{suffix})
+                                    </span>
+                                  </div>
+                                );
+                              })}
                             </div>
                           </div>
                         ))}

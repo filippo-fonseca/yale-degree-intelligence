@@ -22,7 +22,7 @@ export function FriendsOptInPrompt({ onToggleFriends }: FriendsOptInPromptProps)
       <div className="mb-6">
         <h2 className="text-2xl font-medium text-gray-900 dark:text-white">Friends</h2>
         <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-          See how older students in your major built their path — courses and
+          See how older students in your major built their path: courses and
           distributionals, never grades.
         </p>
       </div>
@@ -84,7 +84,7 @@ export function FriendsOptInPrompt({ onToggleFriends }: FriendsOptInPromptProps)
           disabled={isEnabling}
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
-          className="w-full px-6 py-3.5 bg-gradient-to-br from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 text-white text-sm rounded-xl font-medium transition-all disabled:opacity-50 flex items-center justify-center gap-2 shadow-[0_4px_16px_rgba(236,72,153,0.3)]"
+          className="di-btn-primary w-full !rounded-xl !px-6 !py-3.5 !text-sm"
         >
           {isEnabling ? (
             <>

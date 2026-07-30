@@ -192,7 +192,7 @@ export default function LoginPage({
               onHoverEnd={() => setIsHovering(false)}
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              className="w-full py-3 px-4 rounded-xl font-medium text-sm text-white bg-gradient-to-r from-blue-500/30 via-purple-500/30 to-pink-500/30 hover:from-blue-500/40 hover:via-purple-500/40 hover:to-pink-500/40 border border-white/[0.1] shadow-[0_4px_20px_rgba(139,92,246,0.25),inset_0_1px_0_rgba(255,255,255,0.15),inset_0_-1px_0_rgba(0,0,0,0.2)] transition-all duration-300 flex items-center justify-center gap-2"
+              className="di-btn-primary w-full !rounded-xl !px-4 !py-3 !text-sm"
             >
               {loading ? (
                 <motion.span

@@ -1,4 +1,5 @@
 import type { User } from "firebase/auth";
+import { isAdminEmail } from "@/lib/admin";
 import { setUserFlag } from "@/lib/userFlags";
 import type { UserProfile } from "./types";
 
@@ -47,7 +48,8 @@ export function useDashboardOverlayActions({
       setTourOpen(true);
     },
     onReplayWelcome: () => {
-      if (!user) return;
+      // Creator-only Dev tool (settings UI is also gated via isAdminEmail).
+      if (!user || !isAdminEmail(user.email)) return;
       void setUserFlag(user.uid, "hasSeenV3Welcome", false);
       void setUserFlag(user.uid, "hasSeenTutorial", false);
       setShowSettings(false);
@@ -55,7 +57,8 @@ export function useDashboardOverlayActions({
       setWelcomeOpen(true);
     },
     onReplayTutorial: () => {
-      if (!user) return;
+      // Creator-only Dev tool (settings UI is also gated via isAdminEmail).
+      if (!user || !isAdminEmail(user.email)) return;
       void setUserFlag(user.uid, "hasSeenTutorial", false);
       setShowSettings(false);
       setWelcomeOpen(false);

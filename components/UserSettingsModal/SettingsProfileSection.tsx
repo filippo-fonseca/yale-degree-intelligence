@@ -98,19 +98,19 @@ export function SettingsProfileSection({
             </div>
             <div className="flex justify-end gap-1.5">
               <button
+                type="button"
                 onClick={handleCancelBio}
                 disabled={isSavingBio}
-                className="px-2 py-1 text-[11px] rounded-lg border border-black/[0.06] dark:border-white/[0.08] hover:border-gray-300 dark:hover:border-white/[0.15] hover:bg-black/[0.03] dark:hover:bg-white/[0.04] text-gray-600 dark:text-gray-300 disabled:opacity-70 transition-all duration-200"
+                className="di-btn-secondary !px-2 !py-1 !text-[11px]"
               >
                 Cancel
               </button>
               <button
+                type="button"
                 onClick={handleSaveBio}
                 disabled={isSavingBio}
-                className={`px-2.5 py-1 text-[11px] font-semibold rounded-lg border shadow-sm disabled:opacity-70 transition-all duration-200 ${
-                  bioJustSaved
-                    ? "border-emerald-500 bg-emerald-600 text-white shadow-emerald-500/20"
-                    : "border-pink-600 bg-pink-600 text-white shadow-pink-500/20 hover:bg-pink-700 hover:border-pink-700 dark:border-pink-500 dark:bg-gradient-to-r dark:from-pink-500 dark:to-purple-600 dark:hover:from-pink-600 dark:hover:to-purple-700"
+                className={`!px-2.5 !py-1 !text-[11px] ${
+                  bioJustSaved ? "di-btn-success" : "di-btn-primary"
                 }`}
               >
                 {isSavingBio ? "..." : bioJustSaved ? "Saved" : "Save"}
@@ -165,7 +165,7 @@ export function SettingsProfileSection({
                 Let friends see your courses (grades are always hidden, ofc).
               </p>
             </div>
-            <label className="relative inline-flex items-center cursor-pointer">
+            <label className="relative inline-flex cursor-pointer items-center">
               <input
                 type="checkbox"
                 checked={friendsEnabled}
@@ -177,9 +177,12 @@ export function SettingsProfileSection({
                     await onEnableFriends();
                   }
                 }}
-                className="sr-only peer"
+                className="peer sr-only"
               />
-              <div className="w-11 h-6 rounded-full peer transition-colors bg-gray-300 dark:bg-gray-600 shadow-[inset_0_1px_3px_rgba(0,0,0,0.22)] dark:shadow-[inset_0_1px_3px_rgba(0,0,0,0.5)] peer-focus:ring-2 peer-focus:ring-pink-500/40 peer-checked:bg-gradient-to-r peer-checked:from-pink-500 peer-checked:to-purple-600 peer-disabled:opacity-50 after:content-[''] after:absolute after:top-[3px] after:left-[3px] after:h-[18px] after:w-[18px] after:rounded-full after:bg-white after:shadow-[0_1px_3px_rgba(0,0,0,0.45)] after:transition-transform peer-checked:after:translate-x-5"></div>
+              <div
+                className={`di-toggle ${friendsEnabled ? "di-toggle-on" : ""}`}
+                aria-hidden="true"
+              />
             </label>
           </div>
           {friendsEnabled && (

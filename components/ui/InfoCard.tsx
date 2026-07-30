@@ -20,18 +20,20 @@ export function InfoCard({
 
   if (autoHide && !isExpanded) {
     return (
-      <div className={`relative group ${className}`}>
-        {/* Soft gradient glow on hover */}
-        <div className="absolute -inset-px rounded-2xl bg-[conic-gradient(from_var(--angle),#ec4899,#8b5cf6,#3b82f6,#ec4899)] opacity-0 blur-[3px] group-hover:opacity-40 transition-opacity duration-300" />
+      <div className={`relative z-[1] group ${className}`}>
+        {/* Soft gradient glow on hover — kept inside the stacking context so
+            neighboring neumorphic cards cannot erase the bottom border. */}
+        <div className="pointer-events-none absolute -inset-px rounded-2xl bg-[conic-gradient(from_var(--angle),#ec4899,#8b5cf6,#3b82f6,#ec4899)] opacity-0 blur-[3px] group-hover:opacity-40 transition-opacity duration-300" />
         <button
+          type="button"
           onClick={() => setIsExpanded(true)}
-          className="relative flex items-center justify-between w-full p-3 rounded-2xl border border-black/[0.06] dark:border-white/[0.08] bg-white/70 dark:bg-white/[0.04] backdrop-blur-xl text-sm text-gray-700 dark:text-gray-300 shadow-sm hover:bg-white/90 dark:hover:bg-white/[0.07] hover:border-pink-500/30 transition-all"
+          className="relative flex w-full items-center justify-between rounded-2xl border border-gray-200 bg-white p-3 text-sm text-gray-700 shadow-sm transition-all hover:border-pink-500/30 hover:bg-gray-50 dark:border-white/[0.08] dark:bg-white/[0.04] dark:text-gray-300 dark:hover:bg-white/[0.07]"
         >
           <div className="flex items-center gap-2">
             <div className="text-pink-500 dark:text-pink-400">{icon}</div>
             <span className="font-medium">{previewText}</span>
           </div>
-          <FiChevronDown className="w-4 h-4 text-pink-400 group-hover:translate-y-0.5 transition-transform" />
+          <FiChevronDown className="h-4 w-4 text-pink-400 transition-transform group-hover:translate-y-0.5" />
         </button>
       </div>
     );
@@ -39,7 +41,7 @@ export function InfoCard({
 
   return (
     <div
-      className={`flex flex-col gap-2 p-3.5 rounded-2xl border border-black/[0.06] dark:border-white/[0.08] bg-gradient-to-br from-white/80 to-white/50 dark:from-white/[0.05] dark:to-white/[0.02] backdrop-blur-xl shadow-[0_1px_2px_rgba(0,0,0,0.04),0_8px_24px_-12px_rgba(0,0,0,0.12)] dark:shadow-[0_8px_24px_-12px_rgba(0,0,0,0.5)] text-sm leading-relaxed text-gray-600 dark:text-gray-300 ${className}`}
+      className={`relative z-[1] flex flex-col gap-2 rounded-2xl border border-gray-200 bg-white p-3.5 text-sm leading-relaxed text-gray-600 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_8px_24px_-12px_rgba(0,0,0,0.12)] dark:border-white/[0.08] dark:bg-gradient-to-br dark:from-white/[0.05] dark:to-white/[0.02] dark:text-gray-300 dark:shadow-[0_8px_24px_-12px_rgba(0,0,0,0.5)] ${className}`}
     >
       {autoHide && (
         <div className="flex justify-between items-center">

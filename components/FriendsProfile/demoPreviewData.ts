@@ -5,7 +5,7 @@ export const DEMO_PREVIEW_USER = {
   displayName: "Alex Chen",
   majors: ["CPSC"],
   graduationYear: 2027,
-  bio: "CS major — happy to chat about course sequencing!",
+  bio: "CS major. Happy to chat about course sequencing!",
 };
 
 export const DEMO_PREVIEW_COURSES: Course[] = [

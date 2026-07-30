@@ -159,7 +159,7 @@ export function EmptyState({ inProgressCount = 0 }: { inProgressCount?: number }
           {inProgressCount > 0 && (
             <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
               {inProgressCount} course{inProgressCount !== 1 ? "s" : ""} in
-              progress — stats will appear once graded.
+              progress. Stats will appear once graded.
             </p>
           )}
           <p className="text-[11px] text-gray-400 dark:text-gray-500 mt-3">

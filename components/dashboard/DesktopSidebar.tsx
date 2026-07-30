@@ -297,7 +297,7 @@ export function DesktopSidebar({
 
           <div className="px-1 pb-1">
             <p className="text-[10px] text-gray-400 dark:text-gray-600 leading-tight text-justify">
-              Student-built, not affiliated with Yale. Free forever — we will
+              Student-built, not affiliated with Yale. Free forever. We will
               never charge a dime. Data may be inaccurate; verify with your DUS.
             </p>
           </div>

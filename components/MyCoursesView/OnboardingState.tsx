@@ -33,15 +33,17 @@ export function OnboardingState({
         <p className="text-gray-500 dark:text-gray-400 text-sm leading-relaxed">
           {isBrandNew ? (
             <>
-              You&apos;re Class of 2030. You do{" "}
+              We know you&apos;ve just gotten to Yale as a Class of 2030 frosh
+              (welcome!). No worries; you do{" "}
               <span className="font-medium text-gray-700 dark:text-gray-300">
                 not need grades
               </span>{" "}
-              to start. Since you&apos;ve already registered for fall courses,
-              your unofficial transcript is ready on YHub right now; import it
-              even though everything is still in progress with no grades, or
-              jump into the Simulator to map your trajectory. We&apos;ll show
-              what you&apos;re taking and fill grades in when they post.
+              to start using DegreeIntelligence and upload your transcript.
+              Since you&apos;ve already registered for fall courses, your
+              unofficial transcript is ready on YHub right now; import it even
+              though everything is still in progress with no grades, or jump
+              into the Simulator to map your trajectory. We&apos;ll show what
+              you&apos;re taking and fill grades in when they post.
             </>
           ) : (
             "Upload your unofficial transcript to see your academic journey. We won't store the PDF file."
@@ -111,7 +113,7 @@ export function OnboardingState({
                 </span>{" "}
                 →{" "}
                 <span className="px-1.5 py-0.5 rounded bg-gray-100 dark:bg-gray-800/60 border border-gray-300 dark:border-gray-700/50 text-gray-800 dark:text-gray-200 font-mono text-xs">
-                  Unofficial Transcript — Undergraduate
+                  Unofficial Transcript - Undergraduate
                 </span>
               </>,
               <>
@@ -126,7 +128,10 @@ export function OnboardingState({
               </>,
             ].map((step, i) => (
               <div key={i} className="flex items-start gap-3">
-                <div className="flex-shrink-0 w-6 h-6 rounded-full bg-gradient-to-br from-pink-500 to-purple-600 flex items-center justify-center text-white text-xs font-medium shadow-[0_2px_8px_rgba(236,72,153,0.3)]">
+                <div
+                  className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-pink-600 font-sf text-xs font-semibold leading-none text-white shadow-[0_2px_8px_rgba(236,72,153,0.35)]"
+                  aria-hidden="true"
+                >
                   {i + 1}
                 </div>
                 <div className="flex-1 pt-0.5">

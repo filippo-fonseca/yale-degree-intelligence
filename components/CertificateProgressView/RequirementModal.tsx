@@ -287,8 +287,8 @@ export default function RequirementModal({
               {/* Fulfill manually context + button */}
               <div className="space-y-2 border-t border-gray-200 dark:border-gray-800 pt-4">
                 <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">
-                  Some requirements—especially electives or those with a wide
-                  range of possible courses—{" "}
+                  Some requirements, especially electives or those with a wide
+                  range of possible courses,{" "}
                   <strong>
                     can’t be fully auto-detected or supplied by us as "options"
                     above.
@@ -314,7 +314,7 @@ export default function RequirementModal({
               <div className="pt-2">
                 <Link
                   href="/contact"
-                  className="text-xs text-blue-400 hover:underline"
+                  className="text-xs text-blue-600 hover:underline dark:text-blue-400"
                   onClick={(e) => e.stopPropagation()}
                 >
                   See an error? Report it

@@ -101,16 +101,16 @@ export default function CertificateTipModal({
                 <li>
                   <span className="text-gray-800 dark:text-gray-200 font-medium">
                     Manual fulfill
-                  </span>{" "}
-                  — mark a requirement as satisfied by linking a class directly
+                  </span>
+                  : mark a requirement as satisfied by linking a class directly
                   from your transcript. Use the teal "Fulfill manually" button on
                   each requirement card.
                 </li>
                 <li>
                   <span className="text-gray-800 dark:text-gray-200 font-medium">
                     Skip a class
-                  </span>{" "}
-                  — indicate an approved exemption to a listed class on a
+                  </span>
+                  : indicate an approved exemption to a listed class on a
                   requirement (e.g. placement credit). Click a pill in the
                   "Remaining" section and choose "Mark as skipped".
                 </li>

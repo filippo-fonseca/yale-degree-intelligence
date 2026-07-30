@@ -208,7 +208,7 @@ export default function MyCoursesView({
           color={
             stats.gpa !== null ? getNumericGPAColor(stats.gpa) : "text-gray-400"
           }
-          infoTooltip="Weighted GPA across all completed, graded courses — same math as the Academic Stats view."
+          infoTooltip="Weighted GPA across all completed, graded courses. Same math as the Academic Stats view."
         />
       </div>
 

@@ -250,7 +250,7 @@ export default function UserSettingsModal({
             </div>
           </div>
 
-          {/* Owner-only dev tools */}
+          {/* Creator-only Dev tools (filippo.fonseca@yale.edu + filifonsecacagnazzo@gmail.com). */}
           {isOwner && (onReplayWelcome || onReplayTutorial) && (
             <div className="mt-4 rounded-xl border border-amber-400/30 bg-amber-50/60 dark:border-amber-400/20 dark:bg-amber-500/[0.06] px-3.5 py-3">
               <div className="flex items-center gap-1.5">
@@ -264,6 +264,7 @@ export default function UserSettingsModal({
               <div className="mt-2 flex flex-wrap gap-1.5">
                 {onReplayWelcome && (
                   <button
+                    type="button"
                     onClick={onReplayWelcome}
                     className="cursor-pointer text-[11px] px-2.5 py-1.5 rounded-lg border border-amber-400/40 bg-white/70 dark:bg-white/[0.04] hover:border-amber-500/70 hover:bg-amber-100/60 dark:hover:bg-amber-500/10 text-amber-700 dark:text-amber-300 transition-all duration-200"
                   >
@@ -272,6 +273,7 @@ export default function UserSettingsModal({
                 )}
                 {onReplayTutorial && (
                   <button
+                    type="button"
                     onClick={onReplayTutorial}
                     className="cursor-pointer text-[11px] px-2.5 py-1.5 rounded-lg border border-amber-400/40 bg-white/70 dark:bg-white/[0.04] hover:border-amber-500/70 hover:bg-amber-100/60 dark:hover:bg-amber-500/10 text-amber-700 dark:text-amber-300 transition-all duration-200"
                   >
@@ -326,7 +328,7 @@ export default function UserSettingsModal({
                           setShowMoreMenu(false);
                           setShowDeleteConfirm(true);
                         }}
-                        className="w-full flex items-center gap-2 px-3 py-2 text-red-400 hover:bg-red-500/10 hover:text-red-300 text-xs transition-all duration-200"
+                        className="w-full flex items-center gap-2 px-3 py-2 text-red-600 hover:bg-red-50 hover:text-red-700 dark:text-red-400 dark:hover:bg-red-500/10 dark:hover:text-red-300 text-xs transition-all duration-200"
                       >
                         <FiTrash2 size={12} />
                         Delete Account
@@ -344,12 +346,14 @@ export default function UserSettingsModal({
                 </span>
               )}
               <button
+                type="button"
                 onClick={onClose}
-                className="px-3 py-1.5 rounded-lg border border-black/[0.06] dark:border-white/[0.08] hover:border-gray-300 dark:hover:border-white/[0.15] hover:bg-black/[0.03] dark:hover:bg-white/[0.04] text-gray-600 dark:text-gray-300 text-xs transition-all duration-200"
+                className="di-btn-secondary"
               >
                 Cancel
               </button>
               <button
+                type="button"
                 onClick={handleSave}
                 disabled={
                   isSaving ||
@@ -357,14 +361,14 @@ export default function UserSettingsModal({
                   hasDuplicateMajors() ||
                   hasDuplicateCertificates()
                 }
-                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 ${
+                className={
                   isDirty &&
                   !hasDuplicateMajors() &&
                   !hasDuplicateCertificates() &&
                   !isSaving
-                    ? "bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white shadow-[0_4px_16px_rgba(168,85,247,0.35)] ring-1 ring-purple-400/40 animate-pulse"
-                    : "bg-gray-100 dark:bg-gray-800/50 text-gray-400 dark:text-gray-500 cursor-not-allowed border border-black/[0.05] dark:border-white/[0.05]"
-                }`}
+                    ? "di-btn-primary"
+                    : "di-btn-secondary opacity-50 cursor-not-allowed"
+                }
               >
                 {isSaving ? "..." : "Save"}
               </button>

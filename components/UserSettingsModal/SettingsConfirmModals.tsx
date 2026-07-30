@@ -67,20 +67,22 @@ export function SettingsConfirmModals({
               </p>
               <div className="flex justify-end gap-2">
                 <button
+                  type="button"
                   onClick={() => setShowDisableFriendsConfirm(false)}
                   disabled={isTogglingFriends}
-                  className="px-3 py-1.5 rounded-lg bg-gray-100 dark:bg-white/[0.04] border border-gray-200 dark:border-white/[0.08] hover:bg-gray-200 dark:hover:bg-white/[0.08] hover:border-gray-300 dark:hover:border-white/[0.15] text-gray-700 dark:text-gray-300 text-xs disabled:opacity-50 transition-all duration-200"
+                  className="di-btn-secondary"
                 >
                   Cancel
                 </button>
                 <button
+                  type="button"
                   onClick={onConfirmDisableFriends}
                   disabled={isTogglingFriends}
-                  className="px-3 py-1.5 rounded-lg bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white text-xs disabled:opacity-50 flex items-center gap-1.5 transition-all duration-200"
+                  className="di-btn-danger"
                 >
                   {isTogglingFriends ? (
                     <>
-                      <span className="animate-spin h-2.5 w-2.5 border-2 border-white/30 border-t-white rounded-full" />
+                      <span className="h-2.5 w-2.5 animate-spin rounded-full border-2 border-white/30 border-t-white" />
                       ...
                     </>
                   ) : (
@@ -119,17 +121,19 @@ export function SettingsConfirmModals({
               </p>
               <div className="flex justify-end gap-2">
                 <button
+                  type="button"
                   onClick={() => setShowDiscardConfirm(false)}
-                  className="px-3 py-1.5 rounded-lg bg-gray-100 dark:bg-white/[0.04] border border-gray-200 dark:border-white/[0.08] hover:bg-gray-200 dark:hover:bg-white/[0.08] text-gray-700 dark:text-gray-300 text-xs transition-all duration-200"
+                  className="di-btn-secondary"
                 >
                   Keep editing
                 </button>
                 <button
+                  type="button"
                   onClick={() => {
                     setShowDiscardConfirm(false);
                     onClose();
                   }}
-                  className="px-3 py-1.5 rounded-lg bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white text-xs transition-all duration-200"
+                  className="di-btn-danger"
                 >
                   Discard
                 </button>
@@ -169,20 +173,22 @@ export function SettingsConfirmModals({
               </p>
               <div className="flex justify-end gap-2">
                 <button
+                  type="button"
                   onClick={() => setShowDeleteConfirm(false)}
                   disabled={isDeleting}
-                  className="px-3 py-1.5 rounded-lg bg-gray-100 dark:bg-white/[0.04] border border-gray-200 dark:border-white/[0.08] hover:bg-gray-200 dark:hover:bg-white/[0.08] hover:border-gray-300 dark:hover:border-white/[0.15] text-gray-700 dark:text-gray-300 text-xs disabled:opacity-50 transition-all duration-200"
+                  className="di-btn-secondary"
                 >
                   Cancel
                 </button>
                 <button
+                  type="button"
                   onClick={onDeleteAccount}
                   disabled={isDeleting}
-                  className="px-3 py-1.5 rounded-lg bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white text-xs disabled:opacity-50 flex items-center gap-1.5 transition-all duration-200"
+                  className="di-btn-danger"
                 >
                   {isDeleting ? (
                     <>
-                      <span className="animate-spin h-2.5 w-2.5 border-2 border-white/30 border-t-white rounded-full" />
+                      <span className="h-2.5 w-2.5 animate-spin rounded-full border-2 border-white/30 border-t-white" />
                       ...
                     </>
                   ) : (

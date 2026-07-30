@@ -198,7 +198,7 @@ export const TOUR_STEPS: TourStep[] = [
     eyebrow: "My certificates",
     title: "Track certificates like majors",
     description:
-      "Yale College certificates get the same board, heatmap, manual fulfill, and skip tools as majors — with a hard rule that a course counted for a certificate cannot also count toward your major(s).",
+      "Yale College certificates get the same board, heatmap, manual fulfill, and skip tools as majors, with a hard rule that a course counted for a certificate cannot also count toward your major(s).",
     accent: "teal",
   },
 

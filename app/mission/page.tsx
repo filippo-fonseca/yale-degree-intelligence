@@ -177,7 +177,7 @@ export default function MissionPage() {
             </div>
             <p className="text-[10px] text-gray-600">
               Not affiliated with Yale University, Yale College, or DegreeAudit.
-              A free, student-built project — we will never charge a dime.
+              A free, student-built project. We will never charge a dime.
             </p>
           </div>
         </div>

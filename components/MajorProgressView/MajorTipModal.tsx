@@ -106,16 +106,16 @@ export default function MajorTipModal({
                 <li>
                   <span className="text-gray-800 dark:text-gray-200 font-medium">
                     Manual fulfill
-                  </span>{" "}
-                  — mark a requirement as satisfied by linking a class directly
+                  </span>:
+                  mark a requirement as satisfied by linking a class directly
                   from your transcript. You can do this from a pink "Fulfill
                   manually" button on each requirement's card.
                 </li>
                 <li>
                   <span className="text-gray-800 dark:text-gray-200 font-medium">
                     Skip a class
-                  </span>{" "}
-                  — indicate an approved exemption to a listed class on a
+                  </span>:
+                  indicate an approved exemption to a listed class on a
                   requirement (i.e. say you started with Calc III, you could
                   mark Calc I and II as skipped, so we'll count them for your
                   major's progress even though you didn't take them). You can do

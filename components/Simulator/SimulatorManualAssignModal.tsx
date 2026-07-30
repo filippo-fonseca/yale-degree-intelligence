@@ -691,7 +691,7 @@ export default function SimulatorManualAssignModal({
                 onClick={handleSkip}
                 className="w-full px-4 py-2 rounded-lg bg-gray-100 dark:bg-gray-800/50 text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700/50 hover:text-gray-700 dark:hover:text-gray-300 transition-colors text-sm"
               >
-                Skip &mdash; not for my major or certificate
+                Skip - not for my major or certificate
               </button>
             </div>
           </motion.div>

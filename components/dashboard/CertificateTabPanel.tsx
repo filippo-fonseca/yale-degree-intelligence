@@ -67,8 +67,8 @@ export function CertificateTabPanel({
                 onClick={() => onSelectCertificate(certificate)}
                 className={`px-3 py-1.5 rounded-xl text-sm transition-all duration-200 ${
                   selectedCertificate === certificate
-                    ? "bg-gradient-to-br from-teal-500/20 via-teal-600/15 to-emerald-500/20 text-teal-200 border border-teal-500/40 shadow-[inset_0_1px_0_rgba(255,255,255,0.1),0_2px_8px_rgba(20,184,166,0.15)]"
-                    : "bg-gray-50 dark:bg-gray-900/40 text-gray-500 dark:text-gray-400 border border-gray-200 dark:border-gray-800/60 hover:border-gray-300 dark:hover:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800/50 hover:text-gray-700 dark:hover:text-gray-300 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)]"
+                    ? "bg-teal-600 text-white border border-teal-600 shadow-[0_2px_8px_rgba(20,184,166,0.25)]"
+                    : "bg-gray-50 dark:bg-gray-900/40 text-gray-600 dark:text-gray-400 border border-gray-200 dark:border-gray-800/60 hover:border-gray-300 dark:hover:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800/50 hover:text-gray-800 dark:hover:text-gray-300"
                 }`}
               >
                 {CERTIFICATES[certificate] || certificate}

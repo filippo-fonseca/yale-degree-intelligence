@@ -314,8 +314,9 @@ export default function ManualCourseEntryModal({
                     No courses added yet
                   </p>
                   <button
+                    type="button"
                     onClick={addNewEntry}
-                    className="px-4 py-2 rounded-lg bg-pink-500/10 border border-pink-500/30 text-pink-300 text-sm font-medium hover:bg-pink-500/20 transition-colors"
+                    className="di-btn-primary"
                   >
                     Add a course
                   </button>
@@ -373,7 +374,7 @@ export default function ManualCourseEntryModal({
                               )}
                               <button
                                 onClick={() => setShowCustomInput(true)}
-                                className="mt-2 text-xs text-pink-400 hover:text-pink-300 transition-colors"
+                                  className="mt-2 text-xs text-pink-600 hover:text-pink-700 dark:text-pink-400 dark:hover:text-pink-300 transition-colors"
                               >
                                 Can't find it? Enter manually
                               </button>
@@ -408,9 +409,10 @@ export default function ManualCourseEntryModal({
                                   Back to search
                                 </button>
                                 <button
+                                  type="button"
                                   onClick={() => selectCustomCourse(entry.id)}
                                   disabled={!customCodeInput.trim()}
-                                  className="ml-auto px-3 py-1 text-xs rounded bg-pink-500/20 border border-pink-500/30 text-pink-300 hover:bg-pink-500/30 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                                  className="di-btn-primary ml-auto"
                                 >
                                   Add
                                 </button>
@@ -522,7 +524,7 @@ export default function ManualCourseEntryModal({
                 <p className="text-[10px] text-gray-400 dark:text-gray-500 leading-relaxed">
                   By adding courses, you voluntarily store course and grade data
                   on our servers (private to your account). Not affiliated with
-                  Yale. Free forever — we will never charge a dime.{" "}
+                  Yale. Free forever. We will never charge a dime.{" "}
                   <a
                     href="/terms"
                     target="_blank"
@@ -538,15 +540,17 @@ export default function ManualCourseEntryModal({
                 </span>
                 <div className="flex items-center gap-2">
                   <button
+                    type="button"
                     onClick={onClose}
-                    className="px-3 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400 text-sm hover:text-gray-900 dark:hover:text-white hover:border-gray-300 dark:hover:border-gray-600 transition-colors"
+                    className="di-btn-secondary"
                   >
                     Cancel
                   </button>
                   <button
+                    type="button"
                     onClick={handleSubmit}
                     disabled={isSubmitting || validCount === 0}
-                    className="px-4 py-1.5 rounded-lg bg-pink-500/20 border border-pink-500/40 text-pink-300 text-sm font-medium hover:bg-pink-500/30 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-1.5"
+                    className="di-btn-primary"
                   >
                     {isSubmitting ? (
                       <>

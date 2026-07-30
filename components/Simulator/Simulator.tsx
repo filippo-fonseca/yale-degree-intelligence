@@ -2202,10 +2202,10 @@ export default function Simulator({
                   whileTap={
                     planName.trim() && hasChanges ? { scale: 0.98 } : {}
                   }
-                  className={`px-4 py-2 text-sm rounded-xl font-medium transition-all ${
+                  className={`px-4 py-2 text-sm rounded-xl font-medium transition-colors ${
                     planName.trim() && hasChanges
-                      ? "bg-gradient-to-r from-purple-500/30 to-blue-500/30 text-gray-900 dark:text-white border border-purple-500/30 hover:border-purple-400/40 shadow-[0_2px_12px_rgba(139,92,246,0.2),inset_0_1px_0_rgba(255,255,255,0.1)]"
-                      : "bg-black/[0.02] dark:bg-white/[0.02] text-gray-400 dark:text-gray-600 border border-black/[0.04] dark:border-white/[0.04] cursor-not-allowed"
+                      ? "di-btn-primary !px-4 !py-2 !text-sm !rounded-xl"
+                      : "di-btn-secondary opacity-50 cursor-not-allowed !px-4 !py-2 !text-sm !rounded-xl"
                   }`}
                 >
                   {selectedPlanToOverwrite !== null
@@ -2408,7 +2408,7 @@ export default function Simulator({
                 onClick={() => setShowPlanSelector(false)}
                 whileHover={{ scale: 1.01 }}
                 whileTap={{ scale: 0.99 }}
-                className="w-full py-3 px-4 rounded-xl font-medium text-sm text-gray-800 dark:text-white bg-gradient-to-r from-blue-500/20 via-purple-500/20 to-pink-500/20 hover:from-blue-500/30 hover:via-purple-500/30 hover:to-pink-500/30 border border-black/[0.08] dark:border-white/[0.08] shadow-[0_2px_12px_rgba(139,92,246,0.1),inset_0_1px_0_rgba(255,255,255,0.1)] transition-all duration-200 flex items-center justify-center gap-2"
+                className="di-btn-primary w-full !rounded-xl !px-4 !py-3 !text-sm"
               >
                 <FiPlus size={14} className="opacity-70" />
                 Start Fresh / Create New Plan

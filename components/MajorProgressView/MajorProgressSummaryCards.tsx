@@ -35,7 +35,7 @@ export default function MajorProgressSummaryCards({
             ? "text-purple-600 dark:text-purple-300"
             : "text-blue-600 dark:text-blue-300"
         }
-        infoTooltip="This shows your completed credits out of the total—including any prereqs!—required for your indicated major."
+        infoTooltip="This shows your completed credits out of the total (including any prereqs!) required for your indicated major."
       />
       <MajorStatCard
         label="Completion"

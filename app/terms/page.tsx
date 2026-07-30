@@ -50,7 +50,7 @@ export default function TermsOfService() {
           </p>
           <p className="mt-3">
             <strong>DegreeIntelligence is free forever.</strong> We stand to
-            make no money from this — in fact we lose money running it — and we
+            make no money from this. In fact we lose money running it, and we
             will never charge a dime for it.
           </p>
         </section>

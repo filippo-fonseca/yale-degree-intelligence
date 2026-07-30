@@ -66,8 +66,8 @@ export function MajorTabPanel({
                 onClick={() => onSelectMajor(major)}
                 className={`px-3 py-1.5 rounded-xl text-sm transition-all duration-200 ${
                   selectedMajor === major
-                    ? "bg-gradient-to-br from-blue-500/20 via-blue-600/15 to-purple-500/20 text-blue-200 border border-blue-500/40 shadow-[inset_0_1px_0_rgba(255,255,255,0.1),0_2px_8px_rgba(59,130,246,0.15)]"
-                    : "bg-gray-50 dark:bg-gray-900/40 text-gray-500 dark:text-gray-400 border border-gray-200 dark:border-gray-800/60 hover:border-gray-300 dark:hover:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800/50 hover:text-gray-700 dark:hover:text-gray-300 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)]"
+                    ? "bg-blue-600 text-white border border-blue-600 shadow-[0_2px_8px_rgba(59,130,246,0.25)]"
+                    : "bg-gray-50 dark:bg-gray-900/40 text-gray-600 dark:text-gray-400 border border-gray-200 dark:border-gray-800/60 hover:border-gray-300 dark:hover:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800/50 hover:text-gray-800 dark:hover:text-gray-300"
                 }`}
               >
                 {major} - {MAJORS[major] || major}

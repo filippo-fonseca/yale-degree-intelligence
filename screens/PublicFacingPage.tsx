@@ -18,6 +18,7 @@ import {
   FiMoon,
   FiSun,
 } from "react-icons/fi";
+import { FaLinkedinIn } from "react-icons/fa";
 import LogoIcon from "@/icons/LogoIcon";
 import Link from "next/link";
 import { useState, useRef, useEffect } from "react";
@@ -411,10 +412,10 @@ export default function AboutPage() {
         </div>
       </nav>
 
-      {/* §2 Hero */}
+      {/* §2 Hero — slightly denser so the social-proof line + video fit in view */}
       {/* isolate: the dot grid and tiles sit on negative z, so the band needs its
           own stacking context or they paint behind the canvas background. */}
-      <section className="relative isolate pt-24 md:pt-32 pb-16 md:pb-24">
+      <section className="relative isolate pt-20 md:pt-24 pb-10 md:pb-14">
         {/* Hero dot grid, faded out by ~55% of the hero band's height */}
         <div
           aria-hidden
@@ -513,20 +514,26 @@ export default function AboutPage() {
           </div>
         </div>
 
-        <div className="relative max-w-5xl mx-auto px-4 lg:px-6 text-center">
-          {/* 1. The one hero pill */}
+        <div className="relative mx-auto max-w-5xl px-4 text-center lg:px-6">
+          {/* 1. Release + Class of 2030 welcome (stars removed) */}
           <div className="flex justify-center">
-            {/* The banner owns the YDN mention, so the pill is just the release. */}
             <Link
               href="/changelog"
-              className="inline-flex items-center gap-2 rounded-full border border-black/[0.08] dark:border-white/10 bg-white dark:bg-white/[0.04] px-3.5 py-1 text-xs font-medium font-sf text-gray-900 dark:text-white transition-opacity hover:opacity-70"
+              className="inline-flex max-w-2xl flex-wrap items-center justify-center gap-x-2 gap-y-0.5 rounded-full border border-black/[0.08] bg-white px-3.5 py-1.5 text-center font-sf text-[11px] font-medium leading-snug text-gray-900 transition-opacity hover:opacity-70 dark:border-white/10 dark:bg-white/[0.04] dark:text-white sm:text-xs"
             >
-              ✦ v3 is out now
+              <span>v3 is out now</span>
+              <span className="text-gray-300 dark:text-gray-600" aria-hidden>
+                ·
+              </span>
+              <span className="text-gray-600 dark:text-gray-300">
+                Class of 2030: welcome to Yale. No grades needed. Use the
+                Simulator now, or import your YHub unofficial transcript.
+              </span>
             </Link>
           </div>
 
           {/* 2. Headline */}
-          <h1 className="mt-8 font-medium text-balance text-6xl md:text-7xl lg:text-[5.5rem] leading-[1.05] tracking-[-0.02em] text-gray-900 dark:text-white">
+          <h1 className="mt-5 text-balance text-5xl font-medium leading-[1.05] tracking-[-0.02em] text-gray-900 dark:text-white md:mt-6 md:text-6xl lg:text-[4.5rem]">
             The control plane
             <br />
             <span className="text-gray-400 dark:text-gray-500">
@@ -535,13 +542,13 @@ export default function AboutPage() {
           </h1>
 
           {/* 3. Subhead */}
-          <p className="mt-6 mx-auto max-w-[60ch] font-sf text-base md:text-lg text-gray-500 dark:text-gray-400 leading-relaxed">
+          <p className="mx-auto mt-4 max-w-[60ch] font-sf text-sm leading-relaxed text-gray-500 dark:text-gray-400 md:mt-5 md:text-base">
             Plan semesters, track requirements, simulate outcomes, and see
             exactly how your degree is going. Built by Yalies, for Yalies.
           </p>
 
           {/* 4. CTA row */}
-          <div className="mt-8 flex flex-wrap items-center justify-center gap-3 font-sf">
+          <div className="mt-5 flex flex-wrap items-center justify-center gap-3 font-sf md:mt-6">
             <BrandCTA
               onClick={() => startLogin("hero")}
               pending={authPendingId === "hero"}
@@ -554,15 +561,23 @@ export default function AboutPage() {
           </div>
 
           {/* 5. Mono microcopy */}
-          <p className="mt-5 font-mono text-xs tracking-tight text-gray-400 dark:text-gray-500">
-            Free forever · No install · 1 in 6 Yale undergrads already on board
+          <p className="mt-4 font-mono text-xs tracking-tight text-gray-400 dark:text-gray-500">
+            Free forever · No install
           </p>
 
-          {/* 6. Class of 2030 welcome chip */}
-          <p className="mt-6 inline-flex items-center gap-2 rounded-full border border-pink-500/15 bg-pink-500/[0.07] px-4 py-1.5 font-sf text-xs font-medium text-pink-900/80 dark:bg-pink-500/10 dark:text-pink-200/80">
-            🎓 Class of 2030: welcome to Yale. No grades needed. Use the
-            Simulator now, or import your YHub unofficial transcript.
-          </p>
+          {/* 6. Social proof (sits above the launch film) */}
+          <div className="mt-5 md:mt-6">
+            <p className="text-balance text-xl font-medium leading-snug tracking-[-0.015em] text-gray-900 dark:text-white sm:text-2xl md:text-3xl">
+              Used by 1 in 6 Yale undergrads.
+              <br />
+              <span className="text-gray-400 dark:text-gray-500">
+                Some of them even like it.
+              </span>
+            </p>
+            <p className="mt-2 font-mono text-[11px] tracking-tight text-gray-400 dark:text-gray-500 sm:mt-3 sm:text-xs">
+              ~1,200 students · every residential college · zero ads, zero fees
+            </p>
+          </div>
         </div>
       </section>
 
@@ -603,22 +618,6 @@ export default function AboutPage() {
               />
             </div>
           </div>
-        </motion.div>
-      </section>
-
-      {/* §5 Statement band */}
-      <section className="px-4 py-28 lg:px-6">
-        <motion.div {...reveal} className="mx-auto max-w-3xl text-center">
-          <h2 className="font-medium text-balance text-4xl md:text-5xl leading-[1.02] tracking-[-0.015em] text-gray-900 dark:text-white">
-            Used by 1 in 6 Yale undergrads.
-            <br />
-            <span className="text-gray-400 dark:text-gray-500">
-              Some of them even like it.
-            </span>
-          </h2>
-          <p className="mt-6 font-mono text-xs tracking-tight text-gray-400 dark:text-gray-500">
-            ~1,200 students · every residential college · zero ads, zero fees
-          </p>
         </motion.div>
       </section>
 
@@ -723,6 +722,7 @@ export default function AboutPage() {
         line1="Contextual stats that"
         line2="actually help."
         mockSide="left"
+        wideMock
         body={
           <>
             See your progress and trajectory in context, so you know where to
@@ -822,8 +822,8 @@ export default function AboutPage() {
                 ))}
               </div>
 
-              {/* StatsView's ChartCard, twice */}
-              <div className="grid grid-cols-1 gap-4">
+              {/* Charts side-by-side so the mock reads wider, not a tall stack */}
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                 <motion.div
                   initial={{ opacity: 0, y: 16 }}
                   whileInView={{ opacity: 1, y: 0 }}
@@ -856,11 +856,11 @@ export default function AboutPage() {
                       </svg>
                     </div>
                   </div>
-                  <div ref={lineRef} className="h-[220px] w-full">
+                  <div ref={lineRef} className="h-[180px] w-full">
                     {lineShown && (
                       <LineChart
                         key="cum-line-mounted"
-                        height={220}
+                        height={180}
                         xAxis={[
                           {
                             scaleType: "point",
@@ -868,7 +868,7 @@ export default function AboutPage() {
                             tickLabelStyle: {
                               angle: 40,
                               textAnchor: "start",
-                              fontSize: 10,
+                              fontSize: 9,
                               fill: axisTickColor,
                             },
                           },
@@ -880,7 +880,7 @@ export default function AboutPage() {
                             max: 4,
                             tickInterval: [3, 3.25, 3.5, 3.75, 4],
                             tickLabelStyle: {
-                              fontSize: 10,
+                              fontSize: 9,
                               fill: axisTickColor,
                             },
                             labelStyle: {
@@ -899,7 +899,7 @@ export default function AboutPage() {
                           },
                         ]}
                         grid={{ vertical: false, horizontal: true }}
-                        margin={{ left: 50, right: 16, top: 12, bottom: 64 }}
+                        margin={{ left: 40, right: 8, top: 8, bottom: 56 }}
                         sx={{
                           backgroundColor: "transparent",
                           "& .MuiChartsAxis-tickLabel": { fill: axisTickColor },
@@ -948,7 +948,7 @@ export default function AboutPage() {
                       </svg>
                     </div>
                   </div>
-                  <div ref={pieRef} className="h-[220px] w-full">
+                  <div ref={pieRef} className="h-[180px] w-full">
                     {pieShown && (
                       <PieChartWrapper
                         key="pie-mounted"
@@ -1122,23 +1122,29 @@ export default function AboutPage() {
                               {req.desc}
                             </p>
                             <div className="flex flex-wrap gap-1.5">
-                              {req.pills.map((opt) => (
-                                <div
-                                  key={opt.code}
-                                  className={`relative flex items-center rounded-full px-2 py-0.5 text-xs ${OPTION_PILL[opt.status]}`}
-                                >
-                                  {opt.code}
-                                  <span className="ml-1 text-[0.65rem]">
-                                    ({opt.cr}cr
-                                    {opt.status === "in-progress"
-                                      ? ", in progress"
-                                      : opt.status === "complete"
-                                        ? ", complete"
-                                        : ""}
-                                    )
-                                  </span>
-                                </div>
-                              ))}
+                              {req.pills.map((opt) => {
+                                const suffix =
+                                  opt.status === "in-progress"
+                                    ? ", in progress"
+                                    : opt.status === "complete"
+                                      ? ", complete"
+                                      : "";
+                                const label = `${opt.code} (${opt.cr}cr${suffix})`;
+                                return (
+                                  <div
+                                    key={opt.code}
+                                    title={label}
+                                    className={`relative inline-flex max-w-full min-w-0 items-center overflow-hidden rounded-full px-2 py-0.5 text-xs ${OPTION_PILL[opt.status]}`}
+                                  >
+                                    <span className="min-w-0 truncate">
+                                      {opt.code}
+                                    </span>
+                                    <span className="ml-1 shrink-0 whitespace-nowrap text-[0.65rem]">
+                                      ({opt.cr}cr{suffix})
+                                    </span>
+                                  </div>
+                                );
+                              })}
                             </div>
                           </div>
                         ))}
@@ -1329,28 +1335,20 @@ export default function AboutPage() {
         <motion.div {...reveal} className="mx-auto max-w-3xl text-center">
           <Kicker>Mission</Kicker>
           <h2 className="mt-4 text-balance text-4xl font-medium leading-[1.02] tracking-[-0.015em] text-gray-900 dark:text-white md:text-5xl">
-            Built at Yale, because
+            From Yalies, for Yalies.
             <br />
             <span className="text-gray-400 dark:text-gray-500">
-              I needed it.
+              Because we all deserve better.
             </span>
           </h2>
 
-          <div className="mt-8 space-y-5 font-sf text-base leading-relaxed text-gray-500 dark:text-gray-400 md:text-lg">
-            <p>
-              Trying to plan my own majors, I kept hitting the same wall.
-              Yale's requirements are complex, scattered across PDFs and half a
-              dozen poorly organized websites, and nearly impossible to track by
-              hand. Planning a double major turned that into a second job.
-            </p>
-            <p>
-              So I built the tool I wish I had: the tedious parts automated,
-              every major and concentration requirement in one place, and no
-              fragile spreadsheet formulas to maintain. Rather than keep it to
-              myself, I cleaned it up and published it. I sincerely hope it
-              helps.
-            </p>
-          </div>
+          <p className="mx-auto mt-8 max-w-[52ch] font-sf text-base leading-relaxed text-gray-500 dark:text-gray-400 md:text-lg">
+            This will always be free for all of us. Not a business or a startup.
+            I built this for myself to plan out my double major and wanted to
+            share it with others, and since then it has grown exponentially!
+            Makes me so happy to see other people using it and
+            planning/understanding their Yale experience in an easier way.
+          </p>
 
           {/* Team, a single centered person, no cards */}
           <div className="mt-16 flex justify-center font-sf">
@@ -1359,6 +1357,7 @@ export default function AboutPage() {
                 name: "Filippo Fonseca",
                 line: "Yale '28 · MechE (ABET) & EECS",
                 photoRoute: "/team/filippo.jpeg",
+                linkedin: "https://linkedin.com/in/filippo-fonseca",
               },
             ].map((person) => (
               <div
@@ -1376,6 +1375,17 @@ export default function AboutPage() {
                 <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
                   {person.line}
                 </p>
+                {person.linkedin ? (
+                  <a
+                    href={person.linkedin}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-3 inline-flex items-center gap-1.5 rounded-full border border-black/[0.08] bg-white px-2.5 py-1 text-[11px] font-medium text-gray-600 transition-colors hover:border-[#0A66C2]/40 hover:bg-[#0A66C2]/10 hover:text-[#0A66C2] dark:border-white/10 dark:bg-white/[0.04] dark:text-gray-300 dark:hover:border-[#0A66C2]/50 dark:hover:bg-[#0A66C2]/15 dark:hover:text-[#70B5F9]"
+                  >
+                    <FaLinkedinIn size={11} aria-hidden />
+                    LinkedIn
+                  </a>
+                ) : null}
               </div>
             ))}
           </div>
@@ -2025,6 +2035,7 @@ function FeatureSection({
   actions,
   mock,
   mockSide = "right",
+  wideMock = false,
 }: {
   id?: string;
   kicker: string;
@@ -2035,10 +2046,18 @@ function FeatureSection({
   actions?: React.ReactNode;
   mock: React.ReactNode;
   mockSide?: "left" | "right";
+  /** Give the mock column more horizontal room (less tall-feeling demos). */
+  wideMock?: boolean;
 }) {
   return (
     <section id={id} className="px-4 py-24 lg:px-6">
-      <div className="mx-auto grid max-w-6xl items-center gap-12 lg:grid-cols-[5fr,7fr]">
+      <div
+        className={`mx-auto grid items-center gap-12 ${
+          wideMock
+            ? "max-w-7xl lg:grid-cols-[4fr,8fr]"
+            : "max-w-6xl lg:grid-cols-[5fr,7fr]"
+        }`}
+      >
         <motion.div
           {...reveal}
           className={mockSide === "left" ? "lg:order-2" : undefined}

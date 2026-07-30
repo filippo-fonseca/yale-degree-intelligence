@@ -79,14 +79,16 @@ export default function ConfirmDeleteModal({
 
             <div className="mt-6 flex items-center justify-end gap-2">
               <button
+                type="button"
                 onClick={onCancel}
-                className="px-4 py-2 rounded-lg border border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700 bg-white dark:bg-gray-900/50 text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-all"
+                className="di-btn-secondary !px-4 !py-2 !text-sm"
               >
                 Cancel
               </button>
               <button
+                type="button"
                 onClick={onConfirm}
-                className="px-4 py-2 rounded-lg border border-red-300 dark:border-red-800/60 bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-200 hover:bg-red-100 dark:hover:bg-red-900/40 hover:border-red-400 dark:hover:border-red-700 transition-all flex items-center gap-2"
+                className="di-btn-danger !px-4 !py-2 !text-sm"
               >
                 <FiTrash2 className="w-4 h-4" />
                 Delete

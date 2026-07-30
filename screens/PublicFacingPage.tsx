@@ -1334,28 +1334,20 @@ export default function AboutPage() {
         <motion.div {...reveal} className="mx-auto max-w-3xl text-center">
           <Kicker>Mission</Kicker>
           <h2 className="mt-4 text-balance text-4xl font-medium leading-[1.02] tracking-[-0.015em] text-gray-900 dark:text-white md:text-5xl">
-            Built at Yale, because
+            From Yalies, for Yalies.
             <br />
             <span className="text-gray-400 dark:text-gray-500">
-              I needed it.
+              Because we all deserve better.
             </span>
           </h2>
 
-          <div className="mt-8 space-y-5 font-sf text-base leading-relaxed text-gray-500 dark:text-gray-400 md:text-lg">
-            <p>
-              Trying to plan my own majors, I kept hitting the same wall.
-              Yale's requirements are complex, scattered across PDFs and half a
-              dozen poorly organized websites, and nearly impossible to track by
-              hand. Planning a double major turned that into a second job.
-            </p>
-            <p>
-              So I built the tool I wish I had: the tedious parts automated,
-              every major and concentration requirement in one place, and no
-              fragile spreadsheet formulas to maintain. Rather than keep it to
-              myself, I cleaned it up and published it. I sincerely hope it
-              helps.
-            </p>
-          </div>
+          <p className="mx-auto mt-8 max-w-[52ch] font-sf text-base leading-relaxed text-gray-500 dark:text-gray-400 md:text-lg">
+            This will always be free for all of us. Not a business or a startup.
+            I built this for myself to plan out my double major and wanted to
+            share it with others, and since then it has grown exponentially!
+            Makes me so happy to see other people using it and
+            planning/understanding their Yale experience in an easier way.
+          </p>
 
           {/* Team, a single centered person, no cards */}
           <div className="mt-16 flex justify-center font-sf">

@@ -371,6 +371,49 @@ body {
   }
 }
 
+/*
+  Toggle track: peer-checked Tailwind fills wash out in light mode,
+  so on-state is forced opaque via .di-toggle-on.
+*/
+.di-toggle {
+  width: 2.75rem;
+  height: 1.5rem;
+  border-radius: 9999px;
+  background-color: #d1d5db;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.22);
+  transition: background-color 0.15s ease;
+  position: relative;
+}
+.dark .di-toggle {
+  background-color: #4b5563;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.5);
+}
+.di-toggle.di-toggle-on {
+  background-color: #db2777 !important;
+}
+.di-toggle::after {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  height: 18px;
+  width: 18px;
+  border-radius: 9999px;
+  background: #ffffff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.45);
+  transition: transform 0.15s ease;
+}
+.di-toggle.di-toggle-on::after {
+  transform: translateX(1.25rem);
+}
+.peer:focus-visible + .di-toggle {
+  outline: 2px solid rgba(236, 72, 153, 0.4);
+  outline-offset: 2px;
+}
+.peer:disabled + .di-toggle {
+  opacity: 0.5;
+}
+
 /* MUI x-charts tooltips are portaled outside component containers, so local
    sx rules can miss dark-mode backgrounds and text color inheritance. */
 .dark .MuiChartsTooltip-root,

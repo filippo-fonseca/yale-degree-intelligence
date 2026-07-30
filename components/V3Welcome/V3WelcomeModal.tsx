@@ -194,7 +194,7 @@ export default function V3WelcomeModal({
               </button>
               <button
                 onClick={onStartTour}
-                className="group inline-flex items-center justify-center gap-1.5 rounded-xl border border-pink-600 bg-pink-600 px-5 py-2.5 text-sm font-semibold text-white shadow-[0_6px_22px_rgba(236,72,153,0.35)] transition-colors hover:border-pink-700 hover:bg-pink-700"
+                className="di-btn-primary !rounded-xl !px-5 !py-2.5 !text-sm"
               >
                 Take the tour
                 <ArrowRight className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-0.5" />

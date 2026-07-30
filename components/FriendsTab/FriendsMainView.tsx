@@ -250,7 +250,7 @@ export function FriendsMainView({
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
           data-tour="friends-add"
-          className="flex items-center gap-1.5 rounded-lg border border-pink-600 bg-pink-600 px-3 py-1.5 text-xs font-medium text-white shadow-[0_2px_8px_rgba(236,72,153,0.25)] transition-colors hover:border-pink-700 hover:bg-pink-700"
+          className="di-btn-primary"
           onClick={() => setShowSearchModal(true)}
         >
           <FiUserPlus size={13} />
@@ -373,7 +373,7 @@ export function FriendsMainView({
                                 <FiCheck size={10} />
                               </button>
                               <button
-                                className="p-1.5 rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/25 transition border border-red-500/20"
+                                className="rounded-lg border border-red-200 bg-red-50 p-1.5 text-red-600 transition hover:bg-red-100 dark:border-red-500/20 dark:bg-red-500/10 dark:text-red-400 dark:hover:bg-red-500/25"
                                 onClick={() => rejectFriendRequest(req)}
                                 title="Decline"
                               >
@@ -590,13 +590,15 @@ export function FriendsMainView({
               </p>
               <div className="flex justify-end gap-2">
                 <button
+                  type="button"
                   onClick={() => setRemoveFriendTarget(null)}
                   disabled={isRemovingFriend}
-                  className="px-3 py-1.5 rounded-lg border border-gray-200 dark:border-white/[0.08] hover:bg-gray-100 dark:hover:bg-white/[0.06] text-gray-700 dark:text-gray-300 text-sm disabled:opacity-50 transition"
+                  className="di-btn-secondary !text-sm"
                 >
                   Cancel
                 </button>
                 <button
+                  type="button"
                   onClick={async () => {
                     if (!removeFriendTarget.friend.id) return;
                     setIsRemovingFriend(true);
@@ -608,7 +610,7 @@ export function FriendsMainView({
                     }
                   }}
                   disabled={isRemovingFriend}
-                  className="px-3 py-1.5 rounded-lg bg-red-600 hover:bg-red-700 text-white text-sm disabled:opacity-50 flex items-center gap-1.5 transition"
+                  className="di-btn-danger !text-sm"
                 >
                   {isRemovingFriend ? "Removing..." : "Remove friend"}
                 </button>
@@ -655,13 +657,15 @@ export function FriendsMainView({
               </p>
               <div className="flex justify-end gap-2">
                 <button
+                  type="button"
                   onClick={() => setShowDisableConfirm(false)}
                   disabled={isDisabling}
-                  className="px-3 py-1.5 rounded-lg border border-gray-200 dark:border-white/[0.08] hover:bg-gray-100 dark:hover:bg-white/[0.06] text-gray-700 dark:text-gray-300 text-sm disabled:opacity-50 transition"
+                  className="di-btn-secondary !text-sm"
                 >
                   Cancel
                 </button>
                 <button
+                  type="button"
                   onClick={async () => {
                     setIsDisabling(true);
                     try {
@@ -675,7 +679,7 @@ export function FriendsMainView({
                     }
                   }}
                   disabled={isDisabling}
-                  className="px-3 py-1.5 rounded-lg bg-red-600 hover:bg-red-700 text-white text-sm disabled:opacity-50 flex items-center gap-1.5 transition"
+                  className="di-btn-danger !text-sm"
                 >
                   {isDisabling ? (
                     <>

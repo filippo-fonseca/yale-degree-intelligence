@@ -316,7 +316,7 @@ export default function ManualCourseEntryModal({
                   <button
                     type="button"
                     onClick={addNewEntry}
-                    className="rounded-lg border border-pink-600 bg-pink-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:border-pink-700 hover:bg-pink-700"
+                    className="di-btn-primary"
                   >
                     Add a course
                   </button>
@@ -374,7 +374,7 @@ export default function ManualCourseEntryModal({
                               )}
                               <button
                                 onClick={() => setShowCustomInput(true)}
-                                className="mt-2 text-xs text-pink-400 hover:text-pink-300 transition-colors"
+                                  className="mt-2 text-xs text-pink-600 hover:text-pink-700 dark:text-pink-400 dark:hover:text-pink-300 transition-colors"
                               >
                                 Can't find it? Enter manually
                               </button>
@@ -412,7 +412,7 @@ export default function ManualCourseEntryModal({
                                   type="button"
                                   onClick={() => selectCustomCourse(entry.id)}
                                   disabled={!customCodeInput.trim()}
-                                  className="ml-auto rounded border border-pink-600 bg-pink-600 px-3 py-1 text-xs font-medium text-white transition-colors hover:border-pink-700 hover:bg-pink-700 disabled:cursor-not-allowed disabled:opacity-50"
+                                  className="di-btn-primary ml-auto"
                                 >
                                   Add
                                 </button>
@@ -540,8 +540,9 @@ export default function ManualCourseEntryModal({
                 </span>
                 <div className="flex items-center gap-2">
                   <button
+                    type="button"
                     onClick={onClose}
-                    className="px-3 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400 text-sm hover:text-gray-900 dark:hover:text-white hover:border-gray-300 dark:hover:border-gray-600 transition-colors"
+                    className="di-btn-secondary"
                   >
                     Cancel
                   </button>
@@ -549,7 +550,7 @@ export default function ManualCourseEntryModal({
                     type="button"
                     onClick={handleSubmit}
                     disabled={isSubmitting || validCount === 0}
-                    className="inline-flex items-center gap-1.5 rounded-lg border border-pink-600 bg-pink-600 px-4 py-1.5 text-sm font-medium text-white transition-colors hover:border-pink-700 hover:bg-pink-700 disabled:cursor-not-allowed disabled:opacity-50"
+                    className="di-btn-primary"
                   >
                     {isSubmitting ? (
                       <>

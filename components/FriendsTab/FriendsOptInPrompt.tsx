@@ -84,7 +84,7 @@ export function FriendsOptInPrompt({ onToggleFriends }: FriendsOptInPromptProps)
           disabled={isEnabling}
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
-          className="flex w-full items-center justify-center gap-2 rounded-xl border border-pink-600 bg-pink-600 px-6 py-3.5 text-sm font-medium text-white shadow-[0_4px_16px_rgba(236,72,153,0.3)] transition-colors hover:border-pink-700 hover:bg-pink-700 disabled:opacity-50"
+          className="di-btn-primary w-full !rounded-xl !px-6 !py-3.5 !text-sm"
         >
           {isEnabling ? (
             <>

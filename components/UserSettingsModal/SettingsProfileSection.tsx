@@ -98,19 +98,19 @@ export function SettingsProfileSection({
             </div>
             <div className="flex justify-end gap-1.5">
               <button
+                type="button"
                 onClick={handleCancelBio}
                 disabled={isSavingBio}
-                className="px-2 py-1 text-[11px] rounded-lg border border-black/[0.06] dark:border-white/[0.08] hover:border-gray-300 dark:hover:border-white/[0.15] hover:bg-black/[0.03] dark:hover:bg-white/[0.04] text-gray-600 dark:text-gray-300 disabled:opacity-70 transition-all duration-200"
+                className="di-btn-secondary !px-2 !py-1 !text-[11px]"
               >
                 Cancel
               </button>
               <button
+                type="button"
                 onClick={handleSaveBio}
                 disabled={isSavingBio}
-                className={`px-2.5 py-1 text-[11px] font-semibold rounded-lg border shadow-sm disabled:opacity-70 transition-all duration-200 ${
-                  bioJustSaved
-                    ? "border-emerald-500 bg-emerald-600 text-white shadow-emerald-500/20"
-                    : "border-pink-600 bg-pink-600 text-white shadow-pink-500/20 hover:bg-pink-700 hover:border-pink-700 dark:border-pink-500 dark:bg-gradient-to-r dark:from-pink-500 dark:to-purple-600 dark:hover:from-pink-600 dark:hover:to-purple-700"
+                className={`!px-2.5 !py-1 !text-[11px] ${
+                  bioJustSaved ? "di-btn-success" : "di-btn-primary"
                 }`}
               >
                 {isSavingBio ? "..." : bioJustSaved ? "Saved" : "Save"}

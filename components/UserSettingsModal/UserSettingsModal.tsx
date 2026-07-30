@@ -328,7 +328,7 @@ export default function UserSettingsModal({
                           setShowMoreMenu(false);
                           setShowDeleteConfirm(true);
                         }}
-                        className="w-full flex items-center gap-2 px-3 py-2 text-red-400 hover:bg-red-500/10 hover:text-red-300 text-xs transition-all duration-200"
+                        className="w-full flex items-center gap-2 px-3 py-2 text-red-600 hover:bg-red-50 hover:text-red-700 dark:text-red-400 dark:hover:bg-red-500/10 dark:hover:text-red-300 text-xs transition-all duration-200"
                       >
                         <FiTrash2 size={12} />
                         Delete Account
@@ -346,12 +346,14 @@ export default function UserSettingsModal({
                 </span>
               )}
               <button
+                type="button"
                 onClick={onClose}
-                className="px-3 py-1.5 rounded-lg border border-black/[0.06] dark:border-white/[0.08] hover:border-gray-300 dark:hover:border-white/[0.15] hover:bg-black/[0.03] dark:hover:bg-white/[0.04] text-gray-600 dark:text-gray-300 text-xs transition-all duration-200"
+                className="di-btn-secondary"
               >
                 Cancel
               </button>
               <button
+                type="button"
                 onClick={handleSave}
                 disabled={
                   isSaving ||
@@ -359,14 +361,14 @@ export default function UserSettingsModal({
                   hasDuplicateMajors() ||
                   hasDuplicateCertificates()
                 }
-                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 ${
+                className={
                   isDirty &&
                   !hasDuplicateMajors() &&
                   !hasDuplicateCertificates() &&
                   !isSaving
-                    ? "border border-pink-600 bg-pink-600 text-white shadow-sm shadow-pink-500/20 hover:bg-pink-700 hover:border-pink-700"
-                    : "bg-gray-100 dark:bg-gray-800/50 text-gray-400 dark:text-gray-500 cursor-not-allowed border border-black/[0.05] dark:border-white/[0.05]"
-                }`}
+                    ? "di-btn-primary"
+                    : "di-btn-secondary opacity-50 cursor-not-allowed"
+                }
               >
                 {isSaving ? "..." : "Save"}
               </button>

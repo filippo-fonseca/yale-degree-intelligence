@@ -74,13 +74,14 @@ export function SettingsConfirmModals({
                   Cancel
                 </button>
                 <button
+                  type="button"
                   onClick={onConfirmDisableFriends}
                   disabled={isTogglingFriends}
-                  className="px-3 py-1.5 rounded-lg bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white text-xs disabled:opacity-50 flex items-center gap-1.5 transition-all duration-200"
+                  className="inline-flex items-center gap-1.5 rounded-lg bg-red-600 px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-red-700 disabled:opacity-50"
                 >
                   {isTogglingFriends ? (
                     <>
-                      <span className="animate-spin h-2.5 w-2.5 border-2 border-white/30 border-t-white rounded-full" />
+                      <span className="h-2.5 w-2.5 animate-spin rounded-full border-2 border-white/30 border-t-white" />
                       ...
                     </>
                   ) : (
@@ -125,11 +126,12 @@ export function SettingsConfirmModals({
                   Keep editing
                 </button>
                 <button
+                  type="button"
                   onClick={() => {
                     setShowDiscardConfirm(false);
                     onClose();
                   }}
-                  className="px-3 py-1.5 rounded-lg bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white text-xs transition-all duration-200"
+                  className="rounded-lg bg-red-600 px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-red-700"
                 >
                   Discard
                 </button>
@@ -176,13 +178,14 @@ export function SettingsConfirmModals({
                   Cancel
                 </button>
                 <button
+                  type="button"
                   onClick={onDeleteAccount}
                   disabled={isDeleting}
-                  className="px-3 py-1.5 rounded-lg bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white text-xs disabled:opacity-50 flex items-center gap-1.5 transition-all duration-200"
+                  className="inline-flex items-center gap-1.5 rounded-lg bg-red-600 px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-red-700 disabled:opacity-50"
                 >
                   {isDeleting ? (
                     <>
-                      <span className="animate-spin h-2.5 w-2.5 border-2 border-white/30 border-t-white rounded-full" />
+                      <span className="h-2.5 w-2.5 animate-spin rounded-full border-2 border-white/30 border-t-white" />
                       ...
                     </>
                   ) : (

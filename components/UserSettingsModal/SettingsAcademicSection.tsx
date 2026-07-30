@@ -75,7 +75,7 @@ export function SettingsAcademicSection({
           {localProfile.majors.length < 2 && (
             <button
               onClick={handleAddMajor}
-              className="text-[11px] text-pink-400 hover:text-pink-300 flex items-center gap-1"
+              className="text-[11px] text-pink-600 hover:text-pink-700 dark:text-pink-400 dark:hover:text-pink-300 flex items-center gap-1"
               disabled={
                 Object.keys(MAJORS).length === localProfile.majors.length
               }

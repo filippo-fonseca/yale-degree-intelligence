@@ -359,12 +359,12 @@ export default function UserSettingsModal({
                   hasDuplicateMajors() ||
                   hasDuplicateCertificates()
                 }
-                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 ${
+                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 ${
                   isDirty &&
                   !hasDuplicateMajors() &&
                   !hasDuplicateCertificates() &&
                   !isSaving
-                    ? "bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white shadow-[0_4px_16px_rgba(168,85,247,0.35)] ring-1 ring-purple-400/40 animate-pulse"
+                    ? "border border-pink-600 bg-pink-600 text-white shadow-sm shadow-pink-500/20 hover:bg-pink-700 hover:border-pink-700"
                     : "bg-gray-100 dark:bg-gray-800/50 text-gray-400 dark:text-gray-500 cursor-not-allowed border border-black/[0.05] dark:border-white/[0.05]"
                 }`}
               >

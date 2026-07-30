@@ -146,7 +146,7 @@ export default function V3WelcomeModal({
                 <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
                   Welcome to DegreeIntelligence
                 </h2>
-                <span className="inline-flex items-center rounded-full bg-gradient-to-r from-pink-500 to-purple-600 px-2.5 py-0.5 text-xs font-semibold text-white shadow-[0_2px_10px_rgba(168,85,247,0.4)]">
+                <span className="inline-flex items-center rounded-full border border-pink-600 bg-pink-600 px-2.5 py-0.5 text-xs font-semibold text-white shadow-[0_2px_10px_rgba(236,72,153,0.35)]">
                   v3.0.0
                 </span>
               </div>
@@ -194,7 +194,7 @@ export default function V3WelcomeModal({
               </button>
               <button
                 onClick={onStartTour}
-                className="group inline-flex items-center justify-center gap-1.5 px-5 py-2.5 rounded-xl bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-sm font-semibold text-white shadow-[0_6px_22px_rgba(168,85,247,0.4)] transition-all duration-200"
+                className="group inline-flex items-center justify-center gap-1.5 rounded-xl border border-pink-600 bg-pink-600 px-5 py-2.5 text-sm font-semibold text-white shadow-[0_6px_22px_rgba(236,72,153,0.35)] transition-colors hover:border-pink-700 hover:bg-pink-700"
               >
                 Take the tour
                 <ArrowRight className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-0.5" />

@@ -128,7 +128,10 @@ export function OnboardingState({
               </>,
             ].map((step, i) => (
               <div key={i} className="flex items-start gap-3">
-                <div className="flex-shrink-0 w-6 h-6 rounded-full bg-gradient-to-br from-pink-500 to-purple-600 flex items-center justify-center text-white text-xs font-medium shadow-[0_2px_8px_rgba(236,72,153,0.3)]">
+                <div
+                  className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-pink-600 font-sf text-xs font-semibold leading-none text-white shadow-[0_2px_8px_rgba(236,72,153,0.35)]"
+                  aria-hidden="true"
+                >
                   {i + 1}
                 </div>
                 <div className="flex-1 pt-0.5">

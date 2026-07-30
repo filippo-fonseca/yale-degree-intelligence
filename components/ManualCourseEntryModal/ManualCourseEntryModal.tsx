@@ -314,8 +314,9 @@ export default function ManualCourseEntryModal({
                     No courses added yet
                   </p>
                   <button
+                    type="button"
                     onClick={addNewEntry}
-                    className="px-4 py-2 rounded-lg bg-pink-500/10 border border-pink-500/30 text-pink-300 text-sm font-medium hover:bg-pink-500/20 transition-colors"
+                    className="rounded-lg border border-pink-600 bg-pink-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:border-pink-700 hover:bg-pink-700"
                   >
                     Add a course
                   </button>
@@ -408,9 +409,10 @@ export default function ManualCourseEntryModal({
                                   Back to search
                                 </button>
                                 <button
+                                  type="button"
                                   onClick={() => selectCustomCourse(entry.id)}
                                   disabled={!customCodeInput.trim()}
-                                  className="ml-auto px-3 py-1 text-xs rounded bg-pink-500/20 border border-pink-500/30 text-pink-300 hover:bg-pink-500/30 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                                  className="ml-auto rounded border border-pink-600 bg-pink-600 px-3 py-1 text-xs font-medium text-white transition-colors hover:border-pink-700 hover:bg-pink-700 disabled:cursor-not-allowed disabled:opacity-50"
                                 >
                                   Add
                                 </button>
@@ -544,9 +546,10 @@ export default function ManualCourseEntryModal({
                     Cancel
                   </button>
                   <button
+                    type="button"
                     onClick={handleSubmit}
                     disabled={isSubmitting || validCount === 0}
-                    className="px-4 py-1.5 rounded-lg bg-pink-500/20 border border-pink-500/40 text-pink-300 text-sm font-medium hover:bg-pink-500/30 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-1.5"
+                    className="inline-flex items-center gap-1.5 rounded-lg border border-pink-600 bg-pink-600 px-4 py-1.5 text-sm font-medium text-white transition-colors hover:border-pink-700 hover:bg-pink-700 disabled:cursor-not-allowed disabled:opacity-50"
                   >
                     {isSubmitting ? (
                       <>

@@ -721,6 +721,7 @@ export default function AboutPage() {
         line1="Contextual stats that"
         line2="actually help."
         mockSide="left"
+        wideMock
         body={
           <>
             See your progress and trajectory in context, so you know where to
@@ -820,8 +821,8 @@ export default function AboutPage() {
                 ))}
               </div>
 
-              {/* StatsView's ChartCard, twice */}
-              <div className="grid grid-cols-1 gap-4">
+              {/* Charts side-by-side so the mock reads wider, not a tall stack */}
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                 <motion.div
                   initial={{ opacity: 0, y: 16 }}
                   whileInView={{ opacity: 1, y: 0 }}
@@ -854,11 +855,11 @@ export default function AboutPage() {
                       </svg>
                     </div>
                   </div>
-                  <div ref={lineRef} className="h-[220px] w-full">
+                  <div ref={lineRef} className="h-[180px] w-full">
                     {lineShown && (
                       <LineChart
                         key="cum-line-mounted"
-                        height={220}
+                        height={180}
                         xAxis={[
                           {
                             scaleType: "point",
@@ -866,7 +867,7 @@ export default function AboutPage() {
                             tickLabelStyle: {
                               angle: 40,
                               textAnchor: "start",
-                              fontSize: 10,
+                              fontSize: 9,
                               fill: axisTickColor,
                             },
                           },
@@ -878,7 +879,7 @@ export default function AboutPage() {
                             max: 4,
                             tickInterval: [3, 3.25, 3.5, 3.75, 4],
                             tickLabelStyle: {
-                              fontSize: 10,
+                              fontSize: 9,
                               fill: axisTickColor,
                             },
                             labelStyle: {
@@ -897,7 +898,7 @@ export default function AboutPage() {
                           },
                         ]}
                         grid={{ vertical: false, horizontal: true }}
-                        margin={{ left: 50, right: 16, top: 12, bottom: 64 }}
+                        margin={{ left: 40, right: 8, top: 8, bottom: 56 }}
                         sx={{
                           backgroundColor: "transparent",
                           "& .MuiChartsAxis-tickLabel": { fill: axisTickColor },
@@ -946,7 +947,7 @@ export default function AboutPage() {
                       </svg>
                     </div>
                   </div>
-                  <div ref={pieRef} className="h-[220px] w-full">
+                  <div ref={pieRef} className="h-[180px] w-full">
                     {pieShown && (
                       <PieChartWrapper
                         key="pie-mounted"
@@ -2023,6 +2024,7 @@ function FeatureSection({
   actions,
   mock,
   mockSide = "right",
+  wideMock = false,
 }: {
   id?: string;
   kicker: string;
@@ -2033,10 +2035,18 @@ function FeatureSection({
   actions?: React.ReactNode;
   mock: React.ReactNode;
   mockSide?: "left" | "right";
+  /** Give the mock column more horizontal room (less tall-feeling demos). */
+  wideMock?: boolean;
 }) {
   return (
     <section id={id} className="px-4 py-24 lg:px-6">
-      <div className="mx-auto grid max-w-6xl items-center gap-12 lg:grid-cols-[5fr,7fr]">
+      <div
+        className={`mx-auto grid items-center gap-12 ${
+          wideMock
+            ? "max-w-7xl lg:grid-cols-[4fr,8fr]"
+            : "max-w-6xl lg:grid-cols-[5fr,7fr]"
+        }`}
+      >
         <motion.div
           {...reveal}
           className={mockSide === "left" ? "lg:order-2" : undefined}

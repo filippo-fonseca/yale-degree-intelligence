@@ -281,7 +281,7 @@ export default function MajorSelectionFlow({
             >
               <motion.button
                 onClick={() => setStep("majors")}
-                className="px-5 sm:px-6 py-2.5 sm:py-3 bg-purple-600 hover:bg-purple-700 rounded-xl text-white font-medium flex items-center gap-2 transition-colors border border-purple-600 shadow-[0_4px_16px_rgba(139,92,246,0.25)] text-sm sm:text-base"
+                className="di-btn-accent !rounded-xl !px-5 sm:!px-6 !py-2.5 sm:!py-3 !text-sm sm:!text-base"
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
               >
@@ -470,10 +470,10 @@ export default function MajorSelectionFlow({
               <button
                 onClick={() => setStep("certificates")}
                 disabled={selectedMajors.length === 0}
-                className={`py-2.5 px-5 rounded-xl font-medium text-sm transition-all ${
+                className={`py-2.5 px-5 rounded-xl font-medium text-sm transition-colors ${
                   selectedMajors.length === 0
-                    ? "bg-gray-100 dark:bg-gray-800/60 text-gray-400 dark:text-gray-600 cursor-not-allowed border border-gray-200 dark:border-gray-700/40"
-                    : "bg-purple-600 hover:bg-purple-700 text-white border border-purple-600 shadow-[0_2px_8px_rgba(139,92,246,0.25)]"
+                    ? "di-btn-secondary opacity-50 cursor-not-allowed !rounded-xl !px-5 !py-2.5 !text-sm"
+                    : "di-btn-accent !rounded-xl !px-5 !py-2.5 !text-sm"
                 }`}
               >
                 Continue
@@ -589,7 +589,7 @@ export default function MajorSelectionFlow({
               </button>
               <button
                 onClick={() => setStep("bio")}
-                className="py-2.5 px-5 rounded-xl font-medium text-sm bg-purple-600 hover:bg-purple-700 text-white border border-purple-600 shadow-[0_2px_8px_rgba(139,92,246,0.25)] transition-colors"
+                className="di-btn-accent !rounded-xl !px-5 !py-2.5 !text-sm"
               >
                 {selectedCertificates.length === 0 ? "Skip" : "Continue"}
               </button>
@@ -649,7 +649,7 @@ export default function MajorSelectionFlow({
               </button>
               <button
                 onClick={() => setStep("year")}
-                className="py-2 sm:py-2.5 px-4 sm:px-5 rounded-xl font-medium text-sm bg-purple-600 hover:bg-purple-700 text-white border border-purple-600 shadow-[0_2px_8px_rgba(139,92,246,0.25)] transition-colors"
+                className="di-btn-accent !rounded-xl !px-4 sm:!px-5 !py-2 sm:!py-2.5 !text-sm"
               >
                 {bio.length === 0 ? "Skip" : "Continue"}
               </button>
@@ -717,8 +717,8 @@ export default function MajorSelectionFlow({
                 disabled={!graduationYear || isSubmitting}
                 className={`py-2 sm:py-2.5 px-4 sm:px-5 rounded-xl font-medium text-sm transition-colors flex items-center gap-2 ${
                   !graduationYear || isSubmitting
-                    ? "bg-gray-100 dark:bg-gray-800/60 text-gray-400 dark:text-gray-600 cursor-not-allowed border border-gray-200 dark:border-gray-700/40"
-                    : "bg-emerald-600 hover:bg-emerald-700 text-white border border-emerald-600 shadow-[0_2px_8px_rgba(16,185,129,0.25)]"
+                    ? "di-btn-secondary opacity-50 cursor-not-allowed !rounded-xl !px-4 sm:!px-5 !py-2 sm:!py-2.5 !text-sm"
+                    : "di-btn-success !rounded-xl !px-4 sm:!px-5 !py-2 sm:!py-2.5 !text-sm"
                 }`}
               >
                 {isSubmitting ? (

@@ -319,7 +319,7 @@ export default function RequirementModal({
               <div className="pt-2">
                 <Link
                   href="/contact"
-                  className="text-xs text-blue-400 hover:underline"
+                  className="text-xs text-blue-600 hover:underline dark:text-blue-400"
                   onClick={(e) => e.stopPropagation()}
                 >
                   See an error? Report it

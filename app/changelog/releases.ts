@@ -98,7 +98,7 @@ export const RELEASES: Release[] = [
           "Light mode. A full, carefully tuned light theme that matches the dark one, with a system-default option.",
           "A guided in-app tutorial that walks new students through uploading a transcript and reading their plan.",
           "An overall UI and UX polish: a collapsible sidebar, smoother transitions, and a more consistent look everywhere.",
-          "A Class of 2030 welcome: no grades needed to start, a one-click path into the Simulator, and step-by-step YHub instructions so you can import in-progress courses after registration.",
+          "A warmer Class of 2030 frosh welcome on My Courses: you do not need grades to start using DegreeIntelligence and upload your transcript, plus a one-click path into the Simulator and step-by-step YHub instructions so you can import in-progress courses after registration.",
         ],
       },
       {

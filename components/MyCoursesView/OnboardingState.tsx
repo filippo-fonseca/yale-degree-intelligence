@@ -33,15 +33,17 @@ export function OnboardingState({
         <p className="text-gray-500 dark:text-gray-400 text-sm leading-relaxed">
           {isBrandNew ? (
             <>
-              You&apos;re Class of 2030. You do{" "}
+              We know you&apos;ve just gotten to Yale as a Class of 2030 frosh
+              (welcome!). No worries; you do{" "}
               <span className="font-medium text-gray-700 dark:text-gray-300">
                 not need grades
               </span>{" "}
-              to start. Since you&apos;ve already registered for fall courses,
-              your unofficial transcript is ready on YHub right now; import it
-              even though everything is still in progress with no grades, or
-              jump into the Simulator to map your trajectory. We&apos;ll show
-              what you&apos;re taking and fill grades in when they post.
+              to start using DegreeIntelligence and upload your transcript.
+              Since you&apos;ve already registered for fall courses, your
+              unofficial transcript is ready on YHub right now; import it even
+              though everything is still in progress with no grades, or jump
+              into the Simulator to map your trajectory. We&apos;ll show what
+              you&apos;re taking and fill grades in when they post.
             </>
           ) : (
             "Upload your unofficial transcript to see your academic journey. We won't store the PDF file."

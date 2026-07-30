@@ -2,6 +2,7 @@
 
 import type { User } from "firebase/auth";
 import { Course } from "@/lib/types";
+import { isAdminEmail } from "@/lib/admin";
 import { setUserFlag } from "@/lib/userFlags";
 import UserSettingsModal from "@/components/UserSettingsModal/UserSettingsModal";
 import CommandPalette from "@/components/CommandPalette/CommandPalette";
@@ -128,8 +129,12 @@ export function DashboardOverlays({
           onSave={onProfileSave}
           onToggleFriends={onToggleFriends}
           onReplayTour={onReplayTour}
-          onReplayWelcome={onReplayWelcome}
-          onReplayTutorial={onReplayTutorial}
+          onReplayWelcome={
+            isAdminEmail(user.email) ? onReplayWelcome : undefined
+          }
+          onReplayTutorial={
+            isAdminEmail(user.email) ? onReplayTutorial : undefined
+          }
           onLogout={onLogout}
           onDeleteAccount={onDeleteAccount}
         />

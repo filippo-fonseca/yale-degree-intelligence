@@ -250,7 +250,7 @@ export default function UserSettingsModal({
             </div>
           </div>
 
-          {/* Owner-only dev tools */}
+          {/* Creator-only Dev tools (filippo.fonseca@yale.edu + filifonsecacagnazzo@gmail.com). */}
           {isOwner && (onReplayWelcome || onReplayTutorial) && (
             <div className="mt-4 rounded-xl border border-amber-400/30 bg-amber-50/60 dark:border-amber-400/20 dark:bg-amber-500/[0.06] px-3.5 py-3">
               <div className="flex items-center gap-1.5">
@@ -264,6 +264,7 @@ export default function UserSettingsModal({
               <div className="mt-2 flex flex-wrap gap-1.5">
                 {onReplayWelcome && (
                   <button
+                    type="button"
                     onClick={onReplayWelcome}
                     className="cursor-pointer text-[11px] px-2.5 py-1.5 rounded-lg border border-amber-400/40 bg-white/70 dark:bg-white/[0.04] hover:border-amber-500/70 hover:bg-amber-100/60 dark:hover:bg-amber-500/10 text-amber-700 dark:text-amber-300 transition-all duration-200"
                   >
@@ -272,6 +273,7 @@ export default function UserSettingsModal({
                 )}
                 {onReplayTutorial && (
                   <button
+                    type="button"
                     onClick={onReplayTutorial}
                     className="cursor-pointer text-[11px] px-2.5 py-1.5 rounded-lg border border-amber-400/40 bg-white/70 dark:bg-white/[0.04] hover:border-amber-500/70 hover:bg-amber-100/60 dark:hover:bg-amber-500/10 text-amber-700 dark:text-amber-300 transition-all duration-200"
                   >

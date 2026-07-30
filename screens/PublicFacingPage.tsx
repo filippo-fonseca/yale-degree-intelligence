@@ -18,6 +18,7 @@ import {
   FiMoon,
   FiSun,
 } from "react-icons/fi";
+import { FaLinkedinIn } from "react-icons/fa";
 import LogoIcon from "@/icons/LogoIcon";
 import Link from "next/link";
 import { useState, useRef, useEffect } from "react";
@@ -1356,6 +1357,7 @@ export default function AboutPage() {
                 name: "Filippo Fonseca",
                 line: "Yale '28 · MechE (ABET) & EECS",
                 photoRoute: "/team/filippo.jpeg",
+                linkedin: "https://linkedin.com/in/filippo-fonseca",
               },
             ].map((person) => (
               <div
@@ -1373,6 +1375,17 @@ export default function AboutPage() {
                 <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
                   {person.line}
                 </p>
+                {person.linkedin ? (
+                  <a
+                    href={person.linkedin}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-3 inline-flex items-center gap-1.5 rounded-full border border-black/[0.08] bg-white px-2.5 py-1 text-[11px] font-medium text-gray-600 transition-colors hover:border-[#0A66C2]/40 hover:bg-[#0A66C2]/10 hover:text-[#0A66C2] dark:border-white/10 dark:bg-white/[0.04] dark:text-gray-300 dark:hover:border-[#0A66C2]/50 dark:hover:bg-[#0A66C2]/15 dark:hover:text-[#70B5F9]"
+                  >
+                    <FaLinkedinIn size={11} aria-hidden />
+                    LinkedIn
+                  </a>
+                ) : null}
               </div>
             ))}
           </div>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { FilePond, registerPlugin } from "react-filepond";
 import "filepond/dist/filepond.min.css";
 import "./filepond-custom.css";
@@ -25,11 +25,28 @@ async function getAuthHeaders(): Promise<Record<string, string>> {
 export default function FileUpload({ onSuccess }: FileUploadProps) {
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  /**
+   * FilePond fires onupdatefiles on every change to the file list, and each
+   * run costs a PDF parse plus a model call. `isProcessing` cannot guard this
+   * on its own: two callbacks in the same tick both read the pre-update state
+   * and both proceed. A ref is updated synchronously, so it actually holds.
+   */
+  const inFlightRef = useRef(false);
+  /** Signature of the last file we parsed, so a re-fire is not a second call. */
+  const lastHandledRef = useRef<string | null>(null);
 
   async function handleUpdateFiles(fileItems: any[]) {
-    if (!fileItems?.length || !fileItems[0]?.file) {
+    const file = fileItems?.[0]?.file;
+    if (!file) {
       return;
     }
+
+    if (inFlightRef.current) return;
+
+    const signature = `${file.name}:${file.size}:${file.lastModified}`;
+    if (lastHandledRef.current === signature) return;
+
+    inFlightRef.current = true;
 
     try {
       setIsProcessing(true);
@@ -37,7 +54,7 @@ export default function FileUpload({ onSuccess }: FileUploadProps) {
 
       const authHeaders = await getAuthHeaders();
       const formData = new FormData();
-      formData.append("filepond", fileItems[0].file);
+      formData.append("filepond", file);
 
       const response = await fetch("/api/upload", {
         method: "POST",
@@ -76,6 +93,9 @@ export default function FileUpload({ onSuccess }: FileUploadProps) {
       if (extractError) throw new Error(extractError);
       if (!result) throw new Error("No courses found in transcript");
 
+      // Only mark it handled once it succeeded, so a failed attempt can retry.
+      lastHandledRef.current = signature;
+
       await onSuccess(result);
     } catch (error) {
       console.error("Error processing transcript:", error);
@@ -85,6 +105,7 @@ export default function FileUpload({ onSuccess }: FileUploadProps) {
           : "An unknown error occurred while processing your transcript"
       );
     } finally {
+      inFlightRef.current = false;
       setIsProcessing(false);
     }
   }

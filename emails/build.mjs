@@ -209,6 +209,13 @@ function shell({ title, preheader, body }) {
     body { margin: 0 !important; padding: 0 !important; width: 100% !important; }
     a { text-decoration: none; }
 
+    .grad {
+      background-image: linear-gradient(100deg, #f472b6 0%, #db2777 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
 ${darkModeStyles()}
 
     @media screen and (max-width: 600px) {
@@ -324,12 +331,26 @@ function u(text) {
   return `<span style="text-decoration: underline;">${text}</span>`;
 }
 
+/**
+ * Pink gradient text.
+ *
+ * The gradient lives in a stylesheet class while the inline style carries a
+ * solid pink. That split is deliberate and load-bearing: gradient text needs
+ * -webkit-text-fill-color: transparent, and a client that keeps that property
+ * while dropping background-clip would render the word invisible. Clients that
+ * strip the class fall back to the inline pink, so the worst case is a flat
+ * headline rather than a missing one.
+ */
+function grad(text) {
+  return `<span class="grad" style="color: ${LIGHT.accent};">${text}</span>`;
+}
+
 function campaignEmail({ headline, paragraph, cta, videoCaption, title, preheader }) {
   const body = `${header()}
 
           <tr>
             <td align="center" style="padding: 0 0 16px 0;">
-              <h1 class="t-accent h1" style="margin: 0; font-family: ${SERIF}; font-size: 46px; font-weight: 400; font-style: italic; line-height: 1.05; color: ${LIGHT.accent};">
+              <h1 class="t-primary h1" style="margin: 0; font-family: ${SERIF}; font-size: 46px; font-weight: 400; font-style: italic; line-height: 1.05; color: ${LIGHT.primary};">
                 ${headline}
               </h1>
             </td>
@@ -381,13 +402,13 @@ const TARGETS = [
     file: "v3-existing.html",
     render: () =>
       campaignEmail({
-        headline: "v3 is here.",
-        paragraph: `If you're getting this email, you're one of the 1 in 6 Yale students who have
+        headline: `${grad("v3")} is here.`,
+        paragraph: `If you're getting this email, you're among the 1 in 6 Yale students who have
                 signed up to use DegreeIntelligence over the past year. We just wanted to let you
                 know we've been hard at work making Yale's most used degree-planning platform even
                 better. We now have ${u("Certificates")}, a rebuilt ${u("Simulator")},
                 ${u("distributionals")}, a ${u("cleaner UI")}, and ${u("much more")}.`,
-        cta: "Open DegreeIntelligence →",
+        cta: "Log back into DegreeIntelligence →",
         videoCaption: "Watch the v3 tour",
         title: "v3 is here",
         preheader: "Certificates, a rebuilt Simulator, distributionals, a cleaner UI, and much more.",
@@ -400,11 +421,12 @@ const TARGETS = [
       campaignEmail({
         headline: "welcome to Yale.",
         paragraph: `You're about to pick your first Yale courses, and you don't need a single grade
-                to start planning them. DegreeIntelligence is what around 1,200 Yalies use to map
-                out their degrees: ${u("Certificates")}, a rebuilt ${u("Simulator")},
-                ${u("distributionals")}, ${u("requirement tracking")}, and ${u("much more")}.
-                It's free forever, and there's nothing to install.`,
-        cta: "Log in with @yale.edu Google →",
+                to start planning them. For 2026-27, we've added some amazing new features,
+                including ${u("Certificates")}, a rebuilt ${u("Simulator")},
+                ${u("distributionals")}, a ${u("cleaner UI")}, and ${u("much more")}
+                (safe to say you're joining Yale at the right time!). Made by Yalies, for Yalies,
+                DegreeIntelligence is free (forever) and requires nothing to install.`,
+        cta: "Try DegreeIntelligence →",
         videoCaption: "Watch the two-minute tour",
         title: "Welcome to Yale",
         preheader: "No grades needed. Start planning your first semester in a couple of minutes.",
@@ -416,15 +438,16 @@ const TARGETS = [
     file: "v3-newcomers.html",
     render: () =>
       campaignEmail({
-        headline: "1 in 6 Yalies use this.",
+        headline: "1 in 6 Yalies use this. Why don't you?",
         paragraph: `If you're getting this email, you haven't signed up to DegreeIntelligence yet.
                 It's what around 1,200 Yalies across every residential college use to plan their
                 degrees, and we've been hard at work making it even better. We now have
                 ${u("Certificates")}, a rebuilt ${u("Simulator")}, ${u("distributionals")},
-                a ${u("cleaner UI")}, and ${u("much more")}.`,
-        cta: "Log in with @yale.edu Google →",
+                a ${u("cleaner UI")}, and ${u("much more")}. Made by Yalies, for Yalies,
+                DegreeIntelligence is free (forever) and requires nothing to install.`,
+        cta: "Try DegreeIntelligence →",
         videoCaption: "Watch the two-minute tour",
-        title: "1 in 6 Yalies use this",
+        title: "1 in 6 Yalies use this. Why don't you?",
         preheader: "Plan semesters, track requirements, and see how your degree is actually going.",
       }),
   },

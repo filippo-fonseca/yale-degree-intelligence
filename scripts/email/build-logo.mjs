@@ -21,7 +21,7 @@ import { fileURLToPath } from "node:url";
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..");
 const OUT_DIR = path.join(REPO_ROOT, "public", "email");
-const FONT = path.join(REPO_ROOT, "public", "fonts", "sf-medium.otf");
+const FONT = path.join(REPO_ROOT, "public", "fonts", "louize-medium.otf");
 
 const require = createRequire("/opt/homebrew/lib/node_modules/playwright/");
 const { chromium } = require("/opt/homebrew/lib/node_modules/playwright/index.js");
@@ -81,15 +81,17 @@ function markSvg(theme, pixels) {
 function lockupHtml(theme, fontDataUri) {
   return `<!doctype html>
 <html><head><meta charset="utf-8" /><style>
-  @font-face { font-family: "SFLocal"; src: url("${fontDataUri}") format("opentype"); font-weight: 500; }
+  @font-face { font-family: "BrandLocal"; src: url("${fontDataUri}") format("opentype"); font-weight: 500; }
   html, body { margin: 0; padding: 0; background: transparent; }
   .lockup { display: inline-flex; align-items: center; gap: 26px; padding: 12px 16px; }
   .mark { display: block; }
   .word {
-    font-family: "SFLocal", -apple-system, sans-serif;
-    font-size: 92px;
+    /* Louize is the brand serif. It sits optically smaller than the sans at the
+       same size and needs no negative tracking, so both are retuned here. */
+    font-family: "BrandLocal", Georgia, serif;
+    font-size: 104px;
     font-weight: 500;
-    letter-spacing: -2.2px;
+    letter-spacing: -0.5px;
     color: ${theme.wordmark};
     line-height: 1;
     white-space: nowrap;

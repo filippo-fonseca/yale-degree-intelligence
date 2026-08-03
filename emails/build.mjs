@@ -31,8 +31,12 @@ const SITE_URL = "https://degreeint.com";
  * blocks data: URIs in img tags, so a hosted PNG is the only thing that renders
  * everywhere. Override the base when screenshotting locally, since these paths
  * only resolve once public/email/ has been deployed.
+ *
+ * Points at the canonical www host rather than the apex. The apex answers 307
+ * to www, and while browsers follow that, some mail clients and image proxies
+ * will not follow a redirect for an img src and simply show nothing.
  */
-const LOGO_BASE = process.env.EMAIL_LOGO_BASE ?? `${SITE_URL}/email`;
+const LOGO_BASE = process.env.EMAIL_LOGO_BASE ?? "https://www.degreeint.com/email";
 
 /**
  * CAN-SPAM asks for a valid postal address in promotional mail, and filters
@@ -84,7 +88,15 @@ const DARK = {
 
 const SANS =
   "-apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif";
-const SERIF = "'Instrument Serif', Louize, Georgia, 'Times New Roman', serif";
+/**
+ * Louize is the brand serif and the face the logo wordmark is set in, so the
+ * headline asks for it first and the two match wherever it loads: Apple Mail,
+ * iOS Mail, and Outlook for Mac. Gmail and Outlook for Windows ignore
+ * @font-face entirely and land on Georgia, which is the closest widely
+ * installed transitional serif. Instrument Serif is deliberately gone; it was a
+ * third, different look for no gain.
+ */
+const SERIF = "'Louize', Georgia, 'Times New Roman', serif";
 const MONO = "ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace";
 
 /**
@@ -199,8 +211,15 @@ function shell({ title, preheader, body }) {
   <!--[if mso]>
   <noscript><xml><o:OfficeDocumentSettings><o:PixelsPerInch>96</o:PixelsPerInch></o:OfficeDocumentSettings></xml></noscript>
   <![endif]-->
-  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" />
   <style type="text/css">
+    @font-face {
+      font-family: "Louize";
+      src: url("https://www.degreeint.com/fonts/louize-medium.otf") format("opentype");
+      font-weight: 400 700;
+      font-style: normal;
+      font-display: swap;
+    }
+
     :root { color-scheme: light dark; supported-color-schemes: light dark; }
 
     body, table, td, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }

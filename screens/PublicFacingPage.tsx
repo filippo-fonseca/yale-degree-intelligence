@@ -20,6 +20,7 @@ import {
 } from "react-icons/fi";
 import { FaLinkedinIn } from "react-icons/fa";
 import LogoIcon from "@/icons/LogoIcon";
+import { ShinyButton } from "@/components/ui/shiny-button";
 import Link from "next/link";
 import { useState, useRef, useEffect } from "react";
 import dynamic from "next/dynamic";
@@ -404,7 +405,7 @@ export default function AboutPage() {
             >
               <span className="sm:hidden">Log in</span>
               <span className="hidden sm:inline">
-                Log in with @yale.edu Google
+                Log in with @yale.edu email
               </span>
               <span aria-hidden>→</span>
             </MonoCTA>
@@ -533,7 +534,14 @@ export default function AboutPage() {
           </div>
 
           {/* 2. Headline */}
-          <h1 className="mt-5 text-balance text-5xl font-medium leading-[1.05] tracking-[-0.02em] text-gray-900 dark:text-white md:mt-6 md:text-6xl lg:text-[4.5rem]">
+          {/* Two lines, always. "for your Yale degree." is the widest line, and
+              at the old flat 48px it did not fit a phone (386px of text into
+              358px), so it broke as "for your Yale" / "degree.". The clamp
+              scales the mobile size to the viewport instead of stepping down to
+              a fixed size, keeping the hero as large as it can be while still
+              fitting both lines whole. It tops out at 48px, the previous size,
+              so nothing changes from sm upward. */}
+          <h1 className="mt-5 whitespace-nowrap text-[clamp(1.9rem,10.4vw,3rem)] font-medium leading-[1.05] tracking-[-0.02em] text-gray-900 dark:text-white md:mt-6 md:text-6xl lg:text-[4.5rem]">
             The control plane
             <br />
             <span className="text-gray-400 dark:text-gray-500">
@@ -553,7 +561,7 @@ export default function AboutPage() {
               onClick={() => startLogin("hero")}
               pending={authPendingId === "hero"}
             >
-              Log in with @yale.edu Google
+              Log in with @yale.edu email
             </BrandCTA>
             <GhostCTA onClick={() => setShowVideoModal(true)}>
               Watch the launch film
@@ -1419,7 +1427,7 @@ export default function AboutPage() {
               onClick={() => startLogin("closing")}
               pending={authPendingId === "closing"}
             >
-              Log in with @yale.edu Google
+              Log in with @yale.edu email
             </BrandCTA>
           </div>
           <p className="mt-5 font-mono text-xs tracking-tight text-gray-400 dark:text-gray-500">
@@ -1904,7 +1912,11 @@ function Pending() {
   );
 }
 
-/** (a) BRAND primary. Hero CTA and the closing-statement CTA only. */
+/**
+ * (a) BRAND primary. Hero CTA and the closing-statement CTA only.
+ * The flat pink/purple gradient is gone; both primaries now share the one
+ * shiny treatment, separated only by size.
+ */
 function BrandCTA({
   children,
   onClick,
@@ -1912,31 +1924,17 @@ function BrandCTA({
   className = "",
   pending = false,
 }: CTAProps) {
-  const cls = `inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 px-6 py-3 text-sm font-medium text-white shadow-lg shadow-purple-600/25 ${pending ? "opacity-70" : ""} ${className}`;
-  const body = pending ? (
-    <Pending />
-  ) : (
-    <>
-      {children}
-      <span aria-hidden>→</span>
-    </>
-  );
-  if (href)
-    return (
-      <motion.a whileHover={{ y: -1 }} href={href} className={cls}>
-        {body}
-      </motion.a>
-    );
   return (
-    <motion.button
-      whileHover={pending ? undefined : { y: -1 }}
+    <ShinyButton
+      size="md"
+      withArrow
+      href={href}
       onClick={onClick}
-      disabled={pending}
-      aria-busy={pending}
-      className={cls}
+      pending={pending}
+      className={className}
     >
-      {body}
-    </motion.button>
+      {pending ? <Pending /> : children}
+    </ShinyButton>
   );
 }
 
@@ -1948,23 +1946,16 @@ function MonoCTA({
   className = "",
   pending = false,
 }: CTAProps) {
-  const cls = `inline-flex items-center gap-1.5 rounded-full bg-gray-900 text-white dark:bg-white dark:text-gray-900 px-4 py-1.5 text-sm font-medium ${pending ? "opacity-70" : ""} ${className}`;
-  if (href)
-    return (
-      <motion.a whileHover={{ y: -1 }} href={href} className={cls}>
-        {children}
-      </motion.a>
-    );
   return (
-    <motion.button
-      whileHover={pending ? undefined : { y: -1 }}
+    <ShinyButton
+      size="sm"
+      href={href}
       onClick={onClick}
-      disabled={pending}
-      aria-busy={pending}
-      className={cls}
+      pending={pending}
+      className={className}
     >
       {pending ? <Pending /> : children}
-    </motion.button>
+    </ShinyButton>
   );
 }
 

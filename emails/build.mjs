@@ -88,7 +88,15 @@ const DARK = {
 
 const SANS =
   "-apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif";
-const SERIF = "'Instrument Serif', Louize, Georgia, 'Times New Roman', serif";
+/**
+ * Louize is the brand serif and the face the logo wordmark is set in, so the
+ * headline asks for it first and the two match wherever it loads: Apple Mail,
+ * iOS Mail, and Outlook for Mac. Gmail and Outlook for Windows ignore
+ * @font-face entirely and land on Georgia, which is the closest widely
+ * installed transitional serif. Instrument Serif is deliberately gone; it was a
+ * third, different look for no gain.
+ */
+const SERIF = "'Louize', Georgia, 'Times New Roman', serif";
 const MONO = "ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace";
 
 /**
@@ -203,8 +211,15 @@ function shell({ title, preheader, body }) {
   <!--[if mso]>
   <noscript><xml><o:OfficeDocumentSettings><o:PixelsPerInch>96</o:PixelsPerInch></o:OfficeDocumentSettings></xml></noscript>
   <![endif]-->
-  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" />
   <style type="text/css">
+    @font-face {
+      font-family: "Louize";
+      src: url("https://www.degreeint.com/fonts/louize-medium.otf") format("opentype");
+      font-weight: 400 700;
+      font-style: normal;
+      font-display: swap;
+    }
+
     :root { color-scheme: light dark; supported-color-schemes: light dark; }
 
     body, table, td, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }

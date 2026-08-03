@@ -46,3 +46,9 @@ next-env.d.ts
 !.bgsd/config.json
 .bgsd-tmp/
 ycps-cache/
+
+# email campaign rosters (student PII — never commit)
+/lists/
+
+# generated campaign emails (rebuild with: node emails/build.mjs)
+/emails/dist/

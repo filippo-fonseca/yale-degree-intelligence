@@ -257,10 +257,8 @@ function header() {
           <tr>
             <td align="center" style="padding: 0 0 30px 0;">
               <a href="${SITE_URL}" target="_blank" style="text-decoration: none;">
-                <img src="${LOGO_BASE}/logo-light.png" width="42" height="42" alt="DegreeIntelligence" class="logo-light" style="display: inline-block; width: 42px; height: 42px; border: 0;" />
-                <img src="${LOGO_BASE}/logo-dark.png" width="42" height="42" alt="DegreeIntelligence" class="logo-dark" style="display: none; width: 42px; height: 42px; border: 0;" />
-                <div style="height: 10px; font-size: 0; line-height: 0;">&nbsp;</div>
-                <span class="t-primary" style="font-family: ${SANS}; font-size: 15px; font-weight: 600; color: ${LIGHT.primary}; letter-spacing: -0.2px;">DegreeIntelligence</span>
+                <img src="${LOGO_BASE}/lockup-light.png" width="220" height="33" alt="DegreeIntelligence" class="logo-light" style="display: inline-block; width: 220px; height: 33px; border: 0;" />
+                <img src="${LOGO_BASE}/lockup-dark.png" width="220" height="33" alt="DegreeIntelligence" class="logo-dark" style="display: none; width: 220px; height: 33px; border: 0;" />
               </a>
             </td>
           </tr>`;
@@ -404,8 +402,8 @@ const TARGETS = [
       campaignEmail({
         headline: `${grad("v3")} is here.`,
         paragraph: `If you're getting this email, you're among the 1 in 6 Yale students who have
-                signed up to use DegreeIntelligence over the past year. We just wanted to let you
-                know we've been hard at work making Yale's most used degree-planning platform even
+                signed up to use DegreeIntelligence over the past year. First of all, thank you!
+                We just wanted to let you know we've been hard at work making Yale's most used degree-planning platform even
                 better. We now have ${u("Certificates")}, a rebuilt ${u("Simulator")},
                 ${u("distributionals")}, a ${u("cleaner UI")}, and ${u("much more")}.`,
         cta: "Log back into DegreeIntelligence →",
@@ -438,7 +436,7 @@ const TARGETS = [
     file: "v3-newcomers.html",
     render: () =>
       campaignEmail({
-        headline: "1 in 6 Yalies use this. Why don't you?",
+        headline: `1 in 6 Yalies use this.<br /><span class="t-muted" style="color: ${LIGHT.muted};">Why don't you?</span>`,
         paragraph: `If you're getting this email, you haven't signed up to DegreeIntelligence yet.
                 It's what around 1,200 Yalies across every residential college use to plan their
                 degrees, and we've been hard at work making it even better. We now have

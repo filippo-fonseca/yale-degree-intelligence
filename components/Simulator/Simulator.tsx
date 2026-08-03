@@ -24,6 +24,7 @@ import CourseGradeControl from "./CourseGradeControl";
 import CourseDistributionalControl from "./CourseDistributionalControl";
 import { effectiveDistributionals } from "@/lib/utils/effectiveDistributionals";
 import SimulatorProgressPane from "./SimulatorProgressPane";
+import { useDismissibleFlag } from "@/lib/useDismissibleFlag";
 import { type SimulatorView } from "./SimulatorViewSwitcher";
 import SimulatorToolbarRow from "./SimulatorToolbarRow";
 import { type QuickSaveState } from "./SimulatorQuickSave";
@@ -837,6 +838,16 @@ export default function Simulator({
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  // ------------ "New" nudges for the Progress view ------------
+  // Progress gained the projected-GPA and distributional readouts, which is not
+  // discoverable from Canvas. Both the dot and the banner clear the first time
+  // the user actually opens Progress, so neither outlives its usefulness.
+  const progressNew = useDismissibleFlag("sim:progress-grades-distribs");
+
+  useEffect(() => {
+    if (activeView === "progress") progressNew.dismiss();
+  }, [activeView, progressNew]);
 
   // ------------ Canvas / Progress view preference ------------
   useEffect(() => {
@@ -1668,6 +1679,7 @@ export default function Simulator({
         <SimulatorToolbarRow
           view={activeView}
           setView={setActiveView}
+          showProgressNew={progressNew.show}
           planName={currentPlanName}
           planIsDefault={loadedPlanIsDefault}
           hasChanges={hasChanges}
@@ -1681,6 +1693,36 @@ export default function Simulator({
 
       {activeView === "canvas" ? (
         <>
+          {/* Announces what Progress can now do, since nothing on Canvas would
+              tell you. Sits here rather than in Progress because a user who has
+              already opened Progress does not need telling. */}
+          {progressNew.show && (
+            <div className="mb-4 flex items-start gap-2.5 rounded-xl border border-purple-200 bg-purple-50/70 px-3.5 py-2.5 dark:border-purple-800/40 dark:bg-purple-900/15">
+              <span className="mt-1.5 h-2 w-2 flex-shrink-0 rounded-full bg-pink-500" />
+              <p className="flex-1 text-xs leading-relaxed text-gray-700 dark:text-gray-200">
+                <span className="font-semibold">New:</span> you can simulate
+                grades and distributionals too. Turn on the Grades and
+                Distributionals editors below, then open{" "}
+                <button
+                  type="button"
+                  onClick={() => setActiveView("progress")}
+                  className="font-semibold text-purple-700 underline decoration-purple-400/50 underline-offset-2 hover:decoration-purple-500 dark:text-purple-300"
+                >
+                  Progress
+                </button>{" "}
+                to see your projected GPA and distributional tally.
+              </p>
+              <button
+                type="button"
+                onClick={progressNew.dismiss}
+                aria-label="Dismiss"
+                className="flex-shrink-0 rounded-md px-1.5 py-0.5 text-[11px] text-gray-500 transition-colors hover:bg-black/[0.04] hover:text-gray-700 dark:text-gray-400 dark:hover:bg-white/[0.06] dark:hover:text-gray-200"
+              >
+                Dismiss
+              </button>
+            </div>
+          )}
+
           {/* Help Panel */}
           <AnimatePresence>
             {showHelp && (

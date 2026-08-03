@@ -696,15 +696,20 @@ body {
 }
 @property --shiny-shine {
   syntax: "<color>";
-  initial-value: #ffffff;
+  /* Bright core of the sweep. Pink-200 rather than white so the whole
+     gradient reads as the brand accent instead of a neutral glint. */
+  initial-value: #fbcfe8;
   inherits: false;
 }
 
 .shiny-cta {
   --shiny-bg: #0a0a0a;
   --shiny-bg-subtle: #232323;
-  --shiny-highlight: rgba(255, 255, 255, 0.7);
-  --shiny-highlight-subtle: rgba(255, 255, 255, 0.95);
+  /* Brand pink (Tailwind pink-500, brightening to pink-300 on hover). This
+     drives the border sweep, the inner shimmer, and the label glow together,
+     so the accent stays one color across all three layers. */
+  --shiny-highlight: #ec4899;
+  --shiny-highlight-subtle: #f9a8d4;
   --shiny-duration: 3s;
   --shiny-shadow-size: 2px;
   --shiny-transition: 800ms cubic-bezier(0.25, 1, 0.5, 1);

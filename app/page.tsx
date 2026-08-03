@@ -1,12 +1,13 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import CustomLoader from "@/components/ui/CustomLoader";
 import PublicFacingPage from "@/screens/PublicFacingPage";
 import { useAuth } from "@/context/AuthContext";
 import { useTheme } from "@/context/ThemeContext";
 import { createNavItems } from "@/components/dashboard/navItems";
+import { useDismissibleFlag } from "@/lib/useDismissibleFlag";
 import {
   getMajorProgress as computeMajorProgress,
   getCertificateProgress as computeCertificateProgress,
@@ -89,14 +90,21 @@ export default function Home() {
   );
   friendsEnabledRef.current = friendsEnabled;
 
+  // "New" chip on My certificates, cleared the first time the tab is opened.
+  const certificatesNew = useDismissibleFlag("nav:certificates-new");
+
   const navItems = createNavItems(
     userProfile?.majors?.length ?? 0,
     userProfile?.certificates?.length ?? 0,
-    { isBrandNew },
+    { isBrandNew, showCertificatesNew: certificatesNew.show },
   );
 
   const { activeTab, setActiveTab, handleTabChange, registerSimulatorNavCheck } =
     useDashboardNav();
+
+  useEffect(() => {
+    if (activeTab === "certificate") certificatesNew.dismiss();
+  }, [activeTab, certificatesNew]);
 
   const { welcomeOpen, setWelcomeOpen, tourOpen, setTourOpen } = useOnboarding(
     user,

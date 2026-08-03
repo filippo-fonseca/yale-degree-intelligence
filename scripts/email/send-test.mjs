@@ -21,14 +21,19 @@ import { FROM_NAME, REPLY_TO, REPO_ROOT, parseArgs, resendRequest } from "./lib.
 const VERIFIED_FROM = "filippo@degreeint.com";
 const FALLBACK_FROM = "onboarding@resend.dev";
 
+/** Keyed by audience; the same three the builder emits. */
 const VARIANTS = {
   existing: {
     file: "v3-existing.html",
     subject: "v3 is here",
   },
+  frosh: {
+    file: "v3-frosh.html",
+    subject: "Welcome to Yale",
+  },
   newcomers: {
     file: "v3-newcomers.html",
-    subject: "The control plane for your Yale degree",
+    subject: "1 in 6 Yalies use this",
   },
 };
 
@@ -49,9 +54,13 @@ async function verifiedSendingDomains() {
 }
 
 async function main() {
-  const args = parseArgs(process.argv.slice(2), { values: ["to", "only"], flags: [] });
+  const args = parseArgs(process.argv.slice(2), { values: ["to", "only", "prefix"], flags: [] });
   const to = args.to;
   if (!to) throw new Error("--to <address> is required");
+
+  // Bumped per review round so successive previews stay distinguishable in an
+  // inbox that already holds several of them.
+  const prefix = args.prefix ?? "test1";
 
   const selected = args.only ? [args.only] : Object.keys(VARIANTS);
   for (const name of selected) {
@@ -92,7 +101,7 @@ async function main() {
       from: `${FROM_NAME} <${fromAddress}>`,
       to: [to],
       reply_to: REPLY_TO,
-      subject: `[test] ${variant.subject}`,
+      subject: `[${prefix}] ${variant.subject}`,
       html,
     });
 

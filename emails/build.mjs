@@ -26,6 +26,14 @@ const DIST = path.join(HERE, "dist");
 const VIDEO_URL = "https://www.loom.com/share/REPLACE_ME";
 const SITE_URL = "https://degreeint.com";
 
+/**
+ * Logos are served from the site rather than inlined: Gmail strips SVG and
+ * blocks data: URIs in img tags, so a hosted PNG is the only thing that renders
+ * everywhere. Override the base when screenshotting locally, since these paths
+ * only resolve once public/email/ has been deployed.
+ */
+const LOGO_BASE = process.env.EMAIL_LOGO_BASE ?? `${SITE_URL}/email`;
+
 /** CAN-SPAM requires a real postal address in every commercial message. */
 const POSTAL_ADDRESS = "DegreeIntelligence · 421 Temple St · New Haven, CT 06511";
 
@@ -95,6 +103,10 @@ function darkModeStyles() {
     [".video-surface", "background-color: #1c1c20 !important;"],
     [".btn", `background-color: ${DARK.btnBg} !important; color: ${DARK.btnText} !important; border-color: ${DARK.btnBg} !important;`],
     [".btn-text", `color: ${DARK.btnText} !important;`],
+    // The logo's masking disc has to match the page behind it, so each theme
+    // gets its own file and the pair is swapped rather than recoloured.
+    [".logo-light", "display: none !important;"],
+    [".logo-dark", "display: inline-block !important;"],
   ];
 
   const media = rules.map(([sel, decl]) => `      ${sel} { ${decl} }`).join("\n");
@@ -164,27 +176,6 @@ function button({ label, href }) {
           </tr>`;
 }
 
-/** A "what's new" row: coloured dot, serif title, one line of sans explanation. */
-function featureRow({ dot, title, body }) {
-  return `
-                <tr>
-                  <td class="bg-card" style="background-color: ${LIGHT.card}; border: 1px solid ${LIGHT.border}; border-radius: 12px; padding: 16px 18px;">
-                    <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
-                      <tr>
-                        <td width="8" valign="top" style="padding: 7px 13px 0 0;">
-                          <div style="width: 7px; height: 7px; border-radius: 50%; background-color: ${dot};"></div>
-                        </td>
-                        <td valign="top">
-                          <p class="t-primary" style="margin: 0; font-family: ${SERIF}; font-size: 18px; color: ${LIGHT.primary};">${title}</p>
-                          <p class="t-secondary" style="margin: 5px 0 0 0; font-family: ${SANS}; font-size: 13px; line-height: 1.55; color: ${LIGHT.secondary};">${body}</p>
-                        </td>
-                      </tr>
-                    </table>
-                  </td>
-                </tr>
-                <tr><td style="height: 9px; font-size: 0; line-height: 0;">&nbsp;</td></tr>`;
-}
-
 function shell({ title, preheader, body }) {
   return `<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en">
@@ -240,12 +231,20 @@ ${body}
 `;
 }
 
+/**
+ * Logo mark plus wordmark. The wordmark stays live text rather than becoming
+ * part of the image, so the header still reads when a client blocks images,
+ * which Outlook does by default.
+ */
 function header() {
   return `
           <tr>
-            <td align="center" style="padding: 0 0 34px 0;">
-              <a href="${SITE_URL}" target="_blank" class="t-primary" style="font-family: ${SANS}; font-size: 15px; font-weight: 600; color: ${LIGHT.primary}; letter-spacing: -0.2px;">
-                DegreeIntelligence
+            <td align="center" style="padding: 0 0 30px 0;">
+              <a href="${SITE_URL}" target="_blank" style="text-decoration: none;">
+                <img src="${LOGO_BASE}/logo-light.png" width="42" height="42" alt="DegreeIntelligence" class="logo-light" style="display: inline-block; width: 42px; height: 42px; border: 0;" />
+                <img src="${LOGO_BASE}/logo-dark.png" width="42" height="42" alt="DegreeIntelligence" class="logo-dark" style="display: none; width: 42px; height: 42px; border: 0;" />
+                <div style="height: 10px; font-size: 0; line-height: 0;">&nbsp;</div>
+                <span class="t-primary" style="font-family: ${SANS}; font-size: 15px; font-weight: 600; color: ${LIGHT.primary}; letter-spacing: -0.2px;">DegreeIntelligence</span>
               </a>
             </td>
           </tr>`;
@@ -260,18 +259,9 @@ function footer() {
           </tr>
 
           <tr>
-            <td align="center" style="padding: 0 0 8px 0;">
-              <p class="t-muted" style="margin: 0; font-family: ${SERIF}; font-size: 14px; font-style: italic; color: ${LIGHT.muted};">
-                built by Yalies, for Yalies.
-              </p>
-            </td>
-          </tr>
-
-          <tr>
             <td align="center" style="padding: 0 0 18px 0;">
               <p class="t-muted" style="margin: 0; font-family: ${SANS}; font-size: 11px; line-height: 1.6; color: ${LIGHT.muted};">
-                Not affiliated with Yale University in any way. We are Yale College students who
-                built something we wanted to share. It is free and we make no money from it.
+                Not affiliated with Yale University in any way.
               </p>
             </td>
           </tr>
@@ -300,26 +290,20 @@ function existingUsersEmail() {
   const body = `${header()}
 
           <tr>
-            <td align="center" style="padding: 0 0 12px 0;">
-              <p class="t-muted" style="margin: 0; font-family: ${MONO}; font-size: 11px; letter-spacing: 1.4px; text-transform: uppercase; color: ${LIGHT.muted};">
-                v3 · out now
-              </p>
-            </td>
-          </tr>
-
-          <tr>
-            <td align="center" style="padding: 0 0 14px 0;">
-              <h1 class="t-primary h1" style="margin: 0; font-family: ${SERIF}; font-size: 44px; font-weight: 400; line-height: 1.08; color: ${LIGHT.primary};">
+            <td align="center" style="padding: 0 0 16px 0;">
+              <h1 class="t-primary h1" style="margin: 0; font-family: ${SERIF}; font-size: 46px; font-weight: 400; font-style: italic; line-height: 1.05; color: ${LIGHT.primary};">
                 v3 is here.
               </h1>
             </td>
           </tr>
 
           <tr>
-            <td align="center" style="padding: 0 0 32px 0;">
-              <p class="t-secondary" style="margin: 0; font-family: ${SANS}; font-size: 15px; line-height: 1.65; color: ${LIGHT.secondary};">
-                You already use DegreeIntelligence. Here is everything that changed,
-                in about two minutes.
+            <td align="center" style="padding: 0 0 34px 0;">
+              <p class="t-secondary" style="margin: 0; font-family: ${SANS}; font-size: 15px; line-height: 1.7; color: ${LIGHT.secondary};">
+                If you're getting this email, you've signed up to DegreeIntelligence in the past.
+                We wanted to let you know we've been hard at work making Yale's most used
+                degree-planning platform even better. We now have Certificates, a rebuilt
+                Simulator, distributionals, a cleaner UI, and much more.
               </p>
             </td>
           </tr>
@@ -327,52 +311,27 @@ ${videoBlock({ caption: "Watch the v3 tour" })}
 ${button({ label: "Open DegreeIntelligence →", href: SITE_URL })}
 
           <tr>
-            <td align="center" style="padding: 0 0 40px 0;">
-              <p class="t-muted" style="margin: 0; font-family: ${MONO}; font-size: 11px; color: ${LIGHT.muted};">
-                Free forever · No install
+            <td align="center" style="padding: 26px 0 0 0;">
+              <p class="t-primary" style="margin: 0; font-family: ${SERIF}; font-size: 24px; font-style: italic; line-height: 1.3; color: ${LIGHT.primary};">
+                we cannot wait to see what you think!
               </p>
             </td>
           </tr>
 
           <tr>
-            <td align="center" style="padding: 0 0 18px 0;">
-              <p class="t-muted" style="margin: 0; font-family: ${MONO}; font-size: 11px; letter-spacing: 1.4px; text-transform: uppercase; color: ${LIGHT.muted};">
-                what's new
+            <td align="center" style="padding: 16px 0 0 0;">
+              <p class="t-secondary" style="margin: 0; font-family: ${SANS}; font-size: 14px; line-height: 1.7; color: ${LIGHT.secondary};">
+                made with <span style="color: #ec4899;">&#9829;</span> by yalies, for all of us.
+                we genuinely make no money from this and just want to share what we use to
+                plan for ourselves. it's changed our lives!
               </p>
-            </td>
-          </tr>
-
-          <tr>
-            <td>
-              <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
-${featureRow({
-  dot: "#3b82f6",
-  title: "A rebuilt simulator.",
-  body: "Drag courses into your four-year plan and watch requirement progress update live as you go.",
-})}
-${featureRow({
-  dot: "#8b5cf6",
-  title: "Transcript import.",
-  body: "Pull your YHub unofficial transcript straight in. No more typing courses one at a time.",
-})}
-${featureRow({
-  dot: "#ec4899",
-  title: "Certificates.",
-  body: "Full policy engine for every certificate program, so you know exactly what still counts.",
-})}
-${featureRow({
-  dot: "#22c55e",
-  title: "Distributionals, at a glance.",
-  body: "Everything you have finished and everything you still owe, in one clean view.",
-})}
-              </table>
             </td>
           </tr>
 ${footer()}`;
 
   return shell({
     title: "v3 is here",
-    preheader: "A rebuilt simulator, transcript import, certificates, and more.",
+    preheader: "Certificates, a rebuilt Simulator, distributionals, a cleaner UI, and much more.",
     body,
   });
 }

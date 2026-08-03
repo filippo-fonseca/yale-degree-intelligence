@@ -21,7 +21,7 @@ export const RELEASES: Release[] = [
     date: "Summer 2026",
     current: true,
     summary:
-      "A quieter front door. The buttons on our public homepage got a cleaner, calmer treatment.",
+      "A quieter front door, and a transcript import that no longer does the same work twice.",
     sections: [
       {
         title: "Look and feel",
@@ -30,6 +30,14 @@ export const RELEASES: Release[] = [
           "The headline fits properly on a phone. It used to break in the middle of \"Yale degree\"; now it sits on two clean lines and scales itself to your screen.",
           "The log-in buttons just say \"Log in with @yale.edu email\".",
           "If you prefer less motion on screen, the shine stays still. We follow your system's reduce-motion setting.",
+        ],
+      },
+      {
+        title: "Transcript import",
+        items: [
+          "Uploading a transcript no longer reads it twice. Adding, removing, and re-adding a file could kick off the same import several times over; now it runs once.",
+          "Re-importing the same transcript is instant. We remember what we read from a file you have already uploaded, so bringing it in again is immediate instead of a fresh parse.",
+          "Clearer errors when a file is not a transcript. If we cannot find any Yale course codes in it, we say so straight away and point you at your YHub unofficial transcript, instead of failing further along.",
         ],
       },
     ],

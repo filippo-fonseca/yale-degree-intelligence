@@ -70,7 +70,9 @@ vi.mock("firebase-admin/firestore", () => ({
   FieldValue: { serverTimestamp: () => ({}) },
 }));
 
-const { rateLimit } = await import("@/lib/apiAuth");
+// Static import is safe here: vi.mock calls are hoisted above imports, so the
+// mocks above are already registered when this module is evaluated.
+import { rateLimit } from "@/lib/apiAuth";
 
 const HOUR = 60 * 60 * 1000;
 
@@ -133,7 +135,9 @@ describe("rateLimit (Firestore-backed)", () => {
 
   it("writes an expiresAt so a TTL policy can reap the document", async () => {
     await rateLimit("user:ttl", 5, HOUR);
-    const doc = [...h.store.values()][0] as { expiresAt?: { toMillis(): number } };
+    const doc = Array.from(h.store.values())[0] as {
+      expiresAt?: { toMillis(): number };
+    };
     expect(doc.expiresAt).toBeDefined();
     expect(doc.expiresAt!.toMillis()).toBeGreaterThan(Date.now());
   });

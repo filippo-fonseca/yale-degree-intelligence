@@ -36,16 +36,49 @@ const EXPECTED_DOMAIN = "yale.edu";
 const CLASS_YEARS = new Set(["2027", "2028", "2029", "2030"]);
 
 function parseArgs(argv) {
-  const args = { allowExternal: false };
+  const args = { allowExternal: false, exclude: [] };
   for (let i = 0; i < argv.length; i += 1) {
     const arg = argv[i];
     if (arg === "--year") args.year = argv[++i];
     else if (arg === "--in") args.input = argv[++i];
     else if (arg === "--out") args.output = argv[++i];
+    else if (arg === "--exclude") args.exclude.push(argv[++i]);
     else if (arg === "--allow-external") args.allowExternal = true;
     else throw new Error(`unknown argument: ${arg}`);
   }
   return args;
+}
+
+/**
+ * Every address across the --exclude files, as a lookup set.
+ *
+ * This is what keeps the two campaigns disjoint: the newcomer list is built by
+ * excluding the existing-user export, so nobody who already has an account can
+ * receive the "here is what DegreeIntelligence is" email. Accepts the same
+ * messy .txt shapes as the main input, plus the .roster.json this script emits.
+ */
+function readExclusions(paths) {
+  const excluded = new Set();
+
+  for (const relativePath of paths) {
+    const fullPath = path.resolve(REPO_ROOT, relativePath);
+    if (!fs.existsSync(fullPath)) throw new Error(`no such exclude file: ${fullPath}`);
+
+    const contents = fs.readFileSync(fullPath, "utf8");
+
+    if (fullPath.endsWith(".json")) {
+      for (const email of JSON.parse(contents).emails ?? []) {
+        excluded.add(String(email).toLowerCase());
+      }
+      continue;
+    }
+
+    for (const line of contents.split(/\r?\n/)) {
+      for (const token of extractFromLine(line)) excluded.add(token.toLowerCase());
+    }
+  }
+
+  return excluded;
 }
 
 /**
@@ -83,12 +116,14 @@ function main() {
 
   const raw = fs.readFileSync(inputPath, "utf8");
   const lines = raw.split(/\r?\n/);
+  const excluded = readExclusions(args.exclude);
 
   /** address -> first line number it appeared on, so duplicates keep their origin. */
   const accepted = new Map();
   const invalid = [];
   const external = [];
   let duplicates = 0;
+  let suppressed = 0;
 
   lines.forEach((line, index) => {
     const lineNo = index + 1;
@@ -116,6 +151,11 @@ function main() {
         if (!args.allowExternal) continue;
       }
 
+      if (excluded.has(address)) {
+        suppressed += 1;
+        continue;
+      }
+
       if (accepted.has(address)) {
         duplicates += 1;
         continue;
@@ -139,6 +179,9 @@ function main() {
   console.log(`  source lines     ${lines.length}`);
   console.log(`  duplicates       ${duplicates}`);
   console.log(`  non-yale.edu     ${external.length}${args.allowExternal ? " (kept)" : " (dropped)"}`);
+  if (args.exclude.length > 0) {
+    console.log(`  excluded         ${suppressed} (already in ${args.exclude.join(", ")})`);
+  }
   console.log(`  unparseable      ${invalid.length}`);
   console.log(`  wrote            ${path.relative(REPO_ROOT, outputPath)}`);
 

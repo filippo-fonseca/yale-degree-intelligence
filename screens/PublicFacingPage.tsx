@@ -534,14 +534,18 @@ export default function AboutPage() {
           </div>
 
           {/* 2. Headline */}
-          <h1 className="mt-5 text-balance text-5xl font-medium leading-[1.05] tracking-[-0.02em] text-gray-900 dark:text-white md:mt-6 md:text-6xl lg:text-[4.5rem]">
+          {/* Two lines, always. "for your Yale degree." is the widest line, and
+              at the old flat 48px it did not fit a phone (386px of text into
+              358px), so it broke as "for your Yale" / "degree.". The clamp
+              scales the mobile size to the viewport instead of stepping down to
+              a fixed size, keeping the hero as large as it can be while still
+              fitting both lines whole. It tops out at 48px, the previous size,
+              so nothing changes from sm upward. */}
+          <h1 className="mt-5 whitespace-nowrap text-[clamp(1.95rem,8.6vw,3rem)] font-medium leading-[1.05] tracking-[-0.02em] text-gray-900 dark:text-white md:mt-6 md:text-6xl lg:text-[4.5rem]">
             The control plane
             <br />
             <span className="text-gray-400 dark:text-gray-500">
-              for your{" "}
-              {/* Keep the noun phrase intact: at 48px on a phone the line
-                  otherwise breaks as "for your Yale" / "degree." */}
-              <span className="whitespace-nowrap">Yale degree.</span>
+              for your Yale degree.
             </span>
           </h1>
 

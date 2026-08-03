@@ -15,7 +15,6 @@ import { getCourseNameFromCode } from "@/lib/courseCatalog";
 import { truncate } from "@/lib/utils/utils";
 import { YearBadge } from "@/components/ui/YearBadge";
 import { UserAvatar } from "@/components/ui/UserAvatar";
-import { getDistPillStyle } from "@/lib/constants";
 import {
   allocateDistributionals,
   sumCourseCredits,
@@ -68,13 +67,50 @@ const SKILL_REQS = [
 const CARD_SURFACE =
   "rounded-xl bg-gradient-to-br from-gray-900/60 via-gray-900/40 to-gray-950/60 backdrop-blur-md border border-gray-800/50 shadow-[inset_0_1px_0_rgba(255,255,255,0.04),0_4px_16px_rgba(0,0,0,0.25)]";
 
-const DIST_BAR_COLORS: Record<string, string> = {
-  Hu: "bg-purple-500",
-  So: "bg-sky-500",
-  Sc: "bg-emerald-500",
-  QR: "bg-red-500",
-  WR: "bg-orange-500",
+/**
+ * One colour per distributional, driving both the badge and the bar under it so
+ * the two cannot drift apart. Spelled out per code rather than composed from a
+ * hue name, because Tailwind only emits classes it can see literally.
+ *
+ * Dark-only by design, like the rest of this view. The shared `getDistPillStyle`
+ * helper is wrong here: it carries a light-mode ink (`text-*-700`) that lands on
+ * this permanently dark card whenever the viewer's own app is in light mode,
+ * which is what made the badges look muddy. Matching the badge tint to its bar
+ * also fixes the other half of it, a washed-out chip sitting above a fully
+ * saturated bar.
+ *
+ * Hues intentionally match lib/constants DIST_PILL_STYLES so a distributional is
+ * the same colour here as it is inside the app.
+ */
+const DIST_COLORS: Record<string, { bar: string; pill: string }> = {
+  Hu: {
+    bar: "bg-purple-400",
+    pill: "bg-purple-400/15 text-purple-200 border-purple-400/30",
+  },
+  So: {
+    bar: "bg-sky-400",
+    pill: "bg-sky-400/15 text-sky-200 border-sky-400/30",
+  },
+  Sc: {
+    bar: "bg-emerald-400",
+    pill: "bg-emerald-400/15 text-emerald-200 border-emerald-400/30",
+  },
+  QR: {
+    bar: "bg-red-400",
+    pill: "bg-red-400/15 text-red-200 border-red-400/30",
+  },
+  WR: {
+    bar: "bg-orange-400",
+    pill: "bg-orange-400/15 text-orange-200 border-orange-400/30",
+  },
 };
+
+const DIST_FALLBACK = {
+  bar: "bg-gray-500",
+  pill: "bg-gray-500/15 text-gray-300 border-gray-500/30",
+};
+
+const distColors = (code: string) => DIST_COLORS[code] ?? DIST_FALLBACK;
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -220,7 +256,7 @@ function CompactDistributionalProgress({ courses }: { courses: Course[] }) {
             >
               <div className="flex items-center justify-between mb-1.5">
                 <span
-                  className={`text-[10px] font-medium px-1.5 py-0.5 rounded border ${getDistPillStyle(req.code)}`}
+                  className={`text-[10px] font-medium px-1.5 py-0.5 rounded border ${distColors(req.code).pill}`}
                 >
                   {req.code}
                 </span>
@@ -230,7 +266,7 @@ function CompactDistributionalProgress({ courses }: { courses: Course[] }) {
               </div>
               <div className="relative w-full bg-gray-800/70 rounded-full h-1.5 overflow-hidden">
                 <div
-                  className={`absolute inset-y-0 left-0 rounded-full transition-all ${DIST_BAR_COLORS[req.code] || "bg-gray-500"}`}
+                  className={`absolute inset-y-0 left-0 rounded-full transition-all ${distColors(req.code).bar}`}
                   style={{ width: `${pct}%` }}
                 />
               </div>

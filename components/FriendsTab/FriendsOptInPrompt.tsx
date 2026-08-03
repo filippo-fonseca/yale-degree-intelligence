@@ -36,10 +36,11 @@ export function FriendsOptInPrompt({ onToggleFriends }: FriendsOptInPromptProps)
           <p className="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-2">
             What your page could look like
           </p>
-          {/* The frame is an inset surface for the preview to sit on, so it has
-              to follow the theme. It was pinned to gray-950, which put a black
-              slab in the middle of the page in light mode. */}
-          <div className="rounded-xl overflow-hidden border border-gray-200 bg-gray-100 p-2 dark:border-white/[0.06] dark:bg-gray-950">
+          {/* Pinned dark on purpose: PublicProfileView carries no light-mode
+              variants, because the shared page is always a dark surface. The
+              frame has to match it in both themes or the preview's own text
+              colours land on the wrong background. */}
+          <div className="rounded-xl overflow-hidden border border-white/[0.06] bg-gray-950 p-2">
             <PublicProfileView
               profile={{
                 displayName: DEMO_PREVIEW_USER.displayName,

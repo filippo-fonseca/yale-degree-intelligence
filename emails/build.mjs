@@ -34,8 +34,13 @@ const SITE_URL = "https://degreeint.com";
  */
 const LOGO_BASE = process.env.EMAIL_LOGO_BASE ?? `${SITE_URL}/email`;
 
-/** CAN-SPAM requires a real postal address in every commercial message. */
-const POSTAL_ADDRESS = "DegreeIntelligence · 421 Temple St · New Haven, CT 06511";
+/**
+ * CAN-SPAM asks for a valid postal address in promotional mail, and filters
+ * read its presence as a legitimacy signal. It is empty here because the only
+ * address available is a student residence, which should not go out to
+ * thousands of strangers. Set it to a PO box if one gets rented.
+ */
+const POSTAL_ADDRESS = "";
 
 /**
  * Resend swaps this for a working one-click unsubscribe link and suppresses
@@ -61,6 +66,7 @@ const LIGHT = {
   btnBg: "#09090b",
   btnText: "#ffffff",
   wellBg: "#f4f4f5",
+  accent: "#ec4899",
 };
 
 const DARK = {
@@ -73,6 +79,7 @@ const DARK = {
   btnBg: "#fafafa",
   btnText: "#09090b",
   wellBg: "#18181b",
+  accent: "#f472b6",
 };
 
 const SANS =
@@ -107,6 +114,8 @@ function darkModeStyles() {
     // gets its own file and the pair is swapped rather than recoloured.
     [".logo-light", "display: none !important;"],
     [".logo-dark", "display: inline-block !important;"],
+    // The headline pink lifts a step on dark so it keeps its contrast.
+    [".t-accent", `color: ${DARK.accent} !important;`],
   ];
 
   const media = rules.map(([sel, decl]) => `      ${sel} { ${decl} }`).join("\n");
@@ -261,11 +270,13 @@ function footer() {
           <tr>
             <td align="center" style="padding: 0 0 18px 0;">
               <p class="t-muted" style="margin: 0; font-family: ${SANS}; font-size: 11px; line-height: 1.6; color: ${LIGHT.muted};">
-                Not affiliated with Yale University in any way.
+                Not affiliated with Yale University in any way other than us being
+                students sharing our project.
               </p>
             </td>
           </tr>
 
+${POSTAL_ADDRESS ? `
           <tr>
             <td align="center" style="padding: 0 0 10px 0;">
               <p class="t-muted" style="margin: 0; font-family: ${MONO}; font-size: 10px; color: ${LIGHT.muted};">
@@ -273,7 +284,7 @@ function footer() {
               </p>
             </td>
           </tr>
-
+` : ""}
           <tr>
             <td align="center">
               <p class="t-muted" style="margin: 0; font-family: ${SANS}; font-size: 11px; color: ${LIGHT.muted};">
@@ -285,14 +296,32 @@ function footer() {
           </tr>`;
 }
 
-/** Email 1: students who already have an account. No sign-up language. */
-function existingUsersEmail() {
+/**
+ * One layout for all three audiences.
+ *
+ * They differ only in headline, the paragraph explaining why this landed in
+ * your inbox, and the call to action. Keeping the shape identical is the point:
+ * a student who forwards one to a friend on a different list should see the
+ * same email, and it means copy edits cannot leave the three drifting apart.
+ */
+/**
+ * Underline a feature name inside body copy.
+ *
+ * Deliberately not an anchor and not link-coloured: these are emphasis, not
+ * destinations, and colouring them like links would invite clicks that go
+ * nowhere.
+ */
+function u(text) {
+  return `<span style="text-decoration: underline;">${text}</span>`;
+}
+
+function campaignEmail({ headline, paragraph, cta, videoCaption, title, preheader }) {
   const body = `${header()}
 
           <tr>
             <td align="center" style="padding: 0 0 16px 0;">
-              <h1 class="t-primary h1" style="margin: 0; font-family: ${SERIF}; font-size: 46px; font-weight: 400; font-style: italic; line-height: 1.05; color: ${LIGHT.primary};">
-                v3 is here.
+              <h1 class="t-accent h1" style="margin: 0; font-family: ${SERIF}; font-size: 46px; font-weight: 400; font-style: italic; line-height: 1.05; color: ${LIGHT.accent};">
+                ${headline}
               </h1>
             </td>
           </tr>
@@ -300,15 +329,12 @@ function existingUsersEmail() {
           <tr>
             <td align="center" style="padding: 0 0 34px 0;">
               <p class="t-secondary" style="margin: 0; font-family: ${SANS}; font-size: 15px; line-height: 1.7; color: ${LIGHT.secondary};">
-                If you're getting this email, you've signed up to DegreeIntelligence in the past.
-                We wanted to let you know we've been hard at work making Yale's most used
-                degree-planning platform even better. We now have Certificates, a rebuilt
-                Simulator, distributionals, a cleaner UI, and much more.
+                ${paragraph}
               </p>
             </td>
           </tr>
-${videoBlock({ caption: "Watch the v3 tour" })}
-${button({ label: "Open DegreeIntelligence →", href: SITE_URL })}
+${videoBlock({ caption: videoCaption })}
+${button({ label: cta, href: SITE_URL })}
 
           <tr>
             <td align="center" style="padding: 26px 0 0 0;">
@@ -321,85 +347,78 @@ ${button({ label: "Open DegreeIntelligence →", href: SITE_URL })}
           <tr>
             <td align="center" style="padding: 16px 0 0 0;">
               <p class="t-secondary" style="margin: 0; font-family: ${SANS}; font-size: 14px; line-height: 1.7; color: ${LIGHT.secondary};">
-                made with <span style="color: #ec4899;">&#9829;</span> by yalies, for all of us.
+                made with <span style="color: ${LIGHT.accent};">&#9829;</span> by yalies, for all of us.
                 we genuinely make no money from this and just want to share what we use to
                 plan for ourselves. it's changed our lives!
               </p>
             </td>
           </tr>
-${footer()}`;
-
-  return shell({
-    title: "v3 is here",
-    preheader: "Certificates, a rebuilt Simulator, distributionals, a cleaner UI, and much more.",
-    body,
-  });
-}
-
-/** Email 2: the rest of Yale, who have never signed up. Leads with proof. */
-function newcomersEmail() {
-  const body = `${header()}
 
           <tr>
-            <td align="center" style="padding: 0 0 12px 0;">
-              <p class="t-muted" style="margin: 0; font-family: ${MONO}; font-size: 11px; letter-spacing: 1.4px; text-transform: uppercase; color: ${LIGHT.muted};">
-                featured in the Yale Daily News
-              </p>
-            </td>
-          </tr>
-
-          <tr>
-            <td align="center" style="padding: 0 0 14px 0;">
-              <h1 class="t-primary h1" style="margin: 0; font-family: ${SERIF}; font-size: 42px; font-weight: 400; line-height: 1.1; color: ${LIGHT.primary};">
-                The control plane<br />for your Yale degree.
-              </h1>
-            </td>
-          </tr>
-
-          <tr>
-            <td align="center" style="padding: 0 0 32px 0;">
-              <p class="t-secondary" style="margin: 0; font-family: ${SANS}; font-size: 15px; line-height: 1.65; color: ${LIGHT.secondary};">
-                Plan semesters, track requirements, simulate outcomes, and see exactly
-                how your degree is going. Built by Yalies, for Yalies.
-              </p>
-            </td>
-          </tr>
-${videoBlock({ caption: "Watch the two-minute tour" })}
-${button({ label: "Log in with @yale.edu Google →", href: SITE_URL })}
-
-          <tr>
-            <td align="center" style="padding: 0 0 40px 0;">
-              <p class="t-muted" style="margin: 0; font-family: ${MONO}; font-size: 11px; color: ${LIGHT.muted};">
-                Free forever · No install
-              </p>
-            </td>
-          </tr>
-
-          <tr>
-            <td align="center" class="bg-well" style="background-color: ${LIGHT.wellBg}; border: 1px solid ${LIGHT.border}; border-radius: 14px; padding: 28px 24px;">
-              <p class="t-primary" style="margin: 0 0 4px 0; font-family: ${SERIF}; font-size: 26px; line-height: 1.2; color: ${LIGHT.primary};">
-                Used by 1 in 6 Yale undergrads.
-              </p>
-              <p class="t-muted" style="margin: 0 0 14px 0; font-family: ${SERIF}; font-size: 22px; font-style: italic; line-height: 1.2; color: ${LIGHT.muted};">
-                Some of them even like it.
-              </p>
-              <p class="t-muted" style="margin: 0; font-family: ${MONO}; font-size: 11px; line-height: 1.7; color: ${LIGHT.muted};">
-                ~1,200 students · every residential college · zero ads, zero fees
+            <td align="center" style="padding: 18px 0 0 0;">
+              <p class="t-muted" style="margin: 0; font-family: ${SANS}; font-size: 13px; color: ${LIGHT.muted};">
+                have feedback? just reply to this email.
               </p>
             </td>
           </tr>
 ${footer()}`;
 
-  return shell({
-    title: "The control plane for your Yale degree",
-    preheader: "Plan semesters, track requirements, and see how your degree is actually going.",
-    body,
-  });
+  return shell({ title, preheader, body });
 }
 
 const TARGETS = [
-  { file: "v3-existing.html", render: existingUsersEmail },
-  { file: "v3-newcomers.html", render: newcomersEmail },
+  {
+    // Already has an account. No sign-up language, no explaining what DI is.
+    file: "v3-existing.html",
+    render: () =>
+      campaignEmail({
+        headline: "v3 is here.",
+        paragraph: `If you're getting this email, you're one of the 1 in 6 Yale students who have
+                signed up to use DegreeIntelligence over the past year. We just wanted to let you
+                know we've been hard at work making Yale's most used degree-planning platform even
+                better. We now have ${u("Certificates")}, a rebuilt ${u("Simulator")},
+                ${u("distributionals")}, a ${u("cleaner UI")}, and ${u("much more")}.`,
+        cta: "Open DegreeIntelligence →",
+        videoCaption: "Watch the v3 tour",
+        title: "v3 is here",
+        preheader: "Certificates, a rebuilt Simulator, distributionals, a cleaner UI, and much more.",
+      }),
+  },
+  {
+    // Class of 2030: no Yale courses yet, so lead on not needing grades to start.
+    file: "v3-frosh.html",
+    render: () =>
+      campaignEmail({
+        headline: "welcome to Yale.",
+        paragraph: `You're about to pick your first Yale courses, and you don't need a single grade
+                to start planning them. DegreeIntelligence is what around 1,200 Yalies use to map
+                out their degrees: ${u("Certificates")}, a rebuilt ${u("Simulator")},
+                ${u("distributionals")}, ${u("requirement tracking")}, and ${u("much more")}.
+                It's free forever, and there's nothing to install.`,
+        cta: "Log in with @yale.edu Google →",
+        videoCaption: "Watch the two-minute tour",
+        title: "Welcome to Yale",
+        preheader: "No grades needed. Start planning your first semester in a couple of minutes.",
+      }),
+  },
+  {
+    // Upperclass students who never signed up. Proof first, since they need a
+    // reason to trust an email from a name they do not recognise.
+    file: "v3-newcomers.html",
+    render: () =>
+      campaignEmail({
+        headline: "1 in 6 Yalies use this.",
+        paragraph: `If you're getting this email, you haven't signed up to DegreeIntelligence yet.
+                It's what around 1,200 Yalies across every residential college use to plan their
+                degrees, and we've been hard at work making it even better. We now have
+                ${u("Certificates")}, a rebuilt ${u("Simulator")}, ${u("distributionals")},
+                a ${u("cleaner UI")}, and ${u("much more")}.`,
+        cta: "Log in with @yale.edu Google →",
+        videoCaption: "Watch the two-minute tour",
+        title: "1 in 6 Yalies use this",
+        preheader: "Plan semesters, track requirements, and see how your degree is actually going.",
+      }),
+  },
 ];
 
 fs.mkdirSync(DIST, { recursive: true });

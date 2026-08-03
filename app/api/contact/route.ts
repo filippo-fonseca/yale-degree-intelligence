@@ -39,7 +39,7 @@ function buildMailtoFallback(body: {
 
 export async function POST(req: NextRequest) {
   const ip = getClientIp(req);
-  const limited = rateLimit(`contact:${ip}`, 5, 3600000);
+  const limited = await rateLimit(`contact:${ip}`, 5, 3600000);
   if (limited) return limited;
 
   let body: Record<string, unknown>;

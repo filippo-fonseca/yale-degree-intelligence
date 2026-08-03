@@ -165,5 +165,19 @@ match /databases/{database}/documents {
       allow read, write: if false;
     }
 
+    // ============================================
+    // COST CONTROLS — Admin SDK only (client deny)
+    // Written only by the API routes via the Admin SDK, which bypasses these
+    // rules. A client that could write here could reset its own rate limit or
+    // poison another user's cached transcript parse, so both stay deny-all.
+    // ============================================
+    match /rate_limits/{bucketId} {
+      allow read, write: if false;
+    }
+
+    match /transcript_cache/{docId} {
+      allow read, write: if false;
+    }
+
 }
 }

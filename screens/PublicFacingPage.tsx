@@ -20,6 +20,7 @@ import {
 } from "react-icons/fi";
 import { FaLinkedinIn } from "react-icons/fa";
 import LogoIcon from "@/icons/LogoIcon";
+import { ShinyButton } from "@/components/ui/shiny-button";
 import Link from "next/link";
 import { useState, useRef, useEffect } from "react";
 import dynamic from "next/dynamic";
@@ -1904,7 +1905,11 @@ function Pending() {
   );
 }
 
-/** (a) BRAND primary. Hero CTA and the closing-statement CTA only. */
+/**
+ * (a) BRAND primary. Hero CTA and the closing-statement CTA only.
+ * The flat pink/purple gradient is gone; both primaries now share the one
+ * shiny treatment, separated only by size.
+ */
 function BrandCTA({
   children,
   onClick,
@@ -1912,31 +1917,17 @@ function BrandCTA({
   className = "",
   pending = false,
 }: CTAProps) {
-  const cls = `inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 px-6 py-3 text-sm font-medium text-white shadow-lg shadow-purple-600/25 ${pending ? "opacity-70" : ""} ${className}`;
-  const body = pending ? (
-    <Pending />
-  ) : (
-    <>
-      {children}
-      <span aria-hidden>→</span>
-    </>
-  );
-  if (href)
-    return (
-      <motion.a whileHover={{ y: -1 }} href={href} className={cls}>
-        {body}
-      </motion.a>
-    );
   return (
-    <motion.button
-      whileHover={pending ? undefined : { y: -1 }}
+    <ShinyButton
+      size="md"
+      withArrow
+      href={href}
       onClick={onClick}
-      disabled={pending}
-      aria-busy={pending}
-      className={cls}
+      pending={pending}
+      className={className}
     >
-      {body}
-    </motion.button>
+      {pending ? <Pending /> : children}
+    </ShinyButton>
   );
 }
 
@@ -1948,23 +1939,16 @@ function MonoCTA({
   className = "",
   pending = false,
 }: CTAProps) {
-  const cls = `inline-flex items-center gap-1.5 rounded-full bg-gray-900 text-white dark:bg-white dark:text-gray-900 px-4 py-1.5 text-sm font-medium ${pending ? "opacity-70" : ""} ${className}`;
-  if (href)
-    return (
-      <motion.a whileHover={{ y: -1 }} href={href} className={cls}>
-        {children}
-      </motion.a>
-    );
   return (
-    <motion.button
-      whileHover={pending ? undefined : { y: -1 }}
+    <ShinyButton
+      size="sm"
+      href={href}
       onClick={onClick}
-      disabled={pending}
-      aria-busy={pending}
-      className={cls}
+      pending={pending}
+      className={className}
     >
       {pending ? <Pending /> : children}
-    </motion.button>
+    </ShinyButton>
   );
 }
 

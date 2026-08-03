@@ -538,7 +538,10 @@ export default function AboutPage() {
             The control plane
             <br />
             <span className="text-gray-400 dark:text-gray-500">
-              for your Yale degree.
+              for your{" "}
+              {/* Keep the noun phrase intact: at 48px on a phone the line
+                  otherwise breaks as "for your Yale" / "degree." */}
+              <span className="whitespace-nowrap">Yale degree.</span>
             </span>
           </h1>
 

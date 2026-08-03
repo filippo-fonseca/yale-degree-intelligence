@@ -268,6 +268,15 @@ function footer() {
           </tr>
 
           <tr>
+            <td align="center" style="padding: 0 0 14px 0;">
+              <p class="t-muted" style="margin: 0; font-family: ${SANS}; font-size: 12px; line-height: 1.65; color: ${LIGHT.muted};">
+                This is the only email we'll send until registration opens again for the
+                Spring semester. Unsubscribe if you don't want to be emailed.
+              </p>
+            </td>
+          </tr>
+
+          <tr>
             <td align="center" style="padding: 0 0 18px 0;">
               <p class="t-muted" style="margin: 0; font-family: ${SANS}; font-size: 11px; line-height: 1.6; color: ${LIGHT.muted};">
                 Not affiliated with Yale University in any way other than us being

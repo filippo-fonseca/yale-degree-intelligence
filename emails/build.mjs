@@ -31,8 +31,12 @@ const SITE_URL = "https://degreeint.com";
  * blocks data: URIs in img tags, so a hosted PNG is the only thing that renders
  * everywhere. Override the base when screenshotting locally, since these paths
  * only resolve once public/email/ has been deployed.
+ *
+ * Points at the canonical www host rather than the apex. The apex answers 307
+ * to www, and while browsers follow that, some mail clients and image proxies
+ * will not follow a redirect for an img src and simply show nothing.
  */
-const LOGO_BASE = process.env.EMAIL_LOGO_BASE ?? `${SITE_URL}/email`;
+const LOGO_BASE = process.env.EMAIL_LOGO_BASE ?? "https://www.degreeint.com/email";
 
 /**
  * CAN-SPAM asks for a valid postal address in promotional mail, and filters

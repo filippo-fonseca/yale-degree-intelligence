@@ -17,10 +17,25 @@ export type Release = {
 
 export const RELEASES: Release[] = [
   {
+    version: "v3.0.1",
+    date: "Summer 2026",
+    current: true,
+    summary:
+      "A quieter front door. The buttons on our public homepage got a cleaner, calmer treatment.",
+    sections: [
+      {
+        title: "Look and feel",
+        items: [
+          "New buttons on the homepage. The bright pink-and-purple log-in button is gone, replaced by a calmer black one with a soft shine that follows the edge. Every main button on the page now uses the same treatment, so they read as one family instead of three, and they look right in both light and dark mode.",
+          "If you prefer less motion on screen, the shine stays still. We follow your system's reduce-motion setting.",
+        ],
+      },
+    ],
+  },
+  {
     version: "v3.0.0",
     name: "The big release",
     date: "Summer 2026",
-    current: true,
     summary:
       "Our largest update yet, and the public launch of DegreeIntelligence 3. Faster planning, clearer numbers, a friend page worth sharing, tighter privacy, emptier states that actually tell you what to do next, and a cleaned-up codebase so we can keep shipping safely.",
     sections: [

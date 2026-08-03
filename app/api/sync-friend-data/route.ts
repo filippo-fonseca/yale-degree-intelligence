@@ -44,7 +44,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const limited = rateLimit(
+    const limited = await rateLimit(
       `sync-friend:${callerId}:${targetUserId}`,
       30,
       60 * 60 * 1000

@@ -10,7 +10,7 @@ export async function POST(req: NextRequest) {
   const user = await requireAuth(req);
   if (isAuthError(user)) return user;
 
-  const limited = rateLimit(`upload:${user.uid}`, 20, 60 * 60 * 1000);
+  const limited = await rateLimit(`upload:${user.uid}`, 20, 60 * 60 * 1000);
   if (limited) return limited;
 
   const formData: FormData = await req.formData();

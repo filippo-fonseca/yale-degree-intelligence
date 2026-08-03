@@ -26,7 +26,9 @@ export const RELEASES: Release[] = [
       {
         title: "Look and feel",
         items: [
-          "New buttons on the homepage. The bright pink-and-purple log-in button is gone, replaced by a calmer black one with a soft shine that follows the edge. Every main button on the page now uses the same treatment, so they read as one family instead of three, and they look right in both light and dark mode.",
+          "New buttons on the homepage. The flat pink-and-purple log-in button is gone, replaced by a calmer black one with a soft pink shine that travels around the edge. Every main button on the page now uses the same treatment, so they read as one family instead of three, and they look right in both light and dark mode.",
+          "The headline fits properly on a phone. It used to break in the middle of \"Yale degree\"; now it sits on two clean lines and scales itself to your screen.",
+          "The log-in buttons just say \"Log in with @yale.edu email\".",
           "If you prefer less motion on screen, the shine stays still. We follow your system's reduce-motion setting.",
         ],
       },

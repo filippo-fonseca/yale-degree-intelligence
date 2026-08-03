@@ -405,7 +405,7 @@ export default function AboutPage() {
             >
               <span className="sm:hidden">Log in</span>
               <span className="hidden sm:inline">
-                Log in with @yale.edu Google
+                Log in with @yale.edu email
               </span>
               <span aria-hidden>→</span>
             </MonoCTA>
@@ -541,7 +541,7 @@ export default function AboutPage() {
               a fixed size, keeping the hero as large as it can be while still
               fitting both lines whole. It tops out at 48px, the previous size,
               so nothing changes from sm upward. */}
-          <h1 className="mt-5 whitespace-nowrap text-[clamp(1.95rem,8.6vw,3rem)] font-medium leading-[1.05] tracking-[-0.02em] text-gray-900 dark:text-white md:mt-6 md:text-6xl lg:text-[4.5rem]">
+          <h1 className="mt-5 whitespace-nowrap text-[clamp(1.9rem,10.4vw,3rem)] font-medium leading-[1.05] tracking-[-0.02em] text-gray-900 dark:text-white md:mt-6 md:text-6xl lg:text-[4.5rem]">
             The control plane
             <br />
             <span className="text-gray-400 dark:text-gray-500">
@@ -561,7 +561,7 @@ export default function AboutPage() {
               onClick={() => startLogin("hero")}
               pending={authPendingId === "hero"}
             >
-              Log in with @yale.edu Google
+              Log in with @yale.edu email
             </BrandCTA>
             <GhostCTA onClick={() => setShowVideoModal(true)}>
               Watch the launch film
@@ -1427,7 +1427,7 @@ export default function AboutPage() {
               onClick={() => startLogin("closing")}
               pending={authPendingId === "closing"}
             >
-              Log in with @yale.edu Google
+              Log in with @yale.edu email
             </BrandCTA>
           </div>
           <p className="mt-5 font-mono text-xs tracking-tight text-gray-400 dark:text-gray-500">

@@ -20,6 +20,7 @@ import {
 } from "react-icons/fi";
 import { FaLinkedinIn } from "react-icons/fa";
 import LogoIcon from "@/icons/LogoIcon";
+import HeroConstellation from "@/components/landing/HeroConstellation";
 import {
   ShinyButton,
   CTA_SIZES,
@@ -421,6 +422,18 @@ export default function AboutPage() {
       {/* isolate: the dot grid and tiles sit on negative z, so the band needs its
           own stacking context or they paint behind the canvas background. */}
       <section className="relative isolate pt-20 md:pt-24 pb-10 md:pb-14">
+        {/* Drifting constellation, the furthest-back layer of the hero. Sits on
+            -z-20 so the dot grid, the floating tiles, and the type all paint over
+            it. Masked out toward the bottom so it fades before the launch film
+            rather than competing with it. The canvas itself handles cursor
+            parallax, theme, and prefers-reduced-motion. */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0 -z-20 opacity-70 [mask-image:linear-gradient(to_bottom,black_55%,transparent)] dark:opacity-100"
+        >
+          <HeroConstellation />
+        </div>
+
         {/* Hero dot grid, faded out by ~55% of the hero band's height */}
         <div
           aria-hidden

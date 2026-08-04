@@ -5,15 +5,25 @@ import { useEffect, useRef } from "react";
 /**
  * HeroConstellation
  *
- * A subtle, theme-aware "network graph / starfield" that sits BEHIND the hero
- * text. Nodes drift slowly and connect to nearby neighbours with faint lines;
- * the whole field parallax-shifts toward the cursor, and nodes near the cursor
- * brighten and link to it. Pure <canvas> + requestAnimationFrame — no deps.
+ * A subtle, theme-aware night sky behind the hero, in two layers.
+ *
+ * Far layer: a few hundred small neutral stars that twinkle out of phase with
+ * each other and drift only slightly with the cursor. Near layer: a sparse set
+ * of larger brand-accent nodes that drift on their own, link to nearby
+ * neighbours, and brighten and reach toward the pointer.
+ *
+ * The two layers parallax at different rates, which is what reads as depth: the
+ * near field sweeps with the cursor while the sky behind it barely moves. Stars
+ * stay neutral on purpose. Tinting them with the brand would flatten both layers
+ * into one and lose that separation.
+ *
+ * Pure <canvas> + requestAnimationFrame, no deps.
  *
  * - position:absolute inset-0, pointer-events-none, aria-hidden, behind content
- * - respects prefers-reduced-motion (renders a single static frame)
+ * - respects prefers-reduced-motion (renders a single static frame, no listeners)
  * - theme-aware via the `.dark` class on <html> (see context/ThemeContext)
- * - devicePixelRatio-aware for crisp lines; particle count capped
+ * - devicePixelRatio-aware for crisp dots; both layers' counts are capped so a
+ *   wide monitor cannot turn this into thousands of draw calls per frame
  */
 
 // brand accents
@@ -32,6 +42,25 @@ type Node = {
   color: [number, number, number];
 };
 
+/**
+ * Background stars. Far more numerous and much smaller than the accent nodes,
+ * with no links, so the field reads as a sky first and a constellation second.
+ * They parallax at a fraction of the nodes' rate, which is what sells depth:
+ * the near layer sweeps, the far layer barely moves.
+ */
+type Star = {
+  x: number;
+  y: number;
+  r: number;
+  /** Twinkle phase and rate, so they do not all pulse in unison. */
+  phase: number;
+  rate: number;
+  base: number;
+};
+
+/** How much less the star layer shifts than the node layer. */
+const STAR_PARALLAX = 0.35;
+
 export default function HeroConstellation() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
@@ -49,6 +78,7 @@ export default function HeroConstellation() {
     let height = 0;
     let dpr = 1;
     const nodes: Node[] = [];
+    const stars: Star[] = [];
 
     // pointer state (in CSS pixels, relative to the canvas)
     const pointer = { x: -9999, y: -9999, active: false };
@@ -77,6 +107,23 @@ export default function HeroConstellation() {
           color: ACCENTS[(Math.random() * ACCENTS.length) | 0],
         });
       }
+
+      // Denser than the nodes by roughly 4x, and capped so a wide monitor does
+      // not quietly turn this into a few thousand draw calls a frame.
+      stars.length = 0;
+      const starTarget = Math.round(
+        Math.min(260, Math.max(90, (width * height) / 4200)),
+      );
+      for (let i = 0; i < starTarget; i++) {
+        stars.push({
+          x: Math.random() * width,
+          y: Math.random() * height,
+          r: 0.35 + Math.random() * 0.75,
+          phase: Math.random() * Math.PI * 2,
+          rate: 0.6 + Math.random() * 1.5,
+          base: 0.35 + Math.random() * 0.5,
+        });
+      }
     }
 
     function resize() {
@@ -90,7 +137,7 @@ export default function HeroConstellation() {
       buildNodes();
     }
 
-    function draw() {
+    function draw(t: number) {
       const dark = isDark();
       // ease parallax toward target
       parallax.x += (parallax.tx - parallax.x) * 0.06;
@@ -101,6 +148,24 @@ export default function HeroConstellation() {
       // base alphas: brighter on dark, whisper-quiet on light
       const lineBase = dark ? 0.5 : 0.28;
       const dotBase = dark ? 0.85 : 0.5;
+
+      // ── Star layer ────────────────────────────────────────────────────────
+      // Drawn first and shifted less than the nodes, so it sits behind them.
+      // Neutral rather than branded: the accent belongs to the constellation,
+      // and tinting the whole sky would flatten the two layers together.
+      const starAlpha = dark ? 1 : 0.55;
+      const sx0 = parallax.x * STAR_PARALLAX;
+      const sy0 = parallax.y * STAR_PARALLAX;
+      for (const st of stars) {
+        const twinkle = 0.72 + 0.28 * Math.sin(t * 0.001 * st.rate + st.phase);
+        const a = st.base * twinkle * starAlpha;
+        ctx!.beginPath();
+        ctx!.arc(st.x + sx0, st.y + sy0, st.r, 0, Math.PI * 2);
+        ctx!.fillStyle = dark
+          ? `rgba(226,232,240,${a.toFixed(3)})`
+          : `rgba(71,85,105,${a.toFixed(3)})`;
+        ctx!.fill();
+      }
 
       // draw connecting lines first
       for (let i = 0; i < nodes.length; i++) {
@@ -175,7 +240,7 @@ export default function HeroConstellation() {
       }
     }
 
-    function step() {
+    function step(t: number) {
       for (const n of nodes) {
         n.x += n.vx;
         n.y += n.vy;
@@ -184,7 +249,7 @@ export default function HeroConstellation() {
         if (n.y < -20) n.y = height + 20;
         else if (n.y > height + 20) n.y = -20;
       }
-      draw();
+      draw(t);
       raf = requestAnimationFrame(step);
     }
 
@@ -219,7 +284,7 @@ export default function HeroConstellation() {
 
     if (reduceMotion) {
       // static single frame, no listeners
-      draw();
+      draw(0);
       return () => {
         ro?.disconnect();
         window.removeEventListener("resize", resize);

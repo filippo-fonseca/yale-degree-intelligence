@@ -59,7 +59,7 @@ Single Next.js 15 app (Yale DegreeIntelligence). Standard commands are in `READM
 
 ### Services / env
 - Only local process needed: `yarn dev`. Auth and data are live Firebase (no emulator in repo).
-- Copy `.env.example` → `.env.local` for the public `NEXT_PUBLIC_FIREBASE_*` web config. Server secrets (not in the example): `FIREBASE_SERVICE_ACCOUNT_KEY` (Admin SDK / contact persistence / authenticated APIs) and `OPENAI_API_KEY` (`/api/extract` transcript structuring). Email providers for contact are optional.
+- Create `.env.local` yourself; there is no `.env.example` to copy, on purpose (it used to carry the real Firebase config, so clones pointed at production). Every variable is documented in the README's Environment table: the public `NEXT_PUBLIC_FIREBASE_*` web config, plus `FIREBASE_SERVICE_ACCOUNT_KEY` (Admin SDK / contact persistence / authenticated APIs), `ADMIN_EMAILS` (server-only operator list), and `OPENAI_API_KEY` (`/api/extract` transcript structuring, optional). Email providers for contact are optional.
 - Login is Google OAuth restricted to `@yale.edu`. Dashboard/Simulator/courses flows need a signed-in Yale account (Desktop-pane login is the practical path in Cloud VMs).
 
 ### Gotchas

@@ -8,6 +8,7 @@ import { useAuth } from "@/context/AuthContext";
 import { useTheme } from "@/context/ThemeContext";
 import { createNavItems } from "@/components/dashboard/navItems";
 import { useDismissibleFlag } from "@/lib/useDismissibleFlag";
+import { useIsAdmin } from "@/lib/useIsAdmin";
 import {
   getMajorProgress as computeMajorProgress,
   getCertificateProgress as computeCertificateProgress,
@@ -90,6 +91,10 @@ export default function Home() {
   );
   friendsEnabledRef.current = friendsEnabled;
 
+  // Operator status comes from the server, so the admin list stays out of the
+  // client bundle. Only gates which dev tools are offered.
+  const { isAdmin } = useIsAdmin(user);
+
   // "New" chip on My certificates, cleared the first time the tab is opened.
   const certificatesNew = useDismissibleFlag("nav:certificates-new");
 
@@ -151,6 +156,7 @@ export default function Home() {
 
   const overlayActions = useDashboardOverlayActions({
     user,
+    isAdmin,
     hasData,
     setShowSettings,
     setShowMajorSelection,
@@ -175,6 +181,7 @@ export default function Home() {
     <main className="min-h-screen bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100 font-louize overflow-hidden">
       <DashboardOverlays
         user={user}
+        isAdmin={isAdmin}
         userProfile={userProfile}
         courses={courses}
         selectedMajor={selectedMajor}

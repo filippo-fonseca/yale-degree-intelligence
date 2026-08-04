@@ -13,7 +13,7 @@ import { toast } from "react-hot-toast";
 import { Info } from "lucide-react";
 import { UserAvatar } from "../ui/UserAvatar";
 import { YearBadge } from "../ui/YearBadge";
-import { isAdminEmail } from "@/lib/admin";
+import { useIsAdmin } from "@/lib/useIsAdmin";
 import type { UserSettingsModalProps } from "./settingsTypes";
 import { useUserProfileForm } from "./useUserProfileForm";
 import { SettingsProfileSection } from "./SettingsProfileSection";
@@ -33,7 +33,7 @@ export default function UserSettingsModal({
   onReplayWelcome,
   onReplayTutorial,
 }: UserSettingsModalProps) {
-  const isOwner = isAdminEmail(user.email);
+  const { isAdmin: isOwner } = useIsAdmin(user);
   const [isHoveringLogout, setIsHoveringLogout] = useState(false);
 
   const [showMoreMenu, setShowMoreMenu] = useState(false);

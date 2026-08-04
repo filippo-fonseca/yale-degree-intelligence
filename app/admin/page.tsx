@@ -5,7 +5,7 @@ import type { ReactNode } from "react";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
 import { useTheme } from "@/context/ThemeContext";
-import { isAdminEmail } from "@/lib/admin";
+import { useIsAdmin } from "@/lib/useIsAdmin";
 import {
   Area,
   AreaChart,
@@ -485,7 +485,8 @@ export default function AdminPage() {
   const [loadingStats, setLoadingStats] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const isAdmin = isAdminEmail(user?.email);
+  // Asked of the server, so the operator list never reaches the bundle.
+  const { isAdmin, ready: adminReady } = useIsAdmin(user);
 
   const loadStats = async () => {
     if (!user || !isAdmin) return;

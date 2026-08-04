@@ -18,7 +18,7 @@ import {
   FiMoon,
   FiSun,
 } from "react-icons/fi";
-import { FaLinkedinIn } from "react-icons/fa";
+import { FaLinkedinIn, FaGithub } from "react-icons/fa";
 import LogoIcon from "@/icons/LogoIcon";
 import HeroConstellation from "@/components/landing/HeroConstellation";
 import {
@@ -550,21 +550,17 @@ export default function AboutPage() {
             </Link>
           </div>
 
-          {/* 2. Headline */}
-          {/* Two lines, always. "for your Yale degree." is the widest line, and
-              at the old flat 48px it did not fit a phone (386px of text into
-              358px), so it broke as "for your Yale" / "degree.". The clamp
-              scales the mobile size to the viewport instead of stepping down to
-              a fixed size, keeping the hero as large as it can be while still
-              fitting both lines whole. It tops out at 48px, the previous size,
-              so nothing changes from sm upward. */}
-          {/* leading-[1.05] was tight enough that the descender of "plane" hit
-              the ascender of "degree" on the line below. Louize has a long
-              descender, so the hero needs a little more than the display
-              default. */}
-          <h1 className="mt-5 whitespace-nowrap text-[clamp(1.9rem,10.4vw,3rem)]/[1.25] font-medium tracking-[-0.02em] text-gray-900 dark:text-white md:mt-6 md:text-6xl/[1.25] lg:text-[4.5rem]/[1.25]">
-            The control plane
-            <br />
+          {/* 2. Headline
+              Two fixed lines from sm up, where nowrap guarantees the break lands
+              on the <br /> rather than reflowing. On a phone "The open source
+              control plane" is far too wide to hold on one line, so below sm the
+              nowrap and the <br /> both drop out and the balancer wraps it
+              naturally.
+              leading is 1.25 because Louize has a long descender: at the original
+              1.05 the "p" of plane collided with the "d" of degree below it. */}
+          <h1 className="mt-5 text-balance text-[clamp(1.75rem,8.2vw,3rem)]/[1.25] font-medium tracking-[-0.02em] text-gray-900 dark:text-white sm:whitespace-nowrap md:mt-6 md:text-6xl/[1.25] lg:text-[4.5rem]/[1.25]">
+            The open source control plane
+            <br className="hidden sm:block" />{" "}
             <span className="text-gray-400 dark:text-gray-500">
               for your Yale degree.
             </span>
@@ -590,6 +586,19 @@ export default function AboutPage() {
             <GhostCTA onClick={() => setShowVideoModal(true)}>
               Watch the launch film
             </GhostCTA>
+            {/* Sized from the same CTA_SIZES map as its neighbours, so the row
+                stays one height. Quieter than the ghost button on purpose: it
+                matters to a subset of readers, and the login CTA should still
+                win the row. */}
+            <a
+              href={REPO_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`inline-flex items-center justify-center rounded-full font-medium ${CTA_SIZES.md} border border-black/10 bg-transparent text-gray-600 transition-colors hover:border-black/20 hover:text-gray-900 dark:border-white/15 dark:text-gray-400 dark:hover:border-white/25 dark:hover:text-white`}
+            >
+              <FaGithub size={14} aria-hidden />
+              View source code
+            </a>
           </div>
 
           {/* 5. Mono microcopy */}
@@ -608,9 +617,18 @@ export default function AboutPage() {
               </span>
             </p>
             <p className="mx-auto mt-2 max-w-[58ch] font-mono text-[11px] leading-relaxed tracking-tight text-gray-400 dark:text-gray-500 sm:mt-3 sm:text-xs">
-              1.2k students in every ResCo use our platform to manage their
-              academic lives at Yale (and counting!). There are zero ads and no
-              fees. And there never will be.
+              <strong className="font-semibold text-gray-500 dark:text-gray-300">
+                1.2k students
+              </strong>{" "}
+              <strong className="font-semibold text-gray-500 dark:text-gray-300">
+                in every ResCo
+              </strong>{" "}
+              use our platform to manage their academic lives at Yale (and
+              counting!). There are{" "}
+              <strong className="font-semibold text-gray-500 dark:text-gray-300">
+                zero ads and no fees.
+              </strong>{" "}
+              And there never will be. Oh, and our code is open-source!
             </p>
           </div>
         </div>
@@ -1619,6 +1637,8 @@ const reveal = {
   viewport: { once: true, amount: 0.2, margin: "0px 0px 1000% 0px" },
   transition: { duration: 0.6 },
 } as const;
+
+const REPO_URL = "https://github.com/filippo-fonseca/yale-degree-intelligence";
 
 const YDN_BANNER_KEY = "di-ydn-banner-dismissed";
 const YDN_ARTICLE_URL =

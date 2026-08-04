@@ -2,7 +2,6 @@
 
 import type { User } from "firebase/auth";
 import { Course } from "@/lib/types";
-import { isAdminEmail } from "@/lib/admin";
 import { setUserFlag } from "@/lib/userFlags";
 import UserSettingsModal from "@/components/UserSettingsModal/UserSettingsModal";
 import CommandPalette from "@/components/CommandPalette/CommandPalette";
@@ -48,6 +47,8 @@ interface DashboardOverlaysProps {
   onReplayTour: () => void;
   onReplayWelcome: () => void;
   onReplayTutorial: () => void;
+  /** Operator status, resolved server-side by the caller. */
+  isAdmin: boolean;
   onLogout: () => void;
   onDeleteAccount: () => Promise<void>;
   onCloseUpdateModal: () => void;
@@ -95,6 +96,7 @@ export function DashboardOverlays({
   onReplayTour,
   onReplayWelcome,
   onReplayTutorial,
+  isAdmin,
   onLogout,
   onDeleteAccount,
   onCloseUpdateModal,
@@ -130,10 +132,10 @@ export function DashboardOverlays({
           onToggleFriends={onToggleFriends}
           onReplayTour={onReplayTour}
           onReplayWelcome={
-            isAdminEmail(user.email) ? onReplayWelcome : undefined
+            isAdmin ? onReplayWelcome : undefined
           }
           onReplayTutorial={
-            isAdminEmail(user.email) ? onReplayTutorial : undefined
+            isAdmin ? onReplayTutorial : undefined
           }
           onLogout={onLogout}
           onDeleteAccount={onDeleteAccount}

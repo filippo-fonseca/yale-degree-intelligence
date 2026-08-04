@@ -1,10 +1,11 @@
 import type { User } from "firebase/auth";
-import { isAdminEmail } from "@/lib/admin";
 import { setUserFlag } from "@/lib/userFlags";
 import type { UserProfile } from "./types";
 
 interface UseDashboardOverlayActionsOptions {
   user: User | null;
+  /** Operator status, resolved server-side via /api/me. */
+  isAdmin: boolean;
   hasData: boolean;
   setShowSettings: (open: boolean) => void;
   setShowMajorSelection: (open: boolean) => void;
@@ -35,6 +36,7 @@ export function useDashboardOverlayActions({
   handleTabChange,
   handleProfileUpdate,
   logout,
+  isAdmin,
 }: UseDashboardOverlayActionsOptions) {
   return {
     onMajorSelectionComplete: () => setShowMajorSelection(false),
@@ -49,7 +51,7 @@ export function useDashboardOverlayActions({
     },
     onReplayWelcome: () => {
       // Creator-only Dev tool (settings UI is also gated via isAdminEmail).
-      if (!user || !isAdminEmail(user.email)) return;
+      if (!user || !isAdmin) return;
       void setUserFlag(user.uid, "hasSeenV3Welcome", false);
       void setUserFlag(user.uid, "hasSeenTutorial", false);
       setShowSettings(false);
@@ -58,7 +60,7 @@ export function useDashboardOverlayActions({
     },
     onReplayTutorial: () => {
       // Creator-only Dev tool (settings UI is also gated via isAdminEmail).
-      if (!user || !isAdminEmail(user.email)) return;
+      if (!user || !isAdmin) return;
       void setUserFlag(user.uid, "hasSeenTutorial", false);
       setShowSettings(false);
       setWelcomeOpen(false);

@@ -21,8 +21,23 @@ export const RELEASES: Release[] = [
     date: "Summer 2026",
     current: true,
     summary:
-      "A quieter front door, and a transcript import that no longer does the same work twice.",
+      "A quieter front door, a transcript import that no longer does the same work twice, and clearer numbers where you read your progress.",
     sections: [
+      {
+        title: "Reading your progress",
+        items: [
+          "The progress rings in the Simulator now show their percentage. The ring already tracked your plan; you just had to read the number from the text beside it.",
+          "The second GPA on each row of the Simulator's timeline now says \"overall\". Two numbers sat side by side with nothing telling you one was the term and the other your running cumulative GPA.",
+          "The Simulator points out that you can now plan grades and distributionals, not just courses. Turn on the Grades and Distributionals editors and the Progress tab shows your projected GPA and distributional tally.",
+        ],
+      },
+      {
+        title: "Friends",
+        items: [
+          "Your public page is a setting again, not the whole tab. Instead of a full copy of the page rendered inline, you get a short summary of what friends can see, and \"View public page\" opens the real thing.",
+          "The distributional badges on a shared page no longer look washed out, and they match the colour of the bar underneath them.",
+        ],
+      },
       {
         title: "Look and feel",
         items: [

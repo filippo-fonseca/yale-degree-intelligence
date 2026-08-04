@@ -608,9 +608,18 @@ export default function AboutPage() {
               </span>
             </p>
             <p className="mx-auto mt-2 max-w-[58ch] font-mono text-[11px] leading-relaxed tracking-tight text-gray-400 dark:text-gray-500 sm:mt-3 sm:text-xs">
-              1.2k students in every ResCo use our platform to manage their
-              academic lives at Yale (and counting!). There are zero ads and no
-              fees. And there never will be.
+              <strong className="font-semibold text-gray-500 dark:text-gray-300">
+                1.2k students
+              </strong>{" "}
+              <strong className="font-semibold text-gray-500 dark:text-gray-300">
+                in every ResCo
+              </strong>{" "}
+              use our platform to manage their academic lives at Yale (and
+              counting!). There are{" "}
+              <strong className="font-semibold text-gray-500 dark:text-gray-300">
+                zero ads and no fees.
+              </strong>{" "}
+              And there never will be. Oh, and our code is open-source!
             </p>
           </div>
         </div>

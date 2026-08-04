@@ -233,7 +233,12 @@ export default function SimulatorGradesSection({
                                 {fmt(t.termGPA)}
                               </span>
                             </span>
+                            {/* The second figure is the running cumulative GPA,
+                                not another per-term one. It carried only a
+                                trend arrow, which left two bare numbers side by
+                                side, so it is labelled like the term figure. */}
                             <span className="flex items-center gap-1 text-[10px] text-gray-400 dark:text-gray-500 tabular-nums">
+                              overall
                               <TrendArrow
                                 curr={t.cumulativeGPA.gpa}
                                 prev={prev}

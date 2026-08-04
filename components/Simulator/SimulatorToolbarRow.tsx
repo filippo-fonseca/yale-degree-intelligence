@@ -23,6 +23,7 @@ import SimulatorQuickSave, { type QuickSaveState } from "./SimulatorQuickSave";
 export default function SimulatorToolbarRow({
   view,
   setView,
+  showProgressNew = false,
   planName,
   planIsDefault,
   hasChanges,
@@ -34,6 +35,7 @@ export default function SimulatorToolbarRow({
 }: {
   view: SimulatorView;
   setView: (view: SimulatorView) => void;
+  showProgressNew?: boolean;
   planName: string | null;
   planIsDefault: boolean;
   hasChanges: boolean;
@@ -63,7 +65,11 @@ export default function SimulatorToolbarRow({
         </AnimatePresence>
       </div>
       <div data-sim-toolbar-view-row>
-        <SimulatorViewSwitcher view={view} setView={setView} />
+        <SimulatorViewSwitcher
+          view={view}
+          setView={setView}
+          showProgressNew={showProgressNew}
+        />
       </div>
     </div>
   );

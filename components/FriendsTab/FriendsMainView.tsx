@@ -10,17 +10,12 @@ import {
   FiUser,
   FiUserCheck,
   FiMail,
-  FiCopy,
   FiAlertTriangle,
-  FiExternalLink,
-  FiSettings,
-  FiChevronDown,
 } from "react-icons/fi";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "react-hot-toast";
 import type { User } from "firebase/auth";
 import { Course, FriendsProfileVisibility } from "@/lib/types";
-import { PublicProfileView } from "@/components/FriendsProfile/PublicProfileView";
 import { YearBadge } from "../ui/YearBadge";
 import { UserAvatar } from "../ui/UserAvatar";
 import { Skeleton } from "../ui/Skeleton";
@@ -41,6 +36,7 @@ import {
 import { MoreOptionsDropdown } from "./MoreOptionsDropdown";
 import { FriendActionsDropdown } from "./FriendActionsDropdown";
 import { FriendsSearchModal } from "./FriendsSearchModal";
+import { PublicPageCard } from "./PublicPageCard";
 
 type FriendsMainViewProps = {
   user: User;
@@ -135,115 +131,16 @@ export function FriendsMainView({
         </p>
       </div>
 
-      <section className="mb-6 p-4 rounded-xl bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 backdrop-blur-md border border-gray-200 dark:border-white/[0.08] shadow-neu">
-        <p className="text-xs font-semibold uppercase tracking-wider text-pink-600 dark:text-pink-400 mb-3">
-          Your public page
-        </p>
-        <div className="rounded-xl overflow-hidden bg-gray-950 p-2 mb-3">
-          <PublicProfileView
-            profile={{
-              displayName: user?.displayName || undefined,
-              email: user?.email || undefined,
-              photoURL: user?.photoURL || undefined,
-              majors: userProfile?.majors || [],
-              graduationYear: userProfile?.graduationYear,
-              bio: userProfile?.bio,
-            }}
-            courses={courses}
-            visibility={profileVisibility}
-            isPreview
-            isOwnProfile
-          />
-        </div>
-        <div className="mt-3 flex flex-wrap gap-2">
-          <button
-            type="button"
-            onClick={() => {
-              if (!profileShareUrl) return;
-              navigator.clipboard.writeText(profileShareUrl);
-              toast.success("Link copied to clipboard!");
-            }}
-            className="flex-1 min-w-[100px] inline-flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-medium rounded-lg bg-pink-50 dark:bg-pink-900/20 text-pink-600 dark:text-pink-300 border border-pink-200 dark:border-pink-800/40 hover:bg-pink-100 dark:hover:bg-pink-800/30 transition"
-          >
-            <FiCopy size={12} />
-            Copy link
-          </button>
-          <Link
-            href={user ? `/user/${user.uid}` : "#"}
-            target="_blank"
-            className="flex-1 min-w-[100px] inline-flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-medium rounded-lg bg-gray-50 dark:bg-white/[0.04] text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-white/[0.08] hover:border-pink-300 dark:hover:border-pink-500/40 hover:text-pink-600 dark:hover:text-pink-300 transition"
-          >
-            <FiExternalLink size={12} />
-            Open my page
-          </Link>
-          <button
-            type="button"
-            onClick={() => setShowCustomize((v) => !v)}
-            className="flex-1 min-w-[100px] inline-flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-medium rounded-lg bg-purple-500/10 text-purple-700 dark:text-purple-300 border border-purple-500/30 hover:bg-purple-500/20 transition"
-          >
-            <FiSettings size={12} />
-            Customize
-            <FiChevronDown
-              size={12}
-              className={`transition-transform ${showCustomize ? "rotate-180" : ""}`}
-            />
-          </button>
-        </div>
-
-        <AnimatePresence>
-          {showCustomize && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: "auto" }}
-              exit={{ opacity: 0, height: 0 }}
-              className="overflow-hidden"
-            >
-              <div className="mt-4 pt-4 border-t border-gray-200 dark:border-white/[0.06]">
-                <p className="text-[11px] text-gray-500 dark:text-gray-400 mb-3">
-                  This is what friends see on your page.
-                </p>
-                <div className="space-y-2">
-                  {(
-                    [
-                      { key: "showBio", label: "Bio" },
-                      { key: "showStats", label: "Stats overview" },
-                      { key: "showDistributionals", label: "Distributionals" },
-                      { key: "showCourses", label: "Course list" },
-                    ] as const
-                  ).map(({ key, label }) => (
-                    <label
-                      key={key}
-                      className="flex items-center justify-between p-2.5 rounded-lg bg-gray-50 dark:bg-white/[0.03] border border-gray-200/70 dark:border-white/[0.06] cursor-pointer"
-                    >
-                      <span className="text-xs text-gray-700 dark:text-gray-300">{label}</span>
-                      <button
-                        type="button"
-                        role="switch"
-                        aria-checked={resolvedVisibility[key]}
-                        disabled={savingVisibility}
-                        onClick={() =>
-                          updateVisibility({ [key]: !resolvedVisibility[key] })
-                        }
-                        className={`relative w-9 h-5 rounded-full transition-colors ${
-                          resolvedVisibility[key]
-                            ? "bg-pink-500"
-                            : "bg-gray-300 dark:bg-gray-600"
-                        }`}
-                      >
-                        <span
-                          className={`absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform ${
-                            resolvedVisibility[key] ? "translate-x-4" : ""
-                          }`}
-                        />
-                      </button>
-                    </label>
-                  ))}
-                </div>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </section>
+      <PublicPageCard
+        user={user}
+        userProfile={userProfile}
+        shareUrl={profileShareUrl}
+        resolvedVisibility={resolvedVisibility}
+        savingVisibility={savingVisibility}
+        updateVisibility={updateVisibility}
+        showCustomize={showCustomize}
+        onToggleCustomize={() => setShowCustomize((v) => !v)}
+      />
 
       <div className="flex justify-end mb-5">
         <motion.button

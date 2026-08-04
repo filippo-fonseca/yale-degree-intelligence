@@ -18,7 +18,7 @@ export interface NavItem {
 export function createNavItems(
   majorsCount: number,
   certificatesCount: number,
-  options?: { isBrandNew?: boolean },
+  options?: { isBrandNew?: boolean; showCertificatesNew?: boolean },
 ): NavItem[] {
   const brandNewBadge = options?.isBrandNew ? "2030 can use!" : undefined;
   return [
@@ -35,9 +35,15 @@ export function createNavItems(
       badge: brandNewBadge,
     },
     {
+      // Always plural. The tab is where you pick up certificates as much as
+      // where you track them, so it read oddly as "My certificate" for anyone
+      // holding exactly one, and it flickered between labels on add/remove.
       id: "certificate",
       icon: RiAwardFill,
-      label: certificatesCount === 1 ? "My certificate" : "My certificates",
+      label: "My certificates",
+      // Falls back to the 2030 nudge if that is running, so a single slot never
+      // has to show two chips.
+      badge: brandNewBadge ?? (options?.showCertificatesNew ? "New" : undefined),
     },
     {
       id: "simulator",

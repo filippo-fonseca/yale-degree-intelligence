@@ -545,7 +545,11 @@ export default function AboutPage() {
               a fixed size, keeping the hero as large as it can be while still
               fitting both lines whole. It tops out at 48px, the previous size,
               so nothing changes from sm upward. */}
-          <h1 className="mt-5 whitespace-nowrap text-[clamp(1.9rem,10.4vw,3rem)] font-medium leading-[1.05] tracking-[-0.02em] text-gray-900 dark:text-white md:mt-6 md:text-6xl lg:text-[4.5rem]">
+          {/* leading-[1.05] was tight enough that the descender of "plane" hit
+              the ascender of "degree" on the line below. Louize has a long
+              descender, so the hero needs a little more than the display
+              default. */}
+          <h1 className="mt-5 whitespace-nowrap text-[clamp(1.9rem,10.4vw,3rem)]/[1.25] font-medium tracking-[-0.02em] text-gray-900 dark:text-white md:mt-6 md:text-6xl/[1.25] lg:text-[4.5rem]/[1.25]">
             The control plane
             <br />
             <span className="text-gray-400 dark:text-gray-500">
@@ -556,7 +560,10 @@ export default function AboutPage() {
           {/* 3. Subhead */}
           <p className="mx-auto mt-4 max-w-[60ch] font-sf text-sm leading-relaxed text-gray-500 dark:text-gray-400 md:mt-5 md:text-base">
             Plan semesters, track requirements, simulate outcomes, and see
-            exactly how your degree is going. Built by Yalies, for Yalies.
+            exactly how your degree is going.{" "}
+            <span className="font-semibold text-gray-700 dark:text-gray-200">
+              Built by Yalies, for Yalies. ❤️
+            </span>
           </p>
 
           {/* 4. CTA row */}
@@ -573,8 +580,9 @@ export default function AboutPage() {
           </div>
 
           {/* 5. Mono microcopy */}
-          <p className="mt-4 font-mono text-xs tracking-tight text-gray-400 dark:text-gray-500">
-            Free forever · No install
+          <p className="mx-auto mt-4 max-w-[46ch] font-mono text-xs leading-relaxed tracking-tight text-gray-400 dark:text-gray-500">
+            We made this to be free forever. It requires no installation and
+            minimal setup.
           </p>
 
           {/* 6. Social proof (sits above the launch film) */}
@@ -586,8 +594,10 @@ export default function AboutPage() {
                 Some of them even like it.
               </span>
             </p>
-            <p className="mt-2 font-mono text-[11px] tracking-tight text-gray-400 dark:text-gray-500 sm:mt-3 sm:text-xs">
-              ~1,200 students · every residential college · zero ads, zero fees
+            <p className="mx-auto mt-2 max-w-[58ch] font-mono text-[11px] leading-relaxed tracking-tight text-gray-400 dark:text-gray-500 sm:mt-3 sm:text-xs">
+              1.2k students in every ResCo use our platform to manage their
+              academic lives at Yale (and counting!). There are zero ads and no
+              fees. And there never will be.
             </p>
           </div>
         </div>
@@ -1643,7 +1653,7 @@ function YdnBanner() {
               rel="noopener noreferrer"
               className="transition-opacity hover:opacity-80"
             >
-              Featured in the Yale Daily News{" "}
+              read our feature in the Yale Daily News (YDN){" "}
               <span aria-hidden className="opacity-70">
                 ↗
               </span>

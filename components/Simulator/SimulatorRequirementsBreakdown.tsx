@@ -64,11 +64,14 @@ function ProgressRing({
   size = 36,
   strokeWidth = 3.5,
   accent = "purple",
+  showLabel = false,
 }: {
   percentage: number;
   size?: number;
   strokeWidth?: number;
   accent?: Accent;
+  /** Print the percentage in the middle of the ring. */
+  showLabel?: boolean;
 }) {
   const radius = (size - strokeWidth) / 2;
   const circumference = 2 * Math.PI * radius;
@@ -76,7 +79,10 @@ function ProgressRing({
   const offset = circumference - (pct / 100) * circumference;
   const gradientId = `simRingGrad-${accent}`;
 
-  return (
+  // The label has to be overlaid rather than put inside the <svg>: the svg is
+  // counter-rotated so the arc starts at 12 o'clock, and any text within it
+  // would be rotated with it.
+  const ring = (
     <svg
       width={size}
       height={size}
@@ -136,6 +142,20 @@ function ProgressRing({
         </linearGradient>
       </defs>
     </svg>
+  );
+
+  if (!showLabel) return ring;
+
+  return (
+    <span
+      className="relative inline-flex flex-shrink-0 items-center justify-center"
+      style={{ width: size, height: size }}
+    >
+      {ring}
+      <span className="absolute inset-0 flex items-center justify-center text-[9px] font-semibold tabular-nums leading-none text-gray-700 dark:text-gray-200">
+        {Math.round(pct)}%
+      </span>
+    </span>
   );
 }
 
@@ -569,11 +589,14 @@ function ProgramProgressCard({
         onClick={onToggle}
         className="w-full flex items-center gap-2.5 p-3 text-left hover:bg-gray-100 dark:hover:bg-gray-800/20 transition-colors"
       >
+        {/* The ring tracks the with-planned figure, so it prints that number.
+            Sized up from 32 to leave room for the label to stay legible. */}
         <ProgressRing
           percentage={pctWithPlanned}
-          size={32}
+          size={42}
           strokeWidth={3}
           accent={accent}
+          showLabel
         />
 
         <div className="flex-1 min-w-0">

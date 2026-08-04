@@ -36,7 +36,11 @@ export function FriendsOptInPrompt({ onToggleFriends }: FriendsOptInPromptProps)
           <p className="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-2">
             What your page could look like
           </p>
-          <div className="rounded-xl overflow-hidden bg-gray-950 p-2">
+          {/* Pinned dark on purpose: PublicProfileView carries no light-mode
+              variants, because the shared page is always a dark surface. The
+              frame has to match it in both themes or the preview's own text
+              colours land on the wrong background. */}
+          <div className="rounded-xl overflow-hidden border border-white/[0.06] bg-gray-950 p-2">
             <PublicProfileView
               profile={{
                 displayName: DEMO_PREVIEW_USER.displayName,

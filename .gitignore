@@ -52,3 +52,14 @@ ycps-cache/
 
 # generated campaign emails (rebuild with: node emails/build.mjs)
 /emails/dist/
+
+# Internal ops docs and session records — not for the public repo.
+# Firestore rules live in the Firebase console; keeping a copy here would
+# publish the authorization model. Ops runbooks reference console steps and
+# environment names.
+/docs/internal/
+/docs/firestore-rules.md
+/docs/*_OPS_*.md
+.bgsd/ledger.md
+.bgsd/config.json
+.planning/config.json

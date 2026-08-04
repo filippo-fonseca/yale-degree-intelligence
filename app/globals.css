@@ -744,6 +744,41 @@ body {
   --shiny-bg-subtle: #171717;
 }
 
+/*
+  Light mode needs the sweep to work harder. On a dark page the 1px pink border
+  reads easily, because the whole button is only slightly lighter than what
+  surrounds it. Drop the same button onto white and the eye goes to the
+  black-against-white edge instead, and a 1px accent inside that edge
+  disappears.
+
+  So in light mode the border carrying the conic gradient gets thicker, the
+  inset line that would eat into it is dropped, and the pill gains a soft pink
+  halo so the travelling highlight is visible against the page rather than
+  competing with the pill's own silhouette.
+*/
+:root:not(.dark) .shiny-cta {
+  border-width: 2px;
+  box-shadow:
+    0 0 0 1px rgba(236, 72, 153, 0.1),
+    0 4px 14px -4px rgba(236, 72, 153, 0.35);
+}
+
+:root:not(.dark) .shiny-cta:is(:hover, :focus-visible) {
+  box-shadow:
+    0 0 0 1px rgba(236, 72, 153, 0.18),
+    0 6px 20px -4px rgba(236, 72, 153, 0.5);
+}
+
+/* The dot texture and inner shimmer are tuned for near-black; lift them a
+   little so they still register through the thicker light-mode border. */
+:root:not(.dark) .shiny-cta::before {
+  opacity: 0.45;
+}
+
+:root:not(.dark) .shiny-cta::after {
+  opacity: 0.65;
+}
+
 .shiny-cta::before,
 .shiny-cta::after,
 .shiny-cta .shiny-cta-label::before {

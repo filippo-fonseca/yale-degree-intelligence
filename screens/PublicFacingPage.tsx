@@ -586,18 +586,20 @@ export default function AboutPage() {
             <GhostCTA onClick={() => setShowVideoModal(true)}>
               Watch the launch film
             </GhostCTA>
-            {/* Sized from the same CTA_SIZES map as its neighbours, so the row
-                stays one height. Quieter than the ghost button on purpose: it
-                matters to a subset of readers, and the login CTA should still
-                win the row. */}
+          </div>
+
+          {/* Its own row beneath the primaries, and smaller than them. This is
+              for the minority of readers who care, so it should not compete with
+              the login CTA for the eye. */}
+          <div className="mt-3 flex justify-center font-sf">
             <a
               href={REPO_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className={`inline-flex items-center justify-center rounded-full font-medium ${CTA_SIZES.md} border border-black/10 bg-transparent text-gray-600 transition-colors hover:border-black/20 hover:text-gray-900 dark:border-white/15 dark:text-gray-400 dark:hover:border-white/25 dark:hover:text-white`}
+              className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs text-gray-500 transition-colors hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
             >
-              <FaGithub size={14} aria-hidden />
-              View source code
+              <FaGithub size={12} aria-hidden />
+              for the nerds: view source code
             </a>
           </div>
 

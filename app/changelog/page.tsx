@@ -156,8 +156,11 @@ export default function ChangelogPage() {
             transition={{ duration: 0.8, delay: 0.12 }}
             className="mx-auto mt-5 max-w-xl text-pretty text-base leading-relaxed text-gray-600 dark:text-white/60 sm:text-lg"
           >
-            A running history of DegreeIntelligence, from the first launch to the
-            release you are using today. Free, always.
+            This is a running history of DegreeIntelligence and its development
+            over the years. Since we started in August 2025, a lot has changed!
+            But our principle remains the same: free forever, we want to
+            democratize academic planning and success at Yale. Built for
+            students, by students.
           </motion.p>
         </div>
       </header>

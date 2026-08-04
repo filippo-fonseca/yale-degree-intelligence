@@ -30,11 +30,27 @@ export default function PieChartWrapper({
   showLegend = true,
 }: PieChartWrapperProps) {
   const [isMounted, setIsMounted] = useState(false);
-  const { resolvedTheme } = useTheme();
-  const isDark = resolvedTheme === "dark";
+  /**
+   * Read the theme off the <html> class rather than from context.
+   *
+   * Chart.js paints the legend into a canvas, so its color is baked in at draw
+   * time and cannot inherit anything from CSS. That makes it the one place a
+   * disagreement between context state and the class actually on the document
+   * shows up as unreadable text, which is what happened here: dark page, legend
+   * drawn in the light-mode gray. Reading the class is the same source of truth
+   * the rest of the page paints from, so the two cannot diverge, and the
+   * observer keeps it correct when the theme toggle flips the class.
+   */
+  const [isDark, setIsDark] = useState(true);
 
   useEffect(() => {
     setIsMounted(true);
+    const root = document.documentElement;
+    const sync = () => setIsDark(root.classList.contains("dark"));
+    sync();
+    const observer = new MutationObserver(sync);
+    observer.observe(root, { attributes: true, attributeFilter: ["class"] });
+    return () => observer.disconnect();
   }, []);
 
   // Check for valid data

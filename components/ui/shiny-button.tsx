@@ -32,7 +32,12 @@ export interface ShinyButtonProps {
   "aria-label"?: string;
 }
 
-const SIZES: Record<ShinyButtonSize, string> = {
+/**
+ * Shared size tokens for every landing CTA, shiny or ghost. Exported so the
+ * secondary buttons size from the same source: a CTA pair sitting side by side
+ * has to agree on padding and type, and two hand-copied class strings drift.
+ */
+export const CTA_SIZES: Record<ShinyButtonSize, string> = {
   // Matches the padding and type scale the landing page already uses, so
   // swapping the old CTAs for this one doesn't change the page's rhythm.
   sm: "gap-1.5 px-4 py-1.5 text-sm",
@@ -51,7 +56,7 @@ export function ShinyButton({
 }: ShinyButtonProps) {
   const cls = cn(
     "shiny-cta inline-flex items-center justify-center font-medium",
-    SIZES[size],
+    CTA_SIZES[size],
     className,
   );
 

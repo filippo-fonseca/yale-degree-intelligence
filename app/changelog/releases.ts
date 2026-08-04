@@ -45,6 +45,7 @@ export const RELEASES: Release[] = [
           "The headline fits properly on a phone. It used to break in the middle of \"Yale degree\"; now it sits on two clean lines and scales itself to your screen.",
           "The log-in buttons just say \"Log in with @yale.edu email\".",
           "If you prefer less motion on screen, the shine stays still. We follow your system's reduce-motion setting.",
+          "A quiet night sky behind the homepage headline. Stars drift and twinkle, and the whole field leans toward your cursor. It holds still if your system asks for reduced motion.",
           "Buttons that sit next to each other are now the same size, and the in-page buttons are no longer undersized.",
           "The Stats preview is wider. Its charts were being squeezed into the narrow half of the page, so the widgets had less room than the text beside them.",
           "The grade-distribution chart's legend is readable in dark mode. It was being drawn in the light-mode grey on a dark background.",

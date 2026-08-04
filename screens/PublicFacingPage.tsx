@@ -20,7 +20,11 @@ import {
 } from "react-icons/fi";
 import { FaLinkedinIn } from "react-icons/fa";
 import LogoIcon from "@/icons/LogoIcon";
-import { ShinyButton } from "@/components/ui/shiny-button";
+import {
+  ShinyButton,
+  CTA_SIZES,
+  type ShinyButtonSize,
+} from "@/components/ui/shiny-button";
 import Link from "next/link";
 import { useState, useRef, useEffect } from "react";
 import dynamic from "next/dynamic";
@@ -698,6 +702,7 @@ export default function AboutPage() {
         actions={
           <>
             <MonoCTA
+              size="md"
               onClick={() => startLogin("simulator")}
               pending={authPendingId === "simulator"}
             >
@@ -749,6 +754,7 @@ export default function AboutPage() {
         ]}
         actions={
           <MonoCTA
+            size="md"
             onClick={() => startLogin("stats")}
             pending={authPendingId === "stats"}
           >
@@ -1016,6 +1022,7 @@ export default function AboutPage() {
         ]}
         actions={
           <MonoCTA
+            size="md"
             onClick={() => startLogin("major")}
             pending={authPendingId === "major"}
           >
@@ -1231,6 +1238,7 @@ export default function AboutPage() {
         ]}
         actions={
           <MonoCTA
+            size="md"
             onClick={() => startLogin("friends")}
             pending={authPendingId === "friends"}
           >
@@ -1430,9 +1438,6 @@ export default function AboutPage() {
               Log in with @yale.edu email
             </BrandCTA>
           </div>
-          <p className="mt-5 font-mono text-xs tracking-tight text-gray-400 dark:text-gray-500">
-            free · instant · yale google
-          </p>
         </motion.div>
       </section>
 
@@ -1476,8 +1481,9 @@ export default function AboutPage() {
           </nav>
 
           <p className="text-center font-mono text-xs tracking-tight text-gray-400 dark:text-gray-500 max-w-lg mx-auto">
-            © {new Date().getFullYear()} DegreeIntelligence · not affiliated
-            with Yale University · free forever, never a dime
+            © {new Date().getFullYear()} DegreeIntelligence
+            <br />
+            not affiliated with Yale University · free forever, never a dime
           </p>
         </div>
       </footer>
@@ -1898,6 +1904,12 @@ type CTAProps = {
   className?: string;
   /** §11: the pressed CTA disables itself and says so while the popup is open. */
   pending?: boolean;
+  /**
+   * Both buttons in a side-by-side pair must pass the same size, or they end up
+   * different heights. Sizes come from CTA_SIZES so primary and ghost cannot
+   * drift apart.
+   */
+  size?: ShinyButtonSize;
 };
 
 /** The one pending treatment: a label swap, disabled, dimmed. No spinner ring. */
@@ -1923,10 +1935,11 @@ function BrandCTA({
   href,
   className = "",
   pending = false,
+  size = "md",
 }: CTAProps) {
   return (
     <ShinyButton
-      size="md"
+      size={size}
       withArrow
       href={href}
       onClick={onClick}
@@ -1945,10 +1958,11 @@ function MonoCTA({
   href,
   className = "",
   pending = false,
+  size = "sm",
 }: CTAProps) {
   return (
     <ShinyButton
-      size="sm"
+      size={size}
       href={href}
       onClick={onClick}
       pending={pending}
@@ -1959,9 +1973,22 @@ function MonoCTA({
   );
 }
 
-/** (c) Ghost secondary. */
-function GhostCTA({ children, onClick, href, className = "" }: CTAProps) {
-  const cls = `inline-flex items-center gap-2 rounded-full px-6 py-3 text-sm font-medium bg-white text-gray-900 ring-1 ring-black/10 dark:bg-white/[0.06] dark:text-white dark:ring-white/15 ${className}`;
+/**
+ * (c) Ghost secondary.
+ *
+ * Sizes from CTA_SIZES so it matches whichever primary it sits beside, and
+ * uses `border` rather than `ring` for its outline: a ring is a box-shadow and
+ * takes up no layout, so against the shiny pill's 1px border the ghost came out
+ * 2px shorter at the same size.
+ */
+function GhostCTA({
+  children,
+  onClick,
+  href,
+  className = "",
+  size = "md",
+}: CTAProps) {
+  const cls = `inline-flex items-center justify-center rounded-full font-medium ${CTA_SIZES[size]} border border-black/10 bg-white text-gray-900 dark:border-white/15 dark:bg-white/[0.06] dark:text-white ${className}`;
   if (href)
     return (
       <motion.a whileHover={{ y: -1 }} href={href} className={cls}>
@@ -2042,11 +2069,22 @@ function FeatureSection({
 }) {
   return (
     <section id={id} className="px-4 py-24 lg:px-6">
+      {/* The mock always gets the larger fraction. Because `mockSide: "left"`
+          moves the mock into the FIRST grid column via order-1, the column
+          template has to flip with it: a fixed [4fr,8fr] handed the mock the
+          narrow 4fr track and the prose the wide 8fr one, so `wideMock` was
+          squeezing the very demos it was meant to widen. */}
       <div
         className={`mx-auto grid items-center gap-12 ${
+          wideMock ? "max-w-7xl" : "max-w-6xl"
+        } ${
           wideMock
-            ? "max-w-7xl lg:grid-cols-[4fr,8fr]"
-            : "max-w-6xl lg:grid-cols-[5fr,7fr]"
+            ? mockSide === "left"
+              ? "lg:grid-cols-[8fr,4fr]"
+              : "lg:grid-cols-[4fr,8fr]"
+            : mockSide === "left"
+              ? "lg:grid-cols-[7fr,5fr]"
+              : "lg:grid-cols-[5fr,7fr]"
         }`}
       >
         <motion.div

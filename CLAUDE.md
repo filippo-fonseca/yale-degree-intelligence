@@ -21,26 +21,3 @@ the one exception, and it stays scoped to parsing.
 
 Do not reintroduce a chat surface, a BYOK key store, or an MCP endpoint without
 an explicit decision to do so. GitHub issue #37 (Dan) is closed by that removal.
-
-<!-- bgsd:managed -->
-## bgsd (this is a bgsd repo)
-
-This repository is orchestrated by **bgsd** (the Conductor, "Kiwi"), an
-autonomous, self-verifying layer on top of GSD.
-
-**Where the history lives.** Every bgsd session is logged under `.bgsd/`.
-When you need context on what was built or changed, read there, even outside
-a bgsd session:
-- `.bgsd/ledger.md`: an index of every session (the request and the outcome).
-- `.bgsd/seshs/<run-id>/`: the per-session record (RUN.md, AGENTS.md for what
-  each subagent did, plus the aggregated planning markdown).
-- Search it all with `node "${CLAUDE_PLUGIN_ROOT}/scripts/kb.mjs" --query "<terms>"`
-  (for example, "auth middleware").
-
-**Before building.** If the user asks you to build, change, or fix something
-and has NOT already started a session, first ask whether they want to run it
-as a bgsd session (`/bgsd-sesh "<their request>"`) for the full verified,
-parallel pipeline. If yes, start it. If they decline or want something quick,
-just do it directly as normal Claude Code. Default to asking; never silently
-force a session.
-<!-- bgsd:managed -->

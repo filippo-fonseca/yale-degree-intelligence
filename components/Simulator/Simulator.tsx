@@ -1740,8 +1740,10 @@ export default function Simulator({
                 </h4>
                 <ul className="text-xs text-gray-500 dark:text-gray-400 space-y-1.5 list-disc list-inside">
                   <li>
-                    Use this simulator to plan out your remaining semesters and see
-                    fit.
+                    Plan your remaining semesters on the Canvas: use Add on any
+                    upcoming semester to drop a course in, and drag planned
+                    courses between semesters to move them. Multiple courses per
+                    term work fine.
                   </li>
                   {SHOW_QUICK_ADD_POOL && (
                     <li>
@@ -1750,20 +1752,27 @@ export default function Simulator({
                     </li>
                   )}
                   <li>
-                    Use Add on any semester to put a course in it, and drag a
-                    planned course between semesters to move it.
+                    Past semesters are locked: completed and in-progress courses
+                    are pre-assigned and cannot be moved. Click the trash icon on
+                    a planned course to remove it.
                   </li>
                   <li>
-                    Multiple courses per term work fine.
+                    Turn on the Grades and Distributionals editors to give each
+                    planned course a hypothetical grade and distributional
+                    spread.
                   </li>
                   <li>
-                    Click the trash icon on a course to remove it (if it's not
-                    completed/in-progress).
+                    Open Projected progress + results for the live readouts:
+                    major and certificate progress, your simulated GPA timeline,
+                    and the distributional tally, all reflecting what's on the
+                    grid.
                   </li>
                   <li>
-                    Completed/in-progress are pre-assigned and cannot be moved.
+                    Save your work as named plans to explore what-ifs and
+                    revisit later. When you have unsaved changes, the Save
+                    button (or Cmd/Ctrl+S) writes them back to the plan you're
+                    on.
                   </li>
-                  <li>Save or load plans to explore what-ifs and revisit later.</li>
                 </ul>
               </motion.div>
             )}

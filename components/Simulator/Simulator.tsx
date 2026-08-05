@@ -1696,10 +1696,11 @@ export default function Simulator({
           {/* Announces what Progress can now do, since nothing on Canvas would
               tell you. Sits here rather than in Progress because a user who has
               already opened Progress does not need telling. */}
+          {/* 15 is not in Tailwind's opacity scale, so a dark bg with a
+              slash-15 modifier silently compiles to nothing and dark mode
+              falls back to the light lavender. Stick to scale values
+              (20, 25, 40). */}
           {progressNew.show && (
-            {/* /15 is not in Tailwind's opacity scale, so a dark:bg-*/15 here
-                silently compiles to nothing and dark mode falls back to the
-                light lavender. Stick to scale values (20, 25, 40). */}
             <div className="mb-4 flex items-start gap-2.5 rounded-xl border border-purple-200 bg-purple-50/70 px-3.5 py-2.5 dark:border-purple-800/40 dark:bg-purple-900/25">
               <span className="mt-1.5 h-2 w-2 flex-shrink-0 rounded-full bg-pink-500" />
               <p className="flex-1 text-xs leading-relaxed text-gray-700 dark:text-gray-200">

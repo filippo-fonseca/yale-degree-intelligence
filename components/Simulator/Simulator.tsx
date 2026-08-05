@@ -1696,8 +1696,12 @@ export default function Simulator({
           {/* Announces what Progress can now do, since nothing on Canvas would
               tell you. Sits here rather than in Progress because a user who has
               already opened Progress does not need telling. */}
+          {/* 15 is not in Tailwind's opacity scale, so a dark bg with a
+              slash-15 modifier silently compiles to nothing and dark mode
+              falls back to the light lavender. Stick to scale values
+              (20, 25, 40). */}
           {progressNew.show && (
-            <div className="mb-4 flex items-start gap-2.5 rounded-xl border border-purple-200 bg-purple-50/70 px-3.5 py-2.5 dark:border-purple-800/40 dark:bg-purple-900/15">
+            <div className="mb-4 flex items-start gap-2.5 rounded-xl border border-purple-200 bg-purple-50/70 px-3.5 py-2.5 dark:border-purple-800/40 dark:bg-purple-900/25">
               <span className="mt-1.5 h-2 w-2 flex-shrink-0 rounded-full bg-pink-500" />
               <p className="flex-1 text-xs leading-relaxed text-gray-700 dark:text-gray-200">
                 <span className="font-semibold">New:</span> you can simulate
@@ -1708,9 +1712,9 @@ export default function Simulator({
                   onClick={() => setActiveView("progress")}
                   className="font-semibold text-purple-700 underline decoration-purple-400/50 underline-offset-2 hover:decoration-purple-500 dark:text-purple-300"
                 >
-                  Progress
+                  Projected progress + results
                 </button>{" "}
-                to see your projected GPA and distributional tally.
+                to see your simulated GPA and distributional tally.
               </p>
               <button
                 type="button"
@@ -1737,8 +1741,10 @@ export default function Simulator({
                 </h4>
                 <ul className="text-xs text-gray-500 dark:text-gray-400 space-y-1.5 list-disc list-inside">
                   <li>
-                    Use this simulator to plan out your remaining semesters and see
-                    fit.
+                    Plan your remaining semesters on the Canvas: use Add on any
+                    upcoming semester to drop a course in, and drag planned
+                    courses between semesters to move them. Multiple courses per
+                    term work fine.
                   </li>
                   {SHOW_QUICK_ADD_POOL && (
                     <li>
@@ -1747,20 +1753,27 @@ export default function Simulator({
                     </li>
                   )}
                   <li>
-                    Use Add on any semester to put a course in it, and drag a
-                    planned course between semesters to move it.
+                    Past semesters are locked: completed and in-progress courses
+                    are pre-assigned and cannot be moved. Click the trash icon on
+                    a planned course to remove it.
                   </li>
                   <li>
-                    Multiple courses per term work fine.
+                    Turn on the Grades and Distributionals editors to give each
+                    planned course a hypothetical grade and distributional
+                    spread.
                   </li>
                   <li>
-                    Click the trash icon on a course to remove it (if it's not
-                    completed/in-progress).
+                    Open Projected progress + results for the live readouts:
+                    major and certificate progress, your simulated GPA timeline,
+                    and the distributional tally, all reflecting what's on the
+                    grid.
                   </li>
                   <li>
-                    Completed/in-progress are pre-assigned and cannot be moved.
+                    Save your work as named plans to explore what-ifs and
+                    revisit later. When you have unsaved changes, the Save
+                    button (or Cmd/Ctrl+S) writes them back to the plan you're
+                    on.
                   </li>
-                  <li>Save or load plans to explore what-ifs and revisit later.</li>
                 </ul>
               </motion.div>
             )}
@@ -1955,7 +1968,7 @@ export default function Simulator({
                       className={`flex-1 flex items-center justify-center border border-dashed rounded-lg p-3 min-h-[48px] transition-all
                         ${
                           hoveredSemester === semester.id && draggedCourse && !isPast
-                            ? "border-pink-400/60 bg-pink-50 dark:bg-pink-900/15"
+                            ? "border-pink-400/60 bg-pink-50 dark:bg-pink-900/20"
                             : "border-gray-200 dark:border-gray-700/50"
                         }`}
                     >

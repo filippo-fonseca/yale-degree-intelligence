@@ -1,6 +1,7 @@
 "use client";
 
 import { FiInfo, FiPlus, FiRefreshCw } from "react-icons/fi";
+import SaveShortcutHint from "./SaveShortcutHint";
 
 /**
  * The Canvas pane's own control row, sitting directly above the semester grid.
@@ -90,7 +91,7 @@ export default function SimulatorCanvasActions({
             data-sim-canvas-save
             title={
               canSave
-                ? "Save what is on the canvas right now"
+                ? "Save what is on the canvas right now (Cmd+S)"
                 : "Nothing new on the canvas to save"
             }
             className={`${verbClass} ${
@@ -101,6 +102,9 @@ export default function SimulatorCanvasActions({
           >
             <FiPlus size={12} />
             Save
+            {canSave && (
+              <SaveShortcutHint className="hidden sm:inline-block border-emerald-600/30 bg-emerald-500/10 dark:border-emerald-400/25 dark:bg-emerald-400/10" />
+            )}
           </button>
         )}
         <button

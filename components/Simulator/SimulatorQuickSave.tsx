@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import { FiCheck, FiLoader, FiSave } from "react-icons/fi";
+import SaveShortcutHint from "./SaveShortcutHint";
 
 /** Idle is the dirty-canvas resting state; saved is the brief confirmation. */
 export type QuickSaveState = "idle" | "saving" | "saved";
@@ -58,13 +59,19 @@ export default function SimulatorQuickSave({
       ) : saving ? (
         <FiLoader size={14} className="shrink-0 animate-spin" />
       ) : (
-        <FiSave size={14} className="shrink-0" />
+        <FiSave size={14} className="shrink-0 sm:hidden" />
       )}
       {/* Below sm the plan name needs every pixel, so the label drops and the
-          icon carries it: a disk to save, a check once it landed. */}
+          icon carries it: a disk to save, a check once it landed. From sm up
+          the idle icon gives way to the shortcut keycap, which sells the
+          habit better than a disk does; a phone has no keyboard, so the hint
+          never shows there. */}
       <span aria-live="polite" className="hidden sm:inline">
         {saved ? "Saved" : saving ? "Saving" : "Save"}
       </span>
+      {!saved && !saving && (
+        <SaveShortcutHint className="hidden sm:inline-block border-white/40 bg-white/10 text-white dark:border-emerald-200/30 dark:bg-white/[0.06] dark:text-emerald-200" />
+      )}
     </motion.button>
   );
 }

@@ -1711,9 +1711,9 @@ export default function Simulator({
                   onClick={() => setActiveView("progress")}
                   className="font-semibold text-purple-700 underline decoration-purple-400/50 underline-offset-2 hover:decoration-purple-500 dark:text-purple-300"
                 >
-                  Progress
+                  Projected progress + results
                 </button>{" "}
-                to see your projected GPA and distributional tally.
+                to see your simulated GPA and distributional tally.
               </p>
               <button
                 type="button"

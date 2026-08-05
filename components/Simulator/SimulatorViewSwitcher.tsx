@@ -4,7 +4,7 @@ export type SimulatorView = "canvas" | "progress";
 
 const VIEWS: { id: SimulatorView; label: string }[] = [
   { id: "canvas", label: "Canvas" },
-  { id: "progress", label: "Progress" },
+  { id: "progress", label: "Projected progress + results" },
 ];
 
 /**

@@ -1697,7 +1697,10 @@ export default function Simulator({
               tell you. Sits here rather than in Progress because a user who has
               already opened Progress does not need telling. */}
           {progressNew.show && (
-            <div className="mb-4 flex items-start gap-2.5 rounded-xl border border-purple-200 bg-purple-50/70 px-3.5 py-2.5 dark:border-purple-800/40 dark:bg-purple-900/15">
+            {/* /15 is not in Tailwind's opacity scale, so a dark:bg-*/15 here
+                silently compiles to nothing and dark mode falls back to the
+                light lavender. Stick to scale values (20, 25, 40). */}
+            <div className="mb-4 flex items-start gap-2.5 rounded-xl border border-purple-200 bg-purple-50/70 px-3.5 py-2.5 dark:border-purple-800/40 dark:bg-purple-900/25">
               <span className="mt-1.5 h-2 w-2 flex-shrink-0 rounded-full bg-pink-500" />
               <p className="flex-1 text-xs leading-relaxed text-gray-700 dark:text-gray-200">
                 <span className="font-semibold">New:</span> you can simulate
@@ -1955,7 +1958,7 @@ export default function Simulator({
                       className={`flex-1 flex items-center justify-center border border-dashed rounded-lg p-3 min-h-[48px] transition-all
                         ${
                           hoveredSemester === semester.id && draggedCourse && !isPast
-                            ? "border-pink-400/60 bg-pink-50 dark:bg-pink-900/15"
+                            ? "border-pink-400/60 bg-pink-50 dark:bg-pink-900/20"
                             : "border-gray-200 dark:border-gray-700/50"
                         }`}
                     >

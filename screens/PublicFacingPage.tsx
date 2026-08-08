@@ -1420,16 +1420,21 @@ export default function AboutPage() {
             From Yalies, for Yalies.
             <br />
             <span className="text-gray-400 dark:text-gray-500">
-              Because we all deserve better.
+              It started as a spreadsheet.
             </span>
           </h2>
 
           <p className="mx-auto mt-8 max-w-[52ch] font-sf text-base leading-relaxed text-gray-500 dark:text-gray-400 md:text-lg">
-            This will always be free for all of us. Not a business or a startup.
-            I built this for myself to plan out my double major and wanted to
-            share it with others, and since then it has grown exponentially!
-            Makes me so happy to see other people using it and
-            planning/understanding their Yale experience in an easier way.
+            I built this for myself. I was trying to plan a double major,
+            couldn't keep it straight in a spreadsheet, so I made something that
+            could. Then I shared it, and it got away from me in the best way.
+            Watching other people use it to make sense of their own time here is
+            still the best part of it.
+          </p>
+
+          <p className="mx-auto mt-4 max-w-[52ch] font-sf text-base leading-relaxed text-gray-500 dark:text-gray-400 md:text-lg">
+            It's free, and it stays free. Not a business, not a startup, and
+            never going to be one.
           </p>
 
           {/* Team, a single centered person, no cards */}

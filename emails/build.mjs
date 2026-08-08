@@ -310,22 +310,6 @@ function footer() {
             </td>
           </tr>
 
-          <!--
-            For the developers on the list. Deliberately understated: mono, muted,
-            no button, no border. It should read like a note someone left rather
-            than a second thing we want you to click. The icon is a hosted PNG in
-            two themes because Gmail strips SVG.
-          -->
-          <tr>
-            <td align="center" style="padding: 0 0 18px 0;">
-              <a href="${REPO_URL}" target="_blank" class="t-muted" style="font-family: ${MONO}; font-size: 11px; line-height: 1.6; color: ${LIGHT.muted}; text-decoration: none;">
-                <img src="${LOGO_BASE}/github-light.png" width="14" height="14" alt="" class="logo-light" style="display: inline-block; width: 14px; height: 14px; border: 0; vertical-align: -2px;" />
-                <img src="${LOGO_BASE}/github-dark.png" width="14" height="14" alt="" class="logo-dark" style="display: none; width: 14px; height: 14px; border: 0; vertical-align: -2px;" />
-                &nbsp;for the devs: we're open source now.
-                <span style="text-decoration: underline;">have a look</span>
-              </a>
-            </td>
-          </tr>
 
 ${POSTAL_ADDRESS ? `
           <tr>
@@ -424,6 +408,23 @@ ${button({ label: cta, href: SITE_URL })}
               <p class="t-muted" style="margin: 0; font-family: ${SANS}; font-size: 13px; color: ${LIGHT.muted};">
                 have feedback? just reply to this email.
               </p>
+            </td>
+          </tr>
+
+          <!--
+            The open-source note. Still understated (mono, muted, no button), but
+            it sits with the sign-off rather than down in the legal block, where
+            it was reading as boilerplate and getting skipped. The icon is a
+            hosted PNG in two themes because Gmail strips SVG.
+          -->
+          <tr>
+            <td align="center" style="padding: 14px 0 0 0;">
+              <a href="${REPO_URL}" target="_blank" class="t-secondary" style="font-family: ${MONO}; font-size: 12px; line-height: 1.6; color: ${LIGHT.secondary}; text-decoration: none;">
+                <img src="${LOGO_BASE}/github-light.png" width="14" height="14" alt="" class="logo-light" style="display: inline-block; width: 14px; height: 14px; border: 0; vertical-align: -2px;" />
+                <img src="${LOGO_BASE}/github-dark.png" width="14" height="14" alt="" class="logo-dark" style="display: none; width: 14px; height: 14px; border: 0; vertical-align: -2px;" />
+                &nbsp;btw, for the devs: we're open source now.
+                <span style="text-decoration: underline;">have a look at the repo &rarr;</span>
+              </a>
             </td>
           </tr>
 ${footer()}`;

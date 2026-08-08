@@ -23,8 +23,32 @@ const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..
 const OUT_DIR = path.join(REPO_ROOT, "public", "email");
 const FONT = path.join(REPO_ROOT, "public", "fonts", "louize-medium.otf");
 
-const require = createRequire("/opt/homebrew/lib/node_modules/playwright/");
-const { chromium } = require("/opt/homebrew/lib/node_modules/playwright/index.js");
+/**
+ * Playwright is not a dependency of this project, so it gets resolved from
+ * wherever it happens to be installed. The Homebrew global path was hard-coded
+ * here and stopped existing; PLAYWRIGHT_PACKAGE overrides it now, and the local
+ * node_modules copy is tried first so a plain `npm i -D playwright` is enough.
+ */
+const PLAYWRIGHT_CANDIDATES = [
+  process.env.PLAYWRIGHT_PACKAGE,
+  path.join(REPO_ROOT, "node_modules", "playwright"),
+  "/opt/homebrew/lib/node_modules/playwright",
+  "/usr/local/lib/node_modules/playwright",
+].filter(Boolean);
+
+const playwrightDir = PLAYWRIGHT_CANDIDATES.find((dir) =>
+  fs.existsSync(path.join(dir, "index.js")),
+);
+if (!playwrightDir) {
+  console.error(
+    `build-logo: no playwright install found. Tried:\n  ${PLAYWRIGHT_CANDIDATES.join("\n  ")}\n` +
+      "Install it (npm i -D playwright) or set PLAYWRIGHT_PACKAGE to its directory.",
+  );
+  process.exit(1);
+}
+
+const require = createRequire(`${playwrightDir}/`);
+const { chromium } = require(path.join(playwrightDir, "index.js"));
 
 const CHROMIUM =
   process.env.PLAYWRIGHT_CHROMIUM ??
@@ -40,6 +64,10 @@ const GEAR_PATH =
 const BADGE_PATH =
   "M641.5 0C562.923 0 499 63.9231 499 142.5C499 221.077 562.923 285 641.5 285C720.077 285 784 221.077 784 142.5C784 63.9231 720.077 0 641.5 0ZM698.274 93.5156L653.375 149.649V201.875C653.375 208.442 648.067 213.75 641.5 213.75C634.933 213.75 629.625 208.442 629.625 201.875V149.649L584.726 93.5156C580.629 88.3856 581.472 80.9162 586.578 76.8194C591.72 72.7106 599.178 73.5656 603.274 78.6719L641.5 126.457L679.726 78.6719C683.846 73.5775 691.304 72.7106 696.422 76.8194C701.54 80.9281 702.371 88.3975 698.274 93.5156Z";
 
+/** GitHub's own mark, from their published 16px logo. */
+const GITHUB_PATH =
+  "M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8Z";
+
 const THEMES = {
   light: {
     gearFrom: "#2563eb",
@@ -48,6 +76,9 @@ const THEMES = {
     pinFrom: "#db2777",
     pinTo: "#ec4899",
     wordmark: "#09090b",
+    // Muted on purpose. The repo link is a footnote for the handful of people
+    // who care, not a second call to action.
+    github: "#a1a1aa",
   },
   dark: {
     gearFrom: "#60a5fa",
@@ -56,8 +87,15 @@ const THEMES = {
     pinFrom: "#f472b6",
     pinTo: "#f9a8d4",
     wordmark: "#fafafa",
+    github: "#71717a",
   },
 };
+
+function githubSvg(theme, pixels) {
+  return `<svg width="${pixels}" height="${pixels}" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+  <path d="${GITHUB_PATH}" fill="${theme.github}"/>
+</svg>`;
+}
 
 function markSvg(theme, pixels) {
   return `<svg width="${pixels}" height="${pixels}" viewBox="0 0 784 787" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -134,8 +172,20 @@ async function main() {
       omitBackground: true,
     });
 
+    // GitHub mark for the footer's open-source line. Rendered at 3x its
+    // display size so it stays sharp on retina mail clients.
+    await page.setContent(
+      `<html><body style="margin:0;background:transparent">${githubSvg(theme, 42)}</body></html>`,
+    );
+    await page.locator("svg").screenshot({
+      path: path.join(OUT_DIR, `github-${name}.png`),
+      omitBackground: true,
+    });
+
     await context.close();
-    console.log(`wrote public/email/logo-${name}.png and lockup-${name}.png`);
+    console.log(
+      `wrote public/email/logo-${name}.png, lockup-${name}.png and github-${name}.png`,
+    );
   }
 
   await browser.close();

@@ -440,13 +440,16 @@ export default function AboutPage() {
           className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(circle,rgba(0,0,0,0.05)_1px,transparent_1px)] dark:bg-[radial-gradient(circle,rgba(255,255,255,0.055)_1px,transparent_1px)] [background-size:24px_24px] [mask-image:linear-gradient(to_bottom,black,transparent_55%)]"
         />
 
-        {/* §3 Floating course tiles. Framed around the headline, md+ only.
-            The inner max-w-5xl track matches the headline block's envelope, so
-            the tiles orbit the type instead of hugging the viewport edges. */}
+        {/* §3 Floating course tiles.
+            The track is deliberately wider than the max-w-5xl content column so
+            the tiles land in the gutter beside the type rather than on top of
+            it. That gutter only exists once the window is wide enough, which is
+            why the tiles are xl+ only: below that the headline fills the track
+            and anything floating over it collides with a line of the hero. */}
         <div className="pointer-events-none absolute inset-0 -z-[1]">
-          <div className="relative mx-auto h-full max-w-5xl px-4 lg:px-6">
+          <div className="relative mx-auto h-full max-w-7xl px-4 lg:px-6">
             <FloatingTile
-              className="top-[11%] left-[1%] lg:left-[3%]"
+              className="top-[20%] left-[1%]"
               rotate={-6}
               delay={0}
             >
@@ -459,7 +462,7 @@ export default function AboutPage() {
             </FloatingTile>
 
             <FloatingTile
-              className="top-[14%] right-[1%] lg:right-[4%]"
+              className="top-[21%] right-[1%]"
               rotate={5}
               delay={1.5}
             >
@@ -467,7 +470,7 @@ export default function AboutPage() {
             </FloatingTile>
 
             <FloatingTile
-              className="bottom-[13%] left-[0%] !flex-col !items-start !gap-1.5"
+              className="bottom-[13%] left-[1%] !flex-col !items-start !gap-1.5"
               rotate={4}
               delay={3}
             >
@@ -475,7 +478,7 @@ export default function AboutPage() {
             </FloatingTile>
 
             <FloatingTile
-              className="bottom-[10%] right-[0%] lg:right-[1%]"
+              className="bottom-[9%] right-[1%]"
               rotate={-4}
               delay={4.5}
             >
@@ -489,7 +492,7 @@ export default function AboutPage() {
 
             {/* A tiny GPA sparkline, the stats view in miniature */}
             <FloatingTile
-              className="top-[42%] right-[0%] lg:right-[1%] !flex-col !items-start !gap-1.5"
+              className="top-[42%] right-[1%] !flex-col !items-start !gap-1.5"
               rotate={-5}
               delay={2.2}
             >
@@ -502,7 +505,7 @@ export default function AboutPage() {
                 carrying their own tags, totalled into a projected GPA, shows
                 the part of the app the other tiles don't. */}
             <FloatingTile
-              className="top-[43%] left-[0%] lg:left-[1%] !flex-col !items-stretch !gap-2"
+              className="top-[41%] left-[1%] !flex-col !items-stretch !gap-2"
               rotate={5}
               delay={5.2}
             >
@@ -511,7 +514,7 @@ export default function AboutPage() {
 
             {/* Certificates, the second track alongside the major */}
             <FloatingTile
-              className="top-[5%] left-[15%] lg:left-[19%]"
+              className="top-[3%] left-[1%]"
               rotate={-5}
               delay={6.1}
             >
@@ -527,7 +530,7 @@ export default function AboutPage() {
                 between the GPA sparkline and the ECON chip so it clears the
                 headline's long first line entirely. */}
             <FloatingTile
-              className="top-[66%] right-[0%] lg:right-[1%]"
+              className="top-[66%] right-[1%]"
               rotate={4}
               delay={7.3}
             >
@@ -542,7 +545,7 @@ export default function AboutPage() {
 
             {/* A friend, the one social note in the orbit */}
             <FloatingTile
-              className="top-[5%] right-[17%] lg:right-[21%]"
+              className="top-[3%] right-[1%]"
               rotate={6}
               delay={3.7}
             >
@@ -1769,7 +1772,7 @@ function FloatingTile({
         repeat: Infinity,
         ease: "easeInOut",
       }}
-      className={`absolute hidden md:flex items-center gap-1.5 rounded-lg border border-black/[0.06] dark:border-white/[0.07] bg-white/60 dark:bg-white/[0.035] backdrop-blur-sm px-2.5 py-1.5 shadow-md font-sf opacity-80 dark:opacity-75 ${className}`}
+      className={`hero-tile absolute hidden xl:flex items-center gap-1.5 rounded-lg border border-black/[0.06] dark:border-white/[0.07] bg-white/60 dark:bg-white/[0.035] backdrop-blur-sm px-2.5 py-1.5 shadow-md font-sf opacity-80 dark:opacity-75 ${className}`}
     >
       {children}
     </motion.div>

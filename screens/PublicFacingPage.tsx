@@ -450,10 +450,10 @@ export default function AboutPage() {
               rotate={-6}
               delay={0}
             >
-              <span className="font-mono text-xs text-gray-900 dark:text-white">
+              <span className="font-mono text-[11px] text-gray-900 dark:text-white">
                 CPSC 3230
               </span>
-              <span className="rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] font-medium text-emerald-600 dark:text-emerald-400">
+              <span className="rounded-full bg-emerald-500/10 px-1.5 py-px text-[9px] font-medium text-emerald-600 dark:text-emerald-400">
                 A-
               </span>
             </FloatingTile>
@@ -479,10 +479,10 @@ export default function AboutPage() {
               rotate={-4}
               delay={4.5}
             >
-              <span className="font-mono text-xs text-gray-900 dark:text-white">
+              <span className="font-mono text-[11px] text-gray-900 dark:text-white">
                 ECON 1210
               </span>
-              <span className="rounded-full bg-black/[0.05] px-2 py-0.5 text-[10px] font-medium text-gray-500 dark:bg-white/10 dark:text-gray-400">
+              <span className="rounded-full bg-black/[0.05] px-1.5 py-px text-[9px] font-medium text-gray-500 dark:bg-white/10 dark:text-gray-400">
                 Hum
               </span>
             </FloatingTile>
@@ -515,10 +515,10 @@ export default function AboutPage() {
               rotate={-5}
               delay={6.1}
             >
-              <span className="font-mono text-xs text-gray-900 dark:text-white">
+              <span className="font-mono text-[11px] text-gray-900 dark:text-white">
                 Data Science
               </span>
-              <span className="rounded-full bg-violet-500/10 px-2 py-0.5 text-[10px] font-medium text-violet-600 dark:text-violet-400">
+              <span className="rounded-full bg-violet-500/10 px-1.5 py-px text-[9px] font-medium text-violet-600 dark:text-violet-400">
                 Cert 4/6
               </span>
             </FloatingTile>
@@ -531,10 +531,10 @@ export default function AboutPage() {
               rotate={4}
               delay={7.3}
             >
-              <span className="font-mono text-xs text-gray-900 dark:text-white">
+              <span className="font-mono text-[11px] text-gray-900 dark:text-white">
                 EECS × Econ
               </span>
-              <span className="flex items-center gap-1 rounded-full bg-amber-500/10 px-2 py-0.5 text-[10px] font-medium text-amber-600 dark:text-amber-400">
+              <span className="flex items-center gap-1 rounded-full bg-amber-500/10 px-1.5 py-px text-[9px] font-medium text-amber-600 dark:text-amber-400">
                 <span className="h-1.5 w-1.5 rounded-full bg-amber-500" />2
                 shared
               </span>
@@ -1769,7 +1769,7 @@ function FloatingTile({
         repeat: Infinity,
         ease: "easeInOut",
       }}
-      className={`absolute hidden md:flex items-center gap-2 rounded-xl border border-black/[0.08] dark:border-white/[0.09] bg-white/90 dark:bg-white/[0.05] backdrop-blur px-3 py-2 shadow-lg font-sf dark:opacity-90 ${className}`}
+      className={`absolute hidden md:flex items-center gap-1.5 rounded-lg border border-black/[0.06] dark:border-white/[0.07] bg-white/60 dark:bg-white/[0.035] backdrop-blur-sm px-2.5 py-1.5 shadow-md font-sf opacity-80 dark:opacity-75 ${className}`}
     >
       {children}
     </motion.div>
@@ -1886,7 +1886,7 @@ function SimulatedSemesterCard() {
         </span>
       </div>
 
-      <div className="flex w-[10.5rem] flex-col gap-1">
+      <div className="flex w-[9.5rem] flex-col gap-1">
         {SIM_SEMESTER.map((course) => (
           <div
             key={course.code}

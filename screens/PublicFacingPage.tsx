@@ -618,7 +618,7 @@ export default function AboutPage() {
             </p>
             <p className="mx-auto mt-2 max-w-[58ch] font-mono text-[11px] leading-relaxed tracking-tight text-gray-400 dark:text-gray-500 sm:mt-3 sm:text-xs">
               <strong className="font-semibold text-gray-500 dark:text-gray-300">
-                1.2k students
+                1.2k+ students
               </strong>{" "}
               <strong className="font-semibold text-gray-500 dark:text-gray-300">
                 in every ResCo

@@ -559,10 +559,11 @@ export default function AboutPage() {
               leading is 1.25 because Louize has a long descender: at the original
               1.05 the "p" of plane collided with the "d" of degree below it. */}
           <h1 className="mt-5 text-balance text-[clamp(1.75rem,8.2vw,3rem)]/[1.25] font-medium tracking-[-0.02em] text-gray-900 dark:text-white sm:whitespace-nowrap md:mt-6 md:text-6xl/[1.25] lg:text-[4.5rem]/[1.25]">
-            The open source control plane
+            The <span className="font-louize-bold">open source</span> control
+            plane
             <br className="hidden sm:block" />{" "}
             <span className="text-gray-400 dark:text-gray-500">
-              for your Yale degree.
+              for your <span className="yale-flow">Yale</span> degree.
             </span>
           </h1>
 

@@ -57,6 +57,70 @@
     font-family: var(--font-sf);
   }
 
+  /*
+    Optical bold for Louize, which only ships regular and medium. Asking for
+    font-bold would hand the browser a weight it does not have and get synthetic
+    bolding, which smears a serif at display sizes. Stroking the glyph in its own
+    colour thickens it evenly instead, and paint-order keeps the fill on top so
+    the letterforms stay crisp.
+  */
+  .font-louize-bold {
+    -webkit-text-stroke: 0.03em currentColor;
+    paint-order: stroke fill;
+  }
+
+  /*
+    "Yale" in the hero headline, lit in Yale blue with a highlight running
+    through it, so the one word that says whose degree this is doesn't sit in
+    the same flat grey as the rest of the line.
+
+    Same idea as the pink sweep on the CTA, done the way text allows: the
+    gradient is painted behind the glyphs and clipped to them, then slid
+    sideways. Two blues per theme, because Yale blue is nearly black and
+    disappears on a dark page, and the pale blue that reads there washes out on
+    white.
+  */
+  .yale-flow {
+    --yale-flow-base: #00356b;
+    --yale-flow-spark: #5aa9f5;
+
+    background-image: linear-gradient(
+      100deg,
+      var(--yale-flow-base) 0%,
+      var(--yale-flow-base) 38%,
+      var(--yale-flow-spark) 50%,
+      var(--yale-flow-base) 62%,
+      var(--yale-flow-base) 100%
+    );
+    /* Wider than the word, and swept only across 0% to 100% of that overhang.
+       Anywhere outside that range the image stops covering part of the element,
+       and since the fill is clipped to the glyphs, uncovered means invisible
+       letters rather than unpainted background. */
+    background-size: 260% 100%;
+    background-repeat: no-repeat;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    animation: yale-flow 3.6s linear infinite;
+  }
+
+  .dark .yale-flow {
+    --yale-flow-base: #5b9bd5;
+    --yale-flow-spark: #d6ecff;
+  }
+}
+
+@keyframes yale-flow {
+  from {
+    background-position: 100% 0;
+  }
+  to {
+    background-position: 0% 0;
+  }
+}
+
+@layer utilities {
+
   /* Theme-aware background utilities */
   .bg-theme {
     background-color: rgb(var(--background-rgb));
@@ -934,5 +998,9 @@ body {
   }
   .shiny-cta:active {
     translate: none;
+  }
+  .yale-flow {
+    animation: none;
+    background-position: 50% 0;
   }
 }

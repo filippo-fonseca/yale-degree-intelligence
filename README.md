@@ -200,7 +200,7 @@ and email rather than opening an issue.
 ---
 
 <div align="center">
-<sub>Started July 2025. Built by Yalies, for Yalies, in New Haven. ❤️</sub>
+<sub>Started July 2025. Built by Yalies, for Yalies. ❤️</sub>
 
 <sub>Free forever. We make no money from this, and never will.</sub>
 

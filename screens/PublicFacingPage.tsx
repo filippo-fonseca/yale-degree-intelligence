@@ -496,24 +496,48 @@ export default function AboutPage() {
               <AnimatedGpaTrend />
             </FloatingTile>
 
-            {/* Distributionals, the whole set, in the app's own chip colors */}
+            {/* A planned semester out of the Simulator. This slot used to hold
+                the full distributional chip set, which said the same thing as
+                the Distribs tile two positions away. A semester of real courses
+                carrying their own tags, totalled into a projected GPA, shows
+                the part of the app the other tiles don't. */}
             <FloatingTile
-              className="top-[45%] left-[0%] lg:left-[1%]"
+              className="top-[43%] left-[0%] lg:left-[1%] !flex-col !items-stretch !gap-2"
               rotate={5}
               delay={5.2}
             >
-              {/* Two rows, so the full set stays as narrow as the old three
-                  chips and keeps clear of the headline. */}
-              <div className="flex w-[9.25rem] flex-wrap gap-1">
-                {HERO_DIST_CHIPS.map((chip) => (
-                  <span
-                    key={chip.code}
-                    className={`rounded-full border px-1.5 py-0.5 text-[10px] font-medium ${chip.className}`}
-                  >
-                    {chip.code} {chip.status}
-                  </span>
-                ))}
-              </div>
+              <SimulatedSemesterCard />
+            </FloatingTile>
+
+            {/* Certificates, the second track alongside the major */}
+            <FloatingTile
+              className="top-[5%] left-[15%] lg:left-[19%]"
+              rotate={-5}
+              delay={6.1}
+            >
+              <span className="font-mono text-xs text-gray-900 dark:text-white">
+                Data Science
+              </span>
+              <span className="rounded-full bg-violet-500/10 px-2 py-0.5 text-[10px] font-medium text-violet-600 dark:text-violet-400">
+                Cert 4/6
+              </span>
+            </FloatingTile>
+
+            {/* The double-major conflict manager, in one line. Sits in the gap
+                between the GPA sparkline and the ECON chip so it clears the
+                headline's long first line entirely. */}
+            <FloatingTile
+              className="top-[66%] right-[0%] lg:right-[1%]"
+              rotate={4}
+              delay={7.3}
+            >
+              <span className="font-mono text-xs text-gray-900 dark:text-white">
+                EECS × Econ
+              </span>
+              <span className="flex items-center gap-1 rounded-full bg-amber-500/10 px-2 py-0.5 text-[10px] font-medium text-amber-600 dark:text-amber-400">
+                <span className="h-1.5 w-1.5 rounded-full bg-amber-500" />2
+                shared
+              </span>
             </FloatingTile>
 
             {/* A friend, the one social note in the orbit */}
@@ -1833,12 +1857,64 @@ const DIST_SEGMENTS = [
   { code: "QR", color: "#f87171", target: 0.5 },
 ] as const;
 
-/** The full distributional set for the hero tile, in the app's own chip colors. */
-const HERO_DIST_CHIPS = DIST_SEGMENTS.map((seg) => ({
-  code: seg.code,
-  status: seg.target === 1 ? "✓" : "1/2",
-  className: getDistPillStyle(seg.code),
-}));
+/**
+ * One planned semester for the hero's Simulator tile: courses the user hasn't
+ * taken yet, each carrying the distributionals it would satisfy, priced into a
+ * projected GPA. Everything here is hypothetical, which is the whole point of
+ * the tile, so the card says so out loud rather than reading as a transcript.
+ */
+const SIM_SEMESTER = [
+  { code: "CPSC 3650", dists: ["QR"] },
+  { code: "ENGL 2440", dists: ["WR", "Hu"] },
+  { code: "MATH 2220", dists: ["QR"] },
+] as const;
+
+function SimulatedSemesterCard() {
+  return (
+    <>
+      <div className="flex items-center justify-between gap-3">
+        <span className="font-mono text-[10px] text-gray-500 dark:text-gray-400">
+          Spring 2027
+        </span>
+        <span className="rounded-full bg-pink-500/10 px-1.5 py-0.5 font-mono text-[9px] font-semibold tracking-[0.08em] text-pink-600 dark:text-pink-400">
+          PROJECTED
+        </span>
+      </div>
+
+      <div className="flex w-[10.5rem] flex-col gap-1">
+        {SIM_SEMESTER.map((course) => (
+          <div
+            key={course.code}
+            className="flex items-center justify-between gap-2"
+          >
+            <span className="font-mono text-[10px] text-gray-900 dark:text-white">
+              {course.code}
+            </span>
+            <span className="flex gap-1">
+              {course.dists.map((dist) => (
+                <span
+                  key={dist}
+                  className={`rounded border px-1 py-px text-[9px] font-medium ${getDistPillStyle(dist)}`}
+                >
+                  {dist}
+                </span>
+              ))}
+            </span>
+          </div>
+        ))}
+      </div>
+
+      <div className="flex items-center justify-between gap-3 border-t border-black/[0.06] pt-1.5 dark:border-white/[0.08]">
+        <span className="font-mono text-[10px] text-gray-500 dark:text-gray-400">
+          Proj. GPA
+        </span>
+        <span className="font-mono text-[10px] font-medium tabular-nums text-emerald-600 dark:text-emerald-400">
+          3.89 ↑
+        </span>
+      </div>
+    </>
+  );
+}
 
 /** Distributionals progress: five colored pips fill in, 4/5 complete. */
 function AnimatedDistribBar() {

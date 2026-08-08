@@ -25,6 +25,7 @@ const DIST = path.join(HERE, "dist");
 /** Replace once the Loom recording is up; both emails point at it. */
 const VIDEO_URL = "https://www.loom.com/share/REPLACE_ME";
 const SITE_URL = "https://degreeint.com";
+const REPO_URL = "https://github.com/filippo-fonseca/yale-degree-intelligence";
 
 /**
  * Logos are served from the site rather than inlined: Gmail strips SVG and
@@ -306,6 +307,23 @@ function footer() {
                 Not affiliated with Yale University in any way other than us being
                 students sharing our project.
               </p>
+            </td>
+          </tr>
+
+          <!--
+            For the developers on the list. Deliberately understated: mono, muted,
+            no button, no border. It should read like a note someone left rather
+            than a second thing we want you to click. The icon is a hosted PNG in
+            two themes because Gmail strips SVG.
+          -->
+          <tr>
+            <td align="center" style="padding: 0 0 18px 0;">
+              <a href="${REPO_URL}" target="_blank" class="t-muted" style="font-family: ${MONO}; font-size: 11px; line-height: 1.6; color: ${LIGHT.muted}; text-decoration: none;">
+                <img src="${LOGO_BASE}/github-light.png" width="14" height="14" alt="" class="logo-light" style="display: inline-block; width: 14px; height: 14px; border: 0; vertical-align: -2px;" />
+                <img src="${LOGO_BASE}/github-dark.png" width="14" height="14" alt="" class="logo-dark" style="display: none; width: 14px; height: 14px; border: 0; vertical-align: -2px;" />
+                &nbsp;for the devs: we're open source now.
+                <span style="text-decoration: underline;">have a look</span>
+              </a>
             </td>
           </tr>
 

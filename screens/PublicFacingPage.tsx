@@ -440,26 +440,29 @@ export default function AboutPage() {
           className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(circle,rgba(0,0,0,0.05)_1px,transparent_1px)] dark:bg-[radial-gradient(circle,rgba(255,255,255,0.055)_1px,transparent_1px)] [background-size:24px_24px] [mask-image:linear-gradient(to_bottom,black,transparent_55%)]"
         />
 
-        {/* §3 Floating course tiles. Framed around the headline, md+ only.
-            The inner max-w-5xl track matches the headline block's envelope, so
-            the tiles orbit the type instead of hugging the viewport edges. */}
+        {/* §3 Floating course tiles.
+            The track is deliberately wider than the max-w-5xl content column so
+            the tiles land in the gutter beside the type rather than on top of
+            it. That gutter only exists once the window is wide enough, which is
+            why the tiles are xl+ only: below that the headline fills the track
+            and anything floating over it collides with a line of the hero. */}
         <div className="pointer-events-none absolute inset-0 -z-[1]">
-          <div className="relative mx-auto h-full max-w-5xl px-4 lg:px-6">
+          <div className="relative mx-auto h-full max-w-7xl px-4 lg:px-6">
             <FloatingTile
-              className="top-[11%] left-[1%] lg:left-[3%]"
+              className="top-[20%] left-[1%]"
               rotate={-6}
               delay={0}
             >
-              <span className="font-mono text-xs text-gray-900 dark:text-white">
+              <span className="font-mono text-[11px] text-gray-900 dark:text-white">
                 CPSC 3230
               </span>
-              <span className="rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] font-medium text-emerald-600 dark:text-emerald-400">
+              <span className="rounded-full bg-emerald-500/10 px-1.5 py-px text-[9px] font-medium text-emerald-600 dark:text-emerald-400">
                 A-
               </span>
             </FloatingTile>
 
             <FloatingTile
-              className="top-[14%] right-[1%] lg:right-[4%]"
+              className="top-[21%] right-[1%]"
               rotate={5}
               delay={1.5}
             >
@@ -467,7 +470,7 @@ export default function AboutPage() {
             </FloatingTile>
 
             <FloatingTile
-              className="bottom-[13%] left-[0%] !flex-col !items-start !gap-1.5"
+              className="bottom-[13%] left-[1%] !flex-col !items-start !gap-1.5"
               rotate={4}
               delay={3}
             >
@@ -475,50 +478,74 @@ export default function AboutPage() {
             </FloatingTile>
 
             <FloatingTile
-              className="bottom-[10%] right-[0%] lg:right-[1%]"
+              className="bottom-[9%] right-[1%]"
               rotate={-4}
               delay={4.5}
             >
-              <span className="font-mono text-xs text-gray-900 dark:text-white">
+              <span className="font-mono text-[11px] text-gray-900 dark:text-white">
                 ECON 1210
               </span>
-              <span className="rounded-full bg-black/[0.05] px-2 py-0.5 text-[10px] font-medium text-gray-500 dark:bg-white/10 dark:text-gray-400">
+              <span className="rounded-full bg-black/[0.05] px-1.5 py-px text-[9px] font-medium text-gray-500 dark:bg-white/10 dark:text-gray-400">
                 Hum
               </span>
             </FloatingTile>
 
             {/* A tiny GPA sparkline, the stats view in miniature */}
             <FloatingTile
-              className="top-[42%] right-[0%] lg:right-[1%] !flex-col !items-start !gap-1.5"
+              className="top-[42%] right-[1%] !flex-col !items-start !gap-1.5"
               rotate={-5}
               delay={2.2}
             >
               <AnimatedGpaTrend />
             </FloatingTile>
 
-            {/* Distributionals, the whole set, in the app's own chip colors */}
+            {/* A planned semester out of the Simulator. This slot used to hold
+                the full distributional chip set, which said the same thing as
+                the Distribs tile two positions away. A semester of real courses
+                carrying their own tags, totalled into a projected GPA, shows
+                the part of the app the other tiles don't. */}
             <FloatingTile
-              className="top-[45%] left-[0%] lg:left-[1%]"
+              className="top-[41%] left-[1%] !flex-col !items-stretch !gap-2"
               rotate={5}
               delay={5.2}
             >
-              {/* Two rows, so the full set stays as narrow as the old three
-                  chips and keeps clear of the headline. */}
-              <div className="flex w-[9.25rem] flex-wrap gap-1">
-                {HERO_DIST_CHIPS.map((chip) => (
-                  <span
-                    key={chip.code}
-                    className={`rounded-full border px-1.5 py-0.5 text-[10px] font-medium ${chip.className}`}
-                  >
-                    {chip.code} {chip.status}
-                  </span>
-                ))}
-              </div>
+              <SimulatedSemesterCard />
+            </FloatingTile>
+
+            {/* Certificates, the second track alongside the major */}
+            <FloatingTile
+              className="top-[3%] left-[1%]"
+              rotate={-5}
+              delay={6.1}
+            >
+              <span className="font-mono text-[11px] text-gray-900 dark:text-white">
+                Data Science
+              </span>
+              <span className="rounded-full bg-violet-500/10 px-1.5 py-px text-[9px] font-medium text-violet-600 dark:text-violet-400">
+                Cert 4/6
+              </span>
+            </FloatingTile>
+
+            {/* The double-major conflict manager, in one line. Sits in the gap
+                between the GPA sparkline and the ECON chip so it clears the
+                headline's long first line entirely. */}
+            <FloatingTile
+              className="top-[66%] right-[1%]"
+              rotate={4}
+              delay={7.3}
+            >
+              <span className="font-mono text-[11px] text-gray-900 dark:text-white">
+                EECS × Econ
+              </span>
+              <span className="flex items-center gap-1 rounded-full bg-amber-500/10 px-1.5 py-px text-[9px] font-medium text-amber-600 dark:text-amber-400">
+                <span className="h-1.5 w-1.5 rounded-full bg-amber-500" />2
+                shared
+              </span>
             </FloatingTile>
 
             {/* A friend, the one social note in the orbit */}
             <FloatingTile
-              className="top-[5%] right-[17%] lg:right-[21%]"
+              className="top-[3%] right-[1%]"
               rotate={6}
               delay={3.7}
             >
@@ -559,10 +586,11 @@ export default function AboutPage() {
               leading is 1.25 because Louize has a long descender: at the original
               1.05 the "p" of plane collided with the "d" of degree below it. */}
           <h1 className="mt-5 text-balance text-[clamp(1.75rem,8.2vw,3rem)]/[1.25] font-medium tracking-[-0.02em] text-gray-900 dark:text-white sm:whitespace-nowrap md:mt-6 md:text-6xl/[1.25] lg:text-[4.5rem]/[1.25]">
-            The open source control plane
+            The <span className="font-louize-bold">open source</span> control
+            plane
             <br className="hidden sm:block" />{" "}
             <span className="text-gray-400 dark:text-gray-500">
-              for your Yale degree.
+              for your <span className="yale-flow">Yale</span> degree.
             </span>
           </h1>
 
@@ -618,7 +646,7 @@ export default function AboutPage() {
             </p>
             <p className="mx-auto mt-2 max-w-[58ch] font-mono text-[11px] leading-relaxed tracking-tight text-gray-400 dark:text-gray-500 sm:mt-3 sm:text-xs">
               <strong className="font-semibold text-gray-500 dark:text-gray-300">
-                1.2k students
+                1.2k+ students
               </strong>{" "}
               <strong className="font-semibold text-gray-500 dark:text-gray-300">
                 in every ResCo
@@ -1395,16 +1423,21 @@ export default function AboutPage() {
             From Yalies, for Yalies.
             <br />
             <span className="text-gray-400 dark:text-gray-500">
-              Because we all deserve better.
+              It started as a spreadsheet.
             </span>
           </h2>
 
           <p className="mx-auto mt-8 max-w-[52ch] font-sf text-base leading-relaxed text-gray-500 dark:text-gray-400 md:text-lg">
-            This will always be free for all of us. Not a business or a startup.
-            I built this for myself to plan out my double major and wanted to
-            share it with others, and since then it has grown exponentially!
-            Makes me so happy to see other people using it and
-            planning/understanding their Yale experience in an easier way.
+            I built this for myself. I was trying to plan a double major,
+            couldn't keep it straight in a spreadsheet, so I made something that
+            could. Then I shared it, and it got away from me in the best way.
+            Watching other people use it to make sense of their own time here is
+            still the best part of it.
+          </p>
+
+          <p className="mx-auto mt-4 max-w-[52ch] font-sf text-base leading-relaxed text-gray-500 dark:text-gray-400 md:text-lg">
+            It's free, and it stays free. Not a business, not a startup, and
+            never going to be one.
           </p>
 
           {/* Team, a single centered person, no cards */}
@@ -1739,7 +1772,7 @@ function FloatingTile({
         repeat: Infinity,
         ease: "easeInOut",
       }}
-      className={`absolute hidden md:flex items-center gap-2 rounded-xl border border-black/[0.08] dark:border-white/[0.09] bg-white/90 dark:bg-white/[0.05] backdrop-blur px-3 py-2 shadow-lg font-sf dark:opacity-90 ${className}`}
+      className={`hero-tile absolute hidden xl:flex items-center gap-1.5 rounded-lg border border-black/[0.06] dark:border-white/[0.07] bg-white/60 dark:bg-white/[0.035] backdrop-blur-sm px-2.5 py-1.5 shadow-md font-sf opacity-80 dark:opacity-75 ${className}`}
     >
       {children}
     </motion.div>
@@ -1832,12 +1865,64 @@ const DIST_SEGMENTS = [
   { code: "QR", color: "#f87171", target: 0.5 },
 ] as const;
 
-/** The full distributional set for the hero tile, in the app's own chip colors. */
-const HERO_DIST_CHIPS = DIST_SEGMENTS.map((seg) => ({
-  code: seg.code,
-  status: seg.target === 1 ? "✓" : "1/2",
-  className: getDistPillStyle(seg.code),
-}));
+/**
+ * One planned semester for the hero's Simulator tile: courses the user hasn't
+ * taken yet, each carrying the distributionals it would satisfy, priced into a
+ * projected GPA. Everything here is hypothetical, which is the whole point of
+ * the tile, so the card says so out loud rather than reading as a transcript.
+ */
+const SIM_SEMESTER = [
+  { code: "CPSC 3650", dists: ["QR"] },
+  { code: "ENGL 2440", dists: ["WR", "Hu"] },
+  { code: "MATH 2220", dists: ["QR"] },
+] as const;
+
+function SimulatedSemesterCard() {
+  return (
+    <>
+      <div className="flex items-center justify-between gap-3">
+        <span className="font-mono text-[10px] text-gray-500 dark:text-gray-400">
+          Spring 2027
+        </span>
+        <span className="rounded-full bg-pink-500/10 px-1.5 py-0.5 font-mono text-[9px] font-semibold tracking-[0.08em] text-pink-600 dark:text-pink-400">
+          PROJECTED
+        </span>
+      </div>
+
+      <div className="flex w-[9.5rem] flex-col gap-1">
+        {SIM_SEMESTER.map((course) => (
+          <div
+            key={course.code}
+            className="flex items-center justify-between gap-2"
+          >
+            <span className="font-mono text-[10px] text-gray-900 dark:text-white">
+              {course.code}
+            </span>
+            <span className="flex gap-1">
+              {course.dists.map((dist) => (
+                <span
+                  key={dist}
+                  className={`rounded border px-1 py-px text-[9px] font-medium ${getDistPillStyle(dist)}`}
+                >
+                  {dist}
+                </span>
+              ))}
+            </span>
+          </div>
+        ))}
+      </div>
+
+      <div className="flex items-center justify-between gap-3 border-t border-black/[0.06] pt-1.5 dark:border-white/[0.08]">
+        <span className="font-mono text-[10px] text-gray-500 dark:text-gray-400">
+          Proj. GPA
+        </span>
+        <span className="font-mono text-[10px] font-medium tabular-nums text-emerald-600 dark:text-emerald-400">
+          3.89 ↑
+        </span>
+      </div>
+    </>
+  );
+}
 
 /** Distributionals progress: five colored pips fill in, 4/5 complete. */
 function AnimatedDistribBar() {

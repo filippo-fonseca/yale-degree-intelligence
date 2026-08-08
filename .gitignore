@@ -63,3 +63,4 @@ ycps-cache/
 .bgsd/ledger.md
 .bgsd/config.json
 .planning/config.json
+.playwright-mcp/

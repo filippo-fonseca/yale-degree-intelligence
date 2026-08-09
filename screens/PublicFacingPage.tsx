@@ -411,7 +411,16 @@ export default function AboutPage() {
       >
         <div className="max-w-7xl mx-auto h-full px-4 lg:px-6 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <LogoIcon width={22} height={22} />
+            {/* On the light nav the default palette is a mid-blue gradient,
+                which sits next to a near-black wordmark and reads washed out at
+                22px. darkOnLight is the variant built for a light surface (it
+                is what /light-mode-logo exports), so the mark carries the same
+                weight as the word beside it. Dark mode keeps the default. */}
+            <LogoIcon
+              width={22}
+              height={22}
+              variant={isDark ? undefined : "darkOnLight"}
+            />
             <span className="text-sm font-medium text-gray-900 dark:text-white hidden sm:inline">
               DegreeIntelligence
             </span>

@@ -45,6 +45,7 @@ export const RELEASES: Release[] = [
       {
         title: "Look and feel",
         items: [
+          "The homepage navigation bar now stays at the top of the screen as you scroll, and picks up a soft shadow once it is floating over the page. It was meant to do this all along, but it had been scrolling away with everything else.",
           "The main buttons no longer show a hard-edged rectangle pulsing inside them when you hover. The glow behind the label is a soft halo now, the way it was meant to look.",
           "\"Yale\" in the homepage headline is lit in Yale blue, with a highlight that runs through it, and \"open source\" is set heavier so the two things the page is actually about stand out.",
           "The cards floating around the homepage headline are smaller and quieter, and they no longer say the same thing twice. One of the two distributional cards is now a planned semester out of the Simulator, marked PROJECTED, showing courses, their distributionals, and the GPA that plan would give you. There are new cards for certificate progress and for the double-major conflict manager. They now sit beside the headline rather than drifting over it, and they only appear on windows wide enough to have room for them.",

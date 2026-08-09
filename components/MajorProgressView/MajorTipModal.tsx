@@ -155,19 +155,19 @@ export function MajorTipHelpButton({
   label?: string;
 }) {
   return (
-    <div className={`relative ${className}`}>
-      {/* Animated gradient border */}
-      <div
-        className="border-none absolute -inset-[1px] rounded-lg bg-[conic-gradient(from_var(--angle),#ec4899,#8b5cf6,#3b82f6,#ec4899)] opacity-75 blur-[2px] animate-border-spin"
-        style={{ "--angle": "0deg" } as React.CSSProperties}
-      />
-      <div
-        className="absolute -inset-[1px] rounded-lg bg-[conic-gradient(from_var(--angle),#ec4899,#8b5cf6,#3b82f6,#ec4899)] animate-border-spin"
-        style={{ "--angle": "0deg" } as React.CSSProperties}
-      />
+    // The gradient border is the wrapper's own background, revealed by 1.5px of
+    // padding, so it lives entirely inside the element's box. It used to be two
+    // absolutely-positioned layers at -inset-[1px] with a 2px blur, which put the
+    // glow ~3px outside the box; any ancestor with overflow-hidden then sliced it
+    // off at the left and right edges. Nothing extends past the border now, so it
+    // cannot be clipped no matter what it sits inside.
+    <div
+      className={`relative rounded-lg bg-[conic-gradient(from_var(--angle),#ec4899,#8b5cf6,#3b82f6,#ec4899)] p-[1.5px] animate-border-spin ${className}`}
+      style={{ "--angle": "0deg" } as React.CSSProperties}
+    >
       <button
         onClick={onClick}
-        className="relative flex items-center justify-between w-full p-3 bg-white dark:bg-gray-900 rounded-lg text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+        className="relative flex items-center justify-between w-full p-3 bg-white dark:bg-gray-900 rounded-[calc(0.5rem-1.5px)] text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
         title="What do 'Manual fulfill' and 'Skip' mean?"
       >
         <div className="flex items-center gap-2">

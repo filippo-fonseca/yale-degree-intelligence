@@ -146,18 +146,16 @@ export function CertificateTipHelpButton({
   label?: string;
 }) {
   return (
-    <div className={`relative ${className}`}>
-      <div
-        className="border-none absolute -inset-[1px] rounded-lg bg-[conic-gradient(from_var(--angle),#14b8a6,#0d9488,#2dd4bf,#14b8a6)] opacity-75 blur-[2px] animate-border-spin"
-        style={{ "--angle": "0deg" } as React.CSSProperties}
-      />
-      <div
-        className="absolute -inset-[1px] rounded-lg bg-[conic-gradient(from_var(--angle),#14b8a6,#0d9488,#2dd4bf,#14b8a6)] animate-border-spin"
-        style={{ "--angle": "0deg" } as React.CSSProperties}
-      />
+    // Same containment as the major variant: the gradient is this element's own
+    // background, shown through 1.5px of padding, so nothing extends past the
+    // border and an ancestor's overflow-hidden has nothing to clip.
+    <div
+      className={`relative rounded-lg bg-[conic-gradient(from_var(--angle),#14b8a6,#0d9488,#2dd4bf,#14b8a6)] p-[1.5px] animate-border-spin ${className}`}
+      style={{ "--angle": "0deg" } as React.CSSProperties}
+    >
       <button
         onClick={onClick}
-        className="relative flex items-center justify-between w-full p-3 bg-white dark:bg-gray-900 rounded-lg text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+        className="relative flex items-center justify-between w-full p-3 bg-white dark:bg-gray-900 rounded-[calc(0.5rem-1.5px)] text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
         title="What do 'Manual fulfill' and 'Skip' mean?"
       >
         <div className="flex items-center gap-2">

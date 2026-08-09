@@ -206,6 +206,29 @@ export default function AboutPage() {
   const [showVideoModal, setShowVideoModal] = useState(false);
   const { resolvedTheme, toggleTheme } = useTheme();
 
+  // Whether the page has scrolled far enough for the nav to be sitting over
+  // content rather than at rest above the hero. Drives the nav's elevation:
+  // pinned to the top of the viewport with no shadow reads like a rendering
+  // bug, so it earns a border and a shadow once it is actually floating.
+  const [navFloating, setNavFloating] = useState(false);
+  useEffect(() => {
+    // rAF-throttled: scroll fires far more often than the one boolean changes.
+    let frame = 0;
+    const onScroll = () => {
+      if (frame) return;
+      frame = requestAnimationFrame(() => {
+        frame = 0;
+        setNavFloating(window.scrollY > 8);
+      });
+    };
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      if (frame) cancelAnimationFrame(frame);
+    };
+  }, []);
+
   // The chart tokens StatsView derives from the theme. Same values, so the
   // mock charts read as the app's charts in both themes.
   const isDark = resolvedTheme === "dark";
@@ -366,12 +389,26 @@ export default function AboutPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-[#fafafa] dark:bg-[#0a0a0b] font-louize overflow-x-hidden">
+    // overflow-x-clip, not -hidden. `overflow-x: hidden` forces overflow-y to
+    // compute to auto, which makes this div the nearest scrolling ancestor and
+    // silently breaks the sticky nav below: it pins to this box rather than the
+    // viewport, so it scrolled away with the page. `clip` cuts the horizontal
+    // overflow from the drifting hero tiles without creating a scroll container.
+    <div className="min-h-screen bg-[#fafafa] dark:bg-[#0a0a0b] font-louize overflow-x-clip">
       {/* §1 YDN banner, above the nav and dismissible for good */}
       <YdnBanner />
 
       {/* Nav */}
-      <nav className="sticky top-0 z-50 h-14 backdrop-blur-xl bg-white/70 dark:bg-[#0a0a0b]/70 border-b border-black/[0.05] dark:border-white/[0.06]">
+      <nav
+        className={`sticky top-0 z-50 h-14 backdrop-blur-xl transition-[background-color,box-shadow,border-color] duration-300 ${
+          navFloating
+            ? // 90, not 85: 85 is off Tailwind's opacity scale and silently
+              // compiles to nothing, which left the floating nav fully
+              // transparent with the page scrolling under its text.
+              "bg-white/90 dark:bg-[#0a0a0b]/90 border-b border-black/[0.07] dark:border-white/[0.08] shadow-[0_1px_20px_rgba(15,23,42,0.07)] dark:shadow-[0_1px_20px_rgba(0,0,0,0.45)]"
+            : "bg-white/70 dark:bg-[#0a0a0b]/70 border-b border-transparent"
+        }`}
+      >
         <div className="max-w-7xl mx-auto h-full px-4 lg:px-6 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <LogoIcon width={22} height={22} />

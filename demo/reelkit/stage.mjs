@@ -171,6 +171,93 @@ export async function scrollPane(page, dy, ms = 750) {
   );
 }
 
+/**
+ * Drag for native HTML5 drag-and-drop.
+ *
+ * The Simulator uses `draggable` + onDragStart/onDragOver/onDrop, and Chromium
+ * does not synthesise those from page.mouse events, so a mouse-based drag moves
+ * the cursor convincingly and changes nothing. Playwright's dragTo() does fire
+ * them but lands instantly, which is useless as footage.
+ *
+ * So: dispatch the real drag events, and pace the dragover stream by hand while
+ * the cursor overlay travels. The handlers pass the payload through React state
+ * rather than dataTransfer, and they sit on the semester container, so events
+ * dispatched on a descendant reach them by bubbling. Each dragover also sets the
+ * drop-target highlight, which is what sells the motion on screen.
+ */
+export async function htmlDrag(page, fromSel, toSel, opts = {}) {
+  const steps = opts.steps ?? 22;
+  const src = page.locator(fromSel).first();
+  const tgt = page.locator(toSel).first();
+  const a = await src.boundingBox();
+  const b = await tgt.boundingBox();
+  if (!a || !b) throw new Error(`htmlDrag: missing box ${fromSel} -> ${toSel}`);
+
+  const sx = a.x + a.width / 2;
+  const sy = a.y + a.height / 2;
+  const tx = b.x + b.width / 2;
+  const ty = b.y + (opts.toOffsetY ?? b.height / 2);
+
+  await moveCursorToPoint(page, sx, sy);
+  await page.waitForTimeout(420);
+
+  await src.evaluate((el) => {
+    const dt = new DataTransfer();
+    window.__reelDt = dt;
+    el.dispatchEvent(
+      new DragEvent('dragstart', { bubbles: true, cancelable: true, dataTransfer: dt }),
+    );
+  });
+  await page.waitForTimeout(240);
+
+  for (let i = 1; i <= steps; i++) {
+    const t = i / steps;
+    const e = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+    const x = sx + (tx - sx) * e;
+    const y = sy + (ty - sy) * e;
+    await moveCursorToPoint(page, x, y, undefined, true);
+    await tgt.evaluate(
+      (el, p) => {
+        el.dispatchEvent(
+          new DragEvent('dragover', {
+            bubbles: true,
+            cancelable: true,
+            dataTransfer: window.__reelDt,
+            clientX: p.x,
+            clientY: p.y,
+          }),
+        );
+      },
+      { x, y },
+    );
+    await page.waitForTimeout(opts.stepMs ?? 30);
+  }
+
+  await page.waitForTimeout(320);
+  await tgt.evaluate(
+    (el, p) => {
+      el.dispatchEvent(
+        new DragEvent('drop', {
+          bubbles: true,
+          cancelable: true,
+          dataTransfer: window.__reelDt,
+          clientX: p.x,
+          clientY: p.y,
+        }),
+      );
+    },
+    { x: tx, y: ty },
+  );
+  await src
+    .evaluate((el) =>
+      el.dispatchEvent(
+        new DragEvent('dragend', { bubbles: true, dataTransfer: window.__reelDt }),
+      ),
+    )
+    .catch(() => {}); // the source node is gone once the drop re-renders
+  await page.waitForTimeout(opts.after ?? 900);
+}
+
 /** Drag one element onto another with the cursor overlay following the pointer. */
 export async function drag(page, fromSel, toSel, opts = {}) {
   const steps = opts.steps ?? 26;

@@ -6,7 +6,7 @@
 //
 // Nothing here writes to the account. Plans are never saved, certificates are
 // never added, and the tip-modal flags seeded by the stage are localStorage-only.
-import { openStage, finish, drag, gotoTab, scrollPane, HOME } from './stage.mjs';
+import { openStage, finish, htmlDrag, gotoTab, scrollPane, HOME } from './stage.mjs';
 
 const S = {};
 
@@ -15,16 +15,17 @@ const S = {};
 S['01-landing-hero'] = async (outDir) => {
   const st = await openStage({ anon: true, outDir, theme: 'dark', settle: 5000 });
   const { page, rec } = st;
-  await rec.wait(2200);
-  // the constellation leans toward the cursor, so trace across the hero
+  // Hold on the hero: the star field drifts and leans toward the cursor, and
+  // that motion is the shot. Scrolling off it early throws the whole thing away.
+  await rec.wait(2600);
   await rec.hover('h1');
-  await rec.wait(1200);
-  await scrollPane(page, 420);
-  await rec.wait(1500);
-  await scrollPane(page, 520);
-  await rec.wait(1600);
-  await scrollPane(page, 600);
-  await rec.wait(1800);
+  await rec.wait(2400);
+  await rec.hover('a:has-text("Log in"), button:has-text("Log in") >> nth=0');
+  await rec.wait(2600);
+  await scrollPane(page, 380, 1100);
+  await rec.wait(2400);
+  await scrollPane(page, 460, 1100);
+  await rec.wait(2400);
   return finish(st, '01-landing-hero');
 };
 
@@ -54,34 +55,54 @@ S['05-my-courses'] = async (outDir) => {
   const st = await openStage({ tab: 'courses', outDir });
   const { page, rec } = st;
   await rec.wait(1400);
-  // semester rail: jump between terms
-  await rec.click('text=Spring 2026 >> nth=0');
-  await rec.wait(1500);
-  await rec.click('text=Fall 2025 >> nth=0');
-  await rec.wait(1500);
+  // Semester rail. `text=` also matches the section headings, which are not
+  // clickable, so target the rail buttons themselves.
+  await rec.click('button:has-text("Spring 2026") >> nth=0');
+  await rec.wait(1700);
+  await rec.click('button:has-text("Fall 2025") >> nth=0');
+  await rec.wait(1700);
   await scrollPane(page, 380);
-  await rec.wait(1600);
+  await rec.wait(1800);
   return finish(st, '05-my-courses');
 };
+
+// The v3 headline: Cmd+K from anywhere. Driven by the real hotkey rather than
+// the sidebar button, because the shortcut is the feature.
+const PALETTE = 'input[placeholder^="Search courses"]';
 
 S['06-command-palette'] = async (outDir) => {
   const st = await openStage({ tab: 'courses', outDir });
   const { page, rec } = st;
-  await rec.wait(1000);
-  await rec.click('[data-tour="search"]');
+  await rec.wait(1200);
+  await page.keyboard.press('Meta+k');
+  await page.waitForSelector(PALETTE, { timeout: 8000 });
   await rec.wait(900);
-  await rec.type('input[placeholder*="Search" i] >> nth=-1', 'thermo', { delay: 110 });
-  await rec.wait(1900);
-  await page.keyboard.press('Backspace');
-  await page.keyboard.press('Backspace');
-  await page.keyboard.press('Backspace');
-  await page.keyboard.press('Backspace');
-  await page.keyboard.press('Backspace');
-  await page.keyboard.press('Backspace');
-  await rec.wait(500);
-  await rec.type('input[placeholder*="Search" i] >> nth=-1', 'MENG 34', { delay: 110 });
-  await rec.wait(2100);
+  await rec.type(PALETTE, 'thermo', { delay: 115 });
+  await rec.wait(2200);
+  for (let i = 0; i < 6; i++) await page.keyboard.press('Backspace');
+  await rec.wait(600);
+  await rec.type(PALETTE, 'certificate', { delay: 105 });
+  await rec.wait(2400);
+  await page.keyboard.press('ArrowDown');
+  await rec.wait(700);
+  await page.keyboard.press('ArrowDown');
+  await rec.wait(1600);
   return finish(st, '06-command-palette');
+};
+
+// Second take: the palette closing straight into a destination.
+S['06b-command-palette-jump'] = async (outDir) => {
+  const st = await openStage({ tab: 'stats', outDir });
+  const { page, rec } = st;
+  await rec.wait(1200);
+  await page.keyboard.press('Meta+k');
+  await page.waitForSelector(PALETTE, { timeout: 8000 });
+  await rec.wait(800);
+  await rec.type(PALETTE, 'simulator', { delay: 110 });
+  await rec.wait(1800);
+  await page.keyboard.press('Enter');
+  await rec.wait(3200);
+  return finish(st, '06b-command-palette-jump');
 };
 
 /* ----------------------------------------------------------------- majors */
@@ -139,7 +160,7 @@ S['11-certificates'] = async (outDir) => {
   const { page, rec } = st;
   await rec.wait(1600);
   // the policy badge: Data Science allows no double-counting at all
-  await rec.hover('text=no overlap');
+  await rec.hover('text=no overlap >> nth=0');
   await rec.wait(1900);
   await scrollPane(page, 460);
   await rec.wait(2200);
@@ -174,8 +195,10 @@ S['14-distributionals-language'] = async (outDir) => {
   const st = await openStage({ tab: 'distributionals', outDir, settle: 4500 });
   const { page, rec } = st;
   await rec.wait(1000);
-  await page.getByText('LANGUAGE', { exact: true }).first().scrollIntoViewIfNeeded();
-  await rec.wait(1400);
+  // The LANGUAGE section sits well down the pane. scrollIntoViewIfNeeded fights
+  // the inner scroll container, so drive the scroller directly instead.
+  await scrollPane(page, 1150, 1100);
+  await rec.wait(1600);
   // one language at a time: French and Russian tracked separately
   await rec.click('button:has-text("Russian")');
   await rec.wait(2200);
@@ -222,7 +245,7 @@ S['17-simulator-canvas'] = async (outDir) => {
   await scrollPane(page, 340);
   await rec.wait(1400);
   // Past terms are LOCKED, so the live drag is Fall 2026 -> Spring 2027.
-  await drag(
+  await htmlDrag(
     page,
     'text=MENG 3125 >> nth=0',
     'text=Spring 2027 >> nth=0',
@@ -238,12 +261,12 @@ S['18-simulator-drag-back'] = async (outDir) => {
   await rec.wait(1200);
   await scrollPane(page, 340);
   await rec.wait(1200);
-  await drag(page, 'text=ECE 2031 >> nth=0', 'text=Fall 2026 >> nth=0', {
+  await htmlDrag(page, 'text=ECE 2031 >> nth=0', 'text=Fall 2026 >> nth=0', {
     toOffsetY: 200,
     stepMs: 22,
   });
   await rec.wait(1200);
-  await drag(page, 'text=MENG 3422 >> nth=0', 'text=Spring 2027 >> nth=0', {
+  await htmlDrag(page, 'text=MENG 3422 >> nth=0', 'text=Spring 2027 >> nth=0', {
     toOffsetY: 260,
     stepMs: 22,
   });
@@ -259,10 +282,16 @@ S['19-simulator-grades'] = async (outDir) => {
   await rec.wait(1800);
   await scrollPane(page, 420);
   await rec.wait(1400);
+  // scrollIntoViewIfNeeded fights the inner scroller here; the pane is already
+  // positioned, so act on the select directly.
   const sel = page.locator('select').first();
-  await sel.scrollIntoViewIfNeeded();
-  await sel.selectOption('A');
-  await rec.wait(2200);
+  await sel.selectOption('A-', { force: true, timeout: 8000 }).catch(async () => {
+    await sel.selectOption({ index: 2 }, { force: true, timeout: 8000 });
+  });
+  await rec.wait(2000);
+  const sel2 = page.locator('select').nth(1);
+  await sel2.selectOption('A', { force: true, timeout: 8000 }).catch(() => {});
+  await rec.wait(2400);
   return finish(st, '19-simulator-grades');
 };
 
@@ -270,7 +299,9 @@ S['20-simulator-distributionals'] = async (outDir) => {
   const st = await openStage({ tab: 'simulator', outDir, settle: 5200 });
   const { page, rec } = st;
   await rec.wait(1200);
-  await rec.click('button:has-text("Distributionals")');
+  // The sidebar nav item also says "Distributionals"; the nav one carries a
+  // data-tour attribute, so exclude it rather than relying on DOM order.
+  await rec.click('button:not([data-tour]):has-text("Distributionals")');
   await rec.wait(2000);
   await scrollPane(page, 420);
   await rec.wait(2400);
@@ -309,7 +340,7 @@ S['23-simulator-save-affordance'] = async (outDir) => {
   await rec.wait(1200);
   await scrollPane(page, 340);
   await rec.wait(1000);
-  await drag(page, 'text=MENG 3125 >> nth=0', 'text=Spring 2027 >> nth=0', {
+  await htmlDrag(page, 'text=MENG 3125 >> nth=0', 'text=Spring 2027 >> nth=0', {
     toOffsetY: 240,
   });
   await rec.wait(1400);
@@ -408,6 +439,58 @@ S['30-sidebar-tour'] = async (outDir) => {
     await rec.wait(1300);
   }
   return finish(st, '30-sidebar-tour');
+};
+
+/* ------------------------------------------------------- extra coverage */
+
+S['31-course-modal'] = async (outDir) => {
+  const st = await openStage({ tab: 'courses', outDir, settle: 4200 });
+  const { page, rec } = st;
+  await rec.wait(1400);
+  await rec.click('text=BENG 3500 >> nth=0');
+  await rec.wait(3200);
+  await scrollPane(page, 200);
+  await rec.wait(2000);
+  return finish(st, '31-course-modal');
+};
+
+S['32-course-filters'] = async (outDir) => {
+  const st = await openStage({ tab: 'courses', outDir, settle: 4200 });
+  const { page, rec } = st;
+  await rec.wait(1200);
+  await rec.type('input[placeholder*="Search by code" i]', 'MENG', { delay: 120 });
+  await rec.wait(2200);
+  await page.locator('select').first().selectOption({ label: 'In progress' }).catch(() => {});
+  await rec.wait(2400);
+  return finish(st, '32-course-filters');
+};
+
+// Settings is where majors and all 42 certificates are picked. Opened and
+// scrolled only: nothing here is saved.
+S['33-settings-certificates'] = async (outDir) => {
+  const st = await openStage({ tab: 'certificate', outDir, settle: 4200 });
+  const { page, rec } = st;
+  await rec.wait(1200);
+  await rec.click('button[title="Settings"]');
+  await rec.wait(2800);
+  await scrollPane(page, 420, 900);
+  await rec.wait(2200);
+  await scrollPane(page, 520, 900);
+  await rec.wait(2400);
+  return finish(st, '33-settings-certificates');
+};
+
+S['34-major-requirement-modal'] = async (outDir) => {
+  const st = await openStage({ tab: 'major', outDir, settle: 4500 });
+  const { page, rec } = st;
+  await rec.wait(1400);
+  await scrollPane(page, 520);
+  await rec.wait(1400);
+  await rec.click('[data-tour="major-requirement-card"] >> nth=1');
+  await rec.wait(3000);
+  await scrollPane(page, 220);
+  await rec.wait(2000);
+  return finish(st, '34-major-requirement-modal');
 };
 
 export default S;

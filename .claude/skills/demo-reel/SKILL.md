@@ -40,7 +40,33 @@ That written grammar is what the storyboard has to obey.
 > `watch`'s frame extraction fails on ffmpeg 8 (`-vsync` was removed). The
 > download and captions still work, so pull frames with the ffmpeg line above.
 
-## 2. Get a real authenticated session
+## 2. Record against a local dev server, never production
+
+Run the app locally and point the recorder at `http://localhost:3000`. Start the
+dev server yourself if it is not already up.
+
+This is not a nicety. A full pass is one cold page load per shot, a real reel is
+30+ shots, and you will re-run the batch several times while fixing selectors
+and timings. That is easily a hundred loads of the app in an hour. Against a
+deployed environment that is real serverless invocations, real bandwidth, and on
+metered hosting it can push a project over a spend cap. Recording a demo is
+never worth spending production budget on, because a dev server renders
+identical footage.
+
+Ask before pointing any recording run at a deployed URL, and only for a shot
+that genuinely cannot run locally (a production-only integration, a real
+domain in frame).
+
+Two consequences worth planning for:
+
+- **Sessions are per origin.** A `storageState` captured against the production
+  domain will not authenticate `localhost`, because IndexedDB and cookies are
+  origin-scoped. Log in again against the local origin.
+- **Local still talks to real backends.** Hitting a dev server does not mean
+  hitting a fake database. If the app's API keys point at production data, every
+  rule in "Never mutate the user's account" below still applies in full.
+
+## 3. Get a real authenticated session
 
 Most of the product is behind login. Ask the user to log in once, interactively,
 into a browser you control. Do not try to automate an OAuth flow.
@@ -63,7 +89,7 @@ fine and restores you to the logged-out page. Playwright 1.51+ supports the flag
 Poll for the real auth marker rather than asking the user to confirm. For
 Firebase, that is a `firebase:authUser:*` key in that database.
 
-## 3. Probe before you script
+## 4. Probe before you script
 
 Never write shot scripts against guessed selectors. Boot the authenticated app
 once per surface, screenshot it, and dump what is actually there.
@@ -78,7 +104,7 @@ rg -o 'data-(testid|tour)="[^"]+"' -g '*.tsx' | sort -u
 Then read the screenshots. You are choosing what each shot frames, and you
 cannot do that from a DOM dump.
 
-## 4. Deep-link each shot to its surface
+## 5. Deep-link each shot to its surface
 
 Footage spent navigating is footage wasted. Find how the app persists its
 current view and pre-seed it with `addInitScript` before the app boots.
@@ -92,7 +118,38 @@ Seed dismissible tips and first-run modals the same way, so no take opens with
 an overlay across it. Check first that those flags are local-only; if a flag
 lives on the server profile, seeding it would write to the user's real account.
 
-## 5. Know what the recorder cannot do
+## 6. If the UI reads too small, re-render it bigger
+
+The most common note on a first pass is "it's too far away." Cropping in post is
+the wrong fix: it throws away resolution and the result goes soft exactly where
+the viewer is being asked to read a number.
+
+Two approaches that look right and are not:
+
+- **A smaller context viewport.** Playwright *frames* the viewport into the
+  video canvas rather than scaling it, so the page lands in the top-left corner
+  surrounded by black.
+- **A CDP `Emulation.setDeviceMetricsOverride`.** It re-lays-out the page, but
+  the capture still follows the page frame size, so you get the same corner.
+
+What works is CSS zoom on the document, applied in an init script before first
+paint:
+
+```js
+await ctx.addInitScript((z) => {
+  document.documentElement.style.zoom = String(z);   // 1.4–1.6 is a good range
+}, 1.5);
+```
+
+The browser lays out as if the viewport were narrower and repaints across the
+full surface, so controls get bigger and text stays sharp. Verify a click still
+lands afterwards; coordinates stay consistent, but confirm rather than assume.
+
+Add motion in the assembly instead of the capture: a slow push (1.00 → 1.06 over
+the shot) reads as intent. Render it from a 2x upscale, because `zoompan` steps
+in whole source pixels and visibly judders at 1080p.
+
+## 7. Know what the recorder cannot do
 
 `testreel` gives you an animated cursor, click ripples, zoom, and mp4 output.
 Its 15 actions do **not** include drag. If the product's hero interaction is a
@@ -112,7 +169,7 @@ Use `recordPage(page, opts)` rather than the JSON definition format whenever you
 need to own the browser lifecycle, which you do as soon as auth or `colorScheme`
 matters.
 
-## 6. Two failure modes that look like success
+## 8. Two failure modes that look like success
 
 Both produce a valid mp4 that is useless, and neither throws.
 
@@ -144,7 +201,7 @@ const pane = [...document.querySelectorAll('*')]
 Also hold until the pane has actually painted. Code-split views render a
 `Loading…` placeholder, and a shot that opens on it is wasted.
 
-## 7. QC every clip by looking at it
+## 9. QC every clip by looking at it
 
 A green exit code means ffmpeg ran, nothing more. For each clip, check duration
 and sample frames:
@@ -158,7 +215,7 @@ ffmpeg -i shot.mp4 -vf "fps=1/3,scale=700:-1" -q:v 3 /tmp/qc/%02d.jpg
 actually happening, no overlay covering the subject, no dead air at the tail.
 Re-record anything that fails; do not report a clip you have not seen.
 
-## 8. Never mutate the user's account
+## 10. Never mutate the user's account
 
 Recording against a real account is normal and usually the only way to get
 convincing data. Producing footage must not change that data.

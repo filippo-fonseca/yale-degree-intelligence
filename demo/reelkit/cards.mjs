@@ -48,6 +48,10 @@ const CARDS = [
   { id: '06-end-card', kind: 'end' },
 ];
 
+const LOGO =
+  'data:image/png;base64,' +
+  fs.readFileSync(path.join(path.dirname(new URL(import.meta.url).pathname), 'logo.png')).toString('base64');
+
 const FONT =
   `"SF Pro Display","Inter Tight",Inter,-apple-system,"Helvetica Neue",Arial,sans-serif`;
 
@@ -58,12 +62,14 @@ function page(card, transparent) {
       html,body{margin:0;height:100%;background:${ground};}
       .w{height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;
          font-family:${FONT};color:#fff;text-align:center;}
-      .mark{font-size:86px;font-weight:800;letter-spacing:-.035em;}
+      .logo{width:132px;height:132px;margin-bottom:34px;display:block;}
+      .mark{font-size:80px;font-weight:800;letter-spacing:-.035em;}
       .mark b{color:${PINK};}
       .url{margin-top:26px;font-size:44px;font-weight:600;letter-spacing:-.02em;color:#fff;}
       .sub{margin-top:34px;font-size:27px;font-weight:500;color:rgba(255,255,255,.62);letter-spacing:.01em;}
       .fine{position:absolute;bottom:64px;font-size:19px;font-weight:400;color:rgba(255,255,255,.34);}
     </style><div class="w">
+      <img class="logo" src="${LOGO}" alt="" />
       <div class="mark">Degree<b>Intelligence</b></div>
       <div class="url">degreeint.com</div>
       <div class="sub">Free forever &nbsp;·&nbsp; Open source</div>

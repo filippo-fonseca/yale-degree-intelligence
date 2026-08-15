@@ -23,9 +23,31 @@ edit decision. If it were baked into the capture, the footage could only ever
 support one cut. Scale, rotate, blur, and speed-ramp in the editor instead; the
 storyboard's editing notes give the specific values that reproduce the reference.
 
+## Record against localhost, not production
+
+**The recorder points at `http://localhost:3000` by default, and it should stay
+that way.** A full pass is ~34 cold page loads, and in practice you re-run it
+several times while fixing selectors and timings, so a session is comfortably a
+hundred loads. Against production that is real SSR invocations and bandwidth
+spent on an app that is free forever, for footage a dev server renders
+identically.
+
+Recording this reel against production once already coincided with the
+deployment being disabled for billing on 2026-08-15. Whether or not the traffic
+was the cause, it is not a trade worth making again.
+
+`REEL_BASE_URL` exists for the rare shot that genuinely cannot run locally.
+Setting it is a deliberate act.
+
 ## Running it
 
-Once per machine, or whenever the session expires:
+Start the app first:
+
+```bash
+npm run dev            # in the repo root, serves http://localhost:3000
+```
+
+Then, once per machine or whenever the session expires:
 
 ```bash
 cd demo/reelkit
@@ -33,12 +55,16 @@ npm install
 npm run login          # opens real Chrome; sign in with @yale.edu, then it saves
 ```
 
+The session is stored per origin, so a state file captured against
+`degreeint.com` does not authenticate `localhost`. Log in again after switching.
+
 Then:
 
 ```bash
 npm run record -- all              # every shot
 npm run record -- 17-simulator-canvas 21-simulator-progress   # just these
 npm run cards                      # the kinetic type cards as PNGs
+npm run assemble                   # cut the clips into ROUGH-CUT.mp4
 ```
 
 Output goes to `~/Desktop/di-v3-demo-reel/` (override with `REEL_OUT`), one

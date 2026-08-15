@@ -25,9 +25,10 @@ const ctx = await chromium.launchPersistentContext(PROFILE, {
 });
 
 const page = ctx.pages()[0] ?? (await ctx.newPage());
-await page.goto('https://degreeint.com', { waitUntil: 'domcontentloaded' });
+const BASE = process.env.REEL_BASE_URL || 'http://localhost:3000';
+await page.goto(BASE, { waitUntil: 'domcontentloaded' });
 
-console.log('[login] Chrome is open. Sign in with your @yale.edu Google account.');
+console.log(`[login] Chrome is open at ${BASE}. Sign in with your @yale.edu Google account.`);
 console.log('[login] Waiting for Firebase auth to land...');
 
 // Firebase Web SDK v11 persists the signed-in user in IndexedDB

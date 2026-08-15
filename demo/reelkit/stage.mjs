@@ -10,7 +10,18 @@ import { spawnSync } from 'node:child_process';
 import os from 'node:os';
 import path from 'node:path';
 
-export const HOME = 'https://www.degreeint.com';
+/**
+ * Where the reel records from. Localhost by default, deliberately.
+ *
+ * Recording a demo means loading the app ~100 times: every take is a cold page
+ * load, and a batch of 34 shots re-run a few times adds up fast. Pointing that
+ * at production burns real SSR invocations and bandwidth on an app whose whole
+ * pitch is "free forever", for footage a dev server renders identically.
+ *
+ * Overriding this to a deployed URL is a deliberate act, not a default. Do it
+ * only for a one-off shot that genuinely cannot run locally.
+ */
+export const HOME = process.env.REEL_BASE_URL || 'http://localhost:3000';
 const STATE = path.join(os.homedir(), '.di-demo', 'state.json');
 
 /**
@@ -50,7 +61,22 @@ export const TABS = {
  * @param {boolean} [o.cursor]
  */
 export async function openStage(o) {
+  // Compact mode is how the footage gets "closer" without losing resolution.
+  //
+  // Post-cropping a 1080p clip to punch in throws away pixels and goes soft. A
+  // smaller CSS viewport instead makes every control occupy proportionally more
+  // of the frame, and rendering at deviceScaleFactor 2 means the video is
+  // downsampled from 2560x1440 rather than upscaled. 1280 is still comfortably
+  // above the app's desktop breakpoint, so the layout does not change.
+  // Setting a smaller context viewport does not work: Playwright places the
+  // viewport-sized frame into the video canvas rather than scaling it, so the
+  // page ends up in the top-left corner. The override is applied over CDP after
+  // the page exists (see below), which renders a 1280x720 CSS viewport into the
+  // full 1920x1080 surface.
+  const compact = o.compact ?? !!process.env.REEL_COMPACT;
   const viewport = o.viewport ?? { width: 1920, height: 1080 };
+  const videoSize = { width: 1920, height: 1080 };
+  const zoom = o.zoom ?? 1.5;
   const theme = o.theme ?? 'dark';
   fs.mkdirSync(o.outDir, { recursive: true });
 
@@ -65,7 +91,7 @@ export async function openStage(o) {
     // anon shots (landing, login) must not carry the session
     ...(o.anon ? {} : { storageState: STATE }),
     viewport,
-    recordVideo: { dir: o.outDir, size: viewport },
+    recordVideo: { dir: o.outDir, size: videoSize },
     colorScheme: theme,
     deviceScaleFactor: 1,
     reducedMotion: 'no-preference',
@@ -94,11 +120,29 @@ export async function openStage(o) {
     { tabId, theme, keepSimNote: !!o.keepSimNote },
   );
 
+  if (compact) {
+    // Bring the UI closer without losing a pixel.
+    //
+    // Cropping in post throws away resolution; a smaller context viewport puts
+    // the page in the corner of the video canvas (Playwright frames the
+    // viewport, it does not scale it). CSS zoom is the one lever that makes the
+    // browser lay out smaller and repaint across the full 1920x1080 surface, so
+    // controls get bigger and text stays sharp.
+    await ctx.addInitScript((z) => {
+      const apply = () => {
+        document.documentElement.style.zoom = String(z);
+      };
+      apply();
+      document.addEventListener('DOMContentLoaded', apply);
+    }, zoom);
+  }
+
   // Playwright starts the video when the page opens, not when recordPage() is
   // called, so every clip would otherwise begin with the whole cold load.
   // Measure the offset precisely and trim exactly that much in finish().
   const tOpen = Date.now();
   const page = await ctx.newPage();
+
   await page.goto(o.url ?? HOME, { waitUntil: 'domcontentloaded' });
 
   if (!o.anon && !o.url) {

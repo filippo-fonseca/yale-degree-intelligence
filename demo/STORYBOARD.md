@@ -25,7 +25,7 @@ whole film obeys them:
    text and store badges. No hard sell.
 
 Rule 2 is the one that does the heavy lifting, and it is an **edit** decision,
-not a capture decision. That is why every clip in `demo/shots/` is recorded
+not a capture decision. That is why every clip the reel kit renders is recorded
 clean, full-bleed, dark, at 1920x1080, with no window chrome and no gradient
 background. The tilt, the depth of field, and the push are yours to add in the
 edit. Baking them in would make the footage un-editable.
@@ -78,8 +78,8 @@ opens on something true rather than on a slogan.
 | Time | Content | Source |
 |---|---|---|
 | 0:06.0 | **Upload once.** | type card |
-| 0:07.0 | Transcript PDF drops into the upload zone. Macro on the drop target. | `03-transcript-upload` |
-| 0:08.5 | Parse runs. Courses cascade in as cards. Push in slightly. | `03-transcript-upload` |
+| 0:07.0 | Transcript PDF drops into the upload zone. Macro on the drop target. | `27-transcript-upload-ui` |
+| 0:08.5 | Parse runs. Courses cascade in as cards. Push in slightly. | `27-transcript-upload-ui` |
 | 0:11.0 | **Know everything.** (pink) | type card |
 | 0:12.0 | My Courses, by semester. Tilted, drifting left. | `05-my-courses` |
 | 0:14.0 | Cmd+K. Palette snaps open, a course code types itself, jump. | `06-command-palette` |
@@ -97,14 +97,15 @@ reference's "SOUNDS" move.
 | 0:15.0 | Pink full-bleed: **MAJORS** | type card |
 | 0:15.5 | Requirement board, cards filling. Macro on one card going green. | `07-major-board` |
 | 0:17.0 | Heat map snaps on. Whole degree in one grid. | `08-major-heatmap` |
+| 0:18.0 | Two majors, two shared courses, flagged. | `09-major-shared-courses` |
 | 0:18.5 | Violet full-bleed: **CERTIFICATES** | type card |
-| 0:19.0 | Certificate picker. 42 of them scroll past. | `09-certificates-list` |
-| 0:20.5 | Overlap meter fills. A shared course greys out with its reason. | `10-certificate-overlap` |
+| 0:19.0 | Certificate progress, requirement cards, the policy in force. | `11-certificates` |
+| 0:20.5 | The `no overlap` badge. Data Science shares nothing with a major. | `11-certificates` |
 | 0:22.5 | Pink full-bleed: **DISTRIBUTIONALS** | type card |
-| 0:23.0 | Distributional rings and the pie resolve. | `11-distributionals` |
-| 0:24.5 | Language track steps up a level. | `11-distributionals` |
+| 0:23.0 | Distributional rings and the pie resolve. | `13-distributionals` |
+| 0:24.5 | Language track steps up a level. French, then Russian. | `14-distributionals-language` |
 | 0:25.5 | Violet full-bleed: **STATS** | type card |
-| 0:26.0 | GPA line draws itself across eight semesters. | `12-stats` |
+| 0:26.0 | GPA line draws itself across eight semesters. | `16-stats` |
 | 0:27.5 | Black. | — |
 
 ### Act 3 — The what-if (0:28 to 0:44)
@@ -115,15 +116,15 @@ because the Simulator is the thing nobody else has.
 | Time | Content | Source |
 |---|---|---|
 | 0:28.0 | **Now change your mind.** Large, centred, holds through the drop. | type card |
-| 0:29.5 | Canvas. Empty semesters, course pool. Wide, tilted. | `13-simulator-canvas` |
-| 0:31.0 | A course is dragged from one semester into another. Macro, follow the card. | `13-simulator-canvas` |
-| 0:33.0 | Two more drop in fast. Cut each on the beat. | `13-simulator-canvas` |
-| 0:35.0 | Grades editor toggles on. Letter grades appear on every card. | `14-simulator-grades` |
-| 0:36.5 | Distributionals editor toggles on. Tags fill themselves in. | `15-simulator-distributionals` |
+| 0:29.5 | Canvas. Empty semesters, course pool. Wide, tilted. | `17-simulator-canvas` |
+| 0:31.0 | A course is dragged from one semester into another. Macro, follow the card. | `17-simulator-canvas` |
+| 0:33.0 | Two more drop in fast. Cut each on the beat. | `18-simulator-drag-back` |
+| 0:35.0 | Grades editor toggles on. Letter grades appear on every card. | `19-simulator-grades` |
+| 0:36.5 | Distributionals editor toggles on. Tags fill themselves in. | `20-simulator-distributionals` |
 | 0:38.0 | **Watch every number move.** (pink) | type card |
-| 0:39.0 | Snap to the Progress tab. Requirement cards recompute. | `16-simulator-progress` |
-| 0:41.0 | GPA timeline redraws with the projection. Macro on the numbers. | `16-simulator-progress` |
-| 0:42.5 | Cmd+S. Save lands on the plan. | `17-simulator-save` |
+| 0:39.0 | Snap to the Progress tab. Requirement cards recompute. | `21-simulator-progress` |
+| 0:41.0 | GPA timeline redraws with the projection. Macro on the numbers. | `21-simulator-progress` |
+| 0:42.5 | Cmd+S. Save lands on the plan. | `23-simulator-save-affordance` |
 | 0:43.5 | Black. | — |
 
 The 0:36.5 beat is worth protecting in the edit. Tags filling themselves in is
@@ -134,9 +135,9 @@ even at half a second.
 
 | Time | Content | Source |
 |---|---|---|
-| 0:44.0 | Light mode wipes across the dashboard. | `18-theme-toggle` |
-| 0:45.5 | Public friend page. Clean, no grades, courses by semester. | `19-friends-public-page` |
-| 0:47.0 | Copy link. The toast confirms. | `20-friends-tab` |
+| 0:44.0 | Light mode wipes across the dashboard. | `26-theme-toggle` |
+| 0:45.5 | Public friend page. Clean, no grades, courses by semester. | `25-public-page` |
+| 0:47.0 | Copy link. The toast confirms. | `24-friends` |
 | 0:48.0 | Grades and GPA are never shared. Small type, holds. | type card |
 | 0:49.5 | Fast montage, 0.4s each: board, heat map, palette, canvas, stats. | reuse |
 | 0:52.0 | Black. | — |
@@ -151,7 +152,7 @@ The positioning statement, then the CTA. Nothing moves except the type.
 | 0:54.0 | **No guessing.** | type card |
 | 0:55.0 | **Just Yale's rules.** (pink) | type card |
 | 0:56.5 | Black. | — |
-| 0:57.0 | Logo. `degreeint.com`. Beneath it, small: Free forever. Open source. | `21-end-card` |
+| 0:57.0 | Logo. `degreeint.com`. Beneath it, small: Free forever. Open source. | `06-end-card (type card)` |
 | 0:59.0 | Bottom line, very small: Used by roughly 1 in 6 Yale undergrads. | end card |
 | 1:00.0 | Out. | — |
 
@@ -166,31 +167,45 @@ say. It is also the one claim a competitor cannot copy without rebuilding.
 
 ## Deliverables map
 
+These are the real clip ids produced by `demo/reelkit`. Anything referenced in
+the timecode tables above resolves to one of these.
+
 | Clip | Feature | v3? |
 |---|---|---|
-| `01-landing-hero` | Landing, star field, hero buttons | new in v3 |
-| `02-login` | Yale Google sign-in | |
-| `03-transcript-upload` | Transcript parse, dedupe, cached re-import | improved v3 |
+| `01-landing-hero` | Landing, drifting star field, new hero buttons | **new in v3** |
+| `02-landing-light` | The same landing in light mode | **new in v3** |
 | `04-dashboard-reveal` | First paint of the dashboard | |
-| `05-my-courses` | Courses by semester, filters, in-progress | |
-| `06-command-palette` | Cmd+K global search | **new in v3** |
-| `07-major-board` | Requirement board | **new in v3** |
-| `08-major-heatmap` | Heat map view | **new in v3** |
-| `09-certificates-list` | All 42 certificates | **new in v3** |
-| `10-certificate-overlap` | Policy engine, overlap meter, conflicts | **new in v3** |
-| `11-distributionals` | Auto-filled tags, per-language tracking | **new in v3** |
-| `12-stats` | GPA trend, credits, grade distribution | improved v3 |
-| `13-simulator-canvas` | Canvas, drag between semesters | **new in v3** |
-| `14-simulator-grades` | Grades editor | **new in v3** |
-| `15-simulator-distributionals` | Distributionals editor, auto-fill | **new in v3** |
-| `16-simulator-progress` | Progress tab, projected GPA and tally | **new in v3** |
-| `17-simulator-save` | Plan manager, Cmd+S | **new in v3** |
-| `18-theme-toggle` | Light mode | **new in v3** |
-| `19-friends-public-page` | Public page | rebuilt v3 |
-| `20-friends-tab` | Friends tab, copy link, privacy | rebuilt v3 |
-| `21-end-card` | Changelog / mission / open source | |
-| `22-double-major-conflicts` | Shared course conflict manager | **new in v3** |
-| `23-tutorial` | Guided in-app tour | **new in v3** |
+| `05-my-courses` | Courses by semester, semester rail | |
+| `06-command-palette` | Cmd+K, searching courses and requirements | **new in v3** |
+| `06b-command-palette-jump` | Cmd+K straight into another surface | **new in v3** |
+| `07-major-board` | Requirement board, requirement modal | **new in v3** |
+| `08-major-heatmap` | Heat map view of the whole major | **new in v3** |
+| `09-major-shared-courses` | Double-major shared-course conflict manager | **new in v3** |
+| `10-major-switch` | Switching between MENG and EECS | **new in v3** |
+| `11-certificates` | Certificate progress, the `no overlap` policy badge | **new in v3** |
+| `12-certificate-heatmap` | Certificate heat map | **new in v3** |
+| `13-distributionals` | Breakdown donut, area and skill cards | improved v3 |
+| `14-distributionals-language` | One language at a time: French and Russian | **new in v3** |
+| `15-distributionals-heatmap` | Distributional heat map | **new in v3** |
+| `16-stats` | GPA progression, per-department, grade distribution | improved v3 |
+| `17-simulator-canvas` | Canvas, dragging a course between semesters | **new in v3** |
+| `18-simulator-drag-back` | Two more drags, for cutting on the beat | **new in v3** |
+| `19-simulator-grades` | Grades editor, changing a projected grade | **new in v3** |
+| `20-simulator-distributionals` | Distributionals editor, tags pre-filled | **new in v3** |
+| `21-simulator-progress` | Projected progress + results | **new in v3** |
+| `22-simulator-plans` | Plan manager | **new in v3** |
+| `23-simulator-save-affordance` | Save appearing on an unsaved change | **new in v3** |
+| `24-friends` | Friends tab, What's shared, Copy link | rebuilt v3 |
+| `25-public-page` | The public friend page itself | rebuilt v3 |
+| `26-theme-toggle` | Light mode | **new in v3** |
+| `27-transcript-upload-ui` | Re-upload transcript, dropzone, YHub steps | improved v3 |
+| `28-changelog` | The public changelog | **new in v3** |
+| `29-mission` | The mission page | |
+| `30-sidebar-tour` | One pass across every pane, for the montage | |
+
+Not filmed, and why: the guided tour and the v3 welcome are gated on Firestore
+profile flags, and a live transcript parse needs a sample PDF. Both would need a
+throwaway account. See `demo/README.md`.
 
 ## Editing notes
 

@@ -101,9 +101,10 @@ export async function openStage(o) {
   const page = await ctx.newPage();
   await page.goto(o.url ?? HOME, { waitUntil: 'domcontentloaded' });
 
-  if (!o.anon) {
+  if (!o.anon && !o.url) {
     // Wait for the authenticated dashboard rather than a fixed sleep: the
-    // sidebar only renders once Firebase has resolved the user.
+    // sidebar only renders once Firebase has resolved the user. Skipped for
+    // explicit URLs (public page, changelog, mission), which have no sidebar.
     await page.waitForSelector('[data-tour="search"]', { timeout: 45000 });
   }
   if (o.waitFor) {

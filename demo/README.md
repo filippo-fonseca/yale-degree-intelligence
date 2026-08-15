@@ -78,6 +78,22 @@ also let the film show empty states and onboarding, which are genuinely part of
 v3. That is the single highest-value follow-up if you want the reel to be
 complete.
 
+## What rendered
+
+All 34 clips render. `ROUGH-CUT.mp4` is a 63-second animatic built by
+`npm run assemble`: the real clips and type cards cut to the storyboard, with no
+tilt, no depth of field, and no music. It exists to prove the shape and pacing
+before anyone opens an editor, not to be the film.
+
+Two surfaces refused to be filmed the obvious way and are worth knowing about if
+you edit the shot scripts:
+
+- **The public friend page needs a signed-in viewer.** Recorded anonymously it
+  renders "Sign in to view profiles", so `25-public-page` uses the session.
+- **The Simulator's Grades editor is already on in the saved plan.** A single
+  click turned it off and removed every grade control, so `19-simulator-grades`
+  ensures it is off first and then turns it on, which is the shot anyway.
+
 ## Also worth deciding
 
 The footage is your real account: your name, your courses, a 3.90 GPA, and your

@@ -278,8 +278,16 @@ S['19-simulator-grades'] = async (outDir) => {
   const st = await openStage({ tab: 'simulator', outDir, settle: 5200 });
   const { page, rec } = st;
   await rec.wait(1200);
+  // The saved plan already has the Grades editor on, so one click turned it OFF
+  // and removed every select. Ensure it is off first, then turn it on, so the
+  // grades appearing is the shot rather than a no-op.
+  if (await page.locator('select').count()) {
+    await rec.click('button:has-text("Grades")');
+    await rec.wait(1400);
+  }
   await rec.click('button:has-text("Grades")');
-  await rec.wait(1800);
+  await page.waitForSelector('select', { timeout: 10000 });
+  await rec.wait(1600);
   await scrollPane(page, 420);
   await rec.wait(1400);
   // scrollIntoViewIfNeeded fights the inner scroller here; the pane is already
@@ -376,7 +384,9 @@ S['25-public-page'] = async (outDir) => {
   const url = href ? new URL(href, HOME).toString() : null;
   if (!url) throw new Error('25-public-page: could not resolve public page URL');
 
-  const st = await openStage({ anon: true, url, outDir, settle: 6000 });
+  // The public page still requires a signed-in Yale account to view, so this
+  // cannot be recorded anonymously: it renders "Sign in to view profiles".
+  const st = await openStage({ url, outDir, settle: 6000 });
   const { page, rec } = st;
   await rec.wait(2400);
   await scrollPane(page, 420);
@@ -391,10 +401,11 @@ S['25-public-page'] = async (outDir) => {
 S['26-theme-toggle'] = async (outDir) => {
   const st = await openStage({ tab: 'major', outDir, settle: 4500 });
   const { page, rec } = st;
-  await rec.wait(1600);
-  const toggle = page.locator('header button, nav button').filter({ hasText: '' });
-  await rec.click('button:near(:text("DegreeIntelligence")) >> nth=-2');
-  await rec.wait(2600);
+  await rec.wait(1800);
+  await rec.click('button[aria-label="Toggle theme"]');
+  await rec.wait(3000);
+  await rec.click('button[aria-label="Toggle theme"]');
+  await rec.wait(2400);
   return finish(st, '26-theme-toggle');
 };
 

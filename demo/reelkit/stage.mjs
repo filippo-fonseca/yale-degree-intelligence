@@ -13,6 +13,24 @@ import path from 'node:path';
 export const HOME = 'https://www.degreeint.com';
 const STATE = path.join(os.homedir(), '.di-demo', 'state.json');
 
+/**
+ * Browsers opened but not yet closed.
+ *
+ * A shot that throws never reaches finish(), so its browser used to survive the
+ * failure. Six of those accumulated during one batch, each pinning a core, and
+ * later shots slowed from 30s to 259s and started timing out on their own — the
+ * failures were manufacturing more failures. The runner drains this after every
+ * shot, pass or fail.
+ */
+const OPEN = new Set();
+
+export async function closeAllBrowsers() {
+  for (const b of [...OPEN]) {
+    OPEN.delete(b);
+    await b.close().catch(() => {});
+  }
+}
+
 export const TABS = {
   courses: 'upload',
   major: 'major',
@@ -40,6 +58,8 @@ export async function openStage(o) {
     headless: true,
     args: ['--force-color-profile=srgb', '--font-render-hinting=none'],
   });
+
+  OPEN.add(browser);
 
   const ctx = await browser.newContext({
     // anon shots (landing, login) must not carry the session
@@ -303,6 +323,7 @@ export async function gotoTab(rec, tab) {
 export async function finish(st, label) {
   const { browser, rec, leadIn = 0 } = st;
   const result = await rec.stop();
+  OPEN.delete(browser);
   await browser.close();
 
   // Drop the cold-load head so the clip opens on a painted, ready surface.

@@ -344,7 +344,9 @@ S['23-simulator-save-affordance'] = async (outDir) => {
     toOffsetY: 240,
   });
   await rec.wait(1400);
-  await rec.hover('button:has-text("Save")');
+  // "Save" also appears inside the plan manager and the toolbar; match the
+  // canvas button exactly rather than by substring.
+  await rec.hover('button:text-is("Save") >> nth=0');
   await rec.wait(2600);
   return finish(st, '23-simulator-save-affordance');
 };

@@ -6,7 +6,8 @@
   "scripts": {
     "login": "node login.mjs",
     "record": "node record.mjs",
-    "cards": "node cards.mjs"
+    "cards": "node cards.mjs",
+    "assemble": "node assemble.mjs"
   },
   "dependencies": {
     "playwright": "^1.62.1",

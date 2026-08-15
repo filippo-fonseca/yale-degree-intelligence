@@ -5,6 +5,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import SHOTS from './shots.mjs';
+import { closeAllBrowsers } from './stage.mjs';
 
 const OUT_ROOT =
   process.env.REEL_OUT || path.join(os.homedir(), 'Desktop', 'di-v3-demo-reel');
@@ -42,6 +43,10 @@ for (const id of ids) {
   } catch (e) {
     console.log(`[fail] ${id}: ${String(e.message).split('\n')[0].slice(0, 160)}`);
     results.push({ id, ok: false, err: String(e.message).slice(0, 300) });
+  } finally {
+    // A failed shot must not leave its browser running: leaked instances pin a
+    // core each and slow every subsequent shot into its own timeout.
+    await closeAllBrowsers();
   }
 }
 

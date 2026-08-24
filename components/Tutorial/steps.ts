@@ -215,18 +215,24 @@ export const TOUR_STEPS: TourStep[] = [
     eyebrow: "Simulator",
     title: "Plan future semesters on a board",
     description:
-      "The Simulator is a drag-and-drop canvas for the semesters you haven't taken yet. Sketch out schedules course by course and see the whole degree take shape before you commit to anything.",
+      "The Simulator is a drag-and-drop canvas for the semesters you haven't taken yet. Every term through graduation is already laid out for you, empty and waiting. Sketch out schedules course by course and see the whole degree take shape before you commit to anything.",
     accent: "purple",
   },
   {
     id: "sim-drag",
     tabId: "simulator",
-    anchor: ['[data-tour="simulator-course-pool"]', '[data-tour="nav-simulator"]'],
+    // The semester column, not the course pool: the pool is hidden by default
+    // now, and the semesters are the thing you actually drag between.
+    anchor: [
+      '[data-tour="simulator-semester"]',
+      '[data-tour="simulator-board"]',
+      '[data-tour="nav-simulator"]',
+    ],
     icon: Move,
     eyebrow: "Simulator",
-    title: "Drag courses to rearrange",
+    title: "Every semester is a drop zone",
     description:
-      "Drop courses into any future term and drag them between semesters to test different orderings. It's built for what-ifs: try a heavier junior spring, then move it back in seconds.",
+      "This is one semester of your degree. Add a course to it, then drag courses between semesters to test different orderings. It's built for what-ifs: try a heavier junior spring, then move it back in seconds.",
     accent: "purple",
   },
   {

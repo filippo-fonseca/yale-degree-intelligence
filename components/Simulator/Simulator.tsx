@@ -63,6 +63,7 @@ import {
 } from "@/lib/utils/plannedCourseAdmission";
 import PlannedCourseBlockedModal from "./PlannedCourseBlockedModal";
 import { playPop } from "@/lib/soundEffects";
+import { isTourActive, useTourActive } from "@/lib/tourState";
 import type { Allocation } from "@/lib/certificatePolicy";
 
 /**
@@ -782,8 +783,10 @@ export default function Simulator({
             plans.find((p) => p.isDefault) ||
             newest;
           if (toLoad) loadPlanData(toLoad);
-        } else {
-          // Brand-new user with no plans → show the welcome modal.
+        } else if (!isTourActive()) {
+          // Brand-new user with no plans → show the welcome modal. Not during
+          // the guided tour: its Simulator steps point at the real board, and
+          // this dialog would sit on top of every one of them.
           setShowPlanSelector(true);
         }
         setPlansLoaded(true);
@@ -794,6 +797,13 @@ export default function Simulator({
     };
     loadSavedPlans();
   }, [user]);
+
+  // A tour can start while the plan selector is already up (the welcome modal
+  // offers "Take the tour"), so closing it on load is not enough.
+  const tourActive = useTourActive();
+  useEffect(() => {
+    if (tourActive) setShowPlanSelector(false);
+  }, [tourActive]);
 
   // ------------ Keyboard handler for modals ------------
   useEffect(() => {
@@ -1894,6 +1904,7 @@ export default function Simulator({
               return (
                 <motion.div
                   key={semester.id}
+                  data-tour="simulator-semester"
                   onClick={() => {
                     if (isPlaceTarget && selectedPoolCourse) {
                       placeCourseInSemester(selectedPoolCourse, semester.id);

@@ -6,6 +6,7 @@ import { FiX, FiCheck } from "react-icons/fi";
 import { TOUR_STEPS } from "./steps";
 import { ShinyButton } from "@/components/ui/shiny-button";
 import { GhostButton } from "@/components/ui/ghost-button";
+import { setTourActive } from "@/lib/tourState";
 
 interface AppTourProps {
   open: boolean;
@@ -85,6 +86,15 @@ export default function AppTour({
 
   useEffect(() => {
     if (open) setIndex(0);
+  }, [open]);
+
+  // Tell the rest of the app a tour is running, so surfaces that pop their own
+  // modal at first sight (the Simulator's plan selector) hold off. Cleared on
+  // unmount as well as on close, so an interrupted tour cannot leave the app
+  // permanently suppressed.
+  useEffect(() => {
+    setTourActive(open);
+    return () => setTourActive(false);
   }, [open]);
 
   // Lock body scroll while open.

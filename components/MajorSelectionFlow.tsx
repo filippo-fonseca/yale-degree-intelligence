@@ -11,6 +11,7 @@ import { CERTIFICATES } from "@/lib/certificates";
 import { MajorDropdown } from "./ui/MajorDropdown";
 import { CertificateDropdown } from "./ui/CertificateDropdown";
 import { ShinyButton } from "./ui/shiny-button";
+import { GhostButton } from "./ui/ghost-button";
 import Link from "next/link";
 import LogoIcon from "@/icons/LogoIcon";
 import { FiChevronDown, FiX } from "react-icons/fi";
@@ -76,25 +77,6 @@ const FEATURES: { icon: ReactNode; title: string; desc: string }[] = [
     desc: "Compare progress with friends who share their page.",
   },
 ];
-
-/** Secondary action. Mirrors the landing page's ghost CTA at a smaller size. */
-function GhostButton({
-  children,
-  onClick,
-}: {
-  children: ReactNode;
-  onClick: () => void;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className="inline-flex items-center justify-center gap-1.5 rounded-full border border-black/10 bg-white px-4 py-2 font-sf text-sm font-medium text-gray-600 transition-colors hover:text-gray-900 dark:border-white/15 dark:bg-white/[0.06] dark:text-gray-300 dark:hover:text-white"
-    >
-      {children}
-    </button>
-  );
-}
 
 /** Step heading: Louize headline, with an optional SF subhead under it. */
 function StepHeader({ title, subtitle }: { title: string; subtitle?: string }) {

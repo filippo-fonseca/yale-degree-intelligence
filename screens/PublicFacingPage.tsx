@@ -1481,16 +1481,38 @@ export default function AboutPage() {
           </h2>
 
           <p className="mx-auto mt-8 max-w-[52ch] font-sf text-base leading-relaxed text-gray-500 dark:text-gray-400 md:text-lg">
-            I built this for myself. I was trying to plan a double major,
-            couldn't keep it straight in a spreadsheet, so I made something that
-            could. Then I shared it, and it got away from me in the best way.
-            Watching other people use it to make sense of their own time here is
-            still the best part of it.
+            I initially built a version of this tool for myself during the
+            summer between my freshman and sophomore years at Yale. Like many of
+            us, I was quite overwhelmed between trying to fulfill my
+            distributionals, fulfill the requirements for my double major, take
+            cool classes with my friends, and on top of this do well and track
+            grades? Impossible before!
           </p>
 
           <p className="mx-auto mt-4 max-w-[52ch] font-sf text-base leading-relaxed text-gray-500 dark:text-gray-400 md:text-lg">
-            It's free, and it stays free. Not a business, not a startup, and
-            never going to be one.
+            I initially had set up what I thought was a nice-looking,
+            easy-to-use Google Sheets document... but I quickly realized how
+            suboptimal, tedious, and annoying that entire experience was. Most
+            of us do this, if at all, which I found ridiculous... so I sat down
+            and coded this up.
+          </p>
+
+          <p className="mx-auto mt-4 max-w-[52ch] font-sf text-base leading-relaxed text-gray-500 dark:text-gray-400 md:text-lg">
+            Since then, it's become something I could have never imagined! 1 in
+            6 Yale students use it, which is so amazing to see, as it leaves us
+            all more time to spend on things that make us fulfilled (as well as
+            making the most out of our Yale experience through stress-free
+            studying, course selection periods, etc.). I cannot tell you how
+            relaxed I am whenever course selection rolls around, as I already
+            know what I'm going to do months in advance. Even years. And if it
+            changes? The platform adapts with me.
+          </p>
+
+          <p className="mx-auto mt-4 max-w-[52ch] font-sf text-base leading-relaxed text-gray-500 dark:text-gray-400 md:text-lg">
+            I've kept this free for a reason; it's not a startup, not some
+            money-making gimmick. No no. This is a free, open-source tool for
+            the Yale community. And it will always be that way. For students, by
+            students!
           </p>
 
           {/* Team, a single centered person, no cards */}
@@ -1533,15 +1555,29 @@ export default function AboutPage() {
             ))}
           </div>
 
-          <p className="mt-14 font-mono text-xs tracking-tight text-gray-400 dark:text-gray-500">
-            want to contribute?{" "}
-            <a
-              href="mailto:filippo.fonseca@yale.edu"
-              className="underline underline-offset-4 transition-colors hover:text-gray-900 dark:hover:text-white"
-            >
-              → email me
-            </a>
-          </p>
+          {/* The old version of this was one line of 12px mono, which asked
+              for help at the size of a disclaimer. It is a real invitation, so
+              it gets a headline and the two actual routes in: a PR, or a
+              conversation. */}
+          <div className="mt-16 flex flex-col items-center">
+            <p className="text-balance text-2xl font-medium tracking-[-0.015em] text-gray-900 dark:text-white sm:text-3xl">
+              Want to join the team?
+            </p>
+            <p className="mx-auto mt-3 max-w-[52ch] font-sf text-sm leading-relaxed text-gray-500 dark:text-gray-400">
+              We&apos;re open source. Contribute with a pull request, or get
+              involved more actively and email me so we can talk.
+            </p>
+            <div className="mt-6 flex flex-wrap items-center justify-center gap-2.5 font-sf">
+              <GhostCTA href={REPO_URL} size="sm">
+                <FaGithub size={13} aria-hidden />
+                Contribute with a PR
+              </GhostCTA>
+              <GhostCTA href="mailto:filippo.fonseca@yale.edu" size="sm">
+                Email me
+                <span aria-hidden>&rarr;</span>
+              </GhostCTA>
+            </div>
+          </div>
         </motion.div>
       </section>
 

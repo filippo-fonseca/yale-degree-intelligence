@@ -10,7 +10,7 @@ import {
   FiChevronsRight,
   FiCoffee,
 } from "react-icons/fi";
-import { FaHeart } from "react-icons/fa6";
+import { FaGithub, FaHeart } from "react-icons/fa6";
 import { MessageCircleQuestionMark, Search } from "lucide-react";
 import type { NavItem } from "./navItems";
 
@@ -291,6 +291,17 @@ export function DesktopSidebar({
                   />
                 </div>
                 <span className="text-xs">Buy us a coffee</span>
+              </Link>
+              <Link
+                href="https://github.com/filippo-fonseca/yale-degree-intelligence"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full flex items-center space-x-2 p-1.5 rounded-lg hover:bg-black/[0.04] dark:hover:bg-white/[0.06] hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.6)] dark:hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] transition-all duration-200 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
+              >
+                <div className="p-1 rounded-md bg-gradient-to-br from-gray-500/20 to-gray-900/30 border border-gray-500/30 shadow-[inset_0_1px_0_rgba(255,255,255,0.1)] flex items-center justify-center">
+                  <FaGithub className="text-gray-300" size={10} />
+                </div>
+                <span className="text-xs">We&apos;re open source</span>
               </Link>
             </div>
           </motion.div>

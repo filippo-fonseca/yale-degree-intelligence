@@ -25,6 +25,12 @@ export interface ShinyButtonProps {
   className?: string;
   /** Disables the button and dims it. Callers swap the label themselves. */
   pending?: boolean;
+  /**
+   * Inert because the form isn't ready yet, as opposed to `pending`, which is
+   * inert because a request is in flight. Same dimming, but no `aria-busy`:
+   * a disabled Continue button is not busy, it is waiting on the user.
+   */
+  disabled?: boolean;
   /** `md` for hero and section primaries, `sm` for the nav. */
   size?: ShinyButtonSize;
   /** Trailing arrow, matching the old brand CTA. Off for compact buttons. */
@@ -50,13 +56,16 @@ export function ShinyButton({
   href,
   className = "",
   pending = false,
+  disabled = false,
   size = "md",
   withArrow = false,
   "aria-label": ariaLabel,
 }: ShinyButtonProps) {
+  const inert = pending || disabled;
   const cls = cn(
     "shiny-cta inline-flex items-center justify-center font-medium",
     CTA_SIZES[size],
+    inert && "cursor-not-allowed opacity-45",
     className,
   );
 
@@ -82,10 +91,10 @@ export function ShinyButton({
 
   return (
     <motion.button
-      whileHover={pending ? undefined : { y: -1 }}
+      whileHover={inert ? undefined : { y: -1 }}
       onClick={onClick}
-      disabled={pending}
-      aria-busy={pending}
+      disabled={inert}
+      aria-busy={pending || undefined}
       aria-label={ariaLabel}
       className={cls}
     >

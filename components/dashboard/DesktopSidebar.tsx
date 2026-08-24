@@ -138,10 +138,13 @@ export function DesktopSidebar({
                   }
                 />
                 {sidebarExpanded && (
-                  <span className="whitespace-nowrap">{item.label}</span>
+                  <span className="truncate">{item.label}</span>
                 )}
+                {/* shrink-0 with a truncating label beside it: at the sidebar's
+                    width "My certificates" plus a chip overflows the pill, and
+                    the label is the part that can afford to give. */}
                 {sidebarExpanded && item.badge && (
-                  <span className="ml-0.5 px-1.5 py-0.5 text-[9px] rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-700 dark:text-emerald-300 whitespace-nowrap">
+                  <span className="ml-0.5 shrink-0 rounded-full border border-emerald-500/30 bg-emerald-500/15 px-1.5 py-0.5 font-sf text-[9px] leading-none text-emerald-700 dark:text-emerald-300">
                     {item.badge}
                   </span>
                 )}

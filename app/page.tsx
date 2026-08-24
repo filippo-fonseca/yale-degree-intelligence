@@ -16,6 +16,7 @@ import {
 import { useCommandPaletteHotkey } from "@/components/dashboard/useCommandPaletteHotkey";
 import { useSidebarState } from "@/components/dashboard/useSidebarState";
 import { useOnboarding } from "@/components/dashboard/useOnboarding";
+import { useNavNudges } from "@/components/dashboard/useNavNudges";
 import { useDashboardNav } from "@/components/dashboard/useDashboardNav";
 import { useUserProfile } from "@/components/dashboard/useUserProfile";
 import { useFriendsFeature } from "@/components/dashboard/useFriendsFeature";
@@ -98,10 +99,13 @@ export default function Home() {
   // "New" chip on My certificates, cleared the first time the tab is opened.
   const certificatesNew = useDismissibleFlag("nav:certificates-new");
 
+  // "2030 can use!" chips, each retired the first time its tab is opened.
+  const { nudgeTabs, markVisited } = useNavNudges(isBrandNew);
+
   const navItems = createNavItems(
     userProfile?.majors?.length ?? 0,
     userProfile?.certificates?.length ?? 0,
-    { isBrandNew, showCertificatesNew: certificatesNew.show },
+    { nudgeTabs, showCertificatesNew: certificatesNew.show },
   );
 
   const { activeTab, setActiveTab, handleTabChange, registerSimulatorNavCheck } =
@@ -110,6 +114,12 @@ export default function Home() {
   useEffect(() => {
     if (activeTab === "certificate") certificatesNew.dismiss();
   }, [activeTab, certificatesNew]);
+
+  // Retires the chip for whichever tab is open, including the one restored
+  // from the last session, so it does not survive until the next click.
+  useEffect(() => {
+    markVisited(activeTab);
+  }, [activeTab, markVisited]);
 
   const { welcomeOpen, setWelcomeOpen, tourOpen, setTourOpen } = useOnboarding(
     user,

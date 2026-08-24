@@ -70,7 +70,7 @@ export function PublicPageCard({
     .join(" · ");
 
   return (
-    <section className="mb-6 rounded-xl border border-gray-200 bg-white shadow-neu backdrop-blur-md dark:border-white/[0.08] dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60">
+    <section className="overflow-hidden rounded-2xl border border-black/[0.08] bg-white dark:border-white/[0.09] dark:bg-white/[0.02]">
       <div className="flex items-start gap-3 p-4">
         <UserAvatar
           photoURL={user.photoURL || undefined}
@@ -80,14 +80,14 @@ export function PublicPageCard({
         />
 
         <div className="min-w-0 flex-1">
-          <p className="text-[11px] font-semibold uppercase tracking-wider text-pink-600 dark:text-pink-400">
+          <p className="font-mono text-[10px] uppercase tracking-[0.12em] text-gray-400 dark:text-gray-500">
             Your public page
           </p>
-          <p className="mt-1 truncate text-sm font-medium text-gray-900 dark:text-gray-100">
+          <p className="mt-1 truncate font-sf text-sm font-medium text-gray-900 dark:text-gray-100">
             {user.displayName || user.email?.split("@")[0] || "Your page"}
           </p>
           {subtitle && (
-            <p className="mt-0.5 truncate text-[11px] text-gray-500 dark:text-gray-400">
+            <p className="mt-0.5 truncate font-sf text-xs text-gray-500 dark:text-gray-400">
               {subtitle}
             </p>
           )}
@@ -95,36 +95,36 @@ export function PublicPageCard({
           {/* What friends actually see, stated rather than previewed. */}
           <div className="mt-2.5 flex flex-wrap items-center gap-1.5">
             {shared.length === 0 ? (
-              <span className="text-[11px] text-gray-500 dark:text-gray-400">
+              <span className="font-sf text-xs text-gray-500 dark:text-gray-400">
                 Nothing is shared yet. Turn a section on below.
               </span>
             ) : (
               shared.map(({ key, label }) => (
                 <span
                   key={key}
-                  className="rounded-full border border-pink-200 bg-pink-50 px-2 py-0.5 text-[10px] font-medium text-pink-700 dark:border-pink-800/40 dark:bg-pink-900/20 dark:text-pink-300"
+                  className="rounded-full border border-black/[0.08] bg-[#fafafa] px-2 py-0.5 font-sf text-[11px] text-gray-600 dark:border-white/[0.1] dark:bg-white/[0.04] dark:text-gray-300"
                 >
                   {label}
                 </span>
               ))
             )}
             {hidden > 0 && shared.length > 0 && (
-              <span className="text-[10px] text-gray-400 dark:text-gray-500">
+              <span className="font-mono text-[10px] text-gray-400 dark:text-gray-500">
                 {hidden} hidden
               </span>
             )}
           </div>
-          <p className="mt-2 text-[11px] leading-relaxed text-gray-500 dark:text-gray-400">
+          <p className="mt-2 font-mono text-[11px] leading-relaxed text-gray-400 dark:text-gray-500">
             Grades are never shared, whatever you turn on here.
           </p>
         </div>
       </div>
 
-      <div className="flex flex-wrap gap-2 border-t border-gray-200 px-4 py-3 dark:border-white/[0.06]">
+      <div className="flex flex-wrap gap-2 border-t border-black/[0.07] px-4 py-3 font-sf dark:border-white/[0.08]">
         <Link
           href={`/user/${user.uid}`}
           target="_blank"
-          className="inline-flex flex-1 min-w-[120px] items-center justify-center gap-1.5 rounded-lg border border-pink-200 bg-pink-50 px-3 py-2 text-xs font-medium text-pink-700 transition hover:bg-pink-100 dark:border-pink-800/40 dark:bg-pink-900/20 dark:text-pink-300 dark:hover:bg-pink-800/30"
+          className="inline-flex flex-1 min-w-[110px] items-center justify-center gap-1.5 rounded-full border border-black/10 bg-white px-3 py-2 text-sm font-medium text-gray-600 transition-colors hover:text-gray-900 dark:border-white/15 dark:bg-white/[0.06] dark:text-gray-300 dark:hover:text-white"
         >
           <FiExternalLink size={12} />
           View public page
@@ -136,7 +136,7 @@ export function PublicPageCard({
             navigator.clipboard.writeText(shareUrl);
             toast.success("Link copied");
           }}
-          className="inline-flex flex-1 min-w-[100px] items-center justify-center gap-1.5 rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-xs font-medium text-gray-700 transition hover:border-pink-300 hover:text-pink-600 dark:border-white/[0.08] dark:bg-white/[0.04] dark:text-gray-300 dark:hover:border-pink-500/40 dark:hover:text-pink-300"
+          className="inline-flex flex-1 min-w-[110px] items-center justify-center gap-1.5 rounded-full border border-black/10 bg-white px-3 py-2 text-sm font-medium text-gray-600 transition-colors hover:text-gray-900 dark:border-white/15 dark:bg-white/[0.06] dark:text-gray-300 dark:hover:text-white"
         >
           <FiCopy size={12} />
           Copy link
@@ -145,7 +145,7 @@ export function PublicPageCard({
           type="button"
           onClick={onToggleCustomize}
           aria-expanded={showCustomize}
-          className="inline-flex flex-1 min-w-[100px] items-center justify-center gap-1.5 rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-xs font-medium text-gray-700 transition hover:border-pink-300 hover:text-pink-600 dark:border-white/[0.08] dark:bg-white/[0.04] dark:text-gray-300 dark:hover:border-pink-500/40 dark:hover:text-pink-300"
+          className="inline-flex flex-1 min-w-[110px] items-center justify-center gap-1.5 rounded-full border border-black/10 bg-white px-3 py-2 text-sm font-medium text-gray-600 transition-colors hover:text-gray-900 dark:border-white/15 dark:bg-white/[0.06] dark:text-gray-300 dark:hover:text-white"
         >
           <FiSettings size={12} />
           What&apos;s shared
@@ -164,13 +164,13 @@ export function PublicPageCard({
             exit={{ opacity: 0, height: 0 }}
             className="overflow-hidden"
           >
-            <div className="space-y-2 border-t border-gray-200 px-4 py-3 dark:border-white/[0.06]">
+            <div className="space-y-2 border-t border-black/[0.07] px-4 py-3 dark:border-white/[0.08]">
               {SECTIONS.map(({ key, label }) => (
                 <label
                   key={key}
-                  className="flex cursor-pointer items-center justify-between rounded-lg border border-gray-200/70 bg-gray-50 p-2.5 dark:border-white/[0.06] dark:bg-white/[0.03]"
+                  className="flex cursor-pointer items-center justify-between rounded-xl border border-black/[0.06] bg-[#fafafa] p-2.5 dark:border-white/[0.07] dark:bg-white/[0.03]"
                 >
-                  <span className="text-xs text-gray-700 dark:text-gray-300">
+                  <span className="font-sf text-sm text-gray-700 dark:text-gray-300">
                     {label}
                   </span>
                   <button

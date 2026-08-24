@@ -3,6 +3,7 @@
 import type { User } from "firebase/auth";
 import { motion } from "framer-motion";
 import { Course } from "@/lib/types";
+import { FiPlus } from "react-icons/fi";
 import { MAJORS } from "@/lib/majors";
 import { MajorProgressView } from "./dynamicTabs";
 import { SharedCoursesConflictManager } from "./SharedCoursesConflictManager";
@@ -18,6 +19,7 @@ interface MajorTabPanelProps {
   getMajorProgress: () => MajorProgress | null;
   onRequirementChange: () => void;
   onTogglePrereqOverride: (code: string) => void;
+  onOpenSettings: () => void;
 }
 
 export function MajorTabPanel({
@@ -29,6 +31,7 @@ export function MajorTabPanel({
   getMajorProgress,
   onRequirementChange,
   onTogglePrereqOverride,
+  onOpenSettings,
 }: MajorTabPanelProps) {
   const progress = getMajorProgress();
 
@@ -54,7 +57,9 @@ export function MajorTabPanel({
           </p>
         </div>
       )}
-      {userProfile && userProfile?.majors?.length > 1 && (
+      {/* From one major: the row is where you add a second one, and a lone
+          chip still names what the progress below is measuring. */}
+      {userProfile && (userProfile?.majors?.length ?? 0) >= 1 && (
         <div className="mb-4">
           <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1.5 uppercase tracking-wider">
             Viewing Progress For
@@ -73,6 +78,16 @@ export function MajorTabPanel({
                 {major} - {MAJORS[major] || major}
               </button>
             ))}
+            {userProfile.majors.length < 2 && (
+              <button
+                onClick={onOpenSettings}
+                className="inline-flex items-center gap-1 rounded-xl border border-dashed border-black/[0.14] px-3 py-1.5 text-sm text-gray-500 transition-colors hover:border-blue-500/50 hover:text-gray-900 dark:border-white/[0.14] dark:text-gray-400 dark:hover:border-blue-500/50 dark:hover:text-white"
+                title="Add a second major in Settings"
+              >
+                <FiPlus size={13} />
+                Add a second major
+              </button>
+            )}
             <SharedCoursesConflictManager
               userProfile={userProfile}
               courses={courses}

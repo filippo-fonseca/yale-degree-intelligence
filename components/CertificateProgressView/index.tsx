@@ -735,7 +735,7 @@ export default function CertificateProgressView({
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
           <p className="text-xs uppercase tracking-wider text-teal-600 dark:text-teal-400 mb-1">
-            My certificate(s)
+            {userCertificates.length > 1 ? "My certificates" : "My certificate"}
           </p>
           <h3 className="text-xl font-medium text-gray-900 dark:text-white">
             {CERTIFICATES[selectedCertificate]}
@@ -824,7 +824,9 @@ export default function CertificateProgressView({
               : `${completedCredits}/${totalCredits}`
           }
           color={showInProgressStats ? "text-teal-600 dark:text-teal-300" : "text-blue-600 dark:text-blue-300"}
-          infoTooltip="This shows your completed credits out of the total required for your indicated certificate(s)."
+          infoTooltip={`This shows your completed credits out of the total required for your indicated ${
+            userCertificates.length > 1 ? "certificates" : "certificate"
+          }.`}
         />
         <CertificateStatCard
           label="Completion"

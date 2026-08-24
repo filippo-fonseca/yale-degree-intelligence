@@ -2,6 +2,7 @@
 
 import type { User } from "firebase/auth";
 import { motion } from "framer-motion";
+import { FiPlus } from "react-icons/fi";
 import { RiAwardFill } from "react-icons/ri";
 import { Course } from "@/lib/types";
 import { CERTIFICATES } from "@/lib/certificates";
@@ -55,7 +56,10 @@ export function CertificateTabPanel({
         </div>
       )}
 
-      {userProfile && certificates.length > 1 && (
+      {/* From one certificate, not two: with a single one the row is what
+          carries the "add another" affordance, and a lone chip also tells you
+          which certificate the progress below belongs to. */}
+      {userProfile && certificates.length >= 1 && (
         <div className="mb-4">
           <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1.5 uppercase tracking-wider">
             Viewing Progress For
@@ -74,6 +78,16 @@ export function CertificateTabPanel({
                 {CERTIFICATES[certificate] || certificate}
               </button>
             ))}
+            {certificates.length < 3 && (
+              <button
+                onClick={onOpenSettings}
+                className="inline-flex items-center gap-1 rounded-xl border border-dashed border-black/[0.14] px-3 py-1.5 text-sm text-gray-500 transition-colors hover:border-teal-500/50 hover:text-gray-900 dark:border-white/[0.14] dark:text-gray-400 dark:hover:border-teal-500/50 dark:hover:text-white"
+                title="Add a certificate in Settings"
+              >
+                <FiPlus size={13} />
+                Add {certificates.length === 0 ? "a" : "another"} certificate
+              </button>
+            )}
           </div>
         </div>
       )}

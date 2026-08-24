@@ -146,21 +146,18 @@ export function CertificateTipHelpButton({
   label?: string;
 }) {
   return (
-    // Same containment as the major variant: the gradient is this element's own
-    // background, shown through 1.5px of padding, so nothing extends past the
-    // border and an ancestor's overflow-hidden has nothing to clip.
-    <div
-      className={`relative rounded-lg bg-[conic-gradient(from_var(--angle),#14b8a6,#0d9488,#2dd4bf,#14b8a6)] p-[1.5px] animate-border-spin ${className}`}
-      style={{ "--angle": "0deg" } as React.CSSProperties}
-    >
+    // Was an animated conic-gradient border in teal. v3 does not have a second
+    // accent system: a hairline row with a teal icon, matching the major
+    // variant and everything else on the page.
+    <div className={`relative ${className}`}>
       <button
         onClick={onClick}
-        className="relative flex items-center justify-between w-full p-3 bg-white dark:bg-gray-900 rounded-[calc(0.5rem-1.5px)] text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+        className="flex w-full items-center justify-between rounded-xl border border-black/[0.08] bg-white p-3 font-sf text-sm text-gray-600 transition-colors hover:border-black/[0.14] hover:text-gray-900 dark:border-white/[0.09] dark:bg-white/[0.03] dark:text-gray-400 dark:hover:border-white/[0.16] dark:hover:text-white"
         title="What do 'Manual fulfill' and 'Skip' mean?"
       >
         <div className="flex items-center gap-2">
-          <HelpCircle className="w-4 h-4 text-teal-500" />
-          <span>{label}</span>
+          <HelpCircle className="h-4 w-4 shrink-0 text-teal-500 dark:text-teal-400" />
+          <span className="text-left">{label}</span>
         </div>
       </button>
     </div>

@@ -322,8 +322,8 @@ export default function MajorSelectionFlow({
                   </h1>
 
                   <p className="mx-auto mt-3 max-w-[44ch] font-sf text-sm leading-relaxed text-gray-500 dark:text-gray-400">
-                    Four short questions, then the whole app is yours. Every
-                    answer is editable later in Settings.
+                    we only have four short questions for you... then you&apos;re
+                    off to cook. You can edit everything later, dw.
                   </p>
                 </div>
 

@@ -1799,16 +1799,22 @@ function YdnBanner() {
           initial={false}
           exit={{ height: 0, opacity: 0 }}
           transition={{ duration: 0.22, ease: "easeOut" }}
-          className="overflow-hidden bg-gray-900 text-white dark:bg-white/[0.06]"
+          // Yale blue, not the near-black it was: the banner is the one place
+          // on the page pointing at something outside DI, and the paper it
+          // points at is Yale's. The brand pink stays reserved for our own CTAs.
+          className="overflow-hidden bg-[#00356b] text-white"
         >
           <div className="relative mx-auto flex h-9 max-w-7xl items-center justify-center px-10 font-sf text-xs font-medium">
             <a
               href={YDN_ARTICLE_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="transition-opacity hover:opacity-80"
+              className="inline-flex items-center gap-2 transition-opacity hover:opacity-80"
             >
-              read our feature in the Yale Daily News (YDN){" "}
+              <span className="rounded-full bg-white/15 px-1.5 py-0.5 font-mono text-[10px] uppercase tracking-[0.12em] text-white/90">
+                YDN
+              </span>
+              read our feature in the Yale Daily News{" "}
               <span aria-hidden className="opacity-70">
                 ↗
               </span>

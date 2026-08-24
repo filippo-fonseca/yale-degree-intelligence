@@ -96,16 +96,18 @@ function GhostButton({
   );
 }
 
-/** Step heading pair: Louize headline, SF subhead. */
-function StepHeader({ title, subtitle }: { title: string; subtitle: string }) {
+/** Step heading: Louize headline, with an optional SF subhead under it. */
+function StepHeader({ title, subtitle }: { title: string; subtitle?: string }) {
   return (
     <div className="text-center">
       <h2 className="text-[1.5rem]/[1.25] font-medium tracking-[-0.02em] text-gray-900 dark:text-white sm:text-[1.75rem]/[1.25]">
         {title}
       </h2>
-      <p className="mx-auto mt-2 max-w-[42ch] font-sf text-sm leading-relaxed text-gray-500 dark:text-gray-400">
-        {subtitle}
-      </p>
+      {subtitle && (
+        <p className="mx-auto mt-2 max-w-[42ch] font-sf text-sm leading-relaxed text-gray-500 dark:text-gray-400">
+          {subtitle}
+        </p>
+      )}
     </div>
   );
 }
@@ -648,10 +650,7 @@ export default function MajorSelectionFlow({
 
             {step === "year" && (
               <motion.div key="year" {...stepTransition} className="space-y-5">
-                <StepHeader
-                  title="When do you graduate?"
-                  subtitle="This sets your pace, your timeline, and what counts as on track."
-                />
+                <StepHeader title="When do you graduate?" />
 
                 <div className="space-y-3">
                   <div className="flex flex-wrap justify-center gap-2">

@@ -12,6 +12,7 @@ import {
 } from "react-icons/fi";
 import { FaGithub, FaHeart } from "react-icons/fa6";
 import { MessageCircleQuestionMark, Search } from "lucide-react";
+import { playPop } from "@/lib/soundEffects";
 import type { NavItem } from "./navItems";
 
 interface DesktopSidebarProps {
@@ -106,7 +107,7 @@ export function DesktopSidebar({
               whileTap={{ scale: 0.98 }}
               onClick={() => {
                 onTabChange(item.id);
-                void new Audio("/audio/pop.mp3").play().catch(() => null);
+                playPop();
               }}
               data-tour={`nav-${item.id}`}
               title={sidebarExpanded ? undefined : item.label}

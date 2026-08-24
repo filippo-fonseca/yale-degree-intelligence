@@ -14,6 +14,7 @@ import { FaGithub, FaHeart } from "react-icons/fa6";
 import { MessageCircleQuestionMark } from "lucide-react";
 import CompoundLogo from "@/components/ui/CompoundLogo";
 import { UserAvatar } from "@/components/ui/UserAvatar";
+import { playPop } from "@/lib/soundEffects";
 import type { NavItem } from "./navItems";
 
 interface MobileSidebarProps {
@@ -72,7 +73,7 @@ export function MobileSidebar({
                     onClick={() => {
                       onTabChange(item.id);
                       onClose();
-                      void new Audio("/audio/pop.mp3").play().catch(() => null);
+                      playPop();
                     }}
                     className={`w-full flex items-center justify-between px-4 py-3 text-left rounded-2xl transition-all duration-300 ${
                       activeTab === item.id

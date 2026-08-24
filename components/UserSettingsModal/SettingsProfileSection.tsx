@@ -2,6 +2,7 @@
 
 import { FiEdit2, FiSun, FiMoon } from "react-icons/fi";
 import { useTheme } from "@/context/ThemeContext";
+import { useSoundEnabled } from "@/lib/soundEffects";
 import { BIO_MAX } from "./useUserProfileForm";
 import type { UserProfile } from "./settingsTypes";
 
@@ -43,6 +44,7 @@ export function SettingsProfileSection({
   onEnableFriends,
 }: SettingsProfileSectionProps) {
   const { resolvedTheme, toggleTheme } = useTheme();
+  const [soundEnabled, setSoundEnabled] = useSoundEnabled();
   const isDark = resolvedTheme === "dark";
 
   return (
@@ -151,6 +153,34 @@ export function SettingsProfileSection({
                 )}
               </span>
             </button>
+          </div>
+        </div>
+
+        {/* Sound effects. Device-local, so it is not part of the profile form
+            and saves the moment it is flipped. */}
+        <div className="rounded-xl border border-black/[0.06] dark:border-white/[0.08] bg-gray-50 dark:bg-transparent dark:bg-gradient-to-br dark:from-white/[0.06] dark:via-transparent dark:to-black/10 shadow-sm dark:shadow-[0_2px_12px_rgba(0,0,0,0.2)] backdrop-blur-sm">
+          <div className="flex items-center justify-between px-3 py-2.5">
+            <div className="flex-1 mr-2">
+              <span className="text-xs font-medium text-gray-800 dark:text-gray-200">
+                Sound effects
+              </span>
+              <p className="text-[10px] text-gray-500 dark:text-gray-400 mt-0.5">
+                The little pop when you switch tabs or drop a course. On by
+                default, and remembered on this device only.
+              </p>
+            </div>
+            <label className="relative inline-flex cursor-pointer items-center">
+              <input
+                type="checkbox"
+                checked={soundEnabled}
+                onChange={(e) => setSoundEnabled(e.target.checked)}
+                className="peer sr-only"
+              />
+              <div
+                className={`di-toggle ${soundEnabled ? "di-toggle-on" : ""}`}
+                aria-hidden="true"
+              />
+            </label>
           </div>
         </div>
 

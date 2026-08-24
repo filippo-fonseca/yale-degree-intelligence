@@ -62,6 +62,7 @@ import {
   type SlotRefusal,
 } from "@/lib/utils/plannedCourseAdmission";
 import PlannedCourseBlockedModal from "./PlannedCourseBlockedModal";
+import { playPop } from "@/lib/soundEffects";
 import type { Allocation } from "@/lib/certificatePolicy";
 
 /**
@@ -882,11 +883,7 @@ export default function Simulator({
   }, [activeView]);
 
   // ------------ Drag & Drop ------------
-  const playPopSound = () => {
-    const audio = new Audio("/audio/pop.mp3");
-    audio.volume = 0.5;
-    audio.play().catch(() => {}); // Ignore errors if audio can't play
-  };
+  const playPopSound = () => playPop(0.5);
 
   const handleDragStart = (course: Course, sourceSemesterId?: string) => {
     setDraggedCourse(course);

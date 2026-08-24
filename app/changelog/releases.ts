@@ -24,6 +24,16 @@ export const RELEASES: Release[] = [
       "A quieter front door, a transcript import that no longer does the same work twice, and clearer numbers where you read your progress.",
     sections: [
       {
+        title: "Setting up your account",
+        items: [
+          "The setup you go through when you first sign in has been rebuilt to look like the rest of v3. Same typography, same calm dark canvas, same buttons as the homepage, instead of the four differently coloured panels it used to open with.",
+          "Setup now tells you where you are: a short label at the top of the window and a thin line that fills as you answer, in place of the row of numbered circles.",
+          "Choosing your graduation year is now a row of years you tap, and it tells you which class that makes you, rather than a drop-down list.",
+          "The tip cards in setup, and everywhere else in the app, no longer show up as a bright white box in dark mode.",
+          "The major and certificate pickers match the surfaces around them now, in both light and dark mode.",
+        ],
+      },
+      {
         title: "Reading your progress",
         items: [
           "The Simulator's Save button now shows the keyboard shortcut on it (⌘S on a Mac, Ctrl+S elsewhere), so you can save a plan without reaching for the mouse.",

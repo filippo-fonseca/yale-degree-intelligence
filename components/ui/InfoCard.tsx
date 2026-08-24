@@ -40,8 +40,12 @@ export function InfoCard({
   }
 
   return (
+    // dark:bg-transparent is load-bearing: the dark treatment is a gradient,
+    // which is a background-image, so without it the light mode's white
+    // background-color survives and the card reads as a stray white field on a
+    // dark page.
     <div
-      className={`relative z-[1] flex flex-col gap-2 rounded-2xl border border-gray-200 bg-white p-3.5 text-sm leading-relaxed text-gray-600 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_8px_24px_-12px_rgba(0,0,0,0.12)] dark:border-white/[0.08] dark:bg-gradient-to-br dark:from-white/[0.05] dark:to-white/[0.02] dark:text-gray-300 dark:shadow-[0_8px_24px_-12px_rgba(0,0,0,0.5)] ${className}`}
+      className={`relative z-[1] flex flex-col gap-2 rounded-2xl border border-gray-200 bg-white p-3.5 text-sm leading-relaxed text-gray-600 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_8px_24px_-12px_rgba(0,0,0,0.12)] dark:border-white/[0.08] dark:bg-transparent dark:bg-gradient-to-br dark:from-white/[0.05] dark:to-white/[0.02] dark:text-gray-300 dark:shadow-[0_8px_24px_-12px_rgba(0,0,0,0.5)] ${className}`}
     >
       {autoHide && (
         <div className="flex justify-between items-center">

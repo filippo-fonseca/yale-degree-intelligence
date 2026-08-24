@@ -128,7 +128,7 @@ export function MajorDropdown({
       <button
         ref={buttonRef}
         onClick={() => setIsOpen((v) => !v)}
-        className="w-full text-left px-2.5 py-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800/70 flex justify-between items-center"
+        className="w-full font-sf text-left px-3 py-2.5 rounded-xl border border-black/[0.08] dark:border-white/[0.1] bg-white dark:bg-white/[0.03] hover:bg-gray-50 dark:hover:bg-white/[0.06] transition-colors flex justify-between items-center"
       >
         <div className="flex items-center">
           <div className="w-2.5 h-2.5 rounded-full bg-pink-500 mr-2 flex-shrink-0" />
@@ -168,9 +168,9 @@ export function MajorDropdown({
               transform: pos?.openUp ? "translateY(-6px)" : "translateY(6px)",
             }}
           >
-            <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg overflow-hidden">
+            <div className="font-sf bg-white dark:bg-[#141417] border border-black/[0.08] dark:border-white/[0.1] rounded-xl shadow-[0_24px_60px_-20px_rgba(0,0,0,0.25)] dark:shadow-[0_24px_60px_-20px_rgba(0,0,0,0.6)] overflow-hidden">
               {/* Search bar */}
-              <div className="p-1.5 border-b border-gray-200 dark:border-gray-700">
+              <div className="p-1.5 border-b border-black/[0.06] dark:border-white/[0.08]">
                 <div className="relative">
                   <input
                     ref={searchInputRef}
@@ -178,7 +178,7 @@ export function MajorDropdown({
                     placeholder="Search majors..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full bg-white dark:bg-gray-900 text-[11px] text-gray-900 dark:text-gray-200 placeholder-gray-400 dark:placeholder-gray-500 px-2.5 py-1.5 pl-7 rounded-md border border-gray-300 dark:border-gray-700 focus:outline-none focus:ring-1 focus:ring-pink-500"
+                    className="w-full bg-white dark:bg-white/[0.04] text-[11px] text-gray-900 dark:text-gray-200 placeholder-gray-400 dark:placeholder-gray-500 px-2.5 py-1.5 pl-7 rounded-lg border border-black/[0.08] dark:border-white/[0.1] focus:outline-none focus:border-black/25 dark:focus:border-white/25 transition-colors"
                   />
                   <svg
                     className="absolute left-2 top-2 h-3 w-3 text-gray-400 dark:text-gray-500"
@@ -208,7 +208,7 @@ export function MajorDropdown({
                         setIsOpen(false);
                       }}
                       disabled={disabledOptions.includes(code)}
-                      className={`w-full text-left px-2.5 py-1.5 hover:bg-gray-100 dark:hover:bg-gray-700/50 ${
+                      className={`w-full text-left px-2.5 py-1.5 hover:bg-black/[0.04] dark:hover:bg-white/[0.06] ${
                         value === code ? "bg-pink-900/20" : ""
                       } ${
                         disabledOptions.includes(code)

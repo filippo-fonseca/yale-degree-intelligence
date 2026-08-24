@@ -1026,6 +1026,20 @@ export default function AboutPage() {
                           backgroundColor: "transparent",
                           "& .MuiChartsAxis-tickLabel": { fill: axisTickColor },
                           "& .MuiChartsAxis-label": { fill: axisTickColor },
+                          // The legend is HTML, not SVG, so it takes `color`
+                          // and ignores `fill`. Without this it keeps MUI's
+                          // light-theme black and vanishes on the dark card,
+                          // the same fix DistPieChart already carries.
+                          "& .MuiChartsLegend-root, & .MuiChartsLegend-series, & .MuiChartsLegend-label, & .MuiChartsLabel-root":
+                            {
+                              color: `${axisTickColor} !important`,
+                              fontSize: "11px",
+                            },
+                          "& .MuiChartsLegend-root text, & .MuiChartsLegend-label text":
+                            {
+                              fill: `${axisTickColor} !important`,
+                              fontSize: "11px",
+                            },
                           "& .MuiChartsAxis-line, & .MuiChartsAxis-tick": {
                             stroke: gridLineColor,
                           },
@@ -1467,16 +1481,38 @@ export default function AboutPage() {
           </h2>
 
           <p className="mx-auto mt-8 max-w-[52ch] font-sf text-base leading-relaxed text-gray-500 dark:text-gray-400 md:text-lg">
-            I built this for myself. I was trying to plan a double major,
-            couldn't keep it straight in a spreadsheet, so I made something that
-            could. Then I shared it, and it got away from me in the best way.
-            Watching other people use it to make sense of their own time here is
-            still the best part of it.
+            I initially built a version of this tool for myself during the
+            summer between my freshman and sophomore years at Yale. Like many of
+            us, I was quite overwhelmed between trying to fulfill my
+            distributionals, fulfill the requirements for my double major, take
+            cool classes with my friends, and on top of this do well and track
+            grades? Impossible before!
           </p>
 
           <p className="mx-auto mt-4 max-w-[52ch] font-sf text-base leading-relaxed text-gray-500 dark:text-gray-400 md:text-lg">
-            It's free, and it stays free. Not a business, not a startup, and
-            never going to be one.
+            I initially had set up what I thought was a nice-looking,
+            easy-to-use Google Sheets document... but I quickly realized how
+            suboptimal, tedious, and annoying that entire experience was. Most
+            of us do this, if at all, which I found ridiculous... so I sat down
+            and coded this up.
+          </p>
+
+          <p className="mx-auto mt-4 max-w-[52ch] font-sf text-base leading-relaxed text-gray-500 dark:text-gray-400 md:text-lg">
+            Since then, it's become something I could have never imagined! 1 in
+            6 Yale students use it, which is so amazing to see, as it leaves us
+            all more time to spend on things that make us fulfilled (as well as
+            making the most out of our Yale experience through stress-free
+            studying, course selection periods, etc.). I cannot tell you how
+            relaxed I am whenever course selection rolls around, as I already
+            know what I'm going to do months in advance. Even years. And if it
+            changes? The platform adapts with me.
+          </p>
+
+          <p className="mx-auto mt-4 max-w-[52ch] font-sf text-base leading-relaxed text-gray-500 dark:text-gray-400 md:text-lg">
+            I've kept this free for a reason; it's not a startup, not some
+            money-making gimmick. No no. This is a free, open-source tool for
+            the Yale community. And it will always be that way. For students, by
+            students!
           </p>
 
           {/* Team, a single centered person, no cards */}
@@ -1519,15 +1555,29 @@ export default function AboutPage() {
             ))}
           </div>
 
-          <p className="mt-14 font-mono text-xs tracking-tight text-gray-400 dark:text-gray-500">
-            want to contribute?{" "}
-            <a
-              href="mailto:filippo.fonseca@yale.edu"
-              className="underline underline-offset-4 transition-colors hover:text-gray-900 dark:hover:text-white"
-            >
-              → email me
-            </a>
-          </p>
+          {/* The old version of this was one line of 12px mono, which asked
+              for help at the size of a disclaimer. It is a real invitation, so
+              it gets a headline and the two actual routes in: a PR, or a
+              conversation. */}
+          <div className="mt-16 flex flex-col items-center">
+            <p className="text-balance text-2xl font-medium tracking-[-0.015em] text-gray-900 dark:text-white sm:text-3xl">
+              Want to join the team?
+            </p>
+            <p className="mx-auto mt-3 max-w-[52ch] font-sf text-sm leading-relaxed text-gray-500 dark:text-gray-400">
+              We&apos;re open source. Contribute with a pull request, or get
+              involved more actively and email me so we can talk.
+            </p>
+            <div className="mt-6 flex flex-wrap items-center justify-center gap-2.5 font-sf">
+              <GhostCTA href={REPO_URL} size="sm">
+                <FaGithub size={13} aria-hidden />
+                Contribute with a PR
+              </GhostCTA>
+              <GhostCTA href="mailto:filippo.fonseca@yale.edu" size="sm">
+                Email me
+                <span aria-hidden>&rarr;</span>
+              </GhostCTA>
+            </div>
+          </div>
         </motion.div>
       </section>
 
@@ -1749,16 +1799,22 @@ function YdnBanner() {
           initial={false}
           exit={{ height: 0, opacity: 0 }}
           transition={{ duration: 0.22, ease: "easeOut" }}
-          className="overflow-hidden bg-gray-900 text-white dark:bg-white/[0.06]"
+          // Yale blue, not the near-black it was: the banner is the one place
+          // on the page pointing at something outside DI, and the paper it
+          // points at is Yale's. The brand pink stays reserved for our own CTAs.
+          className="overflow-hidden bg-[#00356b] text-white"
         >
           <div className="relative mx-auto flex h-9 max-w-7xl items-center justify-center px-10 font-sf text-xs font-medium">
             <a
               href={YDN_ARTICLE_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="transition-opacity hover:opacity-80"
+              className="inline-flex items-center gap-2 transition-opacity hover:opacity-80"
             >
-              read our feature in the Yale Daily News (YDN){" "}
+              <span className="rounded-full bg-white/15 px-1.5 py-0.5 font-mono text-[10px] uppercase tracking-[0.12em] text-white/90">
+                YDN
+              </span>
+              read our feature in the Yale Daily News{" "}
               <span aria-hidden className="opacity-70">
                 ↗
               </span>

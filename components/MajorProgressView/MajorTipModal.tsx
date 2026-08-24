@@ -155,24 +155,20 @@ export function MajorTipHelpButton({
   label?: string;
 }) {
   return (
-    // The gradient border is the wrapper's own background, revealed by 1.5px of
-    // padding, so it lives entirely inside the element's box. It used to be two
-    // absolutely-positioned layers at -inset-[1px] with a 2px blur, which put the
-    // glow ~3px outside the box; any ancestor with overflow-hidden then sliced it
-    // off at the left and right edges. Nothing extends past the border now, so it
-    // cannot be clipped no matter what it sits inside.
-    <div
-      className={`relative rounded-lg bg-[conic-gradient(from_var(--angle),#ec4899,#8b5cf6,#3b82f6,#ec4899)] p-[1.5px] animate-border-spin ${className}`}
-      style={{ "--angle": "0deg" } as React.CSSProperties}
-    >
+    // Was an animated conic-gradient border, spinning pink through violet to
+    // blue around the bar. v3 does not have a second accent system: this is a
+    // quiet row with a hairline border and a pink icon, like every other
+    // surface, and the help it offers reads better without competing for the
+    // eye against the requirement cards under it.
+    <div className={`relative ${className}`}>
       <button
         onClick={onClick}
-        className="relative flex items-center justify-between w-full p-3 bg-white dark:bg-gray-900 rounded-[calc(0.5rem-1.5px)] text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+        className="flex w-full items-center justify-between rounded-xl border border-black/[0.08] bg-white p-3 font-sf text-sm text-gray-600 transition-colors hover:border-black/[0.14] hover:text-gray-900 dark:border-white/[0.09] dark:bg-white/[0.03] dark:text-gray-400 dark:hover:border-white/[0.16] dark:hover:text-white"
         title="What do 'Manual fulfill' and 'Skip' mean?"
       >
         <div className="flex items-center gap-2">
-          <HelpCircle className="w-4 h-4 text-pink-500" />
-          <span>{label}</span>
+          <HelpCircle className="h-4 w-4 shrink-0 text-pink-500 dark:text-pink-400" />
+          <span className="text-left">{label}</span>
         </div>
       </button>
     </div>

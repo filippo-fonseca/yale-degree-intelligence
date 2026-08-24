@@ -45,7 +45,11 @@ export interface TourStep {
   title: string;
   /** 1-2 sentence explanation of what the feature does and why. */
   description: string;
-  /** Accent color used for the icon chip and glow. */
+  /**
+   * Which area of the app the step belongs to. The tour card renders
+   * monochrome, so this is no longer painted; it stays because it is the only
+   * machine-readable grouping the step list has.
+   */
   accent: TourAccent;
 }
 
@@ -138,7 +142,7 @@ export const TOUR_STEPS: TourStep[] = [
     eyebrow: "My major(s)",
     title: "Read the actual heat map",
     description:
-      "Each square is a requirement. Its color shows whether that requirement is complete, in progress, partial, or untouched.",
+      "Each square is a requirement, and its color says whether that one is complete, in progress, partial, or untouched. Click any square to open the requirement and see exactly which courses count for it. Go on, try one.",
     accent: "pink",
   },
   {
@@ -170,7 +174,7 @@ export const TOUR_STEPS: TourStep[] = [
     eyebrow: "My major(s)",
     title: "Skip and unskip course options",
     description:
-      "Click into a requirement card to open its details. From there, you can mark listed options as skipped, or unskip them later if your plan changes.",
+      "We know you sometimes get to skip a class, whether you placed out of it in high school or worked it out with your DUS. Click into a requirement card to open its details, then mark listed options as skipped, or unskip them later if your plan changes.",
     accent: "pink",
   },
   {
@@ -211,18 +215,24 @@ export const TOUR_STEPS: TourStep[] = [
     eyebrow: "Simulator",
     title: "Plan future semesters on a board",
     description:
-      "The Simulator is a drag-and-drop canvas for the semesters you haven't taken yet. Sketch out schedules course by course and see the whole degree take shape before you commit to anything.",
+      "The Simulator is a drag-and-drop canvas for the semesters you haven't taken yet. Every term through graduation is already laid out for you, empty and waiting. Sketch out schedules course by course and see the whole degree take shape before you commit to anything.",
     accent: "purple",
   },
   {
     id: "sim-drag",
     tabId: "simulator",
-    anchor: ['[data-tour="simulator-course-pool"]', '[data-tour="nav-simulator"]'],
+    // The semester column, not the course pool: the pool is hidden by default
+    // now, and the semesters are the thing you actually drag between.
+    anchor: [
+      '[data-tour="simulator-semester"]',
+      '[data-tour="simulator-board"]',
+      '[data-tour="nav-simulator"]',
+    ],
     icon: Move,
     eyebrow: "Simulator",
-    title: "Drag courses to rearrange",
+    title: "Every semester is a drop zone",
     description:
-      "Drop courses into any future term and drag them between semesters to test different orderings. It's built for what-ifs: try a heavier junior spring, then move it back in seconds.",
+      "This is one semester of your degree. Add a course to it, then drag courses between semesters to test different orderings. It's built for what-ifs: try a heavier junior spring, then move it back in seconds.",
     accent: "purple",
   },
   {

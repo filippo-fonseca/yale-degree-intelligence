@@ -106,6 +106,7 @@ export function DashboardTabPanels({
           getMajorProgress={getMajorProgress}
           onRequirementChange={fetchCourses}
           onTogglePrereqOverride={onTogglePrereqOverride}
+          onOpenSettings={onOpenSettings}
         />
       )}
       {activeTab === "certificate" && (

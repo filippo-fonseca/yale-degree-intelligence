@@ -10,8 +10,9 @@ import {
   FiChevronsRight,
   FiCoffee,
 } from "react-icons/fi";
-import { FaHeart } from "react-icons/fa6";
+import { FaGithub, FaHeart } from "react-icons/fa6";
 import { MessageCircleQuestionMark, Search } from "lucide-react";
+import { playPop } from "@/lib/soundEffects";
 import type { NavItem } from "./navItems";
 
 interface DesktopSidebarProps {
@@ -106,7 +107,7 @@ export function DesktopSidebar({
               whileTap={{ scale: 0.98 }}
               onClick={() => {
                 onTabChange(item.id);
-                void new Audio("/audio/pop.mp3").play().catch(() => null);
+                playPop();
               }}
               data-tour={`nav-${item.id}`}
               title={sidebarExpanded ? undefined : item.label}
@@ -137,10 +138,13 @@ export function DesktopSidebar({
                   }
                 />
                 {sidebarExpanded && (
-                  <span className="whitespace-nowrap">{item.label}</span>
+                  <span className="truncate">{item.label}</span>
                 )}
+                {/* shrink-0 with a truncating label beside it: at the sidebar's
+                    width "My certificates" plus a chip overflows the pill, and
+                    the label is the part that can afford to give. */}
                 {sidebarExpanded && item.badge && (
-                  <span className="ml-0.5 px-1.5 py-0.5 text-[9px] rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-700 dark:text-emerald-300 whitespace-nowrap">
+                  <span className="ml-0.5 shrink-0 rounded-full border border-emerald-500/30 bg-emerald-500/15 px-1.5 py-0.5 font-sf text-[9px] leading-none text-emerald-700 dark:text-emerald-300">
                     {item.badge}
                   </span>
                 )}
@@ -291,6 +295,17 @@ export function DesktopSidebar({
                   />
                 </div>
                 <span className="text-xs">Buy us a coffee</span>
+              </Link>
+              <Link
+                href="https://github.com/filippo-fonseca/yale-degree-intelligence"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full flex items-center space-x-2 p-1.5 rounded-lg hover:bg-black/[0.04] dark:hover:bg-white/[0.06] hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.6)] dark:hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] transition-all duration-200 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
+              >
+                <div className="p-1 rounded-md bg-gradient-to-br from-gray-500/20 to-gray-900/30 border border-gray-500/30 shadow-[inset_0_1px_0_rgba(255,255,255,0.1)] flex items-center justify-center">
+                  <FaGithub className="text-gray-300" size={10} />
+                </div>
+                <span className="text-xs">We&apos;re open source</span>
               </Link>
             </div>
           </motion.div>

@@ -11,6 +11,7 @@ import { CERTIFICATES } from "@/lib/certificates";
 import { MajorDropdown } from "./ui/MajorDropdown";
 import { CertificateDropdown } from "./ui/CertificateDropdown";
 import { ShinyButton } from "./ui/shiny-button";
+import { GhostButton } from "./ui/ghost-button";
 import Link from "next/link";
 import LogoIcon from "@/icons/LogoIcon";
 import { FiChevronDown, FiX } from "react-icons/fi";
@@ -77,35 +78,18 @@ const FEATURES: { icon: ReactNode; title: string; desc: string }[] = [
   },
 ];
 
-/** Secondary action. Mirrors the landing page's ghost CTA at a smaller size. */
-function GhostButton({
-  children,
-  onClick,
-}: {
-  children: ReactNode;
-  onClick: () => void;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className="inline-flex items-center justify-center gap-1.5 rounded-full border border-black/10 bg-white px-4 py-2 font-sf text-sm font-medium text-gray-600 transition-colors hover:text-gray-900 dark:border-white/15 dark:bg-white/[0.06] dark:text-gray-300 dark:hover:text-white"
-    >
-      {children}
-    </button>
-  );
-}
-
-/** Step heading pair: Louize headline, SF subhead. */
-function StepHeader({ title, subtitle }: { title: string; subtitle: string }) {
+/** Step heading: Louize headline, with an optional SF subhead under it. */
+function StepHeader({ title, subtitle }: { title: string; subtitle?: string }) {
   return (
     <div className="text-center">
       <h2 className="text-[1.5rem]/[1.25] font-medium tracking-[-0.02em] text-gray-900 dark:text-white sm:text-[1.75rem]/[1.25]">
         {title}
       </h2>
-      <p className="mx-auto mt-2 max-w-[42ch] font-sf text-sm leading-relaxed text-gray-500 dark:text-gray-400">
-        {subtitle}
-      </p>
+      {subtitle && (
+        <p className="mx-auto mt-2 max-w-[42ch] font-sf text-sm leading-relaxed text-gray-500 dark:text-gray-400">
+          {subtitle}
+        </p>
+      )}
     </div>
   );
 }
@@ -322,8 +306,8 @@ export default function MajorSelectionFlow({
                   </h1>
 
                   <p className="mx-auto mt-3 max-w-[44ch] font-sf text-sm leading-relaxed text-gray-500 dark:text-gray-400">
-                    Four short questions, then the whole app is yours. Every
-                    answer is editable later in Settings.
+                    we only have four short questions for you... then you&apos;re
+                    off to cook. You can edit everything later, dw.
                   </p>
                 </div>
 
@@ -648,10 +632,7 @@ export default function MajorSelectionFlow({
 
             {step === "year" && (
               <motion.div key="year" {...stepTransition} className="space-y-5">
-                <StepHeader
-                  title="When do you graduate?"
-                  subtitle="This sets your pace, your timeline, and what counts as on track."
-                />
+                <StepHeader title="When do you graduate?" />
 
                 <div className="space-y-3">
                   <div className="flex flex-wrap justify-center gap-2">

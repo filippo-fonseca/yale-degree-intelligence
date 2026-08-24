@@ -2,8 +2,11 @@
 
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { FiX, FiArrowLeft, FiArrowRight, FiCheck } from "react-icons/fi";
-import { TOUR_STEPS, type TourAccent } from "./steps";
+import { FiX, FiCheck } from "react-icons/fi";
+import { TOUR_STEPS } from "./steps";
+import { ShinyButton } from "@/components/ui/shiny-button";
+import { GhostButton } from "@/components/ui/ghost-button";
+import { setTourActive } from "@/lib/tourState";
 
 interface AppTourProps {
   open: boolean;
@@ -11,32 +14,6 @@ interface AppTourProps {
   onComplete: () => void;
   onNavigate?: (tabId: string) => void;
 }
-
-const ACCENTS: Record<
-  TourAccent,
-  { chip: string; dot: string }
-> = {
-  pink: {
-    chip:
-      "bg-pink-100 text-pink-600 dark:bg-pink-500/15 dark:text-pink-300 border-pink-200 dark:border-pink-500/30",
-    dot: "bg-pink-500 dark:bg-pink-400",
-  },
-  blue: {
-    chip:
-      "bg-blue-100 text-blue-600 dark:bg-blue-500/15 dark:text-blue-300 border-blue-200 dark:border-blue-500/30",
-    dot: "bg-blue-500 dark:bg-blue-400",
-  },
-  purple: {
-    chip:
-      "bg-purple-100 text-purple-600 dark:bg-purple-500/15 dark:text-purple-300 border-purple-200 dark:border-purple-500/30",
-    dot: "bg-purple-500 dark:bg-purple-400",
-  },
-  teal: {
-    chip:
-      "bg-teal-100 text-teal-600 dark:bg-teal-500/15 dark:text-teal-300 border-teal-200 dark:border-teal-500/30",
-    dot: "bg-teal-500 dark:bg-teal-400",
-  },
-};
 
 type Rect = { top: number; left: number; width: number; height: number };
 
@@ -104,12 +81,20 @@ export default function AppTour({
 
   const total = TOUR_STEPS.length;
   const step = TOUR_STEPS[index];
-  const accent = ACCENTS[step?.accent ?? "purple"];
   const isFirst = index === 0;
   const isLast = index === total - 1;
 
   useEffect(() => {
     if (open) setIndex(0);
+  }, [open]);
+
+  // Tell the rest of the app a tour is running, so surfaces that pop their own
+  // modal at first sight (the Simulator's plan selector) hold off. Cleared on
+  // unmount as well as on close, so an interrupted tour cannot leave the app
+  // permanently suppressed.
+  useEffect(() => {
+    setTourActive(open);
+    return () => setTourActive(false);
   }, [open]);
 
   // Lock body scroll while open.
@@ -251,10 +236,10 @@ export default function AppTour({
             }}
             exit={{ opacity: 0 }}
             transition={{ type: "spring", stiffness: 360, damping: 32 }}
-            className="pointer-events-none absolute rounded-2xl border-2 border-pink-400 ring-4 ring-pink-500/45"
+            className="pointer-events-none absolute rounded-xl border border-pink-500/80"
             style={{
               boxShadow:
-                "0 0 0 9999px rgba(3, 7, 18, 0.56), 0 0 0 1px rgba(255,255,255,0.78), 0 0 34px rgba(236,72,153,0.9)",
+                "0 0 0 9999px rgba(3, 7, 18, 0.58), 0 0 0 3px rgba(236, 72, 153, 0.22)",
             }}
           />
         )}
@@ -268,7 +253,7 @@ export default function AppTour({
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.97, y: 6 }}
           transition={{ type: "spring", stiffness: 340, damping: 28 }}
-          className="absolute flex max-h-[calc(100dvh-2rem)] w-[360px] max-w-[calc(100vw-2rem)] flex-col overflow-hidden rounded-3xl border border-gray-200 dark:border-white/10 bg-white/95 dark:bg-gray-900/90 backdrop-blur-xl shadow-2xl shadow-gray-400/30 dark:shadow-black/60"
+          className="absolute flex max-h-[calc(100dvh-2rem)] w-[360px] max-w-[calc(100vw-2rem)] flex-col overflow-hidden rounded-2xl border border-black/[0.08] bg-white font-louize shadow-[0_32px_80px_-24px_rgba(0,0,0,0.45)] dark:border-white/[0.09] dark:bg-[#101013]"
           style={
             centered
               ? {
@@ -282,29 +267,27 @@ export default function AppTour({
           <button
             onClick={onClose}
             aria-label="Skip tour"
-            className="absolute right-3.5 top-3.5 z-10 rounded-full p-1.5 text-gray-400 hover:text-gray-700 dark:text-gray-500 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-white/10 transition-colors"
+            className="absolute right-3 top-3 z-10 rounded-lg p-1.5 text-gray-400 transition-colors hover:text-gray-700 dark:text-gray-500 dark:hover:text-gray-200"
           >
             <FiX className="h-4 w-4" />
           </button>
 
           <div className="min-h-0 overflow-y-auto px-6 pt-6 pb-5">
-            <div
-              className={`mb-4 inline-flex h-11 w-11 items-center justify-center rounded-2xl border ${accent.chip}`}
-            >
-              <Icon className="h-5 w-5" />
+            <div className="mb-4 inline-flex h-10 w-10 items-center justify-center rounded-xl border border-black/[0.06] bg-[#fafafa] text-gray-400 dark:border-white/[0.07] dark:bg-white/[0.03] dark:text-gray-500">
+              <Icon className="h-4 w-4" />
             </div>
-            <p className="text-[11px] font-semibold uppercase tracking-widest text-gray-400 dark:text-gray-500">
+            <p className="font-mono text-[10px] uppercase tracking-[0.12em] text-gray-400 dark:text-gray-500">
               {step.eyebrow}
             </p>
-            <h2 className="mt-1 text-xl font-semibold tracking-tight text-gray-900 dark:text-white">
+            <h2 className="mt-1.5 text-[1.35rem]/[1.25] font-medium tracking-[-0.02em] text-gray-900 dark:text-white">
               {step.title}
             </h2>
-            <p className="mt-2 text-sm leading-relaxed text-gray-600 dark:text-gray-300">
+            <p className="mt-2.5 font-sf text-sm leading-relaxed text-gray-500 dark:text-gray-400">
               {step.description}
             </p>
           </div>
 
-          <div className="flex shrink-0 flex-wrap items-center justify-between gap-3 border-t border-gray-200/70 dark:border-white/10 px-5 py-3.5 sm:px-6">
+          <div className="flex shrink-0 flex-wrap items-center justify-between gap-3 border-t border-black/[0.07] px-5 py-3.5 font-sf dark:border-white/[0.08] sm:px-6">
             <div className="flex min-w-0 items-center gap-2.5">
               <div className="flex min-w-0 flex-wrap items-center gap-1.5">
                 {TOUR_STEPS.map((s, i) => (
@@ -312,43 +295,31 @@ export default function AppTour({
                     key={s.id}
                     className={`h-1.5 rounded-full transition-all duration-300 ${
                       i === index
-                        ? `w-4 ${accent.dot}`
-                        : "w-1.5 bg-gray-300 dark:bg-white/15"
+                        ? "w-4 bg-gray-900 dark:bg-white"
+                        : i < index
+                          ? "w-1.5 bg-gray-400 dark:bg-white/40"
+                          : "w-1.5 bg-gray-200 dark:bg-white/15"
                     }`}
                   />
                 ))}
               </div>
-              <span className="text-[11px] font-medium text-gray-400 dark:text-gray-500">
+              <span className="font-mono text-[11px] text-gray-400 dark:text-gray-500">
                 {index + 1}/{total}
               </span>
             </div>
 
             <div className="flex shrink-0 flex-wrap items-center justify-end gap-1.5">
-              {!isFirst && (
-                <button
-                  onClick={goBack}
-                  className="inline-flex items-center gap-1 rounded-xl px-3 py-1.5 text-sm font-medium text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/10 transition-all"
-                >
-                  <FiArrowLeft className="h-3.5 w-3.5" />
-                  Back
-                </button>
-              )}
-              <button
-                onClick={goNext}
-                className="inline-flex items-center gap-1.5 rounded-xl bg-gray-900 dark:bg-white px-3.5 py-1.5 text-sm font-semibold text-white dark:text-gray-900 shadow-sm transition-all hover:opacity-90 active:scale-[0.98]"
-              >
+              {!isFirst && <GhostButton onClick={goBack}>Back</GhostButton>}
+              <ShinyButton size="sm" withArrow={!isLast} onClick={goNext}>
                 {isLast ? (
                   <>
                     Finish
                     <FiCheck className="h-3.5 w-3.5" />
                   </>
                 ) : (
-                  <>
-                    Next
-                    <FiArrowRight className="h-3.5 w-3.5" />
-                  </>
+                  "Next"
                 )}
-              </button>
+              </ShinyButton>
             </div>
           </div>
         </motion.div>

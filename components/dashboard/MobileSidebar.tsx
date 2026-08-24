@@ -10,10 +10,11 @@ import {
   FiCoffee,
   FiX,
 } from "react-icons/fi";
-import { FaHeart } from "react-icons/fa6";
+import { FaGithub, FaHeart } from "react-icons/fa6";
 import { MessageCircleQuestionMark } from "lucide-react";
 import CompoundLogo from "@/components/ui/CompoundLogo";
 import { UserAvatar } from "@/components/ui/UserAvatar";
+import { playPop } from "@/lib/soundEffects";
 import type { NavItem } from "./navItems";
 
 interface MobileSidebarProps {
@@ -72,7 +73,7 @@ export function MobileSidebar({
                     onClick={() => {
                       onTabChange(item.id);
                       onClose();
-                      void new Audio("/audio/pop.mp3").play().catch(() => null);
+                      playPop();
                     }}
                     className={`w-full flex items-center justify-between px-4 py-3 text-left rounded-2xl transition-all duration-300 ${
                       activeTab === item.id
@@ -138,6 +139,15 @@ export function MobileSidebar({
                 >
                   <FiCoffee className="text-amber-400" size={12} />
                   <span className="text-xs">Coffee</span>
+                </Link>
+                <Link
+                  href="https://github.com/filippo-fonseca/yale-degree-intelligence"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 p-2 rounded-lg hover:bg-black/[0.04] dark:hover:bg-white/[0.06] transition-all text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
+                >
+                  <FaGithub className="text-gray-400" size={12} />
+                  <span className="text-xs">Source</span>
                 </Link>
               </div>
 

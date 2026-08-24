@@ -31,6 +31,9 @@ export const RELEASES: Release[] = [
           "Choosing your graduation year is now a row of years you tap, and it tells you which class that makes you, rather than a drop-down list.",
           "The tip cards in setup, and everywhere else in the app, no longer show up as a bright white box in dark mode.",
           "The major and certificate pickers match the surfaces around them now, in both light and dark mode.",
+          "The \"what's new\" window you see after an update, and the guided tour, now look like the rest of v3 too.",
+          "The guided tour's Simulator steps used to be hidden behind the Simulator's own welcome dialog if you had not saved a plan yet. The tour now shows you the real board, and points at an actual semester when it explains dragging courses around.",
+          "The tour explains why you would skip a requirement (you placed out of it in high school, or worked it out with your DUS), and nudges you to click into a requirement from the heat map.",
         ],
       },
       {
@@ -53,8 +56,25 @@ export const RELEASES: Release[] = [
         ],
       },
       {
+        title: "Elsewhere in the app",
+        items: [
+          "You can mute the app's sound effects. Settings has a switch for the little pop you hear when you change tabs or drop a course; it is on by default and remembered on the device you set it on.",
+          "The sidebar links to our source code, next to Terms and the coffee link.",
+          "The \"2030 can use!\" chips in the sidebar now disappear once you have opened that tab, one tab at a time, instead of following you around. They also stopped overflowing their button.",
+          "Dragging your transcript onto the upload box now lights the box up, so you can see where the file is going to land. The upload box also follows light mode instead of always being dark.",
+          "The switcher above your major and certificate progress shows up as soon as you have one of them, with a button to add another (up to Yale's limit of two majors and three certificates) that takes you straight to the right place in Settings.",
+          "\"My certificate(s)\" now says \"My certificate\" or \"My certificates\", depending on how many you have.",
+          "The help bars on My Major and My Certificates lost their spinning rainbow border. Same help, less circus.",
+          "The Terms and Mission pages have been rebuilt to match the rest of the site, and they follow your light or dark mode now instead of always being dark.",
+          "The Terms page no longer says we send your data to a model for \"intelligent feedback features\". That stopped being true when the AI advisor was removed; parsing your transcript is the only thing that reaches a model.",
+        ],
+      },
+      {
         title: "Look and feel",
         items: [
+          "The homepage's mission section now tells the real story of how DegreeIntelligence started, and the invitation to help build it is an actual invitation: open a pull request, or email to join the team.",
+          "The Yale Daily News banner at the top of the homepage is Yale blue now, so it reads as the news it is.",
+          "The GPA chart on the homepage had a legend nobody could read in dark mode. It was being drawn in black.",
           "The homepage navigation bar now stays at the top of the screen as you scroll, and picks up a soft shadow once it is floating over the page. It was meant to do this all along, but it had been scrolling away with everything else.",
           "The main buttons no longer show a hard-edged rectangle pulsing inside them when you hover. The glow behind the label is a soft halo now, the way it was meant to look.",
           "\"Yale\" in the homepage headline is lit in Yale blue, with a highlight that runs through it, and \"open source\" is set heavier so the two things the page is actually about stand out.",

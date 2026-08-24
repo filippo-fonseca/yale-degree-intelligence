@@ -133,8 +133,8 @@ export default function FileUpload({ onSuccess }: FileUploadProps) {
         '
         stylePanelLayout="compact"
       />
-      <div className="filepond--label-text">
-        Drag & drop your transcript or{" "}
+      <div className="text-center font-sf text-sm text-gray-500 dark:text-gray-400">
+        Drag &amp; drop your transcript, or{" "}
         <span className="text-pink-500">click above to browse.</span>
       </div>
 

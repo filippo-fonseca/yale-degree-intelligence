@@ -18,9 +18,14 @@ export interface NavItem {
 export function createNavItems(
   majorsCount: number,
   certificatesCount: number,
-  options?: { isBrandNew?: boolean; showCertificatesNew?: boolean },
+  options?: {
+    /** Tabs whose "2030 can use!" chip has not been retired by a visit yet. */
+    nudgeTabs?: ReadonlySet<string>;
+    showCertificatesNew?: boolean;
+  },
 ): NavItem[] {
-  const brandNewBadge = options?.isBrandNew ? "2030 can use!" : undefined;
+  const nudge = (tabId: string) =>
+    options?.nudgeTabs?.has(tabId) ? "2030 can use!" : undefined;
   return [
     {
       id: "upload",
@@ -32,7 +37,7 @@ export function createNavItems(
       id: "major",
       icon: RiProgress3Fill,
       label: majorsCount > 1 ? "My majors" : "My major",
-      badge: brandNewBadge,
+      badge: nudge("major"),
     },
     {
       // Always plural. The tab is where you pick up certificates as much as
@@ -43,13 +48,13 @@ export function createNavItems(
       label: "My certificates",
       // Falls back to the 2030 nudge if that is running, so a single slot never
       // has to show two chips.
-      badge: brandNewBadge ?? (options?.showCertificatesNew ? "New" : undefined),
+      badge: nudge("certificate") ?? (options?.showCertificatesNew ? "New" : undefined),
     },
     {
       id: "simulator",
       icon: MonitorCog,
       label: "Simulator",
-      badge: brandNewBadge,
+      badge: nudge("simulator"),
     },
     {
       id: "stats",

@@ -1026,6 +1026,20 @@ export default function AboutPage() {
                           backgroundColor: "transparent",
                           "& .MuiChartsAxis-tickLabel": { fill: axisTickColor },
                           "& .MuiChartsAxis-label": { fill: axisTickColor },
+                          // The legend is HTML, not SVG, so it takes `color`
+                          // and ignores `fill`. Without this it keeps MUI's
+                          // light-theme black and vanishes on the dark card,
+                          // the same fix DistPieChart already carries.
+                          "& .MuiChartsLegend-root, & .MuiChartsLegend-series, & .MuiChartsLegend-label, & .MuiChartsLabel-root":
+                            {
+                              color: `${axisTickColor} !important`,
+                              fontSize: "11px",
+                            },
+                          "& .MuiChartsLegend-root text, & .MuiChartsLegend-label text":
+                            {
+                              fill: `${axisTickColor} !important`,
+                              fontSize: "11px",
+                            },
                           "& .MuiChartsAxis-line, & .MuiChartsAxis-tick": {
                             stroke: gridLineColor,
                           },

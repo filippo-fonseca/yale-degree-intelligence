@@ -1,66 +1,124 @@
-/* filepond-custom.css */
+/* filepond-custom.css
+ *
+ * The transcript drop zone. Two things this file has to get right that the
+ * FilePond defaults do not:
+ *
+ * 1. Drag feedback. FilePond puts `data-hopper-state="drag-over"` on the root
+ *    while a file is over the window, and nothing was styled off it, so
+ *    dragging a transcript onto the page looked identical to not dragging one.
+ *    Now the zone lights up: solid pink border, a pink wash, and a ring, so it
+ *    is obvious where the file is going to land.
+ * 2. Light mode. The panel was pinned to #111827, a near-black box sitting on
+ *    a white page for anyone not in dark mode.
+ */
+
 .filepond--root {
   font-family: inherit;
   max-width: 100%;
   margin: 0 auto;
-  background-color: #111827;
-  border: 1px solid #1f2937;
-  border-radius: 0.5rem;
+  background-color: #ffffff;
+  border: 1px dashed rgba(0, 0, 0, 0.16);
+  border-radius: 0.75rem;
   cursor: pointer;
+  transition:
+    border-color 0.18s ease,
+    background-color 0.18s ease,
+    box-shadow 0.18s ease;
+}
+
+.dark .filepond--root {
+  background-color: rgba(255, 255, 255, 0.03);
+  border-color: rgba(255, 255, 255, 0.16);
 }
 
 .filepond--root:hover {
-  border-color: #f6339a;
+  border-color: rgba(236, 72, 153, 0.5);
+  background-color: rgba(236, 72, 153, 0.04);
 }
 
 .filepond--root:hover svg {
-    stroke: #f6339a;
+  stroke: #ec4899;
+}
+
+/* Dragging a file anywhere over the page. This is the state the whole file
+   exists for: it has to read from across the screen, because the cursor is
+   busy holding a file and the user is looking for a target. */
+.filepond--root[data-hopper-state="drag-over"] {
+  border-style: solid;
+  border-color: #ec4899;
+  background-color: rgba(236, 72, 153, 0.08);
+  box-shadow:
+    0 0 0 4px rgba(236, 72, 153, 0.16),
+    0 18px 40px -24px rgba(236, 72, 153, 0.55);
+}
+
+.dark .filepond--root[data-hopper-state="drag-over"] {
+  background-color: rgba(236, 72, 153, 0.12);
+  box-shadow:
+    0 0 0 4px rgba(236, 72, 153, 0.2),
+    0 18px 40px -24px rgba(236, 72, 153, 0.7);
+}
+
+.filepond--root[data-hopper-state="drag-over"] .filepond--drop-label {
+  color: #ec4899;
+}
+
+.filepond--root[data-hopper-state="drag-over"] .filepond--label-icon svg {
+  stroke: #ec4899;
+  transform: translateY(-2px);
 }
 
 .filepond--panel-root {
   background-color: transparent;
-  border-radius: 0.5rem;
-  padding: 2rem; /* Add padding to the entire panel */
+  border-radius: 0.75rem;
+  padding: 2rem;
 }
 
 .filepond--drop-label {
-  color: #9ca3af;
+  color: #6b7280;
   min-height: 180px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   position: relative;
+  transition: color 0.18s ease;
+}
 
-  
+.dark .filepond--drop-label {
+  color: #9ca3af;
 }
 
 .filepond--drop-label:hover {
-    color: #f6339a;
+  color: #ec4899;
 }
 
-/* Icon container with top margin */
 .filepond--label-icon {
   display: flex;
   justify-content: center;
-  /* margin: 1.5rem 0 1rem 0; top right bottom left */
 }
 
 .filepond--label-icon svg {
   width: 2rem;
   height: 2rem;
+  stroke: #6b7280;
+  transition:
+    stroke 0.18s ease,
+    transform 0.18s ease;
+}
+
+.dark .filepond--label-icon svg {
   stroke: #9ca3af;
 }
 
-/* Text container with bottom margin */
 .filepond--label-text {
   display: block;
-  margin: 1rem 0 1.5rem 0; /* top right bottom left */
+  margin: 1rem 0 1.5rem 0;
   text-align: center;
 }
 
 .filepond--label-action {
-  color: #60a5fa;
+  color: #ec4899;
   text-decoration: none;
   cursor: pointer;
 }
@@ -75,14 +133,32 @@
 }
 
 .filepond--item-panel {
-  background-color: #1f2937;
-  border-radius: 0.375rem;
+  background-color: #374151;
+  border-radius: 0.5rem;
 }
 
-[data-filepond-item-state*='error'] .filepond--item-panel {
+.dark .filepond--item-panel {
+  background-color: #1f2937;
+}
+
+[data-filepond-item-state*="error"] .filepond--item-panel {
   background-color: #7f1d1d;
 }
 
-[data-filepond-item-state='processing-complete'] .filepond--item-panel {
+[data-filepond-item-state="processing-complete"] .filepond--item-panel {
   background-color: #064e3b;
+}
+
+/* Someone who has asked for less motion still needs the drag state, so the
+   colour stays and only the movement goes. */
+@media (prefers-reduced-motion: reduce) {
+  .filepond--root,
+  .filepond--drop-label,
+  .filepond--label-icon svg {
+    transition: none;
+  }
+
+  .filepond--root[data-hopper-state="drag-over"] .filepond--label-icon svg {
+    transform: none;
+  }
 }

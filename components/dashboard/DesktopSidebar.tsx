@@ -47,7 +47,7 @@ export function DesktopSidebar({
       transition={{ width: { type: "spring", stiffness: 380, damping: 38 } }}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
-      className="hidden lg:flex h-full flex-col justify-between p-3 rounded-3xl bg-gradient-to-br from-white/90 via-gray-50/80 to-white/70 dark:from-gray-900/70 dark:via-gray-900/50 dark:to-gray-950/70 backdrop-blur-xl border border-black/[0.06] dark:border-white/[0.08] shadow-[0_8px_32px_rgba(0,0,0,0.1),0_0_80px_rgba(59,130,246,0.04),inset_0_1px_0_rgba(255,255,255,0.8),inset_0_-1px_0_rgba(0,0,0,0.05)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.4),0_0_80px_rgba(59,130,246,0.06),inset_0_1px_0_rgba(255,255,255,0.1),inset_0_-1px_0_rgba(0,0,0,0.3)] ring-1 ring-black/[0.04] dark:ring-white/[0.05] overflow-visible"
+      className="hidden lg:flex h-full flex-col justify-between p-3 rounded-3xl bg-gradient-to-br from-white/90 via-gray-50/80 to-white/70 dark:from-gray-900/70 dark:via-gray-900/50 dark:to-gray-950/70 backdrop-blur-xl border border-black/[0.06] dark:border-white/[0.08] shadow-[0_8px_32px_rgba(0,0,0,0.1),0_0_80px_rgba(59,130,246,0.04),inset_0_1px_0_rgba(255,255,255,0.8),inset_0_-1px_0_rgba(0,0,0,0.05)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.4),0_0_80px_rgba(59,130,246,0.06),inset_0_1px_0_rgba(255,255,255,0.1),inset_0_-1px_0_rgba(0,0,0,0.3)] ring-1 ring-black/[0.04] dark:ring-white/[0.05] overflow-visible group"
     >
       <div
         className={`flex mb-1.5 ${sidebarExpanded ? "justify-end" : "justify-center"}`}
@@ -62,7 +62,15 @@ export function DesktopSidebar({
           aria-label={
             sidebarPinned ? "Collapse sidebar" : "Keep sidebar open"
           }
-          className="p-1.5 rounded-lg text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-black/[0.04] dark:hover:bg-white/[0.06] transition-all"
+          // Collapsed, the sidebar is a column of icons and this chevron is the
+          // only thing in it that is not a destination, so it reads as clutter
+          // until you actually reach for it. Hidden until the sidebar is
+          // hovered (which is also when it widens), and always there when
+          // pinned, since that is the only way back to collapsed.
+          // focus-visible keeps it reachable by keyboard.
+          className={`rounded-lg p-1.5 text-gray-400 transition-all hover:bg-black/[0.04] hover:text-gray-700 focus-visible:opacity-100 dark:text-gray-500 dark:hover:bg-white/[0.06] dark:hover:text-gray-200 ${
+            sidebarPinned ? "" : "opacity-0 group-hover:opacity-100"
+          }`}
         >
           {sidebarPinned ? (
             <FiChevronsLeft size={16} />

@@ -2,10 +2,13 @@ import { Course } from "@/lib/types";
 
 /** Demo data for the Friends tab “what your page could look like” preview. */
 export const DEMO_PREVIEW_USER = {
-  displayName: "Alex Chen",
-  majors: ["CPSC"],
+  displayName: "Emir Ahmed",
+  // EECS, so the major matches what the bio says. The id is the one in
+  // lib/data/all_reqs.json; a code the catalog does not know would render as
+  // a bare string on the example page.
+  majors: ["EECS"],
   graduationYear: 2027,
-  bio: "CS major. Happy to chat about course sequencing!",
+  bio: "EECS major interested in robotics.",
 };
 
 export const DEMO_PREVIEW_COURSES: Course[] = [

@@ -26,6 +26,7 @@ export const RELEASES: Release[] = [
       {
         title: "Setting up your account",
         items: [
+          "The first screen you see in My courses, with the YHub import steps, now matches the rest of v3 as well.",
           "The setup you go through when you first sign in has been rebuilt to look like the rest of v3. Same typography, same calm dark canvas, same buttons as the homepage, instead of the four differently coloured panels it used to open with.",
           "Setup now tells you where you are: a short label at the top of the window and a thin line that fills as you answer, in place of the row of numbered circles.",
           "Choosing your graduation year is now a row of years you tap, and it tells you which class that makes you, rather than a drop-down list.",

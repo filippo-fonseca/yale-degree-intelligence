@@ -72,6 +72,7 @@ export const RELEASES: Release[] = [
           "The unsaved-changes notice in Settings is much harder to miss, and it says what is at stake.",
           "Closing Settings with unsaved majors, certificates, or graduation year now asks first, and offers to save and close. Only the outside click used to ask; the X, Done, and Escape threw the edit away without a word.",
           "The filters on My courses are ours now. Status, semester, and sort used to open your operating system's own menu, complete with its blue highlight; they open a menu that matches the app, and the bar they sit in matches the page around it.",
+          "The \"Fulfill manually\" picker matches the rest of the app now, and the course you pick is marked with a check rather than a coloured edge.",
           "Signing in goes straight to the loading screen. The homepage used to flash back for a moment after you picked your Yale account, which looked like the log-in had failed.",
           "Marking a requirement option as skipped now works even if you had already removed that course from the requirement. It quietly did nothing before.",
           "The switcher above your major and certificate progress lost its bright blue and teal buttons for the black-and-white ones the rest of v3 uses.",

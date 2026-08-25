@@ -169,7 +169,12 @@ export const calculateMajorProgress = (
 
         const completed = canonicalCompleted.includes(code) && !excluded;
         const inProgress = canonicalInProgress.includes(code) && !excluded;
-        const skipped = canonicalSkipped.includes(code) && !excluded;
+        // An exclusion says "this course I took should not count here". A skip
+        // says "count this option as settled, I am not taking it" and is the
+        // student's most recent word on the option, so it is not suppressed by
+        // an older exclusion: otherwise "Mark as skipped" silently does nothing
+        // on any option the student had excluded first.
+        const skipped = canonicalSkipped.includes(code);
 
         reqOptions.push({
           code,
@@ -205,7 +210,9 @@ export const calculateMajorProgress = (
 
           const completed = canonicalCompleted.includes(code) && !excluded;
           const inProgress = canonicalInProgress.includes(code) && !excluded;
-          const skipped = canonicalSkipped.includes(code) && !excluded;
+          // See the note on the course branch above: a skip outranks an
+          // exclusion, so skipping an excluded option is not a no-op.
+          const skipped = canonicalSkipped.includes(code);
 
           reqOptions.push({
             code,

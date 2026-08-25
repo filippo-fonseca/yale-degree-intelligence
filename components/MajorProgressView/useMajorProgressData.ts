@@ -93,10 +93,18 @@ export function useMajorProgressData(
   const normalizeReq = useCallback(
     (req: any) => ({
       ...req,
-      options: (req.options || []).map((opt: any) => ({
-        ...normalizeOpt(opt),
-        excluded: excludedLookup.has(`${req.name}:${opt.code}`),
-      })),
+      options: (req.options || []).map((opt: any) => {
+        const normalized = normalizeOpt(opt);
+        return {
+          ...normalized,
+          // A skip outranks an exclusion in the calculation, so it has to here
+          // too: otherwise the pill would offer "re-include" on a course the
+          // student just skipped, and never offer the unskip that undoes it.
+          excluded:
+            !normalized.skipped &&
+            excludedLookup.has(`${req.name}:${opt.code}`),
+        };
+      }),
     }),
     [normalizeOpt, excludedLookup],
   );

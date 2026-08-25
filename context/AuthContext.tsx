@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useRef, useState } from "react";
 import {
   User,
   onAuthStateChanged,
@@ -13,6 +13,13 @@ import { isYaleEmail } from "@/lib/allowedEmail";
 type AuthContextType = {
   user: User | null;
   loading: boolean;
+  /**
+   * True from the moment a sign-in is accepted until the session it produced is
+   * live. Firebase resolves the popup before `onAuthStateChanged` fires, so
+   * without this the landing page renders again for a beat between the two,
+   * which reads as the sign-in having failed.
+   */
+  authenticating: boolean;
   signInWithGoogle: () => Promise<void>;
   logout: () => Promise<void>;
 };
@@ -20,6 +27,7 @@ type AuthContextType = {
 const AuthContext = createContext<AuthContextType>({
   user: null,
   loading: true,
+  authenticating: false,
   signInWithGoogle: async () => {},
   logout: async () => {},
 });
@@ -27,6 +35,11 @@ const AuthContext = createContext<AuthContextType>({
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [authenticating, setAuthenticating] = useState(false);
+  // Read inside signInWithGoogle, where a stale `user` from the closure would
+  // decide wrongly whether the session is already live.
+  const userRef = useRef<User | null>(null);
+  userRef.current = user;
 
   const logout = async () => {
     if (!isFirebaseConfigured) return;
@@ -36,6 +49,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       console.error("Error signing out", error);
     }
   };
+
+  // Effects run child-first, so by the time this one lands the dashboard has
+  // already started loading its profile and courses and is showing the loader
+  // itself. Dropping the flag here therefore hands the loader over rather than
+  // uncovering a half-empty dashboard for a frame.
+  useEffect(() => {
+    if (user) setAuthenticating(false);
+  }, [user]);
 
   useEffect(() => {
     if (!isFirebaseConfigured) {
@@ -68,6 +89,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             }
             logout();
             setUser(null);
+            setAuthenticating(false);
           })();
         }
       } else {
@@ -100,7 +122,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           );
         }
       }
+      // The account is good. Cover the gap until the auth listener delivers it,
+      // unless it already has, in which case nothing would clear the flag.
+      if (!userRef.current) setAuthenticating(true);
     } catch (error) {
+      setAuthenticating(false);
       console.error("Error signing in with Google", error);
       if (error instanceof Error && error.message.includes("Yale email")) {
         throw error;
@@ -110,7 +136,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, signInWithGoogle, logout }}>
+    <AuthContext.Provider
+      value={{ user, loading, authenticating, signInWithGoogle, logout }}
+    >
       {children}
     </AuthContext.Provider>
   );

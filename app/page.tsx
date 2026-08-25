@@ -30,7 +30,7 @@ import { DashboardOverlays } from "@/components/dashboard/DashboardOverlays";
 import { useDashboardOverlayActions } from "@/components/dashboard/useDashboardOverlayActions";
 
 export default function Home() {
-  const { user, loading, logout } = useAuth();
+  const { user, loading, authenticating, logout } = useAuth();
   const { resolvedTheme, toggleTheme } = useTheme();
 
   const [showUpdateModal, setShowUpdateModal] = useState(false);
@@ -182,7 +182,10 @@ export default function Home() {
     logout,
   });
 
-  if (loading || (user && (coursesLoading || profileLoading)))
+  // `authenticating` covers the beat between the Google popup closing and the
+  // session arriving, so a successful sign-in goes landing -> loader -> app
+  // instead of flashing the landing page one more time on the way in.
+  if (loading || authenticating || (user && (coursesLoading || profileLoading)))
     return <CustomLoader />;
 
   if (!user) return <PublicFacingPage />;

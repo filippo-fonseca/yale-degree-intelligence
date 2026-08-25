@@ -21,8 +21,6 @@ export function InfoCard({
   if (autoHide && !isExpanded) {
     return (
       <div className={`relative z-[1] group ${className}`}>
-        {/* Soft gradient glow on hover — kept inside the stacking context so
-            neighboring neumorphic cards cannot erase the bottom border. */}
         <button
           type="button"
           onClick={() => setIsExpanded(true)}
@@ -39,10 +37,6 @@ export function InfoCard({
   }
 
   return (
-    // dark:bg-transparent is load-bearing: the dark treatment is a gradient,
-    // which is a background-image, so without it the light mode's white
-    // background-color survives and the card reads as a stray white field on a
-    // dark page.
     <div
       className={`relative z-[1] flex flex-col gap-2 rounded-xl border border-black/[0.08] bg-white p-3.5 font-sf text-sm leading-relaxed text-gray-600 dark:border-white/[0.09] dark:bg-white/[0.03] dark:text-gray-300 ${className}`}
     >

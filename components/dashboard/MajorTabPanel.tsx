@@ -50,7 +50,7 @@ export function MajorTabPanel({
             {userProfile?.majors?.length > 1 ? "majors" : "major"},{" "}
             {user?.displayName?.split(" ")[0]}.
           </h2>
-          <p className="text-gray-600 dark:text-gray-300">
+          <p className="font-sf text-gray-600 dark:text-gray-300">
             This is based on data from your transcript and the{" "}
             {userProfile?.majors?.length > 1 ? "majors" : "major"} you indicated
             to us.
@@ -81,7 +81,7 @@ export function MajorTabPanel({
             {userProfile.majors.length < 2 && (
               <button
                 onClick={onOpenSettings}
-                className="inline-flex items-center gap-1 rounded-xl border border-dashed border-black/[0.14] px-3 py-1.5 text-sm text-gray-500 transition-colors hover:border-blue-500/50 hover:text-gray-900 dark:border-white/[0.14] dark:text-gray-400 dark:hover:border-blue-500/50 dark:hover:text-white"
+                className="inline-flex items-center gap-1 rounded-xl border border-dashed border-black/[0.14] px-3 py-1.5 font-sf text-sm text-gray-500 transition-colors hover:border-black/25 hover:text-gray-900 dark:border-white/[0.14] dark:text-gray-400 dark:hover:border-white/25 dark:hover:text-white"
                 title="Add a second major in Settings"
               >
                 <FiPlus size={13} />

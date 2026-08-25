@@ -49,7 +49,7 @@ export function CertificateTabPanel({
               ? `Your certificate progress, ${user?.displayName?.split(" ")[0]}.`
               : `Certificates are optional. Add yours anytime.`}
           </h2>
-          <p className="text-gray-600 dark:text-gray-300">
+          <p className="font-sf text-gray-600 dark:text-gray-300">
             Track Yale College certificates alongside your major. Courses
             counted toward a certificate cannot also count toward your major(s).
           </p>
@@ -81,7 +81,7 @@ export function CertificateTabPanel({
             {certificates.length < 3 && (
               <button
                 onClick={onOpenSettings}
-                className="inline-flex items-center gap-1 rounded-xl border border-dashed border-black/[0.14] px-3 py-1.5 text-sm text-gray-500 transition-colors hover:border-teal-500/50 hover:text-gray-900 dark:border-white/[0.14] dark:text-gray-400 dark:hover:border-teal-500/50 dark:hover:text-white"
+                className="inline-flex items-center gap-1 rounded-xl border border-dashed border-black/[0.14] px-3 py-1.5 font-sf text-sm text-gray-500 transition-colors hover:border-black/25 hover:text-gray-900 dark:border-white/[0.14] dark:text-gray-400 dark:hover:border-white/25 dark:hover:text-white"
                 title="Add a certificate in Settings"
               >
                 <FiPlus size={13} />

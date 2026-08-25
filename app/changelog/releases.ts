@@ -62,6 +62,11 @@ export const RELEASES: Release[] = [
       {
         title: "Elsewhere in the app",
         items: [
+          "In the Simulator, courses you are taking right now are no longer stuck. You can drag them to another semester or take them out of a plan, the same as a course you have only planned. Finished courses stay put, because those are history.",
+          "Drop a course onto the semester you are in right now and it is marked in progress automatically, so the plan matches what you are actually taking.",
+          "The bar on My Major shows in-progress credits as a striped, lighter section, so you can see where the completed part ends. The two shades of purple were too close to tell apart.",
+          "The dialogs across the app (updating your transcript, the Simulator welcome, confirmations) now share one look, matching the rest of v3.",
+          "The public profile page has proper loading states instead of the words \"Loading profile...\", and its sign-in and not-friends screens follow your light or dark mode.",
           "You can mute the app's sound effects. Settings has a switch for the little pop you hear when you change tabs or drop a course; it is on by default and remembered on the device you set it on.",
           "The sidebar links to our source code, next to Terms and the coffee link.",
           "The \"2030 can use!\" chips in the sidebar now disappear once you have opened that tab, one tab at a time, instead of following you around. They also stopped overflowing their button.",

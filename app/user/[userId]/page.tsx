@@ -25,6 +25,8 @@ import { useRouter } from "next/navigation";
 import { FiArrowLeft } from "react-icons/fi";
 import Link from "next/link";
 import { PublicProfileView } from "@/components/FriendsProfile";
+import { ShinyButton } from "@/components/ui/shiny-button";
+import CustomLoader from "@/components/ui/CustomLoader";
 
 /**
  * Triggers a sync of the target user's friends_public_data with their actual courses.
@@ -218,62 +220,60 @@ export default function UserProfilePage() {
 
   if (authLoading) {
     return (
-      <div className="min-h-screen bg-gray-950 flex items-center justify-center">
-        <div className="animate-pulse text-gray-400">Loading profile...</div>
+      <div className="flex min-h-screen items-center justify-center bg-[#fafafa] dark:bg-[#0a0a0b]">
+        <CustomLoader fullScreen={false} />
       </div>
     );
   }
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-gray-950 flex flex-col items-center justify-center px-6">
-        <div className="text-2xl font-semibold text-blue-300 mb-3 text-center">
-          Sign in to view profiles
-        </div>
-        <p className="text-gray-400 text-center max-w-md mb-6">
-          You need to be signed in with your Yale account to view student
-          profiles on DegreeIntelligence.
+      <div className="flex min-h-screen flex-col items-center justify-center bg-[#fafafa] px-6 font-louize dark:bg-[#0a0a0b]">
+        <h1 className="text-center text-[1.6rem]/[1.25] font-medium tracking-[-0.02em] text-gray-900 dark:text-white">
+          Sign in to view profiles.
+        </h1>
+        <p className="mt-3 max-w-[46ch] text-center font-sf text-sm leading-relaxed text-gray-500 dark:text-gray-400">
+          Student pages are visible to signed-in Yale accounts, and only to
+          friends the student has accepted.
         </p>
-        <Link
-          href="/login"
-          className="px-4 py-2 text-sm font-semibold border-2 border-pink-500 hover:bg-pink-700 text-white rounded-lg transition"
-        >
-          Sign in
-        </Link>
-        <Link
-          href="/"
-          className="mt-4 text-sm text-gray-500 hover:text-gray-300 transition"
-        >
-          Back to homepage
-        </Link>
+        <div className="mt-6 flex flex-wrap items-center justify-center gap-2.5 font-sf">
+          <ShinyButton size="md" withArrow href="/login">
+            Sign in
+          </ShinyButton>
+          <Link
+            href="/"
+            className="inline-flex items-center justify-center rounded-full border border-black/10 bg-white px-4 py-2 font-sf text-sm font-medium text-gray-600 transition-colors hover:text-gray-900 dark:border-white/15 dark:bg-white/[0.06] dark:text-gray-300 dark:hover:text-white"
+          >
+            Back to homepage
+          </Link>
+        </div>
       </div>
     );
   }
 
   if (user && !permissionChecked) {
     return (
-      <div className="min-h-screen bg-gray-950 flex items-center justify-center">
-        <div className="animate-pulse text-gray-400">Loading profile...</div>
+      <div className="flex min-h-screen items-center justify-center bg-[#fafafa] dark:bg-[#0a0a0b]">
+        <CustomLoader fullScreen={false} />
       </div>
     );
   }
 
   if (!hasPermission) {
     return (
-      <div className="min-h-screen bg-gray-950 flex flex-col items-center justify-center px-6">
-        <div className="text-2xl font-semibold text-blue-300 mb-3 text-center">
-          You&apos;re not friends with this person yet
-        </div>
-        <p className="text-gray-400 text-center max-w-md">
-          You must be friends on DegreeIntelligence to view their profile. Send
-          them a friend request from the Friends tab.
+      <div className="flex min-h-screen flex-col items-center justify-center bg-[#fafafa] px-6 font-louize dark:bg-[#0a0a0b]">
+        <h1 className="text-center text-[1.6rem]/[1.25] font-medium tracking-[-0.02em] text-gray-900 dark:text-white">
+          You&apos;re not friends with this person yet.
+        </h1>
+        <p className="mt-3 max-w-[46ch] text-center font-sf text-sm leading-relaxed text-gray-500 dark:text-gray-400">
+          Pages are visible to accepted friends only. Send them a request from
+          the Friends tab and their page opens as soon as they accept.
         </p>
-        <Link
-          href="/"
-          className="mt-6 px-4 py-2 text-sm font-semibold border-2 border-pink-500 hover:bg-pink-700 text-white rounded-lg transition"
-        >
-          Go to dashboard
-        </Link>
+        <div className="mt-6 font-sf">
+          <ShinyButton size="md" withArrow href="/">
+            Go to dashboard
+          </ShinyButton>
+        </div>
       </div>
     );
   }
@@ -305,9 +305,7 @@ export default function UserProfilePage() {
 
         {loading || !userProfile ? (
           <div className="flex justify-center py-16">
-            <div className="animate-pulse text-gray-400">
-              Loading profile...
-            </div>
+            <CustomLoader fullScreen={false} />
           </div>
         ) : (
           <PublicProfileView

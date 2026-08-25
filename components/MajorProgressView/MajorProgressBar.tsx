@@ -18,10 +18,11 @@ export default function MajorProgressBar({
       data-tour="major-progress-bar"
       className="p-3 rounded-xl bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 border border-gray-200 dark:border-gray-800/50 shadow-neu"
     >
-      {/* Same light-mode ramp the certificate bar uses: purple-400 sits at
-          2.1:1 on the gray-200 track, which is too faint to show where the
-          in-progress fill ends. Light steps both fills down; dark: keeps the
-          shades this bar has always had. */}
+      {/* Two fills that have to be told apart at a glance. Colour alone was not
+          doing it: purple-500 beside violet-500 is a shade apart, and a shade
+          is exactly what you cannot see when the two sit edge to edge. The
+          in-progress fill is lighter AND striped, so the boundary reads by
+          texture as well as tone, which also survives a colour-blind viewer. */}
       <div className="relative w-full bg-gray-200 dark:bg-gray-800 rounded-full h-3 overflow-hidden shadow-[inset_0_1px_2px_rgba(0,0,0,0.08)] dark:shadow-[inset_0_1px_2px_rgba(0,0,0,0.3)]">
         {showInProgressStats && (
           <motion.div
@@ -29,7 +30,7 @@ export default function MajorProgressBar({
             initial={{ width: 0 }}
             animate={{ width: `${withInProgressPercentage}%` }}
             transition={{ duration: 1, ease: "easeOut" }}
-            className="absolute inset-y-0 left-0 rounded-full bg-purple-500 dark:bg-purple-500/70"
+            className="absolute inset-y-0 left-0 rounded-full bg-violet-300 bg-[repeating-linear-gradient(45deg,rgba(255,255,255,0.55)_0px,rgba(255,255,255,0.55)_4px,transparent_4px,transparent_8px)] dark:bg-violet-400/45 dark:bg-[repeating-linear-gradient(45deg,rgba(255,255,255,0.22)_0px,rgba(255,255,255,0.22)_4px,transparent_4px,transparent_8px)]"
           />
         )}
         <motion.div
@@ -37,7 +38,7 @@ export default function MajorProgressBar({
           initial={{ width: 0 }}
           animate={{ width: `${completionPercentage}%` }}
           transition={{ duration: 1, ease: "easeOut" }}
-          className="absolute inset-y-0 left-0 rounded-full bg-violet-700 dark:bg-violet-500 shadow-[0_0_10px_rgba(139,92,246,0.6)]"
+          className="absolute inset-y-0 left-0 rounded-full bg-violet-700 dark:bg-violet-500"
         />
       </div>
 

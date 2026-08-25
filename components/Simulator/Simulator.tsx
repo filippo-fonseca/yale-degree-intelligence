@@ -62,6 +62,7 @@ import {
   type SlotRefusal,
 } from "@/lib/utils/plannedCourseAdmission";
 import PlannedCourseBlockedModal from "./PlannedCourseBlockedModal";
+import { ShinyButton } from "@/components/ui/shiny-button";
 import { playPop } from "@/lib/soundEffects";
 import { isTourActive, useTourActive } from "@/lib/tourState";
 import type { Allocation } from "@/lib/certificatePolicy";
@@ -1007,11 +1008,22 @@ export default function Simulator({
             courses: sem.courses.filter((c) => c.code !== draggedCourse.code),
           };
         }
-        // Add to target semester (if not already there)
+        // Add to target semester (if not already there). A course dropped on
+        // the term that is happening right now is a course you are taking
+        // right now, so it lands in-progress and shows blue; drag it back out
+        // to a future term and it goes back to planned.
         if (sem.id === semesterId) {
-          return sem.courses.some((c) => c.code === draggedCourse.code)
-            ? sem
-            : { ...sem, courses: [...sem.courses, draggedCourse] };
+          if (sem.courses.some((c) => c.code === draggedCourse.code)) return sem;
+          const landed =
+            draggedCourse.status === "completed"
+              ? draggedCourse
+              : {
+                  ...draggedCourse,
+                  status: isCurrentSemester(sem.name)
+                    ? ("in-progress" as const)
+                    : ("not-taken" as const),
+                };
+          return { ...sem, courses: [...sem.courses, landed] };
         }
         return sem;
       }),
@@ -1993,9 +2005,13 @@ export default function Simulator({
                       {semester.courses.map((course) => (
                         <motion.div
                           key={`${semester.id}-${course.code}`}
-                          draggable={course.status === "not-taken"}
+                          // Completed courses are history and stay put. An
+                          // in-progress course is this term's plan, which is
+                          // exactly the thing a student is still deciding, so
+                          // it moves and it can be taken out.
+                          draggable={course.status !== "completed"}
                           onDragStart={
-                            course.status === "not-taken"
+                            course.status !== "completed"
                               ? () => handleDragStart(course, semester.id)
                               : undefined
                           }
@@ -2011,7 +2027,7 @@ export default function Simulator({
                               course.status === "completed"
                                 ? "bg-emerald-100 dark:bg-emerald-900/25 text-emerald-700 dark:text-emerald-300 border-emerald-300 dark:border-emerald-700/40"
                                 : course.status === "in-progress"
-                                  ? "bg-blue-100 dark:bg-blue-900/25 text-blue-700 dark:text-blue-300 border-blue-300 dark:border-blue-700/40"
+                                  ? "bg-blue-100 dark:bg-blue-900/25 text-blue-700 dark:text-blue-300 border-blue-300 dark:border-blue-700/40 cursor-grab active:cursor-grabbing"
                                   : "bg-pink-100 dark:bg-pink-900/20 text-pink-700 dark:text-pink-300 border-pink-300 dark:border-pink-700/40 hover:bg-pink-200 dark:hover:bg-pink-800/30 cursor-grab active:cursor-grabbing"
                             }`}
                         >
@@ -2022,7 +2038,7 @@ export default function Simulator({
                                 {getCourseNameFromCode(course.code) ?? ""}
                               </span>
                             </div>
-                            {course.status === "not-taken" && (
+                            {course.status !== "completed" && (
                               <button
                                 onClick={(e) => {
                                   e.stopPropagation();
@@ -2391,19 +2407,25 @@ export default function Simulator({
               exit={{ opacity: 0, scale: 0.95, y: 10 }}
               transition={{ duration: 0.25, ease: "easeOut" }}
               onClick={(e) => e.stopPropagation()}
-              className="w-full max-w-lg p-6 rounded-2xl bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/95 dark:via-gray-900/90 dark:to-gray-950/95 backdrop-blur-2xl border border-gray-200 dark:border-white/[0.08] shadow-[0_8px_48px_rgba(0,0,0,0.1)] dark:shadow-[0_8px_48px_rgba(0,0,0,0.5),0_0_80px_rgba(139,92,246,0.06),inset_0_1px_0_rgba(255,255,255,0.08)] ring-1 ring-black/[0.04] dark:ring-white/[0.05]"
+              className="w-full max-w-lg overflow-hidden rounded-2xl border border-black/[0.08] bg-white shadow-[0_32px_80px_-24px_rgba(0,0,0,0.45)] dark:border-white/[0.09] dark:bg-[#101013]"
             >
               {/* Header */}
-              <div className="text-center mb-6">
-                <h3 className="text-xl font-medium text-gray-900 dark:text-white mb-1">
+              <div className="flex items-center justify-between px-4 py-2.5 font-mono text-[10px] uppercase tracking-[0.12em] text-gray-400 dark:text-gray-500">
+                <span>simulator</span>
+                <span>{savedPlans.length > 0 ? `${savedPlans.length} saved` : "no plans yet"}</span>
+              </div>
+              <div className="h-px w-full bg-black/[0.07] dark:bg-white/[0.08]" />
+              <div className="p-6 pt-5 text-center">
+                <h3 className="text-[1.35rem]/[1.3] font-medium tracking-[-0.02em] text-gray-900 dark:text-white">
                   Welcome to your Yale Simulator.
                 </h3>
-                <p className="text-sm text-gray-500 dark:text-gray-400">
+                <p className="mt-2 font-sf text-sm text-gray-500 dark:text-gray-400">
                   {savedPlans.length > 0
                     ? "Pick up where you left off, or start fresh."
                     : "Drag and drop courses to map out the rest of your degree."}
                 </p>
               </div>
+              <div className="px-6 pb-6">
 
               {/* Saved Plans List */}
               {savedPlans.length > 0 && (
@@ -2425,7 +2447,7 @@ export default function Simulator({
                       }}
                       whileHover={{ scale: 1.01 }}
                       whileTap={{ scale: 0.99 }}
-                      className="w-full p-4 rounded-xl text-left bg-gray-50 dark:bg-transparent dark:bg-gradient-to-br dark:from-white/[0.04] dark:to-transparent border border-gray-200 dark:border-white/[0.06] hover:border-purple-500/30 hover:bg-purple-50 dark:hover:bg-white/[0.06] transition-all duration-200 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] group"
+                      className="group w-full rounded-xl border border-black/[0.06] bg-[#fafafa] p-4 text-left font-sf transition-colors hover:border-black/[0.14] dark:border-white/[0.07] dark:bg-white/[0.03] dark:hover:border-white/[0.16]"
                     >
                       <div className="flex items-center justify-between">
                         <div>
@@ -2467,24 +2489,22 @@ export default function Simulator({
               )}
 
               {/* Start Fresh Button */}
-              <motion.button
-                onClick={() => setShowPlanSelector(false)}
-                whileHover={{ scale: 1.01 }}
-                whileTap={{ scale: 0.99 }}
-                className="di-btn-primary w-full !rounded-xl !px-4 !py-3 !text-sm"
-              >
-                <FiPlus size={14} className="opacity-70" />
-                Start Fresh / Create New Plan
-              </motion.button>
+              <div className="flex justify-center font-sf">
+                <ShinyButton size="md" onClick={() => setShowPlanSelector(false)}>
+                  <FiPlus size={14} />
+                  Start fresh / create new plan
+                </ShinyButton>
+              </div>
 
               {/* Skip hint */}
-              <p className="text-center text-[11px] text-gray-400 dark:text-gray-600 mt-4">
+              <p className="mt-4 text-center font-mono text-[11px] text-gray-400 dark:text-gray-500">
                 Press{" "}
                 <kbd className="px-1.5 py-0.5 rounded bg-black/[0.06] dark:bg-white/[0.06] border border-black/[0.08] dark:border-white/[0.08] text-gray-500 dark:text-gray-400">
                   Esc
                 </kbd>{" "}
                 or click outside to dismiss
               </p>
+              </div>
             </motion.div>
           </motion.div>
         )}

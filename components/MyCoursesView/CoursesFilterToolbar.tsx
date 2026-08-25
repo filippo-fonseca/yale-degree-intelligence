@@ -1,7 +1,22 @@
 "use client";
 
-import { FiSearch, FiX } from "react-icons/fi";
+import { FiArrowDown, FiArrowUp, FiSearch, FiX } from "react-icons/fi";
+import { SelectMenu, type SelectMenuOption } from "../ui/SelectMenu";
 import { SortKey, StatusFilter } from "./types";
+
+const STATUS_OPTIONS: SelectMenuOption<StatusFilter>[] = [
+  { value: "all", label: "All statuses" },
+  { value: "completed", label: "Completed" },
+  { value: "in-progress", label: "In progress" },
+  { value: "skipped", label: "Skipped" },
+];
+
+const SORT_OPTIONS: SelectMenuOption<SortKey>[] = [
+  { value: "semester", label: "By semester" },
+  { value: "code", label: "By code" },
+  { value: "grade", label: "By grade" },
+  { value: "credits", label: "By credits" },
+];
 
 interface CoursesFilterToolbarProps {
   searchQuery: string;
@@ -39,88 +54,93 @@ export function CoursesFilterToolbar({
   const hasActiveFilters =
     statusFilter !== "all" || semesterFilter !== "all" || searchQuery;
 
+  const semesterOptions: SelectMenuOption<string>[] = [
+    { value: "all", label: "All semesters" },
+    ...allSemesters.map((semester) => ({ value: semester, label: semester })),
+  ];
+
   return (
-    <div className="shrink-0 z-20 mb-6 p-3 rounded-xl bg-white/95 dark:bg-gray-950/80 dark:bg-gradient-to-br dark:from-gray-900/80 dark:via-gray-900/70 dark:to-gray-950/80 backdrop-blur-xl border border-gray-200 dark:border-gray-800/50 shadow-neu">
-      <div className="flex flex-col sm:flex-row gap-2">
+    // One hairline card, the same surface as everything else on the page. The
+    // three filters were native selects, which paint their own menu: on a dark
+    // page the highlighted row came back in the operating system's blue, and
+    // the panel could not be styled to match anything around it.
+    <div className="shrink-0 z-20 mb-6 rounded-2xl border border-black/[0.08] bg-white p-3 dark:border-white/[0.09] dark:bg-white/[0.03]">
+      <div className="flex flex-col gap-2 sm:flex-row">
         {/* Search */}
-        <div className="relative flex-1 min-w-0">
-          <FiSearch className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400" />
+        <div className="relative min-w-0 flex-1">
+          <FiSearch className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-gray-400 dark:text-gray-500" />
           <input
             type="text"
-            placeholder="Search by code or name…"
+            placeholder="Search by code or name..."
             value={searchQuery}
             onChange={(e) => onSearchQueryChange(e.target.value)}
-            className="w-full pl-8 pr-7 py-1.5 text-sm rounded-lg bg-gray-100 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-800/50 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-600 focus:outline-none focus:ring-1 focus:ring-blue-500/50 transition-all"
+            className="w-full rounded-xl border border-black/[0.08] bg-white py-2 pl-9 pr-8 font-sf text-sm text-gray-900 transition-colors placeholder:text-gray-400 focus:border-black/25 focus:outline-none dark:border-white/[0.1] dark:bg-white/[0.03] dark:text-white dark:placeholder:text-gray-600 dark:focus:border-white/25"
           />
           {searchQuery && (
             <button
+              type="button"
               onClick={() => onSearchQueryChange("")}
-              className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+              aria-label="Clear search"
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 transition-colors hover:text-gray-700 dark:hover:text-gray-200"
             >
-              <FiX className="w-3.5 h-3.5" />
+              <FiX className="h-3.5 w-3.5" />
             </button>
           )}
         </div>
 
-        {/* Status filter */}
-        <select
+        <SelectMenu
+          label="Filter by status"
           value={statusFilter}
-          onChange={(e) =>
-            onStatusFilterChange(e.target.value as StatusFilter)
-          }
-          className="py-1.5 px-2 text-sm rounded-lg bg-gray-100 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-800/50 text-gray-700 dark:text-gray-300 focus:outline-none focus:ring-1 focus:ring-blue-500/50 transition-all"
-        >
-          <option value="all">All statuses</option>
-          <option value="completed">Completed</option>
-          <option value="in-progress">In progress</option>
-          <option value="skipped">Skipped</option>
-        </select>
+          options={STATUS_OPTIONS}
+          onChange={onStatusFilterChange}
+          className="sm:w-40"
+          menuWidth={160}
+        />
 
-        {/* Semester filter */}
-        <select
+        <SelectMenu
+          label="Filter by semester"
           value={semesterFilter}
-          onChange={(e) => onSemesterFilterChange(e.target.value)}
-          className="py-1.5 px-2 text-sm rounded-lg bg-gray-100 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-800/50 text-gray-700 dark:text-gray-300 focus:outline-none focus:ring-1 focus:ring-blue-500/50 transition-all"
-        >
-          <option value="all">All semesters</option>
-          {allSemesters.map((s) => (
-            <option key={s} value={s}>
-              {s}
-            </option>
-          ))}
-        </select>
+          options={semesterOptions}
+          onChange={onSemesterFilterChange}
+          className="sm:w-44"
+          menuWidth={176}
+        />
 
-        {/* Sort */}
-        <div className="flex items-center gap-1">
-          <select
+        <div className="flex items-center gap-1.5">
+          <SelectMenu
+            label="Sort courses"
             value={sortKey}
-            onChange={(e) => onSortKeyChange(e.target.value as SortKey)}
-            className="py-1.5 px-2 text-sm rounded-lg bg-gray-100 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-800/50 text-gray-700 dark:text-gray-300 focus:outline-none focus:ring-1 focus:ring-blue-500/50 transition-all"
-          >
-            <option value="semester">By semester</option>
-            <option value="code">By code</option>
-            <option value="grade">By grade</option>
-            <option value="credits">By credits</option>
-          </select>
+            options={SORT_OPTIONS}
+            onChange={onSortKeyChange}
+            className="min-w-0 flex-1 sm:w-40"
+            menuWidth={160}
+          />
           <button
+            type="button"
             onClick={onSortAscToggle}
-            className="px-2 py-1.5 text-xs rounded-lg bg-gray-100 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-800/50 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 transition-all"
+            className="shrink-0 rounded-xl border border-black/[0.08] bg-white p-2 text-gray-500 transition-colors hover:border-black/[0.16] hover:text-gray-900 dark:border-white/[0.1] dark:bg-white/[0.03] dark:text-gray-400 dark:hover:border-white/[0.18] dark:hover:text-white"
             title={sortAsc ? "Ascending" : "Descending"}
+            aria-label={sortAsc ? "Sort ascending" : "Sort descending"}
           >
-            {sortAsc ? "↑" : "↓"}
+            {sortAsc ? (
+              <FiArrowUp className="h-3.5 w-3.5" />
+            ) : (
+              <FiArrowDown className="h-3.5 w-3.5" />
+            )}
           </button>
         </div>
       </div>
 
       {/* Active filter summary */}
       {hasActiveFilters && (
-        <div className="mt-2 flex items-center gap-1.5 flex-wrap">
-          <span className="text-[10px] text-gray-400 dark:text-gray-500 uppercase tracking-wider">
+        <div className="mt-2.5 flex flex-wrap items-center gap-2">
+          <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-gray-400 dark:text-gray-500">
             Showing {filteredCount} of {totalCount}
           </span>
           <button
+            type="button"
             onClick={onClearFilters}
-            className="text-[10px] px-2 py-0.5 rounded-full bg-gray-100 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700/50 text-gray-500 hover:text-red-500 dark:hover:text-red-400 transition-all"
+            className="rounded-full border border-black/[0.08] px-2.5 py-0.5 font-sf text-[11px] text-gray-500 transition-colors hover:border-black/20 hover:text-gray-900 dark:border-white/[0.1] dark:text-gray-400 dark:hover:border-white/25 dark:hover:text-white"
           >
             Clear filters
           </button>

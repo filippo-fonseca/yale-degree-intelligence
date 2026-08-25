@@ -26,6 +26,7 @@ export const RELEASES: Release[] = [
       {
         title: "Setting up your account",
         items: [
+          "The first screen you see in My courses, with the YHub import steps, now matches the rest of v3 as well.",
           "The setup you go through when you first sign in has been rebuilt to look like the rest of v3. Same typography, same calm dark canvas, same buttons as the homepage, instead of the four differently coloured panels it used to open with.",
           "Setup now tells you where you are: a short label at the top of the window and a thin line that fills as you answer, in place of the row of numbered circles.",
           "Choosing your graduation year is now a row of years you tap, and it tells you which class that makes you, rather than a drop-down list.",
@@ -61,6 +62,11 @@ export const RELEASES: Release[] = [
       {
         title: "Elsewhere in the app",
         items: [
+          "In the Simulator, courses you are taking right now are no longer stuck. You can drag them to another semester or take them out of a plan, the same as a course you have only planned. Finished courses stay put, because those are history.",
+          "Drop a course onto the semester you are in right now and it is marked in progress automatically, so the plan matches what you are actually taking.",
+          "The bar on My Major shows in-progress credits as a striped, lighter section, so you can see where the completed part ends. The two shades of purple were too close to tell apart.",
+          "The dialogs across the app (updating your transcript, the Simulator welcome, confirmations) now share one look, matching the rest of v3.",
+          "The public profile page has proper loading states instead of the words \"Loading profile...\", and its sign-in and not-friends screens follow your light or dark mode.",
           "Signing in goes straight to the loading screen. The homepage used to flash back for a moment after you picked your Yale account, which looked like the log-in had failed.",
           "Marking a requirement option as skipped now works even if you had already removed that course from the requirement. It quietly did nothing before.",
           "The switcher above your major and certificate progress lost its bright blue and teal buttons for the black-and-white ones the rest of v3 uses.",

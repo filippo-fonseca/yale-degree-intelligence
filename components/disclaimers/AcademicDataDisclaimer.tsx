@@ -13,7 +13,7 @@ export function AcademicDataDisclaimerText({
 }) {
   return (
     <>
-      <p className="text-[11px] text-gray-500 dark:text-gray-400 leading-relaxed">
+      <p className="font-sf text-xs leading-relaxed text-gray-500 dark:text-gray-400">
         <span className="font-medium text-gray-700 dark:text-gray-300">
           {lead}
         </span>{" "}
@@ -34,13 +34,13 @@ export function AcademicDataDisclaimerText({
         <Link
           href="/terms"
           target="_blank"
-          className="text-blue-500 dark:text-blue-400 hover:text-blue-600 dark:hover:text-blue-300 underline underline-offset-2"
+          className="text-gray-700 underline underline-offset-2 transition-colors hover:text-gray-900 dark:text-gray-300 dark:hover:text-white"
         >
           Read our full terms
         </Link>
         .
       </p>
-      <p className="text-[10px] text-gray-400 dark:text-gray-600 mt-2 leading-relaxed">
+      <p className="mt-2 font-mono text-[10px] leading-relaxed text-gray-400 dark:text-gray-500">
         DegreeIntelligence is{" "}
         <span className="font-medium">not affiliated</span> in any way, shape,
         or form with Yale University, Yale College, or DegreeAudit. This is a
@@ -64,11 +64,11 @@ export function AcademicDataDisclaimerCard({
 }) {
   return (
     <div
-      className={`p-4 rounded-xl bg-gradient-to-br from-gray-100/80 via-gray-50/60 to-gray-100/80 dark:from-gray-900/40 dark:via-gray-900/30 dark:to-gray-950/40 border border-gray-200/80 dark:border-gray-800/50 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)] ${className}`}
+      className={`rounded-2xl border border-black/[0.06] bg-[#fafafa] p-4 dark:border-white/[0.07] dark:bg-white/[0.03] ${className}`}
     >
       {showIcon ? (
         <div className="flex items-start gap-3">
-          <div className="p-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20 shrink-0 mt-0.5">
+          <div className="mt-0.5 shrink-0 rounded-lg border border-emerald-500/20 bg-emerald-500/10 p-1.5">
             <svg
               className="w-3.5 h-3.5 text-emerald-400"
               fill="none"

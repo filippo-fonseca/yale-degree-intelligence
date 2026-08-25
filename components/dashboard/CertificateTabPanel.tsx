@@ -61,7 +61,7 @@ export function CertificateTabPanel({
           which certificate the progress below belongs to. */}
       {userProfile && certificates.length >= 1 && (
         <div className="mb-4">
-          <label className="mb-1.5 block font-sf text-[11px] font-medium uppercase tracking-wider text-gray-500 dark:text-gray-500">
+          <label className="mb-2 block font-mono text-[10px] uppercase tracking-[0.12em] text-gray-400 dark:text-gray-500">
             Viewing Progress For
           </label>
           <div className="flex flex-wrap items-center gap-1.5">
@@ -69,10 +69,10 @@ export function CertificateTabPanel({
               <button
                 key={certificate}
                 onClick={() => onSelectCertificate(certificate)}
-                className={`rounded-xl border px-3 py-1.5 font-sf text-sm transition-colors ${
+                className={`rounded-full px-3 py-1.5 font-sf text-sm transition-colors ${
                   selectedCertificate === certificate
-                    ? "border-transparent bg-gray-900 text-white dark:bg-white dark:text-gray-900"
-                    : "border-black/[0.08] bg-white text-gray-600 hover:text-gray-900 dark:border-white/[0.1] dark:bg-white/[0.03] dark:text-gray-400 dark:hover:text-white"
+                    ? "border border-transparent bg-gray-900 text-white dark:bg-white dark:text-gray-900"
+                    : "border border-black/[0.08] bg-white text-gray-600 hover:text-gray-900 dark:border-white/[0.1] dark:bg-white/[0.03] dark:text-gray-400 dark:hover:text-white"
                 }`}
               >
                 {CERTIFICATES[certificate] || certificate}

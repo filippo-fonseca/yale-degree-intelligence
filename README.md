@@ -37,10 +37,13 @@ Used by roughly 1 in 6 Yale undergrads. Free forever, no ads, no fees.
 > [!IMPORTANT]
 > **DegreeIntelligence is not affiliated with, endorsed by, sponsored by, or
 > authorized by Yale University.** It is a free, non-commercial, open-source
-> project built by students in their spare time. It is not an academic advisor
-> and its output is not an official degree audit. It can be wrong. Always
-> confirm anything you see here with your Residential College Dean, your FroCo,
-> your DUS, or the Registrar before acting on it.
+> project built by students in their spare time. The part of the app built by
+> the original creator was written entirely during summer break 2025, outside
+> the US. Since then, open-source contributions from the Yale community have
+> helped the project grow. It is not an academic advisor and its output is not
+> an official degree audit. It can be wrong. Always confirm anything you see
+> here with your Residential College Dean, your FroCo, your DUS, or the
+> Registrar before acting on it.
 >
 > Full terms, including the warranty and liability disclaimers that govern your
 > use of it: **[DISCLAIMER.md](DISCLAIMER.md)**.

@@ -1,8 +1,20 @@
 "use client";
 
-import { Printer, MonitorCog, PenLine } from "lucide-react";
+import type { ReactNode } from "react";
 import FileUpload from "@/components/file-upload";
 import { AcademicDataDisclaimerCard } from "@/components/disclaimers/AcademicDataDisclaimer";
+import { ShinyButton } from "@/components/ui/shiny-button";
+import { GhostButton } from "@/components/ui/ghost-button";
+
+/**
+ * The first screen of My courses, before anything has been imported.
+ *
+ * Same v3 vocabulary as the setup flow and the what's-new modal: the two
+ * panels are windows with a mono status line, the steps are numbered in mono
+ * rather than in filled pink circles, and the two actions are the shiny pill
+ * and the ghost pill instead of a tinted emerald box beside a tinted pink one.
+ * Every word of the copy is unchanged.
+ */
 
 interface OnboardingStateProps {
   userName: string | null;
@@ -10,6 +22,44 @@ interface OnboardingStateProps {
   onManualEntry: () => void;
   onUploadSuccess: (text: string) => Promise<void>;
   onOpenSimulator?: () => void;
+}
+
+/** The window shell both panels sit in. */
+function Panel({
+  label,
+  note,
+  children,
+  className = "",
+  ...rest
+}: {
+  label: string;
+  note?: string;
+  children: ReactNode;
+  className?: string;
+  [key: string]: unknown;
+}) {
+  return (
+    <div
+      className={`w-full max-w-xl overflow-hidden rounded-2xl border border-black/[0.08] bg-white dark:border-white/[0.09] dark:bg-[#101013] ${className}`}
+      {...rest}
+    >
+      <div className="flex items-center justify-between px-4 py-2.5 font-mono text-[10px] uppercase tracking-[0.12em] text-gray-400 dark:text-gray-500">
+        <span>{label}</span>
+        {note && <span>{note}</span>}
+      </div>
+      <div className="h-px w-full bg-black/[0.07] dark:bg-white/[0.08]" />
+      {children}
+    </div>
+  );
+}
+
+/** Inline literal, for the bits of YHub you have to click by name. */
+function Key({ children }: { children: ReactNode }) {
+  return (
+    <span className="rounded border border-black/[0.08] bg-[#fafafa] px-1.5 py-0.5 font-mono text-xs text-gray-700 dark:border-white/[0.1] dark:bg-white/[0.04] dark:text-gray-300">
+      {children}
+    </span>
+  );
 }
 
 export function OnboardingState({
@@ -21,21 +71,45 @@ export function OnboardingState({
 }: OnboardingStateProps) {
   const firstName = userName?.split(" ")[0] ?? "there";
 
+  const steps: ReactNode[] = [
+    <>
+      Go to{" "}
+      <a
+        href="https://yub.yale.edu"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="text-gray-900 underline underline-offset-2 transition-colors hover:text-pink-600 dark:text-white dark:hover:text-pink-300"
+      >
+        Yale Hub (yub.yale.edu)
+      </a>{" "}
+      and sign in with CAS
+    </>,
+    <>
+      Navigate to <Key>Academics</Key> <span aria-hidden>→</span>{" "}
+      <Key>Unofficial Transcript - Undergraduate</Key>
+    </>,
+    <>
+      Click <Key>Print</Key>, save as PDF, then upload it here
+      {isBrandNew
+        ? ". In-progress courses with no grades are supported."
+        : "."}
+    </>,
+  ];
+
   return (
-    <div className="flex flex-col items-center justify-center py-8">
-      {/* Header */}
-      <div className="text-center mb-6 max-w-xl">
-        <h2 className="text-2xl font-medium text-gray-900 dark:text-white mb-2">
+    <div className="flex flex-col items-center justify-center py-8 font-louize">
+      <div className="mb-6 max-w-xl text-center">
+        <h2 className="text-balance text-[1.6rem]/[1.25] font-medium tracking-[-0.02em] text-gray-900 dark:text-white sm:text-[1.9rem]/[1.25]">
           {isBrandNew
             ? `Welcome to Yale, ${firstName}.`
             : `Let's get your courses loaded, ${firstName}.`}
         </h2>
-        <p className="text-gray-500 dark:text-gray-400 text-sm leading-relaxed">
+        <p className="mx-auto mt-3 max-w-[58ch] font-sf text-sm leading-relaxed text-gray-500 dark:text-gray-400">
           {isBrandNew ? (
             <>
               We know you&apos;ve just gotten to Yale as a Class of 2030 frosh
               (welcome!). No worries; you do{" "}
-              <span className="font-medium text-gray-700 dark:text-gray-300">
+              <span className="font-medium text-gray-900 dark:text-gray-200">
                 not need grades
               </span>{" "}
               to start using DegreeIntelligence and upload your transcript.
@@ -49,119 +123,72 @@ export function OnboardingState({
             "Upload your unofficial transcript to see your academic journey. We won't store the PDF file."
           )}
         </p>
+
         {isBrandNew && (
-          <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
+          <div className="mt-5 flex flex-wrap items-center justify-center gap-2.5 font-sf">
             {onOpenSimulator && (
-              <button
-                type="button"
-                onClick={onOpenSimulator}
-                className="inline-flex items-center gap-2 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-2 text-sm font-medium text-emerald-700 dark:text-emerald-300 hover:bg-emerald-500/15 transition-colors"
-              >
-                <MonitorCog size={14} />
+              <ShinyButton size="sm" withArrow onClick={onOpenSimulator}>
                 Open the Simulator
-              </button>
+              </ShinyButton>
             )}
-            <button
-              type="button"
-              onClick={onManualEntry}
-              className="inline-flex items-center gap-2 rounded-xl border border-pink-500/30 bg-pink-500/10 px-4 py-2 text-sm font-medium text-pink-700 dark:text-pink-300 hover:bg-pink-500/15 transition-colors"
-            >
-              <PenLine size={14} />
+            <GhostButton onClick={onManualEntry}>
               Add courses manually
-            </button>
+            </GhostButton>
           </div>
         )}
       </div>
 
-      {/* Tutorial Steps */}
-      <div className="w-full max-w-xl mb-6">
-        <div className="p-4 rounded-xl bg-gradient-to-br from-gray-50/90 via-white/80 to-gray-100/90 dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 backdrop-blur-md border border-gray-200/80 dark:border-gray-800/50 shadow-[inset_0_1px_0_rgba(255,255,255,0.04),0_4px_16px_rgba(0,0,0,0.08)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.04),0_4px_16px_rgba(0,0,0,0.25)]">
-          <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3 flex items-center gap-2">
-            <span className="p-1.5 rounded-lg bg-pink-500/10 border border-pink-500/20">
-              <Printer size={14} className="text-pink-400" />
-            </span>
-            {isBrandNew
-              ? "How to import from YHub (no grades is totally fine)"
-              : "How to get your transcript"}
-          </h3>
+      <Panel
+        label={isBrandNew ? "import from yhub" : "get your transcript"}
+        note={isBrandNew ? "no grades needed" : undefined}
+        className="mb-3"
+      >
+        <div className="p-5">
           {isBrandNew && (
-            <p className="text-xs text-gray-500 dark:text-gray-400 mb-3 leading-relaxed">
+            <p className="mb-4 font-sf text-sm leading-relaxed text-gray-500 dark:text-gray-400">
               You already registered for fall courses, so your unofficial
-              transcript is on YHub now, even though every course still shows
-              as in progress. We parse those in-progress courses so My Courses
-              and the Simulator can start mapping your path right away.
+              transcript is on YHub now, even though every course still shows as
+              in progress. We parse those in-progress courses so My Courses and
+              the Simulator can start mapping your path right away.
             </p>
           )}
-          <div className="space-y-3">
-            {[
-              <>
-                Go to{" "}
-                <a
-                  href="https://yub.yale.edu"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-pink-600 dark:text-pink-400 hover:text-pink-700 dark:hover:text-pink-300 underline underline-offset-2"
-                >
-                  Yale Hub (yub.yale.edu)
-                </a>{" "}
-                and sign in with CAS
-              </>,
-              <>
-                Navigate to{" "}
-                <span className="px-1.5 py-0.5 rounded bg-gray-100 dark:bg-gray-800/60 border border-gray-300 dark:border-gray-700/50 text-gray-800 dark:text-gray-200 font-mono text-xs">
-                  Academics
-                </span>{" "}
-                →{" "}
-                <span className="px-1.5 py-0.5 rounded bg-gray-100 dark:bg-gray-800/60 border border-gray-300 dark:border-gray-700/50 text-gray-800 dark:text-gray-200 font-mono text-xs">
-                  Unofficial Transcript - Undergraduate
-                </span>
-              </>,
-              <>
-                Click{" "}
-                <span className="px-1.5 py-0.5 rounded bg-blue-500/20 border border-blue-500/30 text-blue-600 dark:text-blue-300 font-medium text-xs">
-                  Print
-                </span>{" "}
-                , save as PDF, then upload it here
-                {isBrandNew
-                  ? ". In-progress courses with no grades are supported."
-                  : "."}
-              </>,
-            ].map((step, i) => (
-              <div key={i} className="flex items-start gap-3">
-                <div
-                  className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-pink-600 font-sf text-xs font-semibold leading-none text-white shadow-[0_2px_8px_rgba(236,72,153,0.35)]"
+
+          <ol className="space-y-3">
+            {steps.map((step, i) => (
+              <li key={i} className="flex items-start gap-3">
+                <span
+                  className="mt-0.5 shrink-0 font-mono text-[11px] text-gray-400 dark:text-gray-500"
                   aria-hidden="true"
                 >
-                  {i + 1}
-                </div>
-                <div className="flex-1 pt-0.5">
-                  <p className="text-sm text-gray-700 dark:text-gray-300">
-                    {step}
-                  </p>
-                </div>
-              </div>
+                  {String(i + 1).padStart(2, "0")}
+                </span>
+                <p className="flex-1 font-sf text-sm leading-relaxed text-gray-600 dark:text-gray-300">
+                  {step}
+                </p>
+              </li>
             ))}
-          </div>
+          </ol>
         </div>
-      </div>
+      </Panel>
 
-      {/* Upload Area */}
-      <div
+      <Panel
+        label="upload"
+        note="pdf, max 5mb"
         id="upload-transcript"
         data-tour="courses-upload-dropzone"
-        className="w-full max-w-xl p-6 rounded-xl bg-gradient-to-br from-gray-50/90 via-white/80 to-gray-100/90 dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 backdrop-blur-md border border-gray-200/80 dark:border-gray-800/50 shadow-[inset_0_1px_0_rgba(255,255,255,0.04),0_4px_16px_rgba(0,0,0,0.08)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.04),0_4px_16px_rgba(0,0,0,0.25)]"
       >
-        <FileUpload onSuccess={onUploadSuccess} />
-      </div>
+        <div className="p-5">
+          <FileUpload onSuccess={onUploadSuccess} />
+        </div>
+      </Panel>
 
-      {/* Manual Entry Option */}
-      <div className="w-full max-w-xl mt-3 text-center">
-        <p className="text-sm text-gray-500 dark:text-gray-400">
+      <div className="mt-3 w-full max-w-xl text-center">
+        <p className="font-sf text-sm text-gray-500 dark:text-gray-400">
           Prefer to type in your courses manually?{" "}
           <button
             onClick={onManualEntry}
             data-tour="courses-empty-manual-add"
-            className="text-pink-600 dark:text-pink-400 hover:text-pink-700 dark:hover:text-pink-300 underline underline-offset-2 transition-colors"
+            className="text-gray-900 underline underline-offset-2 transition-colors hover:text-pink-600 dark:text-white dark:hover:text-pink-300"
           >
             Click here
           </button>
@@ -171,7 +198,7 @@ export function OnboardingState({
 
       <AcademicDataDisclaimerCard
         showIcon
-        className="w-full max-w-xl mt-5"
+        className="mt-5 w-full max-w-xl"
         lead="By uploading or writing in your courses and grades, you voluntarily share that academic data with DegreeIntelligence."
       />
     </div>

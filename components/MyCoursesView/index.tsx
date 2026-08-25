@@ -165,7 +165,7 @@ export default function MyCoursesView({
             title="Add courses manually"
           >
             <FiPlus size={14} />
-            <span className="hidden sm:inline">Manual add</span>
+            <span className="hidden sm:inline">Manual course add</span>
           </motion.button>
           <motion.button
             whileHover={{ y: -1 }}

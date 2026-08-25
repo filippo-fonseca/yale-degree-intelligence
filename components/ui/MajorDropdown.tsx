@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect, useLayoutEffect, useMemo } from "react";
+import { useEffect, useState, useRef, useLayoutEffect, useMemo } from "react";
 import { createPortal } from "react-dom";
 import { MAJORS } from "@/lib/majors";
 
@@ -9,6 +9,8 @@ interface MajorDropdownProps {
   onChange: (value: string) => void;
   disabledOptions?: string[];
   className?: string;
+  /** Open the menu (and focus search) on mount / when flipped true */
+  defaultOpen?: boolean;
 }
 
 type MenuPos = { top: number; left: number; width: number; openUp: boolean };
@@ -30,9 +32,13 @@ export function MajorDropdown({
   value,
   onChange,
   disabledOptions = [],
+  defaultOpen = false,
   className = "",
 }: MajorDropdownProps) {
   const [isOpen, setIsOpen] = useState(false);
+  useEffect(() => {
+    if (defaultOpen) setIsOpen(true);
+  }, [defaultOpen]);
   const [searchTerm, setSearchTerm] = useState("");
   const [pos, setPos] = useState<MenuPos | null>(null);
 

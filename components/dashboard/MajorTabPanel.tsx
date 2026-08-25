@@ -61,7 +61,7 @@ export function MajorTabPanel({
           chip still names what the progress below is measuring. */}
       {userProfile && (userProfile?.majors?.length ?? 0) >= 1 && (
         <div className="mb-4">
-          <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1.5 uppercase tracking-wider">
+          <label className="mb-1.5 block font-sf text-[11px] font-medium uppercase tracking-wider text-gray-500 dark:text-gray-500">
             Viewing Progress For
           </label>
           <div className="flex flex-wrap items-center gap-1.5">
@@ -69,10 +69,10 @@ export function MajorTabPanel({
               <button
                 key={major}
                 onClick={() => onSelectMajor(major)}
-                className={`px-3 py-1.5 rounded-xl text-sm transition-all duration-200 ${
+                className={`rounded-xl border px-3 py-1.5 font-sf text-sm transition-colors ${
                   selectedMajor === major
-                    ? "bg-blue-600 text-white border border-blue-600 shadow-[0_2px_8px_rgba(59,130,246,0.25)]"
-                    : "bg-gray-50 dark:bg-gray-900/40 text-gray-600 dark:text-gray-400 border border-gray-200 dark:border-gray-800/60 hover:border-gray-300 dark:hover:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800/50 hover:text-gray-800 dark:hover:text-gray-300"
+                    ? "border-transparent bg-gray-900 text-white dark:bg-white dark:text-gray-900"
+                    : "border-black/[0.08] bg-white text-gray-600 hover:text-gray-900 dark:border-white/[0.1] dark:bg-white/[0.03] dark:text-gray-400 dark:hover:text-white"
                 }`}
               >
                 {major} - {MAJORS[major] || major}
@@ -81,7 +81,7 @@ export function MajorTabPanel({
             {userProfile.majors.length < 2 && (
               <button
                 onClick={onOpenSettings}
-                className="inline-flex items-center gap-1 rounded-xl border border-dashed border-black/[0.14] px-3 py-1.5 text-sm text-gray-500 transition-colors hover:border-blue-500/50 hover:text-gray-900 dark:border-white/[0.14] dark:text-gray-400 dark:hover:border-blue-500/50 dark:hover:text-white"
+                className="inline-flex items-center gap-1 rounded-xl border border-dashed border-black/[0.14] px-3 py-1.5 font-sf text-sm text-gray-500 transition-colors hover:border-black/25 hover:text-gray-900 dark:border-white/[0.14] dark:text-gray-400 dark:hover:border-white/25 dark:hover:text-white"
                 title="Add a second major in Settings"
               >
                 <FiPlus size={13} />

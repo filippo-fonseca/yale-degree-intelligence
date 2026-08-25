@@ -218,5 +218,12 @@ service cloud.firestore {
     match /contact_messages/{docId} {
       allow read, write: if false;
     }
+
+    // Campaign opt-outs. Written by /api/unsubscribe through the Admin SDK,
+    // which these rules do not govern; no client has any business reading the
+    // list of who left.
+    match /email_unsubscribes/{email} {
+      allow read, write: if false;
+    }
   }
 }

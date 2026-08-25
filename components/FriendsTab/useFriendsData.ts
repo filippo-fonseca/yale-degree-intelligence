@@ -32,7 +32,12 @@ export function useFriendsData(user: User | null) {
     if (!user) return;
 
     const publicProfilesUnsub = onSnapshot(
-      query(collection(db, "friends_public_data"), where("enabled", "==", true)),
+      // friends_directory, not friends_public_data: discovery needs a name, a
+      // photo, a major and a year, and nothing else. The content collection is
+      // restricted to the owner and their friends (firestore.rules), so
+      // subscribing to it here would both over-read and, after the rules
+      // tighten, return nothing.
+      query(collection(db, "friends_directory"), where("enabled", "==", true)),
       (snapshot) => {
         const users: UserProfile[] = [];
         const byId: Record<string, UserProfile> = {};

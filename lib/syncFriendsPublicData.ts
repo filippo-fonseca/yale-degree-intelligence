@@ -10,6 +10,10 @@ import {
   serverTimestamp,
 } from "firebase/firestore";
 import { db } from "@/config/firebase";
+import {
+  deleteFriendsDirectory,
+  syncFriendsDirectory,
+} from "@/lib/friendsDirectory";
 import { Course, PublicCourse, DEFAULT_FRIENDS_PROFILE_VISIBILITY } from "@/lib/types";
 import {
   effectiveDistributionals,
@@ -132,6 +136,15 @@ export async function syncFriendsPublicData(
       existingData.graduationYear === (userProfile?.graduationYear || null) &&
       existingData.bio === (userProfile?.bio || null)
     ) {
+      // The content doc is current, but the directory entry may not be: it is
+      // a separate document, and this is the path that repairs an account
+      // whose entry predates the collection.
+      await syncFriendsDirectory(userId, {
+        displayName: user.displayName ?? null,
+        photoURL: user.photoURL ?? null,
+        majors: userProfile?.majors || [],
+        graduationYear: userProfile?.graduationYear ?? null,
+      });
       return; // Data unchanged, skip update
     }
 
@@ -149,6 +162,13 @@ export async function syncFriendsPublicData(
       bio: userProfile?.bio || null,
       visibility: existingData.visibility ?? undefined,
       courses: publicCourses,
+    });
+
+    await syncFriendsDirectory(userId, {
+      displayName: user.displayName ?? null,
+      photoURL: user.photoURL ?? null,
+      majors: userProfile?.majors || [],
+      graduationYear: userProfile?.graduationYear ?? null,
     });
   } catch (error) {
     console.error("Error syncing friends public data:", error);
@@ -200,6 +220,16 @@ export async function enableFriendsFeature(
     courses: publicCourses,
     visibility: { ...DEFAULT_FRIENDS_PROFILE_VISIBILITY },
   });
+
+  // Discovery is a separate document from here on. Written second: a directory
+  // entry pointing at a profile that does not exist yet would show a name in
+  // search that opens nothing.
+  await syncFriendsDirectory(userId, {
+    displayName: user.displayName ?? null,
+    photoURL: user.photoURL ?? null,
+    majors: userProfile?.majors || [],
+    graduationYear: userProfile?.graduationYear ?? null,
+  });
 }
 
 /**
@@ -212,8 +242,10 @@ export async function enableFriendsFeature(
  */
 export async function disableFriendsFeature(userId: string): Promise<void> {
   try {
-    // 1. Delete friends_public_data document
+    // 1. Delete friends_public_data document, and the directory entry with it,
+    //    so a disabled account stops appearing in search.
     await deleteDoc(doc(db, "friends_public_data", userId));
+    await deleteFriendsDirectory(userId);
 
     // 2. Get all friendships involving this user
     const friendsSnapshot = await getDocs(

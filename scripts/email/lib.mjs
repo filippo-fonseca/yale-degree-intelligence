@@ -22,7 +22,13 @@ export const CLASS_YEARS = ["2030", "2029", "2028", "2027"];
  * a bare email address in the display name is a phishing signature that costs
  * deliverability, so the display name stays a human name.
  */
-export const FROM_NAME = "Filippo Fonseca (Yale DegreeIntelligence)";
+/*
+ * The apostrophe is the ASCII one, not a typographic one. A display name is a
+ * mail header, so anything outside ASCII has to travel RFC 2047 encoded, and a
+ * client that mishandles that shows the sender as mojibake. Not a risk worth
+ * taking on the one line every recipient reads before deciding to open this.
+ */
+export const FROM_NAME = "Filippo Fonseca ('28)";
 export const REPLY_TO = "filippo.fonseca@yale.edu";
 
 /** Resend's documented default is 2 requests/second; stay just under it. */

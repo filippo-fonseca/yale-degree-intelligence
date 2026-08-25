@@ -37,7 +37,14 @@ const CONTACT_EMAIL = "filippo.fonseca@yale.edu";
 /**
  * Logos are served from the site rather than inlined: Gmail strips SVG and
  * blocks data: URIs in img tags, so a hosted PNG is the only thing that renders
- * everywhere. Override the base when screenshotting locally, since these paths
+ * everywhere.
+ *
+ * The light lockup carries a white plate baked into the PNG. Gmail ignores
+ * prefers-color-scheme entirely and darkens the message itself, and it never
+ * touches image pixels, so a transparent PNG with a black wordmark ended up
+ * black-on-charcoal in the Gmail app. The plate travels with the image, so the
+ * mark stays legible wherever the swap does not happen. Both files are padded
+ * to the same box so the header does not jump between the two. Override the base when screenshotting locally, since these paths
  * only resolve once public/email/ has been deployed.
  *
  * Points at the canonical www host rather than the apex. The apex answers 307
@@ -307,8 +314,8 @@ function header() {
           <tr>
             <td align="center" style="padding: 0 0 30px 0;">
               <a href="${SITE_URL}" target="_blank" style="text-decoration: none;">
-                <img src="${LOGO_BASE}/lockup-light.png" width="220" height="33" alt="DegreeIntelligence" class="logo-light" style="display: inline-block; width: 220px; height: 33px; border: 0;" />
-                <img src="${LOGO_BASE}/lockup-dark.png" width="220" height="33" alt="DegreeIntelligence" class="logo-dark" style="display: none; width: 220px; height: 33px; border: 0;" />
+                <img src="${LOGO_BASE}/lockup-light.png" width="234" height="45" alt="DegreeIntelligence" class="logo-light" style="display: inline-block; width: 234px; height: 45px; border: 0;" />
+                <img src="${LOGO_BASE}/lockup-dark.png" width="234" height="45" alt="DegreeIntelligence" class="logo-dark" style="display: none; width: 234px; height: 45px; border: 0;" />
               </a>
             </td>
           </tr>`;

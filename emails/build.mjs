@@ -169,7 +169,7 @@ function videoBlock({ caption, lead }) {
                           <span style="display: inline-block; width: 9px; height: 9px; border-radius: 50%; background-color: #28c840; margin-left: 5px;"></span>
                         </td>
                         <td align="center" class="t-muted" style="font-family: ${MONO}; font-size: 11px; color: ${LIGHT.muted}; letter-spacing: 0.2px;">
-                          v3-launch-film.mp4
+                          v3-launch-demo
                         </td>
                         <td width="60">&nbsp;</td>
                       </tr>
@@ -510,7 +510,7 @@ const TARGETS = [
                 better. We now have ${u("Certificates")}, a rebuilt ${u("Simulator")},
                 ${u("distributionals")}, a ${u("cleaner UI")}, and ${u("much more")}.`,
         cta: "Log back into DegreeIntelligence →",
-        videoCaption: "Watch the v3 tour",
+        videoCaption: "Watch the demo",
         title: "v3 is here",
         preheader: "Certificates, a rebuilt Simulator, distributionals, a cleaner UI, and much more.",
       }),
@@ -558,7 +558,7 @@ const TARGETS = [
                 Or hey, we're open source, so you could code it yourself and submit a PR :)`,
         ],
         cta: "Try DegreeIntelligence →",
-        videoCaption: "Watch the two-minute tour",
+        videoCaption: "Watch the demo",
         title: "Welcome to Yale",
         preheader: "The free, open-source app 1 in 6 Yalies use to make sense of majors, distributionals, and what to take next.",
       }),
@@ -577,7 +577,7 @@ const TARGETS = [
                 a ${u("cleaner UI")}, and ${u("much more")}. Made by Yalies, for Yalies,
                 DegreeIntelligence is free (forever) and requires nothing to install.`,
         cta: "Try DegreeIntelligence →",
-        videoCaption: "Watch the two-minute tour",
+        videoCaption: "Watch the demo",
         title: "1 in 6 Yalies use this. Why don't you?",
         preheader: "Plan semesters, track requirements, and see how your degree is actually going.",
       }),

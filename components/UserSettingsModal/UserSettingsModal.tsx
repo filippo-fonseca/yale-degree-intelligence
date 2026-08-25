@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   FiLogOut,
   FiMoreVertical,
@@ -44,7 +44,7 @@ export default function UserSettingsModal({
   const [isTogglingFriends, setIsTogglingFriends] = useState(false);
   const [showDisableFriendsConfirm, setShowDisableFriendsConfirm] =
     useState(false);
-  const [showDiscardConfirm, setShowDiscardConfirm] = useState(false);
+  const [showUnsavedConfirm, setShowUnsavedConfirm] = useState(false);
 
   const modalRef = useRef<HTMLDivElement>(null);
 
@@ -84,22 +84,74 @@ export default function UserSettingsModal({
     handleSave,
   } = profileForm;
 
+  /**
+   * The only way out of Settings.
+   *
+   * The academic fields are the one thing here that is held locally, so
+   * leaving with them dirty loses work. Clicking outside already asked; the
+   * close button, Done, and Escape did not, and quietly threw the edit away.
+   * They all come through here now.
+   */
+  const requestClose = useCallback(() => {
+    if (hasChanges()) {
+      setShowUnsavedConfirm(true);
+      return;
+    }
+    onClose();
+  }, [hasChanges, onClose]);
+
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as HTMLElement;
       if (target.closest('[data-major-dropdown-portal="true"]')) return;
       if (target.closest('[data-certificate-dropdown-portal="true"]')) return;
+      // A confirmation sits above this modal, so a click inside it is not a
+      // click outside Settings.
+      if (target.closest('[data-settings-confirm="true"]')) return;
       if (modalRef.current && !modalRef.current.contains(target)) {
-        if (hasChanges()) {
-          setShowDiscardConfirm(true);
-        } else {
-          onClose();
-        }
+        requestClose();
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [onClose, userProfile, localProfile]);
+  }, [requestClose]);
+
+  // Escape closes the innermost thing that is open, so it only reaches
+  // Settings once the dropdowns and the confirmations have had their turn. On
+  // the unsaved-changes dialog it means "keep editing", the safe answer.
+  useEffect(() => {
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key !== "Escape") return;
+      if (showDeleteConfirm || showDisableFriendsConfirm) return;
+      if (
+        document.querySelector(
+          '[data-major-dropdown-portal="true"], [data-certificate-dropdown-portal="true"]',
+        )
+      ) {
+        return;
+      }
+      if (showUnsavedConfirm) {
+        if (!isSaving) setShowUnsavedConfirm(false);
+        return;
+      }
+      requestClose();
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [
+    requestClose,
+    showDeleteConfirm,
+    showDisableFriendsConfirm,
+    showUnsavedConfirm,
+    isSaving,
+  ]);
+
+  const handleSaveAndClose = async () => {
+    const saved = await handleSave();
+    if (!saved) return;
+    setShowUnsavedConfirm(false);
+    onClose();
+  };
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -161,7 +213,7 @@ export default function UserSettingsModal({
         className="relative w-full max-w-3xl bg-white/95 dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/90 dark:via-gray-900/80 dark:to-gray-950/90 rounded-2xl border border-black/[0.06] dark:border-white/[0.08] shadow-[0_24px_80px_rgba(0,0,0,0.18)] dark:shadow-[0_24px_80px_rgba(0,0,0,0.5),0_0_120px_rgba(139,92,246,0.08),inset_0_1px_0_rgba(255,255,255,0.1),inset_0_-1px_0_rgba(0,0,0,0.3)] backdrop-blur-2xl ring-1 ring-black/[0.04] dark:ring-white/[0.05] overflow-visible"
       >
         <button
-          onClick={onClose}
+          onClick={requestClose}
           aria-label="Close settings"
           className="absolute top-3 right-3 z-10 p-1.5 rounded-lg text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-black/[0.04] dark:hover:bg-white/[0.06] transition-all"
         >
@@ -370,7 +422,7 @@ export default function UserSettingsModal({
               )}
               <button
                 type="button"
-                onClick={onClose}
+                onClick={requestClose}
                 className="inline-flex items-center justify-center rounded-full bg-gray-900 px-4 py-2 font-sf text-sm font-medium text-white transition-colors hover:bg-gray-700 dark:bg-white dark:text-gray-900 dark:hover:bg-gray-200"
               >
                 Done
@@ -383,8 +435,11 @@ export default function UserSettingsModal({
             setShowDisableFriendsConfirm={setShowDisableFriendsConfirm}
             isTogglingFriends={isTogglingFriends}
             onConfirmDisableFriends={handleConfirmDisableFriends}
-            showDiscardConfirm={showDiscardConfirm}
-            setShowDiscardConfirm={setShowDiscardConfirm}
+            showUnsavedConfirm={showUnsavedConfirm}
+            setShowUnsavedConfirm={setShowUnsavedConfirm}
+            onSaveAndClose={handleSaveAndClose}
+            isSaving={isSaving}
+            canSave={!hasDuplicateMajors() && !hasDuplicateCertificates()}
             onClose={onClose}
             showDeleteConfirm={showDeleteConfirm}
             setShowDeleteConfirm={setShowDeleteConfirm}

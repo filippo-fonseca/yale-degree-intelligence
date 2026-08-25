@@ -8,8 +8,12 @@ interface SettingsConfirmModalsProps {
   setShowDisableFriendsConfirm: (value: boolean) => void;
   isTogglingFriends: boolean;
   onConfirmDisableFriends: () => Promise<void>;
-  showDiscardConfirm: boolean;
-  setShowDiscardConfirm: (value: boolean) => void;
+  showUnsavedConfirm: boolean;
+  setShowUnsavedConfirm: (value: boolean) => void;
+  onSaveAndClose: () => Promise<void>;
+  isSaving: boolean;
+  /** False while duplicate majors or certificates block a save. */
+  canSave: boolean;
   onClose: () => void;
   showDeleteConfirm: boolean;
   setShowDeleteConfirm: (value: boolean) => void;
@@ -22,8 +26,11 @@ export function SettingsConfirmModals({
   setShowDisableFriendsConfirm,
   isTogglingFriends,
   onConfirmDisableFriends,
-  showDiscardConfirm,
-  setShowDiscardConfirm,
+  showUnsavedConfirm,
+  setShowUnsavedConfirm,
+  onSaveAndClose,
+  isSaving,
+  canSave,
   onClose,
   showDeleteConfirm,
   setShowDeleteConfirm,
@@ -39,6 +46,7 @@ export function SettingsConfirmModals({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
+            data-settings-confirm="true"
             className="fixed inset-0 bg-black/70 backdrop-blur-md z-[9999] flex items-center justify-center p-4"
             onClick={(e) => {
               if (e.target === e.currentTarget && !isTogglingFriends) {
@@ -95,16 +103,19 @@ export function SettingsConfirmModals({
         )}
       </AnimatePresence>
 
-      {/* Discard / Delete Account Confirmation Modals */}
+      {/* Unsaved changes / Delete Account Confirmation Modals */}
       <AnimatePresence>
-        {showDiscardConfirm && (
+        {showUnsavedConfirm && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
+            data-settings-confirm="true"
             className="fixed inset-0 bg-black/70 backdrop-blur-md z-[9999] flex items-center justify-center p-4"
             onClick={(e) => {
-              if (e.target === e.currentTarget) setShowDiscardConfirm(false);
+              if (e.target === e.currentTarget && !isSaving) {
+                setShowUnsavedConfirm(false);
+              }
             }}
           >
             <motion.div
@@ -113,31 +124,55 @@ export function SettingsConfirmModals({
               exit={{ opacity: 0, scale: 0.95, y: 10 }}
               className="bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/95 dark:via-gray-900/90 dark:to-gray-950/95 border border-gray-200 dark:border-white/[0.1] rounded-2xl p-4 max-w-xs w-full shadow-[0_16px_48px_rgba(0,0,0,0.5)] backdrop-blur-2xl"
             >
-              <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-2">
-                Discard unsaved changes?
+              <h3 className="mb-2 text-sm font-semibold text-gray-900 dark:text-gray-100">
+                Save your changes?
               </h3>
-              <p className="text-gray-500 dark:text-gray-400 text-xs mb-3">
-                You have unsaved changes to your majors or graduation year.
+              <p className="mb-3 font-sf text-xs text-gray-500 dark:text-gray-400">
+                Your majors, certificates, or graduation year have been edited
+                and not saved yet. Everything else in Settings saves on its own.
               </p>
+              {!canSave && (
+                <p className="mb-3 font-sf text-xs text-red-500 dark:text-red-400">
+                  Remove the duplicate major or certificate first, or leave
+                  without saving.
+                </p>
+              )}
               <div className="flex justify-end gap-2">
                 <button
                   type="button"
-                  onClick={() => setShowDiscardConfirm(false)}
+                  onClick={() => setShowUnsavedConfirm(false)}
+                  disabled={isSaving}
                   className="di-btn-secondary"
                 >
                   Keep editing
                 </button>
                 <button
                   type="button"
-                  onClick={() => {
-                    setShowDiscardConfirm(false);
-                    onClose();
-                  }}
-                  className="di-btn-danger"
+                  onClick={onSaveAndClose}
+                  disabled={isSaving || !canSave}
+                  className="di-btn-primary"
                 >
-                  Discard
+                  {isSaving ? (
+                    <>
+                      <span className="h-2.5 w-2.5 animate-spin rounded-full border-2 border-white/30 border-t-white" />
+                      Saving...
+                    </>
+                  ) : (
+                    "Save and close"
+                  )}
                 </button>
               </div>
+              <button
+                type="button"
+                onClick={() => {
+                  setShowUnsavedConfirm(false);
+                  onClose();
+                }}
+                disabled={isSaving}
+                className="mt-3 w-full font-sf text-[11px] text-gray-400 transition-colors hover:text-red-500 disabled:opacity-50 dark:text-gray-500 dark:hover:text-red-400"
+              >
+                Leave without saving
+              </button>
             </motion.div>
           </motion.div>
         )}
@@ -146,6 +181,7 @@ export function SettingsConfirmModals({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
+            data-settings-confirm="true"
             className="fixed inset-0 bg-black/70 backdrop-blur-md z-[9999] flex items-center justify-center p-4"
             onClick={(e) => {
               if (e.target === e.currentTarget && !isDeleting) {

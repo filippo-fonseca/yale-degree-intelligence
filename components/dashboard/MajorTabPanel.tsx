@@ -50,7 +50,7 @@ export function MajorTabPanel({
             {userProfile?.majors?.length > 1 ? "majors" : "major"},{" "}
             {user?.displayName?.split(" ")[0]}.
           </h2>
-          <p className="text-gray-600 dark:text-gray-300">
+          <p className="font-sf text-gray-600 dark:text-gray-300">
             This is based on data from your transcript and the{" "}
             {userProfile?.majors?.length > 1 ? "majors" : "major"} you indicated
             to us.

@@ -20,7 +20,7 @@ export default function MajorProgressHeader({
         <h3 className="text-xl font-medium text-gray-900 dark:text-white">
           {MAJORS[selectedMajor]}
         </h3>
-        <p className="text-sm text-gray-500">
+        <p className="font-sf text-sm text-gray-500">
           {getMajorDescriptionById(selectedMajor)}
         </p>
       </div>

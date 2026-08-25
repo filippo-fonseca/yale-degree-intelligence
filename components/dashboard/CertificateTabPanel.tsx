@@ -49,7 +49,7 @@ export function CertificateTabPanel({
               ? `Your certificate progress, ${user?.displayName?.split(" ")[0]}.`
               : `Certificates are optional. Add yours anytime.`}
           </h2>
-          <p className="text-gray-600 dark:text-gray-300">
+          <p className="font-sf text-gray-600 dark:text-gray-300">
             Track Yale College certificates alongside your major. Courses
             counted toward a certificate cannot also count toward your major(s).
           </p>

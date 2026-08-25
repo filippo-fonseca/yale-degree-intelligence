@@ -120,7 +120,7 @@ async function readSuppressions() {
 
 async function main() {
   const args = parseArgs(process.argv.slice(2), {
-    values: ["year", "variant", "to"],
+    values: ["year", "variant", "to", "subject"],
     flags: ["confirm", "skip-suppression-check"],
   });
 
@@ -136,6 +136,11 @@ async function main() {
   if (!fs.existsSync(htmlPath)) {
     throw new Error(`missing ${variant.file}. Run: node emails/build.mjs`);
   }
+
+  // Only for previews: Gmail threads by subject, so successive tests to the
+  // same inbox collapse into one conversation and the newest is easy to miss.
+  // The campaign itself always uses the variant's own subject.
+  const subject = args.subject ?? variant.subject;
 
   const template = fs.readFileSync(htmlPath, "utf8");
   if (!template.includes("{{{RESEND_UNSUBSCRIBE_URL}}}")) {
@@ -169,7 +174,7 @@ async function main() {
   console.log(`  already sent     ${attempted.size}`);
   console.log(`  unsubscribed     ${suppressed.size}`);
   console.log(`  to send now      ${pending.length}`);
-  console.log(`  subject          ${variant.subject}`);
+  console.log(`  subject          ${subject}`);
   console.log(`  from             ${FROM_NAME} <${FROM_ADDRESS}>`);
   console.log(`  reply-to         ${REPLY_TO}`);
 
@@ -192,7 +197,7 @@ async function main() {
         from: `${FROM_NAME} <${FROM_ADDRESS}>`,
         to: [email],
         reply_to: REPLY_TO,
-        subject: variant.subject,
+        subject,
         html,
         headers: {
           // RFC 8058: the client's own Unsubscribe button posts to this URL.

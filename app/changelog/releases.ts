@@ -67,6 +67,7 @@ export const RELEASES: Release[] = [
           "The bar on My Major shows in-progress credits as a striped, lighter section, so you can see where the completed part ends. The two shades of purple were too close to tell apart.",
           "The dialogs across the app (updating your transcript, the Simulator welcome, confirmations) now share one look, matching the rest of v3.",
           "The public profile page has proper loading states instead of the words \"Loading profile...\", and its sign-in and not-friends screens follow your light or dark mode.",
+          "The \"Manual fulfill\" and \"Skip\" explainer on My Major and My Certificates has been rebuilt in the v3 window: same typography as the rest of the app, the two actions numbered rather than bulleted, and no more blue and teal panels.",
           "Signing in goes straight to the loading screen. The homepage used to flash back for a moment after you picked your Yale account, which looked like the log-in had failed.",
           "Marking a requirement option as skipped now works even if you had already removed that course from the requirement. It quietly did nothing before.",
           "The switcher above your major and certificate progress lost its bright blue and teal buttons for the black-and-white ones the rest of v3 uses.",

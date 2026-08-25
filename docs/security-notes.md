@@ -1,13 +1,15 @@
 # Security notes
 
-Findings from the pre-open-source review, August 2026. The clean results are in
-the PR that added this file; what follows is the work still outstanding, in the
-order I would do it.
+Findings from the pre-open-source review, August 2026.
 
-## 1. `friends_public_data` is readable by every Yale account, not just friends
+Findings 1 through 4 are **fixed in the code and in `firestore.rules`**, but the
+rules are not deployed by merging: see "Deploying this" at the bottom for the
+order, which matters. Finding 5 is a decision for Filippo.
 
-**Severity: the one that matters.** No grades are involved. This is about course
-lists and bios.
+## 1. `friends_public_data` was readable by every Yale account — FIXED
+
+**Severity: the one that mattered.** No grades were involved. This was about
+course lists and bios.
 
 The rule is:
 
@@ -37,7 +39,7 @@ to be able to enumerate their courses.
 never called, which suggests this was the intent and the wiring was never
 finished.
 
-**Fix.** Split discovery from content:
+**Fixed by** splitting discovery from content:
 
 - `friends_directory/{uid}`: `displayName`, `photoURL`, `majors`,
   `graduationYear`, `enabled`. Readable by `isAllowedUser()`. This is what the
@@ -45,12 +47,13 @@ finished.
 - `friends_public_data/{uid}`: courses, bio, visibility. Readable by
   `isOwner(userId) || areFriends(request.auth.uid, userId)`.
 
-App changes that go with it: `useFriendsData` subscribes to the directory
-instead of the full collection, and both writers (`lib/syncFriendsPublicData.ts`
-and `/api/sync-friend-data`) write both documents. Deploy the writes first, then
-the rules, or search goes blank between the two.
+`useFriendsData` subscribes to the directory. Both writers
+(`lib/syncFriendsPublicData.ts` and `/api/sync-friend-data`) keep the entry in
+step, and both do it on every sync rather than only on enable, which makes the
+app self-repairing for anyone whose entry predates the collection. Disabling
+Friends and deleting an account both remove the entry.
 
-## 2. Dead AI collections still accept client writes
+## 2. Dead AI collections accepted client writes — FIXED
 
 `ai_responses`, `cleoai_conversations`, and `conversations` are left over from
 the Dan advisor and the MCP server, both removed in July 2026. Nothing in the
@@ -59,11 +62,13 @@ documents in `ai_responses` and `conversations` as long as `userId` matches
 their own uid. That is an open write endpoint with no size or rate limit
 attached to a feature that no longer exists.
 
-**Fix.** Set all three to `allow read, write: if false`, and delete whatever
-data is still in them (it is conversation history from a removed feature, so it
-is stale PII we have no reason to hold).
+**Fixed:** all three are `allow read, write: if false`. Still outstanding, and
+not something code can do: **delete the documents**. They are conversation
+history from a removed feature, so they are stale PII with no reason to exist.
+The rules now deny the Admin SDK nothing, so a console delete or a small script
+will do it.
 
-## 3. Most writes only require authentication, not a Yale account
+## 3. Writes only required authentication, not a Yale account — FIXED
 
 `isAllowedUser()` guards discovery reads, with a good comment explaining why:
 Firebase issues a token to any Google account, so `isAuthenticated()` does not
@@ -76,10 +81,11 @@ so this only applies to direct Firestore writes from a client holding a token.
 There is no discovery path for a non-Yale account to find a uid to spam, which
 keeps it low, but the storage-abuse path is real and free.
 
-**Fix.** `isAllowedUser()` on the create rules for `courses` and
-`friend-requests`.
+**Fixed:** `isAllowedUser()` on the create and update rules for `courses`, and
+on create for `friend-requests`, which also now rejects a request addressed to
+yourself and one that does not start as `pending`.
 
-## 4. `friend-requests` updates are unconstrained
+## 4. `friend-requests` updates were unconstrained — FIXED
 
 `allow update: if resource.data.to == request.auth.uid` lets the recipient
 rewrite any field on the request, not just accept or decline it. Accepting
@@ -87,15 +93,16 @@ properly goes through `/api/friends/accept`, which verifies the recipient and
 that the request is still pending, so this is not how the app behaves; it is
 just wider than it needs to be.
 
-**Fix.** Constrain the update to a status transition, and pin the immutable
-fields:
+**Fixed** by constraining the update to a status transition, with the immutable
+fields pinned:
 
 ```
-allow update: if resource.data.to == request.auth.uid &&
+allow update: if isAuthenticated() &&
+                resource.data.to == request.auth.uid &&
+                resource.data.status == 'pending' &&
                 request.resource.data.from == resource.data.from &&
                 request.resource.data.to == resource.data.to &&
-                request.resource.data.status in ['accepted', 'rejected'] &&
-                resource.data.status == 'pending';
+                request.resource.data.status in ['accepted', 'rejected'];
 ```
 
 ## 5. Minor: the creator's personal address is in the rules
@@ -106,6 +113,26 @@ student has, but once the repo is public it does tell a reader exactly which
 non-Yale Google account is worth phishing. Worth deciding whether the test
 account is still needed; if it is, a dedicated address used for nothing else is
 a smaller target than a personal one.
+
+## Deploying this
+
+Merging changes nothing in production. The order matters, because the rules and
+the app have to move in step:
+
+1. **Merge and let Vercel deploy.** The app now writes `friends_directory` and
+   reads search from it. The old rules still allow everything it needs, so this
+   step is safe on its own and can sit here indefinitely.
+2. **Run the backfill.** `node scripts/backfill-friends-directory.mjs --dry-run`
+   first, then without the flag. It seeds a directory entry for every enabled
+   account (so nobody vanishes from search before their next visit) and
+   reconciles `friends` into `friends_lookup` (so no existing friendship loses
+   access when the read rule starts checking `areFriends()`).
+3. **Deploy the rules.** `firebase deploy --only firestore:rules`.
+4. **Delete the dead AI collections' documents** (finding 2).
+
+Doing 3 before 2 is the one ordering that hurts: search would empty out for
+accounts with no directory entry yet, and any friendship without a lookup
+document would lose access to the other person's page.
 
 ## Not a finding, recorded so nobody re-derives it
 

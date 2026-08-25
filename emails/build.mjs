@@ -22,8 +22,9 @@ import { fileURLToPath } from "node:url";
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const DIST = path.join(HERE, "dist");
 
-/** Replace once the Loom recording is up; both emails point at it. */
-const VIDEO_URL = "https://www.loom.com/share/REPLACE_ME";
+/** The demo recording. Every email's film block points at it. */
+const VIDEO_URL =
+  "https://www.loom.com/share/05c17c15d00748579e06949a0d3ae69f";
 const SITE_URL = "https://degreeint.com";
 const REPO_URL = "https://github.com/filippo-fonseca/yale-degree-intelligence";
 

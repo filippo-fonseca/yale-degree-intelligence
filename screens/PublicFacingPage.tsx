@@ -713,7 +713,9 @@ export default function AboutPage() {
 
         <motion.div
           {...reveal}
-          className="relative mx-auto max-w-6xl [mask-image:linear-gradient(to_bottom,black_85%,transparent)]"
+          // No bottom fade any more: this is a real player now, and the mask
+          // was swallowing the scrubber and the controls under it.
+          className="relative mx-auto max-w-6xl"
         >
           <div className="overflow-hidden rounded-2xl border border-black/[0.08] dark:border-white/[0.09] bg-white dark:bg-[#101013] shadow-[0_32px_80px_-24px_rgba(0,0,0,0.35)]">
             {/* Title bar */}
@@ -722,21 +724,12 @@ export default function AboutPage() {
               <span className="h-2.5 w-2.5 rounded-full bg-yellow-500/80" />
               <span className="h-2.5 w-2.5 rounded-full bg-green-500/80" />
               <span className="pointer-events-none absolute inset-x-0 text-center font-mono text-[10px] text-gray-400 dark:text-gray-500">
-                v3-launch-film.mp4
+                v3-launch-demo
               </span>
             </div>
 
             {/* Film, edge to edge under the title bar */}
-            <div className="aspect-video">
-              <iframe
-                src="https://www.youtube.com/embed/5H1kjMWQfgs?si=F9mSXs1G_Wy1Fkx-"
-                title="DegreeIntelligence v3 launch film"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                referrerPolicy="strict-origin-when-cross-origin"
-                allowFullScreen
-                className="h-full w-full border-0"
-              />
-            </div>
+            <LoomEmbed title="DegreeIntelligence v3 demo" />
           </div>
         </motion.div>
       </section>
@@ -1693,15 +1686,10 @@ export default function AboutPage() {
                 </div>
 
                 {/* Video embed */}
-                <div className="aspect-video bg-black/50">
-                  <iframe
-                    src="https://www.youtube.com/embed/5H1kjMWQfgs"
-                    title="DegreeIntelligence v3 Launch"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen
-                    className="w-full h-full"
-                  />
-                </div>
+                <LoomEmbed
+                  title="DegreeIntelligence v3 demo"
+                  className="bg-black/50"
+                />
 
                 {/* Footer */}
                 <div className="px-5 py-3 border-t border-black/[0.06] dark:border-white/[0.08] flex items-center justify-between">
@@ -1761,6 +1749,40 @@ const reveal = {
 } as const;
 
 const REPO_URL = "https://github.com/filippo-fonseca/yale-degree-intelligence";
+
+/** The demo, hosted on Loom. Both players on this page show the same film. */
+const LOOM_EMBED_URL =
+  "https://www.loom.com/embed/05c17c15d00748579e06949a0d3ae69f";
+
+/**
+ * The Loom player, at the recording's own aspect ratio.
+ *
+ * Loom serves the film at 1.539:1 rather than 16:9, which is what a Mac window
+ * capture actually is, so the padding-bottom ratio comes from Loom's own embed
+ * snippet. Forcing `aspect-video` on it would letterbox the recording inside
+ * the window chrome it is sitting in.
+ */
+function LoomEmbed({
+  title,
+  className = "",
+}: {
+  title: string;
+  className?: string;
+}) {
+  return (
+    <div
+      className={`relative h-0 w-full ${className}`}
+      style={{ paddingBottom: "64.98194945848375%" }}
+    >
+      <iframe
+        src={LOOM_EMBED_URL}
+        title={title}
+        allowFullScreen
+        className="absolute left-0 top-0 h-full w-full border-0"
+      />
+    </div>
+  );
+}
 
 const YDN_BANNER_KEY = "di-ydn-banner-dismissed";
 const YDN_ARTICLE_URL =

@@ -62,11 +62,14 @@ documents in `ai_responses` and `conversations` as long as `userId` matches
 their own uid. That is an open write endpoint with no size or rate limit
 attached to a feature that no longer exists.
 
-**Fixed:** all three are `allow read, write: if false`. Still outstanding, and
-not something code can do: **delete the documents**. They are conversation
-history from a removed feature, so they are stale PII with no reason to exist.
-The rules now deny the Admin SDK nothing, so a console delete or a small script
-will do it.
+**Fixed:** all three are `allow read, write: if false`, and
+`scripts/purge-dead-collections.mjs` deletes what is left. That script also
+covers `dan_keys` and `mcp_tokens`, which the rules already denied but which
+are the more important two: they held per-user BYOK API keys and MCP tokens.
+Stale third-party credentials are the worst thing to keep, because nobody is
+watching them and the user cannot see that they still exist.
+
+Run `--dry-run` (the default) to see the counts, then `--confirm`.
 
 ## 3. Writes only required authentication, not a Yale account — FIXED
 
@@ -128,7 +131,9 @@ the app have to move in step:
    reconciles `friends` into `friends_lookup` (so no existing friendship loses
    access when the read rule starts checking `areFriends()`).
 3. **Deploy the rules.** `firebase deploy --only firestore:rules`.
-4. **Delete the dead AI collections' documents** (finding 2).
+4. **Purge the dead collections.** `node scripts/purge-dead-collections.mjs`
+   for the counts, then `--confirm`. Independent of steps 1 to 3: nothing reads
+   these, so it can run at any point.
 
 Doing 3 before 2 is the one ordering that hurts: search would empty out for
 accounts with no directory entry yet, and any friendship without a lookup

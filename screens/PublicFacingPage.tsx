@@ -1492,9 +1492,9 @@ export default function AboutPage() {
           <p className="mx-auto mt-4 max-w-[52ch] font-sf text-base leading-relaxed text-gray-500 dark:text-gray-400 md:text-lg">
             I initially had set up what I thought was a nice-looking,
             easy-to-use Google Sheets document... but I quickly realized how
-            suboptimal, tedious, and annoying that entire experience was. Most
-            of us do this, if at all, which I found ridiculous... so I sat down
-            and coded this up.
+            suboptimal, tedious, and annoying that entire experience was. The
+            crazy part is that most of us do this (if at all!)... so I sat down
+            and had a lot of fun making this in Summer 2025.
           </p>
 
           <p className="mx-auto mt-4 max-w-[52ch] font-sf text-base leading-relaxed text-gray-500 dark:text-gray-400 md:text-lg">

@@ -1,7 +1,8 @@
 "use client";
 
-import { motion, AnimatePresence } from "framer-motion";
-import { FiTrash2 } from "react-icons/fi";
+import { ModalShell } from "../ui/ModalShell";
+import { ShinyButton } from "../ui/shiny-button";
+import { GhostButton } from "../ui/ghost-button";
 
 interface SettingsConfirmModalsProps {
   showDisableFriendsConfirm: boolean;
@@ -21,6 +22,57 @@ interface SettingsConfirmModalsProps {
   onDeleteAccount: () => Promise<void>;
 }
 
+/** The destructive answer, in the shape v3 gives every other button. */
+function DangerButton({
+  children,
+  onClick,
+  disabled,
+}: {
+  children: React.ReactNode;
+  onClick: () => void;
+  disabled?: boolean;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={disabled}
+      className="inline-flex items-center justify-center gap-1.5 rounded-full bg-red-600 px-4 py-2 font-sf text-sm font-medium text-white transition-colors hover:bg-red-700 disabled:opacity-50 dark:bg-red-500 dark:hover:bg-red-600"
+    >
+      {children}
+    </button>
+  );
+}
+
+function Spinner() {
+  return (
+    <span className="h-3 w-3 animate-spin rounded-full border-2 border-white/30 border-t-white" />
+  );
+}
+
+/** Body copy for a confirmation, in the interface typeface. */
+function Body({ children }: { children: React.ReactNode }) {
+  return (
+    <p className="mt-2 font-sf text-sm leading-relaxed text-gray-500 dark:text-gray-400">
+      {children}
+    </p>
+  );
+}
+
+function Title({ children }: { children: React.ReactNode }) {
+  return (
+    <h2 className="text-[1.15rem]/[1.3] font-medium tracking-[-0.02em] text-gray-900 dark:text-white">
+      {children}
+    </h2>
+  );
+}
+
+/**
+ * The three questions Settings can ask, on the app's one modal window.
+ *
+ * They sit above Settings, hence the raised z: the shell's default would put
+ * them behind it.
+ */
 export function SettingsConfirmModals({
   showDisableFriendsConfirm,
   setShowDisableFriendsConfirm,
@@ -39,203 +91,122 @@ export function SettingsConfirmModals({
 }: SettingsConfirmModalsProps) {
   return (
     <>
-      {/* Disable Friends Confirmation Modal */}
-      <AnimatePresence>
-        {showDisableFriendsConfirm && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            data-settings-confirm="true"
-            className="fixed inset-0 bg-black/70 backdrop-blur-md z-[9999] flex items-center justify-center p-4"
-            onClick={(e) => {
-              if (e.target === e.currentTarget && !isTogglingFriends) {
-                setShowDisableFriendsConfirm(false);
-              }
-            }}
-          >
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95, y: 10 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: 10 }}
-              className="bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/95 dark:via-gray-900/90 dark:to-gray-950/95 border border-gray-200 dark:border-white/[0.1] rounded-2xl p-4 max-w-xs w-full shadow-[0_16px_48px_rgba(0,0,0,0.5)] backdrop-blur-2xl"
+      <ModalShell
+        open={showDisableFriendsConfirm}
+        onClose={() => setShowDisableFriendsConfirm(false)}
+        label="disable friends"
+        maxWidth="max-w-sm"
+        dismissable={!isTogglingFriends}
+        z="z-[9999]"
+      >
+        <div className="p-5">
+          <Title>Turn Friends off?</Title>
+          <Body>
+            This removes every friend you have and hides your courses from
+            anyone who had you. Turning it back on starts from an empty list.
+          </Body>
+          <div className="mt-5 flex justify-end gap-2 font-sf">
+            <GhostButton onClick={() => setShowDisableFriendsConfirm(false)}>
+              Cancel
+            </GhostButton>
+            <DangerButton
+              onClick={() => void onConfirmDisableFriends()}
+              disabled={isTogglingFriends}
             >
-              <div className="flex items-center gap-2 mb-3">
-                <div className="p-2 bg-gradient-to-br from-red-500/20 to-red-600/10 rounded-xl border border-red-500/20">
-                  <FiTrash2 className="text-red-400" size={16} />
-                </div>
-                <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">
-                  Disable Friends?
-                </h3>
-              </div>
-              <p className="text-gray-500 dark:text-gray-400 text-xs mb-3">
-                This will{" "}
-                <strong className="text-red-400">remove all friends</strong> and
-                hide your courses.
-              </p>
-              <div className="flex justify-end gap-2">
-                <button
-                  type="button"
-                  onClick={() => setShowDisableFriendsConfirm(false)}
-                  disabled={isTogglingFriends}
-                  className="di-btn-secondary"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="button"
-                  onClick={onConfirmDisableFriends}
-                  disabled={isTogglingFriends}
-                  className="di-btn-danger"
-                >
-                  {isTogglingFriends ? (
-                    <>
-                      <span className="h-2.5 w-2.5 animate-spin rounded-full border-2 border-white/30 border-t-white" />
-                      ...
-                    </>
-                  ) : (
-                    "Disable"
-                  )}
-                </button>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Unsaved changes / Delete Account Confirmation Modals */}
-      <AnimatePresence>
-        {showUnsavedConfirm && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            data-settings-confirm="true"
-            className="fixed inset-0 bg-black/70 backdrop-blur-md z-[9999] flex items-center justify-center p-4"
-            onClick={(e) => {
-              if (e.target === e.currentTarget && !isSaving) {
-                setShowUnsavedConfirm(false);
-              }
-            }}
-          >
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95, y: 10 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: 10 }}
-              className="bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/95 dark:via-gray-900/90 dark:to-gray-950/95 border border-gray-200 dark:border-white/[0.1] rounded-2xl p-4 max-w-xs w-full shadow-[0_16px_48px_rgba(0,0,0,0.5)] backdrop-blur-2xl"
-            >
-              <h3 className="mb-2 text-sm font-semibold text-gray-900 dark:text-gray-100">
-                Save your changes?
-              </h3>
-              <p className="mb-3 font-sf text-xs text-gray-500 dark:text-gray-400">
-                Your majors, certificates, or graduation year have been edited
-                and not saved yet. Everything else in Settings saves on its own.
-              </p>
-              {!canSave && (
-                <p className="mb-3 font-sf text-xs text-red-500 dark:text-red-400">
-                  Remove the duplicate major or certificate first, or leave
-                  without saving.
-                </p>
+              {isTogglingFriends ? (
+                <>
+                  <Spinner />
+                  Turning off...
+                </>
+              ) : (
+                "Turn off"
               )}
-              <div className="flex justify-end gap-2">
-                <button
-                  type="button"
-                  onClick={() => setShowUnsavedConfirm(false)}
-                  disabled={isSaving}
-                  className="di-btn-secondary"
-                >
-                  Keep editing
-                </button>
-                <button
-                  type="button"
-                  onClick={onSaveAndClose}
-                  disabled={isSaving || !canSave}
-                  className="di-btn-primary"
-                >
-                  {isSaving ? (
-                    <>
-                      <span className="h-2.5 w-2.5 animate-spin rounded-full border-2 border-white/30 border-t-white" />
-                      Saving...
-                    </>
-                  ) : (
-                    "Save and close"
-                  )}
-                </button>
-              </div>
-              <button
-                type="button"
-                onClick={() => {
-                  setShowUnsavedConfirm(false);
-                  onClose();
-                }}
-                disabled={isSaving}
-                className="mt-3 w-full font-sf text-[11px] text-gray-400 transition-colors hover:text-red-500 disabled:opacity-50 dark:text-gray-500 dark:hover:text-red-400"
-              >
-                Leave without saving
-              </button>
-            </motion.div>
-          </motion.div>
-        )}
-        {showDeleteConfirm && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            data-settings-confirm="true"
-            className="fixed inset-0 bg-black/70 backdrop-blur-md z-[9999] flex items-center justify-center p-4"
-            onClick={(e) => {
-              if (e.target === e.currentTarget && !isDeleting) {
-                setShowDeleteConfirm(false);
-              }
-            }}
-          >
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95, y: 10 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: 10 }}
-              className="bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/95 dark:via-gray-900/90 dark:to-gray-950/95 border border-gray-200 dark:border-white/[0.1] rounded-2xl p-4 max-w-xs w-full shadow-[0_16px_48px_rgba(0,0,0,0.5)] backdrop-blur-2xl"
+            </DangerButton>
+          </div>
+        </div>
+      </ModalShell>
+
+      <ModalShell
+        open={showUnsavedConfirm}
+        onClose={() => setShowUnsavedConfirm(false)}
+        label="unsaved changes"
+        maxWidth="max-w-sm"
+        dismissable={!isSaving}
+        z="z-[9999]"
+      >
+        <div className="p-5">
+          <Title>Save your changes?</Title>
+          <Body>
+            Your majors, certificates, or graduation year have been edited and
+            not saved yet. Everything else in Settings saves on its own.
+          </Body>
+          {!canSave && (
+            <p className="mt-3 font-sf text-xs text-red-500 dark:text-red-400">
+              Remove the duplicate major or certificate first, or leave without
+              saving.
+            </p>
+          )}
+          <div className="mt-5 flex items-center justify-end gap-2 font-sf">
+            <GhostButton onClick={() => setShowUnsavedConfirm(false)}>
+              Keep editing
+            </GhostButton>
+            <ShinyButton
+              size="sm"
+              onClick={() => void onSaveAndClose()}
+              pending={isSaving}
+              disabled={!canSave}
             >
-              <div className="flex items-center gap-2 mb-3">
-                <div className="p-2 bg-gradient-to-br from-red-500/20 to-red-600/10 rounded-xl border border-red-500/20">
-                  <FiTrash2 className="text-red-400" size={16} />
-                </div>
-                <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">
-                  Delete Account
-                </h3>
-              </div>
-              <p className="text-gray-500 dark:text-gray-400 text-xs mb-3">
-                Permanently remove all data including courses, friends, and
-                conversations. Cannot be undone.
-              </p>
-              <div className="flex justify-end gap-2">
-                <button
-                  type="button"
-                  onClick={() => setShowDeleteConfirm(false)}
-                  disabled={isDeleting}
-                  className="di-btn-secondary"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="button"
-                  onClick={onDeleteAccount}
-                  disabled={isDeleting}
-                  className="di-btn-danger"
-                >
-                  {isDeleting ? (
-                    <>
-                      <span className="h-2.5 w-2.5 animate-spin rounded-full border-2 border-white/30 border-t-white" />
-                      ...
-                    </>
-                  ) : (
-                    "Delete"
-                  )}
-                </button>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+              {isSaving ? "Saving..." : "Save and close"}
+            </ShinyButton>
+          </div>
+          <button
+            type="button"
+            onClick={() => {
+              setShowUnsavedConfirm(false);
+              onClose();
+            }}
+            disabled={isSaving}
+            className="mt-3 w-full font-sf text-[11px] text-gray-400 transition-colors hover:text-red-500 disabled:opacity-50 dark:text-gray-500 dark:hover:text-red-400"
+          >
+            Leave without saving
+          </button>
+        </div>
+      </ModalShell>
+
+      <ModalShell
+        open={showDeleteConfirm}
+        onClose={() => setShowDeleteConfirm(false)}
+        label="delete account"
+        maxWidth="max-w-sm"
+        dismissable={!isDeleting}
+        z="z-[9999]"
+      >
+        <div className="p-5">
+          <Title>Delete your account?</Title>
+          <Body>
+            This permanently removes your courses, your profile, and your
+            friends. It cannot be undone.
+          </Body>
+          <div className="mt-5 flex justify-end gap-2 font-sf">
+            <GhostButton onClick={() => setShowDeleteConfirm(false)}>
+              Cancel
+            </GhostButton>
+            <DangerButton
+              onClick={() => void onDeleteAccount()}
+              disabled={isDeleting}
+            >
+              {isDeleting ? (
+                <>
+                  <Spinner />
+                  Deleting...
+                </>
+              ) : (
+                "Delete account"
+              )}
+            </DangerButton>
+          </div>
+        </div>
+      </ModalShell>
     </>
   );
 }

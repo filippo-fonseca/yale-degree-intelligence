@@ -105,33 +105,39 @@ export default function UserSettingsModal({
       const target = event.target as HTMLElement;
       if (target.closest('[data-major-dropdown-portal="true"]')) return;
       if (target.closest('[data-certificate-dropdown-portal="true"]')) return;
-      // A confirmation sits above this modal, so a click inside it is not a
-      // click outside Settings.
-      if (target.closest('[data-settings-confirm="true"]')) return;
+      // A confirmation is already asking something. It owns the screen until
+      // it is answered, and it closes on its own backdrop.
+      if (showUnsavedConfirm || showDeleteConfirm || showDisableFriendsConfirm) {
+        return;
+      }
       if (modalRef.current && !modalRef.current.contains(target)) {
         requestClose();
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [requestClose]);
+  }, [
+    requestClose,
+    showUnsavedConfirm,
+    showDeleteConfirm,
+    showDisableFriendsConfirm,
+  ]);
 
   // Escape closes the innermost thing that is open, so it only reaches
-  // Settings once the dropdowns and the confirmations have had their turn. On
-  // the unsaved-changes dialog it means "keep editing", the safe answer.
+  // Settings once the dropdowns and the confirmations have had their turn.
+  // Each confirmation is a ModalShell and handles the key itself; on the
+  // unsaved-changes one that means "keep editing", the safe answer.
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
       if (event.key !== "Escape") return;
-      if (showDeleteConfirm || showDisableFriendsConfirm) return;
+      if (showDeleteConfirm || showDisableFriendsConfirm || showUnsavedConfirm) {
+        return;
+      }
       if (
         document.querySelector(
           '[data-major-dropdown-portal="true"], [data-certificate-dropdown-portal="true"]',
         )
       ) {
-        return;
-      }
-      if (showUnsavedConfirm) {
-        if (!isSaving) setShowUnsavedConfirm(false);
         return;
       }
       requestClose();
@@ -143,7 +149,6 @@ export default function UserSettingsModal({
     showDeleteConfirm,
     showDisableFriendsConfirm,
     showUnsavedConfirm,
-    isSaving,
   ]);
 
   const handleSaveAndClose = async () => {

@@ -51,6 +51,8 @@ export const RELEASES: Release[] = [
       {
         title: "Friends",
         items: [
+          "The Friends tab has been rebuilt. Turning it on used to mean scrolling past a big preview of a page you did not have yet to find the button; now the button is right at the top, with a plain description of what friends can see and what they never can. The example page is still there if you want it, one click away.",
+          "Inside the tab: your counts are one line instead of three coloured boxes, incoming and outgoing requests are one list instead of two panels, and \"Add friend\" sits in the header where you would look for it.",
           "Your public page is a setting again, not the whole tab. Instead of a full copy of the page rendered inline, you get a short summary of what friends can see, and \"View public page\" opens the real thing.",
           "The distributional badges on a shared page no longer look washed out, and they match the colour of the bar underneath them.",
         ],

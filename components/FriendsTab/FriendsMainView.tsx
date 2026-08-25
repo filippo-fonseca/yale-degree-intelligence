@@ -1,31 +1,18 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useState, type ReactNode } from "react";
 import Link from "next/link";
-import {
-  FiUserPlus,
-  FiUsers,
-  FiCheck,
-  FiX,
-  FiUser,
-  FiUserCheck,
-  FiMail,
-  FiAlertTriangle,
-} from "react-icons/fi";
+import { FiCheck, FiUserPlus, FiX } from "react-icons/fi";
+import { AlertTriangle } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "react-hot-toast";
 import type { User } from "firebase/auth";
 import { Course, FriendsProfileVisibility } from "@/lib/types";
 import { YearBadge } from "../ui/YearBadge";
 import { UserAvatar } from "../ui/UserAvatar";
-import { Skeleton } from "../ui/Skeleton";
-import { EmptyState } from "../ui/EmptyState";
-import {
-  FriendCardSkeleton,
-  RequestCardSkeleton,
-  FriendStatCard,
-  SectionHeading,
-} from "./friendsUiPrimitives";
+import { ShinyButton } from "../ui/shiny-button";
+import { GhostButton } from "../ui/ghost-button";
+import { FriendCardSkeleton, RequestCardSkeleton } from "./friendsUiPrimitives";
 import {
   Friend,
   FriendRequest,
@@ -37,6 +24,23 @@ import { MoreOptionsDropdown } from "./MoreOptionsDropdown";
 import { FriendActionsDropdown } from "./FriendActionsDropdown";
 import { FriendsSearchModal } from "./FriendsSearchModal";
 import { PublicPageCard } from "./PublicPageCard";
+
+/**
+ * Friends, once it is on.
+ *
+ * Rebuilt in the v3 system. What changed, beyond surfaces:
+ *
+ * - The three coloured stat cards are gone. "Friends 3 / Pending (in) 1 /
+ *   Pending (out) 2" took the top third of the tab to say what the section
+ *   headings below it already said, in three different hues. It is one mono
+ *   line now.
+ * - Incoming and sent requests were two side-by-side panels, each with its own
+ *   accent colour, both present whenever either had anything in it. They are
+ *   one Requests section now, incoming first because that is the one that
+ *   needs an answer, and the section disappears entirely when it is empty.
+ * - Add friend is in the header, where the tab's primary action belongs,
+ *   instead of floating between the page card and the stats.
+ */
 
 type FriendsMainViewProps = {
   user: User;
@@ -63,6 +67,100 @@ type FriendsMainViewProps = {
   cancelSentRequest: (requestId: string) => Promise<void>;
 };
 
+/** Mono section label, matching the window bars elsewhere in v3. */
+function SectionLabel({
+  children,
+  count,
+}: {
+  children: ReactNode;
+  count?: number;
+}) {
+  return (
+    <p className="mb-3 font-mono text-[10px] uppercase tracking-[0.12em] text-gray-400 dark:text-gray-500">
+      {children}
+      {count !== undefined && count > 0 && (
+        <span className="ml-1.5 text-gray-500 dark:text-gray-400">{count}</span>
+      )}
+    </p>
+  );
+}
+
+/** The v3 dialog shell, shared by the two confirmations on this tab. */
+function ConfirmDialog({
+  title,
+  icon,
+  children,
+  onClose,
+  busy,
+  actions,
+}: {
+  title: string;
+  icon?: ReactNode;
+  children: ReactNode;
+  onClose: () => void;
+  busy: boolean;
+  actions: ReactNode;
+}) {
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 p-4 font-louize backdrop-blur-md dark:bg-black/75"
+      onClick={(e) => {
+        if (e.target === e.currentTarget && !busy) onClose();
+      }}
+    >
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: 6 }}
+        transition={{ duration: 0.2, ease: [0.25, 1, 0.5, 1] }}
+        className="w-full max-w-sm overflow-hidden rounded-2xl border border-black/[0.08] bg-white shadow-[0_32px_80px_-24px_rgba(0,0,0,0.45)] dark:border-white/[0.09] dark:bg-[#101013]"
+      >
+        <div className="p-5">
+          <div className="flex items-start gap-3">
+            {icon}
+            <div className="min-w-0">
+              <h3 className="text-[1.15rem]/[1.3] font-medium tracking-[-0.02em] text-gray-900 dark:text-white">
+                {title}
+              </h3>
+              <div className="mt-2 font-sf text-sm leading-relaxed text-gray-500 dark:text-gray-400">
+                {children}
+              </div>
+            </div>
+          </div>
+          <div className="mt-5 flex items-center justify-end gap-2 font-sf">
+            {actions}
+          </div>
+        </div>
+      </motion.div>
+    </motion.div>
+  );
+}
+
+/** Destructive primary. The shiny pill is for the good path only. */
+function DangerButton({
+  onClick,
+  disabled,
+  children,
+}: {
+  onClick: () => void;
+  disabled?: boolean;
+  children: ReactNode;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={disabled}
+      className="inline-flex items-center justify-center gap-1.5 rounded-full border border-red-600 bg-red-600 px-4 py-2 font-sf text-sm font-medium text-white transition-colors hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-50"
+    >
+      {children}
+    </button>
+  );
+}
+
 export function FriendsMainView({
   user,
   courses,
@@ -75,7 +173,6 @@ export function FriendsMainView({
   incomingRequests,
   userProfilesById,
   ready,
-  profileVisibility,
   resolvedVisibility,
   savingVisibility,
   updateVisibility,
@@ -110,7 +207,10 @@ export function FriendsMainView({
       !sentRequests.some((req) => req.to === u.uid) &&
       !incomingRequests.some((req) => req.from === u.uid) &&
       (u.displayName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        (u.majors || []).join(" ").toLowerCase().includes(searchTerm.toLowerCase())),
+        (u.majors || [])
+          .join(" ")
+          .toLowerCase()
+          .includes(searchTerm.toLowerCase())),
   );
 
   const closeSearchModal = useCallback(() => {
@@ -118,17 +218,44 @@ export function FriendsMainView({
     setShowSearchModal(false);
   }, []);
 
+  const hasRequests = incomingRequests.length > 0 || sentRequests.length > 0;
+
+  /** The counts, as one line rather than three cards. */
+  const summary = [
+    `${friendProfiles.length} ${friendProfiles.length === 1 ? "friend" : "friends"}`,
+    incomingRequests.length > 0 ? `${incomingRequests.length} to answer` : null,
+    sentRequests.length > 0 ? `${sentRequests.length} waiting on them` : null,
+  ]
+    .filter(Boolean)
+    .join("  ·  ");
+
   return (
-    <div className="w-full max-w-3xl mx-auto font-louize">
-      <div className="mb-5">
-        <div className="flex items-center justify-between gap-2">
-          <h2 className="text-2xl font-medium text-gray-900 dark:text-white">Friends</h2>
+    <div className="mx-auto w-full max-w-3xl font-louize">
+      <div className="mb-5 flex flex-wrap items-start justify-between gap-3">
+        <div className="min-w-0">
+          <h2 className="text-2xl font-medium tracking-[-0.02em] text-gray-900 dark:text-white">
+            Friends
+          </h2>
+          <p className="mt-1 max-w-[56ch] font-sf text-sm text-gray-500 dark:text-gray-400">
+            See how other Yalies built their path: courses and distributionals,
+            never grades.
+          </p>
+          {ready && (
+            <p className="mt-2 font-mono text-[11px] tracking-tight text-gray-400 dark:text-gray-500">
+              {summary}
+            </p>
+          )}
+        </div>
+
+        <div className="flex shrink-0 items-center gap-1.5 font-sf">
+          <div data-tour="friends-add">
+            <ShinyButton size="sm" onClick={() => setShowSearchModal(true)}>
+              <FiUserPlus size={13} />
+              Add friend
+            </ShinyButton>
+          </div>
           <MoreOptionsDropdown onDisable={() => setShowDisableConfirm(true)} />
         </div>
-        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-          See how older students in your major built their path: courses and
-          distributionals, never grades.
-        </p>
       </div>
 
       <PublicPageCard
@@ -142,226 +269,148 @@ export function FriendsMainView({
         onToggleCustomize={() => setShowCustomize((v) => !v)}
       />
 
-      <div className="flex justify-end mb-5">
-        <motion.button
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
-          data-tour="friends-add"
-          className="di-btn-primary"
-          onClick={() => setShowSearchModal(true)}
-        >
-          <FiUserPlus size={13} />
-          Add Friend
-        </motion.button>
-      </div>
-
       {!ready && (
-        <div className="space-y-8">
-          <div className="grid grid-cols-3 gap-3">
-            {[...Array(3)].map((_, i) => (
-              <div
-                key={i}
-                className="p-3 rounded-xl border border-gray-200 dark:border-white/[0.06] bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 shadow-neu"
-              >
-                <Skeleton className="h-3 w-16 mb-2" />
-                <Skeleton className="h-6 w-10" />
-              </div>
-            ))}
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            <div className="p-3 rounded-xl border border-gray-200 dark:border-white/[0.06] bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 shadow-neu">
-              <Skeleton className="h-3 w-36 mb-3" />
-              <div className="space-y-2">
-                <RequestCardSkeleton />
-                <RequestCardSkeleton />
-              </div>
-            </div>
-            <div className="p-3 rounded-xl border border-gray-200 dark:border-white/[0.06] bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 shadow-neu">
-              <Skeleton className="h-3 w-28 mb-3" />
-              <div className="space-y-2">
-                <RequestCardSkeleton />
-              </div>
-            </div>
-          </div>
-
-          <div>
-            <Skeleton className="h-3 w-44 mb-4" />
-            <div className="space-y-2.5">
-              <FriendCardSkeleton />
-              <FriendCardSkeleton />
-              <FriendCardSkeleton />
-            </div>
-          </div>
+        <div className="mt-6 space-y-2.5">
+          <RequestCardSkeleton />
+          <FriendCardSkeleton />
+          <FriendCardSkeleton />
+          <FriendCardSkeleton />
         </div>
       )}
 
       {ready && (
         <>
-          <div className="grid grid-cols-3 gap-3 mb-6">
-            <FriendStatCard
-              label="Friends"
-              value={friendProfiles.length}
-              color="text-pink-600 dark:text-pink-300"
-            />
-            <FriendStatCard
-              label="Pending (in)"
-              value={incomingRequests.length}
-              color="text-emerald-600 dark:text-emerald-300"
-              tooltip="Friend requests other Yale students have sent you."
-            />
-            <FriendStatCard
-              label="Pending (out)"
-              value={sentRequests.length}
-              color="text-blue-600 dark:text-blue-300"
-              tooltip="Friend requests you've sent that are awaiting acceptance."
-            />
-          </div>
+          {hasRequests && (
+            <section className="mt-7">
+              <SectionLabel count={incomingRequests.length + sentRequests.length}>
+                Requests
+              </SectionLabel>
 
-          {(incomingRequests.length > 0 || sentRequests.length > 0) && (
-            <AnimatePresence>
-              <motion.div
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-6"
-              >
-                {incomingRequests.length > 0 && (
-                  <div className="p-3 rounded-xl bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 backdrop-blur-md border border-gray-200 dark:border-white/[0.06] shadow-neu">
-                    <SectionHeading
-                      icon={<FiMail size={11} />}
-                      label="Incoming Requests"
-                      count={incomingRequests.length}
-                      accent="text-emerald-600 dark:text-emerald-400"
-                    />
-                    <div className="space-y-1.5">
-                      {(showAllIncoming
-                        ? incomingRequests
-                        : incomingRequests.slice(0, 4)
-                      ).map((req) => {
-                        const sender = userProfilesById[req.from] || {
-                          uid: req.from,
-                          majors: [],
-                        };
-                        return (
-                          <motion.div
-                            key={req.id}
-                            layout
-                            initial={{ opacity: 0, x: -6 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            exit={{ opacity: 0, x: -6 }}
-                            className="flex items-center justify-between p-2.5 rounded-lg bg-gray-50 dark:bg-white/[0.03] border border-gray-200/70 dark:border-white/[0.06] hover:border-emerald-300 dark:hover:border-emerald-500/40 transition-colors"
+              <div className="space-y-2">
+                <AnimatePresence initial={false}>
+                  {(showAllIncoming
+                    ? incomingRequests
+                    : incomingRequests.slice(0, 4)
+                  ).map((req) => {
+                    const sender = userProfilesById[req.from] || {
+                      uid: req.from,
+                      majors: [],
+                    };
+                    return (
+                      <motion.div
+                        key={req.id}
+                        layout
+                        initial={{ opacity: 0, y: 6 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -4 }}
+                        className="flex items-center justify-between gap-3 rounded-xl border border-black/[0.06] bg-white p-3 dark:border-white/[0.07] dark:bg-white/[0.03]"
+                      >
+                        <div className="flex min-w-0 items-center gap-3">
+                          <UserAvatar
+                            photoURL={sender.photoURL}
+                            displayName={sender.displayName}
+                            size={32}
+                          />
+                          <div className="min-w-0">
+                            <p className="truncate font-sf text-sm font-medium text-gray-900 dark:text-gray-100">
+                              {getDisplayName(sender)}
+                            </p>
+                            <p className="font-mono text-[10px] uppercase tracking-[0.12em] text-gray-400 dark:text-gray-500">
+                              wants to be friends
+                            </p>
+                          </div>
+                        </div>
+                        <div className="flex shrink-0 items-center gap-1.5 font-sf">
+                          <button
+                            onClick={() => acceptFriendRequest(req)}
+                            className="inline-flex items-center gap-1.5 rounded-full border border-emerald-600 bg-emerald-600 px-3 py-1.5 text-sm font-medium text-white transition-colors hover:bg-emerald-700"
                           >
-                            <div className="flex items-center gap-2.5 min-w-0">
-                              <UserAvatar
-                                photoURL={sender.photoURL}
-                                displayName={sender.displayName}
-                                size={24}
-                              />
-                              <span className="text-xs text-gray-800 dark:text-gray-200 truncate font-medium">
-                                {getDisplayName(sender)}
+                            <FiCheck size={12} />
+                            Accept
+                          </button>
+                          <button
+                            onClick={() => rejectFriendRequest(req)}
+                            title="Decline"
+                            aria-label="Decline"
+                            className="rounded-full border border-black/10 p-2 text-gray-400 transition-colors hover:text-red-500 dark:border-white/15 dark:text-gray-500 dark:hover:text-red-400"
+                          >
+                            <FiX size={12} />
+                          </button>
+                        </div>
+                      </motion.div>
+                    );
+                  })}
+                </AnimatePresence>
+
+                {incomingRequests.length > 4 && (
+                  <button
+                    type="button"
+                    onClick={() => setShowAllIncoming((v) => !v)}
+                    className="font-sf text-xs text-gray-500 underline underline-offset-2 transition-colors hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
+                  >
+                    {showAllIncoming
+                      ? "Show fewer"
+                      : `Show all ${incomingRequests.length} incoming`}
+                  </button>
+                )}
+
+                {/* Sent requests are quieter: nothing is being asked of you. */}
+                <AnimatePresence initial={false}>
+                  {(showAllSent ? sentRequests : sentRequests.slice(0, 3)).map(
+                    (req) => {
+                      const recipient = userProfilesById[req.to] || {
+                        uid: req.to,
+                        majors: [],
+                      };
+                      return (
+                        <motion.div
+                          key={req.id}
+                          layout
+                          initial={{ opacity: 0, y: 6 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: -4 }}
+                          className="flex items-center justify-between gap-3 rounded-xl border border-dashed border-black/[0.08] px-3 py-2.5 dark:border-white/[0.09]"
+                        >
+                          <div className="flex min-w-0 items-center gap-3">
+                            <UserAvatar
+                              photoURL={recipient.photoURL}
+                              displayName={recipient.displayName}
+                              size={26}
+                            />
+                            <p className="truncate font-sf text-sm text-gray-500 dark:text-gray-400">
+                              {getDisplayName(recipient)}
+                              <span className="ml-2 font-mono text-[10px] uppercase tracking-[0.12em] text-gray-400 dark:text-gray-500">
+                                sent
                               </span>
-                            </div>
-                            <div className="flex gap-1 shrink-0">
-                              <button
-                                className="p-1.5 rounded-lg bg-emerald-500/15 text-emerald-500 dark:text-emerald-400 hover:bg-emerald-500/30 transition border border-emerald-500/30"
-                                onClick={() => acceptFriendRequest(req)}
-                                title="Accept"
-                              >
-                                <FiCheck size={10} />
-                              </button>
-                              <button
-                                className="rounded-lg border border-red-200 bg-red-50 p-1.5 text-red-600 transition hover:bg-red-100 dark:border-red-500/20 dark:bg-red-500/10 dark:text-red-400 dark:hover:bg-red-500/25"
-                                onClick={() => rejectFriendRequest(req)}
-                                title="Decline"
-                              >
-                                <FiX size={10} />
-                              </button>
-                            </div>
-                          </motion.div>
-                        );
-                      })}
-                      {incomingRequests.length > 4 && (
-                        <button
-                          type="button"
-                          onClick={() => setShowAllIncoming((v) => !v)}
-                          className="text-[10px] text-emerald-500 dark:text-emerald-400 hover:underline pt-0.5"
-                        >
-                          {showAllIncoming
-                            ? "Show less"
-                            : `View all ${incomingRequests.length} requests`}
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                )}
-
-                {sentRequests.length > 0 && (
-                  <div className="p-3 rounded-xl bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 backdrop-blur-md border border-gray-200 dark:border-white/[0.06] shadow-neu">
-                    <SectionHeading
-                      icon={<FiUserCheck size={11} />}
-                      label="Sent Requests"
-                      count={sentRequests.length}
-                      accent="text-blue-600 dark:text-blue-400"
-                    />
-                    <div className="space-y-1.5">
-                      {(showAllSent
-                        ? sentRequests
-                        : sentRequests.slice(0, 4)
-                      ).map((req) => {
-                        const recipient = userProfilesById[req.to] || {
-                          uid: req.to,
-                          majors: [],
-                        };
-                        return (
-                          <motion.div
-                            key={req.id}
-                            layout
-                            initial={{ opacity: 0, x: 6 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            exit={{ opacity: 0, x: 6 }}
-                            className="flex items-center justify-between p-2.5 rounded-lg bg-gray-50 dark:bg-white/[0.03] border border-gray-200/70 dark:border-white/[0.06] hover:border-blue-300 dark:hover:border-blue-500/40 transition-colors"
+                            </p>
+                          </div>
+                          <button
+                            onClick={() => cancelSentRequest(req.id)}
+                            title="Cancel request"
+                            aria-label="Cancel request"
+                            className="shrink-0 rounded-full p-1.5 text-gray-400 transition-colors hover:text-red-500 dark:text-gray-500 dark:hover:text-red-400"
                           >
-                            <div className="flex items-center gap-2.5 min-w-0">
-                              <UserAvatar
-                                photoURL={recipient.photoURL}
-                                displayName={recipient.displayName}
-                                size={24}
-                              />
-                              <div className="min-w-0">
-                                <div className="text-xs text-gray-800 dark:text-gray-200 truncate font-medium">
-                                  {getDisplayName(recipient)}
-                                </div>
-                                <div className="text-[10px] text-blue-400 dark:text-blue-500">
-                                  Pending
-                                </div>
-                              </div>
-                            </div>
-                            <button
-                              className="p-1.5 rounded-lg bg-gray-100 dark:bg-white/[0.04] text-gray-400 dark:text-gray-500 hover:bg-red-500/20 hover:text-red-400 transition border border-gray-200 dark:border-white/[0.08]"
-                              onClick={() => cancelSentRequest(req.id)}
-                              title="Cancel request"
-                            >
-                              <FiX size={10} />
-                            </button>
-                          </motion.div>
-                        );
-                      })}
-                      {sentRequests.length > 4 && (
-                        <button
-                          type="button"
-                          onClick={() => setShowAllSent((v) => !v)}
-                          className="text-[10px] text-blue-500 dark:text-blue-400 hover:underline pt-0.5"
-                        >
-                          {showAllSent
-                            ? "Show less"
-                            : `View all ${sentRequests.length} requests`}
-                        </button>
-                      )}
-                    </div>
-                  </div>
+                            <FiX size={12} />
+                          </button>
+                        </motion.div>
+                      );
+                    },
+                  )}
+                </AnimatePresence>
+
+                {sentRequests.length > 3 && (
+                  <button
+                    type="button"
+                    onClick={() => setShowAllSent((v) => !v)}
+                    className="font-sf text-xs text-gray-500 underline underline-offset-2 transition-colors hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
+                  >
+                    {showAllSent
+                      ? "Show fewer"
+                      : `Show all ${sentRequests.length} sent`}
+                  </button>
                 )}
-              </motion.div>
-            </AnimatePresence>
+              </div>
+            </section>
           )}
 
           <FriendsSearchModal
@@ -374,128 +423,116 @@ export function FriendsMainView({
             profileShareUrl={profileShareUrl}
           />
 
-          <section>
-            <SectionHeading
-              icon={<FiUsers size={11} />}
-              label="Your Friends"
-              count={friendProfiles.length}
-              accent="text-pink-600 dark:text-pink-400"
-            />
+          <section className="mt-7">
+            <SectionLabel count={friendProfiles.length}>
+              Your friends
+            </SectionLabel>
 
-            {friendProfiles.length === 0 && (
-              <EmptyState
-                icon={<FiUsers className="w-7 h-7 text-gray-300 dark:text-gray-500" />}
-                title="No friends yet"
-                description="Add your froco, an upperclassman in your major, or anyone whose path you want to learn from."
-                primaryAction={{
-                  label: "Add friend",
-                  onClick: () => setShowSearchModal(true),
-                }}
-              />
-            )}
+            {friendProfiles.length === 0 ? (
+              <div className="rounded-2xl border border-dashed border-black/[0.12] p-8 text-center dark:border-white/[0.12]">
+                <p className="font-sf text-sm font-medium text-gray-900 dark:text-gray-100">
+                  No friends yet.
+                </p>
+                <p className="mx-auto mt-1.5 max-w-[46ch] font-sf text-sm leading-relaxed text-gray-500 dark:text-gray-400">
+                  Add your froco, an upperclassman in your major, or anyone
+                  whose path you want to learn from.
+                </p>
+                <div className="mt-4 flex justify-center font-sf">
+                  <ShinyButton
+                    size="sm"
+                    onClick={() => setShowSearchModal(true)}
+                  >
+                    <FiUserPlus size={13} />
+                    Add friend
+                  </ShinyButton>
+                </div>
+              </div>
+            ) : (
+              <div className="space-y-2">
+                <AnimatePresence initial={false}>
+                  {friendProfiles.map((f, idx) => {
+                    const friend = friends.find((fr) =>
+                      fr.users.includes(f.uid),
+                    );
+                    if (!friend) return null;
 
-            <AnimatePresence>
-              <div className="space-y-2.5">
-                {friendProfiles.map((f, idx) => {
-                  const friend = friends.find((fr) => fr.users.includes(f.uid));
-                  if (!friend) return null;
-
-                  return (
-                    <motion.div
-                      key={f.uid}
-                      initial={{ opacity: 0, y: 8 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -4, scale: 0.98 }}
-                      transition={{ delay: idx * 0.04 }}
-                      whileHover={{ y: -1 }}
-                      className="flex items-center justify-between p-3 rounded-xl bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-950/60 backdrop-blur-md border border-gray-200 dark:border-white/[0.06] hover:border-pink-300 dark:hover:border-pink-500/40 transition-all shadow-neu"
-                    >
-                      <div className="flex items-center gap-3 min-w-0">
-                        <UserAvatar
-                          photoURL={f.photoURL}
-                          displayName={f.displayName}
-                          size={38}
-                        />
-                        <div className="min-w-0">
-                          <div className="font-medium text-sm text-gray-900 dark:text-gray-100 truncate">
-                            {getDisplayName(f)}
-                          </div>
-                          <div className="text-[10px] text-gray-400 dark:text-gray-500 flex items-center gap-1 flex-wrap mt-0.5">
-                            {f.majors?.length > 0 && (
-                              <span className="text-pink-500 dark:text-pink-400">
-                                {f.majors.join(", ")}
-                              </span>
-                            )}
-                            {f.majors?.length > 0 && f.graduationYear && (
-                              <span className="text-gray-300 dark:text-gray-700">·</span>
-                            )}
-                            {f.graduationYear && (
-                              <YearBadge graduationYear={f.graduationYear} noPadding />
-                            )}
+                    return (
+                      <motion.div
+                        key={f.uid}
+                        layout
+                        initial={{ opacity: 0, y: 6 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -4 }}
+                        transition={{ delay: Math.min(idx * 0.03, 0.2) }}
+                        className="flex items-center justify-between gap-3 rounded-xl border border-black/[0.06] bg-white p-3 transition-colors hover:border-black/[0.12] dark:border-white/[0.07] dark:bg-white/[0.03] dark:hover:border-white/[0.14]"
+                      >
+                        <div className="flex min-w-0 items-center gap-3">
+                          <UserAvatar
+                            photoURL={f.photoURL}
+                            displayName={f.displayName}
+                            size={36}
+                          />
+                          <div className="min-w-0">
+                            <p className="truncate font-sf text-sm font-medium text-gray-900 dark:text-gray-100">
+                              {getDisplayName(f)}
+                            </p>
+                            <div className="mt-0.5 flex flex-wrap items-center gap-1.5 font-sf text-xs text-gray-500 dark:text-gray-400">
+                              {f.majors?.length > 0 && (
+                                <span className="truncate">
+                                  {f.majors.join(", ")}
+                                </span>
+                              )}
+                              {f.majors?.length > 0 && f.graduationYear && (
+                                <span className="text-gray-300 dark:text-gray-600">
+                                  ·
+                                </span>
+                              )}
+                              {f.graduationYear && (
+                                <YearBadge
+                                  graduationYear={f.graduationYear}
+                                  noPadding
+                                />
+                              )}
+                            </div>
                           </div>
                         </div>
-                      </div>
 
-                      <div className="flex items-center gap-1.5 shrink-0">
-                        <Link
-                          href={`/user/${f.uid}`}
-                          className="flex items-center gap-1 px-2.5 py-1.5 text-[11px] font-medium bg-gray-50 dark:bg-white/[0.04] text-gray-600 dark:text-gray-300 rounded-lg border border-gray-200 dark:border-white/[0.08] hover:bg-pink-50 dark:hover:bg-pink-500/20 hover:text-pink-600 dark:hover:text-pink-200 hover:border-pink-200 dark:hover:border-pink-500/40 transition-all"
-                        >
-                          <FiUser size={11} />
-                          Profile
-                        </Link>
-                        <FriendActionsDropdown
-                          friend={friend}
-                          profile={f}
-                          onRemove={setRemoveFriendTarget}
-                        />
-                      </div>
-                    </motion.div>
-                  );
-                })}
+                        <div className="flex shrink-0 items-center gap-1.5 font-sf">
+                          <Link
+                            href={`/user/${f.uid}`}
+                            className="inline-flex items-center gap-1.5 rounded-full border border-black/10 bg-white px-3 py-1.5 text-sm font-medium text-gray-600 transition-colors hover:text-gray-900 dark:border-white/15 dark:bg-white/[0.06] dark:text-gray-300 dark:hover:text-white"
+                          >
+                            View page
+                          </Link>
+                          <FriendActionsDropdown
+                            friend={friend}
+                            profile={f}
+                            onRemove={setRemoveFriendTarget}
+                          />
+                        </div>
+                      </motion.div>
+                    );
+                  })}
+                </AnimatePresence>
               </div>
-            </AnimatePresence>
+            )}
           </section>
         </>
       )}
 
       <AnimatePresence>
         {removeFriendTarget && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/70 backdrop-blur-sm z-[9999] flex items-center justify-center p-4"
-            onClick={(e) => {
-              if (e.target === e.currentTarget && !isRemovingFriend) {
-                setRemoveFriendTarget(null);
-              }
-            }}
-          >
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95, y: 8 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: 8 }}
-              className="bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/95 dark:via-gray-900/90 dark:to-gray-950/95 backdrop-blur-2xl border border-gray-200 dark:border-white/[0.10] rounded-xl p-5 max-w-sm w-full shadow-[0_8px_48px_rgba(0,0,0,0.5)]"
-            >
-              <h3 className="text-base font-semibold text-gray-900 dark:text-gray-100 mb-2">
-                Remove {getDisplayName(removeFriendTarget.profile)}?
-              </h3>
-              <p className="text-gray-500 dark:text-gray-400 text-sm mb-4 leading-relaxed">
-                They will no longer appear in your friends list. You can send a
-                new request later.
-              </p>
-              <div className="flex justify-end gap-2">
-                <button
-                  type="button"
-                  onClick={() => setRemoveFriendTarget(null)}
-                  disabled={isRemovingFriend}
-                  className="di-btn-secondary !text-sm"
-                >
+          <ConfirmDialog
+            title={`Remove ${getDisplayName(removeFriendTarget.profile)}?`}
+            busy={isRemovingFriend}
+            onClose={() => setRemoveFriendTarget(null)}
+            actions={
+              <>
+                <GhostButton onClick={() => setRemoveFriendTarget(null)}>
                   Cancel
-                </button>
-                <button
-                  type="button"
+                </GhostButton>
+                <DangerButton
+                  disabled={isRemovingFriend}
                   onClick={async () => {
                     if (!removeFriendTarget.friend.id) return;
                     setIsRemovingFriend(true);
@@ -506,90 +543,61 @@ export function FriendsMainView({
                       setIsRemovingFriend(false);
                     }
                   }}
-                  disabled={isRemovingFriend}
-                  className="di-btn-danger !text-sm"
                 >
                   {isRemovingFriend ? "Removing..." : "Remove friend"}
-                </button>
-              </div>
-            </motion.div>
-          </motion.div>
+                </DangerButton>
+              </>
+            }
+          >
+            They will no longer appear in your friends list, and neither of you
+            will see the other&apos;s page. You can send a new request later.
+          </ConfirmDialog>
         )}
       </AnimatePresence>
 
       <AnimatePresence>
         {showDisableConfirm && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/70 backdrop-blur-sm z-[9999] flex items-center justify-center p-4"
-            onClick={(e) => {
-              if (e.target === e.currentTarget && !isDisabling) {
-                setShowDisableConfirm(false);
-              }
-            }}
-          >
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95, y: 8 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: 8 }}
-              className="bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-900/95 dark:via-gray-900/90 dark:to-gray-950/95 backdrop-blur-2xl border border-gray-200 dark:border-white/[0.10] rounded-xl p-5 max-w-sm w-full shadow-[0_8px_48px_rgba(0,0,0,0.5)]"
-            >
-              <div className="flex items-center gap-3 mb-3">
-                <div className="p-2 bg-red-500/10 rounded-xl border border-red-500/20">
-                  <FiAlertTriangle className="text-red-500" size={18} />
-                </div>
-                <h3 className="text-base font-semibold text-gray-900 dark:text-gray-100">
-                  Disable Friends Feature?
-                </h3>
-              </div>
-              <p className="text-gray-500 dark:text-gray-400 text-sm mb-4 leading-relaxed">
-                This will{" "}
-                <strong className="text-red-500 dark:text-red-400">
-                  remove all your friends
-                </strong>
-                , pending requests, and hide your courses from others. You can re-enable
-                later, but you'll need to add friends again.
-              </p>
-              <div className="flex justify-end gap-2">
-                <button
-                  type="button"
-                  onClick={() => setShowDisableConfirm(false)}
-                  disabled={isDisabling}
-                  className="di-btn-secondary !text-sm"
-                >
+          <ConfirmDialog
+            title="Turn Friends off?"
+            busy={isDisabling}
+            onClose={() => setShowDisableConfirm(false)}
+            icon={
+              <span className="mt-0.5 shrink-0 rounded-lg border border-red-500/20 bg-red-500/10 p-2 text-red-500">
+                <AlertTriangle className="h-4 w-4" />
+              </span>
+            }
+            actions={
+              <>
+                <GhostButton onClick={() => setShowDisableConfirm(false)}>
                   Cancel
-                </button>
-                <button
-                  type="button"
+                </GhostButton>
+                <DangerButton
+                  disabled={isDisabling}
                   onClick={async () => {
                     setIsDisabling(true);
                     try {
                       await onToggleFriends(false);
-                      toast.success("Friends feature disabled");
+                      toast.success("Friends is off.");
                       setShowDisableConfirm(false);
                     } catch {
-                      toast.error("Failed to disable friends feature");
+                      toast.error("Could not turn Friends off. Try again?");
                     } finally {
                       setIsDisabling(false);
                     }
                   }}
-                  disabled={isDisabling}
-                  className="di-btn-danger !text-sm"
                 >
-                  {isDisabling ? (
-                    <>
-                      <span className="animate-spin h-3 w-3 border-2 border-white/30 border-t-white rounded-full" />
-                      Disabling...
-                    </>
-                  ) : (
-                    "Disable & Remove Friends"
-                  )}
-                </button>
-              </div>
-            </motion.div>
-          </motion.div>
+                  {isDisabling ? "Turning it off..." : "Turn off and remove"}
+                </DangerButton>
+              </>
+            }
+          >
+            This removes{" "}
+            <span className="font-medium text-red-500 dark:text-red-400">
+              all of your friends
+            </span>{" "}
+            and every pending request, and hides your page. You can turn it back
+            on later, but you will have to add everyone again.
+          </ConfirmDialog>
         )}
       </AnimatePresence>
     </div>

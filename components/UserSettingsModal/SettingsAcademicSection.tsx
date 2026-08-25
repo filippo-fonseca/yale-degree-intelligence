@@ -13,12 +13,17 @@ interface SettingsAcademicSectionProps {
   duplicateMajorError: string | null;
   duplicateCertificateError: string | null;
   autoOpenCertificateIndex: number | null;
+  autoOpenMajorIndex: number | null;
   handleAddMajor: () => void;
   handleMajorChange: (index: number, newMajor: string) => void;
   handleRemoveMajor: (index: number) => void;
   handleAddCertificate: () => void;
   handleCertificateChange: (index: number, newCertificate: string) => void;
   handleRemoveCertificate: (index: number) => void;
+  isDirty: boolean;
+  isSaving: boolean;
+  onSave: () => void;
+  canSave: boolean;
   setLocalProfile: Dispatch<SetStateAction<EditableProfile | null>>;
 }
 
@@ -27,6 +32,7 @@ export function SettingsAcademicSection({
   duplicateMajorError,
   duplicateCertificateError,
   autoOpenCertificateIndex,
+  autoOpenMajorIndex,
   handleAddMajor,
   handleMajorChange,
   handleRemoveMajor,
@@ -34,6 +40,10 @@ export function SettingsAcademicSection({
   handleCertificateChange,
   handleRemoveCertificate,
   setLocalProfile,
+  isDirty,
+  isSaving,
+  onSave,
+  canSave,
 }: SettingsAcademicSectionProps) {
   return (
     <>
@@ -54,6 +64,7 @@ export function SettingsAcademicSection({
                 <div className="flex-1">
                   <MajorDropdown
                     value={major}
+                    defaultOpen={autoOpenMajorIndex === index}
                     onChange={(newMajor) => handleMajorChange(index, newMajor)}
                     disabledOptions={localProfile.majors.filter(
                       (m) => m !== major,
@@ -169,6 +180,24 @@ export function SettingsAcademicSection({
           </div>
         </div>
       </div>
+      {/* The save lives with the fields it saves, the way the bio's does.
+          Everything else in Settings writes on change, so a button at the
+          bottom of the panel implied the toggles above it were unsaved too. */}
+      {isDirty && (
+        <div className="flex items-center justify-between gap-2 rounded-xl border border-amber-500/25 bg-amber-500/[0.07] px-3 py-2.5">
+          <span className="font-sf text-xs text-amber-700 dark:text-amber-300">
+            Unsaved changes to your majors, certificates, or year.
+          </span>
+          <button
+            type="button"
+            onClick={onSave}
+            disabled={!canSave || isSaving}
+            className="shrink-0 rounded-full bg-gray-900 px-3.5 py-1.5 font-sf text-sm font-medium text-white transition-colors hover:bg-gray-700 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-white dark:text-gray-900 dark:hover:bg-gray-200"
+          >
+            {isSaving ? "Saving..." : "Save"}
+          </button>
+        </div>
+      )}
     </>
   );
 }

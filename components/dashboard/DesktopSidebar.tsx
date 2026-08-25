@@ -244,9 +244,9 @@ export function DesktopSidebar({
                 target="_blank"
                 className="w-full flex items-center space-x-2 p-1.5 rounded-lg hover:bg-black/[0.04] dark:hover:bg-white/[0.06] hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.6)] dark:hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] transition-all duration-200 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
               >
-                <div className="p-1 rounded-md bg-gradient-to-br from-emerald-500/20 to-emerald-900/30 border border-emerald-500/30 shadow-[inset_0_1px_0_rgba(255,255,255,0.1)] flex items-center justify-center">
+                <div className="flex items-center justify-center rounded-md border border-emerald-600/30 bg-emerald-500/15 p-1 dark:border-emerald-500/30 dark:bg-gradient-to-br dark:from-emerald-500/20 dark:to-emerald-900/30">
                   <FaHeart
-                    className="text-emerald-400 drop-shadow-[0_0_4px_rgba(52,211,153,0.4)]"
+                    className="text-emerald-600 dark:text-emerald-400"
                     size={10}
                   />
                 </div>
@@ -257,9 +257,9 @@ export function DesktopSidebar({
                 target="_blank"
                 className="w-full flex items-center space-x-2 p-1.5 rounded-lg hover:bg-black/[0.04] dark:hover:bg-white/[0.06] hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.6)] dark:hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] transition-all duration-200 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
               >
-                <div className="p-1 rounded-md bg-gradient-to-br from-pink-500/20 to-pink-900/30 border border-pink-500/30 shadow-[inset_0_1px_0_rgba(255,255,255,0.1)] flex items-center justify-center">
+                <div className="flex items-center justify-center rounded-md border border-pink-600/30 bg-pink-500/15 p-1 dark:border-pink-500/30 dark:bg-gradient-to-br dark:from-pink-500/20 dark:to-pink-900/30">
                   <FiBarChart2
-                    className="text-pink-400 drop-shadow-[0_0_4px_rgba(236,72,153,0.4)]"
+                    className="text-pink-600 dark:text-pink-400"
                     size={10}
                   />
                 </div>
@@ -270,9 +270,9 @@ export function DesktopSidebar({
                 target="_blank"
                 className="w-full flex items-center space-x-2 p-1.5 rounded-lg hover:bg-black/[0.04] dark:hover:bg-white/[0.06] hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.6)] dark:hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] transition-all duration-200 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
               >
-                <div className="p-1 rounded-md bg-gradient-to-br from-purple-500/20 to-purple-900/30 border border-purple-500/30 shadow-[inset_0_1px_0_rgba(255,255,255,0.1)] flex items-center justify-center">
+                <div className="flex items-center justify-center rounded-md border border-purple-600/30 bg-purple-500/15 p-1 dark:border-purple-500/30 dark:bg-gradient-to-br dark:from-purple-500/20 dark:to-purple-900/30">
                   <MessageCircleQuestionMark
-                    className="text-purple-400 drop-shadow-[0_0_4px_rgba(167,139,250,0.4)]"
+                    className="text-purple-600 dark:text-purple-400"
                     size={10}
                   />
                 </div>
@@ -283,9 +283,9 @@ export function DesktopSidebar({
                 target="_blank"
                 className="w-full flex items-center space-x-2 p-1.5 rounded-lg hover:bg-black/[0.04] dark:hover:bg-white/[0.06] hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.6)] dark:hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] transition-all duration-200 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
               >
-                <div className="p-1 rounded-md bg-gradient-to-br from-blue-500/20 to-blue-900/30 border border-blue-500/30 shadow-[inset_0_1px_0_rgba(255,255,255,0.1)] flex items-center justify-center">
+                <div className="flex items-center justify-center rounded-md border border-blue-600/30 bg-blue-500/15 p-1 dark:border-blue-500/30 dark:bg-gradient-to-br dark:from-blue-500/20 dark:to-blue-900/30">
                   <FiBook
-                    className="text-blue-400 drop-shadow-[0_0_4px_rgba(96,165,250,0.4)]"
+                    className="text-blue-600 dark:text-blue-400"
                     size={10}
                   />
                 </div>
@@ -296,9 +296,9 @@ export function DesktopSidebar({
                 target="_blank"
                 className="w-full flex items-center space-x-2 p-1.5 rounded-lg hover:bg-black/[0.04] dark:hover:bg-white/[0.06] hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.6)] dark:hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] transition-all duration-200 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
               >
-                <div className="p-1 rounded-md bg-gradient-to-br from-amber-500/20 to-amber-900/30 border border-amber-500/30 shadow-[inset_0_1px_0_rgba(255,255,255,0.1)] flex items-center justify-center">
+                <div className="flex items-center justify-center rounded-md border border-amber-600/30 bg-amber-500/15 p-1 dark:border-amber-500/30 dark:bg-gradient-to-br dark:from-amber-500/20 dark:to-amber-900/30">
                   <FiCoffee
-                    className="text-amber-400 drop-shadow-[0_0_4px_rgba(251,191,36,0.4)]"
+                    className="text-amber-600 dark:text-amber-400"
                     size={10}
                   />
                 </div>
@@ -310,8 +310,8 @@ export function DesktopSidebar({
                 rel="noopener noreferrer"
                 className="w-full flex items-center space-x-2 p-1.5 rounded-lg hover:bg-black/[0.04] dark:hover:bg-white/[0.06] hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.6)] dark:hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] transition-all duration-200 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
               >
-                <div className="p-1 rounded-md bg-gradient-to-br from-gray-500/20 to-gray-900/30 border border-gray-500/30 shadow-[inset_0_1px_0_rgba(255,255,255,0.1)] flex items-center justify-center">
-                  <FaGithub className="text-gray-300" size={10} />
+                <div className="flex items-center justify-center rounded-md border border-gray-600/30 bg-gray-500/15 p-1 dark:border-gray-500/30 dark:bg-gradient-to-br dark:from-gray-500/20 dark:to-gray-900/30">
+                  <FaGithub className="text-gray-600 dark:text-gray-300" size={10} />
                 </div>
                 <span className="text-xs">We&apos;re open source</span>
               </Link>

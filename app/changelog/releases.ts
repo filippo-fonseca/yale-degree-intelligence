@@ -61,6 +61,10 @@ export const RELEASES: Release[] = [
       {
         title: "Elsewhere in the app",
         items: [
+          "Signing in goes straight to the loading screen. The homepage used to flash back for a moment after you picked your Yale account, which looked like the log-in had failed.",
+          "Marking a requirement option as skipped now works even if you had already removed that course from the requirement. It quietly did nothing before.",
+          "The switcher above your major and certificate progress lost its bright blue and teal buttons for the black-and-white ones the rest of v3 uses.",
+          "The tip cards on My Major and My Certificates are set in the same typeface as the rest of the interface, on the same quiet surface as the help bar above them, instead of a rainbow-edged box in the page's serif.",
           "You can mute the app's sound effects. Settings has a switch for the little pop you hear when you change tabs or drop a course; it is on by default and remembered on the device you set it on.",
           "The sidebar links to our source code, next to Terms and the coffee link.",
           "The \"2030 can use!\" chips in the sidebar now disappear once you have opened that tab, one tab at a time, instead of following you around. They also stopped overflowing their button.",

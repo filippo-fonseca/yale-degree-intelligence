@@ -144,7 +144,7 @@ function darkModeStyles() {
   return `    @media (prefers-color-scheme: dark) {\n${media}\n    }\n\n${ogsc}`;
 }
 
-/** The landing page's player chrome, rebuilt in table HTML so it needs no image. */
+/** The landing page's player chrome, around the recording's own first frame. */
 function videoBlock({ caption, lead }) {
   return `${lead ? `
           <tr>
@@ -177,20 +177,36 @@ function videoBlock({ caption, lead }) {
                   </td>
                 </tr>
 
-                <!-- play surface: stays dark in both themes, like a real player -->
+                <!--
+                  The real first frame of the recording, with a play button
+                  baked into the image.
+
+                  No client will run an iframe, so a Loom that plays inside the
+                  message is not on the table: Gmail, Outlook, and Apple Mail
+                  all strip them. Loom's own advice is a thumbnail that links
+                  out, which is what this is. It is a still rather than Loom's
+                  animated GIF because that GIF is 460kb of a mostly static
+                  page, and Outlook would show a single frame of it anyway.
+
+                  The image is hosted on the site for the same reason the logos
+                  are, and the surface behind it stays dark so a client that
+                  blocks images still shows a player rather than a white gap.
+                -->
                 <tr>
-                  <td align="center" class="video-surface" style="background-color: #09090b; padding: 52px 24px;">
+                  <td align="center" class="video-surface" style="background-color: #09090b; padding: 0;">
                     <a href="${VIDEO_URL}" target="_blank" style="text-decoration: none; display: block;">
-                      <table role="presentation" cellspacing="0" cellpadding="0" border="0" align="center" style="margin: 0 auto;">
-                        <tr>
-                          <td align="center" valign="middle" width="62" height="62" style="width: 62px; height: 62px; background-color: #fafafa; border-radius: 31px; text-align: center;">
-                            <span style="font-family: ${SANS}; font-size: 20px; line-height: 62px; color: #09090b;">&#9654;</span>
-                          </td>
-                        </tr>
-                      </table>
-                      <p style="margin: 18px 0 0 0; font-family: ${SANS}; font-size: 13px; color: #a1a1aa;">
-                        ${caption}
-                      </p>
+                      <img src="${LOGO_BASE}/demo-thumb.jpg" width="558" alt="Watch the DegreeIntelligence v3 demo"
+                           style="display: block; width: 100%; max-width: 558px; height: auto; border: 0;" />
+                    </a>
+                  </td>
+                </tr>
+
+                <tr>
+                  <td align="center" class="video-surface" style="background-color: #09090b; padding: 14px 24px 18px 24px;">
+                    <a href="${VIDEO_URL}" target="_blank" style="text-decoration: none;">
+                      <span style="font-family: ${SANS}; font-size: 13px; color: #a1a1aa;">
+                        ${caption} &rarr;
+                      </span>
                     </a>
                   </td>
                 </tr>

@@ -22,10 +22,17 @@ import { fileURLToPath } from "node:url";
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const DIST = path.join(HERE, "dist");
 
-/** Replace once the Loom recording is up; both emails point at it. */
-const VIDEO_URL = "https://www.loom.com/share/REPLACE_ME";
+/** The demo recording. Every email's film block points at it. */
+const VIDEO_URL =
+  "https://www.loom.com/share/05c17c15d00748579e06949a0d3ae69f";
 const SITE_URL = "https://degreeint.com";
 const REPO_URL = "https://github.com/filippo-fonseca/yale-degree-intelligence";
+
+/** The button under the film. The one above it carries each email's own CTA. */
+const CLOSING_CTA = "Try it out for yourself →";
+
+/** Where replies and "email us" both land. Matches the campaign's Reply-To. */
+const CONTACT_EMAIL = "filippo.fonseca@yale.edu";
 
 /**
  * Logos are served from the site rather than inlined: Gmail strips SVG and
@@ -137,9 +144,16 @@ function darkModeStyles() {
   return `    @media (prefers-color-scheme: dark) {\n${media}\n    }\n\n${ogsc}`;
 }
 
-/** The landing page's player chrome, rebuilt in table HTML so it needs no image. */
-function videoBlock({ caption }) {
-  return `
+/** The landing page's player chrome, around the recording's own first frame. */
+function videoBlock({ caption, lead }) {
+  return `${lead ? `
+          <tr>
+            <td align="center" style="padding: 0 0 14px 0;">
+              <p class="t-secondary" style="margin: 0; font-family: ${SANS}; font-size: 14px; line-height: 1.6; color: ${LIGHT.secondary};">
+                ${lead}
+              </p>
+            </td>
+          </tr>` : ""}
           <tr>
             <td style="padding: 0 0 36px 0;">
               <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" class="bg-card" style="background-color: ${LIGHT.card}; border: 1px solid ${LIGHT.border}; border-radius: 14px; overflow: hidden;">
@@ -155,7 +169,7 @@ function videoBlock({ caption }) {
                           <span style="display: inline-block; width: 9px; height: 9px; border-radius: 50%; background-color: #28c840; margin-left: 5px;"></span>
                         </td>
                         <td align="center" class="t-muted" style="font-family: ${MONO}; font-size: 11px; color: ${LIGHT.muted}; letter-spacing: 0.2px;">
-                          v3-launch-film.mp4
+                          v3-launch-demo
                         </td>
                         <td width="60">&nbsp;</td>
                       </tr>
@@ -163,20 +177,36 @@ function videoBlock({ caption }) {
                   </td>
                 </tr>
 
-                <!-- play surface: stays dark in both themes, like a real player -->
+                <!--
+                  The real first frame of the recording, with a play button
+                  baked into the image.
+
+                  No client will run an iframe, so a Loom that plays inside the
+                  message is not on the table: Gmail, Outlook, and Apple Mail
+                  all strip them. Loom's own advice is a thumbnail that links
+                  out, which is what this is. It is a still rather than Loom's
+                  animated GIF because that GIF is 460kb of a mostly static
+                  page, and Outlook would show a single frame of it anyway.
+
+                  The image is hosted on the site for the same reason the logos
+                  are, and the surface behind it stays dark so a client that
+                  blocks images still shows a player rather than a white gap.
+                -->
                 <tr>
-                  <td align="center" class="video-surface" style="background-color: #09090b; padding: 52px 24px;">
+                  <td align="center" class="video-surface" style="background-color: #09090b; padding: 0;">
                     <a href="${VIDEO_URL}" target="_blank" style="text-decoration: none; display: block;">
-                      <table role="presentation" cellspacing="0" cellpadding="0" border="0" align="center" style="margin: 0 auto;">
-                        <tr>
-                          <td align="center" valign="middle" width="62" height="62" style="width: 62px; height: 62px; background-color: #fafafa; border-radius: 31px; text-align: center;">
-                            <span style="font-family: ${SANS}; font-size: 20px; line-height: 62px; color: #09090b;">&#9654;</span>
-                          </td>
-                        </tr>
-                      </table>
-                      <p style="margin: 18px 0 0 0; font-family: ${SANS}; font-size: 13px; color: #a1a1aa;">
-                        ${caption}
-                      </p>
+                      <img src="${LOGO_BASE}/demo-thumb.jpg" width="558" alt="Watch the DegreeIntelligence v3 demo"
+                           style="display: block; width: 100%; max-width: 558px; height: auto; border: 0;" />
+                    </a>
+                  </td>
+                </tr>
+
+                <tr>
+                  <td align="center" class="video-surface" style="background-color: #09090b; padding: 14px 24px 18px 24px;">
+                    <a href="${VIDEO_URL}" target="_blank" style="text-decoration: none;">
+                      <span style="font-family: ${SANS}; font-size: 13px; color: #a1a1aa;">
+                        ${caption} &rarr;
+                      </span>
                     </a>
                   </td>
                 </tr>
@@ -186,10 +216,10 @@ function videoBlock({ caption }) {
           </tr>`;
 }
 
-function button({ label, href }) {
+function button({ label, href, gap = 14 }) {
   return `
           <tr>
-            <td align="center" style="padding: 0 0 14px 0;">
+            <td align="center" style="padding: 0 0 ${gap}px 0;">
               <a href="${href}" target="_blank" class="btn"
                  style="display: inline-block; padding: 14px 26px; font-family: ${SANS}; font-size: 15px; font-weight: 600; text-decoration: none; color: ${LIGHT.btnText}; background-color: ${LIGHT.btnBg}; border: 1px solid ${LIGHT.btnBg}; border-radius: 10px;">
                 ${label}
@@ -346,6 +376,27 @@ ${POSTAL_ADDRESS ? `
  * destinations, and colouring them like links would invite clicks that go
  * nowhere.
  */
+/**
+ * A real destination inside body copy, as opposed to u(), which is emphasis
+ * only. Accent-coloured and underlined so it reads as clickable, with the
+ * .t-accent class carrying the lighter pink for dark-mode clients.
+ */
+function link(text, href) {
+  return `<a href="${href}" target="_blank" class="t-accent" style="color: ${LIGHT.accent}; text-decoration: underline;">${text}</a>`;
+}
+
+/**
+ * The one line in the body that should stop a skimmer.
+ *
+ * Bold and italic together, in the primary colour rather than the body grey,
+ * with the weight inline: Outlook drops <strong>'s styling in places but
+ * honours an inline font-weight, and the colour is what actually pulls the eye
+ * on a phone.
+ */
+function lede(text) {
+  return `<span style="font-weight: 700; font-style: italic; color: ${LIGHT.primary};" class="t-primary">${text}</span>`;
+}
+
 function u(text) {
   return `<span style="text-decoration: underline;">${text}</span>`;
 }
@@ -364,7 +415,37 @@ function grad(text) {
   return `<span class="grad" style="color: ${LIGHT.accent};">${text}</span>`;
 }
 
+/**
+ * The body copy under the headline.
+ *
+ * Takes a string or an array of strings. Separate <p> elements rather than
+ * <br /> pairs, because Outlook collapses the second <br /> and the paragraphs
+ * run together; spacing goes on margin-top so the first paragraph still sits
+ * flush against the headline above it.
+ */
+function copyRow(paragraph, { pad }) {
+  return `          <tr>
+            <td align="center" style="padding: 0 0 ${pad}px 0;">
+${bodyCopy(paragraph)}
+            </td>
+          </tr>`;
+}
+
+function bodyCopy(paragraph) {
+  const parts = Array.isArray(paragraph) ? paragraph : [paragraph];
+  return parts
+    .map(
+      (text, index) => `              <p class="t-secondary" style="margin: ${index === 0 ? "0" : "16px 0 0 0"}; font-family: ${SANS}; font-size: 15px; line-height: 1.7; color: ${LIGHT.secondary};">
+                ${text}
+              </p>`,
+    )
+    .join("\n");
+}
+
 function campaignEmail({ headline, paragraph, cta, videoCaption, title, preheader }) {
+  const parts = Array.isArray(paragraph) ? paragraph : [paragraph];
+  const [opening, ...rest] = parts;
+
   const body = `${header()}
 
           <tr>
@@ -375,15 +456,15 @@ function campaignEmail({ headline, paragraph, cta, videoCaption, title, preheade
             </td>
           </tr>
 
-          <tr>
-            <td align="center" style="padding: 0 0 34px 0;">
-              <p class="t-secondary" style="margin: 0; font-family: ${SANS}; font-size: 15px; line-height: 1.7; color: ${LIGHT.secondary};">
-                ${paragraph}
-              </p>
-            </td>
-          </tr>
-${videoBlock({ caption: videoCaption })}
-${button({ label: cta, href: SITE_URL })}
+${copyRow(opening, { pad: 26 })}
+${/* The way in sits right after the opening paragraph, not at the bottom. A
+     reader who is already sold should not have to read the rest, or scroll
+     past a two-minute film, to find the link. The second one below the film
+     catches everyone who watched it first. */ ""}
+${button({ label: cta, href: SITE_URL, gap: 30 })}
+${rest.length ? copyRow(rest, { pad: 34 }) : ""}
+${videoBlock({ caption: videoCaption, lead: "we've recorded a quick demo for you:" })}
+${button({ label: CLOSING_CTA, href: SITE_URL })}
 
           <tr>
             <td align="center" style="padding: 26px 0 0 0;">
@@ -445,27 +526,57 @@ const TARGETS = [
                 better. We now have ${u("Certificates")}, a rebuilt ${u("Simulator")},
                 ${u("distributionals")}, a ${u("cleaner UI")}, and ${u("much more")}.`,
         cta: "Log back into DegreeIntelligence →",
-        videoCaption: "Watch the v3 tour",
+        videoCaption: "Watch the demo",
         title: "v3 is here",
         preheader: "Certificates, a rebuilt Simulator, distributionals, a cleaner UI, and much more.",
       }),
   },
   {
-    // Class of 2030: no Yale courses yet, so lead on not needing grades to start.
+    // Class of 2030. They have already registered, so this cannot open on
+    // choosing courses. It opens on getting the courses they picked into the
+    // app, and on the part nobody hands you: what the next four years look like.
+    //
+    // Registration is what produces the Yale Hub unofficial transcript, not
+    // grades, so the import works for them on day one. It is still only one of
+    // three ways in, and the copy says so: nobody should think an import is
+    // required before they can use any of this.
     file: "v3-frosh.html",
     render: () =>
       campaignEmail({
         headline: "welcome to Yale.",
-        paragraph: `You're about to pick your first Yale courses, and you don't need a single grade
-                to start planning them. For 2026-27, we've added some amazing new features,
-                including ${u("Certificates")}, a rebuilt ${u("Simulator")},
-                ${u("distributionals")}, a ${u("cleaner UI")}, and ${u("much more")}
-                (safe to say you're joining Yale at the right time!). Made by Yalies, for Yalies,
-                DegreeIntelligence is free (forever) and requires nothing to install.`,
+        paragraph: [
+          `Class of 2030, you've made it! We know navigating Yale is messy... from looking at
+                the requirements for the many potential majors you might be considering to the
+                distributionals you must fulfill to graduate... we're sure you've gained a
+                sense of this already. Yale is
+                famous for offering thousands of classes and allowing students to pick their own
+                schedule, which presents tons of logistical problems and planning pains. We've
+                been there. For even the most organized among us, the best organized of Google
+                Sheets docs with fancy dropdown pills were not enough, leaving us wanting more. Luckily, ${lede(
+                  "a few years ago we built a completely free, open-source app used by 1 in 6 Yale students",
+                )} to stay on top of what can seem like a lot at first (if it does, that's because it is!).`,
+          `Not sure what you're majoring in yet? Try a few on. When you switch majors, every
+                number updates instantly, including nifty features that TRUST US will come in
+                handy later, like our ${u("double major conflict tracker")}. *If you didn't know,
+                you can only share 2 credits or less between majors if you're doubling. This (and
+                countless other nuances) is all built into how we engineered the backend of
+                DegreeIntelligence, so you know you're covered. One of our most popular features
+                is our ${u("Simulator")}, a drag-and-drop experience that makes sure you can
+                visualize your entire Yale trajectory, keep different versions of plans, and more,
+                all the while allocating the classes you pick to your distributionals, major
+                requirements, and more.`,
+          `Once you have real grades, the ${u("Stats")} page keeps you on top of your GPA, your
+                credits, and your pace. Furthermore, the ${u("Distributionals tracker")} shows
+                which of Yale's requirements you've cleared and which are still open. *We also have
+                a ton more features we didn't want to bombard you with on here. Made by Yalies,
+                for Yalies, DegreeIntelligence is free (forever) and requires nothing to install.`,
+          `Don't like something, or have a suggestion? ${link("Email us", `mailto:${CONTACT_EMAIL}`)}.
+                Or hey, we're open source, so you could code it yourself and submit a PR :)`,
+        ],
         cta: "Try DegreeIntelligence →",
-        videoCaption: "Watch the two-minute tour",
+        videoCaption: "Watch the demo",
         title: "Welcome to Yale",
-        preheader: "No grades needed. Start planning your first semester in a couple of minutes.",
+        preheader: "The free, open-source app 1 in 6 Yalies use to make sense of majors, distributionals, and what to take next.",
       }),
   },
   {
@@ -482,7 +593,7 @@ const TARGETS = [
                 a ${u("cleaner UI")}, and ${u("much more")}. Made by Yalies, for Yalies,
                 DegreeIntelligence is free (forever) and requires nothing to install.`,
         cta: "Try DegreeIntelligence →",
-        videoCaption: "Watch the two-minute tour",
+        videoCaption: "Watch the demo",
         title: "1 in 6 Yalies use this. Why don't you?",
         preheader: "Plan semesters, track requirements, and see how your degree is actually going.",
       }),

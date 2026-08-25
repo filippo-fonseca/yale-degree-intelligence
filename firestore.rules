@@ -1,0 +1,222 @@
+rules_version = '2';
+
+// Firestore security rules for DegreeIntelligence.
+//
+// These live in the repo so they can be reviewed and diffed like the rest of
+// the app. Deploying them is a separate, deliberate act:
+//
+//   firebase deploy --only firestore:rules
+//
+// Editing this file changes nothing in production until that runs.
+//
+// The load-bearing rule is the one on /courses: owner-only reads. Grades exist
+// nowhere else, so that single line is what keeps them private. Everything
+// friend-facing is a projection written by the app into /friends_public_data,
+// and PublicCourse (lib/types.ts) has no grade field.
+//
+// Two collections, deliberately: /friends_directory is discovery (a name, a
+// photo, a major, a year) and is readable by any Yale account, because that is
+// what search needs. /friends_public_data is content (courses, bio) and is
+// readable only by the owner and their accepted friends.
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ============================================
+    // HELPER FUNCTIONS
+    // ============================================
+
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    // Mirrors lib/allowedEmail.ts: Yale accounts, plus the creator's
+    // personal Gmail so they can test with a separate account.
+    function isAllowedUser() {
+      return isAuthenticated() &&
+             (request.auth.token.email.matches('.*@yale[.]edu') ||
+              request.auth.token.email == 'filifonsecacagnazzo@gmail.com');
+    }
+
+    function getFriendshipId(uid1, uid2) {
+      return uid1 < uid2 ? uid1 + '_' + uid2 : uid2 + '_' + uid1;
+    }
+
+    function areFriends(uid1, uid2) {
+      return exists(/databases/$(database)/documents/friends_lookup/$(getFriendshipId(uid1, uid2)));
+    }
+
+    // ============================================
+    // COURSES - LOCKED DOWN (owner only)
+    // ============================================
+    match /courses/{courseId} {
+      // CRITICAL: Only the owner can read their own courses
+      // This protects grades from being exposed
+      allow read: if isAuthenticated() &&
+                     resource.data.userId == request.auth.uid;
+
+      // isAllowedUser(), not isAuthenticated(): Firebase issues a token to any
+      // Google account, so authentication alone does not mean "a Yale student".
+      // The API layer already enforces this; direct client writes did not.
+      allow create: if isAllowedUser() &&
+                      request.resource.data.userId == request.auth.uid;
+
+      allow update: if isAllowedUser() &&
+                      resource.data.userId == request.auth.uid &&
+                      request.resource.data.userId == resource.data.userId;
+
+      allow delete: if isAuthenticated() &&
+                      resource.data.userId == request.auth.uid;
+    }
+
+    // ============================================
+    // FRIENDS DIRECTORY — discovery only
+    //
+    // A name, a photo, a major, a year. This is what Friends search reads, and
+    // it is readable by anyone who could plausibly search for you: a Yale
+    // account. Nothing here is more than a classmate could read off your face
+    // at a table in Bass.
+    //
+    // Written by the owner (lib/friendsDirectory.ts) and reconciled by the
+    // Admin SDK in /api/sync-friend-data.
+    // ============================================
+    match /friends_directory/{userId} {
+      allow read: if isAllowedUser();
+
+      allow create, update: if isOwner(userId) &&
+                              request.resource.data.userId == userId;
+
+      allow delete: if isOwner(userId);
+    }
+
+    // ============================================
+    // FRIENDS PUBLIC DATA — the owner and their friends, nobody else
+    //
+    // Grades are NEVER stored here: PublicCourse (lib/types.ts) has no grade
+    // field, and both writers build it field by field. What is here is the
+    // course list and the bio, which the app promises are visible to accepted
+    // friends only. Until August 2026 this doc was readable by any Yale
+    // account, because it doubled as the search index; discovery moved to
+    // friends_directory so this could be closed.
+    //
+    // areFriends() reads friends_lookup, whose documents only the Admin SDK
+    // can create (on /api/friends/accept), so friendship cannot be forged
+    // from a client.
+    // ============================================
+    match /friends_public_data/{userId} {
+      allow read: if isOwner(userId) ||
+                    (isAllowedUser() &&
+                     resource.data.enabled == true &&
+                     areFriends(request.auth.uid, userId));
+
+      allow create, update: if isOwner(userId) &&
+                              request.resource.data.userId == userId;
+
+      allow delete: if isOwner(userId);
+    }
+
+    // ============================================
+    // FRIENDS LOOKUP (for efficient rule checks)
+    // ============================================
+    match /friends_lookup/{friendshipId} {
+      allow read: if isAuthenticated() &&
+                    request.auth.uid in resource.data.users;
+
+      // Friendship lookup docs must be created via Admin SDK / Cloud Function on accept.
+      allow create: if false;
+
+      allow delete: if isAuthenticated() &&
+                      request.auth.uid in resource.data.users;
+
+      allow update: if false;
+    }
+
+    // ============================================
+    // USERS — owner only (emails, bio, private prefs)
+    // Friend-facing profile fields live in friends_public_data.
+    // ============================================
+    match /users/{userId} {
+      allow read, create, update, delete: if isOwner(userId);
+    }
+
+    // ============================================
+    // FRIENDS (backward compatible)
+    // ============================================
+    match /friends/{friendId} {
+      allow read, delete: if isAuthenticated() &&
+                            request.auth.uid in resource.data.users;
+
+      // Friendship docs must be created via Admin SDK / Cloud Function on accept.
+      allow create: if false;
+
+      allow update: if false;
+    }
+
+    // ============================================
+    // FRIEND REQUESTS
+    // ============================================
+    match /friend-requests/{requestId} {
+      allow read, delete: if isAuthenticated() &&
+                            (resource.data.from == request.auth.uid ||
+                             resource.data.to == request.auth.uid);
+
+      // No self-requests, and a Yale account, for the same reason as courses.
+      allow create: if isAllowedUser() &&
+                      request.resource.data.from == request.auth.uid &&
+                      request.resource.data.to != request.auth.uid &&
+                      request.resource.data.status == 'pending';
+
+      // The recipient answers a pending request. They do not get to rewrite it:
+      // who it is from, who it is to, and the fact that it was pending are all
+      // pinned. Accepting through /api/friends/accept is still the path the app
+      // uses, because only the Admin SDK can write the friendship itself.
+      allow update: if isAuthenticated() &&
+                      resource.data.to == request.auth.uid &&
+                      resource.data.status == 'pending' &&
+                      request.resource.data.from == resource.data.from &&
+                      request.resource.data.to == resource.data.to &&
+                      request.resource.data.status in ['accepted', 'rejected'];
+    }
+
+    // ============================================
+    // AI COLLECTIONS — closed
+    //
+    // The Dan advisor and the per-user MCP server were removed in July 2026.
+    // Nothing in the app reads or writes these, but the rules still accepted
+    // client creates, which left an unbounded write endpoint attached to a
+    // feature that no longer exists. Denied outright now; the remaining
+    // documents are conversation history for a removed feature and should be
+    // deleted (docs/security-notes.md).
+    // ============================================
+    match /ai_responses/{docId} {
+      allow read, write: if false;
+    }
+
+    match /cleoai_conversations/{userId} {
+      allow read, write: if false;
+    }
+
+    match /conversations/{docId} {
+      allow read, write: if false;
+    }
+
+    // ============================================
+    // SECRETS — Admin SDK only (client deny)
+    // ============================================
+    match /dan_keys/{userId} {
+      allow read, write: if false;
+    }
+
+    match /mcp_tokens/{userId} {
+      allow read, write: if false;
+    }
+
+    match /contact_messages/{docId} {
+      allow read, write: if false;
+    }
+  }
+}

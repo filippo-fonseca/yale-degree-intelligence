@@ -88,8 +88,9 @@ export async function POST(req: NextRequest) {
       await batch.commit();
     }
 
-    // 8. Delete friends_public_data for this user
+    // 8. Delete friends_public_data and the discovery entry for this user
     await adminDb.collection("friends_public_data").doc(userId).delete();
+    await adminDb.collection("friends_directory").doc(userId).delete();
 
     // 9. Delete leftover secrets from the retired Dan advisor and MCP server.
     // Both features are gone, but old documents can still exist for users who

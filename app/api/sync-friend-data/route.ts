@@ -19,6 +19,42 @@ interface PublicCourse {
 }
 
 /**
+ * Publish the four fields Friends search reads, into the collection search
+ * actually subscribes to. Kept deliberately narrow: no bio, no courses. See
+ * lib/friendsDirectory.ts for why the split exists.
+ */
+async function syncDirectoryEntry(
+  userId: string,
+  entry: {
+    displayName: string | null;
+    photoURL: string | null;
+    majors: string[];
+    graduationYear: number | null;
+  },
+) {
+  if (!adminDb) return;
+  const next = {
+    userId,
+    enabled: true,
+    displayName: entry.displayName,
+    photoURL: entry.photoURL,
+    majors: entry.majors,
+    graduationYear: entry.graduationYear,
+  };
+  const ref = adminDb.collection("friends_directory").doc(userId);
+  const existing = await ref.get();
+  const current = existing.data();
+  const unchanged =
+    current?.enabled === true &&
+    current?.displayName === next.displayName &&
+    current?.photoURL === next.photoURL &&
+    current?.graduationYear === next.graduationYear &&
+    JSON.stringify(current?.majors ?? []) === JSON.stringify(next.majors);
+  if (unchanged) return;
+  await ref.set({ ...next, updatedAt: FieldValue.serverTimestamp() });
+}
+
+/**
  * API endpoint to sync a user's friends_public_data with their actual courses.
  * Called when someone views a friend's profile to ensure data is up-to-date.
  */
@@ -140,6 +176,17 @@ export async function POST(req: NextRequest) {
         JSON.stringify(userProfile?.majors || []) ||
       existingData?.graduationYear !== (userProfile?.graduationYear || null) ||
       existingData?.bio !== (userProfile?.bio || null);
+
+    // The directory entry is a separate document, so it is reconciled whether
+    // or not the content doc changed: this route runs whenever a friend opens
+    // your page, which makes it the repair path for accounts whose entry
+    // predates the collection.
+    await syncDirectoryEntry(targetUserId, {
+      displayName: existingData?.displayName ?? userProfile?.displayName ?? null,
+      photoURL: existingData?.photoURL ?? userProfile?.photoURL ?? null,
+      majors: userProfile?.majors || [],
+      graduationYear: userProfile?.graduationYear ?? null,
+    });
 
     if (!coursesChanged && !profileChanged) {
       return NextResponse.json({

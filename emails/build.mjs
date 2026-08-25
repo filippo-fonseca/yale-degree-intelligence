@@ -558,7 +558,7 @@ const TARGETS = [
                 sense of this already. Yale is
                 famous for offering thousands of classes and allowing students to pick their own
                 schedule, which presents tons of logistical problems and planning pains. We've
-                been there. For even the most organized among us, the best organized of Google
+                been there. For even the most organized among us, the best of Google
                 Sheets docs with fancy dropdown pills were not enough, leaving us wanting more. Luckily, ${lede(
                   "a few years ago we built a completely free, open-source app used by 1 in 6 Yale students",
                 )} to stay on top of what can seem like a lot at first (if it does, that's because it is!).`,

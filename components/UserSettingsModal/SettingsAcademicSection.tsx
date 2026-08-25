@@ -1,7 +1,8 @@
 "use client";
 
 import type { Dispatch, SetStateAction } from "react";
-import { FiChevronDown } from "react-icons/fi";
+import { motion } from "framer-motion";
+import { FiAlertCircle, FiChevronDown } from "react-icons/fi";
 import { MAJORS } from "@/lib/majors";
 import { CERTIFICATES } from "@/lib/certificates";
 import { MajorDropdown } from "../ui/MajorDropdown";
@@ -182,21 +183,44 @@ export function SettingsAcademicSection({
       </div>
       {/* The save lives with the fields it saves, the way the bio's does.
           Everything else in Settings writes on change, so a button at the
-          bottom of the panel implied the toggles above it were unsaved too. */}
+          bottom of the panel implied the toggles above it were unsaved too.
+
+          It is the loudest thing in Settings on purpose: it is the only state
+          in here that is lost by closing the window, and it used to be a thin
+          tinted line that people scrolled straight past. It arrives with a
+          beat, sits on a filled amber card, and stays put at the bottom of the
+          panel until it is answered. */}
       {isDirty && (
-        <div className="flex items-center justify-between gap-2 rounded-xl border border-amber-500/25 bg-amber-500/[0.07] px-3 py-2.5">
-          <span className="font-sf text-xs text-amber-700 dark:text-amber-300">
-            Unsaved changes to your majors, certificates, or year.
-          </span>
+        <motion.div
+          initial={{ opacity: 0, y: 8, scale: 0.98 }}
+          animate={{ opacity: 1, y: 0, scale: [0.98, 1.015, 1] }}
+          transition={{ duration: 0.4, ease: [0.25, 1, 0.5, 1] }}
+          className="sticky bottom-0 z-10 flex items-center justify-between gap-3 rounded-xl border border-amber-500/50 bg-amber-50 px-3.5 py-3 shadow-[0_10px_30px_-12px_rgba(217,119,6,0.55)] dark:bg-amber-500/[0.14] dark:shadow-[0_10px_30px_-12px_rgba(0,0,0,0.7)] lg:col-span-2"
+        >
+          <div className="flex items-start gap-2.5">
+            <FiAlertCircle
+              className="mt-0.5 h-4 w-4 shrink-0 text-amber-600 dark:text-amber-400"
+              aria-hidden="true"
+            />
+            <div>
+              <p className="font-sf text-xs font-semibold text-amber-900 dark:text-amber-200">
+                Unsaved changes
+              </p>
+              <p className="mt-0.5 font-sf text-[11px] leading-relaxed text-amber-800/80 dark:text-amber-200/70">
+                Your majors, certificates, and graduation year are not saved
+                until you press Save.
+              </p>
+            </div>
+          </div>
           <button
             type="button"
             onClick={onSave}
             disabled={!canSave || isSaving}
-            className="shrink-0 rounded-full bg-gray-900 px-3.5 py-1.5 font-sf text-sm font-medium text-white transition-colors hover:bg-gray-700 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-white dark:text-gray-900 dark:hover:bg-gray-200"
+            className="shrink-0 rounded-full bg-gray-900 px-4 py-2 font-sf text-sm font-medium text-white transition-colors hover:bg-gray-700 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-white dark:text-gray-900 dark:hover:bg-gray-200"
           >
             {isSaving ? "Saving..." : "Save"}
           </button>
-        </div>
+        </motion.div>
       )}
     </>
   );

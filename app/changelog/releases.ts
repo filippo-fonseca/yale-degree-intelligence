@@ -68,6 +68,8 @@ export const RELEASES: Release[] = [
           "The dialogs across the app (updating your transcript, the Simulator welcome, confirmations) now share one look, matching the rest of v3.",
           "The public profile page has proper loading states instead of the words \"Loading profile...\", and its sign-in and not-friends screens follow your light or dark mode.",
           "The \"Manual fulfill\" and \"Skip\" explainer on My Major and My Certificates has been rebuilt in the v3 window: same typography as the rest of the app, the two actions numbered rather than bulleted, and no more blue and teal panels.",
+          "Settings has no Done button any more. It read as the thing that saved the panel, when everything except your majors, certificates, and graduation year already saves as you change it. Close Settings the way you close anything else: the X, Escape, or a click outside.",
+          "The unsaved-changes notice in Settings is much harder to miss, and it says what is at stake.",
           "Closing Settings with unsaved majors, certificates, or graduation year now asks first, and offers to save and close. Only the outside click used to ask; the X, Done, and Escape threw the edit away without a word.",
           "Signing in goes straight to the loading screen. The homepage used to flash back for a moment after you picked your Yale account, which looked like the log-in had failed.",
           "Marking a requirement option as skipped now works even if you had already removed that course from the requirement. It quietly did nothing before.",

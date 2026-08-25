@@ -52,9 +52,13 @@ export default function UserSettingsModal({
   const {
     localProfile,
     setLocalProfile,
+    hasChangesSinceOpen,
+    handleRevertAll,
+    isReverting,
     duplicateMajorError,
     duplicateCertificateError,
     autoOpenCertificateIndex,
+    autoOpenMajorIndex,
     isSaving,
     isEditingBio,
     setIsEditingBio,
@@ -214,6 +218,7 @@ export default function UserSettingsModal({
               duplicateMajorError={duplicateMajorError}
               duplicateCertificateError={duplicateCertificateError}
               autoOpenCertificateIndex={autoOpenCertificateIndex}
+              autoOpenMajorIndex={autoOpenMajorIndex}
               handleAddMajor={handleAddMajor}
               handleMajorChange={handleMajorChange}
               handleRemoveMajor={handleRemoveMajor}
@@ -221,6 +226,12 @@ export default function UserSettingsModal({
               handleCertificateChange={handleCertificateChange}
               handleRemoveCertificate={handleRemoveCertificate}
               setLocalProfile={setLocalProfile}
+              isDirty={isDirty}
+              isSaving={isSaving}
+              onSave={handleSave}
+              canSave={
+                isDirty && !hasDuplicateMajors() && !hasDuplicateCertificates()
+              }
             />
           </div>
           {/* end two-column section grid */}
@@ -339,38 +350,30 @@ export default function UserSettingsModal({
               </div>
             </div>
             <div className="flex items-center gap-1.5">
-              {isDirty && (
-                <span className="hidden sm:flex items-center gap-1.5 text-[11px] text-amber-600 dark:text-amber-400">
-                  <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
-                  Unsaved changes
-                </span>
+              {/* No Save here any more. The academic fields save from the
+                  panel they live in, and everything else in Settings writes on
+                  change, so a Save at the bottom claimed authority over
+                  toggles it never touched. What is genuinely missing without
+                  it is a way back, which is what Revert is: it restores the
+                  profile to how Settings found it, including edits already
+                  written to the server. */}
+              {hasChangesSinceOpen() && (
+                <button
+                  type="button"
+                  onClick={handleRevertAll}
+                  disabled={isReverting}
+                  title="Undo every change made since you opened Settings"
+                  className="inline-flex items-center justify-center rounded-full border border-black/10 bg-white px-4 py-2 font-sf text-sm font-medium text-gray-600 transition-colors hover:text-gray-900 disabled:opacity-50 dark:border-white/15 dark:bg-white/[0.06] dark:text-gray-300 dark:hover:text-white"
+                >
+                  {isReverting ? "Reverting..." : "Revert changes"}
+                </button>
               )}
               <button
                 type="button"
                 onClick={onClose}
-                className="di-btn-secondary"
+                className="inline-flex items-center justify-center rounded-full bg-gray-900 px-4 py-2 font-sf text-sm font-medium text-white transition-colors hover:bg-gray-700 dark:bg-white dark:text-gray-900 dark:hover:bg-gray-200"
               >
-                Cancel
-              </button>
-              <button
-                type="button"
-                onClick={handleSave}
-                disabled={
-                  isSaving ||
-                  !isDirty ||
-                  hasDuplicateMajors() ||
-                  hasDuplicateCertificates()
-                }
-                className={
-                  isDirty &&
-                  !hasDuplicateMajors() &&
-                  !hasDuplicateCertificates() &&
-                  !isSaving
-                    ? "di-btn-primary"
-                    : "di-btn-secondary opacity-50 cursor-not-allowed"
-                }
-              >
-                {isSaving ? "..." : "Save"}
+                Done
               </button>
             </div>
           </div>

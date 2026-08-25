@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { MAJORS } from "@/lib/majors";
 import { CERTIFICATES } from "@/lib/certificates";
 import type { EditableProfile, UserProfile } from "./settingsTypes";
@@ -21,6 +21,11 @@ export function useUserProfileForm(
   const [autoOpenCertificateIndex, setAutoOpenCertificateIndex] = useState<
     number | null
   >(null);
+  // Adding a row and then having to click it to choose is two clicks for one
+  // intention. The new row opens its own menu, the way certificates already do.
+  const [autoOpenMajorIndex, setAutoOpenMajorIndex] = useState<number | null>(
+    null,
+  );
   const [isSaving, setIsSaving] = useState(false);
 
   const [isEditingBio, setIsEditingBio] = useState(false);
@@ -29,16 +34,73 @@ export function useUserProfileForm(
   const [bioJustSaved, setBioJustSaved] = useState(false);
   const [bioCount, setBioCount] = useState(0);
 
+  /**
+   * The profile as it stood when Settings opened.
+   *
+   * Most of this panel writes the moment you touch it: the bio saves on its
+   * own button, the toggles save on flip. So "discard" cannot mean "drop the
+   * unsaved edits", because by then there usually are none. Revert has to be
+   * able to put back what was already written, which means remembering the
+   * state we started from rather than diffing against the live document.
+   *
+   * Captured once per mount. The modal unmounts when closed, so every open
+   * starts a fresh baseline.
+   */
+  const openSnapshot = useRef<EditableProfile | null>(null);
+  const [isReverting, setIsReverting] = useState(false);
+
   useEffect(() => {
     if (userProfile) {
-      setLocalProfile({
+      const next = {
         ...userProfile,
         certificates: userProfile.certificates ?? [],
-      });
+      };
+      if (!openSnapshot.current) openSnapshot.current = next;
+      setLocalProfile(next);
       setTempBio(userProfile.bio || "");
       setBioCount((userProfile.bio || "").length);
     }
   }, [userProfile]);
+
+  /**
+   * Anything different from the baseline, saved or not: the academic fields
+   * held locally, and the bio, which has already been written by the time it
+   * differs.
+   */
+  const hasChangesSinceOpen = () => {
+    const base = openSnapshot.current;
+    if (!base || !localProfile) return false;
+    return (
+      JSON.stringify(base.majors) !== JSON.stringify(localProfile.majors) ||
+      JSON.stringify(base.certificates ?? []) !==
+        JSON.stringify(localProfile.certificates) ||
+      base.graduationYear !== localProfile.graduationYear ||
+      (base.bio || "") !== (userProfile?.bio || "")
+    );
+  };
+
+  /** Put the profile back exactly as Settings found it, and persist that. */
+  const handleRevertAll = async () => {
+    const base = openSnapshot.current;
+    if (!base) return;
+    try {
+      setIsReverting(true);
+      await onSave({
+        majors: base.majors,
+        certificates: base.certificates ?? [],
+        graduationYear: base.graduationYear,
+        bio: base.bio || "",
+      });
+      setLocalProfile({ ...base, certificates: base.certificates ?? [] });
+      setTempBio(base.bio || "");
+      setBioCount((base.bio || "").length);
+      setIsEditingBio(false);
+      setDuplicateMajorError(null);
+      setDuplicateCertificateError(null);
+    } finally {
+      setIsReverting(false);
+    }
+  };
 
   const getYearStatus = (graduationYear: number): string => {
     if (graduationYear >= 2031) return "High School";
@@ -80,10 +142,12 @@ export function useUserProfileForm(
       (major) => !localProfile.majors.includes(major),
     );
     if (availableMajor) {
+      const newIndex = localProfile.majors.length;
       setLocalProfile({
         ...localProfile,
         majors: [...localProfile.majors, availableMajor],
       });
+      setAutoOpenMajorIndex(newIndex);
       setDuplicateMajorError(null);
     }
   };
@@ -98,6 +162,7 @@ export function useUserProfileForm(
       return;
     }
     setDuplicateMajorError(null);
+    setAutoOpenMajorIndex(null);
     const newMajors = [...localProfile.majors];
     newMajors[index] = newMajor;
     setLocalProfile({ ...localProfile, majors: newMajors });
@@ -204,9 +269,13 @@ export function useUserProfileForm(
   return {
     localProfile,
     setLocalProfile,
+    hasChangesSinceOpen,
+    handleRevertAll,
+    isReverting,
     duplicateMajorError,
     duplicateCertificateError,
     autoOpenCertificateIndex,
+    autoOpenMajorIndex,
     isSaving,
     isEditingBio,
     setIsEditingBio,

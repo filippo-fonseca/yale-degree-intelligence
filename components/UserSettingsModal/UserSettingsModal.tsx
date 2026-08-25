@@ -407,11 +407,14 @@ export default function UserSettingsModal({
               </div>
             </div>
             <div className="flex items-center gap-1.5">
-              {/* No Save here any more. The academic fields save from the
+              {/* No Save and no Done here. The academic fields save from the
                   panel they live in, and everything else in Settings writes on
-                  change, so a Save at the bottom claimed authority over
-                  toggles it never touched. What is genuinely missing without
-                  it is a way back, which is what Revert is: it restores the
+                  change, so a button at the bottom claimed authority over
+                  toggles it never touched; Done then read as the thing that
+                  committed them. Settings closes the way every other dialog
+                  does: the X, Escape, or a click outside, each of which stops
+                  to ask when the academic fields are dirty. What is left here
+                  is the way back, which is what Revert is: it restores the
                   profile to how Settings found it, including edits already
                   written to the server. */}
               {hasChangesSinceOpen() && (
@@ -425,13 +428,6 @@ export default function UserSettingsModal({
                   {isReverting ? "Reverting..." : "Revert changes"}
                 </button>
               )}
-              <button
-                type="button"
-                onClick={requestClose}
-                className="inline-flex items-center justify-center rounded-full bg-gray-900 px-4 py-2 font-sf text-sm font-medium text-white transition-colors hover:bg-gray-700 dark:bg-white dark:text-gray-900 dark:hover:bg-gray-200"
-              >
-                Done
-              </button>
             </div>
           </div>
 

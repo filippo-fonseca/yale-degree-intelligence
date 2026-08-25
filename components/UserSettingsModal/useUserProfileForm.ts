@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { toast } from "react-hot-toast";
 import { MAJORS } from "@/lib/majors";
 import { CERTIFICATES } from "@/lib/certificates";
 import type { EditableProfile, UserProfile } from "./settingsTypes";
@@ -242,18 +243,24 @@ export function useUserProfileForm(
     setBioJustSaved(false);
   };
 
-  const handleSave = async () => {
+  /**
+   * Resolves true when the academic fields were written, false when the save
+   * was refused or failed. The Save button ignores the result; the unsaved
+   * changes guard needs it, because "Save and close" must not close on a save
+   * that did not happen.
+   */
+  const handleSave = async (): Promise<boolean> => {
     if (hasDuplicateMajors()) {
       setDuplicateMajorError("Please remove duplicate majors before saving");
-      return;
+      return false;
     }
     if (hasDuplicateCertificates()) {
       setDuplicateCertificateError(
         "Please remove duplicate certificates before saving",
       );
-      return;
+      return false;
     }
-    if (!localProfile) return;
+    if (!localProfile) return false;
     try {
       setIsSaving(true);
       await onSave({
@@ -261,6 +268,11 @@ export function useUserProfileForm(
         certificates: localProfile.certificates,
         graduationYear: localProfile.graduationYear,
       });
+      return true;
+    } catch (error) {
+      console.error("Error saving academic settings:", error);
+      toast.error("Could not save your changes. Please try again.");
+      return false;
     } finally {
       setIsSaving(false);
     }

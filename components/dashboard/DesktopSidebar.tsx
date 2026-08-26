@@ -266,7 +266,7 @@ export function DesktopSidebar({
                 <span className="text-xs">Changelog</span>
               </Link>
               <Link
-                href="mailto:filippo.fonseca@yale.edu,emir.ahmed@yale.edu"
+                href="mailto:filippo.fonseca@yale.edu"
                 target="_blank"
                 className="w-full flex items-center space-x-2 p-1.5 rounded-lg hover:bg-black/[0.04] dark:hover:bg-white/[0.06] hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.6)] dark:hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] transition-all duration-200 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
               >

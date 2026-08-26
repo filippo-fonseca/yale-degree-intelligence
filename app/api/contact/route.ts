@@ -27,7 +27,7 @@ function buildMailtoFallback(body: {
   subject: string;
   message: string;
 }) {
-  const to = "filippo.fonseca@yale.edu,emir.ahmed@yale.edu";
+  const to = "filippo.fonseca@yale.edu";
   const mailSubject = encodeURIComponent(
     `[${body.category || "contact"}] ${body.subject}`,
   );

@@ -1,4 +1,7 @@
 import { describe, it, expect } from "vitest";
+import { readFileSync } from "fs";
+import { dirname, join } from "path";
+import { fileURLToPath } from "url";
 import {
   parseIcsCalendar,
   detectTermFromEventDates,
@@ -77,6 +80,10 @@ describe("termFromYaleSeasonFilename", () => {
     expect(termFromYaleSeasonFilename("202503_worksheet.ics")).toEqual({
       term: "Fall",
       year: 2025,
+    });
+    expect(termFromYaleSeasonFilename("202603_worksheet_fe04.ics")).toEqual({
+      term: "Fall",
+      year: 2026,
     });
     expect(termFromYaleSeasonFilename("202601_worksheet.ics")).toEqual({
       term: "Spring",
@@ -331,5 +338,36 @@ describe("courseFromIcsImport", () => {
     expect(course.credits).toBe(1);
     expect(course.userId).toBe("user-1");
     expect(course.grade).toBeNull();
+  });
+});
+
+describe("parseIcsCalendar: real CourseTable Fall 2026 worksheet", () => {
+  const fixture = readFileSync(
+    join(dirname(fileURLToPath(import.meta.url)), "fixtures/coursetable-202603-worksheet.ics"),
+    "utf8",
+  );
+
+  it("reads the five listings and detects Fall 2026 from September–December dates", () => {
+    const result = parseIcsCalendar(fixture, "202603_worksheet_fe04.ics");
+    expect(result.courses.map((c) => c.code).sort()).toEqual([
+      "CPSC 3340",
+      "ECE 2020",
+      "MENG 2050",
+      "MENG 3125",
+      "MENG 3422",
+    ]);
+    expect(result.eventCount).toBe(5);
+    expect(result.detectedTerm).toEqual({ term: "Fall", year: 2026 });
+    expect(result.detectionSource).toBe("dates");
+    expect(result.courses.every((c) => c.inCatalog)).toBe(true);
+    expect(result.courses.find((c) => c.code === "CPSC 3340")?.title).toMatch(
+      /Creative Embedded Systems/i,
+    );
+  });
+
+  it("still detects Fall 2026 if the filename claimed Spring", () => {
+    const result = parseIcsCalendar(fixture, "202601_worksheet.ics");
+    expect(result.detectedTerm).toEqual({ term: "Fall", year: 2026 });
+    expect(result.detectionSource).toBe("dates");
   });
 });

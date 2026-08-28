@@ -13,6 +13,11 @@ import {
 import { Info } from "lucide-react";
 import { Course } from "@/lib/types";
 import { getCourseNameFromCode, getCanonicalCode } from "@/lib/courseCatalog";
+import { applyIcsCoursesToSemester } from "@/lib/icsImport";
+import SimulatorIcsImportModal, {
+  ICS_IMPORT_CANVAS_KEY,
+  type IcsImportRequest,
+} from "./SimulatorIcsImportModal";
 import toast from "react-hot-toast";
 import { useAuth } from "@/context/AuthContext";
 import { doc, getDoc, setDoc } from "firebase/firestore";
@@ -376,6 +381,7 @@ export default function Simulator({
     null,
   );
   const [showHelp, setShowHelp] = useState(false);
+  const [showIcsImport, setShowIcsImport] = useState(false);
   const [savedPlans, setSavedPlans] = useState<Plan[]>([]);
   const [planName, setPlanName] = useState("");
   const [showSaveModal, setShowSaveModal] = useState(false);
@@ -1567,7 +1573,13 @@ export default function Simulator({
   // current action. A modal already owns the keyboard when it is open.
   useEffect(() => {
     quickSaveShortcutRef.current = () => {
-      if (showSaveModal || showPlansModal || showPlanSelector) return;
+      if (
+        showSaveModal ||
+        showPlansModal ||
+        showPlanSelector ||
+        showIcsImport
+      )
+        return;
       void quickSave();
     };
   });
@@ -1663,6 +1675,87 @@ export default function Simulator({
     planLoadedRef.current = false;
     setHasChanges(false);
     setSelectedPoolCourse(null);
+  };
+
+  const importIcsOntoPlan = (request: IcsImportRequest) => {
+    let working = semesters;
+
+    const wantsSavedPlan =
+      request.planKey !== ICS_IMPORT_CANVAS_KEY &&
+      request.planKey !== currentPlanName;
+    if (wantsSavedPlan) {
+      const plan = savedPlans.find((p) => p.name === request.planKey);
+      if (!plan) {
+        toast.error("That plan is no longer saved.");
+        return;
+      }
+      if (
+        !confirmDiscardChanges(
+          "You have unsaved changes. Discard them and load this plan so the calendar can be applied?",
+        )
+      ) {
+        return;
+      }
+      loadPlanData(plan);
+      working = plan.semesters;
+    }
+
+    if (isPastTerm(request.termName)) {
+      toast.error(
+        `${request.termName} is already over, so it can't be filled from a calendar.`,
+      );
+      return;
+    }
+
+    const result = applyIcsCoursesToSemester(
+      working,
+      request.termName,
+      request.courses,
+      user?.uid ?? "anonymous",
+    );
+    if (!result.ok) {
+      toast.error(`${request.termName} isn't on this plan.`);
+      return;
+    }
+
+    setSemesters(result.semesters);
+    const usedCodes = new Set<string>();
+    result.semesters.forEach((sem) =>
+      sem.courses.forEach((c) => usedCodes.add(c.code)),
+    );
+    setAvailableCourses(
+      remainingCourses.filter(
+        (c) =>
+          !usedCodes.has(c.code) &&
+          !completedCourses.some((cc) => cc.code === c.code),
+      ),
+    );
+
+    setShowIcsImport(false);
+
+    if (result.added.length === 0 && result.moved.length === 0) {
+      toast.success("Those courses are already on this plan.");
+      return;
+    }
+
+    playPopSound();
+    const bits: string[] = [];
+    if (result.added.length) {
+      bits.push(
+        `added ${result.added.length} course${result.added.length === 1 ? "" : "s"}`,
+      );
+    }
+    if (result.moved.length) {
+      bits.push(
+        `moved ${result.moved.length} from another semester`,
+      );
+    }
+    if (result.skipped.length) {
+      bits.push(
+        `left ${result.skipped.length} already on the plan`,
+      );
+    }
+    toast.success(`${request.termName}: ${bits.join("; ")}.`);
   };
 
   // ----------------- Render -----------------
@@ -1793,6 +1886,12 @@ export default function Simulator({
                     button (or Cmd/Ctrl+S) writes them back to the plan you're
                     on.
                   </li>
+                  <li>
+                    Already built the semester in CourseTable? Download that
+                    worksheet as ICS and use Import ICS to drop those courses
+                    onto a semester here. We read the dates to pick the term;
+                    you can still choose the plan and override the semester.
+                  </li>
                 </ul>
               </motion.div>
             )}
@@ -1898,6 +1997,7 @@ export default function Simulator({
             canSave={hasChanges}
             onSave={quickSave}
             onClear={resetSimulator}
+            onImportIcs={() => setShowIcsImport(true)}
           />
 
           {/* Semesters Grid */}
@@ -2308,6 +2408,15 @@ export default function Simulator({
         onSetDefault={setDefaultPlan}
         onDelete={deletePlan}
         onSaveCurrent={openSaveModal}
+      />
+
+      <SimulatorIcsImportModal
+        open={showIcsImport}
+        onClose={() => setShowIcsImport(false)}
+        onImport={importIcsOntoPlan}
+        canvasSemesters={semesters}
+        plans={savedPlans}
+        currentPlanName={currentPlanName}
       />
 
       {/* Manual Course Lookup Modal */}

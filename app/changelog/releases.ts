@@ -40,6 +40,7 @@ export const RELEASES: Release[] = [
       {
         title: "Reading your progress",
         items: [
+          "You can import a CourseTable calendar (.ics) into the Simulator. Pick a plan and a semester — we fill in the course codes from the file, and guess the term from the dates on the calendar.",
           "The Simulator's Save button now shows the keyboard shortcut on it (⌘S on a Mac, Ctrl+S elsewhere), so you can save a plan without reaching for the mouse.",
           "The Simulator's second tab is now called \"Projected progress + results\", which is what it actually shows: your plan's progress, GPA timeline, and distributional tally.",
           "The \"New\" announcement bar on the Simulator is readable in dark mode again. It was showing its light-mode colours on a dark page.",

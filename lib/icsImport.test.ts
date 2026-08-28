@@ -258,15 +258,24 @@ END:VEVENT`);
   });
 
   it("rejects an empty file", () => {
-    expect(parseCourseTableIcs("").error).toBe("empty");
+    const result = parseCourseTableIcs("");
+    expect(result.ok).toBe(false);
+    if (result.ok) return;
+    expect(result.error).toBe("empty");
   });
 
   it("rejects a file that is not a calendar", () => {
-    expect(parseCourseTableIcs("this is a pdf").error).toBe("not-calendar");
+    const result = parseCourseTableIcs("this is a pdf");
+    expect(result.ok).toBe(false);
+    if (result.ok) return;
+    expect(result.error).toBe("not-calendar");
   });
 
   it("rejects a calendar with no events", () => {
-    expect(parseCourseTableIcs(wrapCalendar("")).error).toBe("no-events");
+    const result = parseCourseTableIcs(wrapCalendar(""));
+    expect(result.ok).toBe(false);
+    if (result.ok) return;
+    expect(result.error).toBe("no-events");
   });
 
   it("rejects events that carry no course codes", () => {
@@ -274,7 +283,10 @@ END:VEVENT`);
 SUMMARY:Office hours
 DTSTART;TZID=America/New_York:20260902T103000
 END:VEVENT`);
-    expect(parseCourseTableIcs(ics).error).toBe("no-courses");
+    const result = parseCourseTableIcs(ics);
+    expect(result.ok).toBe(false);
+    if (result.ok) return;
+    expect(result.error).toBe("no-courses");
   });
 });
 

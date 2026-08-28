@@ -252,7 +252,7 @@ export function parseCourseTableIcs(
   const detectedTerm = termFromDates(allDates) ?? filenameTerm;
   return {
     ok: true,
-    courses: [...byCode.values()],
+    courses: Array.from(byCode.values()),
     detectedTerm,
     detectedTermName: detectedTerm ? formatTerm(detectedTerm) : null,
     filenameTerm,

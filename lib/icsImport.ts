@@ -302,7 +302,7 @@ export function parseIcsCalendar(
   }
 
   return {
-    courses: [...coursesByCode.values()],
+    courses: Array.from(coursesByCode.values()),
     detectedTerm,
     detectionSource,
     eventCount,

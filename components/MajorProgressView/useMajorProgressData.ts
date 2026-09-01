@@ -4,6 +4,7 @@ import { useMemo, useCallback } from "react";
 
 import { getReqsForMajor, MajorProgress } from "@/lib/majors";
 import { getCourseInfo } from "@/lib/courseCatalog";
+import { tallyRequirementOptions } from "@/lib/requirementProgress";
 import { Course } from "@/lib/types";
 import type { ReqStats } from "./requirementStatus";
 
@@ -122,23 +123,20 @@ export function useMajorProgressData(
     [progress.remainingRequirements, normalizeReq],
   );
 
-  const strictCompletedReqs = useMemo(() => {
-    return completedNorm.filter((req: any) => {
-      const done = req.options
-        .filter((o: any) => o.completed)
-        .reduce((s: number, o: any) => s + (o.credits || 0), 0);
-      return done >= (req.required || 0);
-    });
-  }, [completedNorm]);
+  const reqSatisfied = useCallback((req: any) => {
+    const { completed } = tallyRequirementOptions(req.options);
+    return completed >= (req.required || 0);
+  }, []);
 
-  const demotedFromCompleted = useMemo(() => {
-    return completedNorm.filter((req: any) => {
-      const done = req.options
-        .filter((o: any) => o.completed)
-        .reduce((s: number, o: any) => s + (o.credits || 0), 0);
-      return done < (req.required || 0);
-    });
-  }, [completedNorm]);
+  const strictCompletedReqs = useMemo(
+    () => completedNorm.filter(reqSatisfied),
+    [completedNorm, reqSatisfied],
+  );
+
+  const demotedFromCompleted = useMemo(
+    () => completedNorm.filter((req: any) => !reqSatisfied(req)),
+    [completedNorm, reqSatisfied],
+  );
 
   const reqKeyFn = useCallback((req: any) => req.id ?? req.name, []);
 
@@ -189,17 +187,12 @@ export function useMajorProgressData(
 
   const withStats = useMemo(() => {
     return remainingForUI.map((req: any) => {
-      const reqCompleted = req.options
-        .filter((o: any) => o.completed)
-        .reduce((sum: number, o: any) => sum + (o.credits || 0), 0);
-      const reqInProgress = req.options
-        .filter((o: any) => o.inProgress)
-        .reduce((sum: number, o: any) => sum + (o.credits || 0), 0);
+      const { completed, inProgress } = tallyRequirementOptions(req.options);
       return {
         req,
-        reqCompleted,
-        reqInProgress,
-        notStarted: reqCompleted === 0 && reqInProgress === 0,
+        reqCompleted: completed,
+        reqInProgress: inProgress,
+        notStarted: completed === 0 && inProgress === 0,
       };
     });
   }, [remainingForUI]);
@@ -223,13 +216,13 @@ export function useMajorProgressData(
   const completedStats: ReqStats[] = useMemo(
     () =>
       strictCompletedReqs.map((req: any) => {
-        const reqCompleted = req.options
-          .filter((o: any) => o.completed)
-          .reduce((s: number, o: any) => s + (o.credits || 0), 0);
-        const reqInProgress = req.options
-          .filter((o: any) => o.inProgress)
-          .reduce((s: number, o: any) => s + (o.credits || 0), 0);
-        return { req, reqCompleted, reqInProgress, notStarted: false };
+        const { completed, inProgress } = tallyRequirementOptions(req.options);
+        return {
+          req,
+          reqCompleted: completed,
+          reqInProgress: inProgress,
+          notStarted: false,
+        };
       }),
     [strictCompletedReqs],
   );

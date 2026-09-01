@@ -271,9 +271,9 @@ describe("majors keep the credit their implied claim describes", () => {
 // ---------------------------------------------------------------------------
 
 describe("implied claims come only from the majors in scope", () => {
-  // CPSC 1001 sits in the option lists of EECS, Applied Mathematics, and
-  // Astrophysics, among others. Declaring one of them must not conjure the
-  // other two.
+  // CPSC 1001 sits in the option lists of Applied Mathematics, EECS, and
+  // Chemical Engineering, among others. Declaring one of them must not conjure
+  // the other two.
   const courses = [course("CPSC 1001")];
 
   it("names one major, not every major that lists the course", () => {
@@ -301,7 +301,7 @@ describe("implied claims come only from the majors in scope", () => {
 
   it("calls two declared majors two programs, so a certificate is the third", () => {
     const { allocations, violations } = buildProgramClaimContext(courses, {
-      majorIds: ["AMTH_BS", "ASTR_BS"],
+      majorIds: ["AMTH_BS", "EECS"],
       certificateIds: ["CERT_PROGRAMMING"],
     });
 
@@ -310,7 +310,7 @@ describe("implied claims come only from the majors in scope", () => {
         .filter((a) => a.program.type === "major")
         .map((a) => a.program.id)
         .sort()
-    ).toEqual(["AMTH_BS", "ASTR_BS"]);
+    ).toEqual(["AMTH_BS", "EECS"]);
 
     expect(violations).toEqual([
       {

@@ -677,7 +677,7 @@ export default function AboutPage() {
           {/* 6. Social proof (sits above the launch film) */}
           <div className="mt-5 md:mt-6">
             <p className="text-balance text-xl font-medium leading-snug tracking-[-0.015em] text-gray-900 dark:text-white sm:text-2xl md:text-3xl">
-              Used by 1 in 6 Yale undergrads.
+              Used by 1 in 5 Yale undergrads.
               <br />
               <span className="text-gray-400 dark:text-gray-500">
                 Some of them even like it.

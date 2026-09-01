@@ -38,7 +38,7 @@
   <rect x="510" y="300" width="180" height="2" rx="1" fill="url(#pink)" opacity="0.85"/>
 
   <text x="600" y="352" text-anchor="middle" font-family="ui-monospace,SFMono-Regular,Menlo,monospace"
-        font-size="14" fill="#9a9aa4">1 in 6 Yale undergrads · every residential college · zero ads, no fees</text>
+        font-size="14" fill="#9a9aa4">1 in 5 Yale undergrads · every residential college · zero ads, no fees</text>
   <text x="600" y="382" text-anchor="middle" font-family="ui-monospace,SFMono-Regular,Menlo,monospace"
         font-size="13" fill="#5f5f68">degreeint.com</text>
   </g>

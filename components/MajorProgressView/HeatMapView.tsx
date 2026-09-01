@@ -96,7 +96,8 @@ export default function HeatMapView({
                   {s.req.name}
                 </p>
                 <p className="text-[10px] opacity-80 mt-0.5 whitespace-nowrap">
-                  {STATUS_LABELS[status]} · {earned}/{required} cr
+                  {STATUS_LABELS[status]} · {earned}/{required}{" "}
+                  {required === 1 ? "course" : "courses"}
                 </p>
               </div>
             </div>

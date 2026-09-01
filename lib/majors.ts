@@ -2,27 +2,40 @@
 import { CourseInfo, getCourseInfo, getCanonicalCode, isValidCourseCode } from "./courseCatalog";
 import allReqs from './data/all_reqs.json';
 
-type RequirementOption = {
+export type RequirementOption = {
   type: 'course';
-  code: string; // Canonical course code
+  /** Canonical catalog code, i.e. getCanonicalCode(code) === code. */
+  code: string;
 } | {
   type: 'group';
-  options: string[]; // Array of canonical course codes
-  required: number; // Number of courses required from this group
+  /** Canonical catalog codes the student may choose between. */
+  options: string[];
+  /** How many COURSES from this group count. Nothing beyond it does. */
+  required: number;
   description?: string;
 };
 
-type MajorRequirement = {
+export type MajorRequirement = {
   id: string;
   name: string;
   description?: string;
   requirements: {
     name: string;
     description?: string;
+    /**
+     * How many COURSES the requirement needs — never credits. A half-credit lab
+     * that has to be taken once is 1. `creditRequirements.total` is the only
+     * field denominated in credits.
+     *
+     * When a requirement offers more options than it needs, they have to sit in
+     * a single `group`: loose `course` options are all counted, with no ceiling.
+     */
     required: number;
+    /** Empty when the rule is a category rather than a list of courses. */
     options: RequirementOption[];
   }[];
   creditRequirements: {
+    /** Total course credits, including any prerequisites listed above. */
     total: number;
   };
 };
@@ -69,6 +82,97 @@ export type ExcludedRequirementEntry = {
   code: string;
   requirement: string;
 };
+
+/**
+ * Courses done / underway on one requirement, measured the same way `required`
+ * in lib/data/all_reqs.json is: in courses, never in credits.
+ *
+ * The distinction is the whole ballgame for half-credit courses. PHYS 2060L is
+ * worth 0.5 credits and is the only way to satisfy the Physics advanced lab, so
+ * a view that adds up credits and compares the sum to `required` leaves that
+ * requirement reading "0.5/1" no matter what the student takes. Both numbers
+ * are clamped to `required` as well, so a requirement that lists more options
+ * than it needs — the four alternative introductory Physics sequences, say —
+ * cannot read "4/2".
+ */
+export function countReqProgress(
+  options: { completed?: boolean; inProgress?: boolean }[] | undefined,
+  required: number,
+): { reqCompleted: number; reqInProgress: number } {
+  const opts = options ?? [];
+  const completed = opts.filter((o) => o.completed).length;
+  const inProgress = opts.filter((o) => o.inProgress && !o.completed).length;
+  if (required <= 0) {
+    return { reqCompleted: completed, reqInProgress: inProgress };
+  }
+  const reqCompleted = Math.min(completed, required);
+  return {
+    reqCompleted,
+    reqInProgress: Math.min(inProgress, required - reqCompleted),
+  };
+}
+
+type CreditedOption = { code?: string; credits?: number; completed?: boolean; inProgress?: boolean };
+
+/**
+ * The credits behind one requirement's three states, so a board column can
+ * print a number the cards underneath it add up to.
+ *
+ * Slots are filled in the same order and with the same ceiling countReqProgress
+ * uses, because a requirement that lists ninety-nine acceptable courses for two
+ * slots is worth two courses' credits and no more. Credits still outstanding are
+ * priced at the cheapest options left, which is the least the student can get
+ * away with; a requirement with no options at all is fulfilled by hand, where
+ * Yale's one-credit norm is the only available guess.
+ *
+ * `alreadyCounted`, when passed, is shared across a whole major so a course
+ * listed under two requirements is not counted twice.
+ */
+export function requirementCredits(
+  options: CreditedOption[] | undefined,
+  required: number,
+  alreadyCounted?: Set<string>,
+): { completed: number; inProgress: number; remaining: number } {
+  const opts = options ?? [];
+  const creditsOf = (o: CreditedOption) => o.credits ?? 1;
+  const fresh = (o: CreditedOption) => {
+    if (!alreadyCounted || !o.code) return true;
+    if (alreadyCounted.has(o.code)) return false;
+    alreadyCounted.add(o.code);
+    return true;
+  };
+
+  const ceiling = required > 0 ? required : opts.length;
+
+  let completed = 0;
+  let completedSlots = 0;
+  for (const o of opts) {
+    if (!o.completed || completedSlots >= ceiling) continue;
+    completedSlots += 1;
+    if (fresh(o)) completed += creditsOf(o);
+  }
+
+  let inProgress = 0;
+  let inProgressSlots = 0;
+  for (const o of opts) {
+    if (o.completed || !o.inProgress) continue;
+    if (completedSlots + inProgressSlots >= ceiling) break;
+    inProgressSlots += 1;
+    if (fresh(o)) inProgress += creditsOf(o);
+  }
+
+  const openSlots = Math.max(0, required - completedSlots - inProgressSlots);
+  const untaken = opts
+    .filter((o) => !o.completed && !o.inProgress)
+    .map(creditsOf)
+    .sort((a, b) => a - b)
+    .slice(0, openSlots);
+  const remaining =
+    untaken.reduce((sum, credits) => sum + credits, 0) +
+    Math.max(0, openSlots - untaken.length); // no options left to price; assume 1 credit
+
+  return { completed, inProgress, remaining };
+}
 
 export const calculateMajorProgress = (
   majorId: string,
@@ -126,6 +230,38 @@ export const calculateMajorProgress = (
   let totalInProgressCredits = 0;
   const requirementProgress: CompletedRequirement[] = [];
 
+  /**
+   * Details for one option, falling back for a code the catalog has never heard
+   * of. Dropping such an option would leave `required` counting a slot nothing
+   * can fill, which is how a mistyped code turns into a requirement no student
+   * can ever finish. Showing it keeps the requirement visible and leaves the
+   * "Fulfill manually" and "Mark as skipped" escape hatches usable.
+   * lib/majorRequirementsData.test.ts is what stops such a code from shipping.
+   */
+  const optionDetails = (code: string) => {
+    const course = getCourseInfo(code);
+    return {
+      name: course?.name ?? code,
+      credits: course?.credits ?? 1,
+    };
+  };
+
+  /**
+   * A course counts toward the major once, however many of its requirements it
+   * appears in. Seventeen majors list a course under two requirements — an
+   * Applied Mathematics breadth course is also the extra breadth course, an MCDB
+   * organic chemistry term is also an elective — and adding its credits each
+   * time made the "Total Credits" card claim more than the student had taken.
+   */
+  const creditedOnce = new Set<string>();
+  const countCredits = (code: string, credits: number, bucket: 'completed' | 'inProgress') => {
+    const key = `${bucket}:${code}`;
+    if (creditedOnce.has(key)) return;
+    creditedOnce.add(key);
+    if (bucket === 'completed') totalCompletedCredits += credits;
+    else totalInProgressCredits += credits;
+  };
+
   for (const req of major.requirements) {
     let reqCompleted = 0;
     let reqInProgress = 0;
@@ -147,10 +283,10 @@ export const calculateMajorProgress = (
       });
       if (isPlanned) {
         reqInProgress += 1;
-        totalInProgressCredits += credits;
+        countCredits(code, credits, 'inProgress');
       } else {
         reqCompleted += 1;
-        totalCompletedCredits += credits;
+        countCredits(code, credits, 'completed');
       }
     });
 
@@ -161,8 +297,7 @@ export const calculateMajorProgress = (
         // Skip if this course was already added manually
         if (manualFulfillments.some(m => m.code === code)) continue;
 
-        const course = getCourseInfo(code);
-        if (!course) continue;
+        const { name, credits } = optionDetails(code);
 
         // Check if this course is excluded from this requirement
         const excluded = isExcluded(req.name, code);
@@ -178,32 +313,30 @@ export const calculateMajorProgress = (
 
         reqOptions.push({
           code,
-          name: course.name,
+          name,
           completed: completed || skipped,
           inProgress: inProgress && !completed && !skipped,
           required: true,
-          credits: course.credits,
+          credits,
           skipped
         });
 
         if (completed || skipped) {
           reqCompleted += 1;
-          totalCompletedCredits += course.credits;
+          countCredits(code, credits, 'completed');
         } else if (inProgress) {
           reqInProgress += 1;
-          totalInProgressCredits += course.credits;
+          countCredits(code, credits, 'inProgress');
         }
       } else if (option.type === 'group') {
         let groupCompleted = 0;
         let groupInProgress = 0;
-        let groupCredits = 0;
 
         option.options.forEach((code: string) => {
           // Skip if this course was already added manually
           if (manualFulfillments.some(m => m.code === code)) return;
 
-          const course = getCourseInfo(code);
-          if (!course) return;
+          const { name, credits } = optionDetails(code);
 
           // Check if this course is excluded from this requirement
           const excluded = isExcluded(req.name, code);
@@ -216,37 +349,40 @@ export const calculateMajorProgress = (
 
           reqOptions.push({
             code,
-            name: course.name,
+            name,
             completed: completed || skipped,
             inProgress: inProgress && !completed && !skipped,
             required: (groupCompleted + groupInProgress) < option.required,
-            credits: course.credits,
+            credits,
             skipped
           });
 
           if ((completed || skipped) && groupCompleted < option.required) {
             groupCompleted++;
-            groupCredits += course.credits;
+            countCredits(code, credits, 'completed');
           } else if (inProgress && (groupCompleted + groupInProgress) < option.required) {
             groupInProgress++;
+            // This used to increment the count and nothing else, so a course
+            // underway inside a group contributed no in-progress credits at all.
+            countCredits(code, credits, 'inProgress');
           }
         });
 
         reqCompleted += groupCompleted;
         reqInProgress += groupInProgress;
-        totalCompletedCredits += groupCredits;
       }
     }
-
-    // Only count permanent (non-planned) manuals toward satisfaction
-    const permanentManualCount = manualFulfillments.filter(m => !m.isPlanned).length;
 
     requirementProgress.push({
       name: req.name,
       description: req.description,
       completed: reqCompleted,
       required: req.required,
-      satisfied: reqCompleted >= req.required || permanentManualCount >= (req.required - reqCompleted),
+      // A permanent manual fulfillment already counted toward reqCompleted
+      // above. The old form also compared the manual count against what was
+      // left over, which counted every manual twice: one manual entry closed a
+      // two-course requirement outright.
+      satisfied: reqCompleted >= req.required,
       options: reqOptions
     });
   }

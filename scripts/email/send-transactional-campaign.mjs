@@ -30,7 +30,15 @@ import fs from "node:fs";
 import path from "node:path";
 import { createHmac } from "node:crypto";
 
-import { FROM_NAME, REPLY_TO, REPO_ROOT, loadEnv, parseArgs, requireEnv, resendRequest } from "./lib.mjs";
+import {
+  FROM_NAME,
+  REPLY_TO,
+  REPO_ROOT,
+  parseArgs,
+  readSuppressions,
+  requireEnv,
+  resendRequest,
+} from "./lib.mjs";
 
 const FROM_ADDRESS = "filippo@degreeint.com";
 const SITE_URL = "https://degreeint.com";
@@ -94,31 +102,6 @@ function readLedger(year, variant) {
 
 function writeLedger(year, variant, ledger) {
   fs.writeFileSync(sentLedgerPath(year, variant), JSON.stringify(ledger, null, 2));
-}
-
-/**
- * Everyone who has opted out, straight from Firestore. Read through the Admin
- * SDK rather than the public route: there is no endpoint that lists opt-outs,
- * deliberately, and there should not be one.
- */
-async function readSuppressions() {
-  loadEnv();
-  const key = process.env.FIREBASE_SERVICE_ACCOUNT_KEY;
-  if (!key) return null;
-
-  // Initialized here rather than imported from config/firebaseAdmin.ts, which
-  // is TypeScript behind a path alias and does not resolve from a plain script.
-  const { initializeApp, getApps, cert } = await import("firebase-admin/app");
-  const { getFirestore } = await import("firebase-admin/firestore");
-  const app = getApps().length
-    ? getApps()[0]
-    : initializeApp({
-        credential: cert(JSON.parse(key)),
-        projectId: "yale-degree-intelligence",
-      });
-
-  const snapshot = await getFirestore(app).collection("email_unsubscribes").get();
-  return new Set(snapshot.docs.map((doc) => doc.id.trim().toLowerCase()));
 }
 
 async function main() {

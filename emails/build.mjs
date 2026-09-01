@@ -509,7 +509,7 @@ ${
     ? `
           <tr>
             <td align="center" style="padding: 0 0 10px 0;">
-              <p class="t-primary" style="margin: 0; font-family: ${SANS}; font-size: 18px; font-weight: 600; line-height: 1.4; color: ${LIGHT.primary};">
+              <p class="t-primary" style="margin: 0; font-family: ${SANS}; font-size: 15px; font-weight: 600; line-height: 1.4; color: ${LIGHT.primary};">
                 ${subheadline}
               </p>
             </td>

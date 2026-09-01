@@ -677,6 +677,8 @@ const TARGETS = [
         // row: it belongs to the headline, and a row would let clients that add
         // their own paragraph spacing pull the two lines apart.
         headline: `1 in 6 Yalies use this.<br /><span class="t-muted" style="color: ${LIGHT.muted}; font-size: 34px;">Why don't you? :)</span>`,
+        subnote: `Just hit ${pill("Upload transcript", "upload")} with your unofficial Yale Hub
+                transcript (or add your courses manually) and everything fills in from there.`,
         // Nested on purpose. campaignEmail splits a flat array around the CTA,
         // so [a, b] would drop the sign-off below the button; one array of two
         // keeps both paragraphs in the same block above it.

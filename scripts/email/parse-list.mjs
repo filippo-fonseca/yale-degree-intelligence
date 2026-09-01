@@ -36,13 +36,14 @@ const EXPECTED_DOMAIN = "yale.edu";
 const CLASS_YEARS = new Set(["2027", "2028", "2029", "2030"]);
 
 function parseArgs(argv) {
-  const args = { allowExternal: false, exclude: [] };
+  const args = { allowExternal: false, exclude: [], intersect: [] };
   for (let i = 0; i < argv.length; i += 1) {
     const arg = argv[i];
     if (arg === "--year") args.year = argv[++i];
     else if (arg === "--in") args.input = argv[++i];
     else if (arg === "--out") args.output = argv[++i];
     else if (arg === "--exclude") args.exclude.push(argv[++i]);
+    else if (arg === "--intersect") args.intersect.push(argv[++i]);
     else if (arg === "--allow-external") args.allowExternal = true;
     else throw new Error(`unknown argument: ${arg}`);
   }
@@ -114,9 +115,20 @@ function main() {
   const inputPath = path.resolve(REPO_ROOT, args.input);
   if (!fs.existsSync(inputPath)) throw new Error(`no such file: ${inputPath}`);
 
+  if (args.exclude.length > 0 && args.intersect.length > 0) {
+    throw new Error("--exclude and --intersect are opposites; pass one or the other");
+  }
+
   const raw = fs.readFileSync(inputPath, "utf8");
   const lines = raw.split(/\r?\n/);
   const excluded = readExclusions(args.exclude);
+
+  // The mirror of --exclude, and the other half of the same split: --exclude
+  // builds the newcomer roster by dropping everyone who has an account,
+  // --intersect builds the returning roster by keeping only those people. Run
+  // both against one class list and the two rosters partition it exactly, with
+  // nobody in both and nobody lost.
+  const required = args.intersect.length > 0 ? readExclusions(args.intersect) : null;
 
   /** address -> first line number it appeared on, so duplicates keep their origin. */
   const accepted = new Map();
@@ -152,6 +164,11 @@ function main() {
       }
 
       if (excluded.has(address)) {
+        suppressed += 1;
+        continue;
+      }
+
+      if (required && !required.has(address)) {
         suppressed += 1;
         continue;
       }

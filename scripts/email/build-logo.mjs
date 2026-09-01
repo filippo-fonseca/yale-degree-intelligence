@@ -77,6 +77,16 @@ const REFRESH_BODY = `  <polyline points="23 4 23 10 17 10"/>
   <polyline points="1 20 1 14 7 14"/>
   <path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15"/>`;
 
+/**
+ * Feather's upload, lifted from the dropzone in components/file-upload.tsx.
+ *
+ * Deliberately not the refresh mark. A student with no account is uploading a
+ * transcript for the first time, and refresh-cw means "do that again".
+ */
+const UPLOAD_BODY = `  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+  <polyline points="17 8 12 3 7 8"/>
+  <line x1="12" y1="3" x2="12" y2="15"/>`;
+
 const THEMES = {
   light: {
     gearFrom: "#2563eb",
@@ -110,6 +120,18 @@ const THEMES = {
  * outside the box on both sides and the screenshot, which crops to the svg's
  * own bounds, would shave those pixels off.
  */
+/**
+ * Natural viewBox, unlike refresh. This artwork stops at x=3 and x=21, so even
+ * with a 2px stroke it stays inside 0 0 24 24 and needs no inset. Its 20 units
+ * of ink against refresh's 24 is close enough that the two read as one size in
+ * a 12px pill.
+ */
+function uploadSvg(theme, pixels) {
+  return `<svg width="${pixels}" height="${pixels}" viewBox="0 0 24 24" fill="none" stroke="${theme.refresh}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg">
+${UPLOAD_BODY}
+</svg>`;
+}
+
 function refreshSvg(theme, pixels) {
   return `<svg width="${pixels}" height="${pixels}" viewBox="-2 -2 28 28" fill="none" stroke="${theme.refresh}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg">
 ${REFRESH_BODY}
@@ -216,9 +238,18 @@ async function main() {
       omitBackground: true,
     });
 
+    // Upload mark for the newcomer email's pill.
+    await page.setContent(
+      `<html><body style="margin:0;background:transparent">${uploadSvg(theme, 42)}</body></html>`,
+    );
+    await page.locator("svg").screenshot({
+      path: path.join(OUT_DIR, `upload-${name}.png`),
+      omitBackground: true,
+    });
+
     await context.close();
     console.log(
-      `wrote public/email/logo-${name}.png, lockup-${name}.png, github-${name}.png and refresh-${name}.png`,
+      `wrote public/email/logo-${name}.png, lockup-${name}.png, github-${name}.png, refresh-${name}.png and upload-${name}.png`,
     );
   }
 

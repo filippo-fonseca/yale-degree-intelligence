@@ -9480,7 +9480,7 @@
     "requirements": [
       {
         "name": "Introductory Physics Sequence",
-        "required": 4,
+        "required": 2,
         "options": [
           {
             "type": "course",
@@ -9519,7 +9519,7 @@
       },
       {
         "name": "Introductory Laboratory",
-        "required": 2,
+        "required": 1,
         "options": [
           {
             "type": "course",
@@ -9527,14 +9527,10 @@
           },
           {
             "type": "course",
-            "code": "PHYS 1650L"
-          },
-          {
-            "type": "course",
             "code": "PHYS 1660L"
           }
         ],
-        "description": "PHYS 2050L, or PHYS 1650L and PHYS 1660L sequence."
+        "description": "PHYS 2050L, or PHYS 1650L and PHYS 1660L sequence (note: PHYS 1650L is a prereq for PHYS 1660L)."
       },
       {
         "name": "Advanced Lab I",

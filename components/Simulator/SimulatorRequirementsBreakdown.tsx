@@ -4,7 +4,12 @@ import React, { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FiChevronDown, FiChevronUp, FiX } from "react-icons/fi";
 import { getCanonicalCode, normalizeCourseCode } from "@/lib/courseCatalog";
-import { MAJORS, MajorProgress, ManualRequirementEntry } from "@/lib/majors";
+import {
+  countReqProgress,
+  MAJORS,
+  MajorProgress,
+  ManualRequirementEntry,
+} from "@/lib/majors";
 import { CERTIFICATES, type CertificateProgress } from "@/lib/certificates";
 import { Course } from "@/lib/types";
 import { programLabel, resolvePolicy } from "@/lib/certificatePolicy";
@@ -530,17 +535,16 @@ function ProgramProgressCard({
     prog.remainingRequirements.length;
 
   const getFractionCompleted = (req: CompletedRequirement) => {
-    const completedCredits = req.options
-      .filter((o) => o.completed)
-      .reduce((sum, o) => sum + o.credits, 0);
-    const inProgressCredits = req.options
-      .filter((o) => o.inProgress)
-      .reduce((sum, o) => sum + o.credits, 0);
-    const totalProgress = Math.min(
-      completedCredits + inProgressCredits,
+    // `required` counts courses, so this has to as well. Adding up option
+    // credits instead left every requirement that half-credit courses satisfy
+    // reading half done at best.
+    const { reqCompleted, reqInProgress } = countReqProgress(
+      req.options,
       req.required,
     );
-    return req.required > 0 ? totalProgress / req.required : 0;
+    return req.required > 0
+      ? (reqCompleted + reqInProgress) / req.required
+      : 0;
   };
 
   const completedCount = prog.completedRequirements.length;
@@ -793,17 +797,16 @@ function ReqSection({
           const conflicts = policy?.conflicts.get(req.name) ?? [];
           const skips = policy?.skips.get(req.name) ?? [];
 
-          const completedCredits = req.options
-            .filter((o) => o.completed)
-            .reduce((sum, o) => sum + o.credits, 0);
-          const inProgressCredits = req.options
-            .filter((o) => o.inProgress)
-            .reduce((sum, o) => sum + o.credits, 0);
-          const displayCredits = showCombinedProgress
-            ? completedCredits + inProgressCredits
-            : completedCredits;
+          // Courses, not credits: see the note on getFractionCompleted.
+          const { reqCompleted, reqInProgress } = countReqProgress(
+            req.options,
+            req.required,
+          );
+          const displayCourses = showCombinedProgress
+            ? reqCompleted + reqInProgress
+            : reqCompleted;
           const isIncomplete =
-            showCombinedProgress && displayCredits < req.required;
+            showCombinedProgress && displayCourses < req.required;
 
           return (
             <div
@@ -825,7 +828,7 @@ function ReqSection({
                       : "text-gray-400 dark:text-gray-500"
                   }`}
                 >
-                  {displayCredits}/{req.required}
+                  {displayCourses}/{req.required}
                 </span>
               </div>
 

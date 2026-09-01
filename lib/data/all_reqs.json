@@ -8741,40 +8741,38 @@
         "name": "Physics Prerequisites",
         "required": 2,
         "options": [
-          [
-            {
-              "type": "course",
-              "code": "PHYS 1700"
-            },
-            {
-              "type": "course",
-              "code": "PHYS 1710"
-            },
-            {
-              "type": "course",
-              "code": "PHYS 1800"
-            },
-            {
-              "type": "course",
-              "code": "PHYS 1810"
-            },
-            {
-              "type": "course",
-              "code": "PHYS 2000"
-            },
-            {
-              "type": "course",
-              "code": "PHYS 2010"
-            },
-            {
-              "type": "course",
-              "code": "PHYS 2600"
-            },
-            {
-              "type": "course",
-              "code": "PHYS 2610"
-            }
-          ]
+          {
+            "type": "course",
+            "code": "PHYS 1700"
+          },
+          {
+            "type": "course",
+            "code": "PHYS 1710"
+          },
+          {
+            "type": "course",
+            "code": "PHYS 1800"
+          },
+          {
+            "type": "course",
+            "code": "PHYS 1810"
+          },
+          {
+            "type": "course",
+            "code": "PHYS 2000"
+          },
+          {
+            "type": "course",
+            "code": "PHYS 2010"
+          },
+          {
+            "type": "course",
+            "code": "PHYS 2600"
+          },
+          {
+            "type": "course",
+            "code": "PHYS 2610"
+          }
         ],
         "description": "Two terms of physics."
       },

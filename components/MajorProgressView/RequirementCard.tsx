@@ -4,6 +4,7 @@ import React from "react";
 import { motion } from "framer-motion";
 import { FiX, FiPlus, FiRotateCcw } from "react-icons/fi";
 
+import { requirementCredits } from "@/lib/majors";
 import {
   getReqStatus,
   getReqBreakdown,
@@ -54,12 +55,24 @@ const RequirementCard = React.memo(function RequirementCard({
   handlers: RequirementCardHandlers;
 }) {
   const { req, reqCompleted, reqInProgress } = stats;
-  const status = getReqStatus(reqCompleted, reqInProgress, req.required || 0);
+  const required = req.required || 0;
+  const status = getReqStatus(reqCompleted, reqInProgress, required);
   const isCompletedCard = status === "completed";
   const classes = STATUS_CLASSES[status];
   const breakdown = isCompletedCard
     ? null
-    : getReqBreakdown(reqCompleted, reqInProgress, req.required || 0);
+    : getReqBreakdown(reqCompleted, reqInProgress, required);
+
+  // The badge counts courses, which is what `required` means. Half-credit labs
+  // and 1.5-credit studios make that a different number from the credits, so
+  // spell both out on hover rather than leaving a bare "1/1" to be read either
+  // way.
+  const credits = requirementCredits(req.options, required);
+  const badgeTitle = `${reqCompleted} of ${required} ${
+    required === 1 ? "course" : "courses"
+  } done${reqInProgress > 0 ? `, ${reqInProgress} in progress` : ""} · ${
+    credits.completed
+  } of ${credits.completed + credits.inProgress + credits.remaining} credits`;
 
   const {
     onOpenCourse,
@@ -107,10 +120,11 @@ const RequirementCard = React.memo(function RequirementCard({
         <div className="flex items-center gap-1.5 shrink-0">
           <span
             className={`text-[10px] px-1.5 py-0.5 rounded-md ${classes.badge}`}
+            title={badgeTitle}
           >
             {isCompletedCard
               ? "✓"
-              : `${reqInProgress + reqCompleted}/${req.required}`}
+              : `${reqInProgress + reqCompleted}/${required}`}
           </span>
           {breakdown && (
             <span className={`text-[10px] whitespace-nowrap ${classes.accent}`}>

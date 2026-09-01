@@ -2,7 +2,12 @@
 
 import { useMemo, useCallback } from "react";
 
-import { countReqProgress, getReqsForMajor, MajorProgress } from "@/lib/majors";
+import {
+  countReqProgress,
+  getReqsForMajor,
+  requirementCredits,
+  MajorProgress,
+} from "@/lib/majors";
 import { getCourseInfo } from "@/lib/courseCatalog";
 import { Course } from "@/lib/types";
 import type { ReqStats } from "./requirementStatus";
@@ -250,13 +255,38 @@ export function useMajorProgressData(
     return ordered;
   }, [completedStats, withStats, selectedMajor]);
 
+  /**
+   * Each column header's credit figure comes from the cards in that column, not
+   * from the major-wide totals it used to print. Those disagreed on 70 of the
+   * 142 majors: credits earned on a half-finished requirement land in the
+   * major's completed total while the requirement itself sits under Remaining,
+   * so "3 reqs · 5.5 cr" sat above three cards holding 3 credits between them.
+   *
+   * One shared ledger across the three columns, walked completed-first, so a
+   * course two requirements both accept is only counted once on the board.
+   */
+  const columnCredits = useMemo(() => {
+    const counted = new Set<string>();
+    const sum = (items: ReqStats[], field: "completed" | "inProgress" | "remaining") =>
+      items.reduce(
+        (total, { req }) =>
+          total + requirementCredits(req.options, req.required || 0, counted)[field],
+        0,
+      );
+    return {
+      completed: sum(completedStats, "completed"),
+      inProgress: sum(inProgressReqs, "inProgress"),
+      remaining: sum(idleReqs, "remaining"),
+    };
+  }, [completedStats, inProgressReqs, idleReqs]);
+
   const columns: BoardColumn[] = [
     {
       key: "remaining",
       label: "Remaining",
       status: "notStarted",
       items: idleReqs,
-      credits: progress.remainingCredits || 0,
+      credits: columnCredits.remaining,
       emptyText: "Nothing left here. Nice work!",
     },
     {
@@ -264,7 +294,7 @@ export function useMajorProgressData(
       label: "In progress",
       status: "inProgress",
       items: inProgressReqs,
-      credits: inProgressCredits,
+      credits: columnCredits.inProgress,
       emptyText: "No requirements currently in progress.",
     },
     {
@@ -272,7 +302,7 @@ export function useMajorProgressData(
       label: "Completed",
       status: "completed",
       items: completedStats,
-      credits: completedCredits || 0,
+      credits: columnCredits.completed,
       emptyText:
         "Upload your transcript on My courses to see completed requirements here.",
     },

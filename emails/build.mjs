@@ -573,6 +573,8 @@ const TARGETS = [
                 in terms of your major, certificates, GPA, distributionals, and much more.`,
         paragraph: `If you're getting this email, you're among the 1 in 6 Yale students who have
                 signed up to use DegreeIntelligence over the past year. First of all, thank you!
+                It's your support + feedback that makes our free, student-run, open-source app
+                possible to democratize academic planning at Yale and eliminate guesswork.
                 We just wanted to let you know we've been hard at work making Yale's most used degree-planning platform even
                 better. We now have ${u("Certificates")}, a rebuilt ${u("Simulator")},
                 ${u("distributionals")}, a ${u("cleaner UI")}, and ${u("much more")}.`,

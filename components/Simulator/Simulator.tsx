@@ -17,6 +17,10 @@ import toast from "react-hot-toast";
 import { useAuth } from "@/context/AuthContext";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import { db } from "@/config/firebase";
+import {
+  courseFromIcsImport,
+  mergeIcsCoursesIntoSemesters,
+} from "@/lib/icsImport";
 import ManualCourseLookupModal from "./ManualCourseLookupModal";
 import SimulatorManualAssignModal from "./SimulatorManualAssignModal";
 import SimulatorRequirementsBreakdown from "./SimulatorRequirementsBreakdown";
@@ -30,6 +34,9 @@ import SimulatorToolbarRow from "./SimulatorToolbarRow";
 import { type QuickSaveState } from "./SimulatorQuickSave";
 import SimulatorCanvasActions from "./SimulatorCanvasActions";
 import SimulatorPlansModal from "./SimulatorPlansModal";
+import SimulatorIcsImportModal, {
+  type IcsImportTarget,
+} from "./SimulatorIcsImportModal";
 import type { Plan, Semester } from "./planTypes";
 import {
   calculatePreviewMajorProgressByMajors,
@@ -48,6 +55,7 @@ import {
   compareTermNames,
   isCurrentTerm,
   isPastTerm,
+  parseTermName,
 } from "@/lib/academicTerm";
 import {
   blockedCodesFromViolations,
@@ -380,6 +388,7 @@ export default function Simulator({
   const [planName, setPlanName] = useState("");
   const [showSaveModal, setShowSaveModal] = useState(false);
   const [showPlansModal, setShowPlansModal] = useState(false);
+  const [showIcsImport, setShowIcsImport] = useState(false);
   const [hoveredSemester, setHoveredSemester] = useState<string | null>(null);
   const [lookupSemesterId, setLookupSemesterId] = useState<string | null>(null);
   const [selectedPlanToOverwrite, setSelectedPlanToOverwrite] = useState<
@@ -1567,7 +1576,7 @@ export default function Simulator({
   // current action. A modal already owns the keyboard when it is open.
   useEffect(() => {
     quickSaveShortcutRef.current = () => {
-      if (showSaveModal || showPlansModal || showPlanSelector) return;
+      if (showSaveModal || showPlansModal || showPlanSelector || showIcsImport) return;
       void quickSave();
     };
   });
@@ -1584,6 +1593,110 @@ export default function Simulator({
     const plan = savedPlans[planIndex];
     loadPlanData(plan);
     setShowPlansModal(false);
+  };
+
+  const applyIcsImport = (target: IcsImportTarget) => {
+    const term = parseTermName(target.semesterName);
+    if (!term) {
+      toast.error("Pick a semester to import into.");
+      return;
+    }
+
+    const switching =
+      target.planTarget !== "current" &&
+      !!savedPlans[target.planTarget] &&
+      savedPlans[target.planTarget].name !== currentPlanName;
+
+    if (switching) {
+      if (
+        !confirmDiscardChanges(
+          "You have unsaved changes. Discard them and import into this plan?",
+        )
+      ) {
+        return;
+      }
+    }
+
+    const sourcePlan =
+      switching && target.planTarget !== "current"
+        ? savedPlans[target.planTarget]
+        : null;
+    const sourceSemesters = sourcePlan ? sourcePlan.semesters : semesters;
+    const status: Course["status"] = isCurrentSemester(target.semesterName)
+      ? "in-progress"
+      : "not-taken";
+    const built = target.courses.map((imported) =>
+      courseFromIcsImport(imported, term, user?.uid || "", status),
+    );
+    const { semesters: next, added, skippedDuplicate } =
+      mergeIcsCoursesIntoSemesters(
+        sourceSemesters,
+        target.semesterName,
+        built,
+      );
+
+    if (sourcePlan) {
+      planLoadedRef.current = true;
+      setCurrentPlanName(sourcePlan.name);
+      setSimulatorManualReqs(sourcePlan.manualRequirements ?? []);
+      initialSemestersRef.current = JSON.parse(
+        JSON.stringify(sourcePlan.semesters),
+      ) as Semester[];
+      initialManualReqsRef.current = JSON.parse(
+        JSON.stringify(sourcePlan.manualRequirements ?? []),
+      ) as ManualRequirementEntry[];
+      setShowDistributionals(sourcePlan.showDistributionals ?? false);
+      setShowGrades(sourcePlan.showGrades ?? false);
+      initialTogglesRef.current = {
+        dist: sourcePlan.showDistributionals ?? false,
+        grades: sourcePlan.showGrades ?? false,
+      };
+      try {
+        if (user) {
+          window.localStorage.setItem(
+            `di-sim-recent-${user.uid}`,
+            sourcePlan.name,
+          );
+        }
+      } catch {
+        // ignore
+      }
+    }
+
+    setSemesters(next as Semester[]);
+
+    const usedCodes = new Set<string>();
+    next.forEach((sem) =>
+      sem.courses.forEach((course) => usedCodes.add(course.code)),
+    );
+    setAvailableCourses(
+      remainingCourses.filter(
+        (c) =>
+          !usedCodes.has(c.code) &&
+          !completedCourses.some((cc) => cc.code === c.code),
+      ),
+    );
+
+    setShowIcsImport(false);
+
+    if (added.length === 0) {
+      toast.error(
+        skippedDuplicate.length > 0
+          ? "Every course in that calendar is already on this plan."
+          : "Nothing to import.",
+      );
+      return;
+    }
+
+    const parts = [
+      `Added ${added.length} course${added.length === 1 ? "" : "s"} to ${target.semesterName}`,
+    ];
+    if (skippedDuplicate.length > 0) {
+      parts.push(
+        `${skippedDuplicate.length} already on the plan`,
+      );
+    }
+    toast.success(`${parts.join(". ")}.`);
   };
 
   const setDefaultPlan = async (planIndex: number) => {
@@ -1761,9 +1874,9 @@ export default function Simulator({
                 <ul className="text-xs text-gray-500 dark:text-gray-400 space-y-1.5 list-disc list-inside">
                   <li>
                     Plan your remaining semesters on the Canvas: use Add on any
-                    upcoming semester to drop a course in, and drag planned
-                    courses between semesters to move them. Multiple courses per
-                    term work fine.
+                    upcoming semester to drop a course in, drag planned courses
+                    between semesters to move them, or import a CourseTable
+                    calendar (.ics) to fill a term from a worksheet.
                   </li>
                   {SHOW_QUICK_ADD_POOL && (
                     <li>
@@ -1898,6 +2011,7 @@ export default function Simulator({
             canSave={hasChanges}
             onSave={quickSave}
             onClear={resetSimulator}
+            onImportIcs={() => setShowIcsImport(true)}
           />
 
           {/* Semesters Grid */}
@@ -2308,6 +2422,15 @@ export default function Simulator({
         onSetDefault={setDefaultPlan}
         onDelete={deletePlan}
         onSaveCurrent={openSaveModal}
+      />
+
+      <SimulatorIcsImportModal
+        open={showIcsImport}
+        onClose={() => setShowIcsImport(false)}
+        onImport={applyIcsImport}
+        plans={savedPlans}
+        currentPlanName={currentPlanName}
+        canvasSemesterNames={semesters.map((s) => s.name)}
       />
 
       {/* Manual Course Lookup Modal */}

@@ -581,7 +581,8 @@ const TARGETS = [
         cta: "Log back into DegreeIntelligence →",
         videoCaption: "Watch the demo",
         title: "Are you sure you chose the right classes?",
-        preheader: "Majors, certificates, distributionals, your GPA. It's a lot to keep straight. We're here to help.",
+        preheader:
+          "Choosing the right Yale classes to fulfill requirements for your major, certificates, distributionals, etc. is hard (all the while keeping track of your GPA, etc.). Don't worry. We're here to help.",
       }),
   },
   {
@@ -659,7 +660,8 @@ const TARGETS = [
         cta: "Try DegreeIntelligence →",
         videoCaption: "Watch the demo",
         title: "1 in 6 Yalies use this. Why don't you?",
-        preheader: "Majors, certificates, distributionals, your GPA. It's a lot to keep straight. We're here to help.",
+        preheader:
+          "Choosing the right Yale classes to fulfill requirements for your major, certificates, distributionals, etc. is hard (all the while keeping track of your GPA, etc.). Don't worry. We're here to help.",
       }),
   },
 ];

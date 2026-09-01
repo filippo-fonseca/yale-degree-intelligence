@@ -419,6 +419,15 @@ function u(text) {
 }
 
 /**
+ * Weight-only emphasis. Unlike lede() it stays in the body grey and upright,
+ * so it can carry a long clause without turning a paragraph into a pull quote.
+ * font-weight inline rather than <strong>, which Outlook drops the styling of.
+ */
+function b(text) {
+  return `<span style="font-weight: 700;">${text}</span>`;
+}
+
+/**
  * An inline chip that names a real control in the app.
  *
  * Deliberately not a link and not underlined: it is a picture of a button the
@@ -596,8 +605,8 @@ const TARGETS = [
         subnote: `Click ${pill("Re-upload transcript", "refresh")} to refresh your stats and see
                 where you're at in terms of your major, certificates, GPA, distributionals, and
                 much more.`,
-        paragraph: `If you're getting this email, you're among the 1 in 6 Yale students who have
-                signed up to use DegreeIntelligence over the past year. First of all, thank you!
+        paragraph: `If you're getting this email, ${b(`you're among the 1 in 6 Yale students who have
+                signed up to use DegreeIntelligence over the past year.`)} First of all, thank you!
                 It's your support + feedback that makes our free, student-run, open-source app
                 possible to democratize academic planning at Yale and eliminate guesswork.
                 We just wanted to let you know we've been hard at work making Yale's most used degree-planning platform even

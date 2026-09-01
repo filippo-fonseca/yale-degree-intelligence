@@ -537,7 +537,10 @@ const TARGETS = [
                 signed up to use DegreeIntelligence over the past year. First of all, thank you!
                 We just wanted to let you know we've been hard at work making Yale's most used degree-planning platform even
                 better. We now have ${u("Certificates")}, a rebuilt ${u("Simulator")},
-                ${u("distributionals")}, a ${u("cleaner UI")}, and ${u("much more")}.`,
+                ${u("distributionals")}, a ${u("cleaner UI")}, and ${u("much more")}.
+                Luckily, ${u("add/drop is still open")}, so there's time to change what you're
+                taking this semester, and to see where the classes you already picked put you
+                in the grand scheme of things for your major, certificates, and distributionals.`,
         cta: "Log back into DegreeIntelligence →",
         videoCaption: "Watch the demo",
         title: "Are you sure you chose the right classes?",
@@ -603,7 +606,10 @@ const TARGETS = [
                 It's what around 1,200 Yalies across every residential college use to plan their
                 degrees, and we've been hard at work making it even better. We now have
                 ${u("Certificates")}, a rebuilt ${u("Simulator")}, ${u("distributionals")},
-                a ${u("cleaner UI")}, and ${u("much more")}. Made by Yalies, for Yalies,
+                a ${u("cleaner UI")}, and ${u("much more")}. Luckily, ${u("add/drop is still open")},
+                so there's time to change what you're taking this semester, and to see where the
+                classes you already picked put you in the grand scheme of things for your major,
+                certificates, and distributionals. Made by Yalies, for Yalies,
                 DegreeIntelligence is free (forever) and requires nothing to install.`,
         cta: "Try DegreeIntelligence →",
         videoCaption: "Watch the demo",

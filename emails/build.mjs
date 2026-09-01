@@ -645,8 +645,7 @@ const TARGETS = [
         // keeps both paragraphs in the same block above it.
         paragraph: [
           [
-            `If you're getting this email, you haven't signed up to DegreeIntelligence yet.
-                It's what around 1,200 Yalies across every residential college use to plan their
+            `1.2k Yalies across every residential college use DegreeIntelligence to plan their
                 degrees, and we've been hard at work making it even better. We now have
                 ${u("Certificates")}, a rebuilt ${u("Simulator")}, ${u("distributionals")},
                 a ${u("cleaner UI")}, and ${u("much more")}. Luckily, ${u("add/drop is still open")},

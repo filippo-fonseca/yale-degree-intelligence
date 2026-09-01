@@ -20,9 +20,11 @@ export const CLASS_YEARS = ["2030", "2029", "2028", "2027"];
  * yale.edu cannot be verified (Yale controls that DNS zone), so the campaign
  * sends from degreeint.com and routes replies back to the Yale inbox. Putting
  * a bare email address in the display name is a phishing signature that costs
- * deliverability, so the display name stays a human name.
+ * deliverability, so the display name stays words rather than an address.
+ *
+ * Shared by all three variants: the sender line is the product, not a person.
  */
-export const FROM_NAME = "Filippo Fonseca (Yale DegreeIntelligence)";
+export const FROM_NAME = "Yale DegreeIntelligence";
 export const REPLY_TO = "filippo.fonseca@yale.edu";
 
 /** Resend's documented default is 2 requests/second; stay just under it. */

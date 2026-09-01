@@ -272,6 +272,96 @@ describe("every major in all_reqs.json is internally consistent", () => {
   });
 });
 
+/**
+ * What the My Major cards add up to. `completedCredits` drives the "Total
+ * Credits" card and the percentage on the bar, so it has to describe courses the
+ * student really took.
+ */
+describe("the credit figures the cards print", () => {
+  it("never claims more credits than the student's courses are worth", () => {
+    const overstated: string[] = [];
+    for (const [id, major] of MAJORS) {
+      const taken: string[] = [];
+      for (const req of major.requirements) {
+        for (const option of req.options) {
+          if (option.type === "course") taken.push(option.code);
+          else taken.push(...option.options.slice(0, option.required));
+        }
+      }
+      const distinct = [...new Set(taken)];
+      const worth = distinct.reduce((sum, code) => sum + (getCourseInfo(code)?.credits ?? 1), 0);
+      const { completedCredits } = calculateMajorProgress(id, distinct);
+      if (completedCredits > worth + 0.001) {
+        overstated.push(`${id}: card says ${completedCredits}, courses are worth ${worth}`);
+      }
+    }
+
+    expect(overstated).toEqual([]);
+  });
+
+  it("counts a course once even when two requirements accept it", () => {
+    // AMTH 4310 is both a breadth course and the additional breadth course.
+    const shared = "AMTH 4310";
+    const reqs = getReqsForMajor("AMTH_BS")!.requirements.filter((r) =>
+      r.options.some((o) => (o.type === "group" ? o.options.includes(shared) : o.code === shared)),
+    );
+    expect(reqs.length).toBeGreaterThan(1);
+
+    const { completedCredits } = calculateMajorProgress("AMTH_BS", [shared]);
+    expect(completedCredits).toBe(getCourseInfo(shared)!.credits);
+  });
+
+  it("counts a course underway inside a group as in-progress credit", () => {
+    // The group branch used to bump the count and add no credits at all, and
+    // the audit turned most choices into groups.
+    const { inProgressCredits } = calculateMajorProgress("PHYS_BS", [], ["PHYS 2600"]);
+
+    expect(inProgressCredits).toBe(1);
+  });
+
+  it("never reports negative credits left or more than 100%", () => {
+    const bad: string[] = [];
+    for (const [id, major] of MAJORS) {
+      const everything = major.requirements.flatMap((req) =>
+        req.options.flatMap((o) => (o.type === "group" ? o.options : [o.code])),
+      );
+      const progress = calculateMajorProgress(id, everything);
+      if (progress.remainingCredits < 0) bad.push(`${id}: ${progress.remainingCredits} remaining`);
+      if (progress.percentage > 100) bad.push(`${id}: ${progress.percentage}%`);
+      void major;
+    }
+
+    expect(bad).toEqual([]);
+  });
+
+  it("does not let one manual fulfillment close a two-course requirement", () => {
+    const name = "Econometrics Sequence";
+    const progress = calculateMajorProgress("CSEC_BS", [], [], [], [
+      { code: "ECON 1170", requirement: name, credits: 1 },
+    ]);
+    const req = [
+      ...progress.completedRequirements,
+      ...progress.inProgressRequirements,
+      ...progress.remainingRequirements,
+    ].find((r) => r.name === name)!;
+
+    expect(req.required).toBe(2);
+    expect(req.completed).toBe(1);
+    expect(req.satisfied).toBe(false);
+    expect(progress.completedRequirements.map((r) => r.name)).not.toContain(name);
+  });
+
+  it("still lets enough manual fulfillments close a requirement", () => {
+    const name = "Econometrics Sequence";
+    const progress = calculateMajorProgress("CSEC_BS", [], [], [], [
+      { code: "ECON 1170", requirement: name, credits: 1 },
+      { code: "ECON 2123", requirement: name, credits: 1 },
+    ]);
+
+    expect(progress.completedRequirements.map((r) => r.name)).toContain(name);
+  });
+});
+
 describe("Physics credit totals match the catalog", () => {
   // The catalog quotes the total "beyond the prerequisites"; DI also lists the
   // prerequisites, which are the 2-credit lecture sequence and the half-credit

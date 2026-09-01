@@ -68,6 +68,15 @@ const BADGE_PATH =
 const GITHUB_PATH =
   "M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8Z";
 
+/**
+ * Feather's refresh-cw, the same icon react-icons draws for FiRefreshCw in the
+ * Re-upload transcript button. Stroked rather than filled, so it carries its
+ * colour on the stroke attribute and not on fill like the marks above.
+ */
+const REFRESH_BODY = `  <polyline points="23 4 23 10 17 10"/>
+  <polyline points="1 20 1 14 7 14"/>
+  <path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15"/>`;
+
 const THEMES = {
   light: {
     gearFrom: "#2563eb",
@@ -79,6 +88,9 @@ const THEMES = {
     // Muted on purpose. The repo link is a footnote for the handful of people
     // who care, not a second call to action.
     github: "#a1a1aa",
+    // Sits inside a pill next to bold near-black text, so it wants to read as
+    // part of that label rather than as a second, lighter element.
+    refresh: "#3f3f46",
   },
   dark: {
     gearFrom: "#60a5fa",
@@ -88,8 +100,21 @@ const THEMES = {
     pinTo: "#f9a8d4",
     wordmark: "#fafafa",
     github: "#71717a",
+    refresh: "#d4d4d8",
   },
 };
+
+/**
+ * viewBox is inset by a stroke width rather than the icon's natural 0 0 24 24.
+ * The artwork touches x=23 and x=1 with a 2px stroke, so half of it falls
+ * outside the box on both sides and the screenshot, which crops to the svg's
+ * own bounds, would shave those pixels off.
+ */
+function refreshSvg(theme, pixels) {
+  return `<svg width="${pixels}" height="${pixels}" viewBox="-2 -2 28 28" fill="none" stroke="${theme.refresh}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg">
+${REFRESH_BODY}
+</svg>`;
+}
 
 function githubSvg(theme, pixels) {
   return `<svg width="${pixels}" height="${pixels}" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
@@ -182,9 +207,18 @@ async function main() {
       omitBackground: true,
     });
 
+    // Refresh mark for the Re-upload transcript pill, same 3x treatment.
+    await page.setContent(
+      `<html><body style="margin:0;background:transparent">${refreshSvg(theme, 42)}</body></html>`,
+    );
+    await page.locator("svg").screenshot({
+      path: path.join(OUT_DIR, `refresh-${name}.png`),
+      omitBackground: true,
+    });
+
     await context.close();
     console.log(
-      `wrote public/email/logo-${name}.png, lockup-${name}.png and github-${name}.png`,
+      `wrote public/email/logo-${name}.png, lockup-${name}.png, github-${name}.png and refresh-${name}.png`,
     );
   }
 

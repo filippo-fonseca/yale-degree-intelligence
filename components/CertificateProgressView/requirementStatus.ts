@@ -13,7 +13,7 @@ export function getReqStatus(
   reqInProgress: number,
   required: number,
 ): ReqStatus {
-  // A 0-credit requirement (a "suggested" prerequisite) is only done once a
+  // A 0-course requirement (a "suggested" prerequisite) is only done once a
   // course actually satisfies it; 0 >= 0 must not read as completed.
   if (required <= 0) {
     if (reqCompleted > 0) return "completed";
@@ -27,7 +27,7 @@ export function getReqStatus(
 }
 
 /**
- * Short human breakdown of a requirement's credit mix, e.g. "in progress",
+ * Short human breakdown of a requirement's courses, e.g. "in progress",
  * "1 completed, 1 not started", "1 in progress, 1 not started". Returns null
  * when there's nothing useful to add (fully completed, or purely not started).
  */
@@ -53,7 +53,7 @@ export function getReqBreakdown(
   return parts.join(", ");
 }
 
-/** Fraction of the requirement satisfied by completed credits (0..1). */
+/** Fraction of the requirement satisfied by completed courses (0..1). */
 export function getReqRatio(reqCompleted: number, required: number): number {
   if (required <= 0) return reqCompleted > 0 ? 1 : 0;
   return Math.min(1, reqCompleted / required);
@@ -64,7 +64,7 @@ type StatusClasses = {
   card: string;
   /** Requirement title text. */
   title: string;
-  /** Count/credits badge. */
+  /** Course count badge. */
   badge: string;
   /** Requirement description text. */
   description: string;

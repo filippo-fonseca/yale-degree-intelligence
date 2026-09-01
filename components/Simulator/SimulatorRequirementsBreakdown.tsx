@@ -8,6 +8,7 @@ import { MAJORS, MajorProgress, ManualRequirementEntry } from "@/lib/majors";
 import { CERTIFICATES, type CertificateProgress } from "@/lib/certificates";
 import { Course } from "@/lib/types";
 import { programLabel, resolvePolicy } from "@/lib/certificatePolicy";
+import { tallyRequirementOptions } from "@/lib/requirementProgress";
 import {
   buildProgramClaimContext,
   getCertificateOverlapBudget,
@@ -530,16 +531,8 @@ function ProgramProgressCard({
     prog.remainingRequirements.length;
 
   const getFractionCompleted = (req: CompletedRequirement) => {
-    const completedCredits = req.options
-      .filter((o) => o.completed)
-      .reduce((sum, o) => sum + o.credits, 0);
-    const inProgressCredits = req.options
-      .filter((o) => o.inProgress)
-      .reduce((sum, o) => sum + o.credits, 0);
-    const totalProgress = Math.min(
-      completedCredits + inProgressCredits,
-      req.required,
-    );
+    const { completed, inProgress } = tallyRequirementOptions(req.options);
+    const totalProgress = Math.min(completed + inProgress, req.required);
     return req.required > 0 ? totalProgress / req.required : 0;
   };
 
@@ -793,17 +786,12 @@ function ReqSection({
           const conflicts = policy?.conflicts.get(req.name) ?? [];
           const skips = policy?.skips.get(req.name) ?? [];
 
-          const completedCredits = req.options
-            .filter((o) => o.completed)
-            .reduce((sum, o) => sum + o.credits, 0);
-          const inProgressCredits = req.options
-            .filter((o) => o.inProgress)
-            .reduce((sum, o) => sum + o.credits, 0);
-          const displayCredits = showCombinedProgress
-            ? completedCredits + inProgressCredits
-            : completedCredits;
+          const tally = tallyRequirementOptions(req.options);
+          const displayCourses = showCombinedProgress
+            ? tally.completed + tally.inProgress
+            : tally.completed;
           const isIncomplete =
-            showCombinedProgress && displayCredits < req.required;
+            showCombinedProgress && displayCourses < req.required;
 
           return (
             <div
@@ -825,7 +813,7 @@ function ReqSection({
                       : "text-gray-400 dark:text-gray-500"
                   }`}
                 >
-                  {displayCredits}/{req.required}
+                  {displayCourses}/{req.required}
                 </span>
               </div>
 

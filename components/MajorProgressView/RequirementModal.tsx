@@ -4,6 +4,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import { FiX, FiPlus, FiExternalLink, FiCornerDownLeft } from "react-icons/fi";
 import Link from "next/link";
 
+import { tallyRequirementOptions } from "@/lib/requirementProgress";
+
 /* ========= Types ========= */
 export type ReqOption = {
   code: string;
@@ -20,7 +22,8 @@ export type Requirement = {
   id?: string;
   name: string;
   description?: string;
-  required?: number; // credits or count
+  /** Number of courses the requirement takes. */
+  required?: number;
   options: ReqOption[];
 
   // Optional UI stats — computed here if not provided
@@ -31,19 +34,13 @@ export type Requirement = {
 
 /* ======= Helpers ======= */
 function computeReqStats(req: Requirement) {
-  const options = req.options ?? [];
+  const { completed, inProgress } = tallyRequirementOptions(req.options ?? []);
 
-  const reqCompleted = options
-    .filter((o) => o.completed)
-    .reduce((s, o) => s + (o.credits ?? 0), 0);
-
-  const reqInProgress = options
-    .filter((o) => o.inProgress)
-    .reduce((s, o) => s + (o.credits ?? 0), 0);
-
-  const notStarted = reqCompleted === 0 && reqInProgress === 0;
-
-  return { reqCompleted, reqInProgress, notStarted };
+  return {
+    reqCompleted: completed,
+    reqInProgress: inProgress,
+    notStarted: completed === 0 && inProgress === 0,
+  };
 }
 
 /* ======= Component ======= */

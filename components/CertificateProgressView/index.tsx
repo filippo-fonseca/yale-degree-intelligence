@@ -31,6 +31,7 @@ import { Course } from "@/lib/types";
 import { db } from "@/config/firebase";
 import { setDoc, doc } from "firebase/firestore";
 import { getCourseInfo, normalizeCourseCode } from "@/lib/courseCatalog";
+import { tallyRequirementOptions } from "@/lib/requirementProgress";
 import { InfoCard } from "../ui/InfoCard";
 import RequirementModal from "./RequirementModal";
 import CertificateTipModal, {
@@ -506,11 +507,9 @@ export default function CertificateProgressView({
   // its courses taken cannot sit in Completed. Zero-required requirements only
   // count as satisfied once completed credits actually land on them.
   const reqSatisfied = useCallback((req: any) => {
-    const done = req.options
-      .filter((o: any) => o.completed)
-      .reduce((s: number, o: any) => s + (o.credits || 0), 0);
+    const { completed } = tallyRequirementOptions(req.options);
     const required = req.required || 0;
-    return required > 0 ? done >= required : done > 0;
+    return required > 0 ? completed >= required : completed > 0;
   }, []);
 
   const strictCompletedReqs = useMemo(
@@ -572,17 +571,12 @@ export default function CertificateProgressView({
 
   const withStats = useMemo(() => {
     return remainingForUI.map((req: any) => {
-      const reqCompleted = req.options
-        .filter((o: any) => o.completed)
-        .reduce((sum: number, o: any) => sum + (o.credits || 0), 0);
-      const reqInProgress = req.options
-        .filter((o: any) => o.inProgress)
-        .reduce((sum: number, o: any) => sum + (o.credits || 0), 0);
+      const { completed, inProgress } = tallyRequirementOptions(req.options);
       return {
         req,
-        reqCompleted,
-        reqInProgress,
-        notStarted: reqCompleted === 0 && reqInProgress === 0,
+        reqCompleted: completed,
+        reqInProgress: inProgress,
+        notStarted: completed === 0 && inProgress === 0,
       };
     });
   }, [remainingForUI]);
@@ -630,13 +624,13 @@ export default function CertificateProgressView({
   const completedStats: ReqStats[] = useMemo(
     () =>
       strictCompletedReqs.map((req: any) => {
-        const reqCompleted = req.options
-          .filter((o: any) => o.completed)
-          .reduce((s: number, o: any) => s + (o.credits || 0), 0);
-        const reqInProgress = req.options
-          .filter((o: any) => o.inProgress)
-          .reduce((s: number, o: any) => s + (o.credits || 0), 0);
-        return { req, reqCompleted, reqInProgress, notStarted: false };
+        const { completed, inProgress } = tallyRequirementOptions(req.options);
+        return {
+          req,
+          reqCompleted: completed,
+          reqInProgress: inProgress,
+          notStarted: false,
+        };
       }),
     [strictCompletedReqs],
   );

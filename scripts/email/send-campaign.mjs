@@ -29,7 +29,10 @@ const FROM_ADDRESS = "filippo@degreeint.com";
 
 /** Keyed by audience; the same three the builder emits. */
 const VARIANTS = {
-  existing: { file: "v3-existing.html", subject: "v3 is here" },
+  existing: {
+    file: "v3-existing.html",
+    subject: "Are you sure you chose the right classes?",
+  },
   frosh: { file: "v3-frosh.html", subject: "Welcome to Yale" },
   newcomers: {
     file: "v3-newcomers.html",

@@ -540,7 +540,7 @@ const TARGETS = [
                 ${u("distributionals")}, a ${u("cleaner UI")}, and ${u("much more")}.`,
         cta: "Log back into DegreeIntelligence →",
         videoCaption: "Watch the demo",
-        title: "v3 is here",
+        title: "Are you sure you chose the right classes?",
         preheader: "Certificates, a rebuilt Simulator, distributionals, a cleaner UI, and much more.",
       }),
   },

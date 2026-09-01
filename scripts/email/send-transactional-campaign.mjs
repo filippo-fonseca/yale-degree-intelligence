@@ -36,7 +36,10 @@ const FROM_ADDRESS = "filippo@degreeint.com";
 const SITE_URL = "https://degreeint.com";
 
 const VARIANTS = {
-  existing: { file: "v3-existing.html", subject: "v3 is here" },
+  existing: {
+    file: "v3-existing.html",
+    subject: "Are you sure you chose the right classes?",
+  },
   frosh: { file: "v3-frosh.html", subject: "Welcome to Yale" },
   newcomers: {
     file: "v3-newcomers.html",

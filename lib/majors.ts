@@ -70,6 +70,35 @@ export type ExcludedRequirementEntry = {
   requirement: string;
 };
 
+/**
+ * Courses done / underway on one requirement, measured the same way `required`
+ * in lib/data/all_reqs.json is: in courses, never in credits.
+ *
+ * The distinction is the whole ballgame for half-credit courses. PHYS 2060L is
+ * worth 0.5 credits and is the only way to satisfy the Physics advanced lab, so
+ * a view that adds up credits and compares the sum to `required` leaves that
+ * requirement reading "0.5/1" no matter what the student takes. Both numbers
+ * are clamped to `required` as well, so a requirement that lists more options
+ * than it needs — the four alternative introductory Physics sequences, say —
+ * cannot read "4/2".
+ */
+export function countReqProgress(
+  options: { completed?: boolean; inProgress?: boolean }[] | undefined,
+  required: number,
+): { reqCompleted: number; reqInProgress: number } {
+  const opts = options ?? [];
+  const completed = opts.filter((o) => o.completed).length;
+  const inProgress = opts.filter((o) => o.inProgress && !o.completed).length;
+  if (required <= 0) {
+    return { reqCompleted: completed, reqInProgress: inProgress };
+  }
+  const reqCompleted = Math.min(completed, required);
+  return {
+    reqCompleted,
+    reqInProgress: Math.min(inProgress, required - reqCompleted),
+  };
+}
+
 export const calculateMajorProgress = (
   majorId: string,
   completedCourseCodes: string[],

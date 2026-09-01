@@ -20,7 +20,7 @@ export function getReqStatus(
 }
 
 /**
- * Short human breakdown of a requirement's credit mix, e.g. "in progress",
+ * Short human breakdown of a requirement's course mix, e.g. "in progress",
  * "1 completed, 1 not started", "1 in progress, 1 not started". Returns null
  * when there's nothing useful to add (fully completed, or purely not started).
  */
@@ -46,7 +46,7 @@ export function getReqBreakdown(
   return parts.join(", ");
 }
 
-/** Fraction of the requirement satisfied by completed credits (0..1). */
+/** Fraction of the requirement satisfied by completed courses (0..1). */
 export function getReqRatio(reqCompleted: number, required: number): number {
   if (required <= 0) return reqCompleted > 0 ? 1 : 0;
   return Math.min(1, reqCompleted / required);

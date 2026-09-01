@@ -40,6 +40,10 @@ export const RELEASES: Release[] = [
       {
         title: "Reading your progress",
         items: [
+          "A requirement you finish with a half-credit lab now goes green. PHYS 2060L is the only course that satisfies Physics Advanced Lab I, and taking it left the card sitting in Remaining, because the board was weighing the course's half credit against a requirement counted in courses. Every requirement is now counted in courses, on My Major, My Certificates, and in the Simulator.",
+          "Physics, B.S. Intensive asks for the right number of courses. The introductory lecture sequence is two terms, not four, so PHYS 2600 and 2610 (or any other full pair) complete it; the introductory lab is one course, and PHYS 2050L on its own is enough.",
+          "Half-credit labs and the one-and-a-half-credit language and studio courses in other majors read as 1/1 when you finish them, instead of 1/0.5.",
+          "Engineering Sciences (Electrical), B.A. counts its introductory physics courses. The requirement listed them but could not be completed by taking them.",
           "The Simulator's Save button now shows the keyboard shortcut on it (⌘S on a Mac, Ctrl+S elsewhere), so you can save a plan without reaching for the mouse.",
           "The Simulator's second tab is now called \"Projected progress + results\", which is what it actually shows: your plan's progress, GPA timeline, and distributional tally.",
           "The \"New\" announcement bar on the Simulator is readable in dark mode again. It was showing its light-mode colours on a dark page.",

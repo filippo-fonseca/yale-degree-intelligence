@@ -23,7 +23,14 @@
 import fs from "node:fs";
 import path from "node:path";
 
-import { FROM_NAME, REPLY_TO, REPO_ROOT, parseArgs, resendRequest } from "./lib.mjs";
+import {
+  FROM_NAME,
+  REPLY_TO,
+  REPO_ROOT,
+  parseArgs,
+  readSuppressions,
+  resendRequest,
+} from "./lib.mjs";
 
 const FROM_ADDRESS = "filippo@degreeint.com";
 
@@ -72,7 +79,7 @@ function writeLedger(year, ledger) {
 async function main() {
   const args = parseArgs(process.argv.slice(2), {
     values: ["year", "variant"],
-    flags: ["confirm"],
+    flags: ["confirm", "skip-suppression-check"],
   });
 
   const year = args.year;
@@ -97,11 +104,29 @@ async function main() {
     );
   }
 
-  const emails = readRoster(year);
+  const emails = readRoster(year).map((email) => email.trim().toLowerCase());
   const ledger = readLedger(year);
 
+  // Our own opt-out list, which lives in Firestore because /unsubscribe writes
+  // it there. Resend knows nothing about it: a contact imported into an
+  // audience is deliverable as far as the API is concerned, so without this
+  // check a broadcast happily mails everyone who ever asked us to stop.
+  let suppressed = new Set();
+  if (!args["skip-suppression-check"]) {
+    const fromDb = await readSuppressions();
+    if (fromDb === null) {
+      throw new Error(
+        "could not read email_unsubscribes (no admin credentials). Pass --skip-suppression-check only if you know the list is empty.",
+      );
+    }
+    suppressed = fromDb;
+  }
+
+  const optedOut = emails.filter((email) => suppressed.has(email));
+
   console.log(`class of ${year}, variant ${variantName}`);
-  console.log(`  recipients   ${emails.length}`);
+  console.log(`  recipients   ${emails.length - optedOut.length}`);
+  console.log(`  unsubscribed ${optedOut.length} (skipped)`);
   console.log(`  subject      ${variant.subject}`);
   console.log(`  from         ${FROM_NAME} <${FROM_ADDRESS}>`);
   console.log(`  reply-to     ${REPLY_TO}`);
@@ -126,15 +151,17 @@ async function main() {
   }
 
   const done = new Set(ledger.imported);
-  const pending = emails.filter((email) => !done.has(email));
+  const pending = emails.filter(
+    (email) => !done.has(email) && !suppressed.has(email),
+  );
   console.log(`importing ${pending.length} contacts...`);
 
   let n = 0;
   for (const email of pending) {
-    await resendRequest("POST", `/audiences/${audienceId}/contacts`, {
-      email,
-      unsubscribed: false,
-    });
+    // No unsubscribed flag. Sending one re-imports an existing contact with
+    // that value, so passing false would clear the opt-out of anyone who used
+    // Resend's own unsubscribe link on an earlier send to this audience.
+    await resendRequest("POST", `/audiences/${audienceId}/contacts`, { email });
     ledger.imported.push(email);
     n += 1;
     // Flush often: an interrupted run must not lose what it already did.

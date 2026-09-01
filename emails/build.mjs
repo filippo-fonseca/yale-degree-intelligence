@@ -664,7 +664,10 @@ const TARGETS = [
     file: "v3-newcomers.html",
     render: () =>
       campaignEmail({
-        headline: `1 in 6 Yalies use this.<br /><span class="t-muted" style="color: ${LIGHT.muted};">Why don't you?</span>`,
+        // Second line is sized down inside the h1 rather than split into its own
+        // row: it belongs to the headline, and a row would let clients that add
+        // their own paragraph spacing pull the two lines apart.
+        headline: `1 in 6 Yalies use this.<br /><span class="t-muted" style="color: ${LIGHT.muted}; font-size: 34px;">Why don't you? :)</span>`,
         // Nested on purpose. campaignEmail splits a flat array around the CTA,
         // so [a, b] would drop the sign-off below the button; one array of two
         // keeps both paragraphs in the same block above it.

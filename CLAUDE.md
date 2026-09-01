@@ -12,6 +12,26 @@
 - Keep commits atomic per the rules above even while orchestrating: each layer (engine, route, UI) lands in its own commit.
 - Surface decisions and tradeoffs concisely; only stop to ask when a choice is genuinely irreversible or outside the stated scope.
 
+## Email campaigns: never send to someone who opted out
+- The opt-out list is the Firestore collection **`email_unsubscribes`**, one doc
+  per address, doc ID = the lowercased email. `/unsubscribe` (`app/api/unsubscribe/route.ts`)
+  writes it; `lib/emailUnsubscribe.ts` signs the links. There is deliberately no
+  endpoint that lists opt-outs, so it is read through the Admin SDK only.
+- **Every send must cross-check that list first.** Use `readSuppressions()` from
+  `scripts/email/lib.mjs`, filter the roster through it, and print the skipped
+  count before sending. Never add a third sender that reimplements this.
+- `readSuppressions()` returns **null** when there are no admin credentials,
+  which means "could not check" and is not the same as "nobody opted out".
+  Treat null as a hard stop. `--skip-suppression-check` exists for the case
+  where the list is genuinely known to be empty and nothing else.
+- Never write `unsubscribed: false` when importing a Resend contact. Re-importing
+  an existing contact with that flag clears an opt-out they already made.
+- Resend's audience state and our Firestore list are two different records.
+  Someone can opt out through either one, so both have to be honoured, and the
+  Firestore check is the one our own code owns.
+- Rosters live in `lists/`, which is **gitignored** and holds real student
+  addresses. Never commit one, never paste addresses into a PR, issue, or chat.
+
 ## No AI features in the product
 The Dan advisor and the per-user MCP server were removed in July 2026. DI is a
 deterministic degree tool: every course, requirement, and pace number comes from

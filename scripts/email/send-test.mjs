@@ -25,7 +25,7 @@ const FALLBACK_FROM = "onboarding@resend.dev";
 const VARIANTS = {
   existing: {
     file: "v3-existing.html",
-    subject: "v3 is here",
+    subject: "Are you sure you chose the right classes?",
   },
   frosh: {
     file: "v3-frosh.html",
@@ -33,7 +33,7 @@ const VARIANTS = {
   },
   newcomers: {
     file: "v3-newcomers.html",
-    subject: "1 in 6 Yalies use this. Why don't you?",
+    subject: "Are you sure you chose the right classes?",
   },
 };
 

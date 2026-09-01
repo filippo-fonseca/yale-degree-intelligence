@@ -30,17 +30,28 @@ import fs from "node:fs";
 import path from "node:path";
 import { createHmac } from "node:crypto";
 
-import { FROM_NAME, REPLY_TO, REPO_ROOT, loadEnv, parseArgs, requireEnv, resendRequest } from "./lib.mjs";
+import {
+  FROM_NAME,
+  REPLY_TO,
+  REPO_ROOT,
+  parseArgs,
+  readSuppressions,
+  requireEnv,
+  resendRequest,
+} from "./lib.mjs";
 
 const FROM_ADDRESS = "filippo@degreeint.com";
 const SITE_URL = "https://degreeint.com";
 
 const VARIANTS = {
-  existing: { file: "v3-existing.html", subject: "v3 is here" },
+  existing: {
+    file: "v3-existing.html",
+    subject: "Are you sure you chose the right classes?",
+  },
   frosh: { file: "v3-frosh.html", subject: "Welcome to Yale" },
   newcomers: {
     file: "v3-newcomers.html",
-    subject: "1 in 6 Yalies use this. Why don't you?",
+    subject: "Are you sure you chose the right classes?",
   },
 };
 
@@ -58,21 +69,34 @@ function unsubscribeUrl(email, secret) {
   return `${SITE_URL}/unsubscribe?e=${encodeURIComponent(normalized)}&t=${token}`;
 }
 
-function rosterPath(year) {
-  return path.join(REPO_ROOT, "lists", `${year}.roster.json`);
+/**
+ * Prefers the per-variant roster, falls back to the whole class year. Each year
+ * splits into two disjoint rosters, since the returning and newcomer emails
+ * contradict each other and neither can go to the other's half.
+ */
+function rosterPath(year, variantName) {
+  const specific = path.join(REPO_ROOT, "lists", `${year}.${variantName}.roster.json`);
+  return fs.existsSync(specific)
+    ? specific
+    : path.join(REPO_ROOT, "lists", `${year}.roster.json`);
 }
 
 function sentLedgerPath(year, variant) {
   return path.join(REPO_ROOT, "lists", `${year}.${variant}.sent.json`);
 }
 
-function readRoster(year) {
-  const file = rosterPath(year);
+function readRoster(year, variantName) {
+  const file = rosterPath(year, variantName);
   if (!fs.existsSync(file)) {
     throw new Error(
-      `missing ${file}. Run: node scripts/email/parse-list.mjs --year ${year} --in lists/${year}.txt`,
+      `missing lists/${year}.${variantName}.roster.json (and no lists/${year}.roster.json). Build it with:\n` +
+        `  node scripts/email/export-users.mjs\n` +
+        `  node scripts/email/parse-list.mjs --year ${year} --in lists/${year}.txt \\\n` +
+        `    ${variantName === "existing" ? "--intersect" : "--exclude"} lists/existing-users.txt \\\n` +
+        `    --out lists/${year}.${variantName}.roster.json`,
     );
   }
+  console.log(`  roster file      ${path.relative(REPO_ROOT, file)}`);
   const roster = JSON.parse(fs.readFileSync(file, "utf8"));
   const emails = Array.isArray(roster) ? roster : roster.emails;
   if (!Array.isArray(emails) || emails.length === 0) {
@@ -91,31 +115,6 @@ function readLedger(year, variant) {
 
 function writeLedger(year, variant, ledger) {
   fs.writeFileSync(sentLedgerPath(year, variant), JSON.stringify(ledger, null, 2));
-}
-
-/**
- * Everyone who has opted out, straight from Firestore. Read through the Admin
- * SDK rather than the public route: there is no endpoint that lists opt-outs,
- * deliberately, and there should not be one.
- */
-async function readSuppressions() {
-  loadEnv();
-  const key = process.env.FIREBASE_SERVICE_ACCOUNT_KEY;
-  if (!key) return null;
-
-  // Initialized here rather than imported from config/firebaseAdmin.ts, which
-  // is TypeScript behind a path alias and does not resolve from a plain script.
-  const { initializeApp, getApps, cert } = await import("firebase-admin/app");
-  const { getFirestore } = await import("firebase-admin/firestore");
-  const app = getApps().length
-    ? getApps()[0]
-    : initializeApp({
-        credential: cert(JSON.parse(key)),
-        projectId: "yale-degree-intelligence",
-      });
-
-  const snapshot = await getFirestore(app).collection("email_unsubscribes").get();
-  return new Set(snapshot.docs.map((doc) => doc.id.trim().toLowerCase()));
 }
 
 async function main() {
@@ -144,7 +143,7 @@ async function main() {
 
   // --to sends the real campaign, through this exact code path, to one
   // address. It is how the flow gets checked before it is pointed at a class.
-  const roster = args.to ? [args.to.trim().toLowerCase()] : readRoster(year);
+  const roster = args.to ? [args.to.trim().toLowerCase()] : readRoster(year, variantName);
   const ledgerKey = args.to ? `${variantName}.test` : variantName;
   const ledger = readLedger(year, ledgerKey);
   const attempted = new Set(ledger.attempted);

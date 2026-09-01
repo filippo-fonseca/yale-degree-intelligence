@@ -20,9 +20,11 @@ export const CLASS_YEARS = ["2030", "2029", "2028", "2027"];
  * yale.edu cannot be verified (Yale controls that DNS zone), so the campaign
  * sends from degreeint.com and routes replies back to the Yale inbox. Putting
  * a bare email address in the display name is a phishing signature that costs
- * deliverability, so the display name stays a human name.
+ * deliverability, so the display name stays words rather than an address.
+ *
+ * Shared by all three variants: the sender line is the product, not a person.
  */
-export const FROM_NAME = "Filippo Fonseca (Yale DegreeIntelligence)";
+export const FROM_NAME = "Yale DegreeIntelligence";
 export const REPLY_TO = "filippo.fonseca@yale.edu";
 
 /** Resend's documented default is 2 requests/second; stay just under it. */
@@ -105,6 +107,38 @@ export async function resendRequest(method, endpoint, body, { attempt = 1 } = {}
   }
 
   return payload;
+}
+
+/**
+ * Everyone who has opted out, straight from Firestore. Read through the Admin
+ * SDK rather than the public route: there is no endpoint that lists opt-outs,
+ * deliberately, and there should not be one.
+ *
+ * Returns null when there are no admin credentials rather than an empty set,
+ * so a caller cannot mistake "could not check" for "nobody opted out". Every
+ * sender must treat null as a reason to stop.
+ *
+ * Lives here rather than in one sender because both of them have to consult
+ * the same list, and a second copy is how the two drift apart.
+ */
+export async function readSuppressions() {
+  loadEnv();
+  const key = process.env.FIREBASE_SERVICE_ACCOUNT_KEY;
+  if (!key) return null;
+
+  // Initialized here rather than imported from config/firebaseAdmin.ts, which
+  // is TypeScript behind a path alias and does not resolve from a plain script.
+  const { initializeApp, getApps, cert } = await import("firebase-admin/app");
+  const { getFirestore } = await import("firebase-admin/firestore");
+  const app = getApps().length
+    ? getApps()[0]
+    : initializeApp({
+        credential: cert(JSON.parse(key)),
+        projectId: "yale-degree-intelligence",
+      });
+
+  const snapshot = await getFirestore(app).collection("email_unsubscribes").get();
+  return new Set(snapshot.docs.map((doc) => doc.id.trim().toLowerCase()));
 }
 
 export function audienceNameForYear(year) {

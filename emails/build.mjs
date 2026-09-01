@@ -149,6 +149,10 @@ function darkModeStyles() {
     [".logo-dark", "display: inline-block !important;"],
     // The headline pink lifts a step on dark so it keeps its contrast.
     [".t-accent", `color: ${DARK.accent} !important;`],
+    // Chip naming an in-app button. Its own rule rather than .bg-well because
+    // the label colour has to lift with the background or it goes near-black
+    // on near-black.
+    [".pill", `background-color: ${DARK.wellBg} !important; border-color: ${DARK.border} !important; color: ${DARK.primary} !important;`],
   ];
 
   const media = rules.map(([sel, decl]) => `      ${sel} { ${decl} }`).join("\n");
@@ -415,6 +419,26 @@ function u(text) {
 }
 
 /**
+ * An inline chip that names a real control in the app.
+ *
+ * Deliberately not a link and not underlined: it is a picture of a button the
+ * reader has to find on screen, so it should look like that button rather than
+ * like something to click here. Bold does the emphasis u() would otherwise do.
+ *
+ * inline-block rather than a nested table because it sits mid-sentence and has
+ * to wrap with the text around it. Outlook's Word engine drops border-radius
+ * and inline padding, so it degrades there to bold text on a grey ground,
+ * which still reads as a label. white-space: nowrap keeps the icon from ending
+ * a line on its own with the words orphaned onto the next.
+ */
+function pill(label, icon) {
+  const img = (variant, display) =>
+    `<img src="${LOGO_BASE}/${icon}-${variant}.png" width="12" height="12" alt="" class="logo-${variant}" style="display: ${display}; width: 12px; height: 12px; border: 0; vertical-align: -2px;" />`;
+
+  return `<span class="pill" style="display: inline-block; padding: 1px 9px 2px 8px; border-radius: 100px; background-color: ${LIGHT.wellBg}; border: 1px solid ${LIGHT.border}; font-weight: 700; color: ${LIGHT.primary}; white-space: nowrap;">${img("light", "inline-block")}${img("dark", "none")}&nbsp;${label}</span>`;
+}
+
+/**
  * Pink gradient text.
  *
  * The gradient lives in a stylesheet class while the inline style carries a
@@ -455,7 +479,16 @@ function bodyCopy(paragraph) {
     .join("\n");
 }
 
-function campaignEmail({ headline, paragraph, cta, videoCaption, title, preheader }) {
+function campaignEmail({
+  headline,
+  subheadline,
+  subnote,
+  paragraph,
+  cta,
+  videoCaption,
+  title,
+  preheader,
+}) {
   const parts = Array.isArray(paragraph) ? paragraph : [paragraph];
   const [opening, ...rest] = parts;
 
@@ -468,6 +501,32 @@ function campaignEmail({ headline, paragraph, cta, videoCaption, title, preheade
               </h1>
             </td>
           </tr>
+${/* Optional, and only the returning-user email uses them today. Rendered as
+     their own rows rather than <br />s inside the h1, so the serif headline
+     keeps its own line-height and the two lines can carry different sizes. */ ""}
+${
+  subheadline
+    ? `
+          <tr>
+            <td align="center" style="padding: 0 0 10px 0;">
+              <p class="t-primary" style="margin: 0; font-family: ${SANS}; font-size: 15px; font-weight: 600; line-height: 1.4; color: ${LIGHT.primary};">
+                ${subheadline}
+              </p>
+            </td>
+          </tr>`
+    : ""
+}${
+  subnote
+    ? `
+          <tr>
+            <td align="center" style="padding: 0 0 8px 0;">
+              <p class="t-muted" style="margin: 0; font-family: ${SANS}; font-size: 13px; line-height: 1.6; color: ${LIGHT.muted};">
+                ${subnote}
+              </p>
+            </td>
+          </tr>`
+    : ""
+}
 
 ${copyRow(opening, { pad: 26 })}
 ${/* The way in sits right after the opening paragraph, not at the bottom. A
@@ -533,15 +592,22 @@ const TARGETS = [
     render: () =>
       campaignEmail({
         headline: `${grad("v3")} is here.`,
+        subheadline: "Last semester is over! Time to update your classes on DegreeIntelligence.",
+        subnote: `Click ${pill("Re-upload transcript", "refresh")} to refresh your stats and see
+                where you're at in terms of your major, certificates, GPA, distributionals, and
+                much more.`,
         paragraph: `If you're getting this email, you're among the 1 in 6 Yale students who have
                 signed up to use DegreeIntelligence over the past year. First of all, thank you!
+                It's your support + feedback that makes our free, student-run, open-source app
+                possible to democratize academic planning at Yale and eliminate guesswork.
                 We just wanted to let you know we've been hard at work making Yale's most used degree-planning platform even
                 better. We now have ${u("Certificates")}, a rebuilt ${u("Simulator")},
                 ${u("distributionals")}, a ${u("cleaner UI")}, and ${u("much more")}.`,
         cta: "Log back into DegreeIntelligence →",
         videoCaption: "Watch the demo",
-        title: "v3 is here",
-        preheader: "Certificates, a rebuilt Simulator, distributionals, a cleaner UI, and much more.",
+        title: "Are you sure you chose the right classes?",
+        preheader:
+          "Choosing the right Yale classes to fulfill requirements for your major, certificates, distributionals, etc. is hard (all the while keeping track of your GPA, etc.). Don't worry. We're here to help.",
       }),
   },
   {
@@ -598,17 +664,31 @@ const TARGETS = [
     file: "v3-newcomers.html",
     render: () =>
       campaignEmail({
-        headline: `1 in 6 Yalies use this.<br /><span class="t-muted" style="color: ${LIGHT.muted};">Why don't you?</span>`,
-        paragraph: `If you're getting this email, you haven't signed up to DegreeIntelligence yet.
-                It's what around 1,200 Yalies across every residential college use to plan their
+        // Second line is sized down inside the h1 rather than split into its own
+        // row: it belongs to the headline, and a row would let clients that add
+        // their own paragraph spacing pull the two lines apart.
+        headline: `1 in 6 Yalies use this.<br /><span class="t-muted" style="color: ${LIGHT.muted}; font-size: 34px;">Why don't you? :)</span>`,
+        // Nested on purpose. campaignEmail splits a flat array around the CTA,
+        // so [a, b] would drop the sign-off below the button; one array of two
+        // keeps both paragraphs in the same block above it.
+        paragraph: [
+          [
+            `1.2k Yalies across every residential college use DegreeIntelligence to plan their
                 degrees, and we've been hard at work making it even better. We now have
                 ${u("Certificates")}, a rebuilt ${u("Simulator")}, ${u("distributionals")},
-                a ${u("cleaner UI")}, and ${u("much more")}. Made by Yalies, for Yalies,
-                DegreeIntelligence is free (forever) and requires nothing to install.`,
+                a ${u("cleaner UI")}, and ${u("much more")}. Luckily, ${u("add/drop is still open")},
+                so there's time to change what you're taking this semester (to see where the
+                classes you already picked put you in the grand scheme of things for your major,
+                certificates, and distributionals).`,
+            `Made by Yalies, for Yalies, DegreeIntelligence is free (forever) and open-source.
+                It requires nothing to install!`,
+          ],
+        ],
         cta: "Try DegreeIntelligence →",
         videoCaption: "Watch the demo",
-        title: "1 in 6 Yalies use this. Why don't you?",
-        preheader: "Plan semesters, track requirements, and see how your degree is actually going.",
+        title: "Are you sure you chose the right classes?",
+        preheader:
+          "Choosing the right Yale classes to fulfill requirements for your major, certificates, distributionals, etc. is hard (all the while keeping track of your GPA, etc.). Don't worry. We're here to help.",
       }),
   },
 ];

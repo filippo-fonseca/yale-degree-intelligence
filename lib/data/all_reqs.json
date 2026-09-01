@@ -9342,65 +9342,48 @@
         "required": 2,
         "options": [
           {
-            "type": "course",
-            "code": "PHYS 1700"
-          },
-          {
-            "type": "course",
-            "code": "PHYS 1710"
-          },
-          {
-            "type": "course",
-            "code": "PHYS 1800"
-          },
-          {
-            "type": "course",
-            "code": "PHYS 1810"
-          },
-          {
-            "type": "course",
-            "code": "PHYS 2000"
-          },
-          {
-            "type": "course",
-            "code": "PHYS 2010"
-          },
-          {
-            "type": "course",
-            "code": "PHYS 2600"
-          },
-          {
-            "type": "course",
-            "code": "PHYS 2610"
+            "type": "group",
+            "required": 2,
+            "options": [
+              "PHYS 1700",
+              "PHYS 1710",
+              "PHYS 1800",
+              "PHYS 1810",
+              "PHYS 2000",
+              "PHYS 2010",
+              "PHYS 2600",
+              "PHYS 2610"
+            ]
           }
         ],
-        "description": "Select one full lecture sequence: PHYS 1700+1710, 1800+1810, 2000+2010, or 2600+2610."
+        "description": "Two courses: one complete lecture sequence, either PHYS 1700 and 1710, or PHYS 1800 and 1810, or PHYS 2000 and 2010, or PHYS 2600 and 2610. Both halves must come from the same sequence, and each sequence has its own math corequisites."
       },
       {
         "name": "Introductory Laboratory",
-        "required": 0.5,
+        "required": 1,
         "options": [
           {
-            "type": "course",
-            "code": "PHYS 2050L"
-          },
-          {
-            "type": "course",
-            "code": "PHYS 1660L"
+            "type": "group",
+            "required": 1,
+            "options": [
+              "PHYS 2050L",
+              "PHYS 1650L",
+              "PHYS 1660L"
+            ]
           }
         ],
-        "description": "PHYS 2050L, or PHYS 1650L and PHYS 1660L sequence (note: PHYS 1650L is a prereq for PHYS 1660L)."
+        "description": "PHYS 2050L on its own, or the two-term sequence PHYS 1650L and PHYS 1660L (PHYS 1650L comes first). Each of these labs is worth half a credit."
       },
       {
         "name": "Advanced Lab",
-        "required": 0.5,
+        "required": 1,
         "options": [
           {
             "type": "course",
             "code": "PHYS 2060L"
           }
         ],
-        "description": "PHYS 2060L or equivalent."
+        "description": "PHYS 2060L or an equivalent approved by the DUS. Worth half a credit."
       },
       {
         "name": "Advanced Mathematics for Physics",
@@ -9411,7 +9394,7 @@
             "code": "PHYS 4000"
           }
         ],
-        "description": "PHYS 4000 or other approved advanced mathematics course."
+        "description": "PHYS 4000, or another mathematics course at or above that level."
       },
       {
         "name": "Advanced Classical Physics I",
@@ -9421,7 +9404,8 @@
             "type": "course",
             "code": "PHYS 4010"
           }
-        ]
+        ],
+        "description": "PHYS 4010, which must be taken before PHYS 4020, 4390 and 4400."
       },
       {
         "name": "Advanced Classical Physics II",
@@ -9438,35 +9422,36 @@
         "required": 1,
         "options": [
           {
-            "type": "course",
-            "code": "PHYS 4390"
-          },
-          {
-            "type": "course",
-            "code": "PHYS 4400"
+            "type": "group",
+            "required": 1,
+            "options": [
+              "PHYS 4390",
+              "PHYS 4400"
+            ]
           }
-        ]
+        ],
+        "description": "Either PHYS 4390 or PHYS 4400."
       },
       {
         "name": "Advanced Electives",
         "required": 3,
         "options": [],
-        "description": "Any PHYS course numbered 3000 or higher, or approved advanced course in science/engineering/math, with DUS approval."
+        "description": "Three advanced courses numbered 3000 or higher, such as the advanced lab PHYS 4450L or any 4000-level Physics course. Advanced courses in other sciences, engineering and mathematics also count with DUS approval."
       },
       {
         "name": "Senior Requirement: Independent Research",
         "required": 1,
         "options": [
           {
-            "type": "course",
-            "code": "PHYS 4710"
-          },
-          {
-            "type": "course",
-            "code": "PHYS 4720"
+            "type": "group",
+            "required": 1,
+            "options": [
+              "PHYS 4710",
+              "PHYS 4720"
+            ]
           }
         ],
-        "description": "One term of PHYS 4710 or PHYS 4720, or approved equivalent, in junior or senior year."
+        "description": "One term of PHYS 4710 or PHYS 4720, or an approved equivalent, taken in junior or senior year."
       }
     ]
   },
@@ -9480,61 +9465,40 @@
     "requirements": [
       {
         "name": "Introductory Physics Sequence",
-        "required": 4,
-        "options": [
-          {
-            "type": "course",
-            "code": "PHYS 1700"
-          },
-          {
-            "type": "course",
-            "code": "PHYS 1710"
-          },
-          {
-            "type": "course",
-            "code": "PHYS 1800"
-          },
-          {
-            "type": "course",
-            "code": "PHYS 1810"
-          },
-          {
-            "type": "course",
-            "code": "PHYS 2000"
-          },
-          {
-            "type": "course",
-            "code": "PHYS 2010"
-          },
-          {
-            "type": "course",
-            "code": "PHYS 2600"
-          },
-          {
-            "type": "course",
-            "code": "PHYS 2610"
-          }
-        ],
-        "description": "Select one full lecture sequence: PHYS 1700+1710, 1800+1810, 2000+2010, or 2600+2610."
-      },
-      {
-        "name": "Introductory Laboratory",
         "required": 2,
         "options": [
           {
-            "type": "course",
-            "code": "PHYS 2050L"
-          },
-          {
-            "type": "course",
-            "code": "PHYS 1650L"
-          },
-          {
-            "type": "course",
-            "code": "PHYS 1660L"
+            "type": "group",
+            "required": 2,
+            "options": [
+              "PHYS 1700",
+              "PHYS 1710",
+              "PHYS 1800",
+              "PHYS 1810",
+              "PHYS 2000",
+              "PHYS 2010",
+              "PHYS 2600",
+              "PHYS 2610"
+            ]
           }
         ],
-        "description": "PHYS 2050L, or PHYS 1650L and PHYS 1660L sequence."
+        "description": "Two courses: one complete lecture sequence, either PHYS 1700 and 1710, or PHYS 1800 and 1810, or PHYS 2000 and 2010, or PHYS 2600 and 2610. Both halves must come from the same sequence, and each sequence has its own math corequisites."
+      },
+      {
+        "name": "Introductory Laboratory",
+        "required": 1,
+        "options": [
+          {
+            "type": "group",
+            "required": 1,
+            "options": [
+              "PHYS 2050L",
+              "PHYS 1650L",
+              "PHYS 1660L"
+            ]
+          }
+        ],
+        "description": "PHYS 2050L on its own, or the two-term sequence PHYS 1650L and PHYS 1660L (PHYS 1650L comes first). Each of these labs is worth half a credit."
       },
       {
         "name": "Advanced Lab I",
@@ -9544,7 +9508,8 @@
             "type": "course",
             "code": "PHYS 2060L"
           }
-        ]
+        ],
+        "description": "PHYS 2060L or an equivalent approved by the DUS. Worth half a credit."
       },
       {
         "name": "Advanced Lab II",
@@ -9554,7 +9519,8 @@
             "type": "course",
             "code": "PHYS 4450L"
           }
-        ]
+        ],
+        "description": "PHYS 4450L or an equivalent approved by the DUS."
       },
       {
         "name": "Advanced Mathematics for Physics",
@@ -9565,7 +9531,7 @@
             "code": "PHYS 4000"
           }
         ],
-        "description": "PHYS 4000 or other approved advanced mathematics course."
+        "description": "PHYS 4000, or another mathematics course at or above that level."
       },
       {
         "name": "Classical Mechanics",
@@ -9575,7 +9541,8 @@
             "type": "course",
             "code": "PHYS 4100"
           }
-        ]
+        ],
+        "description": "PHYS 4100, which must be taken before PHYS 4390 or PHYS 4400."
       },
       {
         "name": "Electromagnetism",
@@ -9585,21 +9552,23 @@
             "type": "course",
             "code": "PHYS 4300"
           }
-        ]
+        ],
+        "description": "PHYS 4300, which together with PHYS 4390 or 4400 must precede PHYS 4410."
       },
       {
         "name": "Quantum Mechanics I",
         "required": 1,
         "options": [
           {
-            "type": "course",
-            "code": "PHYS 4390"
-          },
-          {
-            "type": "course",
-            "code": "PHYS 4400"
+            "type": "group",
+            "required": 1,
+            "options": [
+              "PHYS 4390",
+              "PHYS 4400"
+            ]
           }
-        ]
+        ],
+        "description": "Either PHYS 4390 or PHYS 4400."
       },
       {
         "name": "Quantum Mechanics II",
@@ -9619,28 +9588,29 @@
             "type": "course",
             "code": "PHYS 4500"
           }
-        ]
+        ],
+        "description": "PHYS 4500, taken after PHYS 4390 or 4400, or alongside it with the instructor's permission."
       },
       {
         "name": "Advanced Elective",
         "required": 1,
         "options": [],
-        "description": "Any PHYS course numbered 3000 or higher, or approved advanced course in science/engineering/math, with DUS approval."
+        "description": "One advanced course numbered 3000 or higher, including any 4000-level Physics course. Advanced courses in other sciences, engineering and mathematics also count with DUS approval."
       },
       {
         "name": "Senior Requirement: Independent Research (2 terms)",
         "required": 2,
         "options": [
           {
-            "type": "course",
-            "code": "PHYS 4710"
-          },
-          {
-            "type": "course",
-            "code": "PHYS 4720"
+            "type": "group",
+            "required": 2,
+            "options": [
+              "PHYS 4710",
+              "PHYS 4720"
+            ]
           }
         ],
-        "description": "Two terms of PHYS 4710 or PHYS 4720 (any combination), or approved equivalent, in junior or senior year."
+        "description": "Two terms of research in junior or senior year: PHYS 4710 and PHYS 4720, either one of them twice, or an approved equivalent. If you take the same number twice, add the second term with \"Fulfill manually\"."
       }
     ]
   },

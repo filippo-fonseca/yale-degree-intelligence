@@ -6268,6 +6268,7 @@
   },
   {
     "codes": [
+      "AMTH 4310",
       "AMTH 431"
     ],
     "name": "Optimization and Computation",
@@ -16705,6 +16706,7 @@
   },
   {
     "codes": [
+      "CHEM 1630",
       "CHEM 163"
     ],
     "name": "Advanced General Chemistry I",
@@ -16748,6 +16750,7 @@
   },
   {
     "codes": [
+      "CHEM 1670",
       "CHEM 167"
     ],
     "name": "Advanced General Chemistry II",
@@ -24056,6 +24059,7 @@
   },
   {
     "codes": [
+      "CSLI 4900",
       "CSLI 490"
     ],
     "name": "Senior Capstone in Computing and Linguistics",
@@ -39452,6 +39456,7 @@
   },
   {
     "codes": [
+      "ENVE 4480",
       "ENVE 448"
     ],
     "name": "Environmental Transport Processes",
@@ -41224,6 +41229,7 @@
   },
   {
     "codes": [
+      "EPS 2100",
       "EPS 210"
     ],
     "name": "The Geology of North America through its National Parks",
@@ -41351,6 +41357,7 @@
   },
   {
     "codes": [
+      "EPS 2550",
       "EPS 255"
     ],
     "name": "Environmental Geomicrobiology",
@@ -49520,6 +49527,7 @@
   },
   {
     "codes": [
+      "FREN 3010",
       "FREN 191"
     ],
     "name": "Literary Translation: History and Theory in Practice",
@@ -84408,6 +84416,7 @@
   },
   {
     "codes": [
+      "MMES 4491",
       "MMES 491"
     ],
     "name": "Senior Essay",
@@ -84424,6 +84433,7 @@
   },
   {
     "codes": [
+      "MMES 4493",
       "MMES 493",
       "MMES 492"
     ],
@@ -93438,6 +93448,7 @@
   },
   {
     "codes": [
+      "PLSC 1335",
       "PLSC 118"
     ],
     "name": "The Moral Foundations of Politics",
@@ -103975,6 +103986,7 @@
   },
   {
     "codes": [
+      "S&DS 2620",
       "S&DS 262"
     ],
     "name": "Computational Tools for Data Science",

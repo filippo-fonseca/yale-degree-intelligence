@@ -3599,7 +3599,7 @@
       },
       {
         "name": "Introduction to the Fossil Record",
-        "required": 1.5,
+        "required": 2,
         "description": "Both EPS 1250 and EPS 1260L.",
         "options": [
           {
@@ -4314,7 +4314,7 @@
     "requirements": [
       {
         "name": "Language Prerequisite",
-        "required": 1.5,
+        "required": 1,
         "options": [
           {
             "type": "course",
@@ -6774,7 +6774,7 @@
       },
       {
         "name": "Organismal Diversity Lecture + Lab",
-        "required": 1.5,
+        "required": 2,
         "options": [],
         "description": "1 lecture course from EEB 2246–2272 with associated lab, or EEB 3326 and EEB 3327L."
       },
@@ -6943,7 +6943,7 @@
       },
       {
         "name": "Comparative Anatomy Lab",
-        "required": 0.5,
+        "required": 1,
         "options": [
           {
             "type": "course",
@@ -7098,7 +7098,7 @@
       },
       {
         "name": "Organismal Diversity Lecture + Lab",
-        "required": 1.5,
+        "required": 2,
         "options": [],
         "description": "1 lecture course from EEB 2246–2272 with associated lab, or EEB 3326 and EEB 3327L."
       },
@@ -7255,7 +7255,7 @@
       },
       {
         "name": "Comparative Anatomy Lab",
-        "required": 0.5,
+        "required": 1,
         "options": [
           {
             "type": "course",
@@ -8280,7 +8280,7 @@
       },
       {
         "name": "Sophomore Seminar",
-        "required": 0.5,
+        "required": 1,
         "options": [
           {
             "type": "course",
@@ -8330,7 +8330,7 @@
       },
       {
         "name": "Physiological Systems Laboratory",
-        "required": 0.5,
+        "required": 1,
         "options": [
           {
             "type": "course",
@@ -8340,7 +8340,7 @@
       },
       {
         "name": "Biomedical Engineering Laboratory",
-        "required": 0.5,
+        "required": 1,
         "options": [
           {
             "type": "course",
@@ -8350,7 +8350,7 @@
       },
       {
         "name": "Senior Seminar",
-        "required": 0.5,
+        "required": 1,
         "options": [
           {
             "type": "course",
@@ -9378,7 +9378,7 @@
       },
       {
         "name": "Introductory Laboratory",
-        "required": 0.5,
+        "required": 1,
         "options": [
           {
             "type": "course",
@@ -9393,7 +9393,7 @@
       },
       {
         "name": "Advanced Lab",
-        "required": 0.5,
+        "required": 1,
         "options": [
           {
             "type": "course",
@@ -11161,7 +11161,7 @@
       },
       {
         "name": "Third-Year Russian I",
-        "required": 1.5,
+        "required": 1,
         "options": [
           {
             "type": "course",
@@ -11171,7 +11171,7 @@
       },
       {
         "name": "Third-Year Russian II",
-        "required": 1.5,
+        "required": 1,
         "options": [
           {
             "type": "course",
@@ -13494,7 +13494,7 @@
       },
       {
         "name": "Introductory Physics Lab",
-        "required": 0.5,
+        "required": 1,
         "options": [
           {
             "type": "course",
@@ -13522,7 +13522,7 @@
       },
       {
         "name": "Advanced Intro Physics Lab",
-        "required": 0.5,
+        "required": 1,
         "options": [
           {
             "type": "course",
@@ -13676,7 +13676,7 @@
       },
       {
         "name": "Methods and Form I",
-        "required": 1.5,
+        "required": 1,
         "options": [
           {
             "type": "course",
@@ -13686,7 +13686,7 @@
       },
       {
         "name": "Methods and Form II",
-        "required": 1.5,
+        "required": 1,
         "options": [
           {
             "type": "course",
@@ -13736,7 +13736,7 @@
       },
       {
         "name": "Senior Studio I",
-        "required": 1.5,
+        "required": 1,
         "options": [
           {
             "type": "course",
@@ -13746,7 +13746,7 @@
       },
       {
         "name": "Senior Studio II",
-        "required": 1.5,
+        "required": 1,
         "options": [
           {
             "type": "course",
@@ -13824,7 +13824,7 @@
       },
       {
         "name": "Methods and Form I",
-        "required": 1.5,
+        "required": 1,
         "options": [
           {
             "type": "course",
@@ -13834,7 +13834,7 @@
       },
       {
         "name": "Urban Lab",
-        "required": 1.5,
+        "required": 1,
         "options": [
           {
             "type": "course",
@@ -14129,7 +14129,7 @@
       {
         "name": "Prereq: Physics Lab",
         "description": "PHYS 2050L or, with DUS approval, PHYS 1650L/1660L.",
-        "required": 0.5,
+        "required": 1,
         "options": [
           {
             "type": "course",
@@ -14146,7 +14146,7 @@
       {
         "name": "Physics Lab: Advanced",
         "description": "PHYS 2060L required.",
-        "required": 0.5,
+        "required": 1,
         "options": [
           {
             "type": "course",
@@ -15671,7 +15671,7 @@
       },
       {
         "name": "Senior Design II",
-        "required": 0.5,
+        "required": 1,
         "options": [
           {
             "type": "course",
@@ -17113,7 +17113,7 @@
       {
         "name": "Introductory Physics Lab",
         "description": "NOTE: If taking PHYS 1660L, PHYS 1650L is a prereq.",
-        "required": 0.5,
+        "required": 1,
         "options": [
           {
             "type": "course",
@@ -17127,7 +17127,7 @@
       },
       {
         "name": "Advanced Physics Lab",
-        "required": 0.5,
+        "required": 1,
         "options": [
           {
             "type": "course",
@@ -17269,7 +17269,7 @@
       {
         "name": "Introductory Physics Lab",
         "description": "NOTE: If taking PHYS 1660L, PHYS 1650L is a prereq.",
-        "required": 0.5,
+        "required": 1,
         "options": [
           {
             "type": "course",
@@ -17283,7 +17283,7 @@
       },
       {
         "name": "Advanced Physics Lab",
-        "required": 0.5,
+        "required": 1,
         "options": [
           {
             "type": "course",
@@ -18792,7 +18792,7 @@
       },
       {
         "name": "Junior Colloquium",
-        "required": 0.5,
+        "required": 1,
         "description": "Must be taken in junior year.",
         "options": [
           {
@@ -18976,7 +18976,7 @@
       },
       {
         "name": "Junior Colloquium",
-        "required": 0.5,
+        "required": 1,
         "description": "Must be taken in junior year.",
         "options": [
           {

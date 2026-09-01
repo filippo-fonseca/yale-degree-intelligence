@@ -11,7 +11,20 @@
  */
 
 import { describe, expect, it } from "vitest";
-import { calculateMajorProgress, countReqProgress, getReqsForMajor } from "@/lib/majors";
+import {
+  calculateMajorProgress,
+  countReqProgress,
+  getReqsForMajor,
+  majorRequirements,
+} from "@/lib/majors";
+import { getCanonicalCode, getCourseInfo } from "@/lib/courseCatalog";
+
+const MAJORS = Object.entries(majorRequirements);
+const allRequirements = MAJORS.flatMap(([id, major]) =>
+  major.requirements.map((req) => ({ id, major, req, label: `${id} / ${req.name}` })),
+);
+const codesOf = (req: (typeof allRequirements)[number]["req"]) =>
+  req.options.flatMap((o) => (o.type === "group" ? o.options : [o.code]));
 
 const requirement = (majorId: string, name: string) => {
   const req = getReqsForMajor(majorId)?.requirements.find((r) => r.name === name);
@@ -108,6 +121,154 @@ describe("PHYS_BS_INTENSIVE advanced labs", () => {
     const req = progressFor("PHYS_BS_INTENSIVE", "Advanced Lab II", ["PHYS 4450L"]);
 
     expect(req.satisfied).toBe(true);
+  });
+});
+
+/**
+ * These hold for all 142 major variants. Each one is a bug class the audit
+ * against catalog.yale.edu turned up more than eighty times over.
+ */
+describe("every major in all_reqs.json is internally consistent", () => {
+  it("covers 142 variants, each keyed by its own id", () => {
+    expect(MAJORS.length).toBe(142);
+    expect(MAJORS.filter(([id, major]) => major.id !== id)).toEqual([]);
+  });
+
+  it("states `required` as a whole number of courses", () => {
+    // 0.5 and 1.5 used to appear here: someone had written the requirement's
+    // credit value into a field the engine reads as a course count.
+    const wrong = allRequirements
+      .filter(({ req }) => !Number.isInteger(req.required) || req.required < 1)
+      .map(({ label, req }) => `${label} = ${req.required}`);
+
+    expect(wrong).toEqual([]);
+  });
+
+  it("names only courses the catalog knows", () => {
+    const unknown = allRequirements.flatMap(({ label, req }) =>
+      codesOf(req)
+        .filter((code) => !getCourseInfo(code))
+        .map((code) => `${label}: ${code}`),
+    );
+
+    expect(unknown).toEqual([]);
+  });
+
+  it("names each course by its canonical code", () => {
+    // getCanonicalCode is how a student's courses are matched to an option, so
+    // an option naming a cross-listing or a legacy number matches nothing.
+    const aliased = allRequirements.flatMap(({ label, req }) =>
+      codesOf(req)
+        .filter((code) => getCourseInfo(code) && getCanonicalCode(code) !== code)
+        .map((code) => `${label}: ${code} should be ${getCanonicalCode(code)}`),
+    );
+
+    expect(aliased).toEqual([]);
+  });
+
+  it("never lists the same course twice in one requirement", () => {
+    const duplicated = allRequirements
+      .filter(({ req }) => new Set(codesOf(req)).size !== codesOf(req).length)
+      .map(({ label }) => label);
+
+    expect(duplicated).toEqual([]);
+  });
+
+  it("can be satisfied by the options it offers", () => {
+    const impossible = allRequirements
+      .filter(({ req }) => {
+        if (req.options.length === 0) return false; // fulfilled by hand
+        const countable = req.options.reduce(
+          (sum, o) =>
+            sum + (o.type === "group" ? Math.min(o.required, o.options.length) : 1),
+          0,
+        );
+        return req.required > countable;
+      })
+      .map(({ label, req }) => `${label} needs ${req.required}`);
+
+    expect(impossible).toEqual([]);
+  });
+
+  it("puts a choice in a group rather than a loose list of courses", () => {
+    // Loose `course` options are all counted with no ceiling, so a requirement
+    // that offers eight courses for two slots has to say so with a group or it
+    // reads "2/4" to a student who did exactly what the catalog asks.
+    const uncapped = allRequirements
+      .filter(({ req }) => {
+        const loose = req.options.filter((o) => o.type === "course").length;
+        return !req.options.some((o) => o.type === "group") && loose > req.required;
+      })
+      .map(({ label, req }) => `${label}: ${req.options.length} options for ${req.required}`);
+
+    expect(uncapped).toEqual([]);
+  });
+
+  it("gives every group at least as many options as it needs", () => {
+    const short = allRequirements.flatMap(({ label, req }) =>
+      req.options
+        .filter((o) => o.type === "group" && o.required > o.options.length)
+        .map((o) => `${label}: group needs ${(o as { required: number }).required}`),
+    );
+
+    expect(short).toEqual([]);
+  });
+
+  it("quotes a positive credit total", () => {
+    const wrong = MAJORS.filter(
+      ([, major]) =>
+        typeof major.creditRequirements?.total !== "number" ||
+        major.creditRequirements.total <= 0,
+    ).map(([id]) => id);
+
+    expect(wrong).toEqual([]);
+  });
+
+  it("computes progress for every major without throwing", () => {
+    for (const [id] of MAJORS) {
+      const progress = calculateMajorProgress(id, [], []);
+      expect(Number.isFinite(progress.percentage), id).toBe(true);
+      expect(Number.isFinite(progress.remainingCredits), id).toBe(true);
+    }
+  });
+
+  it("quotes a credit total the requirements can actually earn", () => {
+    // The progress bar is completed credits over `creditRequirements.total`, so
+    // a total above everything the requirements can earn pins the bar below
+    // 100% no matter what the student does. Chemistry read 16.5 against a
+    // ceiling of 15.5 because a two-term capstone was recorded as one course.
+    //
+    // Only this direction is asserted. A total BELOW the sum is normal: several
+    // catalogs state one set of courses through overlapping rules (a History
+    // course can be the preindustrial one, the seminar and the regional one at
+    // once), and the honest total there is the catalog's own course count.
+    const unreachable: string[] = [];
+    for (const [id, major] of MAJORS) {
+      let ceiling = 0;
+      for (const req of major.requirements) {
+        if (req.options.length === 0) {
+          ceiling += req.required; // fulfilled by hand; assume Yale's 1-credit norm
+          continue;
+        }
+        for (const option of req.options) {
+          if (option.type === "course") {
+            ceiling += getCourseInfo(option.code)?.credits ?? 1;
+          } else {
+            ceiling += option.options
+              .map((code) => getCourseInfo(code)?.credits ?? 1)
+              .sort((a, b) => a - b)
+              .slice(-option.required)
+              .reduce((sum, credits) => sum + credits, 0);
+          }
+        }
+      }
+      const total = major.creditRequirements.total;
+      if (total > ceiling) {
+        unreachable.push(`${id}: total ${total} above the ${ceiling} its requirements can earn`);
+      }
+    }
+
+    expect(unreachable).toEqual([]);
   });
 });
 

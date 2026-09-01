@@ -2,27 +2,40 @@
 import { CourseInfo, getCourseInfo, getCanonicalCode, isValidCourseCode } from "./courseCatalog";
 import allReqs from './data/all_reqs.json';
 
-type RequirementOption = {
+export type RequirementOption = {
   type: 'course';
-  code: string; // Canonical course code
+  /** Canonical catalog code, i.e. getCanonicalCode(code) === code. */
+  code: string;
 } | {
   type: 'group';
-  options: string[]; // Array of canonical course codes
-  required: number; // Number of courses required from this group
+  /** Canonical catalog codes the student may choose between. */
+  options: string[];
+  /** How many COURSES from this group count. Nothing beyond it does. */
+  required: number;
   description?: string;
 };
 
-type MajorRequirement = {
+export type MajorRequirement = {
   id: string;
   name: string;
   description?: string;
   requirements: {
     name: string;
     description?: string;
+    /**
+     * How many COURSES the requirement needs — never credits. A half-credit lab
+     * that has to be taken once is 1. `creditRequirements.total` is the only
+     * field denominated in credits.
+     *
+     * When a requirement offers more options than it needs, they have to sit in
+     * a single `group`: loose `course` options are all counted, with no ceiling.
+     */
     required: number;
+    /** Empty when the rule is a category rather than a list of courses. */
     options: RequirementOption[];
   }[];
   creditRequirements: {
+    /** Total course credits, including any prerequisites listed above. */
     total: number;
   };
 };
@@ -155,6 +168,22 @@ export const calculateMajorProgress = (
   let totalInProgressCredits = 0;
   const requirementProgress: CompletedRequirement[] = [];
 
+  /**
+   * Details for one option, falling back for a code the catalog has never heard
+   * of. Dropping such an option would leave `required` counting a slot nothing
+   * can fill, which is how a mistyped code turns into a requirement no student
+   * can ever finish. Showing it keeps the requirement visible and leaves the
+   * "Fulfill manually" and "Mark as skipped" escape hatches usable.
+   * lib/majorRequirementsData.test.ts is what stops such a code from shipping.
+   */
+  const optionDetails = (code: string) => {
+    const course = getCourseInfo(code);
+    return {
+      name: course?.name ?? code,
+      credits: course?.credits ?? 1,
+    };
+  };
+
   for (const req of major.requirements) {
     let reqCompleted = 0;
     let reqInProgress = 0;
@@ -190,8 +219,7 @@ export const calculateMajorProgress = (
         // Skip if this course was already added manually
         if (manualFulfillments.some(m => m.code === code)) continue;
 
-        const course = getCourseInfo(code);
-        if (!course) continue;
+        const { name, credits } = optionDetails(code);
 
         // Check if this course is excluded from this requirement
         const excluded = isExcluded(req.name, code);
@@ -207,20 +235,20 @@ export const calculateMajorProgress = (
 
         reqOptions.push({
           code,
-          name: course.name,
+          name,
           completed: completed || skipped,
           inProgress: inProgress && !completed && !skipped,
           required: true,
-          credits: course.credits,
+          credits,
           skipped
         });
 
         if (completed || skipped) {
           reqCompleted += 1;
-          totalCompletedCredits += course.credits;
+          totalCompletedCredits += credits;
         } else if (inProgress) {
           reqInProgress += 1;
-          totalInProgressCredits += course.credits;
+          totalInProgressCredits += credits;
         }
       } else if (option.type === 'group') {
         let groupCompleted = 0;
@@ -231,8 +259,7 @@ export const calculateMajorProgress = (
           // Skip if this course was already added manually
           if (manualFulfillments.some(m => m.code === code)) return;
 
-          const course = getCourseInfo(code);
-          if (!course) return;
+          const { name, credits } = optionDetails(code);
 
           // Check if this course is excluded from this requirement
           const excluded = isExcluded(req.name, code);
@@ -245,17 +272,17 @@ export const calculateMajorProgress = (
 
           reqOptions.push({
             code,
-            name: course.name,
+            name,
             completed: completed || skipped,
             inProgress: inProgress && !completed && !skipped,
             required: (groupCompleted + groupInProgress) < option.required,
-            credits: course.credits,
+            credits,
             skipped
           });
 
           if ((completed || skipped) && groupCompleted < option.required) {
             groupCompleted++;
-            groupCredits += course.credits;
+            groupCredits += credits;
           } else if (inProgress && (groupCompleted + groupInProgress) < option.required) {
             groupInProgress++;
           }

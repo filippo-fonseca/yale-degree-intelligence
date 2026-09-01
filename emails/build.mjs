@@ -455,7 +455,16 @@ function bodyCopy(paragraph) {
     .join("\n");
 }
 
-function campaignEmail({ headline, paragraph, cta, videoCaption, title, preheader }) {
+function campaignEmail({
+  headline,
+  subheadline,
+  subnote,
+  paragraph,
+  cta,
+  videoCaption,
+  title,
+  preheader,
+}) {
   const parts = Array.isArray(paragraph) ? paragraph : [paragraph];
   const [opening, ...rest] = parts;
 
@@ -468,6 +477,32 @@ function campaignEmail({ headline, paragraph, cta, videoCaption, title, preheade
               </h1>
             </td>
           </tr>
+${/* Optional, and only the returning-user email uses them today. Rendered as
+     their own rows rather than <br />s inside the h1, so the serif headline
+     keeps its own line-height and the two lines can carry different sizes. */ ""}
+${
+  subheadline
+    ? `
+          <tr>
+            <td align="center" style="padding: 0 0 10px 0;">
+              <p class="t-primary" style="margin: 0; font-family: ${SANS}; font-size: 18px; font-weight: 600; line-height: 1.4; color: ${LIGHT.primary};">
+                ${subheadline}
+              </p>
+            </td>
+          </tr>`
+    : ""
+}${
+  subnote
+    ? `
+          <tr>
+            <td align="center" style="padding: 0 0 8px 0;">
+              <p class="t-muted" style="margin: 0; font-family: ${SANS}; font-size: 13px; line-height: 1.6; color: ${LIGHT.muted};">
+                ${subnote}
+              </p>
+            </td>
+          </tr>`
+    : ""
+}
 
 ${copyRow(opening, { pad: 26 })}
 ${/* The way in sits right after the opening paragraph, not at the bottom. A
@@ -533,14 +568,14 @@ const TARGETS = [
     render: () =>
       campaignEmail({
         headline: `${grad("v3")} is here.`,
+        subheadline: "Last semester is over! Time to update your classes on DegreeIntelligence.",
+        subnote: `Click ${u("Re-upload transcript")} to refresh your stats and see where you're at
+                in terms of your major, certificates, GPA, distributionals, and much more.`,
         paragraph: `If you're getting this email, you're among the 1 in 6 Yale students who have
                 signed up to use DegreeIntelligence over the past year. First of all, thank you!
                 We just wanted to let you know we've been hard at work making Yale's most used degree-planning platform even
                 better. We now have ${u("Certificates")}, a rebuilt ${u("Simulator")},
-                ${u("distributionals")}, a ${u("cleaner UI")}, and ${u("much more")}.
-                Luckily, ${u("add/drop is still open")}, so there's time to change what you're
-                taking this semester, and to see where the classes you already picked put you
-                in the grand scheme of things for your major, certificates, and distributionals.`,
+                ${u("distributionals")}, a ${u("cleaner UI")}, and ${u("much more")}.`,
         cta: "Log back into DegreeIntelligence →",
         videoCaption: "Watch the demo",
         title: "Are you sure you chose the right classes?",

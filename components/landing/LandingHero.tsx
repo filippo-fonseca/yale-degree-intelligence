@@ -37,7 +37,7 @@ export default function LandingHero({
           </p>
 
           <p className="mt-3 font-sf text-sm text-gray-500 dark:text-gray-400">
-            1 in 6 Yale undergrads already use DegreeIntelligence.
+            1 in 5 Yale undergrads already use DegreeIntelligence.
           </p>
 
           <div className="mt-8 flex flex-wrap items-center justify-center gap-3">

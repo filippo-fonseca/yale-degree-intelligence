@@ -54,6 +54,7 @@ export const RELEASES: Release[] = [
         items: [
           "51 requirements were renamed, because the old name said something that was not true. If you had used \"Fulfill manually\" or removed a course from one of those requirements, that choice will not have carried over and you may need to set it again.",
           "If something still looks wrong on your major, please tell us. This whole release came from one student's email.",
+          "The homepage now says 1 in 5 Yale undergrads use DegreeIntelligence, because that is where the number has got to. It said 1 in 6.",
         ],
       },
     ],

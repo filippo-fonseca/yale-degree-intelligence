@@ -39,6 +39,17 @@ export const RELEASES: Release[] = [
         ],
       },
       {
+        title: "The numbers on My Major",
+        items: [
+          "The credit count above each column on My Major now describes the cards in that column. It used to show a figure for the whole major, so \"3 reqs · 5.5 cr\" could sit above three requirements worth 3 credits between them. That was wrong on 70 of the 142 majors.",
+          "Your total credits no longer count a course twice. If your major accepts one course under two different requirements — an Applied Mathematics breadth course that is also the extra breadth course, an MCDB organic chemistry term that is also an elective — it was being added to your total once for each, so ten majors were crediting you with up to two credits you had not earned.",
+          "A course you are taking right now, chosen from a list of alternatives, now counts toward your in-progress credits. It was showing up in the requirement but adding nothing to the in-progress figure or to the striped part of the bar.",
+          "Marking one course manually no longer completes a requirement that needs two. It was counting your entry twice and calling the requirement done.",
+          "Hovering the count on a requirement now tells you both numbers: how many courses you have done of how many, and how many credits that is. They differ whenever half-credit labs or 1.5-credit studios are involved.",
+          "The Simulator's projected progress had the same problem as My Major and is fixed the same way: a planned half-credit lab satisfied its requirement but was shown as half done and outlined in red.",
+        ],
+      },
+      {
         title: "Worth knowing",
         items: [
           "51 requirements were renamed, because the old name said something that was not true. If you had used \"Fulfill manually\" or removed a course from one of those requirements, that choice will not have carried over and you may need to set it again.",

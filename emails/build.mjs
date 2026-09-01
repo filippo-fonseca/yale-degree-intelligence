@@ -674,9 +674,9 @@ const TARGETS = [
                 degrees, and we've been hard at work making it even better. We now have
                 ${u("Certificates")}, a rebuilt ${u("Simulator")}, ${u("distributionals")},
                 a ${u("cleaner UI")}, and ${u("much more")}. Luckily, ${u("add/drop is still open")},
-                so there's time to change what you're taking this semester, and to see where the
+                so there's time to change what you're taking this semester (to see where the
                 classes you already picked put you in the grand scheme of things for your major,
-                certificates, and distributionals.`,
+                certificates, and distributionals).`,
             `Made by Yalies, for Yalies, DegreeIntelligence is free (forever) and open-source.
                 It requires nothing to install!`,
           ],

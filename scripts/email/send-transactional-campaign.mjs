@@ -69,21 +69,34 @@ function unsubscribeUrl(email, secret) {
   return `${SITE_URL}/unsubscribe?e=${encodeURIComponent(normalized)}&t=${token}`;
 }
 
-function rosterPath(year) {
-  return path.join(REPO_ROOT, "lists", `${year}.roster.json`);
+/**
+ * Prefers the per-variant roster, falls back to the whole class year. Each year
+ * splits into two disjoint rosters, since the returning and newcomer emails
+ * contradict each other and neither can go to the other's half.
+ */
+function rosterPath(year, variantName) {
+  const specific = path.join(REPO_ROOT, "lists", `${year}.${variantName}.roster.json`);
+  return fs.existsSync(specific)
+    ? specific
+    : path.join(REPO_ROOT, "lists", `${year}.roster.json`);
 }
 
 function sentLedgerPath(year, variant) {
   return path.join(REPO_ROOT, "lists", `${year}.${variant}.sent.json`);
 }
 
-function readRoster(year) {
-  const file = rosterPath(year);
+function readRoster(year, variantName) {
+  const file = rosterPath(year, variantName);
   if (!fs.existsSync(file)) {
     throw new Error(
-      `missing ${file}. Run: node scripts/email/parse-list.mjs --year ${year} --in lists/${year}.txt`,
+      `missing lists/${year}.${variantName}.roster.json (and no lists/${year}.roster.json). Build it with:\n` +
+        `  node scripts/email/export-users.mjs\n` +
+        `  node scripts/email/parse-list.mjs --year ${year} --in lists/${year}.txt \\\n` +
+        `    ${variantName === "existing" ? "--intersect" : "--exclude"} lists/existing-users.txt \\\n` +
+        `    --out lists/${year}.${variantName}.roster.json`,
     );
   }
+  console.log(`  roster file      ${path.relative(REPO_ROOT, file)}`);
   const roster = JSON.parse(fs.readFileSync(file, "utf8"));
   const emails = Array.isArray(roster) ? roster : roster.emails;
   if (!Array.isArray(emails) || emails.length === 0) {
@@ -130,7 +143,7 @@ async function main() {
 
   // --to sends the real campaign, through this exact code path, to one
   // address. It is how the flow gets checked before it is pointed at a class.
-  const roster = args.to ? [args.to.trim().toLowerCase()] : readRoster(year);
+  const roster = args.to ? [args.to.trim().toLowerCase()] : readRoster(year, variantName);
   const ledgerKey = args.to ? `${variantName}.test` : variantName;
   const ledger = readLedger(year, ledgerKey);
   const attempted = new Set(ledger.attempted);

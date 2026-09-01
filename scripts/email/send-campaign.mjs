@@ -47,13 +47,29 @@ const VARIANTS = {
   },
 };
 
-function readRoster(year) {
-  const rosterPath = path.join(REPO_ROOT, "lists", `${year}.roster.json`);
+/**
+ * Prefers the per-variant roster, falls back to the whole class year.
+ *
+ * Each year splits into two disjoint rosters, since the returning and newcomer
+ * emails contradict each other and neither can go to the other's half. The
+ * plain <year>.roster.json remains valid for a variant like frosh that goes to
+ * an entire class.
+ */
+function readRoster(year, variantName) {
+  const specific = path.join(REPO_ROOT, "lists", `${year}.${variantName}.roster.json`);
+  const shared = path.join(REPO_ROOT, "lists", `${year}.roster.json`);
+  const rosterPath = fs.existsSync(specific) ? specific : shared;
+
   if (!fs.existsSync(rosterPath)) {
     throw new Error(
-      `missing ${rosterPath}. Run: node scripts/email/parse-list.mjs --year ${year} --in lists/${year}.txt`,
+      `missing ${specific} (and no ${shared}). Build it with:\n` +
+        `  node scripts/email/export-users.mjs\n` +
+        `  node scripts/email/parse-list.mjs --year ${year} --in lists/${year}.txt \\\n` +
+        `    ${variantName === "existing" ? "--intersect" : "--exclude"} lists/existing-users.txt \\\n` +
+        `    --out lists/${year}.${variantName}.roster.json`,
     );
   }
+  console.log(`  roster file  ${path.relative(REPO_ROOT, rosterPath)}`);
   const roster = JSON.parse(fs.readFileSync(rosterPath, "utf8"));
   const emails = Array.isArray(roster) ? roster : roster.emails;
   if (!Array.isArray(emails) || emails.length === 0) {
@@ -104,7 +120,7 @@ async function main() {
     );
   }
 
-  const emails = readRoster(year).map((email) => email.trim().toLowerCase());
+  const emails = readRoster(year, variantName).map((email) => email.trim().toLowerCase());
   const ledger = readLedger(year);
 
   // Our own opt-out list, which lives in Firestore because /unsubscribe writes

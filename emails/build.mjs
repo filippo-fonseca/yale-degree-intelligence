@@ -683,7 +683,7 @@ const TARGETS = [
         ],
         cta: "Try DegreeIntelligence →",
         videoCaption: "Watch the demo",
-        title: "1 in 6 Yalies use this. Why don't you?",
+        title: "Are you sure you chose the right classes?",
         preheader:
           "Choosing the right Yale classes to fulfill requirements for your major, certificates, distributionals, etc. is hard (all the while keeping track of your GPA, etc.). Don't worry. We're here to help.",
       }),

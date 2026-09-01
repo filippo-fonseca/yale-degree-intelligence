@@ -43,7 +43,7 @@ const VARIANTS = {
   frosh: { file: "v3-frosh.html", subject: "Welcome to Yale" },
   newcomers: {
     file: "v3-newcomers.html",
-    subject: "1 in 6 Yalies use this. Why don't you?",
+    subject: "Are you sure you chose the right classes?",
   },
 };
 

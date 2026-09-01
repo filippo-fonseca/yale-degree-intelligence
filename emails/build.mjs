@@ -149,6 +149,10 @@ function darkModeStyles() {
     [".logo-dark", "display: inline-block !important;"],
     // The headline pink lifts a step on dark so it keeps its contrast.
     [".t-accent", `color: ${DARK.accent} !important;`],
+    // Chip naming an in-app button. Its own rule rather than .bg-well because
+    // the label colour has to lift with the background or it goes near-black
+    // on near-black.
+    [".pill", `background-color: ${DARK.wellBg} !important; border-color: ${DARK.border} !important; color: ${DARK.primary} !important;`],
   ];
 
   const media = rules.map(([sel, decl]) => `      ${sel} { ${decl} }`).join("\n");
@@ -415,6 +419,26 @@ function u(text) {
 }
 
 /**
+ * An inline chip that names a real control in the app.
+ *
+ * Deliberately not a link and not underlined: it is a picture of a button the
+ * reader has to find on screen, so it should look like that button rather than
+ * like something to click here. Bold does the emphasis u() would otherwise do.
+ *
+ * inline-block rather than a nested table because it sits mid-sentence and has
+ * to wrap with the text around it. Outlook's Word engine drops border-radius
+ * and inline padding, so it degrades there to bold text on a grey ground,
+ * which still reads as a label. white-space: nowrap keeps the icon from ending
+ * a line on its own with the words orphaned onto the next.
+ */
+function pill(label, icon) {
+  const img = (variant, display) =>
+    `<img src="${LOGO_BASE}/${icon}-${variant}.png" width="12" height="12" alt="" class="logo-${variant}" style="display: ${display}; width: 12px; height: 12px; border: 0; vertical-align: -2px;" />`;
+
+  return `<span class="pill" style="display: inline-block; padding: 1px 9px 2px 8px; border-radius: 100px; background-color: ${LIGHT.wellBg}; border: 1px solid ${LIGHT.border}; font-weight: 700; color: ${LIGHT.primary}; white-space: nowrap;">${img("light", "inline-block")}${img("dark", "none")}&nbsp;${label}</span>`;
+}
+
+/**
  * Pink gradient text.
  *
  * The gradient lives in a stylesheet class while the inline style carries a
@@ -569,8 +593,9 @@ const TARGETS = [
       campaignEmail({
         headline: `${grad("v3")} is here.`,
         subheadline: "Last semester is over! Time to update your classes on DegreeIntelligence.",
-        subnote: `Click ${u("Re-upload transcript")} to refresh your stats and see where you're at
-                in terms of your major, certificates, GPA, distributionals, and much more.`,
+        subnote: `Click ${pill("Re-upload transcript", "refresh")} to refresh your stats and see
+                where you're at in terms of your major, certificates, GPA, distributionals, and
+                much more.`,
         paragraph: `If you're getting this email, you're among the 1 in 6 Yale students who have
                 signed up to use DegreeIntelligence over the past year. First of all, thank you!
                 It's your support + feedback that makes our free, student-run, open-source app

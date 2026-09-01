@@ -17,9 +17,39 @@ export type Release = {
 
 export const RELEASES: Release[] = [
   {
-    version: "v3.0.1",
+    version: "v3.0.2",
     date: "Summer 2026",
     current: true,
+    summary:
+      "Every major re-checked line by line against the Yale course catalog, after a Physics major wrote in about requirements that could not be finished.",
+    sections: [
+      {
+        title: "Your major's requirements",
+        items: [
+          "A Physics major told us the introductory sequence was asking for four lecture courses when Yale asks for two. He was right, and it turned out not to be only Physics: all 142 majors and tracks have now been read back against their page in the Yale College Programs of Study, and a lot of them needed fixing.",
+          "89 requirements across the app could not be completed by anyone, because they asked for more courses than they offered any way to take. Russian, East European, and Eurasian Studies had eight such requirements, Sociology six, and the Music intensive major was a single line reading \"All Standard Music Major Requirements\" that nothing could ever tick off.",
+          "112 requirements pointed at course numbers Yale does not use. Some were courses that have been renumbered since, some were graduate courses undergraduates cannot take, and some were never course numbers at all — placeholders like \"MATH 5000+\" and \"HNDI L5\", or just a department's name.",
+          "Half-credit courses now count as one course towards a requirement. A Physics major who had passed the advanced lab saw it stuck at \"0.5 of 1\" and sitting in Remaining, and every lab-shaped requirement in every major had the same problem.",
+          "Where your major lets you pick between options, the count now stops at what you actually owe. Finishing two of the four introductory Physics sequences used to read \"2/4\", as though you owed the other three.",
+          "Several majors were asking for more courses than the major has. Political Science wanted 17 for a 15-course major and American Studies 18 for a 14-course major, because the same requirement had been counted twice.",
+          "Requirements the catalog states as a category rather than a list — any course in the 2100s, two courses on Africa outside your concentration, a senior essay your DUS approves — now say so plainly and offer the \"Fulfill manually\" button, instead of showing a short and arbitrary list of courses.",
+          "Where the catalog does state a range, you now get the real menu of courses in it rather than a few examples.",
+          "Every requirement now explains the part the checklist cannot show: which halves of a sequence have to match, which alternative paths exist, what your DUS has to approve, and when a requirement is worth more than one credit.",
+          "Twelve courses only had their pre-2025 numbers on file, so a requirement naming the current number never matched what was on your transcript. They now carry both.",
+        ],
+      },
+      {
+        title: "Worth knowing",
+        items: [
+          "51 requirements were renamed, because the old name said something that was not true. If you had used \"Fulfill manually\" or removed a course from one of those requirements, that choice will not have carried over and you may need to set it again.",
+          "If something still looks wrong on your major, please tell us. This whole release came from one student's email.",
+        ],
+      },
+    ],
+  },
+  {
+    version: "v3.0.1",
+    date: "Summer 2026",
     summary:
       "A quieter front door, a transcript import that no longer does the same work twice, and clearer numbers where you read your progress.",
     sections: [

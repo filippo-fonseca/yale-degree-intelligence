@@ -541,7 +541,7 @@ const TARGETS = [
         cta: "Log back into DegreeIntelligence →",
         videoCaption: "Watch the demo",
         title: "Are you sure you chose the right classes?",
-        preheader: "Certificates, a rebuilt Simulator, distributionals, a cleaner UI, and much more.",
+        preheader: "Majors, certificates, distributionals, your GPA. It's a lot to keep straight. We're here to help.",
       }),
   },
   {
@@ -608,7 +608,7 @@ const TARGETS = [
         cta: "Try DegreeIntelligence →",
         videoCaption: "Watch the demo",
         title: "1 in 6 Yalies use this. Why don't you?",
-        preheader: "Plan semesters, track requirements, and see how your degree is actually going.",
+        preheader: "Majors, certificates, distributionals, your GPA. It's a lot to keep straight. We're here to help.",
       }),
   },
 ];

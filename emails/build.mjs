@@ -639,15 +639,23 @@ const TARGETS = [
     render: () =>
       campaignEmail({
         headline: `1 in 6 Yalies use this.<br /><span class="t-muted" style="color: ${LIGHT.muted};">Why don't you?</span>`,
-        paragraph: `If you're getting this email, you haven't signed up to DegreeIntelligence yet.
+        // Nested on purpose. campaignEmail splits a flat array around the CTA,
+        // so [a, b] would drop the sign-off below the button; one array of two
+        // keeps both paragraphs in the same block above it.
+        paragraph: [
+          [
+            `If you're getting this email, you haven't signed up to DegreeIntelligence yet.
                 It's what around 1,200 Yalies across every residential college use to plan their
                 degrees, and we've been hard at work making it even better. We now have
                 ${u("Certificates")}, a rebuilt ${u("Simulator")}, ${u("distributionals")},
                 a ${u("cleaner UI")}, and ${u("much more")}. Luckily, ${u("add/drop is still open")},
                 so there's time to change what you're taking this semester, and to see where the
                 classes you already picked put you in the grand scheme of things for your major,
-                certificates, and distributionals. Made by Yalies, for Yalies,
-                DegreeIntelligence is free (forever) and requires nothing to install.`,
+                certificates, and distributionals.`,
+            `Made by Yalies, for Yalies, DegreeIntelligence is free (forever) and open-source.
+                It requires nothing to install!`,
+          ],
+        ],
         cta: "Try DegreeIntelligence →",
         videoCaption: "Watch the demo",
         title: "1 in 6 Yalies use this. Why don't you?",

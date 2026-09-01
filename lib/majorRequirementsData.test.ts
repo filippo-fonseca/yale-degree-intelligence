@@ -288,7 +288,7 @@ describe("the credit figures the cards print", () => {
           else taken.push(...option.options.slice(0, option.required));
         }
       }
-      const distinct = [...new Set(taken)];
+      const distinct = Array.from(new Set(taken));
       const worth = distinct.reduce((sum, code) => sum + (getCourseInfo(code)?.credits ?? 1), 0);
       const { completedCredits } = calculateMajorProgress(id, distinct);
       if (completedCredits > worth + 0.001) {

@@ -915,7 +915,7 @@ export default function Simulator({
       program: { type: match.programType, id: match.programId },
       requirementTitle: match.requirementName,
     }));
-    const context = buildProgramClaimContext(completedCourses, policyOptions);
+    const context = buildProgramClaimContext(takenForProjection, policyOptions);
     return evaluatePlannedCourseAdmission({
       courseCode: course.code,
       candidates,
@@ -954,7 +954,22 @@ export default function Simulator({
         sem.id === semesterId
           ? sem.courses.some((c) => c.code === course.code)
             ? sem
-            : { ...sem, courses: [...sem.courses, course] }
+            : {
+                ...sem,
+                // Same landing rule as the drag path: the current term means
+                // in progress, any other term means planned.
+                courses: [
+                  ...sem.courses,
+                  course.status === "completed"
+                    ? course
+                    : {
+                        ...course,
+                        status: isCurrentSemester(sem.name)
+                          ? ("in-progress" as const)
+                          : ("not-taken" as const),
+                      },
+                ],
+              }
           : sem,
       ),
     );
@@ -1091,13 +1106,72 @@ export default function Simulator({
     );
   };
 
+  // ------------ Plan-derived course sets (for preview) ------------
+  // The plan on the canvas is the projection's source of truth. A plan
+  // snapshots the student's completed and in-progress courses when it is
+  // created; after that only what sits on the grid counts, so removing an
+  // in-progress course from the grid removes it from the projection.
+  const planTakenCourses = useMemo<Course[]>(
+    () =>
+      semesters.flatMap((s) =>
+        s.courses.filter((c) => c?.code && c.status !== "not-taken"),
+      ),
+    [semesters],
+  );
+
+  // Transcript facts stay facts: a completed course still counts when the
+  // grid has no slot for its term (summer sessions never get a column), so
+  // completed courses union the database back in. In-progress courses are
+  // deliberately absent from the union; those are the plan's to control.
+  const takenForProjection = useMemo<Course[]>(() => {
+    const seen = new Set(planTakenCourses.map((c) => c.code));
+    return [
+      ...planTakenCourses,
+      ...completedCourses.filter(
+        (c) => c.status === "completed" && !seen.has(c.code),
+      ),
+    ];
+  }, [planTakenCourses, completedCourses]);
+
+  const planCompletedCodes = useMemo<string[]>(
+    () =>
+      takenForProjection
+        .filter((c) => c.status === "completed")
+        .map((c) => c.code),
+    [takenForProjection],
+  );
+
+  // Anything sitting in the calendar's current term is a course being taken
+  // right now, whatever its stored status says: a plan saved last spring can
+  // still hold this term's courses as "not-taken".
+  const planInProgressCodes = useMemo<string[]>(
+    () =>
+      semesters.flatMap((s) =>
+        s.courses
+          .filter(
+            (c) =>
+              c?.code &&
+              c.status !== "completed" &&
+              (c.status === "in-progress" || isCurrentSemester(s.name)),
+          )
+          .map((c) => c.code),
+      ),
+    [semesters],
+  );
+
   // ------------ Planned set (for preview) ------------
+  // Excludes the current term: those courses read as in progress, not planned.
   const plannedNow = useMemo<PlannedCoursePick[]>(() => {
     const codes = new Set<string>();
     const list: PlannedCoursePick[] = [];
     semesters.forEach((s) => {
       s.courses.forEach((c) => {
-        if (c?.code && c.status === "not-taken" && !codes.has(c.code)) {
+        if (
+          c?.code &&
+          c.status === "not-taken" &&
+          !isCurrentSemester(s.name) &&
+          !codes.has(c.code)
+        ) {
           codes.add(c.code);
           list.push({ code: c.code, status: "in-progress" });
         }
@@ -1208,17 +1282,17 @@ export default function Simulator({
   // same allocation the main DistributionalProgress uses, so the sim builds on
   // real progress instead of starting from zero.
   const completedDistAssignments = useMemo<string[][]>(() => {
-    const allocation = allocateDistributionals(completedCourses, {
+    const allocation = allocateDistributionals(takenForProjection, {
       auto: distribAutoAllocate,
       overrides: distribOverrides,
     });
-    return completedCourses
+    return takenForProjection
       .map((c) => {
         const req = allocation.reqByCourseKey[allocation.keyOf(c)];
         return req ? [req] : null;
       })
       .filter((a): a is string[] => a !== null);
-  }, [completedCourses, distribAutoAllocate, distribOverrides]);
+  }, [takenForProjection, distribAutoAllocate, distribOverrides]);
 
   // ------------ Live preview progress (local compute) ------------
   useEffect(() => {
@@ -1237,10 +1311,8 @@ export default function Simulator({
     setIsPreviewLoading(true);
     setPreviewError(null);
 
-    const completedCodes = completedCourses.map((c) => c.code);
-    const inProgCodes = semesters.flatMap((s) =>
-      s.courses.filter((c) => c.status === "in-progress").map((c) => c.code),
-    );
+    const completedCodes = planCompletedCodes;
+    const inProgCodes = planInProgressCodes;
     const plannedCodesLocal = plannedCodes;
     const skippedCodes: string[] = [];
 
@@ -1256,7 +1328,7 @@ export default function Simulator({
       plannedCodesLocal,
     );
     const claimContext = buildProgramClaimContext(
-      completedCourses,
+      takenForProjection,
       policyOptions,
     );
     const violationsFor = (certId: string) =>
@@ -1269,16 +1341,25 @@ export default function Simulator({
     // courses that match a certificate and nothing else still cannot count
     // toward a major, so they stay blocked outright.
     const majorBlockedCodes = [
-      ...getMajorBlockedCodes(completedCourses, policyOptions),
+      ...getMajorBlockedCodes(takenForProjection, policyOptions),
       ...plannedAutoCertificateOnlyCodes,
     ];
 
+    // A permanent manual fulfillment only counts while its course is still on
+    // the plan; removing the course from the grid takes the credit with it.
+    const planCodeSet = new Set([
+      ...completedCodes,
+      ...inProgCodes,
+      ...plannedCodesLocal,
+    ]);
     const majorManualReqs = [
-      ...majorPermanentManualsResolved,
+      ...majorPermanentManualsResolved.filter((m) => planCodeSet.has(m.code)),
       ...simulatorMajorManuals.map((m) => ({ ...m, isPlanned: true })),
     ];
     const certificateManualReqs = [
-      ...certificatePermanentManualsResolved,
+      ...certificatePermanentManualsResolved.filter((m) =>
+        planCodeSet.has(m.code),
+      ),
       ...simulatorCertificateManuals.map((m) => ({ ...m, isPlanned: true })),
     ];
 
@@ -1401,8 +1482,9 @@ export default function Simulator({
     user,
     majorIds,
     certificateIds,
-    semesters,
-    completedCourses,
+    takenForProjection,
+    planCompletedCodes,
+    planInProgressCodes,
     plannedCodes,
     simulatorManualReqs,
     majorPermanentManualsResolved,
@@ -2149,7 +2231,7 @@ export default function Simulator({
               plannedCodes={plannedCodes}
               plannedSemesterByCode={plannedSemesterByCode}
               simulatorManualReqs={simulatorManualReqs}
-              courses={completedCourses}
+              courses={takenForProjection}
               policyOptions={policyOptions}
               onRemoveManualReq={(code, requirement) => {
                 setSimulatorManualReqs((prev) =>

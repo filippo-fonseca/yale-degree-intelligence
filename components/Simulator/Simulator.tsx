@@ -1627,6 +1627,35 @@ export default function Simulator({
     }
   };
 
+  const duplicatePlan = async (planIndex: number) => {
+    if (!user || planIndex < 0 || planIndex >= savedPlans.length) return;
+    const source = savedPlans[planIndex];
+    const taken = new Set(savedPlans.map((p) => p.name));
+    let copyName = `Copy of ${source.name}`;
+    for (let n = 2; taken.has(copyName); n++) {
+      copyName = `Copy of ${source.name} ${n}`;
+    }
+    const copy: Plan = {
+      ...structuredClone(source),
+      name: copyName,
+      createdAt: new Date().toISOString(),
+      isDefault: false,
+    };
+    try {
+      const updatedPlans = [...savedPlans, copy];
+      await setDoc(
+        doc(db, "users", user.uid),
+        { savedPlans: updatedPlans },
+        { merge: true },
+      );
+      setSavedPlans(updatedPlans);
+      toast.success(`Saved "${copyName}"`);
+    } catch (e) {
+      console.error("Error duplicating plan:", e);
+      toast.error("Failed to duplicate plan");
+    }
+  };
+
   const resetSimulator = () => {
     if (
       !confirmDiscardChanges(
@@ -2306,6 +2335,7 @@ export default function Simulator({
         onClose={() => setShowPlansModal(false)}
         onLoad={loadPlan}
         onSetDefault={setDefaultPlan}
+        onDuplicate={duplicatePlan}
         onDelete={deletePlan}
         onSaveCurrent={openSaveModal}
       />

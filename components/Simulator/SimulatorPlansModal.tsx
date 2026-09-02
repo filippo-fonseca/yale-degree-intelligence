@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { FiPlus, FiStar, FiTrash2, FiX } from "react-icons/fi";
+import { FiCopy, FiPlus, FiStar, FiTrash2, FiX } from "react-icons/fi";
 import { plannedCourseCount, type Plan } from "./planTypes";
 
 function formatSaved(iso: string): string {
@@ -33,6 +33,7 @@ export default function SimulatorPlansModal({
   onClose,
   onLoad,
   onSetDefault,
+  onDuplicate,
   onDelete,
   onSaveCurrent,
 }: {
@@ -44,6 +45,7 @@ export default function SimulatorPlansModal({
   onClose: () => void;
   onLoad: (index: number) => void;
   onSetDefault: (index: number) => void;
+  onDuplicate: (index: number) => void;
   onDelete: (index: number) => void;
   onSaveCurrent: () => void;
 }) {
@@ -175,6 +177,16 @@ export default function SimulatorPlansModal({
                               size={14}
                               className={plan.isDefault ? "fill-current" : ""}
                             />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => onDuplicate(index)}
+                            aria-label={`Duplicate "${plan.name}"`}
+                            title="Duplicate plan"
+                            data-sim-plan-duplicate={plan.name}
+                            className="p-1.5 rounded-lg text-gray-400 dark:text-gray-500 hover:text-purple-600 dark:hover:text-purple-300 hover:bg-purple-50 dark:hover:bg-purple-500/10 transition-colors"
+                          >
+                            <FiCopy size={14} />
                           </button>
                           <button
                             type="button"

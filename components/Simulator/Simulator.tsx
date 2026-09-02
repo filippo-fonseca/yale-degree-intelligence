@@ -19,11 +19,16 @@ import { doc, getDoc, setDoc } from "firebase/firestore";
 import { db } from "@/config/firebase";
 import ManualCourseLookupModal from "./ManualCourseLookupModal";
 import SimulatorManualAssignModal from "./SimulatorManualAssignModal";
-import SimulatorRequirementsBreakdown from "./SimulatorRequirementsBreakdown";
+import SimulatorRequirementsBreakdown, {
+  COMPLETION_FULL_PCT,
+  projectedCompletionPct,
+} from "./SimulatorRequirementsBreakdown";
 import CourseGradeControl from "./CourseGradeControl";
 import CourseDistributionalControl from "./CourseDistributionalControl";
 import { effectiveDistributionals } from "@/lib/utils/effectiveDistributionals";
-import SimulatorProgressPane from "./SimulatorProgressPane";
+import SimulatorProgressPane, {
+  type CompletionFlash,
+} from "./SimulatorProgressPane";
 import { useDismissibleFlag } from "@/lib/useDismissibleFlag";
 import { type SimulatorView } from "./SimulatorViewSwitcher";
 import SimulatorToolbarRow from "./SimulatorToolbarRow";
@@ -33,12 +38,14 @@ import SimulatorPlansModal from "./SimulatorPlansModal";
 import type { Plan, Semester } from "./planTypes";
 import {
   calculatePreviewMajorProgressByMajors,
+  MAJORS,
   MajorProgress,
   ManualRequirementEntry,
   majorRequirements,
 } from "@/lib/majors";
 import {
   calculatePreviewCertificateProgressByCertificates,
+  CERTIFICATES,
   certificateRequirements,
   type CertificateProgress,
 } from "@/lib/certificates";
@@ -1364,8 +1371,9 @@ export default function Simulator({
     ];
 
     try {
+      let majorsAll: PreviewProgressMap = {};
       if (majorIds.length > 0) {
-        const all = calculatePreviewMajorProgressByMajors(
+        majorsAll = calculatePreviewMajorProgressByMajors(
           majorIds,
           completedCodes,
           inProgCodes,
@@ -1374,7 +1382,7 @@ export default function Simulator({
           plannedCodesLocal,
           majorBlockedCodes,
         );
-        setPreviewProgress(all);
+        setPreviewProgress(majorsAll);
       } else {
         setPreviewProgress({});
       }
@@ -1404,8 +1412,10 @@ export default function Simulator({
           );
         }
         setCertificatePreviewProgress(certAll);
+        registerCompletionSnapshot(majorsAll, certAll);
       } else {
         setCertificatePreviewProgress({});
+        registerCompletionSnapshot(majorsAll, {});
       }
     } catch (batchErr) {
       console.error("[PreviewProgress] batch compute failed:", batchErr);
@@ -1471,6 +1481,7 @@ export default function Simulator({
 
       setPreviewProgress(result);
       setCertificatePreviewProgress(certResult);
+      registerCompletionSnapshot(result, certResult);
 
       if (successes === 0) {
         setPreviewError("Could not load simulated progress.");
@@ -1490,6 +1501,86 @@ export default function Simulator({
     majorPermanentManualsResolved,
     certificatePermanentManualsResolved,
   ]);
+
+  // ------------ Completion transition feedback ------------
+  // Watches the preview for programs crossing the 100% projected line in
+  // either direction, toasts the change, and hangs a dismissable notice on
+  // the Projected progress header. Session-only by design: the notice is a
+  // heads-up about an edit just made, not a stored fact.
+  const [completionFlashes, setCompletionFlashes] = useState<CompletionFlash[]>(
+    [],
+  );
+  // Baseline keyed to the plan it was measured on, so loading a different
+  // plan never reads as gaining or losing a completion. `undefined` planKey
+  // means no baseline yet.
+  const completionBaselineRef = useRef<{
+    planKey: string | null | undefined;
+    pcts: Record<string, number>;
+  }>({ planKey: undefined, pcts: {} });
+
+  // Notices describe edits to the plan on the canvas; a different plan
+  // arriving clears them.
+  useEffect(() => {
+    setCompletionFlashes([]);
+  }, [currentPlanName]);
+
+  // Called by the preview effect with the freshly computed progress, so the
+  // comparison never straddles a render where the plan changed under it.
+  const registerCompletionSnapshot = (
+    majors: PreviewProgressMap,
+    certs: CertificatePreviewProgressMap,
+  ) => {
+    const pcts: Record<string, number> = {};
+    for (const [id, prog] of Object.entries(majors)) {
+      pcts[`major:${id}`] = projectedCompletionPct(prog);
+    }
+    for (const [id, prog] of Object.entries(certs)) {
+      pcts[`certificate:${id}`] = projectedCompletionPct(prog);
+    }
+    const baseline = completionBaselineRef.current;
+    const planKey = currentPlanNameRef.current;
+    completionBaselineRef.current = { planKey, pcts };
+    if (baseline.planKey === undefined || baseline.planKey !== planKey) return;
+
+    const labelOf = (key: string) => {
+      const [kind, id] = key.split(":");
+      return kind === "major" ? (MAJORS[id] ?? id) : (CERTIFICATES[id] ?? id);
+    };
+
+    const changed: CompletionFlash[] = [];
+    for (const [key, pct] of Object.entries(pcts)) {
+      const before = baseline.pcts[key];
+      if (before === undefined) continue;
+      const wasFull = before >= COMPLETION_FULL_PCT;
+      const nowFull = pct >= COMPLETION_FULL_PCT;
+      if (wasFull && !nowFull) {
+        changed.push({ programKey: key, kind: "lost", label: labelOf(key) });
+      } else if (!wasFull && nowFull) {
+        changed.push({ programKey: key, kind: "gained", label: labelOf(key) });
+      }
+    }
+    if (changed.length === 0) return;
+
+    setCompletionFlashes((prevFlashes) => [
+      ...prevFlashes.filter(
+        (f) => !changed.some((c) => c.programKey === f.programKey),
+      ),
+      ...changed,
+    ]);
+    for (const c of changed) {
+      if (c.kind === "lost") {
+        toast(`Your plan no longer completes ${c.label}.`, { icon: "⚠️" });
+      } else {
+        toast.success(`Your plan now completes ${c.label}!`, { icon: "🎉" });
+      }
+    }
+  };
+
+  const dismissCompletionFlash = (programKey: string) => {
+    setCompletionFlashes((prev) =>
+      prev.filter((f) => f.programKey !== programKey),
+    );
+  };
 
   // ------------ Save / Load / Delete Plans ------------
 
@@ -1735,6 +1826,42 @@ export default function Simulator({
     } catch (e) {
       console.error("Error duplicating plan:", e);
       toast.error("Failed to duplicate plan");
+    }
+  };
+
+  const renamePlan = async (planIndex: number, newName: string) => {
+    if (!user || planIndex < 0 || planIndex >= savedPlans.length) return;
+    const oldName = savedPlans[planIndex].name;
+    const trimmed = newName.trim();
+    if (!trimmed || trimmed === oldName) return;
+    if (savedPlans.some((p, i) => i !== planIndex && p.name === trimmed)) {
+      toast.error(`You already have a plan named "${trimmed}"`);
+      return;
+    }
+    try {
+      const updatedPlans = savedPlans.map((p, i) =>
+        i === planIndex ? { ...p, name: trimmed } : p,
+      );
+      await setDoc(
+        doc(db, "users", user.uid),
+        { savedPlans: updatedPlans },
+        { merge: true },
+      );
+      setSavedPlans(updatedPlans);
+      // Plans are matched by name, so the loaded-plan reference and the
+      // recent-plan key must follow the rename.
+      if (currentPlanName === oldName) {
+        setCurrentPlanName(trimmed);
+        try {
+          window.localStorage.setItem(`di-sim-recent-${user.uid}`, trimmed);
+        } catch {
+          // ignore
+        }
+      }
+      toast.success(`Renamed to "${trimmed}"`);
+    } catch (e) {
+      console.error("Error renaming plan:", e);
+      toast.error("Failed to rename plan");
     }
   };
 
@@ -2222,6 +2349,8 @@ export default function Simulator({
           onToggleExpanded={() => setShowMajorPreview((v) => !v)}
           isPreviewLoading={isPreviewLoading}
           previewError={previewError}
+          completionFlashes={completionFlashes}
+          onDismissFlash={dismissCompletionFlash}
           breakdown={
             <SimulatorRequirementsBreakdown
               majorIds={majorIds}
@@ -2418,6 +2547,7 @@ export default function Simulator({
         onLoad={loadPlan}
         onSetDefault={setDefaultPlan}
         onDuplicate={duplicatePlan}
+        onRename={renamePlan}
         onDelete={deletePlan}
         onSaveCurrent={openSaveModal}
       />

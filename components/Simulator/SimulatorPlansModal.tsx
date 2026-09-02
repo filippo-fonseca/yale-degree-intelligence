@@ -1,8 +1,16 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { FiCopy, FiPlus, FiStar, FiTrash2, FiX } from "react-icons/fi";
+import {
+  FiCopy,
+  FiEdit2,
+  FiMoreHorizontal,
+  FiPlus,
+  FiStar,
+  FiTrash2,
+  FiX,
+} from "react-icons/fi";
 import { plannedCourseCount, type Plan } from "./planTypes";
 
 function formatSaved(iso: string): string {
@@ -34,6 +42,7 @@ export default function SimulatorPlansModal({
   onLoad,
   onSetDefault,
   onDuplicate,
+  onRename,
   onDelete,
   onSaveCurrent,
 }: {
@@ -46,6 +55,7 @@ export default function SimulatorPlansModal({
   onLoad: (index: number) => void;
   onSetDefault: (index: number) => void;
   onDuplicate: (index: number) => void;
+  onRename: (index: number, newName: string) => void;
   onDelete: (index: number) => void;
   onSaveCurrent: () => void;
 }) {
@@ -57,6 +67,23 @@ export default function SimulatorPlansModal({
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [isOpen, onClose]);
+
+  // Which row's "..." menu is open, and which row is being renamed inline.
+  const [menuIndex, setMenuIndex] = useState<number | null>(null);
+  const [renamingIndex, setRenamingIndex] = useState<number | null>(null);
+  const [draftName, setDraftName] = useState("");
+
+  useEffect(() => {
+    if (!isOpen) {
+      setMenuIndex(null);
+      setRenamingIndex(null);
+    }
+  }, [isOpen]);
+
+  const commitRename = () => {
+    if (renamingIndex !== null) onRename(renamingIndex, draftName);
+    setRenamingIndex(null);
+  };
 
   return (
     <AnimatePresence>
@@ -136,9 +163,29 @@ export default function SimulatorPlansModal({
                       >
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center gap-1.5 flex-wrap">
-                            <span className="text-sm font-medium text-gray-800 dark:text-gray-100 truncate">
-                              {plan.name}
-                            </span>
+                            {renamingIndex === index ? (
+                              <input
+                                autoFocus
+                                value={draftName}
+                                onChange={(e) => setDraftName(e.target.value)}
+                                onKeyDown={(e) => {
+                                  if (e.key === "Enter") commitRename();
+                                  if (e.key === "Escape") {
+                                    e.stopPropagation();
+                                    setRenamingIndex(null);
+                                  }
+                                }}
+                                onBlur={() => setRenamingIndex(null)}
+                                aria-label={`Rename "${plan.name}"`}
+                                title="Enter to save, Esc to cancel"
+                                data-sim-plan-rename-input={plan.name}
+                                className="w-40 max-w-full text-sm font-medium rounded-md border border-purple-300 dark:border-purple-500/40 bg-white dark:bg-gray-900 px-1.5 py-0.5 text-gray-800 dark:text-gray-100 focus:outline-none"
+                              />
+                            ) : (
+                              <span className="text-sm font-medium text-gray-800 dark:text-gray-100 truncate">
+                                {plan.name}
+                              </span>
+                            )}
                             {isCurrent && (
                               <span className="shrink-0 text-[9px] font-medium uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-purple-100 dark:bg-purple-900/40 text-purple-700 dark:text-purple-200 border border-purple-300 dark:border-purple-600/40">
                                 Current
@@ -198,6 +245,44 @@ export default function SimulatorPlansModal({
                           >
                             <FiTrash2 size={14} />
                           </button>
+                          <div className="relative">
+                            <button
+                              type="button"
+                              onClick={() =>
+                                setMenuIndex(menuIndex === index ? null : index)
+                              }
+                              aria-label={`More actions for "${plan.name}"`}
+                              aria-expanded={menuIndex === index}
+                              title="More actions"
+                              data-sim-plan-menu={plan.name}
+                              className="p-1.5 rounded-lg text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-white/[0.06] transition-colors"
+                            >
+                              <FiMoreHorizontal size={14} />
+                            </button>
+                            {menuIndex === index && (
+                              <>
+                                <div
+                                  className="fixed inset-0 z-10"
+                                  onClick={() => setMenuIndex(null)}
+                                />
+                                <div className="absolute right-0 top-full mt-1 z-20 w-32 rounded-lg border border-gray-200 dark:border-white/[0.1] bg-white dark:bg-gray-900 shadow-lg py-1">
+                                  <button
+                                    type="button"
+                                    data-sim-plan-rename={plan.name}
+                                    onClick={() => {
+                                      setMenuIndex(null);
+                                      setRenamingIndex(index);
+                                      setDraftName(plan.name);
+                                    }}
+                                    className="w-full flex items-center gap-2 px-3 py-1.5 text-xs text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-white/[0.06] transition-colors"
+                                  >
+                                    <FiEdit2 size={12} />
+                                    Rename
+                                  </button>
+                                </div>
+                              </>
+                            )}
+                          </div>
                           <button
                             type="button"
                             onClick={() => onLoad(index)}

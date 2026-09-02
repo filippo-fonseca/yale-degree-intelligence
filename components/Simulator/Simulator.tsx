@@ -1738,6 +1738,42 @@ export default function Simulator({
     }
   };
 
+  const renamePlan = async (planIndex: number, newName: string) => {
+    if (!user || planIndex < 0 || planIndex >= savedPlans.length) return;
+    const oldName = savedPlans[planIndex].name;
+    const trimmed = newName.trim();
+    if (!trimmed || trimmed === oldName) return;
+    if (savedPlans.some((p, i) => i !== planIndex && p.name === trimmed)) {
+      toast.error(`You already have a plan named "${trimmed}"`);
+      return;
+    }
+    try {
+      const updatedPlans = savedPlans.map((p, i) =>
+        i === planIndex ? { ...p, name: trimmed } : p,
+      );
+      await setDoc(
+        doc(db, "users", user.uid),
+        { savedPlans: updatedPlans },
+        { merge: true },
+      );
+      setSavedPlans(updatedPlans);
+      // Plans are matched by name, so the loaded-plan reference and the
+      // recent-plan key must follow the rename.
+      if (currentPlanName === oldName) {
+        setCurrentPlanName(trimmed);
+        try {
+          window.localStorage.setItem(`di-sim-recent-${user.uid}`, trimmed);
+        } catch {
+          // ignore
+        }
+      }
+      toast.success(`Renamed to "${trimmed}"`);
+    } catch (e) {
+      console.error("Error renaming plan:", e);
+      toast.error("Failed to rename plan");
+    }
+  };
+
   const resetSimulator = () => {
     if (
       !confirmDiscardChanges(
@@ -2418,6 +2454,7 @@ export default function Simulator({
         onLoad={loadPlan}
         onSetDefault={setDefaultPlan}
         onDuplicate={duplicatePlan}
+        onRename={renamePlan}
         onDelete={deletePlan}
         onSaveCurrent={openSaveModal}
       />

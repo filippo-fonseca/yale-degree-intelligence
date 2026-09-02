@@ -18,6 +18,45 @@ import {
 type ProgressData = MajorProgress | CertificateProgress;
 type CompletedRequirement = MajorProgress["completedRequirements"][number];
 type Accent = "purple" | "teal";
+type RingAccent = Accent | "green";
+
+function requirementFractionCompleted(req: CompletedRequirement): number {
+  const completedCredits = req.options
+    .filter((o) => o.completed)
+    .reduce((sum, o) => sum + o.credits, 0);
+  const inProgressCredits = req.options
+    .filter((o) => o.inProgress)
+    .reduce((sum, o) => sum + o.credits, 0);
+  const totalProgress = Math.min(
+    completedCredits + inProgressCredits,
+    req.required,
+  );
+  return req.required > 0 ? totalProgress / req.required : 0;
+}
+
+/**
+ * The with-planned completion figure the program card's ring prints, exposed
+ * so the Simulator's completion-transition watcher fires on exactly the same
+ * number. In-progress and planned requirements contribute the same fraction
+ * either way, so the card's split between them does not change the sum.
+ */
+export function projectedCompletionPct(prog: ProgressData): number {
+  const totalReqs =
+    prog.completedRequirements.length +
+    prog.inProgressRequirements.length +
+    prog.remainingRequirements.length;
+  if (totalReqs === 0) return 0;
+  const withPlanned =
+    prog.completedRequirements.length +
+    prog.inProgressRequirements.reduce(
+      (sum, req) => sum + requirementFractionCompleted(req),
+      0,
+    );
+  return (withPlanned / totalReqs) * 100;
+}
+
+/** Full-completion cutoff shared by the green ring and transition watcher. */
+export const COMPLETION_FULL_PCT = 99.95;
 
 /** A conflict or a skipped auto-match, hung on the requirement it affects. */
 type RequirementNote = { code: string; text: string };
@@ -69,7 +108,7 @@ function ProgressRing({
   percentage: number;
   size?: number;
   strokeWidth?: number;
-  accent?: Accent;
+  accent?: RingAccent;
   /** Print the percentage in the middle of the ring. */
   showLabel?: boolean;
 }) {
@@ -116,7 +155,18 @@ function ProgressRing({
             and 2.2:1 (indigo) on a light card, so light mode walks them down
             the same ramp. The dark: stops are the ones that shipped. */}
         <linearGradient id={gradientId} x1="0" y1="0" x2="1" y2="1">
-          {accent === "teal" ? (
+          {accent === "green" ? (
+            <>
+              <stop
+                offset="0%"
+                className="[stop-color:#059669] dark:[stop-color:#34d399]"
+              />
+              <stop
+                offset="100%"
+                className="[stop-color:#047857] dark:[stop-color:#10b981]"
+              />
+            </>
+          ) : accent === "teal" ? (
             <>
               <stop
                 offset="0%"
@@ -529,28 +579,14 @@ function ProgramProgressCard({
     prog.inProgressRequirements.length +
     prog.remainingRequirements.length;
 
-  const getFractionCompleted = (req: CompletedRequirement) => {
-    const completedCredits = req.options
-      .filter((o) => o.completed)
-      .reduce((sum, o) => sum + o.credits, 0);
-    const inProgressCredits = req.options
-      .filter((o) => o.inProgress)
-      .reduce((sum, o) => sum + o.credits, 0);
-    const totalProgress = Math.min(
-      completedCredits + inProgressCredits,
-      req.required,
-    );
-    return req.required > 0 ? totalProgress / req.required : 0;
-  };
-
   const completedCount = prog.completedRequirements.length;
   const trueIPFraction = trueInProgress.reduce(
-    (sum, req) => sum + getFractionCompleted(req),
+    (sum, req) => sum + requirementFractionCompleted(req),
     0,
   );
   const withIPCount = completedCount + trueIPFraction;
   const plannedFraction = planned.reduce(
-    (sum, req) => sum + getFractionCompleted(req),
+    (sum, req) => sum + requirementFractionCompleted(req),
     0,
   );
   const withPlannedCount = withIPCount + plannedFraction;
@@ -559,17 +595,23 @@ function ProgramProgressCard({
   const pctWithPlanned =
     totalReqs > 0 ? (withPlannedCount / totalReqs) * 100 : 0;
 
+  // A fully projected-complete program reads green, whatever its accent.
+  const isFull = pctWithPlanned >= COMPLETION_FULL_PCT;
+  const ringAccent: RingAccent = isFull ? "green" : accent;
+
   // Three fills stack on one gray-200 track, and in light mode the 300-level
   // planned tint measured 1.19:1 (teal) and 1.43:1 (purple) against it: the
   // outermost segment, the one that says how far along the program is, was
   // effectively invisible. Light mode gets a darker ramp so each band clears
   // its neighbour; every dark: value is the one that shipped.
-  const plannedBarClass =
-    accent === "teal"
+  const plannedBarClass = isFull
+    ? "bg-emerald-600 dark:bg-emerald-500/50"
+    : accent === "teal"
       ? "bg-teal-600 dark:bg-teal-500/40"
       : "bg-purple-500 dark:bg-purple-500/40";
-  const plannedTextClass =
-    accent === "teal"
+  const plannedTextClass = isFull
+    ? "text-emerald-600 dark:text-emerald-300"
+    : accent === "teal"
       ? "text-teal-600 dark:text-teal-300"
       : "text-purple-600 dark:text-purple-300";
   const completedBarClass =
@@ -595,7 +637,7 @@ function ProgramProgressCard({
           percentage={pctWithPlanned}
           size={42}
           strokeWidth={3}
-          accent={accent}
+          accent={ringAccent}
           showLabel
         />
 

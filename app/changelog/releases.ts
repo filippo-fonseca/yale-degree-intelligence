@@ -40,6 +40,9 @@ export const RELEASES: Release[] = [
       {
         title: "Reading your progress",
         items: [
+          "You can now rename a saved plan: each row in the plans window has a \"...\" menu with Rename. Type the new name, press Enter, done.",
+          "A major or certificate that your plan fully completes now shows its ring and bar in green in the projected results, so a finished program reads as finished at a glance.",
+          "When an edit to your plan tips a major or certificate over the 100% line, or drops it back under, the Simulator says so: a toast at the moment it happens, and a small notice next to the Projected progress heading you can click through and dismiss.",
           "The Simulator's projected results now follow your plan exactly. If you take a course you're currently enrolled in off the canvas, to simulate dropping it or pushing it to a later term, the requirement it was counting toward stops showing as satisfied. A plan copies in your courses when you create it, and from then on what you see projected is what is on the canvas.",
           "Courses in the current semester now show under \"In Progress\" in the projected results instead of being counted as already satisfied. Drag one to a future term and it moves to \"Planned\"; the numbers follow.",
           "You can now duplicate a saved plan from the plans window. The copy is named \"Copy of\" the original, so branching a what-if off a plan you like no longer means rebuilding it.",

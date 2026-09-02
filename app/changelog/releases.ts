@@ -40,6 +40,9 @@ export const RELEASES: Release[] = [
       {
         title: "Reading your progress",
         items: [
+          "The Simulator's projected results now follow your plan exactly. If you take a course you're currently enrolled in off the canvas, to simulate dropping it or pushing it to a later term, the requirement it was counting toward stops showing as satisfied. A plan copies in your courses when you create it, and from then on what you see projected is what is on the canvas.",
+          "Courses in the current semester now show under \"In Progress\" in the projected results instead of being counted as already satisfied. Drag one to a future term and it moves to \"Planned\"; the numbers follow.",
+          "You can now duplicate a saved plan from the plans window. The copy is named \"Copy of\" the original, so branching a what-if off a plan you like no longer means rebuilding it.",
           "The Simulator's Save button now shows the keyboard shortcut on it (⌘S on a Mac, Ctrl+S elsewhere), so you can save a plan without reaching for the mouse.",
           "The Simulator's second tab is now called \"Projected progress + results\", which is what it actually shows: your plan's progress, GPA timeline, and distributional tally.",
           "The \"New\" announcement bar on the Simulator is readable in dark mode again. It was showing its light-mode colours on a dark page.",

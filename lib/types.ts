@@ -14,6 +14,12 @@ export type ManualRequirement = {
 export type Course = {
   id: string;
   code: string;
+  /**
+   * Stored display-name override. Absent for catalog courses (the name is
+   * derived from the catalog by code at render time); present for custom
+   * codes or when the student edits the name explicitly.
+   */
+  name?: string;
   grade: string | null;
   semester: string;
   year: number;

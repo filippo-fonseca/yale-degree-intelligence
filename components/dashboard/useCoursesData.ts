@@ -10,6 +10,7 @@ import {
   updateDoc,
   writeBatch,
   deleteDoc,
+  deleteField,
 } from "firebase/firestore";
 import { Course } from "@/lib/types";
 import {
@@ -395,6 +396,40 @@ export function useCoursesData({
     setShowManualEntryModal(false);
   };
 
+  /**
+   * Edit an existing course in place. Optimistic local update with rollback,
+   * then a friends re-sync so a public profile never goes stale. `userId` is
+   * never part of `updates` (Firestore rules reject changing it). An empty
+   * `name` clears the stored override so the catalog name takes over again.
+   */
+  const updateCourse = async (
+    courseId: string,
+    updates: Partial<Omit<Course, "id" | "userId">>,
+  ) => {
+    const previous = courses.find((c) => c.id === courseId);
+    if (!previous) return;
+
+    const optimistic: Course = { ...previous, ...updates };
+    if (!optimistic.name) delete optimistic.name;
+    setCourses((prev) =>
+      prev.map((c) => (c.id === courseId ? optimistic : c)),
+    );
+
+    try {
+      const payload: Record<string, unknown> = { ...updates };
+      if ("name" in payload && !payload.name) payload.name = deleteField();
+      await updateDoc(doc(db, "courses", courseId), payload);
+    } catch (error) {
+      console.error("Error updating course:", error);
+      setCourses((prev) =>
+        prev.map((c) => (c.id === courseId ? previous : c)),
+      );
+      throw error;
+    }
+
+    await syncFriendsIfEnabled();
+  };
+
   const toggleDistributional = async (courseId: string, dist: string) => {
     const course = courses.find((c) => c.id === courseId);
     if (!course) return;
@@ -433,6 +468,7 @@ export function useCoursesData({
     fetchCourses,
     parseAndStoreCourses,
     handleManualCourseEntry,
+    updateCourse,
     toggleDistributional,
   };
 }

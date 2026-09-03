@@ -416,9 +416,11 @@ export function useCoursesData({
     );
 
     try {
-      const payload: Record<string, unknown> = { ...updates };
-      if ("name" in payload && !payload.name) payload.name = deleteField();
-      await updateDoc(doc(db, "courses", courseId), payload);
+      const { name, ...rest } = updates;
+      await updateDoc(doc(db, "courses", courseId), {
+        ...rest,
+        ...("name" in updates ? { name: name || deleteField() } : {}),
+      });
     } catch (error) {
       console.error("Error updating course:", error);
       setCourses((prev) =>

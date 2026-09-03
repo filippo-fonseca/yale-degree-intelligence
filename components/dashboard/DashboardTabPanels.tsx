@@ -36,6 +36,10 @@ interface DashboardTabPanelsProps {
   onReupload: () => void;
   onUploadSuccess: (extractedText: string) => Promise<void>;
   fetchCourses: () => Promise<void>;
+  updateCourse: (
+    courseId: string,
+    updates: Partial<Omit<Course, "id" | "userId">>,
+  ) => Promise<void>;
   toggleDistributional: (courseId: string, dist: string) => Promise<void>;
   onTogglePrereqOverride: (code: string) => void;
   onToggleFriends: (enabled: boolean) => Promise<void>;
@@ -65,6 +69,7 @@ export function DashboardTabPanels({
   onReupload,
   onUploadSuccess,
   fetchCourses,
+  updateCourse,
   toggleDistributional,
   onTogglePrereqOverride,
   onToggleFriends,
@@ -85,6 +90,7 @@ export function DashboardTabPanels({
           onReupload={onReupload}
           onUploadSuccess={onUploadSuccess}
           fetchCourses={fetchCourses}
+          updateCourse={updateCourse}
           toggleDistributional={toggleDistributional}
           onOpenSimulator={() => onTabChange("simulator")}
         />

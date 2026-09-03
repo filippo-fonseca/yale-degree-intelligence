@@ -10,6 +10,7 @@ interface FlatCourseListProps {
   scrollContainerRef: RefObject<HTMLDivElement | null>;
   distSelectorCourseId: string | null;
   onCardClick: (course: Course) => void;
+  onEditClick: (course: Course) => void;
   onDeleteClick: (course: Course) => void;
   onDistSelectorToggle: (courseId: string) => void;
   onToggleDistributional: (courseId: string, dist: string) => Promise<void>;
@@ -21,6 +22,7 @@ export function FlatCourseList({
   scrollContainerRef,
   distSelectorCourseId,
   onCardClick,
+  onEditClick,
   onDeleteClick,
   onDistSelectorToggle,
   onToggleDistributional,
@@ -53,6 +55,7 @@ export function FlatCourseList({
             course={course}
             distSelectorCourseId={distSelectorCourseId}
             onCardClick={onCardClick}
+            onEditClick={onEditClick}
             onDeleteClick={onDeleteClick}
             onDistSelectorToggle={onDistSelectorToggle}
             onToggleDistributional={onToggleDistributional}

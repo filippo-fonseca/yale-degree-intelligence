@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { FiTrash2 } from "react-icons/fi";
+import { FiEdit3, FiTrash2 } from "react-icons/fi";
 import { Course } from "@/lib/types";
 import { getDistPillStyle } from "@/lib/constants";
 import { getGPAColor } from "@/lib/utils/utils";
@@ -12,6 +12,7 @@ interface CourseCardProps {
   course: Course;
   distSelectorCourseId: string | null;
   onCardClick: (course: Course) => void;
+  onEditClick: (course: Course) => void;
   onDeleteClick: (course: Course) => void;
   onDistSelectorToggle: (courseId: string) => void;
   onToggleDistributional: (courseId: string, dist: string) => void;
@@ -61,11 +62,12 @@ export function CourseCard({
   course,
   distSelectorCourseId,
   onCardClick,
+  onEditClick,
   onDeleteClick,
   onDistSelectorToggle,
   onToggleDistributional,
 }: CourseCardProps) {
-  const courseName = getCourseNameFromCode(course.code);
+  const courseName = course.name ?? getCourseNameFromCode(course.code);
   const { card, badge, badgeText } = getStatusClasses(
     course.status,
     course.skipped,
@@ -94,7 +96,9 @@ export function CourseCard({
     >
       {/* Top row */}
       <div className="flex justify-between items-start">
-        <div className="pr-8 flex-1 min-w-0">
+        <div
+          className={`${course.skipped ? "pr-8" : "pr-16"} flex-1 min-w-0`}
+        >
           <div className="flex items-center gap-2 flex-wrap">
             <h4 className="font-medium text-gray-900 dark:text-white text-sm leading-snug">
               {course.code}
@@ -121,6 +125,21 @@ export function CourseCard({
             </span>
           </div>
         </div>
+
+        {/* Edit button (non-skipped only) */}
+        {!course.skipped && (
+          <button
+            aria-label="Edit course"
+            className="absolute top-3 right-11 p-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 text-gray-400 dark:text-gray-500 hover:border-blue-400 dark:hover:border-blue-800 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:text-blue-500 dark:hover:text-blue-400 transition-all"
+            onClick={(e) => {
+              e.stopPropagation();
+              onEditClick(course);
+            }}
+            title="Edit course"
+          >
+            <FiEdit3 className="w-3 h-3" />
+          </button>
+        )}
 
         {/* Delete button (non-skipped only) */}
         {!course.skipped && (

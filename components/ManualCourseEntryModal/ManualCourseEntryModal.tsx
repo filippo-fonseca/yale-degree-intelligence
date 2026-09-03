@@ -45,15 +45,15 @@ function parseInitialSemester(initialSemester?: string): {
   };
 }
 
-const GRADES = [
+export const GRADES = [
   "A", "A-", "B+", "B", "B-", "C+", "C", "C-", "D+", "D", "D-", "F", "CR", "In Progress",
 ];
 
-const SEMESTERS = ["Fall", "Spring", "Summer"];
-const CREDITS = [0.5, 1, 1.5, 2];
+export const SEMESTERS = ["Fall", "Spring", "Summer"];
+export const CREDITS = [0.5, 1, 1.5, 2];
 
 const CURRENT_YEAR = new Date().getFullYear();
-const YEARS = Array.from({ length: CURRENT_YEAR - 2018 + 2 }, (_, i) => CURRENT_YEAR + 1 - i);
+export const YEARS = Array.from({ length: CURRENT_YEAR - 2018 + 2 }, (_, i) => CURRENT_YEAR + 1 - i);
 
 export default function ManualCourseEntryModal({
   isOpen,

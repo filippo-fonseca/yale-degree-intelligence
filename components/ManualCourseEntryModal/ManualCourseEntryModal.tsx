@@ -213,6 +213,11 @@ export default function ManualCourseEntryModal({
     try {
       const coursesToAdd: Omit<Course, "id">[] = validEntries.map((entry) => ({
         code: entry.code,
+        // Catalog courses resolve their name by code at render time; only a
+        // custom code needs its typed name written down or it is lost.
+        ...(entry.isCustom && entry.courseName && entry.courseName !== "Course"
+          ? { name: entry.courseName }
+          : {}),
         grade: entry.grade === "In Progress" ? null : entry.grade,
         semester: entry.semester,
         year: entry.year,

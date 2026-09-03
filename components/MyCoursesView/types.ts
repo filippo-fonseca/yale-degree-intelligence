@@ -31,6 +31,10 @@ export interface MyCoursesViewProps {
   onReupload: () => void;
   onUploadSuccess: (text: string) => Promise<void>;
   onDeleteCourse: (course: Course) => Promise<void>;
+  onUpdateCourse: (
+    courseId: string,
+    updates: Partial<Omit<Course, "id" | "userId">>,
+  ) => Promise<void>;
   onToggleDistributional: (courseId: string, dist: string) => Promise<void>;
   /** Class of 2030 shortcut into Simulator without a transcript. */
   onOpenSimulator?: () => void;

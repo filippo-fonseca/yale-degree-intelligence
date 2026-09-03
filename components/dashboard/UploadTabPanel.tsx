@@ -17,6 +17,10 @@ interface UploadTabPanelProps {
   onReupload: () => void;
   onUploadSuccess: (extractedText: string) => Promise<void>;
   fetchCourses: () => Promise<void>;
+  updateCourse: (
+    courseId: string,
+    updates: Partial<Omit<Course, "id" | "userId">>,
+  ) => Promise<void>;
   toggleDistributional: (courseId: string, dist: string) => Promise<void>;
   onOpenSimulator?: () => void;
 }
@@ -31,6 +35,7 @@ export function UploadTabPanel({
   onReupload,
   onUploadSuccess,
   fetchCourses,
+  updateCourse,
   toggleDistributional,
   onOpenSimulator,
 }: UploadTabPanelProps) {
@@ -57,6 +62,7 @@ export function UploadTabPanel({
           await deleteDoc(doc(db, "courses", course.id));
           await fetchCourses();
         }}
+        onUpdateCourse={updateCourse}
         onToggleDistributional={async (courseId, dist) => {
           await toggleDistributional(courseId, dist);
         }}

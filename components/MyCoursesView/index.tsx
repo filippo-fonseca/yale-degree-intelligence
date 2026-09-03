@@ -24,6 +24,7 @@ import {
 } from "./types";
 import ConfirmDeleteModal from "@/components/ConfirmDeleteModal/ConfirmDeleteModal";
 import CourseModal from "@/components/MajorProgressView/CourseModal";
+import { EditCourseModal } from "./EditCourseModal";
 
 export type { MyCoursesViewProps };
 
@@ -37,6 +38,7 @@ export default function MyCoursesView({
   onReupload,
   onUploadSuccess,
   onDeleteCourse,
+  onUpdateCourse,
   onToggleDistributional,
   onOpenSimulator,
 }: MyCoursesViewProps) {
@@ -51,6 +53,7 @@ export default function MyCoursesView({
     isOpen: false,
     course: null,
   });
+  const [editCourse, setEditCourse] = useState<Course | null>(null);
 
   const stats = useMemo(() => computeStats(courses), [courses]);
 
@@ -93,7 +96,7 @@ export default function MyCoursesView({
       course: {
         id: course.id,
         code: course.code,
-        name: getCourseNameFromCode(course.code) ?? "Course",
+        name: course.name ?? getCourseNameFromCode(course.code) ?? "Course",
         status: course.status,
         skipped: course.skipped || false,
         distributionals: effectiveDistributionals(course),
@@ -253,6 +256,7 @@ export default function MyCoursesView({
               onJumpToSemester={jumpToSemester}
               semesterHasInProgress={semesterHasInProgress}
               onCardClick={openCourseModal}
+              onEditClick={setEditCourse}
               onDeleteClick={openDeleteConfirm}
               onDistSelectorToggle={(id) =>
                 setDistSelectorCourseId((prev) => (prev === id ? null : id))
@@ -265,6 +269,7 @@ export default function MyCoursesView({
               scrollContainerRef={scrollContainerRef}
               distSelectorCourseId={distSelectorCourseId}
               onCardClick={openCourseModal}
+              onEditClick={setEditCourse}
               onDeleteClick={openDeleteConfirm}
               onDistSelectorToggle={(id) =>
                 setDistSelectorCourseId((prev) => (prev === id ? null : id))
@@ -287,6 +292,12 @@ export default function MyCoursesView({
         course={modalState.course}
         onClose={() => setModalState({ isOpen: false, course: null })}
         allowSkip={false}
+      />
+
+      <EditCourseModal
+        course={editCourse}
+        onClose={() => setEditCourse(null)}
+        onSave={onUpdateCourse}
       />
 
       <ConfirmDeleteModal

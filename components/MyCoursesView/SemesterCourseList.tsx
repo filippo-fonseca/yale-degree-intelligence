@@ -28,6 +28,7 @@ interface SemesterCourseListProps {
   onJumpToSemester: (key: string) => void;
   semesterHasInProgress: (key: string) => boolean;
   onCardClick: (course: Course) => void;
+  onEditClick: (course: Course) => void;
   onDeleteClick: (course: Course) => void;
   onDistSelectorToggle: (courseId: string) => void;
   onToggleDistributional: (courseId: string, dist: string) => Promise<void>;
@@ -50,6 +51,7 @@ export function SemesterCourseList({
   onJumpToSemester,
   semesterHasInProgress,
   onCardClick,
+  onEditClick,
   onDeleteClick,
   onDistSelectorToggle,
   onToggleDistributional,
@@ -213,6 +215,7 @@ export function SemesterCourseList({
                             course={course}
                             distSelectorCourseId={distSelectorCourseId}
                             onCardClick={onCardClick}
+                            onEditClick={onEditClick}
                             onDeleteClick={onDeleteClick}
                             onDistSelectorToggle={onDistSelectorToggle}
                             onToggleDistributional={onToggleDistributional}

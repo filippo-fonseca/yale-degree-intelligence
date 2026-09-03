@@ -75,6 +75,7 @@ export default function Home() {
     fetchCourses,
     parseAndStoreCourses,
     handleManualCourseEntry,
+    updateCourse,
     toggleDistributional,
   } = useCoursesData({
     user,
@@ -316,6 +317,7 @@ export default function Home() {
               onReupload={() => setShowUpdateModal(true)}
               onUploadSuccess={parseAndStoreCourses}
               fetchCourses={fetchCourses}
+              updateCourse={updateCourse}
               toggleDistributional={toggleDistributional}
               onTogglePrereqOverride={handleTogglePrereqOverride}
               onToggleFriends={handleToggleFriends}

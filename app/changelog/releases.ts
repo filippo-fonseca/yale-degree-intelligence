@@ -68,6 +68,8 @@ export const RELEASES: Release[] = [
       {
         title: "Elsewhere in the app",
         items: [
+          "You can edit a course on My courses now. Every card has a pencil next to the trash can, and it opens a window where the code, name, grade, semester, year, and credits are all yours to change. Fixing a typo or a wrong grade no longer means deleting the course and adding it again.",
+          "A course you enter with your own code keeps the name you typed for it. It used to show up as just the code.",
           "In the Simulator, courses you are taking right now are no longer stuck. You can drag them to another semester or take them out of a plan, the same as a course you have only planned. Finished courses stay put, because those are history.",
           "Drop a course onto the semester you are in right now and it is marked in progress automatically, so the plan matches what you are actually taking.",
           "The bar on My Major shows in-progress credits as a striped, lighter section, so you can see where the completed part ends. The two shades of purple were too close to tell apart.",

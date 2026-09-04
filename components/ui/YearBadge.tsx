@@ -10,7 +10,7 @@ interface YearBadgeProps {
 const getYearStatus = (graduationYear: number): string => {
   // Direct mapping based on graduation year
   if (graduationYear >= 2031) return "High School";
-  if (graduationYear === 2030) return "Freshman";
+  if (graduationYear === 2030) return "First-year";
   if (graduationYear === 2029) return "Sophomore";
   if (graduationYear === 2028) return "Junior";
   if (graduationYear <= 2027) return "Senior";
@@ -26,7 +26,7 @@ export const YearBadge: React.FC<YearBadgeProps> = ({
 
   const getDotColor = (status: string) => {
     switch (status) {
-      case "Freshman":
+      case "First-year":
         return "bg-green-400";
       case "Sophomore":
         return "bg-blue-400";

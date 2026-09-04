@@ -105,7 +105,7 @@ export function useUserProfileForm(
 
   const getYearStatus = (graduationYear: number): string => {
     if (graduationYear >= 2031) return "High School";
-    if (graduationYear === 2030) return "Freshman";
+    if (graduationYear === 2030) return "First-year";
     if (graduationYear === 2029) return "Sophomore";
     if (graduationYear === 2028) return "Junior";
     if (graduationYear <= 2027) return "Senior";

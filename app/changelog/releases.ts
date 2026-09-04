@@ -71,6 +71,7 @@ export const RELEASES: Release[] = [
           "You can edit a course on My courses now. Every card has a pencil next to the trash can, and it opens a window where the code, name, grade, semester, year, and credits are all yours to change. Fixing a typo or a wrong grade no longer means deleting the course and adding it again.",
           "Editing and deleting also work from inside a course's full view: open a class and the same Edit and Delete buttons are at the bottom of the window.",
           "Each semester on My courses now shows its credit total next to the course count, in the header and in the semester list on the left.",
+          "My courses on a phone scrolls as one page now. Your course list used to be squeezed into a little window under the stats and filters; those now scroll away with the page, so the courses get the room.",
           "The edit window's grade, semester, year, and credits pickers use the app's own dropdown now instead of your operating system's menu.",
           "ABX is available as a grade, at the end of the list, for a postponed final exam. It stays out of your GPA like Credit/D/Fail.",
           "A course you enter with your own code keeps the name you typed for it. It used to show up as just the code.",

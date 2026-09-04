@@ -98,6 +98,7 @@ export const RELEASES: Release[] = [
           "Dragging your transcript onto the upload box now lights the box up, so you can see where the file is going to land. The upload box also follows light mode instead of always being dark.",
           "The switcher above your major and certificate progress shows up as soon as you have one of them, with a button to add another (up to Yale's limit of two majors and three certificates) that takes you straight to the right place in Settings.",
           "\"My certificate(s)\" now says \"My certificate\" or \"My certificates\", depending on how many you have.",
+          "Class of 2030 students are labeled \"First-year\" now instead of \"Freshman\", everywhere the class year shows.",
           "The help bars on My Major and My Certificates lost their spinning rainbow border. Same help, less circus.",
           "The Terms and Mission pages have been rebuilt to match the rest of the site, and they follow your light or dark mode now instead of always being dark.",
           "The Terms page no longer says we send your data to a model for \"intelligent feedback features\". That stopped being true when the AI advisor was removed; parsing your transcript is the only thing that reaches a model.",

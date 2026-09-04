@@ -139,12 +139,21 @@ export function DesktopSidebar({
                 />
               )}
               <div className="relative z-10 flex items-center space-x-3 min-w-0">
-                <item.icon
-                  size={item.id === "cleoai" ? 18 : 12}
-                  opacity={
-                    item.id === "cleoai" && activeTab !== "cleoai" ? 0.5 : 1
-                  }
-                />
+                <span className="relative shrink-0 flex">
+                  <item.icon
+                    size={item.id === "cleoai" ? 18 : 12}
+                    opacity={
+                      item.id === "cleoai" && activeTab !== "cleoai" ? 0.5 : 1
+                    }
+                  />
+                  {/* Count bubble on the icon itself, so it survives the
+                      collapsed rail where labels and chips disappear. */}
+                  {!!item.bubbleCount && !sidebarExpanded && (
+                    <span className="absolute -top-2 -right-2.5 min-w-[0.95rem] h-[0.95rem] px-0.5 rounded-full bg-pink-500 text-white text-[9px] font-medium leading-none flex items-center justify-center">
+                      {item.bubbleCount > 9 ? "9+" : item.bubbleCount}
+                    </span>
+                  )}
+                </span>
                 {sidebarExpanded && (
                   <span className="truncate">{item.label}</span>
                 )}
@@ -154,6 +163,11 @@ export function DesktopSidebar({
                 {sidebarExpanded && item.badge && (
                   <span className="ml-0.5 shrink-0 rounded-full border border-emerald-500/30 bg-emerald-500/15 px-1.5 py-0.5 font-sf text-[9px] leading-none text-emerald-700 dark:text-emerald-300">
                     {item.badge}
+                  </span>
+                )}
+                {!!item.bubbleCount && sidebarExpanded && (
+                  <span className="ml-0.5 shrink-0 min-w-[1.05rem] h-[1.05rem] px-1 rounded-full bg-pink-500 text-white text-[10px] font-medium leading-none flex items-center justify-center">
+                    {item.bubbleCount > 9 ? "9+" : item.bubbleCount}
                   </span>
                 )}
               </div>

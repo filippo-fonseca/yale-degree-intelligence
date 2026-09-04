@@ -89,6 +89,11 @@ export function MobileSidebar({
                           {item.badge}
                         </span>
                       )}
+                      {!!item.bubbleCount && (
+                        <span className="min-w-[1.05rem] h-[1.05rem] px-1 rounded-full bg-pink-500 text-white text-[10px] font-medium leading-none flex items-center justify-center shrink-0">
+                          {item.bubbleCount > 9 ? "9+" : item.bubbleCount}
+                        </span>
+                      )}
                     </div>
                     {activeTab === item.id && !item.badge && (
                       <FiChevronRight className="text-blue-400" />

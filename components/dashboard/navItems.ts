@@ -13,6 +13,8 @@ export interface NavItem {
   comingSoon?: boolean;
   /** Short chip shown for Class of 2030 (and similar) welcome nudges. */
   badge?: string;
+  /** Small count bubble (unread notifications); hidden when 0 or undefined. */
+  bubbleCount?: number;
 }
 
 export function createNavItems(
@@ -22,6 +24,8 @@ export function createNavItems(
     /** Tabs whose "2030 can use!" chip has not been retired by a visit yet. */
     nudgeTabs?: ReadonlySet<string>;
     showCertificatesNew?: boolean;
+    /** Unread friend-activity notifications, bubbled on the Friends tab. */
+    friendsBubbleCount?: number;
   },
 ): NavItem[] {
   const nudge = (tabId: string) =>
@@ -65,6 +69,7 @@ export function createNavItems(
       id: "friends",
       icon: FiUsers,
       label: "Friends",
+      bubbleCount: options?.friendsBubbleCount,
     },
     {
       id: "distributionals",

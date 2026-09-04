@@ -48,7 +48,12 @@ export async function POST(req: NextRequest) {
     users,
     createdAt: FieldValue.serverTimestamp(),
   });
-  batch.update(requestRef, { status: "accepted" });
+  // respondedAt lets the sender's notification sort by when the request was
+  // accepted rather than when it was sent.
+  batch.update(requestRef, {
+    status: "accepted",
+    respondedAt: FieldValue.serverTimestamp(),
+  });
   await batch.commit();
 
   return NextResponse.json({ success: true });

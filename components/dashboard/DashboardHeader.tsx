@@ -1,5 +1,6 @@
 "use client";
 
+import type { ReactNode } from "react";
 import type { User } from "firebase/auth";
 import { motion } from "framer-motion";
 import { FiChevronDown, FiMenu, FiMoon, FiSun } from "react-icons/fi";
@@ -17,6 +18,8 @@ interface DashboardHeaderProps {
   onOpenCommandPalette: () => void;
   onToggleTheme: () => void;
   onOpenSettings: () => void;
+  /** The notification bell, rendered between the theme toggle and settings. */
+  notificationBell?: ReactNode;
 }
 
 export function DashboardHeader({
@@ -28,6 +31,7 @@ export function DashboardHeader({
   onOpenCommandPalette,
   onToggleTheme,
   onOpenSettings,
+  notificationBell,
 }: DashboardHeaderProps) {
   return (
     <motion.header
@@ -95,6 +99,8 @@ export function DashboardHeader({
             )}
           </span>
         </button>
+
+        {notificationBell}
 
         <button
           onClick={onOpenSettings}

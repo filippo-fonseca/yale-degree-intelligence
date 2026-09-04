@@ -20,6 +20,8 @@ import { useNavNudges } from "@/components/dashboard/useNavNudges";
 import { useDashboardNav } from "@/components/dashboard/useDashboardNav";
 import { useUserProfile } from "@/components/dashboard/useUserProfile";
 import { useFriendsFeature } from "@/components/dashboard/useFriendsFeature";
+import { useFriendNotifications } from "@/components/dashboard/useFriendNotifications";
+import { NotificationBell } from "@/components/dashboard/NotificationBell";
 import { useCoursesData } from "@/components/dashboard/useCoursesData";
 import { DashboardBackground } from "@/components/dashboard/DashboardBackground";
 import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
@@ -93,6 +95,10 @@ export default function Home() {
   );
   friendsEnabledRef.current = friendsEnabled;
 
+  // Friend-activity notifications: header bell + Friends tab bubble.
+  const { notifications, unreadCount, profiles, markAllSeen } =
+    useFriendNotifications(user, friendsEnabled);
+
   // Operator status comes from the server, so the admin list stays out of the
   // client bundle. Only gates which dev tools are offered.
   const { isAdmin } = useIsAdmin(user);
@@ -106,7 +112,11 @@ export default function Home() {
   const navItems = createNavItems(
     userProfile?.majors?.length ?? 0,
     userProfile?.certificates?.length ?? 0,
-    { nudgeTabs, showCertificatesNew: certificatesNew.show },
+    {
+      nudgeTabs,
+      showCertificatesNew: certificatesNew.show,
+      friendsBubbleCount: unreadCount,
+    },
   );
 
   const { activeTab, setActiveTab, handleTabChange, registerSimulatorNavCheck } =
@@ -264,6 +274,17 @@ export default function Home() {
           onOpenCommandPalette={() => setCommandPaletteOpen(true)}
           onToggleTheme={toggleTheme}
           onOpenSettings={() => setShowSettings(true)}
+          notificationBell={
+            friendsEnabled ? (
+              <NotificationBell
+                notifications={notifications}
+                unreadCount={unreadCount}
+                profiles={profiles}
+                onOpen={markAllSeen}
+                onGoToFriends={() => handleTabChange("friends")}
+              />
+            ) : undefined
+          }
         />
 
         <div className="flex flex-row gap-4 lg:gap-8 pb-4 lg:pb-8 h-[calc(100vh-88px)] lg:h-[calc(100vh-120px)]">

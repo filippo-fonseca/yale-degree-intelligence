@@ -108,8 +108,11 @@ export function useSemesterNavigation(
     const semesterKeys = semesterGroups.map(([semester]) => semester);
 
     const computeActive = () => {
+      // On mobile the container itself doesn't scroll (the tab panel does),
+      // so its top can leave the viewport; sections are then judged against
+      // the viewport top instead.
       const containerTop = container.getBoundingClientRect().top;
-      const threshold = containerTop + 24;
+      const threshold = Math.max(containerTop, 0) + 24;
 
       let current: string | null = null;
       for (const key of semesterKeys) {
@@ -131,11 +134,16 @@ export function useSemesterNavigation(
     };
 
     computeActive();
-    container.addEventListener("scroll", computeActive, { passive: true });
+    // Capture-phase listener so the spy fires whichever ancestor actually
+    // scrolls: the course list on desktop, the tab panel on mobile.
+    document.addEventListener("scroll", computeActive, {
+      capture: true,
+      passive: true,
+    });
     window.addEventListener("resize", computeActive);
 
     return () => {
-      container.removeEventListener("scroll", computeActive);
+      document.removeEventListener("scroll", computeActive, { capture: true });
       window.removeEventListener("resize", computeActive);
     };
   }, [semesterGroups]);

@@ -166,7 +166,10 @@ export default function MyCoursesView({
   }
 
   return (
-    <div className="flex h-full min-h-0 flex-col">
+    // On desktop the view owns its height and only the course list scrolls;
+    // on mobile the chrome (header, stats, toolbar) would leave the list a
+    // sliver, so the whole view flows and scrolls as one page instead.
+    <div className="flex min-h-0 flex-col lg:h-full">
       {/* ---- Header ---- */}
       <div className="shrink-0 mb-4 lg:mb-6 flex flex-col sm:flex-row justify-between items-start gap-3">
         <div>
@@ -251,10 +254,11 @@ export default function MyCoursesView({
         onClearFilters={clearFilters}
       />
 
-      {/* ---- Scrollable region: ONLY the course list + disclaimer scroll ---- */}
+      {/* ---- Desktop: ONLY the course list + disclaimer scroll here.
+           Mobile: this region doesn't scroll; the tab panel does. ---- */}
       <div
         ref={scrollContainerRef}
-        className="flex-1 min-h-0 overflow-y-auto overflow-x-clip -mx-1 px-1"
+        className="lg:flex-1 lg:min-h-0 lg:overflow-y-auto overflow-x-clip -mx-1 px-1"
       >
         <div className="space-y-8">
           {groupBySemester && semesterGroups ? (

@@ -58,6 +58,7 @@ export const RELEASES: Release[] = [
       {
         title: "Friends",
         items: [
+          "You get notified about friend activity now. A bell in the header opens a notification center listing who sent you a friend request and who accepted yours, and an unread count sits as a small bubble on the bell and next to Friends in the sidebar. Rejections stay silent, as they should.",
           "A friend's profile now shows \"Credits taken\" and counts only courses they actually took. Skipped requirements still show under completed courses, but they no longer inflate the credit number.",
           "Your page is now visible only to friends you have actually accepted. It always said that, and grades were never part of it, but the courses on your page could previously be read by any signed-in Yale student rather than just your friends. Search still works the same way: it finds people by name, major, and year, and nothing more.",
           "The Friends tab has been rebuilt. Turning it on used to mean scrolling past a big preview of a page you did not have yet to find the button; now the button is right at the top, with a plain description of what friends can see and what they never can. The example page is still there if you want it, one click away.",

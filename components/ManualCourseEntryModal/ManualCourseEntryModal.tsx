@@ -46,7 +46,7 @@ function parseInitialSemester(initialSemester?: string): {
 }
 
 export const GRADES = [
-  "A", "A-", "B+", "B", "B-", "C+", "C", "C-", "D+", "D", "D-", "F", "CR", "In Progress",
+  "A", "A-", "B+", "B", "B-", "C+", "C", "C-", "D+", "D", "D-", "F", "CR", "In Progress", "ABX",
 ];
 
 export const SEMESTERS = ["Fall", "Spring", "Summer"];

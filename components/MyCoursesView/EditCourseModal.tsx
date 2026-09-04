@@ -6,6 +6,7 @@ import { FiCheck } from "react-icons/fi";
 import { Course } from "@/lib/types";
 import { getCourseNameFromCode } from "@/lib/courseCatalog";
 import ModalShell, { ModalHeader } from "@/components/ui/ModalShell";
+import SelectMenu from "@/components/ui/SelectMenu";
 import {
   GRADES,
   SEMESTERS,
@@ -24,9 +25,6 @@ interface EditCourseModalProps {
 
 const inputClasses =
   "w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg px-3 py-2 text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:border-pink-500/50";
-
-const selectClasses =
-  "w-full px-2 py-1.5 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded text-xs text-gray-900 dark:text-white focus:outline-none focus:border-pink-500/50";
 
 const labelClasses =
   "block text-[10px] text-gray-400 dark:text-gray-500 mb-1 uppercase tracking-wide";
@@ -144,62 +142,54 @@ export function EditCourseModal({
             />
           </div>
 
-          <div className="grid grid-cols-4 gap-2">
+          <div className="grid grid-cols-2 gap-2">
             <div>
               <label className={labelClasses}>Grade</label>
-              <select
+              <SelectMenu
+                label="Grade"
                 value={grade}
-                onChange={(e) => setGrade(e.target.value)}
-                className={selectClasses}
-              >
-                {withStored(GRADES, grade).map((g) => (
-                  <option key={g} value={g}>
-                    {g}
-                  </option>
-                ))}
-              </select>
+                options={withStored(GRADES, grade).map((g) => ({
+                  value: g,
+                  label: g,
+                }))}
+                onChange={setGrade}
+              />
             </div>
             <div>
               <label className={labelClasses}>Semester</label>
-              <select
+              <SelectMenu
+                label="Semester"
                 value={semester}
-                onChange={(e) => setSemester(e.target.value)}
-                className={selectClasses}
-              >
-                {withStored(SEMESTERS, semester).map((s) => (
-                  <option key={s} value={s}>
-                    {s}
-                  </option>
-                ))}
-              </select>
+                options={withStored(SEMESTERS, semester).map((s) => ({
+                  value: s,
+                  label: s,
+                }))}
+                onChange={setSemester}
+              />
             </div>
             <div>
               <label className={labelClasses}>Year</label>
-              <select
-                value={year}
-                onChange={(e) => setYear(parseInt(e.target.value, 10))}
-                className={selectClasses}
-              >
-                {withStored(YEARS, year).map((y) => (
-                  <option key={y} value={y}>
-                    {y}
-                  </option>
-                ))}
-              </select>
+              <SelectMenu
+                label="Year"
+                value={String(year)}
+                options={withStored(YEARS, year).map((y) => ({
+                  value: String(y),
+                  label: String(y),
+                }))}
+                onChange={(v) => setYear(parseInt(v, 10))}
+              />
             </div>
             <div>
               <label className={labelClasses}>Credits</label>
-              <select
-                value={credits}
-                onChange={(e) => setCredits(parseFloat(e.target.value))}
-                className={selectClasses}
-              >
-                {withStored(CREDITS, credits).map((c) => (
-                  <option key={c} value={c}>
-                    {c}
-                  </option>
-                ))}
-              </select>
+              <SelectMenu
+                label="Credits"
+                value={String(credits)}
+                options={withStored(CREDITS, credits).map((c) => ({
+                  value: String(c),
+                  label: `${c} credit${c !== 1 ? "s" : ""}`,
+                }))}
+                onChange={(v) => setCredits(parseFloat(v))}
+              />
             </div>
           </div>
         </div>

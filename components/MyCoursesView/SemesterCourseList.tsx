@@ -34,6 +34,15 @@ interface SemesterCourseListProps {
   onToggleDistributional: (courseId: string, dist: string) => Promise<void>;
 }
 
+/** "5" or "5.5", never "5.0". */
+function formatCredits(total: number): string {
+  return Number.isInteger(total) ? String(total) : total.toFixed(1);
+}
+
+function semesterCredits(semCourses: Course[]): number {
+  return semCourses.reduce((sum, c) => sum + (c.credits || 0), 0);
+}
+
 export function SemesterCourseList({
   semesterGroups,
   skippedCourses,
@@ -108,7 +117,8 @@ export function SemesterCourseList({
                     </p>
                     <p className="text-[10px] text-gray-400 dark:text-gray-500">
                       {semCourses.length} course
-                      {semCourses.length !== 1 ? "s" : ""}
+                      {semCourses.length !== 1 ? "s" : ""} ·{" "}
+                      {formatCredits(semesterCredits(semCourses))} cr
                     </p>
                   </div>
                   {hasInProgress && (
@@ -169,7 +179,9 @@ export function SemesterCourseList({
                     )}
                     <span className={`text-xs ${accent.count}`}>
                       {semCourses.length} course
-                      {semCourses.length !== 1 ? "s" : ""}
+                      {semCourses.length !== 1 ? "s" : ""} ·{" "}
+                      {formatCredits(semesterCredits(semCourses))} credit
+                      {semesterCredits(semCourses) !== 1 ? "s" : ""}
                     </span>
                   </div>
                   <motion.div

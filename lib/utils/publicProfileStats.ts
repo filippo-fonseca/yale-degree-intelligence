@@ -10,9 +10,14 @@ export function getCompletedCoursesCount(courses: ProfileCourse[]): number {
   return courses.filter(isCompletedOrSkipped).length;
 }
 
-export function getTotalCreditsEarned(courses: ProfileCourse[]): number {
+/**
+ * Credits from courses actually taken. Skipped requirements count toward the
+ * completed-courses number but are not sat-in-a-classroom credits, so they
+ * stay out of this one.
+ */
+export function getTotalCreditsTaken(courses: ProfileCourse[]): number {
   return courses
-    .filter(isCompletedOrSkipped)
+    .filter((c) => c.status === "completed" && !c.skipped)
     .reduce((sum, c) => sum + (c.credits || 0), 0);
 }
 

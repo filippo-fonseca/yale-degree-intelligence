@@ -26,7 +26,7 @@ import {
   getInProgressCount,
   getSemesterCount,
   getSortedYears,
-  getTotalCreditsEarned,
+  getTotalCreditsTaken,
   sortSemesters,
   type ProfileCourse,
 } from "@/lib/utils/publicProfileStats";
@@ -587,8 +587,8 @@ export function PublicProfileView({
             <StatTile
               icon={<FiCreditCard className="text-purple-400" size={14} />}
               iconBg="bg-purple-900/25 border-purple-700/40"
-              label="Credits earned"
-              value={getTotalCreditsEarned(courses)}
+              label="Credits taken"
+              value={getTotalCreditsTaken(courses)}
               compact={isPreview}
             />
             <StatTile

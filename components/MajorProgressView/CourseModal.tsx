@@ -5,6 +5,7 @@ import {
   FiMoreVertical,
   FiX,
   FiCornerDownLeft,
+  FiEdit3,
   FiTrash2,
 } from "react-icons/fi";
 import {
@@ -64,6 +65,10 @@ interface CourseModalProps {
   onRefresh?: () => void;
   allowSkip?: boolean;
   onToggleDistributional?: (courseId: string, dist: string) => void;
+  /** When set, the modal offers the same edit action as the course card. */
+  onEdit?: () => void;
+  /** When set, the modal offers the same delete action as the course card. */
+  onDelete?: () => void;
 }
 
 export default function CourseModal({
@@ -74,6 +79,8 @@ export default function CourseModal({
   onRefresh,
   allowSkip = true,
   onToggleDistributional,
+  onEdit,
+  onDelete,
 }: CourseModalProps) {
   const { user } = useAuth();
   const dropdownRef = useRef<HTMLDivElement | null>(null);
@@ -425,6 +432,30 @@ export default function CourseModal({
                     </motion.div>
                   )}
                 </AnimatePresence>
+              </div>
+            )}
+
+            {/* Edit / delete, same actions as the course card */}
+            {(onEdit || onDelete) && (
+              <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700 flex items-center justify-end gap-2">
+                {onEdit && (
+                  <button
+                    onClick={onEdit}
+                    className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 text-gray-500 dark:text-gray-400 hover:border-blue-400 dark:hover:border-blue-800 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:text-blue-500 dark:hover:text-blue-400 transition-all"
+                  >
+                    <FiEdit3 size={13} />
+                    Edit course
+                  </button>
+                )}
+                {onDelete && (
+                  <button
+                    onClick={onDelete}
+                    className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 text-gray-500 dark:text-gray-400 hover:border-red-400 dark:hover:border-red-800 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-500 dark:hover:text-red-400 transition-all"
+                  >
+                    <FiTrash2 size={13} />
+                    Delete
+                  </button>
+                )}
               </div>
             )}
           </motion.div>

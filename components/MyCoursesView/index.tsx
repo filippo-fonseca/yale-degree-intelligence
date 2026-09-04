@@ -116,6 +116,25 @@ export default function MyCoursesView({
     closeDeleteConfirm();
   };
 
+  // The detail modal holds a trimmed course; the edit and delete flows need
+  // the full document, so it is looked back up by id.
+  const fullCourseFromDetail = () =>
+    courses.find((c) => c.id === modalState.course?.id) ?? null;
+
+  const closeDetailModal = () => setModalState({ isOpen: false, course: null });
+
+  const handleEditFromDetail = () => {
+    const full = fullCourseFromDetail();
+    closeDetailModal();
+    if (full) setEditCourse(full);
+  };
+
+  const handleDeleteFromDetail = () => {
+    const full = fullCourseFromDetail();
+    closeDetailModal();
+    if (full) openDeleteConfirm(full);
+  };
+
   const gpaStr = stats.gpa !== null ? stats.gpa.toFixed(2) : "N/A";
 
   if (coursesLoading) {
@@ -290,8 +309,18 @@ export default function MyCoursesView({
       <CourseModal
         isOpen={modalState.isOpen}
         course={modalState.course}
-        onClose={() => setModalState({ isOpen: false, course: null })}
+        onClose={closeDetailModal}
         allowSkip={false}
+        onEdit={
+          modalState.course && !modalState.course.skipped
+            ? handleEditFromDetail
+            : undefined
+        }
+        onDelete={
+          modalState.course && !modalState.course.skipped
+            ? handleDeleteFromDetail
+            : undefined
+        }
       />
 
       <EditCourseModal

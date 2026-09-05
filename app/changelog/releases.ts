@@ -52,6 +52,7 @@ export const RELEASES: Release[] = [
           "The Simulator's second tab is now called \"Projected progress + results\", which is what it actually shows: your plan's progress, GPA timeline, and distributional tally.",
           "The \"New\" announcement bar on the Simulator is readable in dark mode again. It was showing its light-mode colours on a dark page.",
           "The Simulator's Help panel describes the simulator you're actually using: building on the Canvas, the Grades and Distributionals editors, the results view, and saving plans.",
+          "You can import a CourseTable worksheet into the Simulator. Download the semester as an ICS file, pick the plan, and we read the dates to land those courses on the right term — you can still override the semester.",
           "The progress rings in the Simulator now show their percentage. The ring already tracked your plan; you just had to read the number from the text beside it.",
           "The second GPA on each row of the Simulator's timeline now says \"overall\". Two numbers sat side by side with nothing telling you one was the term and the other your running cumulative GPA.",
           "The Simulator points out that you can now plan grades and distributionals, not just courses. Turn on the Grades and Distributionals editors and the Progress tab shows your projected GPA and distributional tally.",

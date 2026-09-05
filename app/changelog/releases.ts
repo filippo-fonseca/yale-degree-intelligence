@@ -40,6 +40,8 @@ export const RELEASES: Release[] = [
       {
         title: "Reading your progress",
         items: [
+          "A saved plan in the Simulator now always shows the courses on your transcript. If you saved a plan last spring and have since added grades or new courses, the locked past semesters fill in with everything you actually took, and the grid runs through the current term.",
+          "When a semester has ended but its courses are still marked in progress, My Courses now says so and offers the two ways to update them: re-upload your transcript to bring in the grades, or edit each course to add its grade.",
           "You can now rename a saved plan: each row in the plans window has a \"...\" menu with Rename. Type the new name, press Enter, done.",
           "A major or certificate that your plan fully completes now shows its ring and bar in green in the projected results, so a finished program reads as finished at a glance.",
           "When an edit to your plan tips a major or certificate over the 100% line, or drops it back under, the Simulator says so: a toast at the moment it happens, and a small notice next to the Projected progress heading you can click through and dismiss.",

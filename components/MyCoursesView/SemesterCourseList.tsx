@@ -2,8 +2,9 @@
 
 import { RefObject } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { FiPlus, FiChevronDown } from "react-icons/fi";
+import { FiPlus, FiChevronDown, FiRefreshCw } from "react-icons/fi";
 import { Course } from "@/lib/types";
+import { isPastTerm } from "@/lib/academicTerm";
 import { getSemesterAccent } from "./helpers";
 import { CardBoop } from "./CardBoop";
 import { CourseCard } from "./CourseCard";
@@ -24,6 +25,7 @@ interface SemesterCourseListProps {
   defaultActiveSemester: string | null;
   distSelectorCourseId: string | null;
   onManualAdd: (semester?: string) => void;
+  onReupload: () => void;
   onToggleSemesterCollapse: (key: string) => void;
   onJumpToSemester: (key: string) => void;
   semesterHasInProgress: (key: string) => boolean;
@@ -56,6 +58,7 @@ export function SemesterCourseList({
   defaultActiveSemester,
   distSelectorCourseId,
   onManualAdd,
+  onReupload,
   onToggleSemesterCollapse,
   onJumpToSemester,
   semesterHasInProgress,
@@ -143,6 +146,13 @@ export function SemesterCourseList({
           const hasInProgress = semesterHasInProgress(semester);
           const season = semester.split(" ")[0];
           const accent = getSemesterAccent(season, hasInProgress);
+          // Courses imported mid-term stay "in progress" until grades come
+          // in, so a finished term can sit here looking current. Say so, and
+          // point at the two ways to bring it up to date.
+          const termEnded = hasInProgress && isPastTerm(semester);
+          const staleCount = semCourses.filter(
+            (c) => c.status === "in-progress" && !c.skipped,
+          ).length;
 
           return (
             <motion.div
@@ -217,6 +227,30 @@ export function SemesterCourseList({
                     transition={{ duration: 0.2, ease: "easeInOut" }}
                     className="overflow-hidden"
                   >
+                    {termEnded && (
+                      <div
+                        role="status"
+                        className="mb-3 flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 rounded-lg border border-amber-300/60 dark:border-amber-500/30 bg-amber-50 dark:bg-amber-900/15 px-3 py-2 text-xs text-amber-800 dark:text-amber-200"
+                      >
+                        <p className="flex-1 min-w-0">
+                          <span className="font-medium">
+                            {semester} has ended,
+                          </span>{" "}
+                          but {staleCount} course{staleCount !== 1 ? "s" : ""}{" "}
+                          {staleCount !== 1 ? "are" : "is"} still marked in
+                          progress. Re-upload your transcript to bring in the
+                          grades, or edit each course to add its grade.
+                        </p>
+                        <button
+                          type="button"
+                          onClick={onReupload}
+                          className="shrink-0 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md border border-amber-400/60 dark:border-amber-500/40 bg-white/70 dark:bg-amber-950/40 hover:bg-amber-100 dark:hover:bg-amber-900/40 text-amber-900 dark:text-amber-100 font-medium transition-colors"
+                        >
+                          <FiRefreshCw size={12} />
+                          Re-upload transcript
+                        </button>
+                      </div>
+                    )}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                       {semCourses.map((course, idx) => (
                         <CardBoop

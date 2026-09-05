@@ -56,6 +56,7 @@ import {
   isCurrentTerm,
   isPastTerm,
 } from "@/lib/academicTerm";
+import { reconcilePlanSemesters } from "@/lib/simulatorPlanReconcile";
 import {
   blockedCodesFromViolations,
   buildProgramClaimContext,
@@ -463,6 +464,11 @@ export default function Simulator({
   const planLoadedRef = useRef(false);
   const hasInitializedRef = useRef(false);
   const hasChangesRef = useRef(false);
+  // Latest transcript, for callbacks (plan load) that run outside a render.
+  const completedCoursesRef = useRef<Course[]>(completedCourses);
+  completedCoursesRef.current = completedCourses;
+  const semestersRef = useRef<Semester[]>(semesters);
+  semestersRef.current = semesters;
   const currentPlanNameRef = useRef<string | null>(null);
   // Holds the "Saved" confirmation on screen, and the always-current quick save
   // action the Cmd+S listener calls (the listener is bound once).
@@ -694,6 +700,40 @@ export default function Simulator({
     );
     hasInitializedRef.current = true;
   }, [graduationYear, remainingCourses, completedCourses]);
+
+  // ------------ Keep a loaded plan in step with the transcript ------------
+  // The parent hands down a fresh `completedCourses` array on every render,
+  // so the trigger is a signature of what actually matters: which courses,
+  // in which term, with which status.
+  const transcriptSignature = useMemo(
+    () =>
+      completedCourses
+        .map((c) => `${c.id}:${c.code}:${c.semester}:${c.year}:${c.status}`)
+        .sort()
+        .join("|"),
+    [completedCourses],
+  );
+  useEffect(() => {
+    if (!planLoadedRef.current) return;
+    const live = completedCoursesRef.current;
+    const reconcile = (sems: Semester[]) =>
+      reconcilePlanSemesters(sems, live, graduationYear) as Semester[];
+    // Both the canvas and its saved-state snapshot move together, so a
+    // transcript change never reads as an unsaved edit on its own.
+    initialSemestersRef.current = reconcile(initialSemestersRef.current);
+    const next = reconcile(semestersRef.current);
+    const usedCodes = new Set(
+      next.flatMap((s) => s.courses.map((c) => c.code)),
+    );
+    setSemesters(next);
+    setAvailableCourses(
+      remainingCourses.filter(
+        (c) =>
+          !usedCodes.has(c.code) && !live.some((cc) => cc.code === c.code),
+      ),
+    );
+    // remainingCourses is read for the pool only; the transcript drives this.
+  }, [transcriptSignature, graduationYear]);
 
   // ------------ Change detection ------------
   useEffect(() => {
@@ -1588,10 +1628,19 @@ export default function Simulator({
   const loadPlanData = (plan: Plan) => {
     // Mark that a plan is loaded so the blank-grid rebuild effect won't clobber it.
     planLoadedRef.current = true;
-    setSemesters(plan.semesters);
+    // The stored snapshot's taken courses are stale the moment the transcript
+    // moves (a term ends, grades land, a re-upload adds this term's courses),
+    // and a locked past column cannot be fixed by hand. Taken courses come
+    // from the live transcript; the plan contributes its planned placements.
+    const liveSemesters = reconcilePlanSemesters(
+      plan.semesters,
+      completedCoursesRef.current,
+      graduationYear,
+    ) as Semester[];
+    setSemesters(liveSemesters);
     setSimulatorManualReqs(plan.manualRequirements ?? []);
     initialSemestersRef.current = JSON.parse(
-      JSON.stringify(plan.semesters),
+      JSON.stringify(liveSemesters),
     ) as Semester[];
     initialManualReqsRef.current = JSON.parse(
       JSON.stringify(plan.manualRequirements ?? []),
@@ -1605,7 +1654,7 @@ export default function Simulator({
     };
 
     const usedCodes = new Set<string>();
-    plan.semesters.forEach((sem) =>
+    liveSemesters.forEach((sem) =>
       sem.courses.forEach((course) => usedCodes.add(course.code)),
     );
 

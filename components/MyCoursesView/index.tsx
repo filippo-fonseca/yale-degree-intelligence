@@ -275,6 +275,7 @@ export default function MyCoursesView({
               defaultActiveSemester={defaultActiveSemester}
               distSelectorCourseId={distSelectorCourseId}
               onManualAdd={onManualAdd}
+              onReupload={onReupload}
               onToggleSemesterCollapse={toggleSemesterCollapse}
               onJumpToSemester={jumpToSemester}
               semesterHasInProgress={semesterHasInProgress}

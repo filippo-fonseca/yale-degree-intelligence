@@ -261,7 +261,7 @@ export default function LoginPage({
           Built by Yalies, for Yalies. NOT associated with Yale University in
           any way, shape, or form. Just a personal proj. ·{" "}
           <a
-            href="mailto:filippo.fonseca@yale.edu,emir.ahmed@yale.edu"
+            href="mailto:filippo.fonseca@yale.edu"
             className="text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
           >
             Feedback?

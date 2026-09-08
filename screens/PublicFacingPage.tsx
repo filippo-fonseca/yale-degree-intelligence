@@ -677,7 +677,7 @@ export default function AboutPage() {
           {/* 6. Social proof (sits above the launch film) */}
           <div className="mt-5 md:mt-6">
             <p className="text-balance text-xl font-medium leading-snug tracking-[-0.015em] text-gray-900 dark:text-white sm:text-2xl md:text-3xl">
-              Used by 1 in 6 Yale undergrads.
+              Used by 1 in 5 Yale students.
               <br />
               <span className="text-gray-400 dark:text-gray-500">
                 Some of them even like it.
@@ -1492,7 +1492,7 @@ export default function AboutPage() {
 
           <p className="mx-auto mt-4 max-w-[52ch] font-sf text-base leading-relaxed text-gray-500 dark:text-gray-400 md:text-lg">
             Since then, it's become something I could have never imagined! 1 in
-            6 Yale students use it, which is so amazing to see, as it leaves us
+            5 Yale students use it, which is so amazing to see, as it leaves us
             all more time to spend on things that make us fulfilled (as well as
             making the most out of our Yale experience through stress-free
             studying, course selection periods, etc.). I cannot tell you how

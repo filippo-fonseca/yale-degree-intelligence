@@ -110,6 +110,7 @@ export const RELEASES: Release[] = [
       {
         title: "Look and feel",
         items: [
+          "The homepage now says 1 in 5 Yale students use DegreeIntelligence, in the line above the launch film and in the founder's note further down the page.",
           "The homepage's mission section now tells the real story of how DegreeIntelligence started, and the invitation to help build it is an actual invitation: open a pull request, or email to join the team.",
           "The Yale Daily News banner at the top of the homepage is Yale blue now, so it reads as the news it is.",
           "The GPA chart on the homepage had a legend nobody could read in dark mode. It was being drawn in black.",

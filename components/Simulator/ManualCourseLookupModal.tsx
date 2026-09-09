@@ -6,7 +6,7 @@ import {
   SIMULATOR_FALL_TERM,
   SIMULATOR_SPRING_TERM,
 } from "@/lib/courseCatalog";
-import { getMeetingLabels, formatMeetingSummary } from "@/lib/meetingTimes";
+import { describeMeetingTime } from "@/lib/meetingTimes";
 import { Course } from "@/lib/types";
 import { Panda } from "lucide-react";
 import Link from "next/link";
@@ -155,13 +155,19 @@ export default function ManualCourseLookupModal({
               ) : (
                 filteredCourses.map((c) => {
                   // Registrar meeting times exist only for the two simulator
-                  // terms, so this is one short line at most.
-                  const meetingTerms = [SIMULATOR_FALL_TERM, SIMULATOR_SPRING_TERM]
-                    .map((term) => ({
+                  // terms, so this is one short line at most. A term the
+                  // course is offered in always gets a line, even if that
+                  // line is "No time listed".
+                  const meetingTerms = [
+                    { term: SIMULATOR_FALL_TERM, offered: c.isFall },
+                    { term: SIMULATOR_SPRING_TERM, offered: c.isSpring },
+                  ]
+                    .map(({ term, offered }) => ({
                       term,
-                      labels: getMeetingLabels(c.canonicalCode, term),
+                      offered,
+                      meeting: describeMeetingTime(c.canonicalCode, term),
                     }))
-                    .filter((t) => t.labels && t.labels.length > 0);
+                    .filter((t) => t.offered || t.meeting.listed);
                   return (
                   <div
                     key={c.canonicalCode}
@@ -226,10 +232,10 @@ export default function ManualCourseLookupModal({
                           {meetingTerms.map((t) => (
                             <span
                               key={t.term}
-                              className="whitespace-nowrap"
-                              title={t.labels!.join("\n")}
+                              className={`whitespace-nowrap ${t.meeting.listed ? "" : "italic"}`}
+                              title={t.meeting.detail}
                             >
-                              {t.term} · {formatMeetingSummary(t.labels)}
+                              {t.term} · {t.meeting.text}
                             </span>
                           ))}
                         </div>

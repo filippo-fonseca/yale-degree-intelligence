@@ -16,7 +16,6 @@ import { Info } from "lucide-react";
 import { Course } from "@/lib/types";
 import { getCourseNameFromCode, getCanonicalCode } from "@/lib/courseCatalog";
 import {
-  hasMeetingTimesForTerm,
   meetingTimeMode,
   getMeetingLabels,
   describeMeetingTime,
@@ -1262,13 +1261,13 @@ export default function Simulator({
     return byCode;
   }, [semesters]);
 
-  // Meeting-time clashes per semester, keyed by semester id. Only the terms
-  // the catalog carries registrar times for produce anything; the rest are
-  // simply absent. Codes are canonicalised so cross-listings compare equal.
+  // Meeting-time clashes per semester, keyed by semester id. Published terms
+  // and projected Fall/Spring terms produce anything; the rest are simply
+  // absent. Codes are canonicalised so cross-listings compare equal.
   const conflictsBySemesterId = useMemo<Record<string, MeetingConflict[]>>(() => {
     const byId: Record<string, MeetingConflict[]> = {};
     semesters.forEach((s) => {
-      if (!hasMeetingTimesForTerm(s.name)) return;
+      if (meetingTimeMode(s.name) === "none") return;
       const codes = s.courses
         .filter((c) => !!c?.code)
         .map((c) => getCanonicalCode(c.code) ?? c.code);
@@ -2266,6 +2265,10 @@ export default function Simulator({
               const termMode = meetingTimeMode(semester.name);
               const termConflicts = conflictsBySemesterId[semester.id] ?? [];
               const clashingCodes = conflictingCodes(termConflicts);
+              // In a projected term the clash is between borrowed 2026-27
+              // slots, so it is a "possible" conflict and dressed down.
+              const conflictsProjected =
+                termMode === "projected" || termConflicts.some((c) => c.projected);
               // One line per clashing pair for the warning pill's tooltip,
               // built from the same labels the chips show.
               const conflictTooltip = termConflicts
@@ -2278,7 +2281,9 @@ export default function Simulator({
                 })
                 .concat([
                   "",
-                  "Based on current 2026-27 offerings; meeting times are in beta. Double-check both courses on Yale Course Search before you count on this.",
+                  conflictsProjected
+                    ? "Projected from 2026-27 offerings. Yale has not published this term; times often change. Double-check before you count on this."
+                    : "Based on current 2026-27 offerings; meeting times are in beta. Double-check both courses on Yale Course Search before you count on this.",
                 ])
                 .join("\n");
               // Tap-to-place only exists to land a course picked out of the
@@ -2338,13 +2343,20 @@ export default function Simulator({
                     <div className="flex items-center gap-1.5">
                       {termConflicts.length > 0 && (
                         <span
-                          className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[10px] font-medium border border-amber-300 dark:border-amber-500/40 bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-300"
+                          className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[10px] font-medium border ${
+                            conflictsProjected
+                              ? "border-dashed border-gray-300 dark:border-gray-600/60 bg-gray-50 dark:bg-gray-800/40 text-gray-600 dark:text-gray-300"
+                              : "border-amber-300 dark:border-amber-500/40 bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-300"
+                          }`}
                           title={conflictTooltip}
                         >
                           <FiAlertTriangle size={10} />
-                          {termConflicts.length} time{" "}
+                          {termConflicts.length}
+                          {conflictsProjected ? " possible" : ""} time{" "}
                           {termConflicts.length === 1 ? "conflict" : "conflicts"}
-                          <span className="opacity-60 normal-case">(beta, double-check)</span>
+                          <span className="opacity-60 normal-case">
+                            {conflictsProjected ? "(projected)" : "(beta, double-check)"}
+                          </span>
                         </span>
                       )}
                       <span
@@ -2425,10 +2437,18 @@ export default function Simulator({
                                   ? "bg-blue-100 dark:bg-blue-900/25 text-blue-700 dark:text-blue-300 border-blue-300 dark:border-blue-700/40 cursor-grab active:cursor-grabbing"
                                   : "bg-pink-100 dark:bg-pink-900/20 text-pink-700 dark:text-pink-300 border-pink-300 dark:border-pink-700/40 hover:bg-pink-200 dark:hover:bg-pink-800/30 cursor-grab active:cursor-grabbing"
                             }
-                            ${hasTimeConflict ? "ring-1 ring-amber-400/70" : ""}`}
+                            ${
+                              hasTimeConflict
+                                ? conflictsProjected
+                                  ? "ring-1 ring-gray-400/60"
+                                  : "ring-1 ring-amber-400/70"
+                                : ""
+                            }`}
                           title={
                             hasTimeConflict
-                              ? "Meets at the same time as another course this term. Meeting times are in beta, so double-check on Yale Course Search."
+                              ? conflictsProjected
+                                ? "May meet at the same time as another course this term (projected from 2026-27; may change)"
+                                : "Meets at the same time as another course this term. Meeting times are in beta, so double-check on Yale Course Search."
                               : undefined
                           }
                         >

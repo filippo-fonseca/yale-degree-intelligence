@@ -9,10 +9,20 @@ import {
   FiTrash2,
   FiCheck,
   FiLock,
+  FiAlertTriangle,
+  FiClock,
 } from "react-icons/fi";
 import { Info } from "lucide-react";
 import { Course } from "@/lib/types";
 import { getCourseNameFromCode, getCanonicalCode } from "@/lib/courseCatalog";
+import {
+  hasMeetingTimesForTerm,
+  getMeetingLabels,
+  formatMeetingSummary,
+  findTermConflicts,
+  conflictingCodes,
+  type MeetingConflict,
+} from "@/lib/meetingTimes";
 import toast from "react-hot-toast";
 import { useAuth } from "@/context/AuthContext";
 import { doc, getDoc, setDoc } from "firebase/firestore";
@@ -904,6 +914,10 @@ export default function Simulator({
   // the user actually opens Progress, so neither outlives its usefulness.
   const progressNew = useDismissibleFlag("sim:progress-grades-distribs");
 
+  // Meeting times only exist for the coming year, and Yale's times drift
+  // between years, so the Canvas says so once until the user dismisses it.
+  const meetingTimesNote = useDismissibleFlag("sim:meeting-times-2026-27");
+
   useEffect(() => {
     if (activeView === "progress") progressNew.dismiss();
   }, [activeView, progressNew]);
@@ -1245,6 +1259,22 @@ export default function Simulator({
       });
     });
     return byCode;
+  }, [semesters]);
+
+  // Meeting-time clashes per semester, keyed by semester id. Only the terms
+  // the catalog carries registrar times for produce anything; the rest are
+  // simply absent. Codes are canonicalised so cross-listings compare equal.
+  const conflictsBySemesterId = useMemo<Record<string, MeetingConflict[]>>(() => {
+    const byId: Record<string, MeetingConflict[]> = {};
+    semesters.forEach((s) => {
+      if (!hasMeetingTimesForTerm(s.name)) return;
+      const codes = s.courses
+        .filter((c) => !!c?.code)
+        .map((c) => getCanonicalCode(c.code) ?? c.code);
+      const found = findTermConflicts(codes, s.name);
+      if (found.length > 0) byId[s.id] = found;
+    });
+    return byId;
   }, [semesters]);
 
   // The same engine inputs the preview runs on, handed to the surfaces that
@@ -2033,6 +2063,32 @@ export default function Simulator({
             </div>
           )}
 
+          {/* Where the meeting times and conflict checks come from, and why
+              they stop after Spring 2027. Neutral rather than purple so it
+              does not read as a second "New" announcement. */}
+          {meetingTimesNote.show && (
+            <div className="mb-4 flex items-start gap-2.5 rounded-xl border border-gray-200 bg-gray-50/70 px-3.5 py-2.5 dark:border-gray-700/60 dark:bg-gray-800/40">
+              <FiClock
+                size={13}
+                className="mt-0.5 flex-shrink-0 text-gray-400 dark:text-gray-500"
+              />
+              <p className="flex-1 text-xs leading-relaxed text-gray-700 dark:text-gray-200">
+                Meeting times shown for Fall 2026 and Spring 2027 come from
+                Yale Course Search. Yale has not published times for later
+                terms, and times often change from year to year, so time
+                conflicts are only checked for the coming year.
+              </p>
+              <button
+                type="button"
+                onClick={meetingTimesNote.dismiss}
+                aria-label="Dismiss"
+                className="flex-shrink-0 rounded-md px-1.5 py-0.5 text-[11px] text-gray-500 transition-colors hover:bg-black/[0.04] hover:text-gray-700 dark:text-gray-400 dark:hover:bg-white/[0.06] dark:hover:text-gray-200"
+              >
+                Dismiss
+              </button>
+            </div>
+          )}
+
           {/* Help Panel */}
           <AnimatePresence>
             {showHelp && (
@@ -2062,6 +2118,11 @@ export default function Simulator({
                     Past semesters are locked: completed and in-progress courses
                     are pre-assigned and cannot be moved. Click the trash icon on
                     a planned course to remove it.
+                  </li>
+                  <li>
+                    Meeting times and time conflicts are shown for Fall 2026
+                    and Spring 2027 only, from Yale Course Search. Later terms
+                    have no published times yet, and times may change.
                   </li>
                   <li>
                     Turn on the Grades and Distributionals editors to give each
@@ -2195,6 +2256,22 @@ export default function Simulator({
                 ? String(semCredits)
                 : semCredits.toFixed(1);
               const isPast = isPastSemester(semester.name);
+              // The catalog only carries registrar meeting times for the two
+              // simulator terms; everywhere else the chip stays as it was.
+              const termHasTimes = hasMeetingTimesForTerm(semester.name);
+              const termConflicts = conflictsBySemesterId[semester.id] ?? [];
+              const clashingCodes = conflictingCodes(termConflicts);
+              // One line per clashing pair for the warning pill's tooltip,
+              // built from the same labels the chips show.
+              const conflictTooltip = termConflicts
+                .map((c) => {
+                  const la = (getMeetingLabels(c.a, semester.name) ?? []).join(", ");
+                  const lb = (getMeetingLabels(c.b, semester.name) ?? []).join(", ");
+                  return la === lb
+                    ? `${c.a} and ${c.b} both meet ${la}`
+                    : `${c.a} meets ${la}; ${c.b} meets ${lb}`;
+                })
+                .join("\n");
               // Tap-to-place only exists to land a course picked out of the
               // pool, so it goes quiet with the pool.
               const isPlaceTarget =
@@ -2250,6 +2327,16 @@ export default function Simulator({
                       )}
                     </h4>
                     <div className="flex items-center gap-1.5">
+                      {termConflicts.length > 0 && (
+                        <span
+                          className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[10px] font-medium border border-amber-300 dark:border-amber-500/40 bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-300"
+                          title={conflictTooltip}
+                        >
+                          <FiAlertTriangle size={10} />
+                          {termConflicts.length} time{" "}
+                          {termConflicts.length === 1 ? "conflict" : "conflicts"}
+                        </span>
+                      )}
                       <span
                         className="px-1.5 py-0.5 rounded-md text-[10px] bg-gray-100 dark:bg-gray-800/60 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-700/40"
                         title="Sum of credits in this semester"
@@ -2289,7 +2376,16 @@ export default function Simulator({
                     </div>
                   ) : (
                     <div className="flex flex-wrap gap-1.5">
-                      {semester.courses.map((course) => (
+                      {semester.courses.map((course) => {
+                        const canonicalCode =
+                          getCanonicalCode(course.code) ?? course.code;
+                        const meetingLabels = termHasTimes
+                          ? getMeetingLabels(canonicalCode, semester.name)
+                          : undefined;
+                        const meetingSummary =
+                          formatMeetingSummary(meetingLabels);
+                        const hasTimeConflict = clashingCodes.has(canonicalCode);
+                        return (
                         <motion.div
                           key={`${semester.id}-${course.code}`}
                           // Completed courses are history and stay put. An
@@ -2316,7 +2412,13 @@ export default function Simulator({
                                 : course.status === "in-progress"
                                   ? "bg-blue-100 dark:bg-blue-900/25 text-blue-700 dark:text-blue-300 border-blue-300 dark:border-blue-700/40 cursor-grab active:cursor-grabbing"
                                   : "bg-pink-100 dark:bg-pink-900/20 text-pink-700 dark:text-pink-300 border-pink-300 dark:border-pink-700/40 hover:bg-pink-200 dark:hover:bg-pink-800/30 cursor-grab active:cursor-grabbing"
-                            }`}
+                            }
+                            ${hasTimeConflict ? "ring-1 ring-amber-400/70" : ""}`}
+                          title={
+                            hasTimeConflict
+                              ? "Meets at the same time as another course this term"
+                              : undefined
+                          }
                         >
                           <div className="flex items-center justify-between w-full">
                             <div>
@@ -2324,6 +2426,18 @@ export default function Simulator({
                               <span className="text-[10px] opacity-60 ml-1">
                                 {getCourseNameFromCode(course.code) ?? ""}
                               </span>
+                              {meetingSummary && (
+                                <span
+                                  className="ml-1.5 text-[10px] text-gray-400 dark:text-gray-500 tabular-nums whitespace-nowrap"
+                                  title={
+                                    meetingLabels && meetingLabels.length > 1
+                                      ? meetingLabels.join("\n")
+                                      : undefined
+                                  }
+                                >
+                                  {meetingSummary}
+                                </span>
+                              )}
                             </div>
                             {course.status !== "completed" && (
                               <button
@@ -2382,7 +2496,8 @@ export default function Simulator({
                               </div>
                             )}
                         </motion.div>
-                      ))}
+                        );
+                      })}
                     </div>
                   )}
                 </motion.div>

@@ -10,6 +10,9 @@ import courses from "./courses.json";
  * - `distributionals`: optional Hu/So/Sc/QR/WR and L1-L5 tags, present only for
  *   the courses an augmentation pass has covered. Absent for everything else,
  *   so transcript / user override stays the source of truth.
+ * - `meetings`: section meeting times keyed by term, ONLY for the simulator
+ *   terms, written by scripts/apply-meeting-times.mjs from the registrar's own
+ *   structured values. Absent when the registrar lists no section.
  */
 export type CourseInfo = {
   codes: string[];
@@ -20,6 +23,23 @@ export type CourseInfo = {
   isFall?: boolean;
   isSpring?: boolean;
   distributionals?: string[];
+  meetings?: Partial<Record<string, CourseSection[]>>;
+};
+
+/** One weekly meeting: day 0 = Monday … 6 = Sunday, minutes since midnight. */
+export type MeetingSlot = { day: number; start: number; end: number };
+
+/**
+ * One section as the registrar lists it. `meets` is the display string
+ * verbatim ("TTh 11:35a-12:50p", "HTBA"); `slots` is its structured form and
+ * is empty for HTBA. `type` is the registrar's schedule code; "DS" is a
+ * discussion section, everything else is a section a student enrolls in.
+ */
+export type CourseSection = {
+  section: string;
+  type: string;
+  meets: string;
+  slots: MeetingSlot[];
 };
 
 /** Exact term labels used in courses.json `offered`. */
@@ -213,6 +233,19 @@ export const getCourseDistributionalsFromCode = (
   const record = lookup(code);
   const tags = record?.distributionals;
   return Array.isArray(tags) ? tags : undefined;
+};
+
+/**
+ * Sections the registrar lists for a course in a term, or undefined when the
+ * catalog carries none (a term outside the simulator horizon, or a course
+ * with no section that term). Only Fall 2026 / Spring 2027 are ever present.
+ */
+export const getCourseSectionsForTerm = (
+  code: string,
+  term: string,
+): CourseSection[] | undefined => {
+  const sections = getCourseInfo(code)?.meetings?.[term];
+  return Array.isArray(sections) && sections.length > 0 ? sections : undefined;
 };
 
 /** All other known codes for a course (excluding the canonical codes[0]). */

@@ -1,7 +1,12 @@
 import { useState, useEffect, useRef, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FiSearch, FiX, FiPlus } from "react-icons/fi";
-import { ALL_COURSES } from "@/lib/courseCatalog";
+import {
+  ALL_COURSES,
+  SIMULATOR_FALL_TERM,
+  SIMULATOR_SPRING_TERM,
+} from "@/lib/courseCatalog";
+import { getMeetingLabels, formatMeetingSummary } from "@/lib/meetingTimes";
 import { Course } from "@/lib/types";
 import { Panda } from "lucide-react";
 import Link from "next/link";
@@ -148,7 +153,16 @@ export default function ManualCourseLookupModal({
                   No results found.
                 </div>
               ) : (
-                filteredCourses.map((c) => (
+                filteredCourses.map((c) => {
+                  // Registrar meeting times exist only for the two simulator
+                  // terms, so this is one short line at most.
+                  const meetingTerms = [SIMULATOR_FALL_TERM, SIMULATOR_SPRING_TERM]
+                    .map((term) => ({
+                      term,
+                      labels: getMeetingLabels(c.canonicalCode, term),
+                    }))
+                    .filter((t) => t.labels && t.labels.length > 0);
+                  return (
                   <div
                     key={c.canonicalCode}
                     className="flex justify-between items-center px-3 py-2 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-pink-400 transition cursor-pointer"
@@ -207,6 +221,19 @@ export default function ManualCourseLookupModal({
                             `(aka: ${c.allCodes.slice(1).join(", ")})`}
                         </span>
                       </div>
+                      {meetingTerms.length > 0 && (
+                        <div className="mt-0.5 flex flex-wrap gap-x-3 gap-y-0.5 text-[11px] text-gray-400 dark:text-gray-500 tabular-nums">
+                          {meetingTerms.map((t) => (
+                            <span
+                              key={t.term}
+                              className="whitespace-nowrap"
+                              title={t.labels!.join("\n")}
+                            >
+                              {t.term} · {formatMeetingSummary(t.labels)}
+                            </span>
+                          ))}
+                        </div>
+                      )}
                     </div>
                     <button
                       className="flex items-center gap-1 px-3 py-1.5 bg-pink-100 dark:bg-pink-900/60 text-pink-700 dark:text-pink-200 rounded-lg border border-pink-300 dark:border-pink-800 hover:bg-pink-200 dark:hover:bg-pink-800 hover:text-pink-900 dark:hover:text-white transition"
@@ -229,7 +256,8 @@ export default function ManualCourseLookupModal({
                       <FiPlus /> Add
                     </button>
                   </div>
-                ))
+                  );
+                })
               )}
             </div>
           </motion.div>

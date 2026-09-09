@@ -10,6 +10,7 @@ import {
   FiCheck,
   FiLock,
   FiAlertTriangle,
+  FiClock,
 } from "react-icons/fi";
 import { Info } from "lucide-react";
 import { Course } from "@/lib/types";
@@ -912,6 +913,10 @@ export default function Simulator({
   // discoverable from Canvas. Both the dot and the banner clear the first time
   // the user actually opens Progress, so neither outlives its usefulness.
   const progressNew = useDismissibleFlag("sim:progress-grades-distribs");
+
+  // Meeting times only exist for the coming year, and Yale's times drift
+  // between years, so the Canvas says so once until the user dismisses it.
+  const meetingTimesNote = useDismissibleFlag("sim:meeting-times-2026-27");
 
   useEffect(() => {
     if (activeView === "progress") progressNew.dismiss();
@@ -2058,6 +2063,32 @@ export default function Simulator({
             </div>
           )}
 
+          {/* Where the meeting times and conflict checks come from, and why
+              they stop after Spring 2027. Neutral rather than purple so it
+              does not read as a second "New" announcement. */}
+          {meetingTimesNote.show && (
+            <div className="mb-4 flex items-start gap-2.5 rounded-xl border border-gray-200 bg-gray-50/70 px-3.5 py-2.5 dark:border-gray-700/60 dark:bg-gray-800/40">
+              <FiClock
+                size={13}
+                className="mt-0.5 flex-shrink-0 text-gray-400 dark:text-gray-500"
+              />
+              <p className="flex-1 text-xs leading-relaxed text-gray-700 dark:text-gray-200">
+                Meeting times shown for Fall 2026 and Spring 2027 come from
+                Yale Course Search. Yale has not published times for later
+                terms, and times often change from year to year, so time
+                conflicts are only checked for the coming year.
+              </p>
+              <button
+                type="button"
+                onClick={meetingTimesNote.dismiss}
+                aria-label="Dismiss"
+                className="flex-shrink-0 rounded-md px-1.5 py-0.5 text-[11px] text-gray-500 transition-colors hover:bg-black/[0.04] hover:text-gray-700 dark:text-gray-400 dark:hover:bg-white/[0.06] dark:hover:text-gray-200"
+              >
+                Dismiss
+              </button>
+            </div>
+          )}
+
           {/* Help Panel */}
           <AnimatePresence>
             {showHelp && (
@@ -2087,6 +2118,11 @@ export default function Simulator({
                     Past semesters are locked: completed and in-progress courses
                     are pre-assigned and cannot be moved. Click the trash icon on
                     a planned course to remove it.
+                  </li>
+                  <li>
+                    Meeting times and time conflicts are shown for Fall 2026
+                    and Spring 2027 only, from Yale Course Search. Later terms
+                    have no published times yet, and times may change.
                   </li>
                   <li>
                     Turn on the Grades and Distributionals editors to give each

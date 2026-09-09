@@ -155,8 +155,8 @@ describe("catalog meeting data", () => {
         }
       }
     }
-    expect([...unknown], "patterns missing from lib/meetingPatterns.json").toEqual([]);
-    expect([...mismatched], "patterns whose slots differ from the registry").toEqual([]);
+    expect(Array.from(unknown), "patterns missing from lib/meetingPatterns.json").toEqual([]);
+    expect(Array.from(mismatched), "patterns whose slots differ from the registry").toEqual([]);
   });
 
   it("exposes sections through the catalog lookup by any alias", () => {
@@ -183,7 +183,7 @@ describe("conflict rule on live data", () => {
     const key = slotKey(timedPrimary(r, term)[0]);
     bySlot.set(key, [...(bySlot.get(key) ?? []), r]);
   }
-  const sharedSlot = [...bySlot.values()].find((list) => list.length >= 2);
+  const sharedSlot = Array.from(bySlot.values()).find((list) => list.length >= 2);
 
   it("reports two single-section courses in the same slot as a conflict", () => {
     expect(sharedSlot).toBeDefined();
@@ -191,7 +191,7 @@ describe("conflict rule on live data", () => {
     expect(coursesConflict(a.codes[0], b.codes[0], term)).toBe(true);
     const found = findTermConflicts([a.codes[0], b.codes[0]], term);
     expect(found).toEqual([{ a: a.codes[0], b: b.codes[0], term }]);
-    expect([...conflictingCodes(found)].sort()).toEqual([a.codes[0], b.codes[0]].sort());
+    expect(Array.from(conflictingCodes(found)).sort()).toEqual([a.codes[0], b.codes[0]].sort());
   });
 
   it("does not report courses that meet on disjoint days", () => {

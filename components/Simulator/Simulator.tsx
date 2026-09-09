@@ -9,6 +9,7 @@ import {
   FiTrash2,
   FiCheck,
   FiLock,
+  FiAlertTriangle,
 } from "react-icons/fi";
 import { Info } from "lucide-react";
 import { Course } from "@/lib/types";
@@ -17,6 +18,9 @@ import {
   hasMeetingTimesForTerm,
   getMeetingLabels,
   formatMeetingSummary,
+  findTermConflicts,
+  conflictingCodes,
+  type MeetingConflict,
 } from "@/lib/meetingTimes";
 import toast from "react-hot-toast";
 import { useAuth } from "@/context/AuthContext";
@@ -1252,6 +1256,22 @@ export default function Simulator({
     return byCode;
   }, [semesters]);
 
+  // Meeting-time clashes per semester, keyed by semester id. Only the terms
+  // the catalog carries registrar times for produce anything; the rest are
+  // simply absent. Codes are canonicalised so cross-listings compare equal.
+  const conflictsBySemesterId = useMemo<Record<string, MeetingConflict[]>>(() => {
+    const byId: Record<string, MeetingConflict[]> = {};
+    semesters.forEach((s) => {
+      if (!hasMeetingTimesForTerm(s.name)) return;
+      const codes = s.courses
+        .filter((c) => !!c?.code)
+        .map((c) => getCanonicalCode(c.code) ?? c.code);
+      const found = findTermConflicts(codes, s.name);
+      if (found.length > 0) byId[s.id] = found;
+    });
+    return byId;
+  }, [semesters]);
+
   // The same engine inputs the preview runs on, handed to the surfaces that
   // render policy so a verdict in the assign modal can never disagree with the
   // numbers in the breakdown.
@@ -2203,6 +2223,19 @@ export default function Simulator({
               // The catalog only carries registrar meeting times for the two
               // simulator terms; everywhere else the chip stays as it was.
               const termHasTimes = hasMeetingTimesForTerm(semester.name);
+              const termConflicts = conflictsBySemesterId[semester.id] ?? [];
+              const clashingCodes = conflictingCodes(termConflicts);
+              // One line per clashing pair for the warning pill's tooltip,
+              // built from the same labels the chips show.
+              const conflictTooltip = termConflicts
+                .map((c) => {
+                  const la = (getMeetingLabels(c.a, semester.name) ?? []).join(", ");
+                  const lb = (getMeetingLabels(c.b, semester.name) ?? []).join(", ");
+                  return la === lb
+                    ? `${c.a} and ${c.b} both meet ${la}`
+                    : `${c.a} meets ${la}; ${c.b} meets ${lb}`;
+                })
+                .join("\n");
               // Tap-to-place only exists to land a course picked out of the
               // pool, so it goes quiet with the pool.
               const isPlaceTarget =
@@ -2258,6 +2291,16 @@ export default function Simulator({
                       )}
                     </h4>
                     <div className="flex items-center gap-1.5">
+                      {termConflicts.length > 0 && (
+                        <span
+                          className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[10px] font-medium border border-amber-300 dark:border-amber-500/40 bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-300"
+                          title={conflictTooltip}
+                        >
+                          <FiAlertTriangle size={10} />
+                          {termConflicts.length} time{" "}
+                          {termConflicts.length === 1 ? "conflict" : "conflicts"}
+                        </span>
+                      )}
                       <span
                         className="px-1.5 py-0.5 rounded-md text-[10px] bg-gray-100 dark:bg-gray-800/60 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-700/40"
                         title="Sum of credits in this semester"
@@ -2305,6 +2348,7 @@ export default function Simulator({
                           : undefined;
                         const meetingSummary =
                           formatMeetingSummary(meetingLabels);
+                        const hasTimeConflict = clashingCodes.has(canonicalCode);
                         return (
                         <motion.div
                           key={`${semester.id}-${course.code}`}
@@ -2332,7 +2376,13 @@ export default function Simulator({
                                 : course.status === "in-progress"
                                   ? "bg-blue-100 dark:bg-blue-900/25 text-blue-700 dark:text-blue-300 border-blue-300 dark:border-blue-700/40 cursor-grab active:cursor-grabbing"
                                   : "bg-pink-100 dark:bg-pink-900/20 text-pink-700 dark:text-pink-300 border-pink-300 dark:border-pink-700/40 hover:bg-pink-200 dark:hover:bg-pink-800/30 cursor-grab active:cursor-grabbing"
-                            }`}
+                            }
+                            ${hasTimeConflict ? "ring-1 ring-amber-400/70" : ""}`}
+                          title={
+                            hasTimeConflict
+                              ? "Meets at the same time as another course this term"
+                              : undefined
+                          }
                         >
                           <div className="flex items-center justify-between w-full">
                             <div>

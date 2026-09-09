@@ -13,6 +13,11 @@ import {
 import { Info } from "lucide-react";
 import { Course } from "@/lib/types";
 import { getCourseNameFromCode, getCanonicalCode } from "@/lib/courseCatalog";
+import {
+  hasMeetingTimesForTerm,
+  getMeetingLabels,
+  formatMeetingSummary,
+} from "@/lib/meetingTimes";
 import toast from "react-hot-toast";
 import { useAuth } from "@/context/AuthContext";
 import { doc, getDoc, setDoc } from "firebase/firestore";
@@ -2195,6 +2200,9 @@ export default function Simulator({
                 ? String(semCredits)
                 : semCredits.toFixed(1);
               const isPast = isPastSemester(semester.name);
+              // The catalog only carries registrar meeting times for the two
+              // simulator terms; everywhere else the chip stays as it was.
+              const termHasTimes = hasMeetingTimesForTerm(semester.name);
               // Tap-to-place only exists to land a course picked out of the
               // pool, so it goes quiet with the pool.
               const isPlaceTarget =
@@ -2289,7 +2297,15 @@ export default function Simulator({
                     </div>
                   ) : (
                     <div className="flex flex-wrap gap-1.5">
-                      {semester.courses.map((course) => (
+                      {semester.courses.map((course) => {
+                        const canonicalCode =
+                          getCanonicalCode(course.code) ?? course.code;
+                        const meetingLabels = termHasTimes
+                          ? getMeetingLabels(canonicalCode, semester.name)
+                          : undefined;
+                        const meetingSummary =
+                          formatMeetingSummary(meetingLabels);
+                        return (
                         <motion.div
                           key={`${semester.id}-${course.code}`}
                           // Completed courses are history and stay put. An
@@ -2324,6 +2340,18 @@ export default function Simulator({
                               <span className="text-[10px] opacity-60 ml-1">
                                 {getCourseNameFromCode(course.code) ?? ""}
                               </span>
+                              {meetingSummary && (
+                                <span
+                                  className="ml-1.5 text-[10px] text-gray-400 dark:text-gray-500 tabular-nums whitespace-nowrap"
+                                  title={
+                                    meetingLabels && meetingLabels.length > 1
+                                      ? meetingLabels.join("\n")
+                                      : undefined
+                                  }
+                                >
+                                  {meetingSummary}
+                                </span>
+                              )}
                             </div>
                             {course.status !== "completed" && (
                               <button
@@ -2382,7 +2410,8 @@ export default function Simulator({
                               </div>
                             )}
                         </motion.div>
-                      ))}
+                        );
+                      })}
                     </div>
                   )}
                 </motion.div>

@@ -1,0 +1,4135 @@
+{
+  "source": "github.com/filippo-fonseca/scraper-courses meeting_patterns.json",
+  "patterns": {
+    "MTWTh 8:20-9:10a": {
+      "slots": [
+        {
+          "day": 0,
+          "start": 500,
+          "end": 550
+        },
+        {
+          "day": 1,
+          "start": 500,
+          "end": 550
+        },
+        {
+          "day": 2,
+          "start": 500,
+          "end": 550
+        },
+        {
+          "day": 3,
+          "start": 500,
+          "end": 550
+        }
+      ],
+      "firstSeen": "Fall 2026 ASL 1100 01"
+    },
+    "MTWThF 8:20-9:10a": {
+      "slots": [
+        {
+          "day": 0,
+          "start": 500,
+          "end": 550
+        },
+        {
+          "day": 1,
+          "start": 500,
+          "end": 550
+        },
+        {
+          "day": 2,
+          "start": 500,
+          "end": 550
+        },
+        {
+          "day": 3,
+          "start": 500,
+          "end": 550
+        },
+        {
+          "day": 4,
+          "start": 500,
+          "end": 550
+        }
+      ],
+      "firstSeen": "Fall 2026 ITAL 1100 01"
+    },
+    "MTThF 8:20-9:10a": {
+      "slots": [
+        {
+          "day": 0,
+          "start": 500,
+          "end": 550
+        },
+        {
+          "day": 1,
+          "start": 500,
+          "end": 550
+        },
+        {
+          "day": 3,
+          "start": 500,
+          "end": 550
+        },
+        {
+          "day": 4,
+          "start": 500,
+          "end": 550
+        }
+      ],
+      "firstSeen": "Fall 2026 JAPN 1300 01"
+    },
+    "MW 8:30-9:50a": {
+      "slots": [
+        {
+          "day": 0,
+          "start": 510,
+          "end": 590
+        },
+        {
+          "day": 2,
+          "start": 510,
+          "end": 590
+        }
+      ],
+      "firstSeen": "Fall 2026 ECON 3339 01"
+    },
+    "MW 9-10:15a; M 11:35a-12:25p": {
+      "slots": [
+        {
+          "day": 0,
+          "start": 540,
+          "end": 615
+        },
+        {
+          "day": 0,
+          "start": 695,
+          "end": 745
+        },
+        {
+          "day": 2,
+          "start": 540,
+          "end": 615
+        }
+      ],
+      "firstSeen": "Fall 2026 DRST 0001 09"
+    },
+    "MW 9-10:15a": {
+      "slots": [
+        {
+          "day": 0,
+          "start": 540,
+          "end": 615
+        },
+        {
+          "day": 2,
+          "start": 540,
+          "end": 615
+        }
+      ],
+      "firstSeen": "Fall 2026 HUMS 0275 01"
+    },
+    "MW 9-10:15a; F 11:35a-12:25p": {
+      "slots": [
+        {
+          "day": 0,
+          "start": 540,
+          "end": 615
+        },
+        {
+          "day": 2,
+          "start": 540,
+          "end": 615
+        },
+        {
+          "day": 4,
+          "start": 695,
+          "end": 745
+        }
+      ],
+      "firstSeen": "Fall 2026 DRST 0005 01"
+    },
+    "M 9-10:50a": {
+      "slots": [
+        {
+          "day": 0,
+          "start": 540,
+          "end": 650
+        }
+      ],
+      "firstSeen": "Fall 2026 ENGL 4460 01"
+    },
+    "MTWTh 9:05-9:55a": {
+      "slots": [
+        {
+          "day": 0,
+          "start": 545,
+          "end": 595
+        },
+        {
+          "day": 1,
+          "start": 545,
+          "end": 595
+        },
+        {
+          "day": 2,
+          "start": 545,
+          "end": 595
+        },
+        {
+          "day": 3,
+          "start": 545,
+          "end": 595
+        }
+      ],
+      "firstSeen": "Fall 2026 NPLI 1100 01"
+    },
+    "MW 9:10-11a": {
+      "slots": [
+        {
+          "day": 0,
+          "start": 550,
+          "end": 660
+        },
+        {
+          "day": 2,
+          "start": 550,
+          "end": 660
+        }
+      ],
+      "firstSeen": "Fall 2026 HGRN 1100 01"
+    },
+    "M 9:15-11:15a": {
+      "slots": [
+        {
+          "day": 0,
+          "start": 555,
+          "end": 675
+        }
+      ],
+      "firstSeen": "Fall 2026 NAVY 3130 01"
+    },
+    "M 9:25-10:15a": {
+      "slots": [
+        {
+          "day": 0,
+          "start": 565,
+          "end": 615
+        }
+      ],
+      "firstSeen": "Fall 2026 MUSI 1111 A"
+    },
+    "MTWThF 10:30-11:20a; MWF 9:25-10:15a": {
+      "slots": [
+        {
+          "day": 0,
+          "start": 565,
+          "end": 615
+        },
+        {
+          "day": 0,
+          "start": 630,
+          "end": 680
+        },
+        {
+          "day": 1,
+          "start": 630,
+          "end": 680
+        },
+        {
+          "day": 2,
+          "start": 565,
+          "end": 615
+        },
+        {
+          "day": 2,
+          "start": 630,
+          "end": 680
+        },
+        {
+          "day": 3,
+          "start": 630,
+          "end": 680
+        },
+        {
+          "day": 4,
+          "start": 565,
+          "end": 615
+        },
+        {
+          "day": 4,
+          "start": 630,
+          "end": 680
+        }
+      ],
+      "firstSeen": "Fall 2026 RUSS 1250 01"
+    },
+    "MTWTh 9:25-10:15a": {
+      "slots": [
+        {
+          "day": 0,
+          "start": 565,
+          "end": 615
+        },
+        {
+          "day": 1,
+          "start": 565,
+          "end": 615
+        },
+        {
+          "day": 2,
+          "start": 565,
+          "end": 615
+        },
+        {
+          "day": 3,
+          "start": 565,
+          "end": 615
+        }
+      ],
+      "firstSeen": "Fall 2026 HELN 1100 01"
+    },
+    "MTWThF 9:25-10:15a": {
+      "slots": [
+        {
+          "day": 0,
+          "start": 565,
+          "end": 615
+        },
+        {
+          "day": 1,
+          "start": 565,
+          "end": 615
+        },
+        {
+          "day": 2,
+          "start": 565,
+          "end": 615
+        },
+        {
+          "day": 3,
+          "start": 565,
+          "end": 615
+        },
+        {
+          "day": 4,
+          "start": 565,
+          "end": 615
+        }
+      ],
+      "firstSeen": "Fall 2026 HNDI 1100 01"
+    },
+    "MTWF 9:25-10:15a": {
+      "slots": [
+        {
+          "day": 0,
+          "start": 565,
+          "end": 615
+        },
+        {
+          "day": 1,
+          "start": 565,
+          "end": 615
+        },
+        {
+          "day": 2,
+          "start": 565,
+          "end": 615
+        },
+        {
+          "day": 4,
+          "start": 565,
+          "end": 615
+        }
+      ],
+      "firstSeen": "Fall 2026 CHNS 1320 01"
+    },
+    "MTThF 9:25-10:15a": {
+      "slots": [
+        {
+          "day": 0,
+          "start": 565,
+          "end": 615
+        },
+        {
+          "day": 1,
+          "start": 565,
+          "end": 615
+        },
+        {
+          "day": 3,
+          "start": 565,
+          "end": 615
+        },
+        {
+          "day": 4,
+          "start": 565,
+          "end": 615
+        }
+      ],
+      "firstSeen": "Fall 2026 HEBR 1300 01"
+    },
+    "MW 9:25-10:15a": {
+      "slots": [
+        {
+          "day": 0,
+          "start": 565,
+          "end": 615
+        },
+        {
+          "day": 2,
+          "start": 565,
+          "end": 615
+        }
+      ],
+      "firstSeen": "Fall 2026 HIST 2225 01"
+    },
+    "MW 9:25-10:15a; F 9:25-10:15a": {
+      "slots": [
+        {
+          "day": 0,
+          "start": 565,
+          "end": 615
+        },
+        {
+          "day": 2,
+          "start": 565,
+          "end": 615
+        },
+        {
+          "day": 4,
+          "start": 565,
+          "end": 615
+        }
+      ],
+      "firstSeen": "Fall 2026 MCDB 4300 01"
+    },
+    "MWF 9:25-10:15a": {
+      "slots": [
+        {
+          "day": 0,
+          "start": 565,
+          "end": 615
+        },
+        {
+          "day": 2,
+          "start": 565,
+          "end": 615
+        },
+        {
+          "day": 4,
+          "start": 565,
+          "end": 615
+        }
+      ],
+      "firstSeen": "Fall 2026 KREN 1520 01"
+    },
+    "M 9:25-11:15a": {
+      "slots": [
+        {
+          "day": 0,
+          "start": 565,
+          "end": 675
+        }
+      ],
+      "firstSeen": "Fall 2026 MUSI 3228 01"
+    },
+    "MTThF 9:25-11:15a": {
+      "slots": [
+        {
+          "day": 0,
+          "start": 565,
+          "end": 675
+        },
+        {
+          "day": 1,
+          "start": 565,
+          "end": 675
+        },
+        {
+          "day": 3,
+          "start": 565,
+          "end": 675
+        },
+        {
+          "day": 4,
+          "start": 565,
+          "end": 675
+        }
+      ],
+      "firstSeen": "Fall 2026 SPAN 1250 01"
+    },
+    "M 9:25-11:20a": {
+      "slots": [
+        {
+          "day": 0,
+          "start": 565,
+          "end": 680
+        }
+      ],
+      "firstSeen": "Fall 2026 HSHM 4770 01"
+    },
+    "MTWTh 9:25-11:20a": {
+      "slots": [
+        {
+          "day": 0,
+          "start": 565,
+          "end": 680
+        },
+        {
+          "day": 1,
+          "start": 565,
+          "end": 680
+        },
+        {
+          "day": 2,
+          "start": 565,
+          "end": 680
+        },
+        {
+          "day": 3,
+          "start": 565,
+          "end": 680
+        }
+      ],
+      "firstSeen": "Spring 2027 FREN 1450 01"
+    },
+    "MTWTh 9:25-11:20a; F 9:25-11:20a": {
+      "slots": [
+        {
+          "day": 0,
+          "start": 565,
+          "end": 680
+        },
+        {
+          "day": 1,
+          "start": 565,
+          "end": 680
+        },
+        {
+          "day": 2,
+          "start": 565,
+          "end": 680
+        },
+        {
+          "day": 3,
+          "start": 565,
+          "end": 680
+        },
+        {
+          "day": 4,
+          "start": 565,
+          "end": 680
+        }
+      ],
+      "firstSeen": "Fall 2026 FREN 1250 01"
+    },
+    "MTWThF 9:25-11:20a": {
+      "slots": [
+        {
+          "day": 0,
+          "start": 565,
+          "end": 680
+        },
+        {
+          "day": 1,
+          "start": 565,
+          "end": 680
+        },
+        {
+          "day": 2,
+          "start": 565,
+          "end": 680
+        },
+        {
+          "day": 3,
+          "start": 565,
+          "end": 680
+        },
+        {
+          "day": 4,
+          "start": 565,
+          "end": 680
+        }
+      ],
+      "firstSeen": "Fall 2026 LATN 1012 01"
+    },
+    "MW 9:25-11:20a": {
+      "slots": [
+        {
+          "day": 0,
+          "start": 565,
+          "end": 680
+        },
+        {
+          "day": 2,
+          "start": 565,
+          "end": 680
+        }
+      ],
+      "firstSeen": "Fall 2026 TDPS 3301 01"
+    },
+    "MW 10:10-11:25a": {
+      "slots": [
+        {
+          "day": 0,
+          "start": 610,
+          "end": 685
+        },
+        {
+          "day": 2,
+          "start": 610,
+          "end": 685
+        }
+      ],
+      "firstSeen": "Fall 2026 NPLI 1500 01"
+    },
+    "MW 10:10a-12p": {
+      "slots": [
+        {
+          "day": 0,
+          "start": 610,
+          "end": 720
+        },
+        {
+          "day": 2,
+          "start": 610,
+          "end": 720
+        }
+      ],
+      "firstSeen": "Fall 2026 SWED 1100 01"
+    },
+    "M 10:30-11:20a": {
+      "slots": [
+        {
+          "day": 0,
+          "start": 630,
+          "end": 680
+        }
+      ],
+      "firstSeen": "Fall 2026 MUSI 1111 B"
+    },
+    "MTWTh 10:30-11:20a": {
+      "slots": [
+        {
+          "day": 0,
+          "start": 630,
+          "end": 680
+        },
+        {
+          "day": 1,
+          "start": 630,
+          "end": 680
+        },
+        {
+          "day": 2,
+          "start": 630,
+          "end": 680
+        },
+        {
+          "day": 3,
+          "start": 630,
+          "end": 680
+        }
+      ],
+      "firstSeen": "Fall 2026 HELN 1300 01"
+    },
+    "MTWThF 10:30-11:20a": {
+      "slots": [
+        {
+          "day": 0,
+          "start": 630,
+          "end": 680
+        },
+        {
+          "day": 1,
+          "start": 630,
+          "end": 680
+        },
+        {
+          "day": 2,
+          "start": 630,
+          "end": 680
+        },
+        {
+          "day": 3,
+          "start": 630,
+          "end": 680
+        },
+        {
+          "day": 4,
+          "start": 630,
+          "end": 680
+        }
+      ],
+      "firstSeen": "Fall 2026 HNDI 1300 01"
+    },
+    "MTWF 10:30-11:20a": {
+      "slots": [
+        {
+          "day": 0,
+          "start": 630,
+          "end": 680
+        },
+        {
+          "day": 1,
+          "start": 630,
+          "end": 680
+        },
+        {
+          "day": 2,
+          "start": 630,
+          "end": 680
+        },
+        {
+          "day": 4,
+          "start": 630,
+          "end": 680
+        }
+      ],
+      "firstSeen": "Fall 2026 CHNS 1320 02"
+    },
+    "MTThF 10:30-11:20a": {
+      "slots": [
+        {
+          "day": 0,
+          "start": 630,
+          "end": 680
+        },
+        {
+          "day": 1,
+          "start": 630,
+          "end": 680
+        },
+        {
+          "day": 3,
+          "start": 630,
+          "end": 680
+        },
+        {
+          "day": 4,
+          "start": 630,
+          "end": 680
+        }
+      ],
+      "firstSeen": "Fall 2026 HEBR 1100 01"
+    },
+    "MW 10:30-11:20a": {
+      "slots": [
+        {
+          "day": 0,
+          "start": 630,
+          "end": 680
+        },
+        {
+          "day": 2,
+          "start": 630,
+          "end": 680
+        }
+      ],
+      "firstSeen": "Fall 2026 HSHM 2260 01"
+    },
+    "MWF 10:30-11:20a": {
+      "slots": [
+        {
+          "day": 0,
+          "start": 630,
+          "end": 680
+        },
+        {
+          "day": 2,
+          "start": 630,
+          "end": 680
+        },
+        {
+          "day": 4,
+          "start": 630,
+          "end": 680
+        }
+      ],
+      "firstSeen": "Fall 2026 KREN 1520 02"
+    },
+    "MW 10:45a-12p": {
+      "slots": [
+        {
+          "day": 0,
+          "start": 645,
+          "end": 720
+        },
+        {
+          "day": 2,
+          "start": 645,
+          "end": 720
+        }
+      ],
+      "firstSeen": "Fall 2026 BNGL 1500 01"
+    },
+    "M 11a-1:20p": {
+      "slots": [
+        {
+          "day": 0,
+          "start": 660,
+          "end": 800
+        }
+      ],
+      "firstSeen": "Fall 2026 MUSI 4231 01"
+    },
+    "M 11:35a-12:25p": {
+      "slots": [
+        {
+          "day": 0,
+          "start": 695,
+          "end": 745
+        }
+      ],
+      "firstSeen": "Fall 2026 HIST 1733 A"
+    },
+    "MW 1:05-2:20p; M 11:35a-12:25p": {
+      "slots": [
+        {
+          "day": 0,
+          "start": 695,
+          "end": 745
+        },
+        {
+          "day": 0,
+          "start": 785,
+          "end": 860
+        },
+        {
+          "day": 2,
+          "start": 785,
+          "end": 860
+        }
+      ],
+      "firstSeen": "Fall 2026 DRST 0001 02"
+    },
+    "MW 2:35-3:50p; M 11:35a-12:25p": {
+      "slots": [
+        {
+          "day": 0,
+          "start": 695,
+          "end": 745
+        },
+        {
+          "day": 0,
+          "start": 875,
+          "end": 950
+        },
+        {
+          "day": 2,
+          "start": 875,
+          "end": 950
+        }
+      ],
+      "firstSeen": "Fall 2026 DRST 0001 03"
+    },
+    "TTh 9-10:15a; M 11:35a-12:25p": {
+      "slots": [
+        {
+          "day": 0,
+          "start": 695,
+          "end": 745
+        },
+        {
+          "day": 1,
+          "start": 540,
+          "end": 615
+        },
+        {
+          "day": 3,
+          "start": 540,
+          "end": 615
+        }
+      ],
+      "firstSeen": "Fall 2026 DRST 0001 01"
+    },
+    "MTWThF 11:35a-12:25p": {
+      "slots": [
+        {
+          "day": 0,
+          "start": 695,
+          "end": 745
+        },
+        {
+          "day": 1,
+          "start": 695,
+          "end": 745
+        },
+        {
+          "day": 2,
+          "start": 695,
+          "end": 745
+        },
+        {
+          "day": 3,
+          "start": 695,
+          "end": 745
+        },
+        {
+          "day": 4,
+          "start": 695,
+          "end": 745
+        }
+      ],
+      "firstSeen": "Fall 2026 ZULU 1110 01"
+    },
+    "TTh 11:35a-12:50p; M 11:35a-12:25p": {
+      "slots": [
+        {
+          "day": 0,
+          "start": 695,
+          "end": 745
+        },
+        {
+          "day": 1,
+          "start": 695,
+          "end": 770
+        },
+        {
+          "day": 3,
+          "start": 695,
+          "end": 770
+        }
+      ],
+      "firstSeen": "Fall 2026 DRST 0001 06"
+    },
+    "TTh 2:35-3:50p; M 11:35a-12:25p": {
+      "slots": [
+        {
+          "day": 0,
+          "start": 695,
+          "end": 745
+        },
+        {
+          "day": 1,
+          "start": 875,
+          "end": 950
+        },
+        {
+          "day": 3,
+          "start": 875,
+          "end": 950
+        }
+      ],
+      "firstSeen": "Fall 2026 DRST 0001 05"
+    },
+    "MW 11:35a-12:25p; T 7-10p": {
+      "slots": [
+        {
+          "day": 0,
+          "start": 695,
+          "end": 745
+        },
+        {
+          "day": 1,
+          "start": 1140,
+          "end": 1320
+        },
+        {
+          "day": 2,
+          "start": 695,
+          "end": 745
+        }
+      ],
+      "firstSeen": "Fall 2026 CPLT 3610 01"
+    },
+    "MW 11:35a-12:25p": {
+      "slots": [
+        {
+          "day": 0,
+          "start": 695,
+          "end": 745
+        },
+        {
+          "day": 2,
+          "start": 695,
+          "end": 745
+        }
+      ],
+      "firstSeen": "Fall 2026 HIST 1453 01"
+    },
+    "MWF 11:35a-12:25p": {
+      "slots": [
+        {
+          "day": 0,
+          "start": 695,
+          "end": 745
+        },
+        {
+          "day": 2,
+          "start": 695,
+          "end": 745
+        },
+        {
+          "day": 4,
+          "start": 695,
+          "end": 745
+        }
+      ],
+      "firstSeen": "Fall 2026 KREN 1500 01"
+    },
+    "MW 11:35a-12:50p": {
+      "slots": [
+        {
+          "day": 0,
+          "start": 695,
+          "end": 770
+        },
+        {
+          "day": 2,
+          "start": 695,
+          "end": 770
+        }
+      ],
+      "firstSeen": "Spring 2027 HLTH 2300 01"
+    },
+    "MWF 11:35a-12:50p": {
+      "slots": [
+        {
+          "day": 0,
+          "start": 695,
+          "end": 770
+        },
+        {
+          "day": 2,
+          "start": 695,
+          "end": 770
+        },
+        {
+          "day": 4,
+          "start": 695,
+          "end": 770
+        }
+      ],
+      "firstSeen": "Fall 2026 RUSS 1500 01"
+    },
+    "MW 11:40a-1:30p": {
+      "slots": [
+        {
+          "day": 0,
+          "start": 700,
+          "end": 810
+        },
+        {
+          "day": 2,
+          "start": 700,
+          "end": 810
+        }
+      ],
+      "firstSeen": "Fall 2026 HGRN 1400 01"
+    },
+    "MTWTh 12:10-1p": {
+      "slots": [
+        {
+          "day": 0,
+          "start": 730,
+          "end": 780
+        },
+        {
+          "day": 1,
+          "start": 730,
+          "end": 780
+        },
+        {
+          "day": 2,
+          "start": 730,
+          "end": 780
+        },
+        {
+          "day": 3,
+          "start": 730,
+          "end": 780
+        }
+      ],
+      "firstSeen": "Fall 2026 MTBT 1100 01"
+    },
+    "MW 1-2:20p": {
+      "slots": [
+        {
+          "day": 0,
+          "start": 780,
+          "end": 860
+        },
+        {
+          "day": 2,
+          "start": 780,
+          "end": 860
+        }
+      ],
+      "firstSeen": "Fall 2026 ECON 4424 01"
+    },
+    "M 1-3:55p": {
+      "slots": [
+        {
+          "day": 0,
+          "start": 780,
+          "end": 955
+        }
+      ],
+      "firstSeen": "Fall 2026 EEB 3360 01"
+    },
+    "M 1-4p": {
+      "slots": [
+        {
+          "day": 0,
+          "start": 780,
+          "end": 960
+        }
+      ],
+      "firstSeen": "Fall 2026 TDPS 1000 01"
+    },
+    "M 1-5p": {
+      "slots": [
+        {
+          "day": 0,
+          "start": 780,
+          "end": 1020
+        }
+      ],
+      "firstSeen": "Fall 2026 BENG 3100 A"
+    },
+    "MF 1-5p": {
+      "slots": [
+        {
+          "day": 0,
+          "start": 780,
+          "end": 1020
+        },
+        {
+          "day": 4,
+          "start": 780,
+          "end": 1020
+        }
+      ],
+      "firstSeen": "Fall 2026 BENG 3100 01"
+    },
+    "M 1:05-2:20p": {
+      "slots": [
+        {
+          "day": 0,
+          "start": 785,
+          "end": 860
+        }
+      ],
+      "firstSeen": "Fall 2026 EVST 4960 01"
+    },
+    "MW 1:05-2:20p; W 11:35a-12:25p": {
+      "slots": [
+        {
+          "day": 0,
+          "start": 785,
+          "end": 860
+        },
+        {
+          "day": 2,
+          "start": 695,
+          "end": 745
+        },
+        {
+          "day": 2,
+          "start": 785,
+          "end": 860
+        }
+      ],
+      "firstSeen": "Fall 2026 DRST 0003 02"
+    },
+    "MW 1:05-2:20p": {
+      "slots": [
+        {
+          "day": 0,
+          "start": 785,
+          "end": 860
+        },
+        {
+          "day": 2,
+          "start": 785,
+          "end": 860
+        }
+      ],
+      "firstSeen": "Spring 2027 HLTH 0155 01"
+    },
+    "MW 1:05-2:20p; F 10:30a-1:30p": {
+      "slots": [
+        {
+          "day": 0,
+          "start": 785,
+          "end": 860
+        },
+        {
+          "day": 2,
+          "start": 785,
+          "end": 860
+        },
+        {
+          "day": 4,
+          "start": 630,
+          "end": 810
+        }
+      ],
+      "firstSeen": "Spring 2027 MENG 3020L 01"
+    },
+    "MW 1:05-2:20p; F 11:35a-12:25p": {
+      "slots": [
+        {
+          "day": 0,
+          "start": 785,
+          "end": 860
+        },
+        {
+          "day": 2,
+          "start": 785,
+          "end": 860
+        },
+        {
+          "day": 4,
+          "start": 695,
+          "end": 745
+        }
+      ],
+      "firstSeen": "Fall 2026 DRST 0005 02"
+    },
+    "MTWTh 1:10-2p": {
+      "slots": [
+        {
+          "day": 0,
+          "start": 790,
+          "end": 840
+        },
+        {
+          "day": 1,
+          "start": 790,
+          "end": 840
+        },
+        {
+          "day": 2,
+          "start": 790,
+          "end": 840
+        },
+        {
+          "day": 3,
+          "start": 790,
+          "end": 840
+        }
+      ],
+      "firstSeen": "Fall 2026 TAML 1100 01"
+    },
+    "M 1:30-2:20p": {
+      "slots": [
+        {
+          "day": 0,
+          "start": 810,
+          "end": 860
+        }
+      ],
+      "firstSeen": "Fall 2026 HIST 1681 E"
+    },
+    "MW 1:30-2:20p; M 7-10p": {
+      "slots": [
+        {
+          "day": 0,
+          "start": 810,
+          "end": 860
+        },
+        {
+          "day": 0,
+          "start": 1140,
+          "end": 1320
+        },
+        {
+          "day": 2,
+          "start": 810,
+          "end": 860
+        }
+      ],
+      "firstSeen": "Fall 2026 CPLT 1501 01"
+    },
+    "MTWThF 1:30-2:20p": {
+      "slots": [
+        {
+          "day": 0,
+          "start": 810,
+          "end": 860
+        },
+        {
+          "day": 1,
+          "start": 810,
+          "end": 860
+        },
+        {
+          "day": 2,
+          "start": 810,
+          "end": 860
+        },
+        {
+          "day": 3,
+          "start": 810,
+          "end": 860
+        },
+        {
+          "day": 4,
+          "start": 810,
+          "end": 860
+        }
+      ],
+      "firstSeen": "Fall 2026 UKRN 1300 01"
+    },
+    "MW 1:30-2:20p": {
+      "slots": [
+        {
+          "day": 0,
+          "start": 810,
+          "end": 860
+        },
+        {
+          "day": 2,
+          "start": 810,
+          "end": 860
+        }
+      ],
+      "firstSeen": "Fall 2026 HIST 1788 01"
+    },
+    "M 1:30-2:20p; W 1:30-3:20p": {
+      "slots": [
+        {
+          "day": 0,
+          "start": 810,
+          "end": 860
+        },
+        {
+          "day": 2,
+          "start": 810,
+          "end": 920
+        }
+      ],
+      "firstSeen": "Fall 2026 EEB 0035 01"
+    },
+    "M 1:30-3:20p": {
+      "slots": [
+        {
+          "day": 0,
+          "start": 810,
+          "end": 920
+        }
+      ],
+      "firstSeen": "Spring 2027 ANTH 3185 01"
+    },
+    "M 1:30-3:25p": {
+      "slots": [
+        {
+          "day": 0,
+          "start": 810,
+          "end": 925
+        }
+      ],
+      "firstSeen": "Fall 2026 HIST 2478 01"
+    },
+    "MW 1:30-3:25p": {
+      "slots": [
+        {
+          "day": 0,
+          "start": 810,
+          "end": 925
+        },
+        {
+          "day": 2,
+          "start": 810,
+          "end": 925
+        }
+      ],
+      "firstSeen": "Fall 2026 TDPS 2004 01"
+    },
+    "MWF 1:30-3:25p": {
+      "slots": [
+        {
+          "day": 0,
+          "start": 810,
+          "end": 925
+        },
+        {
+          "day": 2,
+          "start": 810,
+          "end": 925
+        },
+        {
+          "day": 4,
+          "start": 810,
+          "end": 925
+        }
+      ],
+      "firstSeen": "Fall 2026 ARCH 3000 01"
+    },
+    "MW 1:30-4:30p": {
+      "slots": [
+        {
+          "day": 0,
+          "start": 810,
+          "end": 990
+        },
+        {
+          "day": 2,
+          "start": 810,
+          "end": 990
+        }
+      ],
+      "firstSeen": "Fall 2026 MB&B 3640 01"
+    },
+    "M 1:30-5:30p": {
+      "slots": [
+        {
+          "day": 0,
+          "start": 810,
+          "end": 1050
+        }
+      ],
+      "firstSeen": "Spring 2027 MCDB 2010L 01"
+    },
+    "MW 1:30-6:30p": {
+      "slots": [
+        {
+          "day": 0,
+          "start": 810,
+          "end": 1110
+        },
+        {
+          "day": 2,
+          "start": 810,
+          "end": 1110
+        }
+      ],
+      "firstSeen": "Spring 2027 MCDB 3440L 01"
+    },
+    "MW 2:10-4p": {
+      "slots": [
+        {
+          "day": 0,
+          "start": 850,
+          "end": 960
+        },
+        {
+          "day": 2,
+          "start": 850,
+          "end": 960
+        }
+      ],
+      "firstSeen": "Fall 2026 WLOF 1130 01"
+    },
+    "M 2:30-6:30p": {
+      "slots": [
+        {
+          "day": 0,
+          "start": 870,
+          "end": 1110
+        }
+      ],
+      "firstSeen": "Spring 2027 CENG 4120L 01"
+    },
+    "M 2:35-3:25p": {
+      "slots": [
+        {
+          "day": 0,
+          "start": 875,
+          "end": 925
+        }
+      ],
+      "firstSeen": "Fall 2026 HIST 1733 B"
+    },
+    "MTWTh 2:35-3:25p": {
+      "slots": [
+        {
+          "day": 0,
+          "start": 875,
+          "end": 925
+        },
+        {
+          "day": 1,
+          "start": 875,
+          "end": 925
+        },
+        {
+          "day": 2,
+          "start": 875,
+          "end": 925
+        },
+        {
+          "day": 3,
+          "start": 875,
+          "end": 925
+        }
+      ],
+      "firstSeen": "Fall 2026 ASL 1100 05"
+    },
+    "MTWThF 2:35-3:25p": {
+      "slots": [
+        {
+          "day": 0,
+          "start": 875,
+          "end": 925
+        },
+        {
+          "day": 1,
+          "start": 875,
+          "end": 925
+        },
+        {
+          "day": 2,
+          "start": 875,
+          "end": 925
+        },
+        {
+          "day": 3,
+          "start": 875,
+          "end": 925
+        },
+        {
+          "day": 4,
+          "start": 875,
+          "end": 925
+        }
+      ],
+      "firstSeen": "Fall 2026 ITAL 1300 05"
+    },
+    "MTThF 2:35-3:25p": {
+      "slots": [
+        {
+          "day": 0,
+          "start": 875,
+          "end": 925
+        },
+        {
+          "day": 1,
+          "start": 875,
+          "end": 925
+        },
+        {
+          "day": 3,
+          "start": 875,
+          "end": 925
+        },
+        {
+          "day": 4,
+          "start": 875,
+          "end": 925
+        }
+      ],
+      "firstSeen": "Fall 2026 PORT 1100 06"
+    },
+    "MW 2:35-3:25p": {
+      "slots": [
+        {
+          "day": 0,
+          "start": 875,
+          "end": 925
+        },
+        {
+          "day": 2,
+          "start": 875,
+          "end": 925
+        }
+      ],
+      "firstSeen": "Fall 2026 HIST 1260 01"
+    },
+    "MW 2:35-3:25p; F 9:25-10:15a": {
+      "slots": [
+        {
+          "day": 0,
+          "start": 875,
+          "end": 925
+        },
+        {
+          "day": 2,
+          "start": 875,
+          "end": 925
+        },
+        {
+          "day": 4,
+          "start": 565,
+          "end": 615
+        }
+      ],
+      "firstSeen": "Fall 2026 ECON 1108 01"
+    },
+    "MWF 2:35-3:25p": {
+      "slots": [
+        {
+          "day": 0,
+          "start": 875,
+          "end": 925
+        },
+        {
+          "day": 2,
+          "start": 875,
+          "end": 925
+        },
+        {
+          "day": 4,
+          "start": 875,
+          "end": 925
+        }
+      ],
+      "firstSeen": "Spring 2027 KREN 1530 02"
+    },
+    "MW 2:35-3:50p; W 11:35a-12:25p": {
+      "slots": [
+        {
+          "day": 0,
+          "start": 875,
+          "end": 950
+        },
+        {
+          "day": 2,
+          "start": 695,
+          "end": 745
+        },
+        {
+          "day": 2,
+          "start": 875,
+          "end": 950
+        }
+      ],
+      "firstSeen": "Fall 2026 DRST 0003 04"
+    },
+    "MW 2:35-3:50p": {
+      "slots": [
+        {
+          "day": 0,
+          "start": 875,
+          "end": 950
+        },
+        {
+          "day": 2,
+          "start": 875,
+          "end": 950
+        }
+      ],
+      "firstSeen": "Fall 2026 HEBR 1580 01"
+    },
+    "MW 2:35-3:50p; F 11:35a-12:25p": {
+      "slots": [
+        {
+          "day": 0,
+          "start": 875,
+          "end": 950
+        },
+        {
+          "day": 2,
+          "start": 875,
+          "end": 950
+        },
+        {
+          "day": 4,
+          "start": 695,
+          "end": 745
+        }
+      ],
+      "firstSeen": "Fall 2026 DRST 0005 05"
+    },
+    "MW 2:35-3:55p": {
+      "slots": [
+        {
+          "day": 0,
+          "start": 875,
+          "end": 955
+        },
+        {
+          "day": 2,
+          "start": 875,
+          "end": 955
+        }
+      ],
+      "firstSeen": "Spring 2027 ECON 4436 02"
+    },
+    "MW 2:40-3:55p": {
+      "slots": [
+        {
+          "day": 0,
+          "start": 880,
+          "end": 955
+        },
+        {
+          "day": 2,
+          "start": 880,
+          "end": 955
+        }
+      ],
+      "firstSeen": "Fall 2026 MTBT 1300 01"
+    },
+    "M 3:30-5:20p": {
+      "slots": [
+        {
+          "day": 0,
+          "start": 930,
+          "end": 1040
+        }
+      ],
+      "firstSeen": "Spring 2027 MCDB 4500 01"
+    },
+    "M 3:30-7:30p": {
+      "slots": [
+        {
+          "day": 0,
+          "start": 930,
+          "end": 1170
+        }
+      ],
+      "firstSeen": "Fall 2026 ART 3794 01"
+    },
+    "M 4-4:50p": {
+      "slots": [
+        {
+          "day": 0,
+          "start": 960,
+          "end": 1010
+        }
+      ],
+      "firstSeen": "Fall 2026 MB&B 1230L A"
+    },
+    "MTWTh 4-4:50p": {
+      "slots": [
+        {
+          "day": 0,
+          "start": 960,
+          "end": 1010
+        },
+        {
+          "day": 1,
+          "start": 960,
+          "end": 1010
+        },
+        {
+          "day": 2,
+          "start": 960,
+          "end": 1010
+        },
+        {
+          "day": 3,
+          "start": 960,
+          "end": 1010
+        }
+      ],
+      "firstSeen": "Fall 2026 GMAN 1300 02"
+    },
+    "MTWThF 4-4:50p": {
+      "slots": [
+        {
+          "day": 0,
+          "start": 960,
+          "end": 1010
+        },
+        {
+          "day": 1,
+          "start": 960,
+          "end": 1010
+        },
+        {
+          "day": 2,
+          "start": 960,
+          "end": 1010
+        },
+        {
+          "day": 3,
+          "start": 960,
+          "end": 1010
+        },
+        {
+          "day": 4,
+          "start": 960,
+          "end": 1010
+        }
+      ],
+      "firstSeen": "Fall 2026 TLGU 1300 01"
+    },
+    "MW 4-4:50p": {
+      "slots": [
+        {
+          "day": 0,
+          "start": 960,
+          "end": 1010
+        },
+        {
+          "day": 2,
+          "start": 960,
+          "end": 1010
+        }
+      ],
+      "firstSeen": "Fall 2026 HUMS 2410 01"
+    },
+    "MWF 4-4:50p": {
+      "slots": [
+        {
+          "day": 0,
+          "start": 960,
+          "end": 1010
+        },
+        {
+          "day": 2,
+          "start": 960,
+          "end": 1010
+        },
+        {
+          "day": 4,
+          "start": 960,
+          "end": 1010
+        }
+      ],
+      "firstSeen": "Fall 2026 LING 1380 01"
+    },
+    "MW 4-5:15p": {
+      "slots": [
+        {
+          "day": 0,
+          "start": 960,
+          "end": 1035
+        },
+        {
+          "day": 2,
+          "start": 960,
+          "end": 1035
+        }
+      ],
+      "firstSeen": "Fall 2026 HIST 3467 01"
+    },
+    "M 4-5:55p": {
+      "slots": [
+        {
+          "day": 0,
+          "start": 960,
+          "end": 1075
+        }
+      ],
+      "firstSeen": "Fall 2026 HIST 2216 01"
+    },
+    "MW 4-5:55p": {
+      "slots": [
+        {
+          "day": 0,
+          "start": 960,
+          "end": 1075
+        },
+        {
+          "day": 2,
+          "start": 960,
+          "end": 1075
+        }
+      ],
+      "firstSeen": "Fall 2026 TDPS 2004 02"
+    },
+    "MW 4-6:30p": {
+      "slots": [
+        {
+          "day": 0,
+          "start": 960,
+          "end": 1110
+        },
+        {
+          "day": 2,
+          "start": 960,
+          "end": 1110
+        }
+      ],
+      "firstSeen": "Fall 2026 MUSI 1192 01"
+    },
+    "M 4-7p": {
+      "slots": [
+        {
+          "day": 0,
+          "start": 960,
+          "end": 1140
+        }
+      ],
+      "firstSeen": "Fall 2026 MENG 2616L A"
+    },
+    "MW 4:10-6p": {
+      "slots": [
+        {
+          "day": 0,
+          "start": 970,
+          "end": 1080
+        },
+        {
+          "day": 2,
+          "start": 970,
+          "end": 1080
+        }
+      ],
+      "firstSeen": "Fall 2026 PNJB 1300 01"
+    },
+    "M 5-5:50p": {
+      "slots": [
+        {
+          "day": 0,
+          "start": 1020,
+          "end": 1070
+        }
+      ],
+      "firstSeen": "Fall 2026 MCDB 3100 A"
+    },
+    "MW 5-6:50p": {
+      "slots": [
+        {
+          "day": 0,
+          "start": 1020,
+          "end": 1130
+        },
+        {
+          "day": 2,
+          "start": 1020,
+          "end": 1130
+        }
+      ],
+      "firstSeen": "Fall 2026 BNGL 1100 01"
+    },
+    "M 5:10-6p": {
+      "slots": [
+        {
+          "day": 0,
+          "start": 1030,
+          "end": 1080
+        }
+      ],
+      "firstSeen": "Fall 2026 CHEM 4900 01"
+    },
+    "M 5:30-8:30p": {
+      "slots": [
+        {
+          "day": 0,
+          "start": 1050,
+          "end": 1230
+        }
+      ],
+      "firstSeen": "Spring 2027 MENG 2050 01"
+    },
+    "MW 6-7:15p": {
+      "slots": [
+        {
+          "day": 0,
+          "start": 1080,
+          "end": 1155
+        },
+        {
+          "day": 2,
+          "start": 1080,
+          "end": 1155
+        }
+      ],
+      "firstSeen": "Fall 2026 MENG 3323 01"
+    },
+    "MW 6:10-8p": {
+      "slots": [
+        {
+          "day": 0,
+          "start": 1090,
+          "end": 1200
+        },
+        {
+          "day": 2,
+          "start": 1090,
+          "end": 1200
+        }
+      ],
+      "firstSeen": "Fall 2026 PNJB 1100 01"
+    },
+    "M 7-7:50p": {
+      "slots": [
+        {
+          "day": 0,
+          "start": 1140,
+          "end": 1190
+        }
+      ],
+      "firstSeen": "Fall 2026 MCDB 3100 B"
+    },
+    "MW 7-8:15p": {
+      "slots": [
+        {
+          "day": 0,
+          "start": 1140,
+          "end": 1215
+        },
+        {
+          "day": 2,
+          "start": 1140,
+          "end": 1215
+        }
+      ],
+      "firstSeen": "Fall 2026 MENG 4469 01"
+    },
+    "M 7-8:55p": {
+      "slots": [
+        {
+          "day": 0,
+          "start": 1140,
+          "end": 1255
+        }
+      ],
+      "firstSeen": "Spring 2027 CPLT 2510 01"
+    },
+    "TTh 1:05-2:20p; M 7-9p": {
+      "slots": [
+        {
+          "day": 0,
+          "start": 1140,
+          "end": 1260
+        },
+        {
+          "day": 1,
+          "start": 785,
+          "end": 860
+        },
+        {
+          "day": 3,
+          "start": 785,
+          "end": 860
+        }
+      ],
+      "firstSeen": "Fall 2026 ENGL 0831 01"
+    },
+    "MW 7-9p": {
+      "slots": [
+        {
+          "day": 0,
+          "start": 1140,
+          "end": 1260
+        },
+        {
+          "day": 2,
+          "start": 1140,
+          "end": 1260
+        }
+      ],
+      "firstSeen": "Fall 2026 MUSI 1191 01"
+    },
+    "M 7-9:30p": {
+      "slots": [
+        {
+          "day": 0,
+          "start": 1140,
+          "end": 1290
+        }
+      ],
+      "firstSeen": "Fall 2026 ART 3995 01"
+    },
+    "M 7-10p": {
+      "slots": [
+        {
+          "day": 0,
+          "start": 1140,
+          "end": 1320
+        }
+      ],
+      "firstSeen": "Fall 2026 ASTR 1550 01"
+    },
+    "M 7-10p; T 4-5:55p": {
+      "slots": [
+        {
+          "day": 0,
+          "start": 1140,
+          "end": 1320
+        },
+        {
+          "day": 1,
+          "start": 960,
+          "end": 1075
+        }
+      ],
+      "firstSeen": "Fall 2026 AMST 3395 01"
+    },
+    "M 8-8:50p": {
+      "slots": [
+        {
+          "day": 0,
+          "start": 1200,
+          "end": 1250
+        }
+      ],
+      "firstSeen": "Fall 2026 MCDB 3100 C"
+    },
+    "T 7:15-8:45a": {
+      "slots": [
+        {
+          "day": 1,
+          "start": 435,
+          "end": 525
+        }
+      ],
+      "firstSeen": "Fall 2026 NAVY 4110 01"
+    },
+    "T 7:30-8:45a; Th 7:30-8:45a": {
+      "slots": [
+        {
+          "day": 1,
+          "start": 450,
+          "end": 525
+        },
+        {
+          "day": 3,
+          "start": 450,
+          "end": 525
+        }
+      ],
+      "firstSeen": "Fall 2026 NAVY 3110 01"
+    },
+    "T 7:40-8:30a": {
+      "slots": [
+        {
+          "day": 1,
+          "start": 460,
+          "end": 510
+        }
+      ],
+      "firstSeen": "Fall 2026 USAF 1001 01"
+    },
+    "T 8-9:40a": {
+      "slots": [
+        {
+          "day": 1,
+          "start": 480,
+          "end": 580
+        }
+      ],
+      "firstSeen": "Fall 2026 USAF 3001 01"
+    },
+    "T 8:15-10:15a": {
+      "slots": [
+        {
+          "day": 1,
+          "start": 495,
+          "end": 615
+        }
+      ],
+      "firstSeen": "Fall 2026 USAF 4011 01"
+    },
+    "TTh 8:30-9:50a": {
+      "slots": [
+        {
+          "day": 1,
+          "start": 510,
+          "end": 590
+        },
+        {
+          "day": 3,
+          "start": 510,
+          "end": 590
+        }
+      ],
+      "firstSeen": "Fall 2026 EVST 3360 01"
+    },
+    "T 8:40-9:30a": {
+      "slots": [
+        {
+          "day": 1,
+          "start": 520,
+          "end": 570
+        }
+      ],
+      "firstSeen": "Fall 2026 USAF 2001 01"
+    },
+    "T 9-10:15a": {
+      "slots": [
+        {
+          "day": 1,
+          "start": 540,
+          "end": 615
+        }
+      ],
+      "firstSeen": "Spring 2027 MENG 3423L 01"
+    },
+    "TTh 9-10:15a; W 11:35a-12:25p": {
+      "slots": [
+        {
+          "day": 1,
+          "start": 540,
+          "end": 615
+        },
+        {
+          "day": 2,
+          "start": 695,
+          "end": 745
+        },
+        {
+          "day": 3,
+          "start": 540,
+          "end": 615
+        }
+      ],
+      "firstSeen": "Fall 2026 DRST 0003 01"
+    },
+    "TTh 9-10:15a": {
+      "slots": [
+        {
+          "day": 1,
+          "start": 540,
+          "end": 615
+        },
+        {
+          "day": 3,
+          "start": 540,
+          "end": 615
+        }
+      ],
+      "firstSeen": "Fall 2026 HEBR 1370 01"
+    },
+    "T 9:25-10:15a": {
+      "slots": [
+        {
+          "day": 1,
+          "start": 565,
+          "end": 615
+        }
+      ],
+      "firstSeen": "Fall 2026 HSAR 3247 R"
+    },
+    "TTh 9:25-10:15a": {
+      "slots": [
+        {
+          "day": 1,
+          "start": 565,
+          "end": 615
+        },
+        {
+          "day": 3,
+          "start": 565,
+          "end": 615
+        }
+      ],
+      "firstSeen": "Spring 2027 HSHM 2340 01"
+    },
+    "T 9:25-11:15a": {
+      "slots": [
+        {
+          "day": 1,
+          "start": 565,
+          "end": 675
+        }
+      ],
+      "firstSeen": "Fall 2026 MUSI 4249 01"
+    },
+    "T 9:25-11:20a": {
+      "slots": [
+        {
+          "day": 1,
+          "start": 565,
+          "end": 680
+        }
+      ],
+      "firstSeen": "Fall 2026 HSHM 4660 01"
+    },
+    "TTh 9:25-11:20a": {
+      "slots": [
+        {
+          "day": 1,
+          "start": 565,
+          "end": 680
+        },
+        {
+          "day": 3,
+          "start": 565,
+          "end": 680
+        }
+      ],
+      "firstSeen": "Fall 2026 TDPS 3000 01"
+    },
+    "TWF 10:10-11:25a": {
+      "slots": [
+        {
+          "day": 1,
+          "start": 610,
+          "end": 685
+        },
+        {
+          "day": 2,
+          "start": 610,
+          "end": 685
+        },
+        {
+          "day": 4,
+          "start": 610,
+          "end": 685
+        }
+      ],
+      "firstSeen": "Fall 2026 SBCR 1100 01"
+    },
+    "TTh 10:10-11:25a": {
+      "slots": [
+        {
+          "day": 1,
+          "start": 610,
+          "end": 685
+        },
+        {
+          "day": 3,
+          "start": 610,
+          "end": 685
+        }
+      ],
+      "firstSeen": "Fall 2026 MTBT 1500 01"
+    },
+    "TThF 10:10-11:25a": {
+      "slots": [
+        {
+          "day": 1,
+          "start": 610,
+          "end": 685
+        },
+        {
+          "day": 3,
+          "start": 610,
+          "end": 685
+        },
+        {
+          "day": 4,
+          "start": 610,
+          "end": 685
+        }
+      ],
+      "firstSeen": "Fall 2026 CZEC 1200 01"
+    },
+    "T 10:30-11:20a": {
+      "slots": [
+        {
+          "day": 1,
+          "start": 630,
+          "end": 680
+        }
+      ],
+      "firstSeen": "Fall 2026 HIST 1681 A"
+    },
+    "TTh 10:30-11:20a": {
+      "slots": [
+        {
+          "day": 1,
+          "start": 630,
+          "end": 680
+        },
+        {
+          "day": 3,
+          "start": 630,
+          "end": 680
+        }
+      ],
+      "firstSeen": "Fall 2026 HSHM 2060 01"
+    },
+    "T 11:35a-12:25p": {
+      "slots": [
+        {
+          "day": 1,
+          "start": 695,
+          "end": 745
+        }
+      ],
+      "firstSeen": "Fall 2026 HIST 1681 B"
+    },
+    "TTh 11:35a-12:25p": {
+      "slots": [
+        {
+          "day": 1,
+          "start": 695,
+          "end": 745
+        },
+        {
+          "day": 3,
+          "start": 695,
+          "end": 745
+        }
+      ],
+      "firstSeen": "Fall 2026 HSHM 2090 01"
+    },
+    "TTh 11:35a-12:50p; W 11:35a-12:25p": {
+      "slots": [
+        {
+          "day": 1,
+          "start": 695,
+          "end": 770
+        },
+        {
+          "day": 2,
+          "start": 695,
+          "end": 745
+        },
+        {
+          "day": 3,
+          "start": 695,
+          "end": 770
+        }
+      ],
+      "firstSeen": "Fall 2026 DRST 0003 08"
+    },
+    "TTh 11:35a-12:50p": {
+      "slots": [
+        {
+          "day": 1,
+          "start": 695,
+          "end": 770
+        },
+        {
+          "day": 3,
+          "start": 695,
+          "end": 770
+        }
+      ],
+      "firstSeen": "Fall 2026 HELN 1500 01"
+    },
+    "TTh 11:35a-12:50p; F 11:35a-12:25p": {
+      "slots": [
+        {
+          "day": 1,
+          "start": 695,
+          "end": 770
+        },
+        {
+          "day": 3,
+          "start": 695,
+          "end": 770
+        },
+        {
+          "day": 4,
+          "start": 695,
+          "end": 745
+        }
+      ],
+      "firstSeen": "Fall 2026 DRST 0005 07"
+    },
+    "TWF 11:40a-12:55p": {
+      "slots": [
+        {
+          "day": 1,
+          "start": 700,
+          "end": 775
+        },
+        {
+          "day": 2,
+          "start": 700,
+          "end": 775
+        },
+        {
+          "day": 4,
+          "start": 700,
+          "end": 775
+        }
+      ],
+      "firstSeen": "Fall 2026 SBCR 1300 01"
+    },
+    "TThF 11:40a-12:55p": {
+      "slots": [
+        {
+          "day": 1,
+          "start": 700,
+          "end": 775
+        },
+        {
+          "day": 3,
+          "start": 700,
+          "end": 775
+        },
+        {
+          "day": 4,
+          "start": 700,
+          "end": 775
+        }
+      ],
+      "firstSeen": "Fall 2026 CZEC 1100 01"
+    },
+    "TTh 12:10-2p": {
+      "slots": [
+        {
+          "day": 1,
+          "start": 730,
+          "end": 840
+        },
+        {
+          "day": 3,
+          "start": 730,
+          "end": 840
+        }
+      ],
+      "firstSeen": "Fall 2026 TBTN 1500 01"
+    },
+    "TTh 1-2:20p": {
+      "slots": [
+        {
+          "day": 1,
+          "start": 780,
+          "end": 860
+        },
+        {
+          "day": 3,
+          "start": 780,
+          "end": 860
+        }
+      ],
+      "firstSeen": "Fall 2026 ECON 3363 01"
+    },
+    "T 1-3p; Th 1-3p": {
+      "slots": [
+        {
+          "day": 1,
+          "start": 780,
+          "end": 900
+        },
+        {
+          "day": 3,
+          "start": 780,
+          "end": 900
+        }
+      ],
+      "firstSeen": "Fall 2026 MENG 4137L 01"
+    },
+    "TTh 1-3p": {
+      "slots": [
+        {
+          "day": 1,
+          "start": 780,
+          "end": 900
+        },
+        {
+          "day": 3,
+          "start": 780,
+          "end": 900
+        }
+      ],
+      "firstSeen": "Spring 2027 MENG 4138L 01"
+    },
+    "T 1-4p": {
+      "slots": [
+        {
+          "day": 1,
+          "start": 780,
+          "end": 960
+        }
+      ],
+      "firstSeen": "Fall 2026 PHYS 1650L A"
+    },
+    "T 1-5p": {
+      "slots": [
+        {
+          "day": 1,
+          "start": 780,
+          "end": 1020
+        }
+      ],
+      "firstSeen": "Fall 2026 MB&B 2510L 01"
+    },
+    "TTh 1-5p": {
+      "slots": [
+        {
+          "day": 1,
+          "start": 780,
+          "end": 1020
+        },
+        {
+          "day": 3,
+          "start": 780,
+          "end": 1020
+        }
+      ],
+      "firstSeen": "Fall 2026 CHEM 2260L 01"
+    },
+    "T 1:05-2:20p": {
+      "slots": [
+        {
+          "day": 1,
+          "start": 785,
+          "end": 860
+        }
+      ],
+      "firstSeen": "Fall 2026 BENG 2080 01"
+    },
+    "TTh 1:05-2:20p; W 11:35a-12:25p": {
+      "slots": [
+        {
+          "day": 1,
+          "start": 785,
+          "end": 860
+        },
+        {
+          "day": 2,
+          "start": 695,
+          "end": 745
+        },
+        {
+          "day": 3,
+          "start": 785,
+          "end": 860
+        }
+      ],
+      "firstSeen": "Fall 2026 DRST 0003 03"
+    },
+    "T 1:05-2:20p; Th 1-5p": {
+      "slots": [
+        {
+          "day": 1,
+          "start": 785,
+          "end": 860
+        },
+        {
+          "day": 3,
+          "start": 780,
+          "end": 1020
+        }
+      ],
+      "firstSeen": "Fall 2026 EVST 2234L 01"
+    },
+    "TTh 1:05-2:20p": {
+      "slots": [
+        {
+          "day": 1,
+          "start": 785,
+          "end": 860
+        },
+        {
+          "day": 3,
+          "start": 785,
+          "end": 860
+        }
+      ],
+      "firstSeen": "Fall 2026 HEBR 1500 01"
+    },
+    "TTh 1:05-2:20p; F 11:35a-12:25p": {
+      "slots": [
+        {
+          "day": 1,
+          "start": 785,
+          "end": 860
+        },
+        {
+          "day": 3,
+          "start": 785,
+          "end": 860
+        },
+        {
+          "day": 4,
+          "start": 695,
+          "end": 745
+        }
+      ],
+      "firstSeen": "Fall 2026 DRST 0005 03"
+    },
+    "TTh 1:25-2:40p": {
+      "slots": [
+        {
+          "day": 1,
+          "start": 805,
+          "end": 880
+        },
+        {
+          "day": 3,
+          "start": 805,
+          "end": 880
+        }
+      ],
+      "firstSeen": "Fall 2026 BNGL 1300 01"
+    },
+    "T 1:30-2:20p": {
+      "slots": [
+        {
+          "day": 1,
+          "start": 810,
+          "end": 860
+        }
+      ],
+      "firstSeen": "Fall 2026 HIST 2214 A"
+    },
+    "TTh 1:30-2:20p": {
+      "slots": [
+        {
+          "day": 1,
+          "start": 810,
+          "end": 860
+        },
+        {
+          "day": 3,
+          "start": 810,
+          "end": 860
+        }
+      ],
+      "firstSeen": "Spring 2027 HSHM 2050 01"
+    },
+    "T 1:30-3:20p": {
+      "slots": [
+        {
+          "day": 1,
+          "start": 810,
+          "end": 920
+        }
+      ],
+      "firstSeen": "Spring 2027 ENGL 3450 01"
+    },
+    "T 1:30-3:25p": {
+      "slots": [
+        {
+          "day": 1,
+          "start": 810,
+          "end": 925
+        }
+      ],
+      "firstSeen": "Fall 2026 HELN 2230 01"
+    },
+    "TTh 1:30-3:25p": {
+      "slots": [
+        {
+          "day": 1,
+          "start": 810,
+          "end": 925
+        },
+        {
+          "day": 3,
+          "start": 810,
+          "end": 925
+        }
+      ],
+      "firstSeen": "Spring 2027 ART 1514 03"
+    },
+    "T 1:30-3:30p": {
+      "slots": [
+        {
+          "day": 1,
+          "start": 810,
+          "end": 930
+        }
+      ],
+      "firstSeen": "Fall 2026 USAF 4011 02"
+    },
+    "T 1:30-4:30p": {
+      "slots": [
+        {
+          "day": 1,
+          "start": 810,
+          "end": 990
+        }
+      ],
+      "firstSeen": "Fall 2026 TDPS 2009 01"
+    },
+    "TTh 1:30-4:30p": {
+      "slots": [
+        {
+          "day": 1,
+          "start": 810,
+          "end": 990
+        },
+        {
+          "day": 3,
+          "start": 810,
+          "end": 990
+        }
+      ],
+      "firstSeen": "Fall 2026 PHYS 4450L 01"
+    },
+    "T 1:30-5:30p": {
+      "slots": [
+        {
+          "day": 1,
+          "start": 810,
+          "end": 1050
+        }
+      ],
+      "firstSeen": "Fall 2026 MCDB 2210L A"
+    },
+    "TTh 1:30-5:30p": {
+      "slots": [
+        {
+          "day": 1,
+          "start": 810,
+          "end": 1050
+        },
+        {
+          "day": 3,
+          "start": 810,
+          "end": 1050
+        }
+      ],
+      "firstSeen": "Fall 2026 MCDB 3420L 01"
+    },
+    "TTh 2-3:25p": {
+      "slots": [
+        {
+          "day": 1,
+          "start": 840,
+          "end": 925
+        },
+        {
+          "day": 3,
+          "start": 840,
+          "end": 925
+        }
+      ],
+      "firstSeen": "Fall 2026 TDPS 2000 01"
+    },
+    "TTh 2:10-4p": {
+      "slots": [
+        {
+          "day": 1,
+          "start": 850,
+          "end": 960
+        },
+        {
+          "day": 3,
+          "start": 850,
+          "end": 960
+        }
+      ],
+      "firstSeen": "Fall 2026 TBTN 1300 01"
+    },
+    "T 2:30-4:30p": {
+      "slots": [
+        {
+          "day": 1,
+          "start": 870,
+          "end": 990
+        }
+      ],
+      "firstSeen": "Fall 2026 FILM 3300 01"
+    },
+    "T 2:30-5:30p": {
+      "slots": [
+        {
+          "day": 1,
+          "start": 870,
+          "end": 1050
+        }
+      ],
+      "firstSeen": "Spring 2027 MENG 3423L A"
+    },
+    "T 2:30-6:30p": {
+      "slots": [
+        {
+          "day": 1,
+          "start": 870,
+          "end": 1110
+        }
+      ],
+      "firstSeen": "Fall 2026 ART 2943 01"
+    },
+    "T 2:35-3:25p": {
+      "slots": [
+        {
+          "day": 1,
+          "start": 875,
+          "end": 925
+        }
+      ],
+      "firstSeen": "Fall 2026 HIST 1681 C"
+    },
+    "TTh 2:35-3:25p": {
+      "slots": [
+        {
+          "day": 1,
+          "start": 875,
+          "end": 925
+        },
+        {
+          "day": 3,
+          "start": 875,
+          "end": 925
+        }
+      ],
+      "firstSeen": "Fall 2026 HIST 1116 01"
+    },
+    "TTh 2:35-3:50p; W 11:35a-12:25p": {
+      "slots": [
+        {
+          "day": 1,
+          "start": 875,
+          "end": 950
+        },
+        {
+          "day": 2,
+          "start": 695,
+          "end": 745
+        },
+        {
+          "day": 3,
+          "start": 875,
+          "end": 950
+        }
+      ],
+      "firstSeen": "Fall 2026 DRST 0003 05"
+    },
+    "TTh 2:35-3:50p": {
+      "slots": [
+        {
+          "day": 1,
+          "start": 875,
+          "end": 950
+        },
+        {
+          "day": 3,
+          "start": 875,
+          "end": 950
+        }
+      ],
+      "firstSeen": "Fall 2026 HEBR 1170 01"
+    },
+    "TTh 2:35-3:50p; F 11:35a-12:25p": {
+      "slots": [
+        {
+          "day": 1,
+          "start": 875,
+          "end": 950
+        },
+        {
+          "day": 3,
+          "start": 875,
+          "end": 950
+        },
+        {
+          "day": 4,
+          "start": 695,
+          "end": 745
+        }
+      ],
+      "firstSeen": "Fall 2026 DRST 0005 06"
+    },
+    "T 2:35-3:50p; Th 4-5:15p": {
+      "slots": [
+        {
+          "day": 1,
+          "start": 875,
+          "end": 950
+        },
+        {
+          "day": 3,
+          "start": 960,
+          "end": 1035
+        }
+      ],
+      "firstSeen": "Fall 2026 CPLT 1540 02"
+    },
+    "T 3:30-5:20p": {
+      "slots": [
+        {
+          "day": 1,
+          "start": 930,
+          "end": 1040
+        }
+      ],
+      "firstSeen": "Spring 2027 MCDB 4400 01"
+    },
+    "T 4-4:50p": {
+      "slots": [
+        {
+          "day": 1,
+          "start": 960,
+          "end": 1010
+        }
+      ],
+      "firstSeen": "Fall 2026 HIST 1125 A"
+    },
+    "TTh 4-4:50p": {
+      "slots": [
+        {
+          "day": 1,
+          "start": 960,
+          "end": 1010
+        },
+        {
+          "day": 3,
+          "start": 960,
+          "end": 1010
+        }
+      ],
+      "firstSeen": "Fall 2026 HSHM 2270 01"
+    },
+    "TTh 4-5:15p": {
+      "slots": [
+        {
+          "day": 1,
+          "start": 960,
+          "end": 1035
+        },
+        {
+          "day": 3,
+          "start": 960,
+          "end": 1035
+        }
+      ],
+      "firstSeen": "Fall 2026 HSHM 2390 01"
+    },
+    "T 4-5:55p": {
+      "slots": [
+        {
+          "day": 1,
+          "start": 960,
+          "end": 1075
+        }
+      ],
+      "firstSeen": "Fall 2026 HSHM 4200 01"
+    },
+    "TTh 4-5:55p": {
+      "slots": [
+        {
+          "day": 1,
+          "start": 960,
+          "end": 1075
+        },
+        {
+          "day": 3,
+          "start": 960,
+          "end": 1075
+        }
+      ],
+      "firstSeen": "Fall 2026 ART 1111 01"
+    },
+    "TTh 4-6:15p": {
+      "slots": [
+        {
+          "day": 1,
+          "start": 960,
+          "end": 1095
+        },
+        {
+          "day": 3,
+          "start": 960,
+          "end": 1095
+        }
+      ],
+      "firstSeen": "Fall 2026 MUSI 1190 01"
+    },
+    "T 5-5:50p": {
+      "slots": [
+        {
+          "day": 1,
+          "start": 1020,
+          "end": 1070
+        }
+      ],
+      "firstSeen": "Fall 2026 MCDB 3100 D"
+    },
+    "T 5:05-5:55p": {
+      "slots": [
+        {
+          "day": 1,
+          "start": 1025,
+          "end": 1075
+        }
+      ],
+      "firstSeen": "Fall 2026 HIST 1125 B"
+    },
+    "TTh 6-7:15p": {
+      "slots": [
+        {
+          "day": 1,
+          "start": 1080,
+          "end": 1155
+        },
+        {
+          "day": 3,
+          "start": 1080,
+          "end": 1155
+        }
+      ],
+      "firstSeen": "Fall 2026 DUTC 1500 01"
+    },
+    "T 7-7:50p": {
+      "slots": [
+        {
+          "day": 1,
+          "start": 1140,
+          "end": 1190
+        }
+      ],
+      "firstSeen": "Fall 2026 HIST 1125 C"
+    },
+    "TTh 7-8:15p": {
+      "slots": [
+        {
+          "day": 1,
+          "start": 1140,
+          "end": 1215
+        },
+        {
+          "day": 3,
+          "start": 1140,
+          "end": 1215
+        }
+      ],
+      "firstSeen": "Spring 2027 MENG 3323 01"
+    },
+    "T 7-8:55p": {
+      "slots": [
+        {
+          "day": 1,
+          "start": 1140,
+          "end": 1255
+        }
+      ],
+      "firstSeen": "Fall 2026 PHIL 4350 01"
+    },
+    "T 7-9p; Th 4-5:55p": {
+      "slots": [
+        {
+          "day": 1,
+          "start": 1140,
+          "end": 1260
+        },
+        {
+          "day": 3,
+          "start": 960,
+          "end": 1075
+        }
+      ],
+      "firstSeen": "Fall 2026 FILM 4700 01"
+    },
+    "T 7-10p": {
+      "slots": [
+        {
+          "day": 1,
+          "start": 1140,
+          "end": 1320
+        }
+      ],
+      "firstSeen": "Fall 2026 MENG 1105 A"
+    },
+    "T 7-10p; W 3:30-6:20p": {
+      "slots": [
+        {
+          "day": 1,
+          "start": 1140,
+          "end": 1320
+        },
+        {
+          "day": 2,
+          "start": 930,
+          "end": 1100
+        }
+      ],
+      "firstSeen": "Fall 2026 AMST 4463 01"
+    },
+    "T 8-8:50p": {
+      "slots": [
+        {
+          "day": 1,
+          "start": 1200,
+          "end": 1250
+        }
+      ],
+      "firstSeen": "Fall 2026 HIST 1125 D"
+    },
+    "W 8:20-11:20a": {
+      "slots": [
+        {
+          "day": 2,
+          "start": 500,
+          "end": 680
+        }
+      ],
+      "firstSeen": "Fall 2026 PHYS 1650L D"
+    },
+    "W 8:20a-12:20p": {
+      "slots": [
+        {
+          "day": 2,
+          "start": 500,
+          "end": 740
+        }
+      ],
+      "firstSeen": "Fall 2026 ART 4942 01"
+    },
+    "WF 9-10:15a; F 11:35a-12:25p": {
+      "slots": [
+        {
+          "day": 2,
+          "start": 540,
+          "end": 615
+        },
+        {
+          "day": 4,
+          "start": 540,
+          "end": 615
+        },
+        {
+          "day": 4,
+          "start": 695,
+          "end": 745
+        }
+      ],
+      "firstSeen": "Fall 2026 DRST 0005 08"
+    },
+    "W 9-10:30a": {
+      "slots": [
+        {
+          "day": 2,
+          "start": 540,
+          "end": 630
+        }
+      ],
+      "firstSeen": "Fall 2026 URBN 1102 01"
+    },
+    "W 9:25-10:15a": {
+      "slots": [
+        {
+          "day": 2,
+          "start": 565,
+          "end": 615
+        }
+      ],
+      "firstSeen": "Fall 2026 HSAR 3257 A"
+    },
+    "W 9:25-11:20a": {
+      "slots": [
+        {
+          "day": 2,
+          "start": 565,
+          "end": 680
+        }
+      ],
+      "firstSeen": "Fall 2026 HELN 3000 01"
+    },
+    "WF 9:25-11:20a": {
+      "slots": [
+        {
+          "day": 2,
+          "start": 565,
+          "end": 680
+        },
+        {
+          "day": 4,
+          "start": 565,
+          "end": 680
+        }
+      ],
+      "firstSeen": "Fall 2026 ART 1838 01"
+    },
+    "W 10:30-11:20a": {
+      "slots": [
+        {
+          "day": 2,
+          "start": 630,
+          "end": 680
+        }
+      ],
+      "firstSeen": "Fall 2026 HIST 1498 A"
+    },
+    "W 11:35a-12:25p": {
+      "slots": [
+        {
+          "day": 2,
+          "start": 695,
+          "end": 745
+        }
+      ],
+      "firstSeen": "Fall 2026 HSAR 3326 A"
+    },
+    "W 11:35a-12:50p": {
+      "slots": [
+        {
+          "day": 2,
+          "start": 695,
+          "end": 770
+        }
+      ],
+      "firstSeen": "Fall 2026 ANTH 3153 01"
+    },
+    "WF 11:35a-12:50p": {
+      "slots": [
+        {
+          "day": 2,
+          "start": 695,
+          "end": 770
+        },
+        {
+          "day": 4,
+          "start": 695,
+          "end": 770
+        }
+      ],
+      "firstSeen": "Fall 2026 MCDB 3500 01"
+    },
+    "W 1-4p": {
+      "slots": [
+        {
+          "day": 2,
+          "start": 780,
+          "end": 960
+        }
+      ],
+      "firstSeen": "Fall 2026 HUMS 0960 01"
+    },
+    "W 1-5p": {
+      "slots": [
+        {
+          "day": 2,
+          "start": 780,
+          "end": 1020
+        }
+      ],
+      "firstSeen": "Fall 2026 CHEM 1340L M"
+    },
+    "W 1:30-2:20p": {
+      "slots": [
+        {
+          "day": 2,
+          "start": 810,
+          "end": 860
+        }
+      ],
+      "firstSeen": "Fall 2026 HIST 1784 B"
+    },
+    "W 1:30-3:25p": {
+      "slots": [
+        {
+          "day": 2,
+          "start": 810,
+          "end": 925
+        }
+      ],
+      "firstSeen": "Fall 2026 HELN 3050 01"
+    },
+    "WF 1:30-3:25p": {
+      "slots": [
+        {
+          "day": 2,
+          "start": 810,
+          "end": 925
+        },
+        {
+          "day": 4,
+          "start": 810,
+          "end": 925
+        }
+      ],
+      "firstSeen": "Fall 2026 ART 1836 01"
+    },
+    "W 1:30-4:30p": {
+      "slots": [
+        {
+          "day": 2,
+          "start": 810,
+          "end": 990
+        }
+      ],
+      "firstSeen": "Fall 2026 PHYS 1650L G"
+    },
+    "W 1:30-5:30p": {
+      "slots": [
+        {
+          "day": 2,
+          "start": 810,
+          "end": 1050
+        }
+      ],
+      "firstSeen": "Fall 2026 MCDB 2210L B"
+    },
+    "W 2-5p": {
+      "slots": [
+        {
+          "day": 2,
+          "start": 840,
+          "end": 1020
+        }
+      ],
+      "firstSeen": "Fall 2026 MCDB 2310L 01"
+    },
+    "WTh 2:30-3:45p": {
+      "slots": [
+        {
+          "day": 2,
+          "start": 870,
+          "end": 945
+        },
+        {
+          "day": 3,
+          "start": 870,
+          "end": 945
+        }
+      ],
+      "firstSeen": "Fall 2026 ZULU 1150 01"
+    },
+    "W 2:30-5:30p": {
+      "slots": [
+        {
+          "day": 2,
+          "start": 870,
+          "end": 1050
+        }
+      ],
+      "firstSeen": "Spring 2027 MENG 1105 A"
+    },
+    "W 2:30-6:30p": {
+      "slots": [
+        {
+          "day": 2,
+          "start": 870,
+          "end": 1110
+        }
+      ],
+      "firstSeen": "Spring 2027 ART 3941 01"
+    },
+    "W 2:35-3:25p": {
+      "slots": [
+        {
+          "day": 2,
+          "start": 875,
+          "end": 925
+        }
+      ],
+      "firstSeen": "Fall 2026 HSHM 2090 B"
+    },
+    "W 3:30-5:20p": {
+      "slots": [
+        {
+          "day": 2,
+          "start": 930,
+          "end": 1040
+        }
+      ],
+      "firstSeen": "Spring 2027 BENG 4485 01"
+    },
+    "W 3:30-6:30p": {
+      "slots": [
+        {
+          "day": 2,
+          "start": 930,
+          "end": 1110
+        }
+      ],
+      "firstSeen": "Fall 2026 GMAN 4100 01"
+    },
+    "W 3:30-7:30p": {
+      "slots": [
+        {
+          "day": 2,
+          "start": 930,
+          "end": 1170
+        }
+      ],
+      "firstSeen": "Spring 2027 ART 3559 01"
+    },
+    "W 4-4:50p": {
+      "slots": [
+        {
+          "day": 2,
+          "start": 960,
+          "end": 1010
+        }
+      ],
+      "firstSeen": "Fall 2026 HIST 1109 A"
+    },
+    "W 4-5:55p": {
+      "slots": [
+        {
+          "day": 2,
+          "start": 960,
+          "end": 1075
+        }
+      ],
+      "firstSeen": "Fall 2026 HSHM 4560 01"
+    },
+    "W 4-7p": {
+      "slots": [
+        {
+          "day": 2,
+          "start": 960,
+          "end": 1140
+        }
+      ],
+      "firstSeen": "Fall 2026 MENG 2616L B"
+    },
+    "W 5-5:50p": {
+      "slots": [
+        {
+          "day": 2,
+          "start": 1020,
+          "end": 1070
+        }
+      ],
+      "firstSeen": "Fall 2026 HIST 1260 A"
+    },
+    "W 5:05-5:55p": {
+      "slots": [
+        {
+          "day": 2,
+          "start": 1025,
+          "end": 1075
+        }
+      ],
+      "firstSeen": "Fall 2026 HIST 1116 B"
+    },
+    "W 7-7:50p": {
+      "slots": [
+        {
+          "day": 2,
+          "start": 1140,
+          "end": 1190
+        }
+      ],
+      "firstSeen": "Fall 2026 HIST 1109 B"
+    },
+    "W 7-8:55p": {
+      "slots": [
+        {
+          "day": 2,
+          "start": 1140,
+          "end": 1255
+        }
+      ],
+      "firstSeen": "Fall 2026 HUMS 3852 01"
+    },
+    "W 7-9:30p": {
+      "slots": [
+        {
+          "day": 2,
+          "start": 1140,
+          "end": 1290
+        }
+      ],
+      "firstSeen": "Fall 2026 MUSI 1193 01"
+    },
+    "W 7-10p": {
+      "slots": [
+        {
+          "day": 2,
+          "start": 1140,
+          "end": 1320
+        }
+      ],
+      "firstSeen": "Fall 2026 MENG 1105 B"
+    },
+    "W 7-10p; Th 9:25-11:20a": {
+      "slots": [
+        {
+          "day": 2,
+          "start": 1140,
+          "end": 1320
+        },
+        {
+          "day": 3,
+          "start": 565,
+          "end": 680
+        }
+      ],
+      "firstSeen": "Fall 2026 FILM 3440 01"
+    },
+    "W 8-8:50p": {
+      "slots": [
+        {
+          "day": 2,
+          "start": 1200,
+          "end": 1250
+        }
+      ],
+      "firstSeen": "Fall 2026 MB&B 1050 L"
+    },
+    "Th 7:15-8:45a": {
+      "slots": [
+        {
+          "day": 3,
+          "start": 435,
+          "end": 525
+        }
+      ],
+      "firstSeen": "Fall 2026 NAVY 1110 01"
+    },
+    "Th 7:30-9a": {
+      "slots": [
+        {
+          "day": 3,
+          "start": 450,
+          "end": 540
+        }
+      ],
+      "firstSeen": "Fall 2026 USAF 1009 01"
+    },
+    "Th 8:20-11:20a": {
+      "slots": [
+        {
+          "day": 3,
+          "start": 500,
+          "end": 680
+        }
+      ],
+      "firstSeen": "Fall 2026 PHYS 1650L J"
+    },
+    "Th 8:20a-12:20p": {
+      "slots": [
+        {
+          "day": 3,
+          "start": 500,
+          "end": 740
+        }
+      ],
+      "firstSeen": "Spring 2027 ART 2984 01"
+    },
+    "Th 8:30-11:25a": {
+      "slots": [
+        {
+          "day": 3,
+          "start": 510,
+          "end": 685
+        }
+      ],
+      "firstSeen": "Fall 2026 EVST 3308 01"
+    },
+    "Th 9-11a": {
+      "slots": [
+        {
+          "day": 3,
+          "start": 540,
+          "end": 660
+        }
+      ],
+      "firstSeen": "Spring 2027 TDPS 4305 01"
+    },
+    "Th 9a-12p": {
+      "slots": [
+        {
+          "day": 3,
+          "start": 540,
+          "end": 720
+        }
+      ],
+      "firstSeen": "Spring 2027 MENG 3423L B"
+    },
+    "Th 9:25-10:15a": {
+      "slots": [
+        {
+          "day": 3,
+          "start": 565,
+          "end": 615
+        }
+      ],
+      "firstSeen": "Fall 2026 HIST 1260 B"
+    },
+    "Th 9:25-11:20a": {
+      "slots": [
+        {
+          "day": 3,
+          "start": 565,
+          "end": 680
+        }
+      ],
+      "firstSeen": "Fall 2026 HIST 3151 01"
+    },
+    "Th 10:30-11:20a": {
+      "slots": [
+        {
+          "day": 3,
+          "start": 630,
+          "end": 680
+        }
+      ],
+      "firstSeen": "Fall 2026 HSHM 2260 A"
+    },
+    "Th 11:35a-12:25p": {
+      "slots": [
+        {
+          "day": 3,
+          "start": 695,
+          "end": 745
+        }
+      ],
+      "firstSeen": "Fall 2026 HSHM 2260 B"
+    },
+    "Th 11:35a-1:05p": {
+      "slots": [
+        {
+          "day": 3,
+          "start": 695,
+          "end": 785
+        }
+      ],
+      "firstSeen": "Fall 2026 TDPS 1000 B"
+    },
+    "Th 1-2:50p": {
+      "slots": [
+        {
+          "day": 3,
+          "start": 780,
+          "end": 890
+        }
+      ],
+      "firstSeen": "Spring 2027 BENG 4910 01"
+    },
+    "Th 1-4p": {
+      "slots": [
+        {
+          "day": 3,
+          "start": 780,
+          "end": 960
+        }
+      ],
+      "firstSeen": "Fall 2026 PHYS 1650L M"
+    },
+    "Th 1-5p": {
+      "slots": [
+        {
+          "day": 3,
+          "start": 780,
+          "end": 1020
+        }
+      ],
+      "firstSeen": "Fall 2026 MB&B 2510L 02"
+    },
+    "Th 1:05-2:20p": {
+      "slots": [
+        {
+          "day": 3,
+          "start": 785,
+          "end": 860
+        }
+      ],
+      "firstSeen": "Fall 2026 BENG 4080 01"
+    },
+    "Th 1:30-2:20p": {
+      "slots": [
+        {
+          "day": 3,
+          "start": 810,
+          "end": 860
+        }
+      ],
+      "firstSeen": "Fall 2026 HSHM 2060 A"
+    },
+    "Th 1:30-3:25p": {
+      "slots": [
+        {
+          "day": 3,
+          "start": 810,
+          "end": 925
+        }
+      ],
+      "firstSeen": "Fall 2026 HLTH 4900 01"
+    },
+    "Th 1:30-4:30p": {
+      "slots": [
+        {
+          "day": 3,
+          "start": 810,
+          "end": 990
+        }
+      ],
+      "firstSeen": "Fall 2026 EEB 2256L 01"
+    },
+    "Th 1:30-5:30p": {
+      "slots": [
+        {
+          "day": 3,
+          "start": 810,
+          "end": 1050
+        }
+      ],
+      "firstSeen": "Fall 2026 MCDB 2210L C"
+    },
+    "Th 2:30-4:20p": {
+      "slots": [
+        {
+          "day": 3,
+          "start": 870,
+          "end": 980
+        }
+      ],
+      "firstSeen": "Fall 2026 MUSI 3220 01"
+    },
+    "Th 2:30-5:30p": {
+      "slots": [
+        {
+          "day": 3,
+          "start": 870,
+          "end": 1050
+        }
+      ],
+      "firstSeen": "Spring 2027 MENG 1105 B"
+    },
+    "Th 2:30-6:30p": {
+      "slots": [
+        {
+          "day": 3,
+          "start": 870,
+          "end": 1110
+        }
+      ],
+      "firstSeen": "Spring 2027 EPS 1260L 01"
+    },
+    "Th 2:35-3:25p": {
+      "slots": [
+        {
+          "day": 3,
+          "start": 875,
+          "end": 925
+        }
+      ],
+      "firstSeen": "Fall 2026 HSHM 2060 B"
+    },
+    "Th 4-4:50p": {
+      "slots": [
+        {
+          "day": 3,
+          "start": 960,
+          "end": 1010
+        }
+      ],
+      "firstSeen": "Fall 2026 HSHM 2060 H"
+    },
+    "Th 4-5:55p": {
+      "slots": [
+        {
+          "day": 3,
+          "start": 960,
+          "end": 1075
+        }
+      ],
+      "firstSeen": "Fall 2026 HSHM 4450 01"
+    },
+    "Th 5-5:50p": {
+      "slots": [
+        {
+          "day": 3,
+          "start": 1020,
+          "end": 1070
+        }
+      ],
+      "firstSeen": "Fall 2026 HIST 2225 D"
+    },
+    "Th 5:05-5:55p": {
+      "slots": [
+        {
+          "day": 3,
+          "start": 1025,
+          "end": 1075
+        }
+      ],
+      "firstSeen": "Fall 2026 HSHM 2060 E"
+    },
+    "Th 7-7:50p": {
+      "slots": [
+        {
+          "day": 3,
+          "start": 1140,
+          "end": 1190
+        }
+      ],
+      "firstSeen": "Fall 2026 HSHM 2060 F"
+    },
+    "Th 7-10p": {
+      "slots": [
+        {
+          "day": 3,
+          "start": 1140,
+          "end": 1320
+        }
+      ],
+      "firstSeen": "Fall 2026 MENG 1105 C"
+    },
+    "Th 8-8:50p": {
+      "slots": [
+        {
+          "day": 3,
+          "start": 1200,
+          "end": 1250
+        }
+      ],
+      "firstSeen": "Fall 2026 HSHM 2070 D"
+    },
+    "F 8:20-9:10a": {
+      "slots": [
+        {
+          "day": 4,
+          "start": 500,
+          "end": 550
+        }
+      ],
+      "firstSeen": "Fall 2026 ARCH 1001 A"
+    },
+    "F 8:20-11:20a": {
+      "slots": [
+        {
+          "day": 4,
+          "start": 500,
+          "end": 680
+        }
+      ],
+      "firstSeen": "Fall 2026 PHYS 1650L P"
+    },
+    "F 8:20a-12:20p": {
+      "slots": [
+        {
+          "day": 4,
+          "start": 500,
+          "end": 740
+        }
+      ],
+      "firstSeen": "Fall 2026 TDPS 4020 01"
+    },
+    "F 9-9:50a": {
+      "slots": [
+        {
+          "day": 4,
+          "start": 540,
+          "end": 590
+        }
+      ],
+      "firstSeen": "Spring 2027 ARCH 1301 A"
+    },
+    "F 9a-12p": {
+      "slots": [
+        {
+          "day": 4,
+          "start": 540,
+          "end": 720
+        }
+      ],
+      "firstSeen": "Spring 2027 MENG 2616L C"
+    },
+    "F 9:25-10:15a": {
+      "slots": [
+        {
+          "day": 4,
+          "start": 565,
+          "end": 615
+        }
+      ],
+      "firstSeen": "Fall 2026 HSHM 2270 C"
+    },
+    "F 9:25-11:20a": {
+      "slots": [
+        {
+          "day": 4,
+          "start": 565,
+          "end": 680
+        }
+      ],
+      "firstSeen": "Fall 2026 HSHM 4810 01"
+    },
+    "F 10a-12:30p": {
+      "slots": [
+        {
+          "day": 4,
+          "start": 600,
+          "end": 750
+        }
+      ],
+      "firstSeen": "Spring 2027 ARCH 1301 01"
+    },
+    "F 10:30-11:20a": {
+      "slots": [
+        {
+          "day": 4,
+          "start": 630,
+          "end": 680
+        }
+      ],
+      "firstSeen": "Fall 2026 HSHM 2060 C"
+    },
+    "F 10:30a-1:30p": {
+      "slots": [
+        {
+          "day": 4,
+          "start": 630,
+          "end": 810
+        }
+      ],
+      "firstSeen": "Spring 2027 MENG 1105 C"
+    },
+    "F 11:30a-1p": {
+      "slots": [
+        {
+          "day": 4,
+          "start": 690,
+          "end": 780
+        }
+      ],
+      "firstSeen": "Fall 2026 CHEM 4000 01"
+    },
+    "F 11:30a-1:20p": {
+      "slots": [
+        {
+          "day": 4,
+          "start": 690,
+          "end": 800
+        }
+      ],
+      "firstSeen": "Fall 2026 TDPS 4501 01"
+    },
+    "F 11:30a-1:25p": {
+      "slots": [
+        {
+          "day": 4,
+          "start": 690,
+          "end": 805
+        }
+      ],
+      "firstSeen": "Fall 2026 ENAS 3110 01"
+    },
+    "F 11:35a-12:25p": {
+      "slots": [
+        {
+          "day": 4,
+          "start": 695,
+          "end": 745
+        }
+      ],
+      "firstSeen": "Fall 2026 HSHM 2060 D"
+    },
+    "F 11:35a-12:50p": {
+      "slots": [
+        {
+          "day": 4,
+          "start": 695,
+          "end": 770
+        }
+      ],
+      "firstSeen": "Fall 2026 ENGL 4100 01"
+    },
+    "F 12:30-2:30p": {
+      "slots": [
+        {
+          "day": 4,
+          "start": 750,
+          "end": 870
+        }
+      ],
+      "firstSeen": "Fall 2026 NAVY 1000 01"
+    },
+    "F 1-4p": {
+      "slots": [
+        {
+          "day": 4,
+          "start": 780,
+          "end": 960
+        }
+      ],
+      "firstSeen": "Fall 2026 HUMS 0299 01"
+    },
+    "F 1-5p": {
+      "slots": [
+        {
+          "day": 4,
+          "start": 780,
+          "end": 1020
+        }
+      ],
+      "firstSeen": "Fall 2026 BENG 3100 B"
+    },
+    "F 1:30-2:20p": {
+      "slots": [
+        {
+          "day": 4,
+          "start": 810,
+          "end": 860
+        }
+      ],
+      "firstSeen": "Fall 2026 HIST 1260 E"
+    },
+    "F 1:30-3p": {
+      "slots": [
+        {
+          "day": 4,
+          "start": 810,
+          "end": 900
+        }
+      ],
+      "firstSeen": "Fall 2026 TDPS 1000 A"
+    },
+    "F 1:30-3:20p": {
+      "slots": [
+        {
+          "day": 4,
+          "start": 810,
+          "end": 920
+        }
+      ],
+      "firstSeen": "Fall 2026 CPSC 4900 01"
+    },
+    "F 1:30-3:25p": {
+      "slots": [
+        {
+          "day": 4,
+          "start": 810,
+          "end": 925
+        }
+      ],
+      "firstSeen": "Spring 2027 MCDB 4350 01"
+    },
+    "F 1:30-3:30p": {
+      "slots": [
+        {
+          "day": 4,
+          "start": 810,
+          "end": 930
+        }
+      ],
+      "firstSeen": "Fall 2026 USAF 4011 03"
+    },
+    "F 1:30-4:30p": {
+      "slots": [
+        {
+          "day": 4,
+          "start": 810,
+          "end": 990
+        }
+      ],
+      "firstSeen": "Fall 2026 MUSI 2228 01"
+    },
+    "F 1:30-5:30p": {
+      "slots": [
+        {
+          "day": 4,
+          "start": 810,
+          "end": 1050
+        }
+      ],
+      "firstSeen": "Fall 2026 MCDB 2210L D"
+    },
+    "F 2:30-3:20p": {
+      "slots": [
+        {
+          "day": 4,
+          "start": 870,
+          "end": 920
+        }
+      ],
+      "firstSeen": "Spring 2027 CHEM 2510L 01"
+    },
+    "F 2:30-4:25p": {
+      "slots": [
+        {
+          "day": 4,
+          "start": 870,
+          "end": 985
+        }
+      ],
+      "firstSeen": "Fall 2026 SCIE 0020 01"
+    },
+    "F 2:30-5:30p": {
+      "slots": [
+        {
+          "day": 4,
+          "start": 870,
+          "end": 1050
+        }
+      ],
+      "firstSeen": "Spring 2027 MENG 3423L C"
+    },
+    "F 2:35-3:25p": {
+      "slots": [
+        {
+          "day": 4,
+          "start": 875,
+          "end": 925
+        }
+      ],
+      "firstSeen": "Fall 2026 CHEM 1610 S"
+    },
+    "F 4-5:55p": {
+      "slots": [
+        {
+          "day": 4,
+          "start": 960,
+          "end": 1075
+        }
+      ],
+      "firstSeen": "Spring 2027 HSHM 4410 01"
+    },
+    "F 4-7p": {
+      "slots": [
+        {
+          "day": 4,
+          "start": 960,
+          "end": 1140
+        }
+      ],
+      "firstSeen": "Fall 2026 MENG 2616L C"
+    }
+  }
+}

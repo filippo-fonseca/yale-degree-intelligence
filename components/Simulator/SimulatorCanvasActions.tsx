@@ -1,6 +1,6 @@
 "use client";
 
-import { FiInfo, FiPlus, FiRefreshCw } from "react-icons/fi";
+import { FiInfo, FiPlus, FiRefreshCw, FiUpload } from "react-icons/fi";
 import SaveShortcutHint from "./SaveShortcutHint";
 
 /**
@@ -26,6 +26,7 @@ export default function SimulatorCanvasActions({
   canSave,
   onSave,
   onClear,
+  onImportIcs,
 }: {
   showGrades: boolean;
   onToggleGrades: () => void;
@@ -39,6 +40,7 @@ export default function SimulatorCanvasActions({
   /** The header's quick save, shared verbatim so the two cannot diverge. */
   onSave: () => void;
   onClear: () => void;
+  onImportIcs: () => void;
 }) {
   const verbClass =
     "inline-flex items-center gap-1 px-2 py-1 text-[11px] rounded-lg border border-transparent transition-colors";
@@ -74,6 +76,15 @@ export default function SimulatorCanvasActions({
       </button>
 
       <div className="ml-auto flex items-center gap-1" data-sim-canvas-actions>
+        <button
+          type="button"
+          onClick={onImportIcs}
+          data-sim-ics-import
+          className={`${verbClass} text-gray-500 dark:text-gray-400 hover:border-gray-200 dark:hover:border-white/10 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-white/[0.06]`}
+        >
+          <FiUpload size={12} />
+          Import ICS
+        </button>
         <button
           type="button"
           onClick={onToggleHelp}

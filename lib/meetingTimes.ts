@@ -75,6 +75,38 @@ export const formatMeetingSummary = (labels: string[] | undefined): string | und
   return `${labels[0]} +${labels.length - 1}`;
 };
 
+export const HTBA_LABEL = "HTBA";
+export const NO_TIME_LISTED_LABEL = "No time listed";
+
+/**
+ * What to print next to a course in a term that carries meeting times. Never
+ * empty: a course the registrar lists no section for says so explicitly, and
+ * HTBA is explained. `detail` is tooltip text; `listed` is false only when
+ * the catalog has no section at all for the course in that term.
+ */
+export const describeMeetingTime = (
+  code: string,
+  term: string,
+): { text: string; detail: string; listed: boolean } => {
+  const labels = getMeetingLabels(code, term);
+  if (!labels) {
+    return {
+      text: NO_TIME_LISTED_LABEL,
+      detail: `Yale Course Search lists no section for this course in ${term}. Check the registrar before counting on it.`,
+      listed: false,
+    };
+  }
+  const text = formatMeetingSummary(labels) ?? NO_TIME_LISTED_LABEL;
+  if (labels.length === 1 && labels[0] === HTBA_LABEL) {
+    return {
+      text,
+      detail: "Hours to be arranged: the registrar has not set a meeting time, so this course cannot be checked for conflicts.",
+      listed: true,
+    };
+  }
+  return { text, detail: labels.join("\n"), listed: true };
+};
+
 export type MeetingConflict = {
   /** Canonical codes as given, in input order. */
   a: string;

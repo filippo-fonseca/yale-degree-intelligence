@@ -18,7 +18,7 @@ import { getCourseNameFromCode, getCanonicalCode } from "@/lib/courseCatalog";
 import {
   hasMeetingTimesForTerm,
   getMeetingLabels,
-  formatMeetingSummary,
+  describeMeetingTime,
   findTermConflicts,
   conflictingCodes,
   type MeetingConflict,
@@ -2073,10 +2073,11 @@ export default function Simulator({
                 className="mt-0.5 flex-shrink-0 text-gray-400 dark:text-gray-500"
               />
               <p className="flex-1 text-xs leading-relaxed text-gray-700 dark:text-gray-200">
-                Meeting times shown for Fall 2026 and Spring 2027 come from
-                Yale Course Search. Yale has not published times for later
-                terms, and times often change from year to year, so time
-                conflicts are only checked for the coming year.
+                Meeting times reflect the current Yale Course Search
+                offerings for 2026-27 and are in beta: double-check a
+                course&apos;s time there before you count on it. Yale has not published
+                times for later terms, and times often change from year to
+                year, so conflicts are only checked for the coming year.
               </p>
               <button
                 type="button"
@@ -2121,7 +2122,9 @@ export default function Simulator({
                   </li>
                   <li>
                     Meeting times and time conflicts are shown for Fall 2026
-                    and Spring 2027 only, from Yale Course Search. Later terms
+                    and Spring 2027 only, based on the current Yale Course
+                    Search offerings. This is in beta, so double-check a
+                    flagged conflict there. Later terms
                     have no published times yet, and times may change.
                   </li>
                   <li>
@@ -2271,6 +2274,10 @@ export default function Simulator({
                     ? `${c.a} and ${c.b} both meet ${la}`
                     : `${c.a} meets ${la}; ${c.b} meets ${lb}`;
                 })
+                .concat([
+                  "",
+                  "Based on current 2026-27 offerings; meeting times are in beta. Double-check both courses on Yale Course Search before you count on this.",
+                ])
                 .join("\n");
               // Tap-to-place only exists to land a course picked out of the
               // pool, so it goes quiet with the pool.
@@ -2335,6 +2342,7 @@ export default function Simulator({
                           <FiAlertTriangle size={10} />
                           {termConflicts.length} time{" "}
                           {termConflicts.length === 1 ? "conflict" : "conflicts"}
+                          <span className="opacity-60 normal-case">(beta, double-check)</span>
                         </span>
                       )}
                       <span
@@ -2379,11 +2387,11 @@ export default function Simulator({
                       {semester.courses.map((course) => {
                         const canonicalCode =
                           getCanonicalCode(course.code) ?? course.code;
-                        const meetingLabels = termHasTimes
-                          ? getMeetingLabels(canonicalCode, semester.name)
+                        // In a term that carries times, every chip says
+                        // something: the time, HTBA, or "No time listed".
+                        const meeting = termHasTimes
+                          ? describeMeetingTime(canonicalCode, semester.name)
                           : undefined;
-                        const meetingSummary =
-                          formatMeetingSummary(meetingLabels);
                         const hasTimeConflict = clashingCodes.has(canonicalCode);
                         return (
                         <motion.div
@@ -2416,7 +2424,7 @@ export default function Simulator({
                             ${hasTimeConflict ? "ring-1 ring-amber-400/70" : ""}`}
                           title={
                             hasTimeConflict
-                              ? "Meets at the same time as another course this term"
+                              ? "Meets at the same time as another course this term. Meeting times are in beta, so double-check on Yale Course Search."
                               : undefined
                           }
                         >
@@ -2426,16 +2434,16 @@ export default function Simulator({
                               <span className="text-[10px] opacity-60 ml-1">
                                 {getCourseNameFromCode(course.code) ?? ""}
                               </span>
-                              {meetingSummary && (
+                              {meeting && (
                                 <span
-                                  className="ml-1.5 text-[10px] text-gray-400 dark:text-gray-500 tabular-nums whitespace-nowrap"
-                                  title={
-                                    meetingLabels && meetingLabels.length > 1
-                                      ? meetingLabels.join("\n")
-                                      : undefined
-                                  }
+                                  className={`ml-1.5 text-[10px] tabular-nums whitespace-nowrap ${
+                                    meeting.listed
+                                      ? "text-gray-400 dark:text-gray-500"
+                                      : "italic text-gray-400/80 dark:text-gray-500/80"
+                                  }`}
+                                  title={meeting.detail}
                                 >
-                                  {meetingSummary}
+                                  {meeting.text}
                                 </span>
                               )}
                             </div>

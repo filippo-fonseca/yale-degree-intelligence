@@ -22,6 +22,8 @@ import {
 import {
   conflictingCodes,
   coursesConflict,
+  describeMeetingTime,
+  NO_TIME_LISTED_LABEL,
   findTermConflicts,
   formatMeetingSummary,
   getMeetingLabels,
@@ -218,6 +220,24 @@ describe("conflict rule on live data", () => {
     expect(getMeetingLabels(a.codes[0], term)).toEqual([timedPrimary(a, term)[0].meets]);
     expect(getMeetingLabels(a.codes[0], "Fall 2027")).toBeUndefined();
     expect(getMeetingLabels("NOPE 9999", term)).toBeUndefined();
+  });
+
+  it("never describes a course with an empty string", () => {
+    const [a] = sharedSlot!;
+    const timed = describeMeetingTime(a.codes[0], term);
+    expect(timed.text).toBe(timedPrimary(a, term)[0].meets);
+    expect(timed.listed).toBe(true);
+    const htba = withMeetings.find((r) => {
+      const primary = primarySections(r.meetings?.[term] ?? []);
+      return primary.length > 0 && primary.every((s) => s.meets === "HTBA");
+    })!;
+    const arranged = describeMeetingTime(htba.codes[0], term);
+    expect(arranged.text).toBe("HTBA");
+    expect(arranged.detail).toMatch(/to be arranged/);
+    const missing = describeMeetingTime("NOPE 9999", term);
+    expect(missing.text).toBe(NO_TIME_LISTED_LABEL);
+    expect(missing.listed).toBe(false);
+    expect(missing.detail).toContain(term);
   });
 
   it("does nothing for terms without meeting data", () => {

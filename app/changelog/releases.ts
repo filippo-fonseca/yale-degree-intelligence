@@ -42,7 +42,8 @@ export const RELEASES: Release[] = [
         items: [
           "Courses you place in Fall 2026 or Spring 2027 now show when they meet, straight from Yale Course Search, so you can see at a glance whether a plan fits in a week.",
           "If two courses in the same semester meet at the same time, the Simulator flags the semester and marks both courses, so you find out while planning rather than at registration.",
-          "Meeting times exist only for the coming year. Yale has not published later terms, and times often change from year to year, so the Simulator only checks conflicts for Fall 2026 and Spring 2027 and says so.",
+          "Yale has only published meeting times for the coming year, so those are the only ones shown as fact. For later semesters, a course shows the slot it held in 2026-27 as a projection, marked with a wavy equals sign, and overlaps there are flagged as possible conflicts. Looking back at past years, about two courses in three keep the same slot, so treat projected times as a guide and double-check once Yale publishes the term.",
+          "A course with no published time says so explicitly rather than showing nothing: HTBA when the registrar has not set a time, or a short note when Course Search lists no section for it.",
           "The course lookup window shows each course's meeting time next to the semester it is offered in.",
         ],
       },

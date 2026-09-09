@@ -16,7 +16,7 @@ import { Info } from "lucide-react";
 import { Course } from "@/lib/types";
 import { getCourseNameFromCode, getCanonicalCode } from "@/lib/courseCatalog";
 import {
-  hasMeetingTimesForTerm,
+  meetingTimeMode,
   getMeetingLabels,
   describeMeetingTime,
   findTermConflicts,
@@ -916,7 +916,7 @@ export default function Simulator({
 
   // Meeting times only exist for the coming year, and Yale's times drift
   // between years, so the Canvas says so once until the user dismisses it.
-  const meetingTimesNote = useDismissibleFlag("sim:meeting-times-2026-27");
+  const meetingTimesNote = useDismissibleFlag("sim:meeting-times-projected");
 
   useEffect(() => {
     if (activeView === "progress") progressNew.dismiss();
@@ -1261,13 +1261,13 @@ export default function Simulator({
     return byCode;
   }, [semesters]);
 
-  // Meeting-time clashes per semester, keyed by semester id. Only the terms
-  // the catalog carries registrar times for produce anything; the rest are
-  // simply absent. Codes are canonicalised so cross-listings compare equal.
+  // Meeting-time clashes per semester, keyed by semester id. Published terms
+  // and projected Fall/Spring terms produce anything; the rest are simply
+  // absent. Codes are canonicalised so cross-listings compare equal.
   const conflictsBySemesterId = useMemo<Record<string, MeetingConflict[]>>(() => {
     const byId: Record<string, MeetingConflict[]> = {};
     semesters.forEach((s) => {
-      if (!hasMeetingTimesForTerm(s.name)) return;
+      if (meetingTimeMode(s.name) === "none") return;
       const codes = s.courses
         .filter((c) => !!c?.code)
         .map((c) => getCanonicalCode(c.code) ?? c.code);
@@ -2064,8 +2064,8 @@ export default function Simulator({
           )}
 
           {/* Where the meeting times and conflict checks come from, and why
-              they stop after Spring 2027. Neutral rather than purple so it
-              does not read as a second "New" announcement. */}
+              later terms are only projections. Neutral rather than purple so
+              it does not read as a second "New" announcement. */}
           {meetingTimesNote.show && (
             <div className="mb-4 flex items-start gap-2.5 rounded-xl border border-gray-200 bg-gray-50/70 px-3.5 py-2.5 dark:border-gray-700/60 dark:bg-gray-800/40">
               <FiClock
@@ -2073,11 +2073,13 @@ export default function Simulator({
                 className="mt-0.5 flex-shrink-0 text-gray-400 dark:text-gray-500"
               />
               <p className="flex-1 text-xs leading-relaxed text-gray-700 dark:text-gray-200">
-                Meeting times reflect the current Yale Course Search
-                offerings for 2026-27 and are in beta: double-check a
-                course&apos;s time there before you count on it. Yale has not published
-                times for later terms, and times often change from year to
-                year, so conflicts are only checked for the coming year.
+                Meeting times for Fall 2026 and Spring 2027 reflect current
+                Yale Course Search offerings and are in beta: double-check a
+                course&apos;s time there before you count on it. For later
+                semesters we show the slot a course held in 2026-27 as a
+                projection (marked &asymp;). Yale has not published those
+                terms, and about one course in three moves, so treat projected
+                times and conflicts as a guide only.
               </p>
               <button
                 type="button"
@@ -2121,11 +2123,13 @@ export default function Simulator({
                     a planned course to remove it.
                   </li>
                   <li>
-                    Meeting times and time conflicts are shown for Fall 2026
-                    and Spring 2027 only, based on the current Yale Course
-                    Search offerings. This is in beta, so double-check a
-                    flagged conflict there. Later terms
-                    have no published times yet, and times may change.
+                    Meeting times and time conflicts for Fall 2026 and Spring
+                    2027 come from the current Yale Course Search offerings
+                    and are in beta, so double-check a flagged conflict there.
+                    Later semesters show the slot a course held in 2026-27 as a
+                    projection (marked &asymp;); Yale has not published those
+                    terms and times often change, so treat projected times and
+                    conflicts as a guide only.
                   </li>
                   <li>
                     Turn on the Grades and Distributionals editors to give each
@@ -2259,11 +2263,16 @@ export default function Simulator({
                 ? String(semCredits)
                 : semCredits.toFixed(1);
               const isPast = isPastSemester(semester.name);
-              // The catalog only carries registrar meeting times for the two
-              // simulator terms; everywhere else the chip stays as it was.
-              const termHasTimes = hasMeetingTimesForTerm(semester.name);
+              // Registrar times for the two published terms, projections
+              // from those for later Fall/Spring terms, and nothing anywhere
+              // else, where the chip stays as it was.
+              const termMode = meetingTimeMode(semester.name);
               const termConflicts = conflictsBySemesterId[semester.id] ?? [];
               const clashingCodes = conflictingCodes(termConflicts);
+              // In a projected term the clash is between borrowed 2026-27
+              // slots, so it is a "possible" conflict and dressed down.
+              const conflictsProjected =
+                termMode === "projected" || termConflicts.some((c) => c.projected);
               // One line per clashing pair for the warning pill's tooltip,
               // built from the same labels the chips show.
               const conflictTooltip = termConflicts
@@ -2276,7 +2285,9 @@ export default function Simulator({
                 })
                 .concat([
                   "",
-                  "Based on current 2026-27 offerings; meeting times are in beta. Double-check both courses on Yale Course Search before you count on this.",
+                  conflictsProjected
+                    ? "Projected from 2026-27 offerings. Yale has not published this term; times often change. Double-check before you count on this."
+                    : "Based on current 2026-27 offerings; meeting times are in beta. Double-check both courses on Yale Course Search before you count on this.",
                 ])
                 .join("\n");
               // Tap-to-place only exists to land a course picked out of the
@@ -2336,13 +2347,20 @@ export default function Simulator({
                     <div className="flex items-center gap-1.5">
                       {termConflicts.length > 0 && (
                         <span
-                          className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[10px] font-medium border border-amber-300 dark:border-amber-500/40 bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-300"
+                          className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[10px] font-medium border ${
+                            conflictsProjected
+                              ? "border-dashed border-gray-300 dark:border-gray-600/60 bg-gray-50 dark:bg-gray-800/40 text-gray-600 dark:text-gray-300"
+                              : "border-amber-300 dark:border-amber-500/40 bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-300"
+                          }`}
                           title={conflictTooltip}
                         >
                           <FiAlertTriangle size={10} />
-                          {termConflicts.length} time{" "}
+                          {termConflicts.length}
+                          {conflictsProjected ? " possible" : ""} time{" "}
                           {termConflicts.length === 1 ? "conflict" : "conflicts"}
-                          <span className="opacity-60 normal-case">(beta, double-check)</span>
+                          <span className="opacity-60 normal-case">
+                            {conflictsProjected ? "(projected)" : "(beta, double-check)"}
+                          </span>
                         </span>
                       )}
                       <span
@@ -2388,10 +2406,12 @@ export default function Simulator({
                         const canonicalCode =
                           getCanonicalCode(course.code) ?? course.code;
                         // In a term that carries times, every chip says
-                        // something: the time, HTBA, or "No time listed".
-                        const meeting = termHasTimes
-                          ? describeMeetingTime(canonicalCode, semester.name)
-                          : undefined;
+                        // something: the time, HTBA, "No time listed", or in
+                        // a projected term the slot borrowed from 2026-27.
+                        const meeting =
+                          termMode !== "none"
+                            ? describeMeetingTime(canonicalCode, semester.name)
+                            : undefined;
                         const hasTimeConflict = clashingCodes.has(canonicalCode);
                         return (
                         <motion.div
@@ -2421,10 +2441,18 @@ export default function Simulator({
                                   ? "bg-blue-100 dark:bg-blue-900/25 text-blue-700 dark:text-blue-300 border-blue-300 dark:border-blue-700/40 cursor-grab active:cursor-grabbing"
                                   : "bg-pink-100 dark:bg-pink-900/20 text-pink-700 dark:text-pink-300 border-pink-300 dark:border-pink-700/40 hover:bg-pink-200 dark:hover:bg-pink-800/30 cursor-grab active:cursor-grabbing"
                             }
-                            ${hasTimeConflict ? "ring-1 ring-amber-400/70" : ""}`}
+                            ${
+                              hasTimeConflict
+                                ? conflictsProjected
+                                  ? "ring-1 ring-gray-400/60"
+                                  : "ring-1 ring-amber-400/70"
+                                : ""
+                            }`}
                           title={
                             hasTimeConflict
-                              ? "Meets at the same time as another course this term. Meeting times are in beta, so double-check on Yale Course Search."
+                              ? conflictsProjected
+                                ? "May meet at the same time as another course this term (projected from 2026-27; may change)"
+                                : "Meets at the same time as another course this term. Meeting times are in beta, so double-check on Yale Course Search."
                               : undefined
                           }
                         >
@@ -2437,13 +2465,20 @@ export default function Simulator({
                               {meeting && (
                                 <span
                                   className={`ml-1.5 text-[10px] tabular-nums whitespace-nowrap ${
-                                    meeting.listed
-                                      ? "text-gray-400 dark:text-gray-500"
-                                      : "italic text-gray-400/80 dark:text-gray-500/80"
+                                    !meeting.listed
+                                      ? "italic text-gray-400/80 dark:text-gray-500/80"
+                                      : meeting.projection
+                                        ? "italic text-gray-400 dark:text-gray-500"
+                                        : "text-gray-400 dark:text-gray-500"
                                   }`}
                                   title={meeting.detail}
                                 >
-                                  {meeting.text}
+                                  {meeting.projection ? `\u2248 ${meeting.text}` : meeting.text}
+                                  {meeting.projection && meeting.projection.stableYears >= 2 && (
+                                    <span className="ml-0.5 not-italic opacity-60">
+                                      ×{meeting.projection.stableYears}y
+                                    </span>
+                                  )}
                                 </span>
                               )}
                             </div>

@@ -23,7 +23,11 @@ import {
   conflictingCodes,
   coursesConflict,
   describeMeetingTime,
+  isProjectedTerm,
+  meetingTimeMode,
   NO_TIME_LISTED_LABEL,
+  NO_TIME_TO_PROJECT_LABEL,
+  resolveMeetings,
   findTermConflicts,
   formatMeetingSummary,
   getMeetingLabels,
@@ -192,7 +196,7 @@ describe("conflict rule on live data", () => {
     const [a, b] = sharedSlot!;
     expect(coursesConflict(a.codes[0], b.codes[0], term)).toBe(true);
     const found = findTermConflicts([a.codes[0], b.codes[0]], term);
-    expect(found).toEqual([{ a: a.codes[0], b: b.codes[0], term }]);
+    expect(found).toEqual([{ a: a.codes[0], b: b.codes[0], term, projected: false }]);
     expect(Array.from(conflictingCodes(found)).sort()).toEqual([a.codes[0], b.codes[0]].sort());
   });
 
@@ -218,7 +222,7 @@ describe("conflict rule on live data", () => {
   it("labels a course by its enroll-able sections and nothing for other terms", () => {
     const [a] = sharedSlot!;
     expect(getMeetingLabels(a.codes[0], term)).toEqual([timedPrimary(a, term)[0].meets]);
-    expect(getMeetingLabels(a.codes[0], "Fall 2027")).toBeUndefined();
+    expect(getMeetingLabels(a.codes[0], "Fall 2025")).toBeUndefined();
     expect(getMeetingLabels("NOPE 9999", term)).toBeUndefined();
   });
 
@@ -240,9 +244,11 @@ describe("conflict rule on live data", () => {
     expect(missing.detail).toContain(term);
   });
 
-  it("does nothing for terms without meeting data", () => {
+  it("does nothing for past terms and terms it cannot parse", () => {
     const [a, b] = sharedSlot!;
-    expect(findTermConflicts([a.codes[0], b.codes[0]], "Fall 2027")).toEqual([]);
+    expect(findTermConflicts([a.codes[0], b.codes[0]], "Fall 2025")).toEqual([]);
+    expect(findTermConflicts([a.codes[0], b.codes[0]], "Summer 2027")).toEqual([]);
+    expect(findTermConflicts([a.codes[0], b.codes[0]], "TBD")).toEqual([]);
   });
 
   it("is not a conflict when one course offers a section that clears the other", () => {
@@ -262,5 +268,74 @@ describe("conflict rule on live data", () => {
     const [a, b] = sharedSlot!;
     expect(findTermConflicts([a.codes[0], b.codes[0], a.codes[0]], term)).toHaveLength(2);
     expect(findTermConflicts([a.codes[0], a.codes[0]], term)).toEqual([]);
+  });
+});
+
+describe("projected terms", () => {
+  it("classifies terms as actual, projected, or none", () => {
+    expect(meetingTimeMode("Fall 2026")).toBe("actual");
+    expect(meetingTimeMode("Spring 2027")).toBe("actual");
+    expect(meetingTimeMode("Fall 2027")).toBe("projected");
+    expect(meetingTimeMode("Spring 2028")).toBe("projected");
+    expect(meetingTimeMode("Spring 2026")).toBe("none");
+    expect(meetingTimeMode("Fall 2025")).toBe("none");
+    expect(isProjectedTerm("Summer 2028")).toBe(false);
+    expect(isProjectedTerm("")).toBe(false);
+  });
+
+  const projectedFall = withMeetings.filter((r) => r.projected?.Fall);
+  const projectedSpring = withMeetings.filter((r) => r.projected?.Spring);
+
+  it("carries projections for a meaningful share of the pool, with sane provenance", () => {
+    expect(projectedFall.length).toBeGreaterThan(1000);
+    expect(projectedSpring.length).toBeGreaterThan(500);
+    for (const r of [...projectedFall, ...projectedSpring]) {
+      for (const [season, p] of Object.entries(r.projected!)) {
+        expect(p!.from).toBe(season === "Fall" ? SIMULATOR_FALL_TERM : SIMULATOR_SPRING_TERM);
+        expect(p!.stableYears).toBeGreaterThanOrEqual(1);
+        expect(p!.stableYears).toBeLessThanOrEqual(4);
+        // A projection always rests on a timed, enroll-able section.
+        expect(timedPrimary(r, p!.from).length).toBeGreaterThan(0);
+      }
+    }
+  });
+
+  it("reuses the published offering in a later same-season term and says so", () => {
+    const stable = projectedFall.find((r) => r.projected!.Fall!.stableYears >= 2)!;
+    const single = projectedFall.find((r) => r.projected!.Fall!.stableYears === 1)!;
+    expect(stable).toBeDefined();
+    expect(single).toBeDefined();
+    const resolved = resolveMeetings(stable.codes[0], "Fall 2028");
+    expect(resolved?.from).toBe(SIMULATOR_FALL_TERM);
+    expect(resolved?.projection?.stableYears).toBe(stable.projected!.Fall!.stableYears);
+    expect(getMeetingLabels(stable.codes[0], "Fall 2028")).toEqual(
+      getMeetingLabels(stable.codes[0], SIMULATOR_FALL_TERM),
+    );
+    const described = describeMeetingTime(stable.codes[0], "Fall 2028");
+    expect(described.projection).toBeDefined();
+    expect(described.detail).toContain("Projected from Fall 2026");
+    expect(described.detail).toMatch(/years running/);
+    expect(describeMeetingTime(single.codes[0], "Fall 2027").detail).toMatch(/only recent offering/);
+    // Spring projections never leak into Fall terms or vice versa.
+    const springOnly = withMeetings.find((r) => r.projected?.Spring && !r.projected.Fall)!;
+    expect(resolveMeetings(springOnly.codes[0], "Fall 2027")).toBeUndefined();
+    expect(describeMeetingTime(springOnly.codes[0], "Fall 2027").text).toBe(NO_TIME_TO_PROJECT_LABEL);
+  });
+
+  it("flags clashes in projected terms as projected", () => {
+    // Two single-section Fall 2026 courses in the same slot, both projectable.
+    const bySlot = new Map<string, CatalogRecord[]>();
+    for (const r of projectedFall) {
+      const timed = timedPrimary(r, SIMULATOR_FALL_TERM);
+      if (timed.length !== 1 || primarySections(r.meetings![SIMULATOR_FALL_TERM]!).length !== 1) continue;
+      const key = slotKey(timed[0]);
+      bySlot.set(key, [...(bySlot.get(key) ?? []), r]);
+    }
+    const pair = Array.from(bySlot.values()).find((list) => list.length >= 2);
+    expect(pair).toBeDefined();
+    const [a, b] = pair!;
+    const found = findTermConflicts([a.codes[0], b.codes[0]], "Fall 2027");
+    expect(found).toEqual([{ a: a.codes[0], b: b.codes[0], term: "Fall 2027", projected: true }]);
+    expect(findTermConflicts([a.codes[0], b.codes[0]], "Spring 2028").every((c) => c.projected)).toBe(true);
   });
 });

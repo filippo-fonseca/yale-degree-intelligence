@@ -13,6 +13,10 @@ import courses from "./courses.json";
  * - `meetings`: section meeting times keyed by term, ONLY for the simulator
  *   terms, written by scripts/apply-meeting-times.mjs from the registrar's own
  *   structured values. Absent when the registrar lists no section.
+ * - `projected`: per season, which published offering later terms may borrow
+ *   their meeting time from, and how many consecutive years the course has
+ *   held that slot (also written by the apply script, from the scrape of past
+ *   terms). Absent when the course had no timed section that season in 2026-27.
  */
 export type CourseInfo = {
   codes: string[];
@@ -24,6 +28,17 @@ export type CourseInfo = {
   isSpring?: boolean;
   distributionals?: string[];
   meetings?: Partial<Record<string, CourseSection[]>>;
+  projected?: Partial<Record<Season, MeetingProjection>>;
+};
+
+export type Season = "Fall" | "Spring";
+
+/** Where a projected meeting time comes from and how long it has held. */
+export type MeetingProjection = {
+  /** The published term whose sections are reused, e.g. "Fall 2026". */
+  from: string;
+  /** Consecutive same-season years ending at `from` with the same slot (>= 1). */
+  stableYears: number;
 };
 
 /** One weekly meeting: day 0 = Monday … 6 = Sunday, minutes since midnight. */

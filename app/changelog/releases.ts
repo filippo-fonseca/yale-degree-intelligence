@@ -38,6 +38,15 @@ export const RELEASES: Release[] = [
         ],
       },
       {
+        title: "Planning your year",
+        items: [
+          "Courses you place in Fall 2026 or Spring 2027 now show when they meet, straight from Yale Course Search, so you can see at a glance whether a plan fits in a week.",
+          "If two courses in the same semester meet at the same time, the Simulator flags the semester and marks both courses, so you find out while planning rather than at registration.",
+          "Meeting times exist only for the coming year. Yale has not published later terms, and times often change from year to year, so the Simulator only checks conflicts for Fall 2026 and Spring 2027 and says so.",
+          "The course lookup window shows each course's meeting time next to the semester it is offered in.",
+        ],
+      },
+      {
         title: "Reading your progress",
         items: [
           "A saved plan in the Simulator now always shows the courses on your transcript. If you saved a plan last spring and have since added grades or new courses, the locked past semesters fill in with everything you actually took, and the grid runs through the current term.",

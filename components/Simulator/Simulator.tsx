@@ -17,6 +17,7 @@ import { Course } from "@/lib/types";
 import { getCourseNameFromCode, getCanonicalCode } from "@/lib/courseCatalog";
 import {
   hasMeetingTimesForTerm,
+  meetingTimeMode,
   getMeetingLabels,
   describeMeetingTime,
   findTermConflicts,
@@ -2259,9 +2260,10 @@ export default function Simulator({
                 ? String(semCredits)
                 : semCredits.toFixed(1);
               const isPast = isPastSemester(semester.name);
-              // The catalog only carries registrar meeting times for the two
-              // simulator terms; everywhere else the chip stays as it was.
-              const termHasTimes = hasMeetingTimesForTerm(semester.name);
+              // Registrar times for the two published terms, projections
+              // from those for later Fall/Spring terms, and nothing anywhere
+              // else, where the chip stays as it was.
+              const termMode = meetingTimeMode(semester.name);
               const termConflicts = conflictsBySemesterId[semester.id] ?? [];
               const clashingCodes = conflictingCodes(termConflicts);
               // One line per clashing pair for the warning pill's tooltip,
@@ -2388,10 +2390,12 @@ export default function Simulator({
                         const canonicalCode =
                           getCanonicalCode(course.code) ?? course.code;
                         // In a term that carries times, every chip says
-                        // something: the time, HTBA, or "No time listed".
-                        const meeting = termHasTimes
-                          ? describeMeetingTime(canonicalCode, semester.name)
-                          : undefined;
+                        // something: the time, HTBA, "No time listed", or in
+                        // a projected term the slot borrowed from 2026-27.
+                        const meeting =
+                          termMode !== "none"
+                            ? describeMeetingTime(canonicalCode, semester.name)
+                            : undefined;
                         const hasTimeConflict = clashingCodes.has(canonicalCode);
                         return (
                         <motion.div
@@ -2437,13 +2441,20 @@ export default function Simulator({
                               {meeting && (
                                 <span
                                   className={`ml-1.5 text-[10px] tabular-nums whitespace-nowrap ${
-                                    meeting.listed
-                                      ? "text-gray-400 dark:text-gray-500"
-                                      : "italic text-gray-400/80 dark:text-gray-500/80"
+                                    !meeting.listed
+                                      ? "italic text-gray-400/80 dark:text-gray-500/80"
+                                      : meeting.projection
+                                        ? "italic text-gray-400 dark:text-gray-500"
+                                        : "text-gray-400 dark:text-gray-500"
                                   }`}
                                   title={meeting.detail}
                                 >
-                                  {meeting.text}
+                                  {meeting.projection ? `\u2248 ${meeting.text}` : meeting.text}
+                                  {meeting.projection && meeting.projection.stableYears >= 2 && (
+                                    <span className="ml-0.5 not-italic opacity-60">
+                                      ×{meeting.projection.stableYears}y
+                                    </span>
+                                  )}
                                 </span>
                               )}
                             </div>

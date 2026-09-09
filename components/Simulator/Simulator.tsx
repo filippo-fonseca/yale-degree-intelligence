@@ -916,7 +916,7 @@ export default function Simulator({
 
   // Meeting times only exist for the coming year, and Yale's times drift
   // between years, so the Canvas says so once until the user dismisses it.
-  const meetingTimesNote = useDismissibleFlag("sim:meeting-times-2026-27");
+  const meetingTimesNote = useDismissibleFlag("sim:meeting-times-projected");
 
   useEffect(() => {
     if (activeView === "progress") progressNew.dismiss();
@@ -2064,8 +2064,8 @@ export default function Simulator({
           )}
 
           {/* Where the meeting times and conflict checks come from, and why
-              they stop after Spring 2027. Neutral rather than purple so it
-              does not read as a second "New" announcement. */}
+              later terms are only projections. Neutral rather than purple so
+              it does not read as a second "New" announcement. */}
           {meetingTimesNote.show && (
             <div className="mb-4 flex items-start gap-2.5 rounded-xl border border-gray-200 bg-gray-50/70 px-3.5 py-2.5 dark:border-gray-700/60 dark:bg-gray-800/40">
               <FiClock
@@ -2073,11 +2073,13 @@ export default function Simulator({
                 className="mt-0.5 flex-shrink-0 text-gray-400 dark:text-gray-500"
               />
               <p className="flex-1 text-xs leading-relaxed text-gray-700 dark:text-gray-200">
-                Meeting times reflect the current Yale Course Search
-                offerings for 2026-27 and are in beta: double-check a
-                course&apos;s time there before you count on it. Yale has not published
-                times for later terms, and times often change from year to
-                year, so conflicts are only checked for the coming year.
+                Meeting times for Fall 2026 and Spring 2027 reflect current
+                Yale Course Search offerings and are in beta: double-check a
+                course&apos;s time there before you count on it. For later
+                semesters we show the slot a course held in 2026-27 as a
+                projection (marked &asymp;). Yale has not published those
+                terms, and about one course in three moves, so treat projected
+                times and conflicts as a guide only.
               </p>
               <button
                 type="button"
@@ -2121,11 +2123,13 @@ export default function Simulator({
                     a planned course to remove it.
                   </li>
                   <li>
-                    Meeting times and time conflicts are shown for Fall 2026
-                    and Spring 2027 only, based on the current Yale Course
-                    Search offerings. This is in beta, so double-check a
-                    flagged conflict there. Later terms
-                    have no published times yet, and times may change.
+                    Meeting times and time conflicts for Fall 2026 and Spring
+                    2027 come from the current Yale Course Search offerings
+                    and are in beta, so double-check a flagged conflict there.
+                    Later semesters show the slot a course held in 2026-27 as a
+                    projection (marked &asymp;); Yale has not published those
+                    terms and times often change, so treat projected times and
+                    conflicts as a guide only.
                   </li>
                   <li>
                     Turn on the Grades and Distributionals editors to give each

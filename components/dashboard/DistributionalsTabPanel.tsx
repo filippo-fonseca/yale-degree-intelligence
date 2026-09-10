@@ -8,12 +8,15 @@ import { DistributionalsView } from "./dynamicTabs";
 interface DistributionalsTabPanelProps {
   courses: Course[];
   hasData: boolean;
+  /** Drives the milestone chart's deadline terms. */
+  graduationYear?: number | null;
   onGoToCourses: () => void;
 }
 
 export function DistributionalsTabPanel({
   courses,
   hasData,
+  graduationYear,
   onGoToCourses,
 }: DistributionalsTabPanelProps) {
   return (
@@ -30,7 +33,11 @@ export function DistributionalsTabPanel({
           onGoToCourses={onGoToCourses}
         />
       ) : (
-        <DistributionalsView courses={courses} onGoToCourses={onGoToCourses} />
+        <DistributionalsView
+          courses={courses}
+          graduationYear={graduationYear}
+          onGoToCourses={onGoToCourses}
+        />
       )}
     </motion.div>
   );

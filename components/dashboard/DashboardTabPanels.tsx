@@ -140,6 +140,7 @@ export function DashboardTabPanels({
         <DistributionalsTabPanel
           courses={courses}
           hasData={hasData}
+          graduationYear={userProfile?.graduationYear}
           onGoToCourses={() => onTabChange("upload")}
         />
       )}

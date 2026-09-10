@@ -515,10 +515,16 @@ function collectNotes(evaluation: MilestoneEvaluation, limit: number | null): No
     });
   });
   if (limit === null) return groups;
-  // Compact mode shows the first few lines overall, newest milestone first.
+  // Compact mode has room for a few lines, so the milestone the student is
+  // working toward goes first; a missed earlier year is history by comparison.
+  const currentKey = evaluation.milestones.find((m) => m.isCurrent)?.key;
+  const ordered = [
+    ...groups.filter((g) => g.key === currentKey),
+    ...groups.filter((g) => g.key !== currentKey),
+  ];
   let budget = limit;
   const trimmed: NoteGroup[] = [];
-  groups.forEach((g) => {
+  ordered.forEach((g) => {
     if (budget <= 0) return;
     trimmed.push({ ...g, notes: g.notes.slice(0, budget) });
     budget -= Math.min(g.notes.length, budget);

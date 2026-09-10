@@ -2,7 +2,7 @@
 
 import { Course } from "@/lib/types";
 import { motion, AnimatePresence } from "framer-motion";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { FiInfo, FiGrid, FiList } from "react-icons/fi";
 import {
   allocateDistributionals,
@@ -19,19 +19,41 @@ import { LanguageSection } from "./LanguageSection";
 import { AllocationControl } from "./AllocationControl";
 import { DistEmptyState } from "./DistEmptyState";
 import { useDistributionalPreferences } from "./useDistributionalPreferences";
+import MilestoneSnapshot from "./MilestoneSnapshot";
+import {
+  evaluateDistributionalMilestones,
+  toMilestoneCourseInputs,
+  type DistReqKey,
+} from "@/lib/distributionalMilestones";
 
 // ─── Main component ───────────────────────────────────────────────────────────
 
 const DistributionalsView = ({
   courses,
+  graduationYear,
   onGoToCourses,
 }: {
   courses: Course[];
+  graduationYear?: number | null;
   onGoToCourses?: () => void;
 }) => {
   const [view, setView] = useState<"board" | "heatmap">("board");
   const { autoAllocate, overrides, setAuto, reassign } =
     useDistributionalPreferences();
+
+  // Yale's promotion milestones, scored against the same allocation the cards
+  // below use. Computed before the loading guard so hook order never changes.
+  const milestoneEvaluation = useMemo(
+    () =>
+      evaluateDistributionalMilestones({
+        courses: toMilestoneCourseInputs(courses ?? []),
+        graduationYear,
+        allocationOverrides: autoAllocate
+          ? undefined
+          : (overrides as Record<string, DistReqKey>),
+      }),
+    [courses, graduationYear, autoAllocate, overrides],
+  );
 
   // Data still resolving: render a polished skeleton instead of blank space.
   if (!courses) {
@@ -134,6 +156,15 @@ const DistributionalsView = ({
           value={langStatusText}
           color={langComplete ? "text-emerald-600 dark:text-emerald-300" : "text-teal-600 dark:text-teal-300"}
           infoTooltip="Language-requirement progress based on your placement level."
+        />
+      </div>
+
+      {/* Yale's cumulative promotion milestones */}
+      <div data-tour="distributionals-milestones">
+        <MilestoneSnapshot
+          evaluation={milestoneEvaluation}
+          title="Your milestones"
+          subtitle="Yale checks these at the end of each year, and they stack."
         />
       </div>
 

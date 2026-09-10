@@ -30,6 +30,9 @@ type SimulatorProgressPaneProps = {
   /** The requirements breakdown, built by the Simulator from the same engine
    * inputs the preview runs on. Passed as a slot so this pane stays a layout. */
   breakdown: React.ReactNode;
+  /** Double-major overlap meter, absent unless the student has two majors.
+   * A slot for the same reason the breakdown is one. */
+  majorOverlap?: React.ReactNode;
   gpaTimelineTerms: {
     key: string;
     label: string;
@@ -54,6 +57,7 @@ export default function SimulatorProgressPane({
   completionFlashes,
   onDismissFlash,
   breakdown,
+  majorOverlap,
   gpaTimelineTerms,
   distributionalAssignments,
 }: SimulatorProgressPaneProps) {
@@ -159,6 +163,10 @@ export default function SimulatorProgressPane({
             />
           </button>
         </div>
+
+        {/* Sits outside the collapsible body: an overlap warning should not be
+            something you have to expand the preview to notice. */}
+        {majorOverlap && <div className="flex">{majorOverlap}</div>}
 
         <AnimatePresence initial={false}>
           {expanded && (

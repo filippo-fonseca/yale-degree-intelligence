@@ -60,7 +60,16 @@ import {
   type CertificateProgress,
 } from "@/lib/certificates";
 import type { GPAEntry } from "@/lib/gpa";
-import { allocateDistributionals } from "@/lib/distributionalAllocation";
+import type { DistTallyInput } from "@/lib/distributionalTally";
+import {
+  evaluateDistributionalMilestones,
+  type MilestoneCourseInput,
+  type MilestoneEvaluation,
+} from "@/lib/distributionalMilestones";
+import {
+  buildDistributionalTallyInputs,
+  buildMilestoneCourseInputs,
+} from "@/lib/simulatorMilestones";
 import {
   compareTermNames,
   isCurrentTerm,
@@ -1385,33 +1394,42 @@ export default function Simulator({
       });
   }, [completedCourses, semesters]);
 
-  // Distributional assignments across planned courses (one string[] per course).
-  const plannedDistAssignments = useMemo<string[][]>(
+  // Distributionals across the WHOLE plan: the transcript plus everything on
+  // the canvas, every course single-counted through the same allocation the
+  // main DistributionalProgress uses and carrying its real credits. Planned
+  // coursework used to skip both, so a planned "Hu, WR" course counted twice
+  // and a half-credit planned course counted as a whole one.
+  const distributionalAssignments = useMemo<DistTallyInput[]>(
     () =>
-      semesters.flatMap((s) =>
-        s.courses
-          .filter((c) => c.status === "not-taken")
-          .map((c) => effectiveDistributionals(c)),
-      ),
-    [semesters],
+      buildDistributionalTallyInputs({
+        taken: takenForProjection,
+        semesters,
+        auto: distribAutoAllocate,
+        overrides: distribOverrides,
+      }),
+    [takenForProjection, semesters, distribAutoAllocate, distribOverrides],
   );
 
-  // The profile base: distributionals already allocated to the student's real
-  // courses, using their saved auto/override preference. Single-counted per the
-  // same allocation the main DistributionalProgress uses, so the sim builds on
-  // real progress instead of starting from zero.
-  const completedDistAssignments = useMemo<string[][]>(() => {
-    const allocation = allocateDistributionals(takenForProjection, {
-      auto: distribAutoAllocate,
-      overrides: distribOverrides,
-    });
-    return takenForProjection
-      .map((c) => {
-        const req = allocation.reqByCourseKey[allocation.keyOf(c)];
-        return req ? [req] : null;
-      })
-      .filter((a): a is string[] => a !== null);
-  }, [takenForProjection, distribAutoAllocate, distribOverrides]);
+  // The same plan, shaped for Yale's promotion milestones. These are cumulative
+  // DEADLINES, not a graduation total, so every course carries the term it sits
+  // in: a course planned for senior spring cannot fill a sophomore-year slot.
+  const milestoneCourseInputs = useMemo<MilestoneCourseInput[]>(
+    () =>
+      buildMilestoneCourseInputs({
+        taken: takenForProjection,
+        semesters,
+      }),
+    [takenForProjection, semesters],
+  );
+
+  const milestoneEvaluation = useMemo<MilestoneEvaluation>(
+    () =>
+      evaluateDistributionalMilestones({
+        courses: milestoneCourseInputs,
+        graduationYear,
+      }),
+    [milestoneCourseInputs, graduationYear],
+  );
 
   // ------------ Live preview progress (local compute) ------------
   useEffect(() => {
@@ -2629,10 +2647,9 @@ export default function Simulator({
             />
           }
           gpaTimelineTerms={gpaTimelineTerms}
-          distributionalAssignments={[
-            ...completedDistAssignments,
-            ...plannedDistAssignments,
-          ]}
+          distributionalAssignments={distributionalAssignments}
+          milestoneEvaluation={milestoneEvaluation}
+          // TODO(orchestrator): pass <MilestoneSnapshot variant="compact" evaluation={milestoneEvaluation} />
         />
       )}
 

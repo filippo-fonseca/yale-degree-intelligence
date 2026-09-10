@@ -17,9 +17,41 @@ export type Release = {
 
 export const RELEASES: Release[] = [
   {
+    version: "v3.1.0",
+    date: "Fall 2026",
+    current: true,
+    summary:
+      "Yale's year-by-year distributional milestones, drawn the way the college draws them, plus a double-major overlap check that reads your whole plan.",
+    sections: [
+      {
+        title: "Reading your progress",
+        items: [
+          "Distributionals now shows Yale's milestone chart as a live snapshot of your record: four stacked columns, one per year, with a bar for every credit the college expects by the end of that year. Bars fill with the colour of the area or skill that earned them, planned courses show as a lighter fill, and what is still owed stays as a grey placeholder.",
+          "Each column carries the credits you need for promotion (8, 16, 26, and 36 to graduate) as its own progress bar, and a status that says whether that milestone is met, on track, at risk, or missed, with the term it is due.",
+          "The chart follows the actual rules: the first two milestones count enrollment, while the junior and senior ones need passing letter grades, so a course taken Credit/D/Fail no longer counts toward them.",
+          "Under the chart, a short list spells out exactly what is left for the milestone you are working toward.",
+        ],
+      },
+      {
+        title: "Planning your year",
+        items: [
+          "The same milestone snapshot lives in the Simulator's projected results, so you can see which year each planned course closes out and whether a plan leaves a milestone at risk.",
+          "If you have two majors, the Simulator now counts every course that serves both, including the ones only on your canvas, against Yale's limit of two shared credits. A meter shows where you stand, opens to list each shared course and the requirement it fills in each major, and lets you mark a course as a prerequisite so it does not count.",
+          "A planned course carrying two distributional tags now counts toward one requirement, the same way a completed course does, and half-credit planned courses count as half a credit.",
+        ],
+      },
+      {
+        title: "Fixes",
+        items: [
+          "Unskipping or removing a course from inside a requirement window on My major now updates the window right away, instead of waiting for a page refresh.",
+        ],
+      },
+    ],
+  },
+  {
     version: "v3.0.1",
     date: "Summer 2026",
-    current: true,
+    current: false,
     summary:
       "A quieter front door, a transcript import that no longer does the same work twice, and clearer numbers where you read your progress.",
     sections: [

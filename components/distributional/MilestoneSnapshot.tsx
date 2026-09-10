@@ -12,7 +12,7 @@
 // for that distributional.
 
 import { motion } from "framer-motion";
-import { useMemo } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { FiCheck, FiClock, FiAlertTriangle, FiXCircle } from "react-icons/fi";
 import type {
   DistReqKey,
@@ -270,22 +270,26 @@ function CreditsMeter({
 
   return (
     <div className="mt-1">
-      <div className="flex items-baseline justify-between gap-1">
-        <span
-          className={`text-gray-500 dark:text-gray-400 truncate ${
-            compact ? "text-[8px]" : "text-[10px]"
-          }`}
-        >
-          {compact ? `Credits: ${required}` : label}
-        </span>
-        <span
-          className={`font-mono text-gray-700 dark:text-gray-300 shrink-0 ${
-            compact ? "text-[8px]" : "text-[10px]"
-          }`}
-        >
-          {round(earned)}/{required}
-        </span>
-      </div>
+      {compact ? (
+        // Narrow panes cannot hold "Credits for promotion: 8" without
+        // truncating it, so compact says the same thing in four words.
+        <div className="flex items-baseline gap-1 text-[9px] whitespace-nowrap">
+          <span className="text-gray-500 dark:text-gray-400">{required} cr</span>
+          <span className="text-gray-300 dark:text-gray-600">·</span>
+          <span className="font-mono text-gray-700 dark:text-gray-300">
+            {round(earned)}/{required}
+          </span>
+        </div>
+      ) : (
+        <div className="flex items-baseline justify-between gap-1">
+          <span className="text-[10px] text-gray-500 dark:text-gray-400 truncate">
+            {label}
+          </span>
+          <span className="text-[10px] font-mono text-gray-700 dark:text-gray-300 shrink-0">
+            {round(earned)}/{required}
+          </span>
+        </div>
+      )}
       <div
         className="relative mt-1 w-full rounded-full bg-gray-200 dark:bg-gray-800/70 overflow-hidden"
         style={{ height: compact ? 3 : 5 }}
@@ -353,23 +357,33 @@ function MilestoneColumn({
   return (
     <div
       aria-label={columnAriaLabel(milestone)}
-      className={`rounded-xl border transition-all ${compact ? "p-2" : "p-3"} ${
+      className={`rounded-xl border transition-all ${
+        compact ? "p-2 flex-1 min-w-[132px]" : "p-3"
+      } ${
         isCurrent
           ? "border-violet-300 dark:border-violet-600/50 bg-violet-50/60 dark:bg-violet-500/[0.07] shadow-[0_0_0_3px_rgba(139,92,246,0.12)]"
           : "border-gray-200 dark:border-gray-800/60 bg-white/60 dark:bg-gray-900/30"
       }`}
     >
-      {/* Title + status */}
-      <div className="flex items-start justify-between gap-1 mb-0.5">
-        <h4
-          className={`font-semibold text-gray-900 dark:text-white leading-tight ${
-            compact ? "text-[10px]" : "text-xs sm:text-sm"
-          }`}
-        >
-          {spec.label}
-        </h4>
-        <StatusChip milestone={milestone} compact={compact} />
-      </div>
+      {/* Title + status. Compact stacks them: a chip beside a wrapping title
+          overflows the column at Simulator-pane widths. */}
+      {compact ? (
+        <div className="mb-1">
+          <h4 className="text-[10px] font-semibold text-gray-900 dark:text-white leading-tight">
+            {spec.label}
+          </h4>
+          <div className="mt-1">
+            <StatusChip milestone={milestone} compact />
+          </div>
+        </div>
+      ) : (
+        <div className="flex items-start justify-between gap-1 mb-0.5">
+          <h4 className="text-xs sm:text-sm font-semibold text-gray-900 dark:text-white leading-tight">
+            {spec.label}
+          </h4>
+          <StatusChip milestone={milestone} compact={false} />
+        </div>
+      )}
 
       <CreditsMeter milestone={milestone} compact={compact} />
 
@@ -392,12 +406,9 @@ function MilestoneColumn({
         ))}
       </div>
 
-      {isCurrent && milestone.deadlineTerm && (
-        <p
-          className={`mt-2 font-medium text-violet-600 dark:text-violet-300 ${
-            compact ? "text-[8px]" : "text-[10px]"
-          }`}
-        >
+      {/* The ring carries "you are here" on its own in compact. */}
+      {!compact && isCurrent && milestone.deadlineTerm && (
+        <p className="mt-2 text-[10px] font-medium text-violet-600 dark:text-violet-300">
           You are here · checked {milestone.deadlineTerm}
         </p>
       )}
@@ -547,6 +558,12 @@ export default function MilestoneSnapshot({
 
   const noteGroups = collectNotes(evaluation, compact ? 3 : null);
 
+  // Compact lives in the Simulator's half-width pane (about 380px at lg and
+  // 510px at xl), which is narrower than four legible columns. The row scrolls
+  // rather than crushing, and a fade shows when there is more to the right.
+  const scrollRef = useRef<HTMLDivElement | null>(null);
+  const [showFade, setShowFade] = useState(false);
+
   // Remount the bars when the underlying fills change so the staggered fill
   // animation replays on new data, not just on first mount.
   const dataKey = useMemo(
@@ -556,6 +573,21 @@ export default function MilestoneSnapshot({
         .join("|"),
     [milestones],
   );
+
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el || !compact) return;
+    const update = () =>
+      setShowFade(el.scrollLeft + el.clientWidth < el.scrollWidth - 2);
+    update();
+    el.addEventListener("scroll", update, { passive: true });
+    const observer = new ResizeObserver(update);
+    observer.observe(el);
+    return () => {
+      el.removeEventListener("scroll", update);
+      observer.disconnect();
+    };
+  }, [compact, dataKey]);
 
   if (milestones.length === 0) return null;
 
@@ -603,23 +635,32 @@ export default function MilestoneSnapshot({
       >
         {!compact && <Legend />}
 
-        <div className="overflow-x-auto -mx-1 px-1 pb-1">
-          <div
-            key={dataKey}
-            className={`grid grid-cols-4 items-end ${compact ? "gap-1.5 min-w-[320px]" : "gap-2 sm:gap-3 min-w-[560px]"}`}
-          >
-            {milestones.map((m) => (
-              <MilestoneColumn
-                key={m.key}
-                milestone={m}
-                skillBySource={skillBySource}
-                compact={compact}
-                barHeight={barHeight}
-                barGap={barGap}
-                stackHeight={stackHeight}
-              />
-            ))}
+        <div className="relative">
+          <div ref={scrollRef} className="overflow-x-auto -mx-1 px-1 pb-1">
+            <div
+              key={dataKey}
+              className={
+                compact
+                  ? "flex items-end gap-1.5"
+                  : "grid grid-cols-4 items-end gap-2 sm:gap-3 min-w-[560px]"
+              }
+            >
+              {milestones.map((m) => (
+                <MilestoneColumn
+                  key={m.key}
+                  milestone={m}
+                  skillBySource={skillBySource}
+                  compact={compact}
+                  barHeight={barHeight}
+                  barGap={barGap}
+                  stackHeight={stackHeight}
+                />
+              ))}
+            </div>
           </div>
+          {compact && showFade && (
+            <div className="pointer-events-none absolute inset-y-0 right-0 w-8 bg-gradient-to-l from-white dark:from-gray-950 to-transparent" />
+          )}
         </div>
       </div>
 

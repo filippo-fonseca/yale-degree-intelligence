@@ -90,6 +90,7 @@ import {
 } from "@/lib/utils/plannedCourseAdmission";
 import PlannedCourseBlockedModal from "./PlannedCourseBlockedModal";
 import SimulatorMajorOverlapPill from "./SimulatorMajorOverlapPill";
+import MilestoneSnapshot from "@/components/distributional/MilestoneSnapshot";
 import { findSharedMajorCourses } from "@/lib/utils/sharedCourses";
 import { ShinyButton } from "@/components/ui/shiny-button";
 import { playPop } from "@/lib/soundEffects";
@@ -2649,7 +2650,14 @@ export default function Simulator({
           gpaTimelineTerms={gpaTimelineTerms}
           distributionalAssignments={distributionalAssignments}
           milestoneEvaluation={milestoneEvaluation}
-          // TODO(orchestrator): pass <MilestoneSnapshot variant="compact" evaluation={milestoneEvaluation} />
+          milestoneSnapshot={
+            milestoneEvaluation && (
+              <MilestoneSnapshot
+                variant="compact"
+                evaluation={milestoneEvaluation}
+              />
+            )
+          }
         />
       )}
 

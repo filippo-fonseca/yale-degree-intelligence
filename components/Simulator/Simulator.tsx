@@ -60,7 +60,16 @@ import {
   type CertificateProgress,
 } from "@/lib/certificates";
 import type { GPAEntry } from "@/lib/gpa";
-import { allocateDistributionals } from "@/lib/distributionalAllocation";
+import type { DistTallyInput } from "@/lib/distributionalTally";
+import {
+  evaluateDistributionalMilestones,
+  type MilestoneCourseInput,
+  type MilestoneEvaluation,
+} from "@/lib/distributionalMilestones";
+import {
+  buildDistributionalTallyInputs,
+  buildMilestoneCourseInputs,
+} from "@/lib/simulatorMilestones";
 import {
   compareTermNames,
   isCurrentTerm,
@@ -80,6 +89,9 @@ import {
   type SlotRefusal,
 } from "@/lib/utils/plannedCourseAdmission";
 import PlannedCourseBlockedModal from "./PlannedCourseBlockedModal";
+import SimulatorMajorOverlapPill from "./SimulatorMajorOverlapPill";
+import MilestoneSnapshot from "@/components/distributional/MilestoneSnapshot";
+import { findSharedMajorCourses } from "@/lib/utils/sharedCourses";
 import { ShinyButton } from "@/components/ui/shiny-button";
 import { playPop } from "@/lib/soundEffects";
 import { isTourActive, useTourActive } from "@/lib/tourState";
@@ -117,6 +129,11 @@ interface SimulatorProps {
   certificatePermanentManuals?: ManualRequirementEntry[];
   /** Lets the dashboard ask the simulator to confirm before navigating away. */
   onRegisterNavCheck?: (fn: ((cb: () => void) => void) | null) => void;
+  /** Courses the student marked as prerequisites, exempt from the double-major
+   * overlap cap. Same list the transcript-side checker reads. */
+  prereqOverrides?: string[];
+  /** Marks or unmarks a course as a prerequisite. Read-only pill without it. */
+  onTogglePrereqOverride?: (code: string) => void;
 }
 
 type PreviewProgressMap = Record<string, MajorProgress>;
@@ -384,6 +401,8 @@ export default function Simulator({
   majorPermanentManuals,
   certificatePermanentManuals,
   onRegisterNavCheck,
+  prereqOverrides,
+  onTogglePrereqOverride,
 }: SimulatorProps) {
   const { user } = useAuth();
 
@@ -1291,6 +1310,39 @@ export default function Simulator({
     [majorIds, certificateIds, simulatorManualReqs, plannedCodes],
   );
 
+  // Yale's two-major overlap cap, read across the whole plan rather than the
+  // transcript alone: a course you have only dropped on the canvas still eats
+  // into the two credits allowed to count toward both majors.
+  const majorOverlap = useMemo(() => {
+    if (majorIds.length < 2) return null;
+
+    const creditsByCode: Record<string, number> = {};
+    for (const course of takenForProjection) {
+      if (course.code) creditsByCode[course.code] = course.credits || 1;
+    }
+    for (const semester of semesters) {
+      for (const course of semester.courses) {
+        if (course?.code && !(course.code in creditsByCode)) {
+          creditsByCode[course.code] = course.credits || 1;
+        }
+      }
+    }
+
+    return findSharedMajorCourses(majorIds, previewProgress, {
+      creditsByCode,
+      prereqOverrides: prereqOverrides ?? [],
+      plannedCodes,
+      includeInProgress: true,
+    });
+  }, [
+    majorIds,
+    previewProgress,
+    takenForProjection,
+    semesters,
+    plannedCodes,
+    prereqOverrides,
+  ]);
+
   // ------------ Live add-on derived props (no effects) ------------
   // Chronological, term-keyed GPA timeline: completed transcript courses merged
   // with planned sim courses under a shared `${semester} ${year}` key.
@@ -1343,33 +1395,42 @@ export default function Simulator({
       });
   }, [completedCourses, semesters]);
 
-  // Distributional assignments across planned courses (one string[] per course).
-  const plannedDistAssignments = useMemo<string[][]>(
+  // Distributionals across the WHOLE plan: the transcript plus everything on
+  // the canvas, every course single-counted through the same allocation the
+  // main DistributionalProgress uses and carrying its real credits. Planned
+  // coursework used to skip both, so a planned "Hu, WR" course counted twice
+  // and a half-credit planned course counted as a whole one.
+  const distributionalAssignments = useMemo<DistTallyInput[]>(
     () =>
-      semesters.flatMap((s) =>
-        s.courses
-          .filter((c) => c.status === "not-taken")
-          .map((c) => effectiveDistributionals(c)),
-      ),
-    [semesters],
+      buildDistributionalTallyInputs({
+        taken: takenForProjection,
+        semesters,
+        auto: distribAutoAllocate,
+        overrides: distribOverrides,
+      }),
+    [takenForProjection, semesters, distribAutoAllocate, distribOverrides],
   );
 
-  // The profile base: distributionals already allocated to the student's real
-  // courses, using their saved auto/override preference. Single-counted per the
-  // same allocation the main DistributionalProgress uses, so the sim builds on
-  // real progress instead of starting from zero.
-  const completedDistAssignments = useMemo<string[][]>(() => {
-    const allocation = allocateDistributionals(takenForProjection, {
-      auto: distribAutoAllocate,
-      overrides: distribOverrides,
-    });
-    return takenForProjection
-      .map((c) => {
-        const req = allocation.reqByCourseKey[allocation.keyOf(c)];
-        return req ? [req] : null;
-      })
-      .filter((a): a is string[] => a !== null);
-  }, [takenForProjection, distribAutoAllocate, distribOverrides]);
+  // The same plan, shaped for Yale's promotion milestones. These are cumulative
+  // DEADLINES, not a graduation total, so every course carries the term it sits
+  // in: a course planned for senior spring cannot fill a sophomore-year slot.
+  const milestoneCourseInputs = useMemo<MilestoneCourseInput[]>(
+    () =>
+      buildMilestoneCourseInputs({
+        taken: takenForProjection,
+        semesters,
+      }),
+    [takenForProjection, semesters],
+  );
+
+  const milestoneEvaluation = useMemo<MilestoneEvaluation>(
+    () =>
+      evaluateDistributionalMilestones({
+        courses: milestoneCourseInputs,
+        graduationYear,
+      }),
+    [milestoneCourseInputs, graduationYear],
+  );
 
   // ------------ Live preview progress (local compute) ------------
   useEffect(() => {
@@ -2558,6 +2619,14 @@ export default function Simulator({
           previewError={previewError}
           completionFlashes={completionFlashes}
           onDismissFlash={dismissCompletionFlash}
+          majorOverlap={
+            majorOverlap && (
+              <SimulatorMajorOverlapPill
+                overlap={majorOverlap}
+                onTogglePrereqOverride={onTogglePrereqOverride}
+              />
+            )
+          }
           breakdown={
             <SimulatorRequirementsBreakdown
               majorIds={majorIds}
@@ -2579,10 +2648,16 @@ export default function Simulator({
             />
           }
           gpaTimelineTerms={gpaTimelineTerms}
-          distributionalAssignments={[
-            ...completedDistAssignments,
-            ...plannedDistAssignments,
-          ]}
+          distributionalAssignments={distributionalAssignments}
+          milestoneEvaluation={milestoneEvaluation}
+          milestoneSnapshot={
+            milestoneEvaluation && (
+              <MilestoneSnapshot
+                variant="compact"
+                evaluation={milestoneEvaluation}
+              />
+            )
+          }
         />
       )}
 

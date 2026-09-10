@@ -13,6 +13,7 @@ interface SimulatorTabPanelProps {
   onRegisterNavCheck: (
     check: ((callback: () => void) => void) | null,
   ) => void;
+  onTogglePrereqOverride: (code: string) => void;
 }
 
 export function SimulatorTabPanel({
@@ -20,6 +21,7 @@ export function SimulatorTabPanel({
   userProfile,
   courses,
   onRegisterNavCheck,
+  onTogglePrereqOverride,
 }: SimulatorTabPanelProps) {
   const certificates = userProfile.certificates ?? [];
 
@@ -67,6 +69,8 @@ export function SimulatorTabPanel({
             })),
         )}
         onRegisterNavCheck={onRegisterNavCheck}
+        prereqOverrides={userProfile.prereqOverrides ?? []}
+        onTogglePrereqOverride={onTogglePrereqOverride}
       />
     </motion.div>
   );

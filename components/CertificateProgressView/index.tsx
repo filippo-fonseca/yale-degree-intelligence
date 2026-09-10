@@ -33,6 +33,7 @@ import { setDoc, doc } from "firebase/firestore";
 import { getCourseInfo, normalizeCourseCode } from "@/lib/courseCatalog";
 import { InfoCard } from "../ui/InfoCard";
 import RequirementModal from "./RequirementModal";
+import { resolveLiveRequirement } from "@/components/MajorProgressView/liveRequirement";
 import CertificateTipModal, {
   CertificateTipHelpButton,
   resetCertificateTipSeen,
@@ -1027,7 +1028,7 @@ export default function CertificateProgressView({
 
       <RequirementModal
         isOpen={reqModal.isOpen}
-        requirement={reqModal.req}
+        requirement={resolveLiveRequirement(reqModal.req, heatCells)}
         onClose={() => setReqModal({ isOpen: false, req: null })}
         onOpenCourse={handleOpenCourse}
         onUnskip={handleUnskip}

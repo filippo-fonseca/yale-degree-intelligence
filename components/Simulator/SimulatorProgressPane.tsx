@@ -4,6 +4,8 @@ import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FiAlertTriangle, FiCheckCircle, FiChevronDown } from "react-icons/fi";
 import type { GPAEntry } from "@/lib/gpa";
+import type { DistTallyInput } from "@/lib/distributionalTally";
+import type { MilestoneEvaluation } from "@/lib/distributionalMilestones";
 import SimulatorGradesSection from "./SimulatorGradesSection";
 import SimulatorDistributionalsSection from "./SimulatorDistributionalsSection";
 
@@ -30,13 +32,20 @@ type SimulatorProgressPaneProps = {
   /** The requirements breakdown, built by the Simulator from the same engine
    * inputs the preview runs on. Passed as a slot so this pane stays a layout. */
   breakdown: React.ReactNode;
+  /** Double-major overlap meter, absent unless the student has two majors.
+   * A slot for the same reason the breakdown is one. */
+  majorOverlap?: React.ReactNode;
   gpaTimelineTerms: {
     key: string;
     label: string;
     completed: GPAEntry[];
     planned: GPAEntry[];
   }[];
-  distributionalAssignments: string[][];
+  distributionalAssignments: DistTallyInput[];
+  /** Yale's promotion milestones read against the whole plan, when known. */
+  milestoneEvaluation?: MilestoneEvaluation | null;
+  /** The milestone chart, a slot for the same reason the breakdown is one. */
+  milestoneSnapshot?: React.ReactNode;
 };
 
 /**
@@ -54,8 +63,11 @@ export default function SimulatorProgressPane({
   completionFlashes,
   onDismissFlash,
   breakdown,
+  majorOverlap,
   gpaTimelineTerms,
   distributionalAssignments,
+  milestoneEvaluation,
+  milestoneSnapshot,
 }: SimulatorProgressPaneProps) {
   const [flashMenu, setFlashMenu] = useState<"lost" | "gained" | null>(null);
   const lostFlashes = completionFlashes.filter((f) => f.kind === "lost");
@@ -160,6 +172,10 @@ export default function SimulatorProgressPane({
           </button>
         </div>
 
+        {/* Sits outside the collapsible body: an overlap warning should not be
+            something you have to expand the preview to notice. */}
+        {majorOverlap && <div className="flex">{majorOverlap}</div>}
+
         <AnimatePresence initial={false}>
           {expanded && (
             <motion.div
@@ -191,6 +207,8 @@ export default function SimulatorProgressPane({
         <SimulatorGradesSection terms={gpaTimelineTerms} />
         <SimulatorDistributionalsSection
           assignments={distributionalAssignments}
+          milestoneEvaluation={milestoneEvaluation}
+          milestoneSnapshot={milestoneSnapshot}
         />
       </div>
     </div>

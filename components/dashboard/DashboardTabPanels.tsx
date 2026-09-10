@@ -133,12 +133,14 @@ export function DashboardTabPanels({
           userProfile={userProfile}
           courses={courses}
           onRegisterNavCheck={onRegisterNavCheck}
+          onTogglePrereqOverride={onTogglePrereqOverride}
         />
       )}
       {activeTab === "distributionals" && (
         <DistributionalsTabPanel
           courses={courses}
           hasData={hasData}
+          graduationYear={userProfile?.graduationYear}
           onGoToCourses={() => onTabChange("upload")}
         />
       )}

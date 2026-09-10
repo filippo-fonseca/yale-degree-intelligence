@@ -16,6 +16,7 @@ import MajorProgressBoard from "./MajorProgressBoard";
 import MajorProgressModals from "./MajorProgressModals";
 import { useMajorViewPreferences } from "./useMajorViewPreferences";
 import { useMajorProgressData } from "./useMajorProgressData";
+import { resolveLiveRequirement } from "./liveRequirement";
 import {
   useMajorCourseHandlers,
   type CourseModalState,
@@ -92,6 +93,13 @@ export default function MajorProgressView({
     columns,
   } = useMajorProgressData(progress, courses, selectedMajor);
 
+  // Keep the open requirement modal in step with the board after a skip,
+  // unskip, or removal instead of showing the pills it was opened with.
+  const liveReqModal = {
+    isOpen: reqModal.isOpen,
+    req: resolveLiveRequirement(reqModal.req, heatCells),
+  };
+
   if (!progress) {
     return <MajorProgressLoadingSkeleton />;
   }
@@ -148,7 +156,7 @@ export default function MajorProgressView({
         setModalOpen={setModalOpen}
         manualCourseModal={manualCourseModal}
         setManualCourseModal={setManualCourseModal}
-        reqModal={reqModal}
+        reqModal={liveReqModal}
         setReqModal={setReqModal}
         courses={courses}
         userMajors={userMajors}

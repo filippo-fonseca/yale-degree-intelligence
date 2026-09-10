@@ -1,10 +1,19 @@
 "use client";
 
-import { useState } from "react";
+import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { FiChevronDown, FiChevronUp, FiCheck } from "react-icons/fi";
+import {
+  FiChevronDown,
+  FiChevronUp,
+  FiCheck,
+  FiAlertTriangle,
+} from "react-icons/fi";
 import { getDistPillStyle } from "@/lib/constants";
-import { tallyDistributionals } from "@/lib/distributionalTally";
+import {
+  tallyDistributionals,
+  type DistTallyInput,
+} from "@/lib/distributionalTally";
+import type { MilestoneEvaluation } from "@/lib/distributionalMilestones";
 
 // Per-req progress-bar color, matching the DistributionalProgress palette.
 const REQ_BAR_COLOR: Record<string, string> = {
@@ -16,13 +25,34 @@ const REQ_BAR_COLOR: Record<string, string> = {
 };
 
 interface SimulatorDistributionalsSectionProps {
-  assignments: string[][];
+  /** One entry per course: the requirement it counts toward, and its credits. */
+  assignments: DistTallyInput[];
+  /** Yale's promotion milestones read against the whole plan, when known. */
+  milestoneEvaluation?: MilestoneEvaluation | null;
+  /** The milestone chart itself, passed as a slot so this stays a layout. */
+  milestoneSnapshot?: React.ReactNode;
 }
 
 export default function SimulatorDistributionalsSection({
   assignments,
+  milestoneEvaluation,
+  milestoneSnapshot,
 }: SimulatorDistributionalsSectionProps) {
   const [open, setOpen] = useState(true);
+
+  // The milestone the student is working toward right now. Its verdict is the
+  // one thing worth saying in a collapsed header: missing a promotion
+  // milestone is not a graduation problem you can fix later.
+  const currentMilestone =
+    milestoneEvaluation?.milestones.find((m) => m.isCurrent) ?? null;
+  const milestoneName = currentMilestone
+    ? currentMilestone.spec.label.split(" / ")[0]
+    : "";
+  const behind =
+    currentMilestone?.status === "at-risk" ||
+    currentMilestone?.status === "missed";
+  const onTrack =
+    currentMilestone?.status === "met" || currentMilestone?.status === "projected";
 
   const { byRequirement } = tallyDistributionals(assignments ?? []);
 
@@ -61,6 +91,32 @@ export default function SimulatorDistributionalsSection({
             )}
           </div>
         </div>
+        {currentMilestone && behind && (
+          <span
+            className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[10px] font-medium border flex-shrink-0 ${
+              currentMilestone.status === "missed"
+                ? "border-rose-300 dark:border-rose-500/40 bg-rose-50 dark:bg-rose-500/10 text-rose-700 dark:text-rose-300"
+                : "border-amber-300 dark:border-amber-500/40 bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-300"
+            }`}
+            title={currentMilestone.notes[0] ?? currentMilestone.spec.description}
+          >
+            <FiAlertTriangle size={10} />
+            {milestoneName} milestone{" "}
+            {currentMilestone.status === "missed" ? "missed" : "at risk"}
+          </span>
+        )}
+        {currentMilestone && onTrack && (
+          <span
+            className={`text-[10px] font-medium flex-shrink-0 ${
+              currentMilestone.status === "met"
+                ? "text-emerald-600 dark:text-emerald-400"
+                : "text-sky-600 dark:text-sky-400"
+            }`}
+            title={currentMilestone.spec.description}
+          >
+            {milestoneName} milestone on track
+          </span>
+        )}
         {open ? (
           <FiChevronUp className="w-3.5 h-3.5 text-gray-500 flex-shrink-0" />
         ) : (
@@ -156,6 +212,8 @@ export default function SimulatorDistributionalsSection({
                   )}
                 </>
               )}
+
+              {milestoneEvaluation && milestoneSnapshot}
             </div>
           </motion.div>
         )}

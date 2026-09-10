@@ -133,6 +133,7 @@ export function DashboardTabPanels({
           userProfile={userProfile}
           courses={courses}
           onRegisterNavCheck={onRegisterNavCheck}
+          onTogglePrereqOverride={onTogglePrereqOverride}
         />
       )}
       {activeTab === "distributionals" && (

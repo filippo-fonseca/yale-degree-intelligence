@@ -80,6 +80,8 @@ import {
   type SlotRefusal,
 } from "@/lib/utils/plannedCourseAdmission";
 import PlannedCourseBlockedModal from "./PlannedCourseBlockedModal";
+import SimulatorMajorOverlapPill from "./SimulatorMajorOverlapPill";
+import { findSharedMajorCourses } from "@/lib/utils/sharedCourses";
 import { ShinyButton } from "@/components/ui/shiny-button";
 import { playPop } from "@/lib/soundEffects";
 import { isTourActive, useTourActive } from "@/lib/tourState";
@@ -117,6 +119,11 @@ interface SimulatorProps {
   certificatePermanentManuals?: ManualRequirementEntry[];
   /** Lets the dashboard ask the simulator to confirm before navigating away. */
   onRegisterNavCheck?: (fn: ((cb: () => void) => void) | null) => void;
+  /** Courses the student marked as prerequisites, exempt from the double-major
+   * overlap cap. Same list the transcript-side checker reads. */
+  prereqOverrides?: string[];
+  /** Marks or unmarks a course as a prerequisite. Read-only pill without it. */
+  onTogglePrereqOverride?: (code: string) => void;
 }
 
 type PreviewProgressMap = Record<string, MajorProgress>;
@@ -384,6 +391,8 @@ export default function Simulator({
   majorPermanentManuals,
   certificatePermanentManuals,
   onRegisterNavCheck,
+  prereqOverrides,
+  onTogglePrereqOverride,
 }: SimulatorProps) {
   const { user } = useAuth();
 
@@ -1290,6 +1299,39 @@ export default function Simulator({
       ).policyOptions,
     [majorIds, certificateIds, simulatorManualReqs, plannedCodes],
   );
+
+  // Yale's two-major overlap cap, read across the whole plan rather than the
+  // transcript alone: a course you have only dropped on the canvas still eats
+  // into the two credits allowed to count toward both majors.
+  const majorOverlap = useMemo(() => {
+    if (majorIds.length < 2) return null;
+
+    const creditsByCode: Record<string, number> = {};
+    for (const course of takenForProjection) {
+      if (course.code) creditsByCode[course.code] = course.credits || 1;
+    }
+    for (const semester of semesters) {
+      for (const course of semester.courses) {
+        if (course?.code && !(course.code in creditsByCode)) {
+          creditsByCode[course.code] = course.credits || 1;
+        }
+      }
+    }
+
+    return findSharedMajorCourses(majorIds, previewProgress, {
+      creditsByCode,
+      prereqOverrides: prereqOverrides ?? [],
+      plannedCodes,
+      includeInProgress: true,
+    });
+  }, [
+    majorIds,
+    previewProgress,
+    takenForProjection,
+    semesters,
+    plannedCodes,
+    prereqOverrides,
+  ]);
 
   // ------------ Live add-on derived props (no effects) ------------
   // Chronological, term-keyed GPA timeline: completed transcript courses merged
@@ -2558,6 +2600,14 @@ export default function Simulator({
           previewError={previewError}
           completionFlashes={completionFlashes}
           onDismissFlash={dismissCompletionFlash}
+          majorOverlap={
+            majorOverlap && (
+              <SimulatorMajorOverlapPill
+                overlap={majorOverlap}
+                onTogglePrereqOverride={onTogglePrereqOverride}
+              />
+            )
+          }
           breakdown={
             <SimulatorRequirementsBreakdown
               majorIds={majorIds}

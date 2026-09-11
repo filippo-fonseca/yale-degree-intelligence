@@ -16,7 +16,7 @@ import {
  */
 
 const LAST_UPDATED = "August 24, 2026";
-const CONTACT_EMAILS = ["filippo.fonseca@yale.edu", "emir.ahmed@yale.edu"];
+const CONTACT_EMAILS = ["filippo.fonseca@yale.edu"];
 
 function Section({
   index,

@@ -22,6 +22,25 @@ export function getInProgressCount(courses: Course[]): number {
   return courses.filter((c) => !c.skipped && c.status === "in-progress").length;
 }
 
+/** Grades on a completed course that earn no credit (failed or withdrawn). */
+const NO_CREDIT_GRADES = new Set(["F", "W"]);
+
+/**
+ * Credits earned across every term, summer included. Counts any completed,
+ * non-skipped course, whatever its grading basis: a Credit/D/Fail, pass, or
+ * transfer course earns credit even though it never enters the GPA.
+ */
+export function getEarnedCredits(courses: Course[]): number {
+  let total = 0;
+  for (const c of courses) {
+    if (c.skipped || c.status !== "completed") continue;
+    const grade = (c.grade ?? "").trim().toUpperCase();
+    if (NO_CREDIT_GRADES.has(grade)) continue;
+    if (typeof c.credits === "number" && c.credits > 0) total += c.credits;
+  }
+  return Math.round(total * 100) / 100;
+}
+
 export function toGPAEntry(course: Course): GPAEntry {
   return { grade: course.grade, credits: course.credits };
 }
@@ -51,7 +70,7 @@ export function computeAcademicStatsSummary(
 
   return {
     gpa: gpaResult.gpa != null ? gpaResult.gpa.toFixed(2) : "0.00",
-    totalCredits: gpaResult.gradedCredits,
+    totalCredits: getEarnedCredits(courses),
     completedCourses: eligible.length,
     inProgressCourses,
     distribution,

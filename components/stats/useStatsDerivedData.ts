@@ -3,6 +3,7 @@ import { Course } from "@/lib/types";
 import { gradePoints } from "@/lib/constants";
 import { computeGPA } from "@/lib/gpa";
 import {
+  getEarnedCredits,
   getGPAEligibleCourses,
   getInProgressCount,
   toGPAEntry,
@@ -89,7 +90,7 @@ export function useStatsDerivedData(
     const gpaResult = computeGPA(activeCourses.map(toGPAEntry));
     const overallGpa = gpaResult.gpa ?? 0;
     const summary = {
-      totalCredits: gpaResult.gradedCredits,
+      totalCredits: getEarnedCredits(courses),
       totalGradePoints:
         gpaResult.gpa != null ? gpaResult.gpa * gpaResult.gradedCredits : 0,
     };

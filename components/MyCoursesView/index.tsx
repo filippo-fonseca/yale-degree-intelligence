@@ -225,7 +225,7 @@ export default function MyCoursesView({
           label="Credits earned"
           value={stats.earnedCredits}
           color="text-purple-600 dark:text-purple-300"
-          infoTooltip="Credits from completed, graded courses (excluding in-progress and skipped)."
+          infoTooltip="Credits from every completed course across all terms, summer included. Credit/D/Fail courses count; failed and withdrawn courses do not."
         />
         <StatCard
           label="Cumulative GPA"

@@ -45,6 +45,7 @@ export const RELEASES: Release[] = [
         items: [
           "Unskipping or removing a course from inside a requirement window on My major now updates the window right away, instead of waiting for a page refresh.",
           "The credits total on My courses and My stats now adds up every course you have completed in every term, summer included. Courses taken Credit/D/Fail or without a letter grade used to be left out.",
+          "Global Affairs now lists its language requirement: one course tagged L4 or L5 in a modern language. Your own language courses fill it in automatically, it does not count toward the 14 courses, and you can fulfill it manually if you placed beyond L4.",
         ],
       },
     ],

@@ -10,6 +10,7 @@ import {
   STATUS_CLASSES,
   type ReqStats,
 } from "./requirementStatus";
+import { getDistPillStyle } from "@/lib/constants";
 
 export type RequirementCardHandlers = {
   onOpenCourse: (opt: any, reqName: string) => void;
@@ -124,6 +125,22 @@ const RequirementCard = React.memo(function RequirementCard({
         <p className={`text-[11px] mb-2 ${classes.description}`}>
           {req.description}
         </p>
+      )}
+
+      {Array.isArray(req.tags) && req.tags.length > 0 && (
+        <div className="flex flex-wrap items-center gap-1.5 mb-2">
+          <span className={`text-[10px] ${classes.description}`}>
+            Any course tagged
+          </span>
+          {req.tags.map((tag: string) => (
+            <span
+              key={tag}
+              className={`text-[10px] px-2 py-0.5 rounded-full border font-medium ${getDistPillStyle(tag)}`}
+            >
+              {tag}
+            </span>
+          ))}
+        </div>
       )}
 
       <div className="flex flex-wrap gap-1.5">

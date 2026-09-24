@@ -28,7 +28,7 @@ export const RELEASES: Release[] = [
         items: [
           "Distributionals now shows Yale's milestone chart as a live snapshot of your record: four stacked columns, one per year, with a bar for every credit the college expects by the end of that year. Bars fill with the colour of the area or skill that earned them, planned courses show as a lighter fill, and what is still owed stays as a grey placeholder.",
           "Each column carries the credits you need for promotion (8, 16, 26, and 36 to graduate) as its own progress bar, and a status that says whether that milestone is met, on track, at risk, or missed, with the term it is due.",
-          "The chart follows the actual rules: the first two milestones count enrollment, while the junior and senior ones need passing letter grades, so a course taken Credit/D/Fail no longer counts toward them.",
+          "The chart follows the actual rules: the first two milestones count enrollment, so a course you are taking now counts, while the junior and senior ones need passing letter grades. A course taken Credit/D/Fail counts toward none of them.",
           "Under the chart, a short list spells out exactly what is left for the milestone you are working toward.",
         ],
       },

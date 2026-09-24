@@ -70,3 +70,98 @@ describe("calculateMajorProgress: skips and exclusions", () => {
     expect(option?.completed).toBe(true);
   });
 });
+
+describe("calculateMajorProgress: Global Affairs L4 language requirement", () => {
+  const GLBL = "GLBL_BA";
+  const LANG_REQ = "Language Requirement (L4)";
+  // Illustrative codes; tags come from the injected resolver, not the catalog.
+  const TAGS: Record<string, string[]> = {
+    "SPAN 1100": ["L1"],
+    "SPAN 1200": ["L2"],
+    "SPAN 1300": ["L3"],
+    "SPAN 1400": ["L4"],
+    "SPAN 2300": ["Hu", "L5"],
+  };
+  const resolver = (code: string) => TAGS[code] ?? [];
+
+  function langReq(completed: string[], inProgress: string[] = []) {
+    const progress = calculateMajorProgress(
+      GLBL,
+      completed,
+      inProgress,
+      [],
+      [],
+      [],
+      [],
+      resolver,
+    );
+    const all = [
+      ...progress.completedRequirements,
+      ...progress.inProgressRequirements,
+      ...progress.remainingRequirements,
+    ];
+    return { progress, req: all.find((r) => r.name === LANG_REQ) };
+  }
+
+  it("is part of the Global Affairs requirements and carries L4/L5 pills", () => {
+    const { req } = langReq([]);
+    expect(req).toBeDefined();
+    expect(req?.tags).toEqual(["L4", "L5"]);
+    expect(req?.satisfied).toBe(false);
+  });
+
+  it("is satisfied by a completed L4 course", () => {
+    const { req, progress } = langReq(["SPAN 1400"]);
+    expect(req?.satisfied).toBe(true);
+    expect(req?.options.map((o) => o.code)).toEqual(["SPAN 1400"]);
+    expect(
+      progress.completedRequirements.some((r) => r.name === LANG_REQ),
+    ).toBe(true);
+  });
+
+  it("is satisfied by a completed L5 course", () => {
+    const { req } = langReq(["SPAN 2300"]);
+    expect(req?.satisfied).toBe(true);
+  });
+
+  it("is not satisfied by L1-L3 courses alone", () => {
+    const { req, progress } = langReq(["SPAN 1100", "SPAN 1200", "SPAN 1300"]);
+    expect(req?.satisfied).toBe(false);
+    expect(req?.options).toEqual([]);
+    expect(
+      progress.remainingRequirements.some((r) => r.name === LANG_REQ),
+    ).toBe(true);
+  });
+
+  it("shows an in-progress L4 course as in progress, not satisfied", () => {
+    const { req, progress } = langReq([], ["SPAN 1400"]);
+    expect(req?.satisfied).toBe(false);
+    expect(req?.options[0]?.inProgress).toBe(true);
+    expect(
+      progress.inProgressRequirements.some((r) => r.name === LANG_REQ),
+    ).toBe(true);
+  });
+
+  it("does not count the language course toward the 14-course total", () => {
+    const { progress } = langReq(["SPAN 1400"]);
+    expect(progress.completedCredits).toBe(0);
+    expect(progress.totalCredits).toBe(14);
+  });
+
+  it("accepts a manual fulfillment (placement beyond L4)", () => {
+    const progress = calculateMajorProgress(
+      GLBL,
+      [],
+      [],
+      [],
+      [{ code: "SPAN 1100", requirement: LANG_REQ, credits: 1 }],
+      [],
+      [],
+      resolver,
+    );
+    expect(
+      progress.completedRequirements.some((r) => r.name === LANG_REQ),
+    ).toBe(true);
+    expect(progress.completedCredits).toBe(0);
+  });
+});

@@ -28,7 +28,7 @@ export const RELEASES: Release[] = [
         items: [
           "Distributionals now shows Yale's milestone chart as a live snapshot of your record: four stacked columns, one per year, with a bar for every credit the college expects by the end of that year. Bars fill with the colour of the area or skill that earned them, planned courses show as a lighter fill, and what is still owed stays as a grey placeholder.",
           "Each column carries the credits you need for promotion (8, 16, 26, and 36 to graduate) as its own progress bar, and a status that says whether that milestone is met, on track, at risk, or missed, with the term it is due.",
-          "The chart follows the actual rules: the first two milestones count enrollment, while the junior and senior ones need passing letter grades, so a course taken Credit/D/Fail no longer counts toward them.",
+          "The chart follows the actual rules: the first two milestones count enrollment, so a course you are taking now counts, while the junior and senior ones need passing letter grades. A course taken Credit/D/Fail counts toward none of them.",
           "Under the chart, a short list spells out exactly what is left for the milestone you are working toward.",
         ],
       },
@@ -45,6 +45,7 @@ export const RELEASES: Release[] = [
         items: [
           "Unskipping or removing a course from inside a requirement window on My major now updates the window right away, instead of waiting for a page refresh.",
           "The credits total on My courses and My stats now adds up every course you have completed in every term, summer included. Courses taken Credit/D/Fail or without a letter grade used to be left out.",
+          "The distributional milestone chart now shows running totals. Each year's column includes everything you have completed or planned by then, with credit beyond that year's checkpoint stacked above a line, so a second humanities course no longer seems to disappear. In-progress, planned, and not-yet-planned bars now look different from each other. Following Yale's chart, a Credit/D/Fail course no longer counts toward any year's milestone.",
           "Every course in a Simulator semester now shows how many credits it is worth.",
         ],
       },

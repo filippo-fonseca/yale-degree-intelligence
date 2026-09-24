@@ -1,5 +1,6 @@
 import { Course } from "@/lib/types";
 import { gradePoints } from "@/lib/constants";
+import { getEarnedCredits } from "@/lib/utils/academicStats";
 
 /** Color class for a numeric GPA value (matches StatsView's logic). */
 export function getNumericGPAColor(gpa: number): string {
@@ -89,7 +90,6 @@ export function computeStats(courses: Course[]) {
   let totalCourses = 0;
   let completedCount = 0;
   let inProgressCount = 0;
-  let earnedCredits = 0;
   let totalGradePoints = 0;
   let gradedCredits = 0;
 
@@ -107,7 +107,6 @@ export function computeStats(courses: Course[]) {
       if (c.grade && gradePoints[c.grade] !== undefined) {
         const pts = gradePoints[c.grade];
         const cr = c.credits || 1;
-        earnedCredits += cr;
         totalGradePoints += pts * cr;
         gradedCredits += cr;
       }
@@ -115,6 +114,7 @@ export function computeStats(courses: Course[]) {
   }
 
   const gpa = gradedCredits > 0 ? totalGradePoints / gradedCredits : null;
+  const earnedCredits = getEarnedCredits(courses);
 
   return { totalCourses, completedCount, inProgressCount, earnedCredits, gpa };
 }

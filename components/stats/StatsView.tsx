@@ -104,7 +104,7 @@ export default function StatsView({ courses }: { courses: Course[] }) {
           color={creditsColor(summary.totalCredits)}
           icon={<BookOpen className="h-3.5 w-3.5" />}
           sub={`${progressToGraduation.toFixed(0)}% to graduation min`}
-          tooltip="Counts only completed, non-skipped courses with a recorded grade."
+          tooltip="Credits from every completed course across all terms, summer included. Credit/D/Fail courses count; failed and withdrawn courses do not."
         />
         <StatCard
           label="Courses Completed"

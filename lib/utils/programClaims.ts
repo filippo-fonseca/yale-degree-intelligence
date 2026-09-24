@@ -152,8 +152,13 @@ function majorOptionCodes(majorId: string): Map<string, string> {
   const major = majorRequirements[majorId];
   for (const requirement of major?.requirements ?? []) {
     for (const option of requirement.options ?? []) {
+      // A distributional option (e.g. "any L4 course") lists no codes.
       const codes =
-        option.type === "course" ? [option.code] : option.options ?? [];
+        option.type === "course"
+          ? [option.code]
+          : option.type === "group"
+            ? option.options ?? []
+            : [];
       for (const code of codes) {
         const normalized = normalizeCourseCode(code);
         if (!byCode.has(normalized)) byCode.set(normalized, requirement.name);

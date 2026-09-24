@@ -1,5 +1,11 @@
 // src/lib/majors.ts
-import { CourseInfo, getCourseInfo, getCanonicalCode, isValidCourseCode } from "./courseCatalog";
+import {
+  CourseInfo,
+  getCourseInfo,
+  getCanonicalCode,
+  getCourseDistributionalsFromCode,
+  isValidCourseCode,
+} from "./courseCatalog";
 import allReqs from './data/all_reqs.json';
 
 type RequirementOption = {
@@ -10,7 +16,23 @@ type RequirementOption = {
   options: string[]; // Array of canonical course codes
   required: number; // Number of courses required from this group
   description?: string;
+} | {
+  /**
+   * Satisfied by any taken course carrying one of these distributional tags,
+   * e.g. ["L4", "L5"] for a language-proficiency requirement. The matching
+   * courses are not listed up front; they are found among the student's own
+   * completed and in-progress courses.
+   */
+  type: 'distributional';
+  tags: string[];
 };
+
+/** Resolves the distributional tags (Hu, QR, L1-L5, ...) a course carries. */
+export type DistributionalResolver = (code: string) => string[];
+
+/** Default resolver: whatever the catalog knows about the code. */
+const catalogDistributionals: DistributionalResolver = (code) =>
+  getCourseDistributionalsFromCode(code) ?? [];
 
 type MajorRequirement = {
   id: string;
@@ -21,6 +43,12 @@ type MajorRequirement = {
     description?: string;
     required: number;
     options: RequirementOption[];
+    /**
+     * True when the requirement sits outside the major's course count (Global
+     * Affairs' L4 language requirement): it still has to be met, but its
+     * credits do not count toward creditRequirements.total.
+     */
+    excludeFromCreditTotal?: boolean;
   }[];
   creditRequirements: {
     total: number;
@@ -41,6 +69,8 @@ type CompletedRequirement = {
   completed: number;
   required: number;
   satisfied: boolean;
+  /** Distributional tags that satisfy this requirement, for display as pills. */
+  tags?: string[];
   options: {
     code: string;
     name: string;
@@ -78,7 +108,13 @@ export const calculateMajorProgress = (
   manualRequirements: ManualRequirementEntry[] = [],
   excludedRequirements: ExcludedRequirementEntry[] = [],
   /** Courses claimed by certificates (or otherwise blocked from counting toward majors). */
-  blockedCourseCodes: string[] = []
+  blockedCourseCodes: string[] = [],
+  /**
+   * Tags for a course code, used by 'distributional' options. Callers that
+   * have the student's courses should pass their effective tags so transcript
+   * tags win over the catalog; the default reads the catalog only.
+   */
+  distributionalsFor: DistributionalResolver = catalogDistributionals
 ): MajorProgress => {
   const major = majorRequirements[majorId];
   if (!major) throw new Error(`Major ${majorId} not found`);
@@ -130,6 +166,10 @@ export const calculateMajorProgress = (
     let reqCompleted = 0;
     let reqInProgress = 0;
     const reqOptions: CompletedRequirement['options'] = [];
+    // Credits are gathered per requirement and only added to the major's
+    // totals at the end, so a requirement outside the course count can skip it.
+    let reqCompletedCredits = 0;
+    let reqInProgressCredits = 0;
 
     // Check for manual fulfillments for this requirement
     const manualFulfillments = manualByRequirement[req.name] || [];
@@ -147,10 +187,10 @@ export const calculateMajorProgress = (
       });
       if (isPlanned) {
         reqInProgress += 1;
-        totalInProgressCredits += credits;
+        reqInProgressCredits += credits;
       } else {
         reqCompleted += 1;
-        totalCompletedCredits += credits;
+        reqCompletedCredits += credits;
       }
     });
 
@@ -188,10 +228,10 @@ export const calculateMajorProgress = (
 
         if (completed || skipped) {
           reqCompleted += 1;
-          totalCompletedCredits += course.credits;
+          reqCompletedCredits += course.credits;
         } else if (inProgress) {
           reqInProgress += 1;
-          totalInProgressCredits += course.credits;
+          reqInProgressCredits += course.credits;
         }
       } else if (option.type === 'group') {
         let groupCompleted = 0;
@@ -234,8 +274,48 @@ export const calculateMajorProgress = (
 
         reqCompleted += groupCompleted;
         reqInProgress += groupInProgress;
-        totalCompletedCredits += groupCredits;
+        reqCompletedCredits += groupCredits;
+      } else if (option.type === 'distributional') {
+        const wanted = new Set(option.tags);
+        const seen = new Set<string>();
+
+        const consider = (code: string, status: 'completed' | 'inProgress') => {
+          if (seen.has(code)) return;
+          seen.add(code);
+          if (manualFulfillments.some(m => m.code === code)) return;
+          if (isExcluded(req.name, code)) return;
+          if (!distributionalsFor(code).some((tag) => wanted.has(tag))) return;
+
+          const info = getCourseInfo(code);
+          const credits = info?.credits ?? 1;
+          const counted = reqCompleted + reqInProgress < req.required;
+          reqOptions.push({
+            code,
+            name: info?.name || code,
+            completed: status === 'completed',
+            inProgress: status === 'inProgress',
+            required: counted,
+            credits,
+          });
+          if (!counted) return;
+          if (status === 'completed') {
+            reqCompleted += 1;
+            reqCompletedCredits += credits;
+          } else {
+            reqInProgress += 1;
+            reqInProgressCredits += credits;
+          }
+        };
+
+        // Completed first, so a finished course is the one that counts.
+        canonicalCompleted.forEach((code) => consider(code, 'completed'));
+        canonicalInProgress.forEach((code) => consider(code, 'inProgress'));
       }
+    }
+
+    if (!req.excludeFromCreditTotal) {
+      totalCompletedCredits += reqCompletedCredits;
+      totalInProgressCredits += reqInProgressCredits;
     }
 
     // Only count permanent (non-planned) manuals toward satisfaction
@@ -247,6 +327,7 @@ export const calculateMajorProgress = (
       completed: reqCompleted,
       required: req.required,
       satisfied: reqCompleted >= req.required || permanentManualCount >= (req.required - reqCompleted),
+      tags: req.options.flatMap((o) => (o.type === 'distributional' ? o.tags : [])),
       options: reqOptions
     });
   }
@@ -326,7 +407,8 @@ export function calculatePreviewMajorProgressByMajors(
   skippedCourseCodes: string[] = [],
   manualRequirements: ManualRequirementEntry[] = [],
   plannedCourseCodes: string[] = [],
-  blockedCourseCodes: string[] = []
+  blockedCourseCodes: string[] = [],
+  distributionalsFor?: DistributionalResolver
 ): Record<string, MajorProgress> {
   // Canonicalize + dedupe planned into inProgress (without overriding completed/skipped)
   const canon = (arr: string[]) =>
@@ -371,7 +453,8 @@ export function calculatePreviewMajorProgressByMajors(
       skippedCanon,
       manualRequirements,
       [], // excludedRequirements - not used in simulator preview
-      blockedCanon
+      blockedCanon,
+      distributionalsFor
     );
   }
   return out;

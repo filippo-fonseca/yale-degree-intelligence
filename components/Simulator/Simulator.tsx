@@ -2482,6 +2482,12 @@ export default function Simulator({
                             ? describeMeetingTime(canonicalCode, semester.name)
                             : undefined;
                         const hasTimeConflict = clashingCodes.has(canonicalCode);
+                        const courseCredits = getCourseCredits(
+                          course as Course & MaybeCreditFields,
+                        );
+                        const courseCreditsLabel = Number.isInteger(courseCredits)
+                          ? String(courseCredits)
+                          : courseCredits.toFixed(1);
                         return (
                         <motion.div
                           key={`${semester.id}-${course.code}`}
@@ -2551,20 +2557,28 @@ export default function Simulator({
                                 </span>
                               )}
                             </div>
-                            {course.status !== "completed" && (
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  removeCourseFromSemester(
-                                    semester.id,
-                                    course.code,
-                                  );
-                                }}
-                                className="ml-1.5 opacity-0 group-hover:opacity-100 transition-opacity text-red-300 hover:text-red-200"
+                            <div className="flex items-center shrink-0">
+                              <span
+                                className="ml-1.5 text-[10px] tabular-nums whitespace-nowrap opacity-60"
+                                title="Credits"
                               >
-                                <FiTrash2 className="h-3 w-3" />
-                              </button>
-                            )}
+                                {courseCreditsLabel} cr
+                              </span>
+                              {course.status !== "completed" && (
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    removeCourseFromSemester(
+                                      semester.id,
+                                      course.code,
+                                    );
+                                  }}
+                                  className="ml-1.5 opacity-0 group-hover:opacity-100 transition-opacity text-red-300 hover:text-red-200"
+                                >
+                                  <FiTrash2 className="h-3 w-3" />
+                                </button>
+                              )}
+                            </div>
                           </div>
                           {course.status === "not-taken" &&
                             (showGrades || showDistributionals) && (

@@ -92,23 +92,50 @@ function slotColor(
   skillBySource: Map<string, DistReqKey>,
 ): string {
   if (slot.req !== "ANY_SKILL") return REQ_COLOR[slot.req];
+  if (slot.resolvedReq) return REQ_COLOR[slot.resolvedReq];
   const resolved = slot.source ? skillBySource.get(slot.source) : undefined;
   return resolved ? REQ_COLOR[resolved] : ANY_SKILL_COLOR;
 }
 
-function slotLabel(slot: MilestoneSlotResult): string {
-  return slot.req === "ANY_SKILL" ? "QR, WR, or L" : slot.req;
+/** How a bar is drawn: settled, being taken now, on the plan, or open. */
+type BarState = "done" | "in-progress" | "planned" | "open";
+
+function barState(slot: MilestoneSlotResult): BarState {
+  if (slot.fill === "done") return "done";
+  if (slot.fill === "empty") return "open";
+  return slot.sourceStatus === "in-progress" ? "in-progress" : "planned";
 }
 
-function slotTitle(slot: MilestoneSlotResult): string {
+const STATE_SUFFIX: Record<BarState, string> = {
+  done: "",
+  "in-progress": "in progress",
+  planned: "planned",
+  open: "not planned",
+};
+
+function slotLabel(slot: MilestoneSlotResult, compact: boolean): string {
+  const base =
+    slot.req === "ANY_SKILL" ? (slot.resolvedReq ?? "QR, WR, or L") : slot.req;
+  const suffix = STATE_SUFFIX[barState(slot)];
+  return compact || !suffix ? base : `${base} · ${suffix}`;
+}
+
+function slotTitle(slot: MilestoneSlotResult, ahead: boolean): string {
   const what =
     slot.req === "ANY_SKILL"
       ? "One credit in quantitative reasoning, writing, or a foreign language"
       : REQ_NAME[slot.req];
-  if (slot.fill === "done") return `${what} — filled by ${slot.source ?? "a completed course"}`;
-  if (slot.fill === "projected")
-    return `${what} — planned: ${slot.source ?? "in-progress or planned coursework"}`;
-  return `${what} — not yet fulfilled`;
+  const tail = ahead ? ". Not due at this checkpoint; counts toward graduation." : "";
+  switch (barState(slot)) {
+    case "done":
+      return `${what}: done with ${slot.source ?? "a completed course"}${tail}`;
+    case "in-progress":
+      return `${what}: in progress with ${slot.source ?? "a current course"}${tail}`;
+    case "planned":
+      return `${what}: planned with ${slot.source ?? "a planned course"}${tail}`;
+    default:
+      return `${what}: no completed or planned course covers this yet`;
+  }
 }
 
 /* -------------------------------------------------------------------------- */
@@ -184,15 +211,19 @@ function SlotBar({
   height,
   delay,
   compact,
+  ahead = false,
 }: {
   slot: MilestoneSlotResult;
   color: string;
   height: number;
   delay: number;
   compact: boolean;
+  /** Credit beyond what this checkpoint requires. */
+  ahead?: boolean;
 }) {
-  const label = slotLabel(slot);
-  const title = slotTitle(slot);
+  const state = barState(slot);
+  const label = `${ahead ? "+ " : ""}${slotLabel(slot, compact)}`;
+  const title = slotTitle(slot, ahead);
   const fontSize = compact ? 9 : 11;
 
   const common =
@@ -201,7 +232,7 @@ function SlotBar({
   let style: React.CSSProperties;
   let className: string;
 
-  if (slot.fill === "done") {
+  if (state === "done") {
     style = {
       height,
       backgroundColor: color,
@@ -211,7 +242,17 @@ function SlotBar({
       boxShadow: `inset 0 1px 0 rgba(255,255,255,0.35), 0 1px 3px ${rgba(color, 0.35)}`,
     };
     className = `${common} font-semibold`;
-  } else if (slot.fill === "projected") {
+  } else if (state === "in-progress") {
+    // Being taken right now: solid, just not yet settled.
+    style = {
+      height,
+      backgroundColor: rgba(color, 0.45),
+      borderColor: rgba(color, 0.9),
+      color: "#ffffff",
+      fontSize,
+    };
+    className = `${common} font-semibold`;
+  } else if (state === "planned") {
     style = {
       height,
       backgroundColor: rgba(color, 0.2),
@@ -230,20 +271,26 @@ function SlotBar({
     className = `${common} border-dashed border-gray-300 dark:border-gray-700/70 bg-gray-100/60 dark:bg-gray-800/30 text-gray-400 dark:text-gray-500 font-medium`;
   }
 
+  if (ahead) {
+    // Earned early: same colours, quieter, so the required stack still reads
+    // as Yale's chart.
+    style = { ...style, opacity: 0.7 };
+  }
+
   return (
     <motion.div
       title={title}
       aria-label={title}
       initial={{ scaleY: 0, opacity: 0 }}
-      animate={{ scaleY: 1, opacity: 1 }}
+      animate={{ scaleY: 1, opacity: ahead ? 0.7 : 1 }}
       transition={{ duration: 0.32, delay, ease: [0.22, 1, 0.36, 1] }}
       style={{ ...style, transformOrigin: "bottom" }}
       className={className}
     >
-      <span className="truncate px-1 leading-none tracking-wide">{label}</span>
-      {slot.fill === "projected" && !compact && (
-        <span className="sr-only">planned</span>
+      {state === "in-progress" && !compact && (
+        <FiClock size={9} strokeWidth={2.5} className="shrink-0 ml-1" />
       )}
+      <span className="truncate px-1 leading-none tracking-wide">{label}</span>
     </motion.div>
   );
 }
@@ -352,7 +399,8 @@ function MilestoneColumn({
   stackHeight: number;
 }) {
   const { spec, slots, isCurrent } = milestone;
-  const count = slots.length;
+  const ahead = milestone.ahead ?? [];
+  const count = slots.length + ahead.length;
 
   return (
     <div
@@ -393,6 +441,27 @@ function MilestoneColumn({
         className="mt-2.5 flex flex-col justify-end"
         style={{ minHeight: stackHeight, gap: barGap }}
       >
+        {ahead.map((slot, i) => (
+          <SlotBar
+            key={`${spec.key}-ahead-${i}-${slot.req}-${slot.fill}`}
+            slot={slot}
+            color={slotColor(slot, skillBySource)}
+            height={barHeight}
+            delay={0.05 + (count - 1 - i) * 0.035}
+            compact={compact}
+            ahead
+          />
+        ))}
+        {ahead.length > 0 && (
+          <div
+            className="flex items-center gap-1 text-[8px] font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500"
+            title="Bars above the line are credit you already have or have planned beyond what this checkpoint asks for. They count toward the next milestones and graduation."
+          >
+            <span className="flex-1 border-t border-dashed border-gray-300 dark:border-gray-700" />
+            {!compact && <span>Ahead ↑ · Due ↓</span>}
+            <span className="flex-1 border-t border-dashed border-gray-300 dark:border-gray-700" />
+          </div>
+        )}
         {slots.map((slot, i) => (
           <SlotBar
             key={`${spec.key}-${i}-${slot.req}-${slot.fill}`}
@@ -400,7 +469,7 @@ function MilestoneColumn({
             color={slotColor(slot, skillBySource)}
             height={barHeight}
             // Bottom bar first, so each column fills upward.
-            delay={0.05 + (count - 1 - i) * 0.035}
+            delay={0.05 + (count - 1 - ahead.length - i) * 0.035}
             compact={compact}
           />
         ))}
@@ -476,6 +545,10 @@ function Legend() {
           <span className="text-[11px] text-gray-600 dark:text-gray-400">Completed</span>
         </div>
         <div className="flex items-center gap-2">
+          <span className="h-3.5 w-7 rounded border border-gray-400 dark:border-gray-500 bg-gray-400/45 shrink-0" />
+          <span className="text-[11px] text-gray-600 dark:text-gray-400">In progress</span>
+        </div>
+        <div className="flex items-center gap-2">
           <span
             className="h-3.5 w-7 rounded border border-dashed border-gray-400 dark:border-gray-500 shrink-0"
             style={{
@@ -487,7 +560,15 @@ function Legend() {
         </div>
         <div className="flex items-center gap-2">
           <span className="h-3.5 w-7 rounded border border-dashed border-gray-300 dark:border-gray-700 bg-gray-100/60 dark:bg-gray-800/30 shrink-0" />
-          <span className="text-[11px] text-gray-600 dark:text-gray-400">Still open</span>
+          <span className="text-[11px] text-gray-600 dark:text-gray-400">Not planned yet</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="h-3.5 w-7 rounded bg-gray-400 dark:bg-gray-500 opacity-70 shrink-0 text-[8px] font-semibold text-white flex items-center justify-center">
+            +
+          </span>
+          <span className="text-[11px] text-gray-600 dark:text-gray-400 leading-tight">
+            Ahead: beyond this checkpoint
+          </span>
         </div>
       </div>
     </div>
@@ -559,7 +640,11 @@ export default function MilestoneSnapshot({
 
   const barHeight = compact ? 16 : 26;
   const barGap = compact ? 4 : 6;
-  const maxSlots = milestones.reduce((max, m) => Math.max(max, m.slots.length), 0);
+  // Ahead bars sit on the same stack, plus a divider row when a column has any.
+  const maxSlots = milestones.reduce(
+    (max, m) => Math.max(max, m.slots.length + (m.ahead?.length ?? 0)),
+    0,
+  );
   const stackHeight = maxSlots * barHeight + Math.max(0, maxSlots - 1) * barGap;
 
   const noteGroups = collectNotes(evaluation, compact ? 3 : null);
@@ -575,7 +660,12 @@ export default function MilestoneSnapshot({
   const dataKey = useMemo(
     () =>
       milestones
-        .map((m) => `${m.key}:${m.status}:${m.slots.map((s) => s.fill[0]).join("")}`)
+        .map(
+          (m) =>
+            `${m.key}:${m.status}:${m.slots.map((s) => s.fill[0]).join("")}:${(m.ahead ?? [])
+              .map((s) => s.fill[0])
+              .join("")}`,
+        )
         .join("|"),
     [milestones],
   );
@@ -626,11 +716,21 @@ export default function MilestoneSnapshot({
         </div>
       )}
 
+      {compact && (
+        <p className="text-[10px] leading-snug text-gray-500 dark:text-gray-400 mb-2">
+          Running totals by each checkpoint. Solid is done, faded is in progress,
+          striped is planned, grey is not planned yet, and + bars are credit
+          beyond what that checkpoint asks.
+        </p>
+      )}
+
       {!compact && (
         <p className="text-[11px] leading-snug text-gray-500 dark:text-gray-400 border-l-2 border-gray-200 dark:border-gray-700/60 pl-2.5 mb-4">
-          Milestones toward fulfilling the distributional requirements. The
-          milestones are cumulative. No courses taken Credit/D/Fail may be used to
-          fulfill a distributional requirement.
+          Each column is a running total: everything you have completed, are
+          taking, or have planned by that checkpoint, not just what you took that
+          year. Bars below the line are what Yale requires by then; bars above it
+          are credit you already have toward later milestones. No courses taken
+          Credit/D/Fail may be used to fulfill a distributional requirement.
         </p>
       )}
 

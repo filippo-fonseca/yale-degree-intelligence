@@ -208,6 +208,10 @@ export type MilestoneSlotResult = MilestoneSlotSpec & {
   fill: SlotFill;
   /** Course code that fills the slot, when there is one. */
   source?: string;
+  /** Status of the course that fills the slot, so planned reads as planned. */
+  sourceStatus?: MilestoneCourseInput["status"];
+  /** For an ANY_SKILL slot, the skill that actually filled it. */
+  resolvedReq?: DistReqKey;
 };
 
 export type MilestoneStatus =
@@ -232,6 +236,13 @@ export type MilestoneResult = {
     projectedMet: boolean;
   };
   slots: MilestoneSlotResult[];
+  /**
+   * Credit already earned or planned by this checkpoint beyond what it
+   * requires, up to the graduation totals. The milestones are cumulative, so a
+   * second Hu credit taken sophomore year still belongs in the junior column;
+   * it just is not due yet. Never empty slots, and never on the senior column.
+   */
+  ahead: MilestoneSlotResult[];
   distributionalsMet: boolean;
   distributionalsProjectedMet: boolean;
   status: MilestoneStatus;
@@ -426,6 +437,7 @@ function sortForDisplay(courses: MilestoneCourseInput[]): MilestoneCourseInput[]
 }
 
 type ReqSnapshot = {
+  byCode: Map<string, MilestoneCourseInput>;
   /** Credits allocated to each of the five area/skill requirements. */
   creditsByReq: Record<string, number>;
   /** Courses backing each requirement, best-settled first. */
@@ -462,6 +474,7 @@ function snapshot(
   });
 
   return {
+    byCode: new Map(courses.map((c) => [c.code, c])),
     creditsByReq,
     coursesByReq,
     language: evaluateLanguage(courses, languagePlacement),
@@ -495,7 +508,34 @@ function sourceAt(
   return undefined;
 }
 
+/** A filled slot, carrying the status of the course that fills it. */
+function filled(
+  slot: MilestoneSlotSpec,
+  fill: Exclude<SlotFill, "empty">,
+  snap: ReqSnapshot,
+  source: string | undefined,
+  resolvedReq?: DistReqKey,
+): MilestoneSlotResult {
+  return {
+    ...slot,
+    fill,
+    source,
+    sourceStatus: source ? snap.byCode.get(source)?.status : undefined,
+    ...(resolvedReq ? { resolvedReq } : {}),
+  };
+}
+
 const SKILL_ORDER: DistReqKey[] = ["QR", "WR", "L"];
+
+/** What graduation asks of each requirement, in the order Yale stacks them. */
+const GRADUATION_TARGETS: [DistReqKey, number][] = [
+  ["Hu", 2],
+  ["Sc", 2],
+  ["So", 2],
+  ["QR", 2],
+  ["WR", 2],
+  ["L", 1],
+];
 
 /** The skills categories with at least one credit, in chart order. */
 function satisfiedSkills(snap: ReqSnapshot): DistReqKey[] {
@@ -562,6 +602,35 @@ export function evaluateDistributionalMilestones(input: {
 
     const languageIsCompletion = spec.gradingBasis === "letter";
 
+    /** Fill the `index`th slot of a named requirement at this checkpoint. */
+    const fillReq = (
+      slot: MilestoneSlotSpec,
+      req: DistReqKey,
+      index: number,
+    ): MilestoneSlotResult => {
+      if (req === "L" && languageIsCompletion) {
+        // Junior and senior want the whole language requirement finished, not
+        // a single course credit.
+        if (doneSnap.language.complete) {
+          return filled(slot, "done", doneSnap, doneSnap.language.source);
+        }
+        if (projSnap.language.complete) {
+          return filled(slot, "projected", projSnap, projSnap.language.source);
+        }
+        return { ...slot, fill: "empty" };
+      }
+
+      const doneCredits = reqCredits(doneSnap, req);
+      const projCredits = Math.max(reqCredits(projSnap, req), doneCredits);
+      if (doneCredits >= index + 1 - EPS) {
+        return filled(slot, "done", doneSnap, sourceAt(doneSnap, req, index));
+      }
+      if (projCredits >= index + 1 - EPS) {
+        return filled(slot, "projected", projSnap, sourceAt(projSnap, req, index));
+      }
+      return { ...slot, fill: "empty" };
+    };
+
     const seen: Record<string, number> = {};
     const slots: MilestoneSlotResult[] = spec.slots.map((slot) => {
       if (slot.req === "ANY_SKILL") {
@@ -571,11 +640,13 @@ export function evaluateDistributionalMilestones(input: {
         const projSkills = satisfiedSkills(projSnap);
         if (doneSkills.length > index) {
           const req = doneSkills[index];
-          return { ...slot, fill: "done", source: sourceAt(doneSnap, req, 0) };
+          return filled(slot, "done", doneSnap, sourceAt(doneSnap, req, 0), req);
         }
-        if (projSkills.length > index) {
-          const req = projSkills[index];
-          return { ...slot, fill: "projected", source: sourceAt(projSnap, req, 0) };
+        // Skills already counted as done cannot fill a second slot.
+        const extra = projSkills.filter((s) => !doneSkills.includes(s));
+        const req = extra[index - doneSkills.length];
+        if (req) {
+          return filled(slot, "projected", projSnap, sourceAt(projSnap, req, 0), req);
         }
         return { ...slot, fill: "empty" };
       }
@@ -583,29 +654,27 @@ export function evaluateDistributionalMilestones(input: {
       const req = slot.req;
       const index = seen[req] ?? 0;
       seen[req] = index + 1;
-
-      if (req === "L" && languageIsCompletion) {
-        // Junior and senior want the whole language requirement finished, not
-        // a single course credit.
-        if (doneSnap.language.complete) {
-          return { ...slot, fill: "done", source: doneSnap.language.source };
-        }
-        if (projSnap.language.complete) {
-          return { ...slot, fill: "projected", source: projSnap.language.source };
-        }
-        return { ...slot, fill: "empty" };
-      }
-
-      const doneCredits = reqCredits(doneSnap, req);
-      const projCredits = Math.max(reqCredits(projSnap, req), doneCredits);
-      if (doneCredits >= index + 1 - EPS) {
-        return { ...slot, fill: "done", source: sourceAt(doneSnap, req, index) };
-      }
-      if (projCredits >= index + 1 - EPS) {
-        return { ...slot, fill: "projected", source: sourceAt(projSnap, req, index) };
-      }
-      return { ...slot, fill: "empty" };
+      return fillReq(slot, req, index);
     });
+
+    // Cumulative credit beyond the checkpoint: count what the required slots
+    // already used (an ANY_SKILL slot uses the skill it resolved to), then
+    // fill toward the graduation totals and keep whatever is covered.
+    const used: Record<string, number> = {};
+    slots.forEach((slot) => {
+      const req = slot.req === "ANY_SKILL" ? slot.resolvedReq : slot.req;
+      if (req) used[req] = (used[req] ?? 0) + 1;
+    });
+    const ahead: MilestoneSlotResult[] = [];
+    if (spec.key !== "senior") {
+      GRADUATION_TARGETS.forEach(([req, target]) => {
+        for (let index = used[req] ?? 0; index < target; index += 1) {
+          const slot = req === "Hu" || req === "Sc" || req === "So" ? area(req) : skill(req);
+          const result = fillReq(slot, req, index);
+          if (result.fill !== "empty") ahead.push(result);
+        }
+      });
+    }
 
     const distributionalsMet = slots.every((s) => s.fill === "done");
     const distributionalsProjectedMet = slots.every((s) => s.fill !== "empty");
@@ -633,6 +702,7 @@ export function evaluateDistributionalMilestones(input: {
         projectedMet: projected >= spec.creditsRequired - EPS,
       },
       slots,
+      ahead,
       distributionalsMet,
       distributionalsProjectedMet,
       notes,

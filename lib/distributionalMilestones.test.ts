@@ -634,3 +634,92 @@ describe("toMilestoneCourseInputs", () => {
     expect(m.slots.some((s) => s.source === "MATH 112")).toBe(false);
   });
 });
+
+/* -------------------------------------------------------------------------- */
+/* Cumulative columns                                                         */
+/* -------------------------------------------------------------------------- */
+
+describe("ahead-of-checkpoint credit", () => {
+  const eval2028 = (courses: MilestoneCourseInput[]) =>
+    evaluateDistributionalMilestones({
+      courses,
+      graduationYear: 2028,
+      currentTerm: "Fall 2027",
+    });
+
+  it("shows a second Hu credit on the junior column, where only one is due", () => {
+    const res = eval2028([
+      c({ code: "PHIL 101", distributionals: ["Hu"], term: "Fall 2024" }),
+      c({ code: "ENGL 101", distributionals: ["Hu"], term: "Spring 2026" }),
+    ]);
+    const junior = milestone(res, "junior");
+    expect(junior.slots.filter((s) => s.req === "Hu" && s.fill === "done")).toHaveLength(1);
+    expect(junior.ahead.map((s) => [s.req, s.fill, s.source])).toContainEqual([
+      "Hu",
+      "done",
+      "ENGL 101",
+    ]);
+  });
+
+  it("carries earlier credit into the first-year column beyond its two skills", () => {
+    const res = eval2028([
+      c({ code: "MATH 112", distributionals: ["QR"], term: "Fall 2024" }),
+      c({ code: "ENGL 114", distributionals: ["WR"], term: "Fall 2024" }),
+      c({ code: "PSYC 110", distributionals: ["So"], term: "Spring 2025" }),
+    ]);
+    const first = milestone(res, "first-year");
+    expect(first.slots.map((s) => s.resolvedReq)).toEqual(["QR", "WR"]);
+    expect(first.ahead.map((s) => s.req)).toEqual(["So"]);
+  });
+
+  it("never adds ahead bars to the senior column and never lists open slots", () => {
+    const res = eval2028([c({ code: "PHIL 101", distributionals: ["Hu"] })]);
+    expect(milestone(res, "senior").ahead).toEqual([]);
+    res.milestones.forEach((m) =>
+      m.ahead.forEach((s) => expect(s.fill).not.toBe("empty")),
+    );
+  });
+
+  it("ignores credit that lands after the checkpoint", () => {
+    const res = eval2028([
+      c({ code: "PHIL 101", distributionals: ["Hu"], term: "Fall 2024" }),
+      c({ code: "ENGL 101", distributionals: ["Hu"], term: "Fall 2027" }),
+    ]);
+    expect(milestone(res, "junior").ahead.some((s) => s.req === "Hu")).toBe(false);
+  });
+});
+
+describe("slot source status", () => {
+  it("tells planned coursework apart from coursework in progress", () => {
+    const res = evaluateDistributionalMilestones({
+      courses: [
+        c({ code: "PHIL 101", distributionals: ["Hu"], status: "in-progress", grade: null, term: "Fall 2027" }),
+        c({ code: "ENGL 101", distributionals: ["Hu"], status: "planned", grade: null, term: "Spring 2028" }),
+      ],
+      graduationYear: 2028,
+      currentTerm: "Fall 2027",
+    });
+    const hu = milestone(res, "senior").slots.filter((s) => s.req === "Hu");
+    expect(hu.map((s) => [s.fill, s.sourceStatus])).toEqual([
+      ["projected", "in-progress"],
+      ["projected", "planned"],
+    ]);
+  });
+
+  it("does not let a skill already done fill the second first-year bar as planned", () => {
+    const res = evaluateDistributionalMilestones({
+      courses: [
+        c({ code: "ENGL 114", distributionals: ["WR"], term: "Fall 2024" }),
+        c({ code: "ENGL 115", distributionals: ["WR"], status: "planned", grade: null, term: "Spring 2025" }),
+        c({ code: "MATH 112", distributionals: ["QR"], status: "planned", grade: null, term: "Spring 2025" }),
+      ],
+      graduationYear: 2028,
+      currentTerm: "Fall 2024",
+    });
+    const first = milestone(res, "first-year");
+    expect(first.slots.map((s) => [s.fill, s.resolvedReq])).toEqual([
+      ["done", "WR"],
+      ["projected", "QR"],
+    ]);
+  });
+});

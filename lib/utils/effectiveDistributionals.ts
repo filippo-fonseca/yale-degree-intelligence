@@ -1,4 +1,7 @@
-import { getCourseDistributionalsFromCode } from "@/lib/courseCatalog";
+import {
+  getCanonicalCode,
+  getCourseDistributionalsFromCode,
+} from "@/lib/courseCatalog";
 
 /**
  * The minimum a course-shaped object has to carry for its distributionals to be
@@ -68,4 +71,29 @@ export function distributionalEditBase(
   course: DistributionalCourseLike | null | undefined,
 ): string[] {
   return [...effectiveDistributionals(course)];
+}
+
+/**
+ * A code-to-tags lookup over a student's own courses, for engines that only
+ * see course codes (the major calculation's distributional options). A code
+ * the student has resolves through `effectiveDistributionals`, so their stored
+ * tags win; any other code (a planned course, say) falls back to the catalog.
+ * Codes are matched on their canonical form as well as their raw spelling.
+ */
+export function distributionalResolverFor(
+  courses: readonly DistributionalCourseLike[],
+): (code: string) => string[] {
+  const byCode = new Map<string, string[]>();
+  for (const course of courses) {
+    if (!course?.code) continue;
+    const tags = effectiveDistributionals(course);
+    byCode.set(course.code, tags);
+    const canon = getCanonicalCode(course.code);
+    if (canon && !byCode.has(canon)) byCode.set(canon, tags);
+  }
+  return (code) =>
+    byCode.get(code) ??
+    byCode.get(getCanonicalCode(code) ?? code) ??
+    getCourseDistributionalsFromCode(code) ??
+    [];
 }

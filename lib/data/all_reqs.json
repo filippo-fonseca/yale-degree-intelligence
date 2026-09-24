@@ -4132,6 +4132,19 @@
         "options": []
       },
       {
+        "name": "Language Requirement (L4)",
+        "description": "One course designated L4 (or higher) in a modern language other than English. Does not count toward the 14 courses. If you placed beyond L4 without taking a course, fulfill it manually.",
+        "required": 1,
+        "excludeFromCreditTotal": true,
+        "options": [
+          {
+            "type": "distributional",
+            "tags": ["L4", "L5"],
+            "excludeSubjects": ["LATN", "GREK", "SKRT", "AKKD", "EGYP"]
+          }
+        ]
+      },
+      {
         "name": "Senior Requirement",
         "description": "Complete one of: Capstone project (GLBL 4499), senior essay in a substantive seminar, or senior essay in GLBL 4500.",
         "required": 1,

@@ -1,5 +1,6 @@
 import { Course } from "@/lib/types";
 import { calculateMajorProgress } from "@/lib/majors";
+import { distributionalResolverFor } from "@/lib/utils/effectiveDistributionals";
 import {
   calculateCertificateProgress,
   certificateRequirements,
@@ -100,6 +101,7 @@ export function buildSimulatorRemainingCourses(
       manualRequirements,
       excludedRequirements,
       majorBlocked,
+      distributionalResolverFor(courses),
     );
 
     return toPoolCourses(progress, major);

@@ -9,6 +9,7 @@ import {
   type ProgramClaimOptions,
 } from "@/lib/utils/programClaims";
 import { bucketCourses } from "@/lib/utils/courseBuckets";
+import { distributionalResolverFor } from "@/lib/utils/effectiveDistributionals";
 
 export function getMajorProgress(
   selectedMajor: string,
@@ -47,6 +48,7 @@ export function getMajorProgress(
     manualRequirements,
     excludedRequirements,
     getMajorBlockedCodes(courses, policyOptions),
+    distributionalResolverFor(courses),
   );
 }
 

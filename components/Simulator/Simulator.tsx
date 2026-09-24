@@ -35,7 +35,10 @@ import SimulatorRequirementsBreakdown, {
 } from "./SimulatorRequirementsBreakdown";
 import CourseGradeControl from "./CourseGradeControl";
 import CourseDistributionalControl from "./CourseDistributionalControl";
-import { effectiveDistributionals } from "@/lib/utils/effectiveDistributionals";
+import {
+  distributionalResolverFor,
+  effectiveDistributionals,
+} from "@/lib/utils/effectiveDistributionals";
 import SimulatorProgressPane, {
   type CompletionFlash,
 } from "./SimulatorProgressPane";
@@ -1453,6 +1456,9 @@ export default function Simulator({
     const inProgCodes = planInProgressCodes;
     const plannedCodesLocal = plannedCodes;
     const skippedCodes: string[] = [];
+    // Taken courses resolve through their stored tags; planned ones through
+    // the catalog. Feeds distributional major requirements (e.g. an L4 course).
+    const distributionalsFor = distributionalResolverFor(takenForProjection);
 
     const {
       policyOptions,
@@ -1512,6 +1518,7 @@ export default function Simulator({
           majorManualReqs,
           plannedCodesLocal,
           majorBlockedCodes,
+          distributionalsFor,
         );
         setPreviewProgress(majorsAll);
       } else {
@@ -1563,6 +1570,7 @@ export default function Simulator({
             majorManualReqs,
             plannedCodesLocal,
             majorBlockedCodes,
+            distributionalsFor,
           )[mid];
 
           if (

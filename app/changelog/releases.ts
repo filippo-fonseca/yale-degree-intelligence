@@ -45,7 +45,7 @@ export const RELEASES: Release[] = [
         items: [
           "Unskipping or removing a course from inside a requirement window on My major now updates the window right away, instead of waiting for a page refresh.",
           "The credits total on My courses and My stats now adds up every course you have completed in every term, summer included. Courses taken Credit/D/Fail or without a letter grade used to be left out.",
-          "The distributional milestone chart now shows running totals. Each year's column includes everything you have completed or planned by then, with credit beyond that year's checkpoint stacked above a line, so a second humanities course no longer seems to disappear. In-progress, planned, and not-yet-planned bars now look different from each other.",
+          "The distributional milestone chart now shows running totals. Each year's column includes everything you have completed or planned by then, with credit beyond that year's checkpoint stacked above a line, so a second humanities course no longer seems to disappear. In-progress, planned, and not-yet-planned bars now look different from each other. Following Yale's chart, a Credit/D/Fail course no longer counts toward any year's milestone.",
         ],
       },
     ],

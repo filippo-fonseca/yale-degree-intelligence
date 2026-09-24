@@ -21,10 +21,10 @@
 //                                            2 each of Hu, Sc, So.
 //
 // Two grading bases matter. The first-year and sophomore milestones may be met
-// by ENROLLMENT: a course taken Credit/D/Fail, withdrawn from, or failed still
-// counts, and a course currently in progress counts too. The junior and senior
-// milestones require PASSING LETTER GRADES, so a Credit/D/Fail course does not
-// count and an in-progress course can only ever be "projected".
+// by ENROLLMENT, so a course currently in progress counts. The junior and senior
+// milestones require PASSING LETTER GRADES, so an in-progress course can only
+// ever be "projected". On every basis, Yale's chart is explicit: "No courses
+// taken Credit/D/Fail may be used to fulfill a distributional requirement."
 //
 // Credit totals for promotion are a separate axis: they count every earned
 // credit, Credit/D/Fail included, which is why credits and distributional
@@ -289,7 +289,8 @@ function countsAsDone(
   basis: MilestoneSpec["gradingBasis"],
 ): boolean {
   if (basis === "enrollment") {
-    return course.status === "completed" || course.status === "in-progress";
+    if (course.status === "in-progress") return true;
+    return course.status === "completed" && !isCreditDFail(course.grade);
   }
   return course.status === "completed" && hasPassingLetterGrade(course);
 }

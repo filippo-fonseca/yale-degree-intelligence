@@ -151,7 +151,7 @@ describe("first-year milestone", () => {
     expect(fills(milestone(res, "first-year"))).toEqual(["done", "done"]);
   });
 
-  it("counts a Credit/D/Fail course, because the basis is enrollment", () => {
+  it("does not count a Credit/D/Fail course, even on the enrollment basis", () => {
     const res = evaluateDistributionalMilestones({
       courses: [
         c({ code: "MATH 112", distributionals: ["QR"], grade: "CR" }),
@@ -161,7 +161,9 @@ describe("first-year milestone", () => {
       graduationYear: 2028,
       currentTerm: "Fall 2025",
     });
-    expect(milestone(res, "first-year").status).toBe("met");
+    const first = milestone(res, "first-year");
+    expect(fills(first)).toEqual(["done", "empty"]);
+    expect(first.status).not.toBe("met");
   });
 });
 
@@ -312,7 +314,7 @@ describe("junior milestone", () => {
 describe("grading basis", () => {
   const crWriting = c({ code: "ENGL 114", distributionals: ["WR"], grade: "CR" });
 
-  it("a Credit/D/Fail writing course counts for sophomore but not for junior", () => {
+  it("a Credit/D/Fail writing course counts toward no milestone", () => {
     const res = evaluateDistributionalMilestones({
       courses: [
         crWriting,
@@ -324,8 +326,9 @@ describe("grading basis", () => {
       graduationYear: 2028,
       currentTerm: "Fall 2027",
     });
-    // Sophomore only needs one WR credit and takes the CR course happily.
+    // Sophomore needs one WR credit; the letter-graded course supplies it.
     expect(milestone(res, "sophomore").slots[4].fill).toBe("done");
+    expect(milestone(res, "sophomore").slots[4].source).toBe("ENGL 120");
     // Junior needs two WR credits by letter grade and only has one.
     const junior = milestone(res, "junior");
     expect(junior.slots[4].fill).toBe("done");

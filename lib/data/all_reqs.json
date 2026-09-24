@@ -4139,7 +4139,8 @@
         "options": [
           {
             "type": "distributional",
-            "tags": ["L4", "L5"]
+            "tags": ["L4", "L5"],
+            "excludeSubjects": ["LATN", "GREK", "SKRT", "AKKD", "EGYP"]
           }
         ]
       },

@@ -1,8 +1,10 @@
 // src/lib/majors.ts
 import {
   CourseInfo,
+  courseSubject,
   getCourseInfo,
   getCanonicalCode,
+  getOtherCodesForCourse,
   getCourseDistributionalsFromCode,
   isValidCourseCode,
 } from "./courseCatalog";
@@ -25,6 +27,12 @@ type RequirementOption = {
    */
   type: 'distributional';
   tags: string[];
+  /**
+   * Subjects that never count, checked against every cross-listed code of the
+   * course. Global Affairs asks for a MODERN language, so Latin, Greek and the
+   * other classical languages are listed here.
+   */
+  excludeSubjects?: string[];
 };
 
 /** Resolves the distributional tags (Hu, QR, L1-L5, ...) a course carries. */
@@ -277,7 +285,12 @@ export const calculateMajorProgress = (
         reqCompletedCredits += groupCredits;
       } else if (option.type === 'distributional') {
         const wanted = new Set(option.tags);
+        const excludedSubjects = new Set(option.excludeSubjects ?? []);
         const seen = new Set<string>();
+        const inExcludedSubject = (code: string) =>
+          [code, ...getOtherCodesForCourse(code)].some((c) =>
+            excludedSubjects.has(courseSubject(c) ?? ''),
+          );
 
         const consider = (code: string, status: 'completed' | 'inProgress') => {
           if (seen.has(code)) return;
@@ -285,6 +298,7 @@ export const calculateMajorProgress = (
           if (manualFulfillments.some(m => m.code === code)) return;
           if (isExcluded(req.name, code)) return;
           if (!distributionalsFor(code).some((tag) => wanted.has(tag))) return;
+          if (inExcludedSubject(code)) return;
 
           const info = getCourseInfo(code);
           const credits = info?.credits ?? 1;

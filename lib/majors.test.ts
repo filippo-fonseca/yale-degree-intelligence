@@ -81,6 +81,8 @@ describe("calculateMajorProgress: Global Affairs L4 language requirement", () =>
     "SPAN 1300": ["L3"],
     "SPAN 1400": ["L4"],
     "SPAN 2300": ["Hu", "L5"],
+    "LATN 3900": ["Hu", "L5"],
+    "GREK 1400": ["L4"],
   };
   const resolver = (code: string) => TAGS[code] ?? [];
 
@@ -163,5 +165,11 @@ describe("calculateMajorProgress: Global Affairs L4 language requirement", () =>
       progress.completedRequirements.some((r) => r.name === LANG_REQ),
     ).toBe(true);
     expect(progress.completedCredits).toBe(0);
+  });
+
+  it("does not count a classical language, since YCPS asks for a modern one", () => {
+    const { req } = langReq(["LATN 3900", "GREK 1400"]);
+    expect(req?.completed).toBe(0);
+    expect(req?.satisfied).toBe(false);
   });
 });

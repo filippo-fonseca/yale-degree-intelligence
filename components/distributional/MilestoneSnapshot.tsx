@@ -113,14 +113,26 @@ const STATE_SUFFIX: Record<BarState, string> = {
   open: "not planned",
 };
 
-function slotLabel(slot: MilestoneSlotResult, compact: boolean): string {
+function slotLabel(
+  slot: MilestoneSlotResult,
+  compact: boolean,
+  showPlanning: boolean,
+): string {
   const base =
     slot.req === "ANY_SKILL" ? (slot.resolvedReq ?? "QR, WR, or L") : slot.req;
-  const suffix = STATE_SUFFIX[barState(slot)];
+  const state = barState(slot);
+  // Outside the Simulator there is no plan to speak of, so only "in progress"
+  // (a fact about the transcript) earns a word on the bar.
+  const suffix =
+    showPlanning || state === "in-progress" ? STATE_SUFFIX[state] : "";
   return compact || !suffix ? base : `${base} · ${suffix}`;
 }
 
-function slotTitle(slot: MilestoneSlotResult, ahead: boolean): string {
+function slotTitle(
+  slot: MilestoneSlotResult,
+  ahead: boolean,
+  showPlanning: boolean,
+): string {
   const what =
     slot.req === "ANY_SKILL"
       ? "One credit in quantitative reasoning, writing, or a foreign language"
@@ -134,7 +146,9 @@ function slotTitle(slot: MilestoneSlotResult, ahead: boolean): string {
     case "planned":
       return `${what}: planned with ${slot.source ?? "a planned course"}${tail}`;
     default:
-      return `${what}: no completed or planned course covers this yet`;
+      return showPlanning
+        ? `${what}: no completed or planned course covers this yet`
+        : `${what}: not yet fulfilled`;
   }
 }
 
@@ -212,6 +226,7 @@ function SlotBar({
   delay,
   compact,
   ahead = false,
+  showPlanning,
 }: {
   slot: MilestoneSlotResult;
   color: string;
@@ -220,10 +235,11 @@ function SlotBar({
   compact: boolean;
   /** Credit beyond what this checkpoint requires. */
   ahead?: boolean;
+  showPlanning: boolean;
 }) {
   const state = barState(slot);
-  const label = `${ahead ? "+ " : ""}${slotLabel(slot, compact)}`;
-  const title = slotTitle(slot, ahead);
+  const label = `${ahead ? "+ " : ""}${slotLabel(slot, compact, showPlanning)}`;
+  const title = slotTitle(slot, ahead, showPlanning);
   const fontSize = compact ? 9 : 11;
 
   const common =
@@ -387,6 +403,7 @@ function MilestoneColumn({
   milestone,
   skillBySource,
   compact,
+  showPlanning,
   barHeight,
   barGap,
   stackHeight,
@@ -394,6 +411,7 @@ function MilestoneColumn({
   milestone: MilestoneResult;
   skillBySource: Map<string, DistReqKey>;
   compact: boolean;
+  showPlanning: boolean;
   barHeight: number;
   barGap: number;
   stackHeight: number;
@@ -449,6 +467,7 @@ function MilestoneColumn({
             height={barHeight}
             delay={0.05 + (count - 1 - i) * 0.035}
             compact={compact}
+            showPlanning={showPlanning}
             ahead
           />
         ))}
@@ -471,6 +490,7 @@ function MilestoneColumn({
             // Bottom bar first, so each column fills upward.
             delay={0.05 + (count - 1 - ahead.length - i) * 0.035}
             compact={compact}
+            showPlanning={showPlanning}
           />
         ))}
       </div>
@@ -509,7 +529,7 @@ function LegendRow({ code, name }: { code: DistReqKey; name: string }) {
   );
 }
 
-function Legend() {
+function Legend({ showPlanning }: { showPlanning: boolean }) {
   return (
     <div className="rounded-xl border border-gray-200 dark:border-gray-800/60 bg-gray-50/70 dark:bg-gray-900/30 p-3 space-y-3">
       <div>
@@ -548,6 +568,7 @@ function Legend() {
           <span className="h-3.5 w-7 rounded border border-gray-400 dark:border-gray-500 bg-gray-400/45 shrink-0" />
           <span className="text-[11px] text-gray-600 dark:text-gray-400">In progress</span>
         </div>
+        {showPlanning && (
         <div className="flex items-center gap-2">
           <span
             className="h-3.5 w-7 rounded border border-dashed border-gray-400 dark:border-gray-500 shrink-0"
@@ -558,9 +579,12 @@ function Legend() {
           />
           <span className="text-[11px] text-gray-600 dark:text-gray-400">Planned</span>
         </div>
+        )}
         <div className="flex items-center gap-2">
           <span className="h-3.5 w-7 rounded border border-dashed border-gray-300 dark:border-gray-700 bg-gray-100/60 dark:bg-gray-800/30 shrink-0" />
-          <span className="text-[11px] text-gray-600 dark:text-gray-400">Not planned yet</span>
+          <span className="text-[11px] text-gray-600 dark:text-gray-400">
+            {showPlanning ? "Not planned yet" : "Still open"}
+          </span>
         </div>
         <div className="flex items-center gap-2">
           <span className="h-3.5 w-7 rounded bg-gray-400 dark:bg-gray-500 opacity-70 shrink-0 text-[8px] font-semibold text-white flex items-center justify-center">
@@ -620,6 +644,11 @@ function collectNotes(evaluation: MilestoneEvaluation, limit: number | null): No
 export type MilestoneSnapshotProps = {
   evaluation: MilestoneEvaluation;
   variant?: "full" | "compact";
+  /**
+   * Speak in plan terms ("planned", "not planned"). On by default only in the
+   * compact Simulator chart; the Distributionals page reads the transcript.
+   */
+  showPlanning?: boolean;
   title?: string;
   subtitle?: string;
 };
@@ -627,6 +656,7 @@ export type MilestoneSnapshotProps = {
 export default function MilestoneSnapshot({
   evaluation,
   variant = "full",
+  showPlanning = variant === "compact",
   title,
   subtitle,
 }: MilestoneSnapshotProps) {
@@ -726,9 +756,9 @@ export default function MilestoneSnapshot({
 
       {!compact && (
         <p className="text-[11px] leading-snug text-gray-500 dark:text-gray-400 border-l-2 border-gray-200 dark:border-gray-700/60 pl-2.5 mb-4">
-          Each column is a running total: everything you have completed, are
-          taking, or have planned by that checkpoint, not just what you took that
-          year. Bars below the line are what Yale requires by then; bars above it
+          Each column is a running total: everything you have{" "}
+          {showPlanning ? "completed, are taking, or have planned" : "completed or are taking"}{" "}
+          by that checkpoint, not just what you took that year. Bars below the line are what Yale requires by then; bars above it
           are credit you already have toward later milestones. No courses taken
           Credit/D/Fail may be used to fulfill a distributional requirement.
         </p>
@@ -739,7 +769,7 @@ export default function MilestoneSnapshot({
           compact ? "" : "grid grid-cols-1 lg:grid-cols-[190px_minmax(0,1fr)] gap-4"
         }
       >
-        {!compact && <Legend />}
+        {!compact && <Legend showPlanning={showPlanning} />}
 
         <div className="relative">
           <div ref={scrollRef} className="overflow-x-auto -mx-1 px-1 pb-1">
@@ -757,6 +787,7 @@ export default function MilestoneSnapshot({
                   milestone={m}
                   skillBySource={skillBySource}
                   compact={compact}
+                  showPlanning={showPlanning}
                   barHeight={barHeight}
                   barGap={barGap}
                   stackHeight={stackHeight}

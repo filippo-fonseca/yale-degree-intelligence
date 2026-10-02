@@ -2490,6 +2490,15 @@ export default function Simulator({
                         const courseCreditsLabel = Number.isInteger(courseCredits)
                           ? String(courseCredits)
                           : courseCredits.toFixed(1);
+                        // In-progress courses take a projected grade too, so
+                        // the GPA can reflect how this term might land. Their
+                        // distributionals stay the transcript's.
+                        const showCourseGrade =
+                          showGrades && course.status !== "completed";
+                        const showCourseDistributionals =
+                          showDistributionals && course.status === "not-taken";
+                        const hasCourseControls =
+                          showCourseGrade || showCourseDistributionals;
                         return (
                         <motion.div
                           key={`${semester.id}-${course.code}`}
@@ -2506,8 +2515,7 @@ export default function Simulator({
                           whileHover={{ scale: 1.02 }}
                           whileTap={{ scale: 0.98 }}
                           className={`w-full flex ${
-                            course.status === "not-taken" &&
-                            (showGrades || showDistributionals)
+                            hasCourseControls
                               ? "flex-col items-stretch"
                               : "items-center justify-between"
                           } px-2 py-1 rounded-lg text-xs select-none transition-all border relative group shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]
@@ -2582,13 +2590,7 @@ export default function Simulator({
                               )}
                             </div>
                           </div>
-                          {/* In-progress courses take a projected grade too, so
-                              the GPA can reflect how this term might land.
-                              Their distributionals stay the transcript's. */}
-                          {course.status !== "completed" &&
-                            (showGrades ||
-                              (showDistributionals &&
-                                course.status === "not-taken")) && (
+                          {hasCourseControls && (
                               <div
                                 className="w-full mt-1.5 pt-1.5 border-t border-black/[0.06] dark:border-white/[0.08] flex flex-col gap-1.5"
                                 onClick={(e) => e.stopPropagation()}
@@ -2599,7 +2601,7 @@ export default function Simulator({
                                   e.stopPropagation();
                                 }}
                               >
-                                {showGrades && (
+                                {showCourseGrade && (
                                   <div className="flex items-center gap-1.5">
                                     <span className="text-[10px] opacity-60">
                                       Grade
@@ -2616,8 +2618,7 @@ export default function Simulator({
                                     />
                                   </div>
                                 )}
-                                {showDistributionals &&
-                                  course.status === "not-taken" && (
+                                {showCourseDistributionals && (
                                   <CourseDistributionalControl
                                     value={effectiveDistributionals(course)}
                                     onChange={(codes) =>

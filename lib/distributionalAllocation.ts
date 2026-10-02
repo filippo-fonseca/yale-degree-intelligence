@@ -19,6 +19,8 @@ const TARGET: Record<string, number> = Object.fromEntries(
   ALLOC_REQS.map((r) => [r.code, r.target]),
 );
 
+const EPS = 1e-9;
+
 /** Credits a course contributes toward a distributional requirement. */
 export function courseDistCredits(course: Course): number {
   return course.credits > 0 ? course.credits : 1;
@@ -39,6 +41,18 @@ export type DistAllocation = {
   keyOf: (course: Course) => string;
 };
 
+/**
+ * One pass of the matcher: the courses to place, and how many credits each
+ * requirement may hold during this pass. Later passes keep everything earlier
+ * passes placed (a placed course can be moved to another requirement it is
+ * eligible for, but never unplaced), so ordering the passes ranks the courses.
+ */
+export type AllocationStage = {
+  courses: Course[];
+  /** Credit capacity per requirement. Missing requirements default to 0. */
+  caps: Record<string, number>;
+};
+
 /** A course's identity for allocation. Prefer the firestore id, fall back to code. */
 function courseKey(course: Course): string {
   return course.id || course.code;
@@ -50,31 +64,49 @@ function eligibleOptions(course: Course): string[] {
   return ALLOC_REQ_CODES.filter((c) => tags.includes(c));
 }
 
+function byCode(a: Course, b: Course): number {
+  return (
+    (a.code || "").localeCompare(b.code || "") ||
+    courseKey(a).localeCompare(courseKey(b))
+  );
+}
+
 /**
  * Allocate each course to a single area/skill requirement.
  *
  * - `auto`: ignore overrides and compute the assignment that fills the most
- *   requirement slots (maximum bipartite matching with per-requirement capacity).
+ *   requirement slots.
  * - manual (`auto` false): honor `overrides` (course code -> req code) as fixed
  *   assignments, then auto-fill everything else around them.
+ *
+ * The fill is a maximum matching, found with augmenting paths: when a course's
+ * requirements are all full, a course already sitting in one of them is moved
+ * to another requirement it qualifies for, if that frees the room. A greedy
+ * pass cannot do that, so a "Hu, WR" course placed first could strand a later
+ * Hu-only course with nowhere to go.
+ *
+ * `stages` lets a caller rank courses (for example, completed coursework before
+ * planned coursework, or one checkpoint's minimums before the graduation
+ * totals). Without it there is one stage holding every course at the graduation
+ * targets.
  *
  * Courses that cannot be matched into an open slot are still attached to their
  * first eligible requirement as "extra" so nothing silently disappears.
  */
 export function allocateDistributionals(
   courses: Course[],
-  opts: { auto: boolean; overrides: Record<string, string> },
+  opts: {
+    auto: boolean;
+    overrides: Record<string, string>;
+    stages?: AllocationStage[];
+  },
 ): DistAllocation {
   const { auto, overrides } = opts;
 
   const candidates = courses
     .filter((c) => !c.skipped && eligibleOptions(c).length > 0)
     .slice()
-    .sort(
-      (a, b) =>
-        (a.code || "").localeCompare(b.code || "") ||
-        courseKey(a).localeCompare(courseKey(b)),
-    );
+    .sort(byCode);
 
   const optionsByCourseKey: Record<string, string[]> = {};
   const byKey: Record<string, Course> = {};
@@ -85,54 +117,116 @@ export function allocateDistributionals(
   });
 
   const reqByCourseKey: Record<string, string> = {};
-  const remaining: Record<string, number> = {};
+  const load: Record<string, number> = {};
+  const members: Record<string, string[]> = {};
   ALLOC_REQ_CODES.forEach((c) => {
-    remaining[c] = TARGET[c];
+    load[c] = 0;
+    members[c] = [];
   });
+  const fixed = new Set<string>();
 
-  const toMatch: Course[] = [];
+  const place = (k: string, req: string) => {
+    reqByCourseKey[k] = req;
+    load[req] += courseDistCredits(byKey[k]);
+    members[req].push(k);
+  };
+  const unplace = (k: string) => {
+    const req = reqByCourseKey[k];
+    if (!req) return;
+    load[req] -= courseDistCredits(byKey[k]);
+    members[req] = members[req].filter((m) => m !== k);
+    delete reqByCourseKey[k];
+  };
 
   if (!auto) {
     candidates.forEach((c) => {
       const k = courseKey(c);
       const ov = overrides[c.code];
       if (ov && optionsByCourseKey[k].includes(ov)) {
-        reqByCourseKey[k] = ov;
-        remaining[ov] = Math.max(0, remaining[ov] - courseDistCredits(c));
-      } else {
-        toMatch.push(c);
+        place(k, ov);
+        fixed.add(k);
       }
     });
-  } else {
-    candidates.forEach((c) => toMatch.push(c));
   }
 
-  // Greedy credit-based assignment: most-constrained courses first.
-  const sorted = [...toMatch].sort((a, b) => {
-    const optsA = optionsByCourseKey[courseKey(a)].length;
-    const optsB = optionsByCourseKey[courseKey(b)].length;
-    return (
-      optsA - optsB ||
-      courseKey(a).localeCompare(courseKey(b))
-    );
+  let caps: Record<string, number> = { ...TARGET };
+  const room = (req: string) => (caps[req] ?? 0) - load[req];
+
+  /**
+   * Find room for course `k` in one of its requirements, moving other courses
+   * along an augmenting path when every requirement it qualifies for is full.
+   */
+  const tryPlace = (k: string, visited: Set<string>): boolean => {
+    const options = optionsByCourseKey[k];
+    // Prefer the requirement with the most room, so ties spread evenly.
+    const open = options
+      .filter((req) => room(req) > EPS)
+      .sort((a, b) => room(b) - room(a));
+    if (open.length > 0) {
+      place(k, open[0]);
+      return true;
+    }
+    for (const req of options) {
+      if (visited.has(req)) continue;
+      visited.add(req);
+      for (const other of [...members[req]]) {
+        if (fixed.has(other)) continue;
+        // Moving `other` out must actually open room for `k`.
+        if (room(req) + courseDistCredits(byKey[other]) <= EPS) continue;
+        unplace(other);
+        if (tryPlaceElsewhere(other, req, visited)) {
+          place(k, req);
+          return true;
+        }
+        place(other, req);
+      }
+    }
+    return false;
+  };
+
+  /** Re-place a displaced course anywhere except the requirement it left. */
+  const tryPlaceElsewhere = (
+    k: string,
+    leaving: string,
+    visited: Set<string>,
+  ): boolean => {
+    const saved = optionsByCourseKey[k];
+    optionsByCourseKey[k] = saved.filter((r) => r !== leaving);
+    try {
+      return tryPlace(k, visited);
+    } finally {
+      optionsByCourseKey[k] = saved;
+    }
+  };
+
+  // Most-constrained courses first, then a stable order by code.
+  const order = (list: Course[]) =>
+    list
+      .filter((c) => byKey[courseKey(c)])
+      .slice()
+      .sort(
+        (a, b) =>
+          optionsByCourseKey[courseKey(a)].length -
+            optionsByCourseKey[courseKey(b)].length || byCode(a, b),
+      );
+
+  const stages: AllocationStage[] = opts.stages ?? [
+    { courses: candidates, caps: TARGET },
+  ];
+  stages.forEach((stage) => {
+    caps = { ...stage.caps };
+    order(stage.courses).forEach((c) => {
+      const k = courseKey(c);
+      if (reqByCourseKey[k]) return;
+      tryPlace(k, new Set());
+    });
   });
 
-  for (const c of sorted) {
+  // Anything still unplaced counts as extra credit toward its first option.
+  candidates.forEach((c) => {
     const k = courseKey(c);
-    const opts = optionsByCourseKey[k];
-    const credits = courseDistCredits(c);
-    const open = opts
-      .filter((req) => remaining[req] > 0)
-      .sort((a, b) => remaining[b] - remaining[a]);
-
-    if (open.length > 0) {
-      const req = open[0];
-      reqByCourseKey[k] = req;
-      remaining[req] = Math.max(0, remaining[req] - credits);
-    } else {
-      reqByCourseKey[k] = opts[0];
-    }
-  }
+    if (!reqByCourseKey[k]) place(k, optionsByCourseKey[k][0]);
+  });
 
   const coursesByReq: Record<string, Course[]> = {};
   ALLOC_REQ_CODES.forEach((c) => {

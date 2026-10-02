@@ -32,6 +32,7 @@
 
 import { Course } from "@/lib/types";
 import {
+  ALLOC_REQS,
   allocateDistributionals,
   courseDistCredits,
 } from "@/lib/distributionalAllocation";
@@ -446,39 +447,99 @@ type ReqSnapshot = {
   language: LanguageVerdict;
 };
 
-function snapshot(
-  courses: MilestoneCourseInput[],
-  overrides: Record<string, string>,
-  languagePlacement?: string | null,
-): ReqSnapshot {
+/** The five allocated requirements a checkpoint's slots ask for, in credits. */
+function checkpointNeeds(spec: MilestoneSpec): Record<string, number> {
+  const needs: Record<string, number> = {};
+  spec.slots.forEach((slot) => {
+    if (slot.req === "L") return;
+    if (slot.req === "ANY_SKILL") {
+      // "Two of QR, WR, L": QR and WR each get room for one credit, and the
+      // language axis is scored separately.
+      needs.QR = Math.max(needs.QR ?? 0, 1);
+      needs.WR = Math.max(needs.WR ?? 0, 1);
+      return;
+    }
+    needs[slot.req] = (needs[slot.req] ?? 0) + 1;
+  });
+  return needs;
+}
+
+/**
+ * The done and projected views of one checkpoint, read off ONE allocation.
+ *
+ * They used to be two independent allocations, and that is how a planned
+ * course went missing: a completed "Hu, WR" course counted as Hu in the done
+ * view, but once a Hu course planned for senior spring joined the projected
+ * view, that allocation moved the completed course to WR. The second Hu bar
+ * then saw one done Hu credit and one projected Hu credit, never two, and read
+ * "not planned". With one allocation a course counts toward the same
+ * requirement in both views.
+ *
+ * The allocation places settled coursework before planned coursework, and this
+ * checkpoint's minimums before the graduation totals, so planned courses never
+ * push a completed course out of a slot it can fill.
+ */
+function checkpointSnapshots(args: {
+  doneCourses: MilestoneCourseInput[];
+  projCourses: MilestoneCourseInput[];
+  needs: Record<string, number>;
+  overrides: Record<string, string>;
+  languagePlacement?: string | null;
+}): { doneSnap: ReqSnapshot; projSnap: ReqSnapshot } {
+  const { doneCourses, projCourses, needs, overrides, languagePlacement } = args;
+  const doneIds = new Set(doneCourses.map((c) => toCourseShape(c).id));
+
   const byKey = new Map<string, MilestoneCourseInput>();
-  const shaped = courses.map((c) => {
+  const shaped = projCourses.map((c) => {
     const s = toCourseShape(c);
     byKey.set(s.id, c);
     return s;
   });
+  const shapedDone = shaped.filter((s) => doneIds.has(s.id));
+  const shapedRest = shaped.filter((s) => !doneIds.has(s.id));
+  const graduation = Object.fromEntries(ALLOC_REQS.map((r) => [r.code, r.target]));
 
   const hasOverrides = Object.keys(overrides).length > 0;
   const alloc = allocateDistributionals(shaped, {
     auto: !hasOverrides,
     overrides,
+    stages: [
+      { courses: shapedDone, caps: needs },
+      { courses: shapedRest, caps: needs },
+      { courses: shapedDone, caps: graduation },
+      { courses: shapedRest, caps: graduation },
+    ],
   });
 
-  const creditsByReq: Record<string, number> = {};
-  const coursesByReq: Record<string, MilestoneCourseInput[]> = {};
-  Object.entries(alloc.coursesByReq).forEach(([req, list]) => {
-    const inputs = sortForDisplay(
-      list.map((c) => byKey.get(c.id)).filter(Boolean) as MilestoneCourseInput[],
-    );
-    coursesByReq[req] = inputs;
-    creditsByReq[req] = list.reduce((sum, c) => sum + courseDistCredits(c), 0);
-  });
+  const build = (
+    keep: (c: MilestoneCourseInput) => boolean,
+    courses: MilestoneCourseInput[],
+  ): ReqSnapshot => {
+    const creditsByReq: Record<string, number> = {};
+    const coursesByReq: Record<string, MilestoneCourseInput[]> = {};
+    Object.entries(alloc.coursesByReq).forEach(([req, list]) => {
+      const inputs = sortForDisplay(
+        list
+          .map((c) => byKey.get(c.id))
+          .filter((c): c is MilestoneCourseInput => !!c && keep(c)),
+      );
+      coursesByReq[req] = inputs;
+      creditsByReq[req] = inputs.reduce(
+        (sum, c) => sum + courseDistCredits(toCourseShape(c)),
+        0,
+      );
+    });
+    return {
+      byCode: new Map(courses.map((c) => [c.code, c])),
+      creditsByReq,
+      coursesByReq,
+      language: evaluateLanguage(courses, languagePlacement),
+    };
+  };
 
   return {
-    byCode: new Map(courses.map((c) => [c.code, c])),
-    creditsByReq,
-    coursesByReq,
-    language: evaluateLanguage(courses, languagePlacement),
+    doneSnap: build((c) => doneIds.has(toCourseShape(c).id), doneCourses),
+    projSnap: build(() => true, projCourses),
   };
 }
 
@@ -591,8 +652,13 @@ export function evaluateDistributionalMilestones(input: {
       countsAsProjected(c, spec.gradingBasis),
     );
 
-    const doneSnap = snapshot(doneCourses, overrides, input.languagePlacement);
-    const projSnap = snapshot(projCourses, overrides, input.languagePlacement);
+    const { doneSnap, projSnap } = checkpointSnapshots({
+      doneCourses,
+      projCourses,
+      needs: checkpointNeeds(spec),
+      overrides,
+      languagePlacement: input.languagePlacement,
+    });
 
     // Credits are their own axis: every earned credit counts, Credit/D/Fail
     // included, and in-progress plus planned coursework is the projection.

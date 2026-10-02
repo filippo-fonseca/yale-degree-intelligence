@@ -23,14 +23,18 @@
 
 import type { Course } from "@/lib/types";
 import { getCourseCreditsFromCode } from "@/lib/courseCatalog";
-import { allocateDistributionals } from "@/lib/distributionalAllocation";
+import {
+  ALLOC_REQS,
+  allocateDistributionals,
+  type AllocationStage,
+} from "@/lib/distributionalAllocation";
 import type { DistTallyInput } from "@/lib/distributionalTally";
 import {
   toMilestoneCourseInputs,
   type MilestoneCourseInput,
 } from "@/lib/distributionalMilestones";
 import { effectiveDistributionals } from "@/lib/utils/effectiveDistributionals";
-import { parseTermName } from "@/lib/academicTerm";
+import { isCurrentTerm, parseTermName } from "@/lib/academicTerm";
 
 /** The shape of a canvas column. Structurally the Simulator's `Semester`. */
 export type PlanSemesterLike = {
@@ -137,7 +141,9 @@ export function buildMilestoneCourseInputs(args: {
     code: course.code,
     credits: planCourseCredits(course),
     distributionals: effectiveDistributionals(course),
-    status: "planned" as const,
+    // A course sitting in the calendar's current term is being taken now,
+    // whatever its stored status says, matching the rest of the Simulator.
+    status: isCurrentTerm(term) ? ("in-progress" as const) : ("planned" as const),
     grade: course.grade ?? null,
     term: parseTermName(term) ? term : null,
   }));
@@ -147,8 +153,11 @@ export function buildMilestoneCourseInputs(args: {
 
 /**
  * The distributional tally feed: one entry per course, carrying the single
- * requirement it was allocated to (plus any language level) and its real
- * credits.
+ * requirement it was allocated to (plus any language level), its real credits,
+ * and whether it is only planned.
+ *
+ * Courses already taken (or being taken this term) are placed first, so a
+ * planned course can never push one of them out of a requirement it fills.
  */
 export function buildDistributionalTallyInputs(args: {
   taken: Course[];
@@ -160,19 +169,37 @@ export function buildDistributionalTallyInputs(args: {
 
   const takenCourses = (taken ?? []).filter(isRealCourse);
   const takenCodes = new Set(takenCourses.map((c) => c.code));
-  const plannedCourses = collectPlannedPlacements(semesters, takenCodes).map(
-    (p) => p.course,
-  );
+  const placements = collectPlannedPlacements(semesters, takenCodes);
 
   // Credits are resolved before allocation so the allocator and the tally
   // agree on what a half-credit course is worth.
-  const courses: Course[] = [...takenCourses, ...plannedCourses].map((c) => ({
+  const withCredits = (c: Course): Course => ({
     ...c,
     credits: planCourseCredits(c),
-  }));
+  });
+  const settled: Course[] = [
+    ...takenCourses,
+    ...placements.filter((p) => isCurrentTerm(p.term)).map((p) => p.course),
+  ].map(withCredits);
+  const planned: Course[] = placements
+    .filter((p) => !isCurrentTerm(p.term))
+    .map((p) => withCredits(p.course));
+  const courses = [...settled, ...planned];
 
-  const allocation = allocateDistributionals(courses, { auto, overrides });
+  const graduation = Object.fromEntries(
+    ALLOC_REQS.map((r) => [r.code, r.target]),
+  );
+  const stages: AllocationStage[] = [
+    { courses: settled, caps: graduation },
+    { courses: planned, caps: graduation },
+  ];
+  const allocation = allocateDistributionals(courses, {
+    auto,
+    overrides,
+    stages,
+  });
 
+  const plannedSet = new Set(planned);
   const entries: DistTallyInput[] = [];
   courses.forEach((course) => {
     const req = allocation.reqByCourseKey[allocation.keyOf(course)];
@@ -181,7 +208,11 @@ export function buildDistributionalTallyInputs(args: {
     );
     const codes = [...(req ? [req] : []), ...languages];
     if (codes.length === 0) return;
-    entries.push({ codes, credits: course.credits });
+    entries.push({
+      codes,
+      credits: course.credits,
+      ...(plannedSet.has(course) ? { planned: true } : {}),
+    });
   });
   return entries;
 }

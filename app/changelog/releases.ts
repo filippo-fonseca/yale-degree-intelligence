@@ -49,6 +49,8 @@ export const RELEASES: Release[] = [
           "Global Affairs now lists its language requirement: one course tagged L4 or L5 in a modern language. Your own language courses fill it in automatically, it does not count toward the 14 courses, and you can fulfill it manually if you placed beyond L4.",
           "The distributional milestone chart now shows running totals. Each year's column includes everything you have completed or planned by then, with credit beyond that year's checkpoint stacked above a line, so a second humanities course no longer seems to disappear. In-progress, planned, and not-yet-planned bars now look different from each other. Following Yale's chart, a Credit/D/Fail course no longer counts toward any year's milestone.",
           "Every course in a Simulator semester now shows how many credits it is worth.",
+          "A distributional you have planned for later, such as a second humanities course in your last semester, now counts toward graduation instead of showing as not planned. The milestone chart now uses three clear states: solid bars are met, striped bars are planned, and red outlines are missing. Each year shows only the minimum Yale asks for by then.",
+          "The Distributionals page now reads your main Simulator plan, so it agrees with the Simulator about what is planned and what is still missing. In the Simulator, each distributional bar shows credit you have and credit you have planned separately.",
         ],
       },
     ],

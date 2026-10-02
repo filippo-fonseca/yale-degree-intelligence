@@ -106,7 +106,13 @@ export function reconcilePlanSemesters(
     for (const course of transcriptCourses) {
       if (courseTermName(course) !== name || seen.has(course.code)) continue;
       seen.add(course.code);
-      courses.push(course);
+      // An in-progress course has no real grade yet, so a projected grade the
+      // student set on it in the plan survives until the transcript has one.
+      const projected =
+        course.status === "in-progress" && course.grade == null
+          ? stored?.courses.find((c) => c.code === course.code)?.grade
+          : undefined;
+      courses.push(projected != null ? { ...course, grade: projected } : course);
     }
 
     for (const course of stored?.courses ?? []) {

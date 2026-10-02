@@ -35,6 +35,7 @@ export const RELEASES: Release[] = [
       {
         title: "Planning your year",
         items: [
+          "You can now give a course you are taking this term a projected grade in the Simulator, so your projected GPA reflects how the current semester might turn out. The projected grade stays with your saved plan until your real grade arrives.",
           "The same milestone snapshot lives in the Simulator's projected results, so you can see which year each planned course closes out and whether a plan leaves a milestone at risk.",
           "If you have two majors, the Simulator now counts every course that serves both, including the ones only on your canvas, against Yale's limit of two shared credits. A meter shows where you stand, opens to list each shared course and the requirement it fills in each major, and lets you mark a course as a prerequisite so it does not count.",
           "A planned course carrying two distributional tags now counts toward one requirement, the same way a completed course does, and half-credit planned courses count as half a credit.",

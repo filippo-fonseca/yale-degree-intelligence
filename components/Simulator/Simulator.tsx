@@ -1365,8 +1365,10 @@ export default function Simulator({
       return b;
     };
 
+    // In-progress transcript courses have no grade yet; they reach the
+    // timeline through the grid below, carrying any projected grade.
     completedCourses
-      .filter((c) => !c.skipped)
+      .filter((c) => !c.skipped && c.status !== "in-progress")
       .forEach((c) => {
         bucket(`${c.semester} ${c.year}`).completed.push({
           grade: c.grade ?? null,
@@ -1376,7 +1378,7 @@ export default function Simulator({
 
     semesters.forEach((s) => {
       s.courses
-        .filter((c) => c.status === "not-taken")
+        .filter((c) => c.status !== "completed")
         .forEach((c) => {
           bucket(s.name).planned.push({
             grade: c.grade ?? null,
@@ -2580,8 +2582,13 @@ export default function Simulator({
                               )}
                             </div>
                           </div>
-                          {course.status === "not-taken" &&
-                            (showGrades || showDistributionals) && (
+                          {/* In-progress courses take a projected grade too, so
+                              the GPA can reflect how this term might land.
+                              Their distributionals stay the transcript's. */}
+                          {course.status !== "completed" &&
+                            (showGrades ||
+                              (showDistributionals &&
+                                course.status === "not-taken")) && (
                               <div
                                 className="w-full mt-1.5 pt-1.5 border-t border-black/[0.06] dark:border-white/[0.08] flex flex-col gap-1.5"
                                 onClick={(e) => e.stopPropagation()}
@@ -2609,7 +2616,8 @@ export default function Simulator({
                                     />
                                   </div>
                                 )}
-                                {showDistributionals && (
+                                {showDistributionals &&
+                                  course.status === "not-taken" && (
                                   <CourseDistributionalControl
                                     value={effectiveDistributionals(course)}
                                     onChange={(codes) =>

@@ -3,8 +3,8 @@
 // Yale College publishes a one-page "Distributional Requirements" milestone
 // chart: four stacked-bar columns (first-year, sophomore, junior, senior), each
 // taller than the last, one short bar per required credit. This is that chart,
-// rendered live from the student's own courses: every bar is filled, planned, or
-// still open, and every column carries its credit target and a verdict.
+// rendered live from the student's own courses: every bar is met, planned, or
+// missing, and every column carries its credit target and a verdict.
 //
 // The layout follows the original (bottoms aligned, slots top to bottom in
 // `spec.slots` order, italic caption under each column, legend on the left).
@@ -97,20 +97,24 @@ function slotColor(
   return resolved ? REQ_COLOR[resolved] : ANY_SKILL_COLOR;
 }
 
-/** How a bar is drawn: settled, being taken now, on the plan, or open. */
-type BarState = "done" | "in-progress" | "planned" | "open";
+/**
+ * How a bar is drawn. Three states, and only three, so a glance answers the
+ * question: met (completed or being taken now), planned (a course later on the
+ * plan covers it before the deadline), or missing (nothing covers it yet).
+ * Planned and missing must never look alike.
+ */
+type BarState = "met" | "planned" | "missing";
 
 function barState(slot: MilestoneSlotResult): BarState {
-  if (slot.fill === "done") return "done";
-  if (slot.fill === "empty") return "open";
-  return slot.sourceStatus === "in-progress" ? "in-progress" : "planned";
+  if (slot.fill === "done") return "met";
+  if (slot.fill === "empty") return "missing";
+  return slot.sourceStatus === "planned" ? "planned" : "met";
 }
 
 const STATE_SUFFIX: Record<BarState, string> = {
-  done: "",
-  "in-progress": "in progress",
+  met: "",
   planned: "planned",
-  open: "not planned",
+  missing: "missing",
 };
 
 function slotLabel(slot: MilestoneSlotResult, compact: boolean): string {
@@ -120,21 +124,20 @@ function slotLabel(slot: MilestoneSlotResult, compact: boolean): string {
   return compact || !suffix ? base : `${base} · ${suffix}`;
 }
 
-function slotTitle(slot: MilestoneSlotResult, ahead: boolean): string {
+function slotTitle(slot: MilestoneSlotResult): string {
   const what =
     slot.req === "ANY_SKILL"
       ? "One credit in quantitative reasoning, writing, or a foreign language"
       : REQ_NAME[slot.req];
-  const tail = ahead ? ". Not due at this checkpoint; counts toward graduation." : "";
   switch (barState(slot)) {
-    case "done":
-      return `${what}: done with ${slot.source ?? "a completed course"}${tail}`;
-    case "in-progress":
-      return `${what}: in progress with ${slot.source ?? "a current course"}${tail}`;
+    case "met":
+      return slot.sourceStatus === "in-progress"
+        ? `${what}: met with ${slot.source ?? "a course you are taking now"} (in progress)`
+        : `${what}: met with ${slot.source ?? "a completed course"}`;
     case "planned":
-      return `${what}: planned with ${slot.source ?? "a planned course"}${tail}`;
+      return `${what}: planned with ${slot.source ?? "a planned course"}`;
     default:
-      return `${what}: no completed or planned course covers this yet`;
+      return `${what}: missing. Nothing you have taken or planned covers this yet.`;
   }
 }
 
@@ -171,10 +174,12 @@ const STATUS_CHIP: Record<
     label: "Missed",
   },
   upcoming: {
+    // A later checkpoint with something still missing: not urgent, but it
+    // must not read as fine.
     className:
-      "bg-gray-100 text-gray-500 border-gray-300 dark:bg-gray-800/60 dark:text-gray-400 dark:border-gray-700/50",
+      "bg-gray-100 text-gray-600 border-gray-300 dark:bg-gray-800/60 dark:text-gray-300 dark:border-gray-700/50",
     icon: FiClock,
-    label: "Upcoming",
+    label: "Gaps to fill",
   },
 };
 
@@ -211,19 +216,16 @@ function SlotBar({
   height,
   delay,
   compact,
-  ahead = false,
 }: {
   slot: MilestoneSlotResult;
   color: string;
   height: number;
   delay: number;
   compact: boolean;
-  /** Credit beyond what this checkpoint requires. */
-  ahead?: boolean;
 }) {
   const state = barState(slot);
-  const label = `${ahead ? "+ " : ""}${slotLabel(slot, compact)}`;
-  const title = slotTitle(slot, ahead);
+  const label = slotLabel(slot, compact);
+  const title = slotTitle(slot);
   const fontSize = compact ? 9 : 11;
 
   const common =
@@ -232,7 +234,7 @@ function SlotBar({
   let style: React.CSSProperties;
   let className: string;
 
-  if (state === "done") {
+  if (state === "met") {
     style = {
       height,
       backgroundColor: color,
@@ -240,16 +242,6 @@ function SlotBar({
       color: "#ffffff",
       fontSize,
       boxShadow: `inset 0 1px 0 rgba(255,255,255,0.35), 0 1px 3px ${rgba(color, 0.35)}`,
-    };
-    className = `${common} font-semibold`;
-  } else if (state === "in-progress") {
-    // Being taken right now: solid, just not yet settled.
-    style = {
-      height,
-      backgroundColor: rgba(color, 0.45),
-      borderColor: rgba(color, 0.9),
-      color: "#ffffff",
-      fontSize,
     };
     className = `${common} font-semibold`;
   } else if (state === "planned") {
@@ -267,14 +259,9 @@ function SlotBar({
     };
     className = `${common} font-semibold`;
   } else {
+    // Missing: no fill and a rose outline, so it never reads as planned.
     style = { height, fontSize };
-    className = `${common} border-dashed border-gray-300 dark:border-gray-700/70 bg-gray-100/60 dark:bg-gray-800/30 text-gray-400 dark:text-gray-500 font-medium`;
-  }
-
-  if (ahead) {
-    // Earned early: same colours, quieter, so the required stack still reads
-    // as Yale's chart.
-    style = { ...style, opacity: 0.7 };
+    className = `${common} border-dashed border-rose-300 dark:border-rose-500/50 bg-rose-50/60 dark:bg-rose-500/[0.06] text-rose-600 dark:text-rose-300 font-medium`;
   }
 
   return (
@@ -282,13 +269,13 @@ function SlotBar({
       title={title}
       aria-label={title}
       initial={{ scaleY: 0, opacity: 0 }}
-      animate={{ scaleY: 1, opacity: ahead ? 0.7 : 1 }}
+      animate={{ scaleY: 1, opacity: 1 }}
       transition={{ duration: 0.32, delay, ease: [0.22, 1, 0.36, 1] }}
       style={{ ...style, transformOrigin: "bottom" }}
       className={className}
     >
-      {state === "in-progress" && !compact && (
-        <FiClock size={9} strokeWidth={2.5} className="shrink-0 ml-1" />
+      {state === "met" && !compact && (
+        <FiCheck size={9} strokeWidth={3} className="shrink-0 ml-1" />
       )}
       <span className="truncate px-1 leading-none tracking-wide">{label}</span>
     </motion.div>
@@ -371,16 +358,31 @@ function CreditsMeter({
 /* Column                                                                     */
 /* -------------------------------------------------------------------------- */
 
+/** How many of a column's bars are met, planned, and missing. */
+function stateCounts(milestone: MilestoneResult): Record<BarState, number> {
+  const counts: Record<BarState, number> = { met: 0, planned: 0, missing: 0 };
+  milestone.slots.forEach((s) => {
+    counts[barState(s)] += 1;
+  });
+  return counts;
+}
+
 function columnAriaLabel(milestone: MilestoneResult): string {
-  const filled = milestone.slots.filter((s) => s.fill === "done").length;
-  const planned = milestone.slots.filter((s) => s.fill === "projected").length;
+  const { met, planned, missing } = stateCounts(milestone);
   const by = milestone.deadlineTerm ? ` by ${milestone.deadlineTerm}` : "";
   return (
     `${milestone.spec.label} milestone${by}: ${STATUS_CHIP[milestone.status].label}. ` +
-    `${filled} of ${milestone.slots.length} distributional slots complete` +
-    (planned > 0 ? `, ${planned} covered by planned coursework` : "") +
-    `. ${milestone.credits.earned} of ${milestone.credits.required} course credits.`
+    `${met} met, ${planned} planned, ${missing} missing of ${milestone.slots.length} required. ` +
+    `${milestone.credits.earned} of ${milestone.credits.required} course credits.`
   );
+}
+
+/** One plain line under a column: what is left, in words. */
+function columnSummary(milestone: MilestoneResult): string {
+  const { planned, missing } = stateCounts(milestone);
+  if (missing === 0 && planned === 0) return "All met";
+  if (missing === 0) return `${planned} planned, nothing missing`;
+  return planned > 0 ? `${missing} missing, ${planned} planned` : `${missing} missing`;
 }
 
 function MilestoneColumn({
@@ -399,8 +401,8 @@ function MilestoneColumn({
   stackHeight: number;
 }) {
   const { spec, slots, isCurrent } = milestone;
-  const ahead = milestone.ahead ?? [];
-  const count = slots.length + ahead.length;
+  const count = slots.length;
+  const { missing } = stateCounts(milestone);
 
   return (
     <div
@@ -441,27 +443,6 @@ function MilestoneColumn({
         className="mt-2.5 flex flex-col justify-end"
         style={{ minHeight: stackHeight, gap: barGap }}
       >
-        {ahead.map((slot, i) => (
-          <SlotBar
-            key={`${spec.key}-ahead-${i}-${slot.req}-${slot.fill}`}
-            slot={slot}
-            color={slotColor(slot, skillBySource)}
-            height={barHeight}
-            delay={0.05 + (count - 1 - i) * 0.035}
-            compact={compact}
-            ahead
-          />
-        ))}
-        {ahead.length > 0 && (
-          <div
-            className="flex items-center gap-1 text-[8px] font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500"
-            title="Bars above the line are credit you already have or have planned beyond what this checkpoint asks for. They count toward the next milestones and graduation."
-          >
-            <span className="flex-1 border-t border-dashed border-gray-300 dark:border-gray-700" />
-            {!compact && <span>Ahead ↑ · Due ↓</span>}
-            <span className="flex-1 border-t border-dashed border-gray-300 dark:border-gray-700" />
-          </div>
-        )}
         {slots.map((slot, i) => (
           <SlotBar
             key={`${spec.key}-${i}-${slot.req}-${slot.fill}`}
@@ -469,11 +450,21 @@ function MilestoneColumn({
             color={slotColor(slot, skillBySource)}
             height={barHeight}
             // Bottom bar first, so each column fills upward.
-            delay={0.05 + (count - 1 - ahead.length - i) * 0.035}
+            delay={0.05 + (count - 1 - i) * 0.035}
             compact={compact}
           />
         ))}
       </div>
+
+      <p
+        className={`mt-1.5 font-medium ${compact ? "text-[9px]" : "text-[10px]"} ${
+          missing > 0
+            ? "text-rose-600 dark:text-rose-300"
+            : "text-gray-500 dark:text-gray-400"
+        }`}
+      >
+        {columnSummary(milestone)}
+      </p>
 
       {/* The ring carries "you are here" on its own in compact. */}
       {!compact && isCurrent && milestone.deadlineTerm && (
@@ -542,11 +533,9 @@ function Legend() {
         </p>
         <div className="flex items-center gap-2">
           <span className="h-3.5 w-7 rounded bg-gray-400 dark:bg-gray-500 shrink-0" />
-          <span className="text-[11px] text-gray-600 dark:text-gray-400">Completed</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <span className="h-3.5 w-7 rounded border border-gray-400 dark:border-gray-500 bg-gray-400/45 shrink-0" />
-          <span className="text-[11px] text-gray-600 dark:text-gray-400">In progress</span>
+          <span className="text-[11px] text-gray-600 dark:text-gray-400 leading-tight">
+            Met (completed or taking now)
+          </span>
         </div>
         <div className="flex items-center gap-2">
           <span
@@ -556,18 +545,14 @@ function Legend() {
                 "repeating-linear-gradient(135deg, rgba(148,163,184,0.6) 0px, rgba(148,163,184,0.6) 4px, transparent 4px, transparent 9px)",
             }}
           />
-          <span className="text-[11px] text-gray-600 dark:text-gray-400">Planned</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <span className="h-3.5 w-7 rounded border border-dashed border-gray-300 dark:border-gray-700 bg-gray-100/60 dark:bg-gray-800/30 shrink-0" />
-          <span className="text-[11px] text-gray-600 dark:text-gray-400">Not planned yet</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <span className="h-3.5 w-7 rounded bg-gray-400 dark:bg-gray-500 opacity-70 shrink-0 text-[8px] font-semibold text-white flex items-center justify-center">
-            +
-          </span>
           <span className="text-[11px] text-gray-600 dark:text-gray-400 leading-tight">
-            Ahead: beyond this checkpoint
+            Planned (on your plan in time)
+          </span>
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="h-3.5 w-7 rounded border border-dashed border-rose-300 dark:border-rose-500/50 bg-rose-50/60 dark:bg-rose-500/[0.06] shrink-0" />
+          <span className="text-[11px] text-gray-600 dark:text-gray-400 leading-tight">
+            Missing (nothing covers it yet)
           </span>
         </div>
       </div>
@@ -640,9 +625,8 @@ export default function MilestoneSnapshot({
 
   const barHeight = compact ? 16 : 26;
   const barGap = compact ? 4 : 6;
-  // Ahead bars sit on the same stack, plus a divider row when a column has any.
   const maxSlots = milestones.reduce(
-    (max, m) => Math.max(max, m.slots.length + (m.ahead?.length ?? 0)),
+    (max, m) => Math.max(max, m.slots.length),
     0,
   );
   const stackHeight = maxSlots * barHeight + Math.max(0, maxSlots - 1) * barGap;
@@ -662,9 +646,7 @@ export default function MilestoneSnapshot({
       milestones
         .map(
           (m) =>
-            `${m.key}:${m.status}:${m.slots.map((s) => s.fill[0]).join("")}:${(m.ahead ?? [])
-              .map((s) => s.fill[0])
-              .join("")}`,
+            `${m.key}:${m.status}:${m.slots.map((s) => barState(s)[0]).join("")}`,
         )
         .join("|"),
     [milestones],
@@ -718,19 +700,19 @@ export default function MilestoneSnapshot({
 
       {compact && (
         <p className="text-[10px] leading-snug text-gray-500 dark:text-gray-400 mb-2">
-          Running totals by each checkpoint. Solid is done, faded is in progress,
-          striped is planned, grey is not planned yet, and + bars are credit
-          beyond what that checkpoint asks.
+          What you need by each checkpoint, counting everything up to then.
+          Solid is met, striped is planned, and red outline is missing.
         </p>
       )}
 
       {!compact && (
         <p className="text-[11px] leading-snug text-gray-500 dark:text-gray-400 border-l-2 border-gray-200 dark:border-gray-700/60 pl-2.5 mb-4">
-          Each column is a running total: everything you have completed, are
-          taking, or have planned by that checkpoint, not just what you took that
-          year. Bars below the line are what Yale requires by then; bars above it
-          are credit you already have toward later milestones. No courses taken
-          Credit/D/Fail may be used to fulfill a distributional requirement.
+          Each column shows the minimum Yale requires by that checkpoint, and it
+          counts everything you have taken, are taking, or have planned up to
+          then. A course counts toward every checkpoint from its term onward, so
+          a humanities course planned for senior spring covers graduation but
+          not junior year. Solid bars are met, striped bars are planned, and red
+          outlines are missing. Courses taken Credit/D/Fail do not count.
         </p>
       )}
 

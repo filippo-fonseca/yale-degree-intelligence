@@ -462,7 +462,7 @@ export default function MajorSelectionFlow({
                   We want to support every major and concentration. If yours is
                   missing,{" "}
                   <Link
-                    href="mailto:filippo.fonseca@yale.edu,emir.ahmed@yale.edu"
+                    href="mailto:filippo.fonseca@yale.edu"
                     className="text-gray-600 underline underline-offset-2 transition-colors hover:text-gray-900 dark:text-gray-300 dark:hover:text-white"
                   >
                     tell us

@@ -128,7 +128,7 @@ export function MobileSidebar({
                   <span className="text-xs">Terms</span>
                 </Link>
                 <Link
-                  href="mailto:filippo.fonseca@yale.edu,emir.ahmed@yale.edu"
+                  href="mailto:filippo.fonseca@yale.edu"
                   className="flex items-center gap-2 p-2 rounded-lg hover:bg-black/[0.04] dark:hover:bg-white/[0.06] transition-all text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
                 >
                   <MessageCircleQuestionMark

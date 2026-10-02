@@ -32,7 +32,7 @@ export default function LandingFooter({ onLogin }: LandingFooterProps) {
               </button>
             )}
             <a
-              href="mailto:filippo.fonseca@yale.edu,emir.ahmed@yale.edu"
+              href="mailto:filippo.fonseca@yale.edu"
               className="inline-flex items-center gap-2 rounded-full border border-black/[0.08] bg-white/70 px-5 py-2.5 font-sf text-sm font-medium text-gray-700 backdrop-blur-md transition hover:bg-white dark:border-white/[0.1] dark:bg-white/[0.04] dark:text-gray-200"
             >
               <FiMail size={14} /> Email us

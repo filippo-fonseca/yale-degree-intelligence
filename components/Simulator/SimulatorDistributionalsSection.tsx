@@ -61,8 +61,14 @@ export default function SimulatorDistributionalsSection({
   const langReqs = byRequirement.filter((r) => r.target == null);
 
   const totalTags = byRequirement.reduce((sum, r) => sum + r.count, 0);
+  // Met counts only what is taken or being taken; planned credit is reported
+  // on its own so it never passes for done.
   const metCount = areaSkillReqs.filter(
-    (r) => r.count >= (r.target ?? 0),
+    (r) => r.count - r.planned >= (r.target ?? 0),
+  ).length;
+  const plannedCount = areaSkillReqs.filter(
+    (r) =>
+      r.count - r.planned < (r.target ?? 0) && r.count >= (r.target ?? 0),
   ).length;
 
   return (
@@ -85,6 +91,11 @@ export default function SimulatorDistributionalsSection({
                 <span className="text-gray-400 dark:text-gray-600 ml-0.5">
                   areas &amp; skills met
                 </span>
+                {plannedCount > 0 && (
+                  <span className="text-sky-600 dark:text-sky-300 ml-1">
+                    · {plannedCount} more planned
+                  </span>
+                )}
               </>
             ) : (
               <span>Assign distributionals to planned courses</span>
@@ -142,10 +153,16 @@ export default function SimulatorDistributionalsSection({
                 <>
                   {areaSkillReqs.map((req) => {
                     const target = req.target ?? 0;
-                    const fulfilled = target > 0 && req.count >= target;
-                    const progress =
-                      target > 0 ? Math.min(req.count / target, 1) : 0;
+                    // Only the minimum matters: credit beyond the target is
+                    // not shown. Settled credit fills first, planned after it.
+                    const settled = Math.min(req.count - req.planned, target);
+                    const planned = Math.min(req.planned, target - settled);
+                    const missing = Math.max(0, target - settled - planned);
+                    const fulfilled = target > 0 && settled >= target;
+                    const settledPct = target > 0 ? (settled / target) * 100 : 0;
+                    const plannedPct = target > 0 ? (planned / target) * 100 : 0;
                     const bar = REQ_BAR_COLOR[req.key] ?? "#a855f7";
+                    const round = (n: number) => Math.round(n * 100) / 100;
 
                     return (
                       <div key={req.key}>
@@ -165,19 +182,43 @@ export default function SimulatorDistributionalsSection({
                             )}
                           </div>
                           {fulfilled ? (
-                            <span className="text-emerald-500 dark:text-emerald-400">
-                              <FiCheck size={14} strokeWidth={3} />
+                            <span className="inline-flex items-center gap-1 text-[10px] font-medium text-emerald-600 dark:text-emerald-400">
+                              <FiCheck size={12} strokeWidth={3} />
+                              Met
+                            </span>
+                          ) : missing > 0 ? (
+                            <span className="text-[10px] font-medium text-rose-600 dark:text-rose-300">
+                              {round(missing)} missing
+                              {planned > 0 && (
+                                <span className="font-normal text-sky-600 dark:text-sky-300">
+                                  {" "}
+                                  · {round(planned)} planned
+                                </span>
+                              )}
                             </span>
                           ) : (
-                            <span className="text-[10px] text-gray-400 dark:text-gray-500">
-                              {Math.min(req.count, target)}/{target}
+                            <span className="text-[10px] font-medium text-sky-600 dark:text-sky-300">
+                              Planned
                             </span>
                           )}
                         </div>
-                        <div className="relative w-full h-1.5 bg-gray-200 dark:bg-gray-800/70 rounded-full overflow-hidden">
+                        <div
+                          className="relative w-full h-1.5 bg-gray-200 dark:bg-gray-800/70 rounded-full overflow-hidden"
+                          title={`${round(settled)} met, ${round(planned)} planned, ${round(missing)} missing of ${target}`}
+                        >
                           <motion.div
                             initial={{ width: 0 }}
-                            animate={{ width: `${progress * 100}%` }}
+                            animate={{ width: `${settledPct + plannedPct}%` }}
+                            transition={{ duration: 0.5, ease: "easeOut" }}
+                            className="absolute inset-y-0 left-0 rounded-full"
+                            style={{
+                              backgroundColor: `${bar}33`,
+                              backgroundImage: `repeating-linear-gradient(135deg, ${bar}99 0px, ${bar}99 3px, transparent 3px, transparent 6px)`,
+                            }}
+                          />
+                          <motion.div
+                            initial={{ width: 0 }}
+                            animate={{ width: `${settledPct}%` }}
                             transition={{ duration: 0.5, ease: "easeOut" }}
                             className="absolute inset-y-0 left-0 rounded-full"
                             style={{

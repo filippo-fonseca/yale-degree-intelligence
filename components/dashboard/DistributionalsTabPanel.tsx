@@ -4,12 +4,15 @@ import { motion } from "framer-motion";
 import { Course } from "@/lib/types";
 import { TabNeedsCoursesEmpty } from "@/components/ui/TabNeedsCoursesEmpty";
 import { DistributionalsView } from "./dynamicTabs";
+import type { Plan } from "@/components/Simulator/planTypes";
 
 interface DistributionalsTabPanelProps {
   courses: Course[];
   hasData: boolean;
   /** Drives the milestone chart's deadline terms. */
   graduationYear?: number | null;
+  /** The student's main Simulator plan, so planned courses show as planned. */
+  plan?: Plan | null;
   onGoToCourses: () => void;
 }
 
@@ -17,6 +20,7 @@ export function DistributionalsTabPanel({
   courses,
   hasData,
   graduationYear,
+  plan,
   onGoToCourses,
 }: DistributionalsTabPanelProps) {
   return (
@@ -36,6 +40,7 @@ export function DistributionalsTabPanel({
         <DistributionalsView
           courses={courses}
           graduationYear={graduationYear}
+          plan={plan}
           onGoToCourses={onGoToCourses}
         />
       )}

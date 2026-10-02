@@ -25,6 +25,19 @@ export type Plan = {
   showGrades?: boolean;
 };
 
+/**
+ * The plan that speaks for the student outside the Simulator: the one marked
+ * default, else the newest. Null when there are no plans.
+ */
+export function primaryPlan(plans: Plan[] | null | undefined): Plan | null {
+  if (!plans || plans.length === 0) return null;
+  return (
+    plans.find((p) => p.isDefault) ??
+    [...plans].sort((a, b) => (b.createdAt || "").localeCompare(a.createdAt || ""))[0] ??
+    null
+  );
+}
+
 /** Courses a plan schedules but the student has not taken yet. */
 export function plannedCourseCount(plan: Plan): number {
   return plan.semesters.reduce(

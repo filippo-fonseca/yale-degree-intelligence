@@ -1,3 +1,5 @@
+import type { Plan } from "@/components/Simulator/planTypes";
+
 export interface UserProfile {
   majors: string[];
   certificates?: string[];
@@ -11,4 +13,6 @@ export interface UserProfile {
   // welcome modal. Persisted so we don't re-show them on every visit.
   hasSeenTutorial?: boolean;
   hasSeenV3Welcome?: boolean;
+  // Simulator plans, written by the Simulator onto the same document.
+  savedPlans?: Plan[];
 }

@@ -7,6 +7,7 @@ import { computeAcademicStatsSummary } from "@/lib/utils/academicStats";
 import type { MajorProgress } from "@/lib/majors";
 import type { CertificateProgress } from "@/lib/certificates";
 import type { UserProfile } from "./types";
+import { primaryPlan } from "@/components/Simulator/planTypes";
 import { UploadTabPanel } from "./UploadTabPanel";
 import { StatsTabPanel } from "./StatsTabPanel";
 import { MajorTabPanel } from "./MajorTabPanel";
@@ -141,6 +142,7 @@ export function DashboardTabPanels({
           courses={courses}
           hasData={hasData}
           graduationYear={userProfile?.graduationYear}
+          plan={primaryPlan(userProfile?.savedPlans)}
           onGoToCourses={() => onTabChange("upload")}
         />
       )}

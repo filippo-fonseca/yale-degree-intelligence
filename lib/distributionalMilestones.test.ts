@@ -726,3 +726,48 @@ describe("slot source status", () => {
     ]);
   });
 });
+
+describe("planned coursework accumulates toward later checkpoints", () => {
+  // A completed "Hu, WR" course plus a Hu planned for senior spring used to
+  // show the second Hu bar as "not planned".
+  const courses = () => [
+    c({ code: "ENGL 120", distributionals: ["Hu", "WR"], term: "Fall 2026" }),
+    c({
+      code: "HIST 300",
+      distributionals: ["Hu"],
+      status: "planned",
+      grade: null,
+      term: "Spring 2030",
+    }),
+  ];
+  const evaluate = () =>
+    evaluateDistributionalMilestones({
+      courses: courses(),
+      graduationYear: 2030,
+      currentTerm: "Fall 2026",
+    });
+
+  it("counts a Hu planned for the last term toward graduation", () => {
+    const hu = milestone(evaluate(), "senior").slots.filter((s) => s.req === "Hu");
+    expect(hu.map((s) => s.fill)).toEqual(["done", "projected"]);
+    expect(hu[1].sourceStatus).toBe("planned");
+  });
+
+  it("does not count that course toward an earlier checkpoint", () => {
+    const junior = milestone(evaluate(), "junior");
+    expect(junior.slots.some((s) => s.source === "HIST 300")).toBe(false);
+  });
+
+  it("never shows a completed course as planned", () => {
+    evaluate().milestones.forEach((m) => {
+      m.slots.forEach((s) => {
+        if (s.fill === "projected") expect(s.sourceStatus).not.toBe("completed");
+      });
+    });
+  });
+
+  it("lets a completed Hu+WR course fill a first-year skill", () => {
+    const first = milestone(evaluate(), "first-year");
+    expect(first.slots[0]).toMatchObject({ fill: "done", resolvedReq: "WR" });
+  });
+});

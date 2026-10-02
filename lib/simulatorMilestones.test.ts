@@ -294,3 +294,30 @@ describe("buildMilestoneCourseInputs", () => {
     expect(inputs).toEqual([]);
   });
 });
+
+describe("buildDistributionalTallyInputs planned credit", () => {
+  it("reports planned credit separately and keeps taken courses in place", () => {
+    const taken = [
+      course({
+        code: "TEST 1",
+        status: "completed",
+        semester: "Fall",
+        year: 2024,
+        distributionals: ["Hu", "WR"],
+      }),
+    ];
+    const tally = tallyDistributionals(
+      buildDistributionalTallyInputs({
+        taken,
+        semesters: [
+          term("Spring 2030", [
+            course({ code: "TEST 2", status: "not-taken", distributionals: ["Hu"] }),
+          ]),
+        ],
+        ...auto,
+      }),
+    );
+    expect(tally.counts.Hu).toBe(2);
+    expect(tally.plannedCounts.Hu).toBe(1);
+  });
+});

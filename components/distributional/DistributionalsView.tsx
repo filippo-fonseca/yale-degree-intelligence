@@ -25,16 +25,21 @@ import {
   toMilestoneCourseInputs,
   type DistReqKey,
 } from "@/lib/distributionalMilestones";
+import { buildMilestoneCourseInputs } from "@/lib/simulatorMilestones";
+import type { Plan } from "@/components/Simulator/planTypes";
 
 // ─── Main component ───────────────────────────────────────────────────────────
 
 const DistributionalsView = ({
   courses,
   graduationYear,
+  plan,
   onGoToCourses,
 }: {
   courses: Course[];
   graduationYear?: number | null;
+  /** The student's main Simulator plan, read for its planned courses. */
+  plan?: Plan | null;
   onGoToCourses?: () => void;
 }) => {
   const [view, setView] = useState<"board" | "heatmap">("board");
@@ -43,16 +48,23 @@ const DistributionalsView = ({
 
   // Yale's promotion milestones, scored against the same allocation the cards
   // below use. Computed before the loading guard so hook order never changes.
+  // With a Simulator plan, its untaken courses join as planned, exactly as the
+  // Simulator's own chart reads them, so the two surfaces agree.
   const milestoneEvaluation = useMemo(
     () =>
       evaluateDistributionalMilestones({
-        courses: toMilestoneCourseInputs(courses ?? []),
+        courses: plan
+          ? buildMilestoneCourseInputs({
+              taken: courses ?? [],
+              semesters: plan.semesters ?? [],
+            })
+          : toMilestoneCourseInputs(courses ?? []),
         graduationYear,
         allocationOverrides: autoAllocate
           ? undefined
           : (overrides as Record<string, DistReqKey>),
       }),
-    [courses, graduationYear, autoAllocate, overrides],
+    [courses, plan, graduationYear, autoAllocate, overrides],
   );
 
   // Data still resolving: render a polished skeleton instead of blank space.
@@ -164,7 +176,11 @@ const DistributionalsView = ({
         <MilestoneSnapshot
           evaluation={milestoneEvaluation}
           title="Your milestones"
-          subtitle="Yale checks these at the end of each year, and they stack."
+          subtitle={
+            plan
+              ? `Yale checks these at the end of each year, and they stack. Planned courses come from your Simulator plan "${plan.name}".`
+              : "Yale checks these at the end of each year, and they stack. Add courses in the Simulator to see what your plan covers."
+          }
         />
       </div>
 

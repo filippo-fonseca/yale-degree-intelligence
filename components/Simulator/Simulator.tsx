@@ -66,6 +66,7 @@ import type { GPAEntry } from "@/lib/gpa";
 import type { DistTallyInput } from "@/lib/distributionalTally";
 import {
   evaluateDistributionalMilestones,
+  type DistReqKey,
   type MilestoneCourseInput,
   type MilestoneEvaluation,
 } from "@/lib/distributionalMilestones";
@@ -1433,8 +1434,13 @@ export default function Simulator({
       evaluateDistributionalMilestones({
         courses: milestoneCourseInputs,
         graduationYear,
+        // The same manual allocation the tally above honours, so the chart and
+        // the per-requirement bars never disagree about a multi-tag course.
+        allocationOverrides: distribAutoAllocate
+          ? undefined
+          : (distribOverrides as Record<string, DistReqKey>),
       }),
-    [milestoneCourseInputs, graduationYear],
+    [milestoneCourseInputs, graduationYear, distribAutoAllocate, distribOverrides],
   );
 
   // ------------ Live preview progress (local compute) ------------

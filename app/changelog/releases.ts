@@ -74,6 +74,8 @@ export const RELEASES: Release[] = [
           "On the Distributionals page in Manual mode, a course you can move between requirements now shows its name next to the requirement picker, so you can tell which course you are moving.",
           "If your secondary school taught primarily in a language other than English, you can now say so in the Language section of the Distributionals page. ENGL 120 then counts toward your language requirement instead of WR, on the Distributionals page and in the Simulator.",
           "Courses taken Credit/D/Fail no longer count toward your distributional requirements, following Yale's rules. They still appear, marked as not counting. When a Credit/D/Fail course fills a requirement in your major, it now carries a note to check your major's rules, since many majors do not accept them.",
+          "Projected grades you set in the Simulator on a course you are taking now are saved with your plan. Before, Save sometimes did not appear after the edit, and for some transcripts the grade reset to In Progress when you saved or reopened the plan.",
+          "In the Simulator's GPA timeline, a semester with no grades yet now shows N/A instead of repeating your previous GPA.",
         ],
       },
     ],

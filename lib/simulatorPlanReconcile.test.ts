@@ -126,6 +126,17 @@ describe("reconcilePlanSemesters", () => {
     expect(real.find((s) => s.name === "Fall 2026")!.courses[0].grade).toBe("A-");
   });
 
+  it("keeps a projected grade over the transcript's \"In Progress\" placeholder", () => {
+    const projected = { ...course("CPSC 223", "Fall", 2026, "in-progress"), grade: "B+" };
+    const plan = [sem("Fall 2026", [projected])];
+
+    const placeholder = [
+      { ...course("CPSC 223", "Fall", 2026, "in-progress"), grade: "In Progress" },
+    ];
+    const kept = reconcilePlanSemesters(plan, placeholder, 2028, NOW);
+    expect(kept.find((s) => s.name === "Fall 2026")!.courses[0].grade).toBe("B+");
+  });
+
   it("extends the grid through the current term and graduation with no gaps", () => {
     // Old plan that stopped at Spring 2026, saved by a student who then
     // pushed graduation out a year.

@@ -28,6 +28,11 @@ export interface PlanSemester {
   courses: Course[];
 }
 
+/** False for a null grade and for the parser's "In Progress" placeholder. */
+function hasRealGrade(course: Course): boolean {
+  return course.grade != null && course.grade !== "In Progress";
+}
+
 /** `"Fall 2026"` for a Fall or Spring course; null for summer and odd terms. */
 export function courseTermName(course: Course): string | null {
   const parsed = parseTermName(`${course.semester} ${course.year}`);
@@ -108,8 +113,10 @@ export function reconcilePlanSemesters(
       seen.add(course.code);
       // An in-progress course has no real grade yet, so a projected grade the
       // student set on it in the plan survives until the transcript has one.
+      // Some transcripts print "In Progress" in the grade column and the
+      // parser stores that literal, which is a placeholder, not a grade.
       const projected =
-        course.status === "in-progress" && course.grade == null
+        course.status === "in-progress" && !hasRealGrade(course)
           ? stored?.courses.find((c) => c.code === course.code)?.grade
           : undefined;
       courses.push(projected != null ? { ...course, grade: projected } : course);

@@ -612,6 +612,25 @@ export default function Simulator({
       Array.from(currentPlacements).some((p) => !initialPlacements.has(p)) ||
       Array.from(initialPlacements).some((p) => !currentPlacements.has(p));
 
+    // In-progress courses come back from the transcript on load, so where they
+    // sit is not the plan's to keep. Their projected grade is, so a grade edit
+    // on one has to read as unsaved like any planned edit does.
+    const inProgressGrades = (sems: Semester[]) =>
+      new Map(
+        sems.flatMap((s) =>
+          s.courses
+            .filter((c) => c.status === "in-progress")
+            .map((c) => [c.code, c.grade ?? ""] as const),
+        ),
+      );
+    const initialProjected = inProgressGrades(initialSemestersRef.current);
+    const projectedGradesChanged = Array.from(
+      inProgressGrades(semesters),
+    ).some(
+      ([code, grade]) =>
+        initialProjected.has(code) && initialProjected.get(code) !== grade,
+    );
+
     // Compare manual requirements
     const currentManualReqsStr = JSON.stringify(simulatorManualReqs);
     const initialManualReqsStr = JSON.stringify(initialManualReqsRef.current);
@@ -622,7 +641,11 @@ export default function Simulator({
       showDistributionals !== initialTogglesRef.current.dist ||
       showGrades !== initialTogglesRef.current.grades;
 
-    const changed = placementsChanged || manualReqsChanged || togglesChanged;
+    const changed =
+      placementsChanged ||
+      projectedGradesChanged ||
+      manualReqsChanged ||
+      togglesChanged;
 
     setHasChanges(changed);
   }, [semesters, simulatorManualReqs, showDistributionals, showGrades]);

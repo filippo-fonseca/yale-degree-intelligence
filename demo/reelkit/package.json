@@ -1,0 +1,16 @@
+{
+  "name": "di-demo-reelkit",
+  "private": true,
+  "type": "module",
+  "description": "Records the DegreeIntelligence v3 launch-film clips against the live app.",
+  "scripts": {
+    "login": "node login.mjs",
+    "record": "node record.mjs",
+    "cards": "node cards.mjs",
+    "assemble": "node assemble.mjs"
+  },
+  "dependencies": {
+    "playwright": "^1.62.1",
+    "testreel": "^0.2.0"
+  }
+}

@@ -15,7 +15,7 @@
 where you actually stand: majors, certificates, distributionals, GPA, and what
 happens to all of it if you change your plan.
 
-Used by roughly 1 in 6 Yale undergrads. Free forever, no ads, no fees.
+Used by roughly 1 in 5 Yale undergrads. Free forever, no ads, no fees.
 
 <br />
 

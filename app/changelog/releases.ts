@@ -51,6 +51,7 @@ export const RELEASES: Release[] = [
           "Every course in a Simulator semester now shows how many credits it is worth.",
           "A distributional you have planned for later, such as a second humanities course in your last semester, now counts toward graduation instead of showing as not planned. The milestone chart now uses three clear states: solid bars are met, striped bars are planned, and red outlines are missing. Each year shows only the minimum Yale asks for by then.",
           "The Distributionals page now reads your main Simulator plan, so it agrees with the Simulator about what is planned and what is still missing. In the Simulator, each distributional bar shows credit you have and credit you have planned separately.",
+          "In dark mode, the notice on My courses that a semester has ended now sits on a dark background instead of a pale one.",
         ],
       },
     ],

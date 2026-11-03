@@ -230,7 +230,7 @@ export function SemesterCourseList({
                     {termEnded && (
                       <div
                         role="status"
-                        className="mb-3 flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 rounded-lg border border-amber-300/60 dark:border-amber-500/30 bg-amber-50 dark:bg-amber-900/15 px-3 py-2 text-xs text-amber-800 dark:text-amber-200"
+                        className="mb-3 flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 rounded-lg border border-amber-300/60 dark:border-amber-500/30 bg-amber-50 dark:bg-amber-900/20 px-3 py-2 text-xs text-amber-800 dark:text-amber-200"
                       >
                         <p className="flex-1 min-w-0">
                           <span className="font-medium">

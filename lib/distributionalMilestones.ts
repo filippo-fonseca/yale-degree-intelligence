@@ -407,8 +407,9 @@ function evaluateLanguage(
       required.length > 0 &&
       tracks.some(
         (track) =>
-          // ENGL 120 satisfies the requirement whatever the placement.
-          track.viaEnglish ||
+          // ENGL 120 satisfies the requirement whatever the placement, but
+          // only when it counts: taken Credit/D/Fail, it completes nothing.
+          (track.viaEnglish && track.isComplete) ||
           required.every((level) => (track.coursesByLevel[level] || []).length > 0),
       );
     return { credits, complete, inferredPlacement: false, source };

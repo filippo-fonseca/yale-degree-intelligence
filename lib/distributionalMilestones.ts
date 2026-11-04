@@ -40,6 +40,7 @@ import {
   LANG_LEVELS,
   buildLanguageTracks,
   requiredLevelsForPlacement,
+  withEnglishLanguageRule,
 } from "@/lib/languageRequirement";
 import { effectiveDistributionals } from "@/lib/utils/effectiveDistributionals";
 import { compareTermNames, currentTermName, parseTermName } from "@/lib/academicTerm";
@@ -405,8 +406,11 @@ function evaluateLanguage(
     const required = requiredLevelsForPlacement(placed);
     const complete =
       required.length > 0 &&
-      tracks.some((track) =>
-        required.every((level) => (track.coursesByLevel[level] || []).length > 0),
+      tracks.some(
+        (track) =>
+          // ENGL 120 satisfies the requirement whatever the placement.
+          track.viaEnglish ||
+          required.every((level) => (track.coursesByLevel[level] || []).length > 0),
       );
     return { credits, complete, inferredPlacement: false, source };
   }
@@ -627,6 +631,11 @@ export function evaluateDistributionalMilestones(input: {
   currentTerm?: string;
   allocationOverrides?: Record<string, DistReqKey>;
   languagePlacement?: string | null;
+  /**
+   * The student's secondary school taught primarily in a language other than
+   * English, so ENGL 120 counts toward the language requirement instead of WR.
+   */
+  englishSatisfiesLanguage?: boolean;
 }): MilestoneEvaluation {
   const currentTerm =
     input.currentTerm && parseTermName(input.currentTerm)
@@ -637,7 +646,10 @@ export function evaluateDistributionalMilestones(input: {
       ? Number(input.graduationYear)
       : null;
   const overrides: Record<string, string> = { ...(input.allocationOverrides ?? {}) };
-  const courses = (input.courses ?? []).filter(Boolean);
+  const courses = withEnglishLanguageRule(
+    (input.courses ?? []).filter(Boolean),
+    !!input.englishSatisfiesLanguage,
+  );
 
   type Draft = Omit<MilestoneResult, "isCurrent" | "status"> & {
     deadlineTerm: string | null;

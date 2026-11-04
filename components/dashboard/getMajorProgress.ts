@@ -10,6 +10,7 @@ import {
 } from "@/lib/utils/programClaims";
 import { bucketCourses } from "@/lib/utils/courseBuckets";
 import { distributionalResolverFor } from "@/lib/utils/effectiveDistributionals";
+import { isCreditDFailCourse } from "@/lib/utils/creditDFail";
 
 export function getMajorProgress(
   selectedMajor: string,
@@ -49,6 +50,7 @@ export function getMajorProgress(
     excludedRequirements,
     getMajorBlockedCodes(courses, policyOptions),
     distributionalResolverFor(courses),
+    courses.filter(isCreditDFailCourse).map((course) => course.code),
   );
 }
 

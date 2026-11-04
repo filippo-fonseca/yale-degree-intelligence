@@ -102,14 +102,17 @@ export function DistReqCard({
             const isCompleted =
               course.status === "completed" && !course.skipped;
             const isInProgress = course.status === "in-progress";
+            const courseName = getCourseNameFromCode(course.code);
             return (
               <div
                 key={course.id}
                 className="flex items-center justify-between gap-2"
               >
-                <div className="flex items-center gap-1.5 min-w-0">
+                {/* Code and name stay visible even when the reassign picker
+                    is showing, so it is clear which course is being moved. */}
+                <div className="flex items-center gap-1.5 min-w-0 flex-1">
                   <span
-                    className={`text-xs font-medium ${
+                    className={`text-xs font-medium shrink-0 ${
                       isCompleted
                         ? "text-gray-700 dark:text-gray-300"
                         : isInProgress
@@ -124,13 +127,24 @@ export function DistReqCard({
                       IP
                     </span>
                   )}
+                  {canReassign && courseName && (
+                    <span
+                      className="text-xs text-gray-400 dark:text-gray-500 truncate min-w-0"
+                      title={courseName}
+                    >
+                      {courseName}
+                    </span>
+                  )}
                 </div>
                 {canReassign ? (
                   <select
                     value={req.code}
                     onChange={(e) => onReassign!(course.code, e.target.value)}
-                    className="text-[11px] rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900/80 text-gray-700 dark:text-gray-200 px-1.5 py-0.5 focus:outline-none focus:ring-1 focus:ring-purple-500/50"
-                    title="Count this course toward a different requirement"
+                    className="shrink-0 text-[11px] rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900/80 text-gray-700 dark:text-gray-200 px-1.5 py-0.5 focus:outline-none focus:ring-1 focus:ring-purple-500/50"
+                    title={`Count ${course.code} toward a different requirement`}
+                    aria-label={`Requirement that ${course.code}${
+                      courseName ? ` (${courseName})` : ""
+                    } counts toward`}
                   >
                     {options.map((opt) => (
                       <option key={opt} value={opt}>
@@ -140,7 +154,7 @@ export function DistReqCard({
                   </select>
                 ) : (
                   <span className="text-xs text-gray-400 dark:text-gray-500 truncate ml-2 max-w-[150px] text-right">
-                    {getCourseNameFromCode(course.code)}
+                    {courseName}
                   </span>
                 )}
               </div>

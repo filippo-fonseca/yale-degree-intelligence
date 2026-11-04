@@ -61,7 +61,25 @@ type MajorRequirement = {
   creditRequirements: {
     total: number;
   };
+  /**
+   * The department's Credit/D/Fail rule, from the Yale College Programs of
+   * Study. "none" means no Cr/D/F course counts toward the major, and the
+   * engine refuses to count one. "allowed" means they count. Unset means the
+   * rule has not been recorded here, which is the case for every major today:
+   * a Cr/D/F course still fills requirements, but carries a warning.
+   */
+  creditDFail?: MajorCreditDFailPolicy;
 };
+
+export type MajorCreditDFailPolicy = "none" | "allowed";
+
+/**
+ * How a Credit/D/Fail course relates to a requirement option.
+ * - "unverified": it counts here, but the major's rule is unknown (or the
+ *   student assigned it by hand), so the student should check it.
+ * - "refused": the major counts no Cr/D/F courses, so it does not count.
+ */
+export type CreditDFailFlag = "unverified" | "refused";
 
 // Create a typed version of allReqs
 export const majorRequirements: Record<string, MajorRequirement> = allReqs as Record<string, MajorRequirement>;
@@ -88,6 +106,8 @@ type CompletedRequirement = {
     credits: number;
     skipped?: boolean;
     manual?: boolean;
+    /** Set when the student took this course Credit/D/Fail. */
+    creditDFail?: CreditDFailFlag;
   }[];
 };
 
@@ -122,10 +142,29 @@ export const calculateMajorProgress = (
    * have the student's courses should pass their effective tags so transcript
    * tags win over the catalog; the default reads the catalog only.
    */
-  distributionalsFor: DistributionalResolver = catalogDistributionals
+  distributionalsFor: DistributionalResolver = catalogDistributionals,
+  /**
+   * Codes of courses the student took Credit/D/Fail. With no recorded policy
+   * they still count and are flagged; under a "none" policy they do not count.
+   */
+  creditDFailCourseCodes: string[] = []
 ): MajorProgress => {
   const major = majorRequirements[majorId];
   if (!major) throw new Error(`Major ${majorId} not found`);
+
+  const creditDFailSet = new Set(
+    creditDFailCourseCodes.map((code) => getCanonicalCode(code) || code)
+  );
+  const refusesCreditDFail = major.creditDFail === "none";
+  const isCreditDFailCode = (code: string) =>
+    creditDFailSet.has(getCanonicalCode(code) || code);
+  // The flag an option carries when its course was taken Credit/D/Fail. A
+  // major recorded as "allowed" needs no warning at all.
+  const creditDFailFlagFor = (code: string): CreditDFailFlag | undefined => {
+    if (!isCreditDFailCode(code)) return undefined;
+    if (refusesCreditDFail) return "refused";
+    return major.creditDFail === undefined ? "unverified" : undefined;
+  };
 
   // Normalize all course codes
   const blockedSet = new Set(
@@ -139,6 +178,10 @@ export const calculateMajorProgress = (
   const canonicalCompleted = stripBlocked(completedCourseCodes);
   const canonicalInProgress = stripBlocked(inProgressCourseCodes);
   const canonicalSkipped = stripBlocked(skippedCourseCodes);
+  // Under a "none" policy a Cr/D/F course is taken but cannot count, the same
+  // way an exclusion works. A skip is a separate statement and is kept.
+  const countsForMajor = (code: string) =>
+    !(refusesCreditDFail && isCreditDFailCode(code));
 
   // Build a set of exclusions for quick lookup: "reqName:code"
   const exclusionSet = new Set(
@@ -166,6 +209,20 @@ export const calculateMajorProgress = (
     });
   });
 
+  // The flag for a listed course/group option. Only a course the student
+  // actually took is flagged; a skipped option is not a Cr/D/F enrollment.
+  const creditDFailOption = (
+    code: string,
+    skipped: boolean,
+  ): { creditDFail?: CreditDFailFlag } => {
+    if (skipped) return {};
+    const taken =
+      canonicalCompleted.includes(code) || canonicalInProgress.includes(code);
+    if (!taken) return {};
+    const flag = creditDFailFlagFor(code);
+    return flag ? { creditDFail: flag } : {};
+  };
+
   let totalCompletedCredits = 0;
   let totalInProgressCredits = 0;
   const requirementProgress: CompletedRequirement[] = [];
@@ -183,6 +240,9 @@ export const calculateMajorProgress = (
     const manualFulfillments = manualByRequirement[req.name] || [];
 
     // Process manual fulfillments
+    // A manual fulfillment is the student's own override (often a DUS
+    // exception), so it counts even under a "none" policy; a Cr/D/F course
+    // assigned by hand still carries the warning.
     manualFulfillments.forEach(({code, credits, isPlanned}) => {
       reqOptions.push({
         code,
@@ -191,7 +251,10 @@ export const calculateMajorProgress = (
         inProgress: !!isPlanned, // Planned manuals show as in-progress
         required: true,
         credits: credits,
-        manual: true
+        manual: true,
+        ...(isCreditDFailCode(code) && major.creditDFail !== "allowed"
+          ? { creditDFail: "unverified" as const }
+          : {}),
       });
       if (isPlanned) {
         reqInProgress += 1;
@@ -215,8 +278,9 @@ export const calculateMajorProgress = (
         // Check if this course is excluded from this requirement
         const excluded = isExcluded(req.name, code);
 
-        const completed = canonicalCompleted.includes(code) && !excluded;
-        const inProgress = canonicalInProgress.includes(code) && !excluded;
+        const counts = !excluded && countsForMajor(code);
+        const completed = canonicalCompleted.includes(code) && counts;
+        const inProgress = canonicalInProgress.includes(code) && counts;
         // An exclusion says "this course I took should not count here". A skip
         // says "count this option as settled, I am not taking it" and is the
         // student's most recent word on the option, so it is not suppressed by
@@ -231,7 +295,8 @@ export const calculateMajorProgress = (
           inProgress: inProgress && !completed && !skipped,
           required: true,
           credits: course.credits,
-          skipped
+          skipped,
+          ...creditDFailOption(code, skipped),
         });
 
         if (completed || skipped) {
@@ -256,8 +321,9 @@ export const calculateMajorProgress = (
           // Check if this course is excluded from this requirement
           const excluded = isExcluded(req.name, code);
 
-          const completed = canonicalCompleted.includes(code) && !excluded;
-          const inProgress = canonicalInProgress.includes(code) && !excluded;
+          const counts = !excluded && countsForMajor(code);
+          const completed = canonicalCompleted.includes(code) && counts;
+          const inProgress = canonicalInProgress.includes(code) && counts;
           // See the note on the course branch above: a skip outranks an
           // exclusion, so skipping an excluded option is not a no-op.
           const skipped = canonicalSkipped.includes(code);
@@ -269,7 +335,8 @@ export const calculateMajorProgress = (
             inProgress: inProgress && !completed && !skipped,
             required: (groupCompleted + groupInProgress) < option.required,
             credits: course.credits,
-            skipped
+            skipped,
+            ...creditDFailOption(code, skipped),
           });
 
           if ((completed || skipped) && groupCompleted < option.required) {
@@ -302,7 +369,22 @@ export const calculateMajorProgress = (
 
           const info = getCourseInfo(code);
           const credits = info?.credits ?? 1;
+          // Under a "none" policy the course is listed, flagged, and not
+          // counted, so it reads as refused instead of vanishing.
+          if (!countsForMajor(code)) {
+            reqOptions.push({
+              code,
+              name: info?.name || code,
+              completed: false,
+              inProgress: false,
+              required: false,
+              credits,
+              creditDFail: 'refused',
+            });
+            return;
+          }
           const counted = reqCompleted + reqInProgress < req.required;
+          const flag = creditDFailFlagFor(code);
           reqOptions.push({
             code,
             name: info?.name || code,
@@ -310,6 +392,7 @@ export const calculateMajorProgress = (
             inProgress: status === 'inProgress',
             required: counted,
             credits,
+            ...(flag ? { creditDFail: flag } : {}),
           });
           if (!counted) return;
           if (status === 'completed') {
@@ -422,7 +505,8 @@ export function calculatePreviewMajorProgressByMajors(
   manualRequirements: ManualRequirementEntry[] = [],
   plannedCourseCodes: string[] = [],
   blockedCourseCodes: string[] = [],
-  distributionalsFor?: DistributionalResolver
+  distributionalsFor?: DistributionalResolver,
+  creditDFailCourseCodes: string[] = []
 ): Record<string, MajorProgress> {
   // Canonicalize + dedupe planned into inProgress (without overriding completed/skipped)
   const canon = (arr: string[]) =>
@@ -468,7 +552,8 @@ export function calculatePreviewMajorProgressByMajors(
       manualRequirements,
       [], // excludedRequirements - not used in simulator preview
       blockedCanon,
-      distributionalsFor
+      distributionalsFor,
+      creditDFailCourseCodes
     );
   }
   return out;

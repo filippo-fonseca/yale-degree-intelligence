@@ -95,13 +95,16 @@ export function LanguageSection({
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
               <span className="text-sm text-gray-500 dark:text-gray-400">
-                {viaEnglish ? (
+                {viaEnglish && isComplete ? (
                   <>
                     Satisfied by{" "}
                     <span className="text-teal-600 dark:text-teal-300 font-semibold">
                       ENGL 120
                     </span>
                   </>
+                ) : viaEnglish ? (
+                  // Only reachable when ENGL 120 was taken Credit/D/Fail.
+                  <>ENGL 120 taken Credit/D/Fail does not count</>
                 ) : (
                   <>
                     {track ? `${track.label}: placed into ` : "Placed into "}

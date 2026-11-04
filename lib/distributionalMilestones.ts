@@ -43,6 +43,7 @@ import {
   withEnglishLanguageRule,
 } from "@/lib/languageRequirement";
 import { effectiveDistributionals } from "@/lib/utils/effectiveDistributionals";
+import { isCreditDFail } from "@/lib/utils/creditDFail";
 import { compareTermNames, currentTermName, parseTermName } from "@/lib/academicTerm";
 
 /* -------------------------------------------------------------------------- */
@@ -270,10 +271,8 @@ function normalizeGrade(grade?: string | null): string {
   return (grade ?? "").trim().toUpperCase();
 }
 
-/** True when the course was taken Credit/D/Fail. */
-export function isCreditDFail(grade?: string | null): boolean {
-  return normalizeGrade(grade) === "CR";
-}
+// Cr/D/F detection is shared with the allocation and language engines.
+export { isCreditDFail };
 
 function hasPassingLetterGrade(course: MilestoneCourseInput): boolean {
   const g = normalizeGrade(course.grade);
@@ -408,8 +407,9 @@ function evaluateLanguage(
       required.length > 0 &&
       tracks.some(
         (track) =>
-          // ENGL 120 satisfies the requirement whatever the placement.
-          track.viaEnglish ||
+          // ENGL 120 satisfies the requirement whatever the placement, but
+          // only when it counts: taken Credit/D/Fail, it completes nothing.
+          (track.viaEnglish && track.isComplete) ||
           required.every((level) => (track.coursesByLevel[level] || []).length > 0),
       );
     return { credits, complete, inferredPlacement: false, source };

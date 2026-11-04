@@ -2,7 +2,7 @@
 
 import React from "react";
 import { motion } from "framer-motion";
-import { FiX, FiPlus, FiRotateCcw } from "react-icons/fi";
+import { FiX, FiPlus, FiRotateCcw, FiAlertTriangle } from "react-icons/fi";
 
 import {
   getReqStatus,
@@ -11,6 +11,7 @@ import {
   type ReqStats,
 } from "./requirementStatus";
 import { getDistPillStyle } from "@/lib/constants";
+import { creditDFailMajorNote } from "@/lib/utils/creditDFail";
 
 export type RequirementCardHandlers = {
   onOpenCourse: (opt: any, reqName: string) => void;
@@ -39,6 +40,7 @@ function optionPillClasses(opt: any): string {
 }
 
 function optionSuffix(opt: any): string {
+  if (opt.creditDFail === "refused") return ", Cr/D/F, not counted";
   if (opt.excluded) return ", excluded";
   if (opt.manual) return ", manual";
   if (opt.skipped) return ", skipped";
@@ -86,6 +88,18 @@ const RequirementCard = React.memo(function RequirementCard({
         (opt: any) => opt.completed || opt.manual || opt.skipped,
       )
     : req.options;
+
+  // One short warning for the whole requirement when a Credit/D/Fail course is
+  // on it. A refusal (the major's rule is recorded as "none") outranks the
+  // generic "check your major's rules" warning.
+  const creditDFailFlags = visibleOptions.map((opt: any) => opt.creditDFail);
+  const creditDFailNote = creditDFailMajorNote(
+    creditDFailFlags.includes("refused")
+      ? "refused"
+      : creditDFailFlags.includes("unverified")
+        ? "unverified"
+        : null,
+  );
 
   return (
     <motion.div
@@ -169,6 +183,15 @@ const RequirementCard = React.memo(function RequirementCard({
               <span className="ml-1 text-[0.65rem]">
                 ({opt.credits}cr{optionSuffix(opt)})
               </span>
+              {opt.creditDFail && (
+                <span
+                  className="ml-1 text-amber-600 dark:text-amber-400"
+                  title={creditDFailMajorNote(opt.creditDFail) ?? undefined}
+                  aria-label={creditDFailMajorNote(opt.creditDFail) ?? undefined}
+                >
+                  <FiAlertTriangle size={10} />
+                </span>
+              )}
               {showX && (
                 <button
                   type="button"
@@ -221,6 +244,13 @@ const RequirementCard = React.memo(function RequirementCard({
           </button>
         )}
       </div>
+
+      {creditDFailNote && (
+        <p className="mt-2 flex items-start gap-1 text-[10px] text-amber-700 dark:text-amber-300">
+          <FiAlertTriangle size={10} className="mt-0.5 shrink-0" />
+          <span>{creditDFailNote}</span>
+        </p>
+      )}
     </motion.div>
   );
 });

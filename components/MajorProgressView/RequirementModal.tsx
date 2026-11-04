@@ -1,8 +1,16 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { FiX, FiPlus, FiExternalLink, FiCornerDownLeft } from "react-icons/fi";
+import {
+  FiX,
+  FiPlus,
+  FiExternalLink,
+  FiCornerDownLeft,
+  FiAlertTriangle,
+} from "react-icons/fi";
 import Link from "next/link";
+import type { CreditDFailFlag } from "@/lib/majors";
+import { creditDFailMajorNote } from "@/lib/utils/creditDFail";
 
 /* ========= Types ========= */
 export type ReqOption = {
@@ -14,6 +22,8 @@ export type ReqOption = {
   skipped?: boolean;
   manual?: boolean;
   excluded?: boolean;
+  /** Set when the student took this course Credit/D/Fail. */
+  creditDFail?: CreditDFailFlag;
 };
 
 export type Requirement = {
@@ -207,7 +217,9 @@ export default function RequirementModal({
                         <span className="font-medium">{opt.code}</span>
                         <span className="text-[0.7rem] opacity-80">
                           ({opt.credits ?? 0}cr
-                          {opt.manual
+                          {opt.creditDFail === "refused"
+                            ? ", Cr/D/F, not counted"
+                            : opt.manual
                             ? ", manual"
                             : opt.excluded
                             ? ", excluded"
@@ -220,6 +232,15 @@ export default function RequirementModal({
                             : ""}
                           )
                         </span>
+                        {opt.creditDFail && (
+                          <span
+                            className="text-amber-600 dark:text-amber-400"
+                            title={creditDFailMajorNote(opt.creditDFail) ?? undefined}
+                            aria-label={creditDFailMajorNote(opt.creditDFail) ?? undefined}
+                          >
+                            <FiAlertTriangle size={12} />
+                          </span>
+                        )}
                       </div>
 
                       {/* Middle: explicit Expand button (only when expandable) */}

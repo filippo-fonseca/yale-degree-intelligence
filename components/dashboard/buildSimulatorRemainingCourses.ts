@@ -1,6 +1,7 @@
 import { Course } from "@/lib/types";
 import { calculateMajorProgress } from "@/lib/majors";
 import { distributionalResolverFor } from "@/lib/utils/effectiveDistributionals";
+import { isCreditDFailCourse } from "@/lib/utils/creditDFail";
 import {
   calculateCertificateProgress,
   certificateRequirements,
@@ -102,6 +103,7 @@ export function buildSimulatorRemainingCourses(
       excludedRequirements,
       majorBlocked,
       distributionalResolverFor(courses),
+      courses.filter(isCreditDFailCourse).map((course) => course.code),
     );
 
     return toPoolCourses(progress, major);

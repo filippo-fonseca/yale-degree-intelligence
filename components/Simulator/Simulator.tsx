@@ -64,6 +64,7 @@ import {
 } from "@/lib/certificates";
 import type { GPAEntry } from "@/lib/gpa";
 import type { DistTallyInput } from "@/lib/distributionalTally";
+import { isCreditDFailCourse } from "@/lib/utils/creditDFail";
 import {
   evaluateDistributionalMilestones,
   type DistReqKey,
@@ -1487,6 +1488,11 @@ export default function Simulator({
     // Taken courses resolve through their stored tags; planned ones through
     // the catalog. Feeds distributional major requirements (e.g. an L4 course).
     const distributionalsFor = distributionalResolverFor(takenForProjection);
+    // Courses taken Credit/D/Fail, so the major engine can flag (or, where a
+    // major records a "none" policy, refuse) them.
+    const creditDFailCodes = takenForProjection
+      .filter(isCreditDFailCourse)
+      .map((c) => c.code);
 
     const {
       policyOptions,
@@ -1547,6 +1553,7 @@ export default function Simulator({
           plannedCodesLocal,
           majorBlockedCodes,
           distributionalsFor,
+          creditDFailCodes,
         );
         setPreviewProgress(majorsAll);
       } else {
@@ -1599,6 +1606,7 @@ export default function Simulator({
             plannedCodesLocal,
             majorBlockedCodes,
             distributionalsFor,
+            creditDFailCodes,
           )[mid];
 
           if (
@@ -2647,6 +2655,7 @@ export default function Simulator({
                                 {showCourseDistributionals && (
                                   <CourseDistributionalControl
                                     value={effectiveDistributionals(course)}
+                                    creditDFail={isCreditDFailCourse(course)}
                                     onChange={(codes) =>
                                       updatePlannedCourse(semester.id, course.code, {
                                         distributionals: codes,

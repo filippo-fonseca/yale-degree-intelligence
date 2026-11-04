@@ -35,6 +35,7 @@ import {
 } from "@/lib/distributionalMilestones";
 import { effectiveDistributionals } from "@/lib/utils/effectiveDistributionals";
 import { withEnglishLanguageRule } from "@/lib/languageRequirement";
+import { countingDistributionals } from "@/lib/utils/creditDFail";
 import { isCurrentTerm, parseTermName } from "@/lib/academicTerm";
 
 /** The shape of a canvas column. Structurally the Simulator's `Semester`. */
@@ -213,7 +214,9 @@ export function buildDistributionalTallyInputs(args: {
   const entries: DistTallyInput[] = [];
   courses.forEach((course) => {
     const req = allocation.reqByCourseKey[allocation.keyOf(course)];
-    const languages = effectiveDistributionals(course).filter((t) =>
+    // A Credit/D/Fail course counts toward no requirement, language included;
+    // the allocation above already left it out of the five.
+    const languages = countingDistributionals(course).filter((t) =>
       LANGUAGE_LEVELS.has(t),
     );
     const codes = [...(req ? [req] : []), ...languages];

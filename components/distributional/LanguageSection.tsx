@@ -6,6 +6,7 @@ import { useMemo, useState } from "react";
 import { FiCheck, FiInfo } from "react-icons/fi";
 import { STATUS_CLASSES } from "../MajorProgressView/requirementStatus";
 import { buildLanguageTracks } from "@/lib/languageRequirement";
+import { CREDIT_D_FAIL_DIST_NOTE } from "@/lib/utils/creditDFail";
 import { LANG_LEVELS } from "./constants";
 
 // ─── Language section ─────────────────────────────────────────────────────────
@@ -31,6 +32,10 @@ export function LanguageSection({
   const getCount = (code: string) => (track?.coursesByLevel[code] || []).length;
   const getCoursesFor = (code: string): Course[] =>
     track?.coursesByLevel[code] || [];
+  // Tagged for a level but taken Credit/D/Fail: shown struck through under the
+  // level so it reads as not counting rather than disappearing.
+  const getCreditDFailFor = (code: string): Course[] =>
+    track?.creditDFailByLevel[code] || [];
 
   const placementLevel = track?.placement ?? null;
   const requiredLevels = track?.requiredLevels ?? [];
@@ -90,13 +95,16 @@ export function LanguageSection({
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
               <span className="text-sm text-gray-500 dark:text-gray-400">
-                {viaEnglish ? (
+                {viaEnglish && isComplete ? (
                   <>
                     Satisfied by{" "}
                     <span className="text-teal-600 dark:text-teal-300 font-semibold">
                       ENGL 120
                     </span>
                   </>
+                ) : viaEnglish ? (
+                  // Only reachable when ENGL 120 was taken Credit/D/Fail.
+                  <>ENGL 120 taken Credit/D/Fail does not count</>
                 ) : (
                   <>
                     {track ? `${track.label}: placed into ` : "Placed into "}
@@ -144,6 +152,7 @@ export function LanguageSection({
               const levelNum = parseInt(level.slice(1));
               const hasLevel = getCount(level) > 0;
               const coursesForLevel = getCoursesFor(level);
+              const crdfForLevel = getCreditDFailFor(level);
               const isRequired = requiredLevels.includes(level);
               const isNext = level === nextNeeded;
               const isNotNeeded = placementLevel !== null && !isRequired;
@@ -196,6 +205,13 @@ export function LanguageSection({
                   {coursesForLevel.length > 0 ? (
                     <span className="text-[10px] text-gray-400 dark:text-gray-500 mt-0.5 max-w-[70px] truncate text-center">
                       {coursesForLevel[0].code}
+                    </span>
+                  ) : crdfForLevel.length > 0 ? (
+                    <span
+                      className="text-[10px] text-gray-400 dark:text-gray-500 mt-0.5 max-w-[70px] truncate text-center line-through"
+                      title={CREDIT_D_FAIL_DIST_NOTE}
+                    >
+                      {crdfForLevel[0].code}
                     </span>
                   ) : subLabel ? (
                     <span
@@ -284,6 +300,20 @@ export function LanguageSection({
                 )}
             </span>
           </label>
+        )}
+
+        {/* Credit/D/Fail language courses, which complete no level */}
+        {LANG_LEVELS.some((l) => getCreditDFailFor(l).length > 0) && (
+          <div className="p-3 rounded-lg bg-gray-100/50 dark:bg-gray-800/30 border border-gray-200 dark:border-gray-800 mb-3">
+            <p className="text-xs text-gray-500 dark:text-gray-400">
+              <span className="font-medium text-gray-600 dark:text-gray-300">
+                Not counted:
+              </span>{" "}
+              {LANG_LEVELS.flatMap((l) => getCreditDFailFor(l).map((c) => c.code)).join(", ")}.
+              {" "}Courses taken Credit/D/Fail do not count toward the language
+              requirement, though they still set your inferred placement.
+            </p>
+          </div>
         )}
 
         {/* Info note */}

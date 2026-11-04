@@ -53,6 +53,7 @@ export const RELEASES: Release[] = [
           "The Distributionals page now reads your main Simulator plan, so it agrees with the Simulator about what is planned and what is still missing. In the Simulator, each distributional bar shows credit you have and credit you have planned separately.",
           "On the Distributionals page in Manual mode, a course you can move between requirements now shows its name next to the requirement picker, so you can tell which course you are moving.",
           "If your secondary school taught primarily in a language other than English, you can now say so in the Language section of the Distributionals page. ENGL 120 then counts toward your language requirement instead of WR, on the Distributionals page and in the Simulator.",
+          "Courses taken Credit/D/Fail no longer count toward your distributional requirements, following Yale's rules. They still appear, marked as not counting. When a Credit/D/Fail course fills a requirement in your major, it now carries a note to check your major's rules, since many majors do not accept them.",
         ],
       },
     ],

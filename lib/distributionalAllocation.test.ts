@@ -47,3 +47,34 @@ describe("allocateDistributionals", () => {
     expect(alloc.reqByCourseKey.x).toBe("Hu");
   });
 });
+
+describe("allocateDistributionals: Credit/D/Fail", () => {
+  it("counts a Credit/D/Fail course toward no requirement", () => {
+    const x = { ...course("x", ["Hu", "WR"]), grade: "CR" };
+    const y = course("y", ["Hu"]);
+    const alloc = allocateDistributionals([x, y], { auto: true, overrides: {} });
+
+    expect(alloc.reqByCourseKey).toEqual({ y: "Hu" });
+    expect(alloc.coursesByReq.Hu.map((c) => c.id)).toEqual(["y"]);
+    expect(alloc.coursesByReq.WR).toEqual([]);
+    expect(alloc.optionsByCourseKey.x).toBeUndefined();
+  });
+
+  it("reports a Credit/D/Fail course under every requirement it is tagged for", () => {
+    const x = { ...course("x", ["Hu", "WR"]), grade: " cr " };
+    const alloc = allocateDistributionals([x], { auto: true, overrides: {} });
+
+    expect(alloc.creditDFailByReq.Hu.map((c) => c.id)).toEqual(["x"]);
+    expect(alloc.creditDFailByReq.WR.map((c) => c.id)).toEqual(["x"]);
+    expect(alloc.creditDFailByReq.QR).toEqual([]);
+  });
+
+  it("ignores a manual override pointing a Credit/D/Fail course at a requirement", () => {
+    const x = { ...course("x", ["Hu"]), grade: "CR" };
+    const alloc = allocateDistributionals([x], {
+      auto: false,
+      overrides: { [x.code]: "Hu" },
+    });
+    expect(alloc.coursesByReq.Hu).toEqual([]);
+  });
+});

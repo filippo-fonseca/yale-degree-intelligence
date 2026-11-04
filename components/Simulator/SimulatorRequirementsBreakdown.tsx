@@ -2,11 +2,12 @@
 
 import React, { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { FiChevronDown, FiChevronUp, FiX } from "react-icons/fi";
+import { FiChevronDown, FiChevronUp, FiX, FiAlertTriangle } from "react-icons/fi";
 import { getCanonicalCode, normalizeCourseCode } from "@/lib/courseCatalog";
 import { MAJORS, MajorProgress, ManualRequirementEntry } from "@/lib/majors";
 import { CERTIFICATES, type CertificateProgress } from "@/lib/certificates";
 import { Course } from "@/lib/types";
+import { creditDFailMajorNote } from "@/lib/utils/creditDFail";
 import { programLabel, resolvePolicy } from "@/lib/certificatePolicy";
 import {
   buildProgramClaimContext,
@@ -915,6 +916,15 @@ function ReqSection({
                         {opt.completed && opt.manual && (
                           <span className="text-[9px] text-purple-400/70 ml-0.5">
                             manual
+                          </span>
+                        )}
+                        {opt.creditDFail && (
+                          <span
+                            className="ml-0.5 text-amber-600 dark:text-amber-400"
+                            title={creditDFailMajorNote(opt.creditDFail) ?? undefined}
+                            aria-label={creditDFailMajorNote(opt.creditDFail) ?? undefined}
+                          >
+                            <FiAlertTriangle size={9} />
                           </span>
                         )}
                         {isSimulatorManual && (

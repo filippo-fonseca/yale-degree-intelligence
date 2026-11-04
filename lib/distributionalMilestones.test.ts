@@ -349,6 +349,20 @@ describe("ENGL 120 for the language requirement", () => {
     });
     expect(milestone(res, "junior").slots[7].fill).toBe("done");
   });
+
+  it("does not finish the language requirement with ENGL 120 taken Credit/D/Fail", () => {
+    const crEnglish = noSpanish.map((x) =>
+      x.code === "ENGL 120" ? { ...x, grade: "CR" } : x,
+    );
+    const res = evaluateDistributionalMilestones({
+      courses: [...crEnglish, ...JUNIOR_AREAS, ...filler(19)],
+      graduationYear: 2028,
+      currentTerm: "Fall 2027",
+      languagePlacement: "L2",
+      englishSatisfiesLanguage: true,
+    });
+    expect(milestone(res, "junior").slots[7].fill).not.toBe("done");
+  });
 });
 
 describe("grading basis", () => {

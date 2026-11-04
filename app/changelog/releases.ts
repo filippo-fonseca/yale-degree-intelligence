@@ -52,6 +52,7 @@ export const RELEASES: Release[] = [
           "A distributional you have planned for later, such as a second humanities course in your last semester, now counts toward graduation instead of showing as not planned. The milestone chart now uses three clear states: solid bars are met, striped bars are planned, and red outlines are missing. Each year shows only the minimum Yale asks for by then.",
           "The Distributionals page now reads your main Simulator plan, so it agrees with the Simulator about what is planned and what is still missing. In the Simulator, each distributional bar shows credit you have and credit you have planned separately.",
           "On the Distributionals page in Manual mode, a course you can move between requirements now shows its name next to the requirement picker, so you can tell which course you are moving.",
+          "If your secondary school taught primarily in a language other than English, you can now say so in the Language section of the Distributionals page. ENGL 120 then counts toward your language requirement instead of WR, on the Distributionals page and in the Simulator.",
         ],
       },
     ],

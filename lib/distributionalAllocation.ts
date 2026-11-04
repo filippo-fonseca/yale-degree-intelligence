@@ -1,10 +1,15 @@
 import { Course } from "@/lib/types";
 import { effectiveDistributionals } from "@/lib/utils/effectiveDistributionals";
+import {
+  countingDistributionals,
+  isCreditDFailCourse,
+} from "@/lib/utils/creditDFail";
 
 // The five Yale area + skill distributional requirements that compete for a
 // single course. A course tagged with more than one of these may only count
 // toward ONE of them, so we have to decide which. Language levels (L1-L5) are a
-// separate axis and are intentionally NOT part of this allocation.
+// separate axis and are intentionally NOT part of this allocation. A course
+// taken Credit/D/Fail counts toward none of them (see lib/utils/creditDFail).
 export const ALLOC_REQS = [
   { code: "Hu", target: 2 },
   { code: "So", target: 2 },
@@ -37,6 +42,13 @@ export type DistAllocation = {
   coursesByReq: Record<string, Course[]>;
   /** Stable course key -> the area/skill requirements it is eligible for (>=1). */
   optionsByCourseKey: Record<string, string[]>;
+  /**
+   * Requirement code -> courses TAGGED for it that were taken Credit/D/Fail.
+   * They count toward nothing; this only lets a view show them as not counting
+   * instead of letting them vanish. A course appears under every requirement
+   * it is tagged for.
+   */
+  creditDFailByReq: Record<string, Course[]>;
   /** Stable course key by course (mirror of the key function for callers). */
   keyOf: (course: Course) => string;
 };
@@ -58,9 +70,12 @@ function courseKey(course: Course): string {
   return course.id || course.code;
 }
 
-/** The area/skill requirement codes a course is tagged with (intersection). */
+/**
+ * The area/skill requirement codes a course can count toward (intersection of
+ * its tags with the five). A Credit/D/Fail course is eligible for none.
+ */
 function eligibleOptions(course: Course): string[] {
-  const tags = effectiveDistributionals(course);
+  const tags = countingDistributionals(course);
   return ALLOC_REQ_CODES.filter((c) => tags.includes(c));
 }
 
@@ -237,10 +252,26 @@ export function allocateDistributionals(
     if (req) coursesByReq[req].push(c);
   });
 
+  const creditDFailByReq: Record<string, Course[]> = {};
+  ALLOC_REQ_CODES.forEach((c) => {
+    creditDFailByReq[c] = [];
+  });
+  courses
+    .filter((c) => !c.skipped && isCreditDFailCourse(c))
+    .slice()
+    .sort(byCode)
+    .forEach((c) => {
+      const tags = effectiveDistributionals(c);
+      ALLOC_REQ_CODES.forEach((req) => {
+        if (tags.includes(req)) creditDFailByReq[req].push(c);
+      });
+    });
+
   return {
     reqByCourseKey,
     coursesByReq,
     optionsByCourseKey,
+    creditDFailByReq,
     keyOf: courseKey,
   };
 }

@@ -1,5 +1,6 @@
 import { Course } from "@/lib/types";
 import { courseSubject, normalizeCourseCode } from "@/lib/courseCatalog";
+import { isCreditDFailCourse } from "@/lib/utils/creditDFail";
 import {
   effectiveDistributionals,
   type DistributionalCourseLike,
@@ -174,7 +175,14 @@ export type LanguageTrack = {
   subject: string;
   /** Friendly name when the catalog knows one ("French"), else the subject. */
   label: string;
+  /** Courses that count toward each level. Credit/D/Fail courses never do. */
   coursesByLevel: Record<string, Course[]>;
+  /**
+   * Courses tagged for a level but taken Credit/D/Fail. They do not complete
+   * the level, yet they still show where the student started, so they shape
+   * the inferred placement and stay visible as "not counting".
+   */
+  creditDFailByLevel: Record<string, Course[]>;
   taggedLevels: string[];
   /** Lowest level tagged in this language, which we read as the placement. */
   placement: number;
@@ -194,28 +202,38 @@ const UNKNOWN_SUBJECT = "__other__";
  * own. The returned list is ordered best-first: a completed language comes
  * first, then the furthest-along one, so callers that only want a single answer
  * ("is the language requirement done?") can read tracks[0].
+ *
+ * A course taken Credit/D/Fail never completes a level (Yale bars Cr/D/F from
+ * every distributional requirement), but it still counts as evidence of the
+ * placement: someone who took L1 Credit/D/Fail placed into L1, and reading
+ * their placement as L2 would shrink what they still owe.
  */
 export const buildLanguageTracks = (
   distMap: Record<string, Course[]>,
 ): LanguageTrack[] => {
-  const bySubject = new Map<string, Record<string, Course[]>>();
+  const bySubject = new Map<
+    string,
+    { counting: Record<string, Course[]>; crdf: Record<string, Course[]> }
+  >();
 
   LANG_LEVELS.forEach((level) => {
     (distMap[level] || []).forEach((course) => {
       const subject = isEnglishLanguageCourse(course.code)
         ? ENGLISH_LANGUAGE_TRACK
         : courseSubject(course.code) || UNKNOWN_SUBJECT;
-      const levels = bySubject.get(subject) || {};
-      levels[level] = [...(levels[level] || []), course];
-      bySubject.set(subject, levels);
+      const entry = bySubject.get(subject) || { counting: {}, crdf: {} };
+      const bucket = isCreditDFailCourse(course) ? entry.crdf : entry.counting;
+      bucket[level] = [...(bucket[level] || []), course];
+      bySubject.set(subject, entry);
     });
   });
 
   const tracks: LanguageTrack[] = [];
 
-  bySubject.forEach((coursesByLevel, subject) => {
+  bySubject.forEach(({ counting: coursesByLevel, crdf }, subject) => {
     const taggedLevels = LANG_LEVELS.filter(
-      (l) => (coursesByLevel[l] || []).length > 0,
+      (l) =>
+        (coursesByLevel[l] || []).length > 0 || (crdf[l] || []).length > 0,
     );
     if (taggedLevels.length === 0) return;
 
@@ -238,6 +256,7 @@ export const buildLanguageTracks = (
           ? "English (ENGL 120)"
           : LANGUAGE_SUBJECT_NAMES[subject] || subject,
       coursesByLevel,
+      creditDFailByLevel: crdf,
       taggedLevels: [...taggedLevels],
       placement,
       requiredLevels,

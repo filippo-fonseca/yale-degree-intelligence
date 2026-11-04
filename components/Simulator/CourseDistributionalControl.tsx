@@ -2,6 +2,7 @@
 
 import { getDistPillStyle } from "@/lib/constants";
 import { ALLOC_REQ_CODES } from "@/lib/distributionalAllocation";
+import { CREDIT_D_FAIL_DIST_NOTE } from "@/lib/utils/creditDFail";
 
 const LANG_LEVELS = ["L1", "L2", "L3", "L4", "L5"] as const;
 
@@ -12,12 +13,15 @@ interface CourseDistributionalControlProps {
   value: string[];
   onChange: (codes: string[]) => void;
   disabled?: boolean;
+  /** The course is graded Credit/D/Fail, so its tags count toward nothing. */
+  creditDFail?: boolean;
 }
 
 export default function CourseDistributionalControl({
   value,
   onChange,
   disabled = false,
+  creditDFail = false,
 }: CourseDistributionalControlProps) {
   const selected = value ?? [];
 
@@ -52,6 +56,14 @@ export default function CourseDistributionalControl({
           </button>
         );
       })}
+      {creditDFail && (
+        <span
+          className="basis-full text-[10px] text-gray-400 dark:text-gray-500"
+          title={CREDIT_D_FAIL_DIST_NOTE}
+        >
+          Cr/D/F: these tags do not count toward distributionals.
+        </span>
+      )}
     </div>
   );
 }

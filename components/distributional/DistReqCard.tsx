@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import { FiCheck } from "react-icons/fi";
 import { getDistPillStyle } from "@/lib/constants";
 import { type DistAllocation } from "@/lib/distributionalAllocation";
+import { CREDIT_D_FAIL_DIST_NOTE } from "@/lib/utils/creditDFail";
 import {
   getReqStatus,
   STATUS_CLASSES,
@@ -22,10 +23,13 @@ export function DistReqCard({
   manual = false,
   allocation,
   onReassign,
+  creditDFailCourses = [],
 }: {
   req: { code: string; name: string; color: string };
   count: number;
   courses: Course[];
+  /** Courses tagged for this requirement but taken Credit/D/Fail. */
+  creditDFailCourses?: Course[];
   target?: number;
   manual?: boolean;
   allocation?: DistAllocation;
@@ -161,6 +165,37 @@ export function DistReqCard({
               </div>
             );
           })}
+        </div>
+      )}
+
+      {/* Tagged for this requirement but taken Credit/D/Fail: listed so the
+          course does not silently vanish, struck through because it counts
+          for nothing here. */}
+      {creditDFailCourses.length > 0 && (
+        <div
+          className={`${
+            coursesForReq.length > 0 ? "mt-1.5" : "mt-3 pt-3 border-t border-gray-200/50 dark:border-gray-800/50"
+          } space-y-1.5`}
+        >
+          {creditDFailCourses.map((course) => (
+            <div
+              key={`crdf-${course.id}`}
+              className="flex items-center justify-between gap-2"
+              title={CREDIT_D_FAIL_DIST_NOTE}
+            >
+              <div className="flex items-center gap-1.5 min-w-0">
+                <span className="text-xs font-medium text-gray-400 dark:text-gray-500 line-through">
+                  {course.code}
+                </span>
+                <span className="text-[9px] px-1 py-0.5 rounded bg-gray-100 dark:bg-gray-800/60 text-gray-500 dark:text-gray-400 border border-gray-300/60 dark:border-gray-700/50 shrink-0">
+                  Cr/D/F
+                </span>
+              </div>
+              <span className="text-xs text-gray-400 dark:text-gray-500 truncate ml-2 max-w-[150px] text-right">
+                Does not count
+              </span>
+            </div>
+          ))}
         </div>
       )}
     </motion.div>

@@ -64,6 +64,7 @@ import {
 } from "@/lib/certificates";
 import type { GPAEntry } from "@/lib/gpa";
 import type { DistTallyInput } from "@/lib/distributionalTally";
+import { isCreditDFailCourse } from "@/lib/utils/creditDFail";
 import {
   evaluateDistributionalMilestones,
   type DistReqKey,
@@ -2647,6 +2648,7 @@ export default function Simulator({
                                 {showCourseDistributionals && (
                                   <CourseDistributionalControl
                                     value={effectiveDistributionals(course)}
+                                    creditDFail={isCreditDFailCourse(course)}
                                     onChange={(codes) =>
                                       updatePlannedCourse(semester.id, course.code, {
                                         distributionals: codes,

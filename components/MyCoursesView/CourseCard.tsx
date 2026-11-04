@@ -7,6 +7,10 @@ import { getDistPillStyle } from "@/lib/constants";
 import { getGPAColor } from "@/lib/utils/utils";
 import { getCourseNameFromCode } from "@/lib/courseCatalog";
 import { effectiveDistributionals } from "@/lib/utils/effectiveDistributionals";
+import {
+  CREDIT_D_FAIL_DIST_NOTE,
+  isCreditDFailCourse,
+} from "@/lib/utils/creditDFail";
 
 interface CourseCardProps {
   course: Course;
@@ -84,6 +88,9 @@ export function CourseCard({
       : "";
 
   const distributionals = effectiveDistributionals(course);
+  // Yale counts no Credit/D/Fail course toward distributionals, so its tags
+  // stay visible but read as struck through.
+  const distNotCounted = isCreditDFailCourse(course);
   const selectorOpen = distSelectorCourseId === course.id;
 
   return (
@@ -170,14 +177,27 @@ export function CourseCard({
         >
           <div className="flex flex-wrap items-center gap-1.5">
             {distributionals.length > 0 ? (
-              distributionals.map((d, dIdx) => (
-                <span
-                  key={`${d}-${dIdx}`}
-                  className={`text-[10px] px-2 py-0.5 rounded-full border font-medium ${getDistPillStyle(d)}`}
-                >
-                  {d}
-                </span>
-              ))
+              <>
+                {distributionals.map((d, dIdx) => (
+                  <span
+                    key={`${d}-${dIdx}`}
+                    className={`text-[10px] px-2 py-0.5 rounded-full border font-medium ${getDistPillStyle(d)} ${
+                      distNotCounted ? "opacity-50 line-through" : ""
+                    }`}
+                    title={distNotCounted ? CREDIT_D_FAIL_DIST_NOTE : undefined}
+                  >
+                    {d}
+                  </span>
+                ))}
+                {distNotCounted && (
+                  <span
+                    className="text-[10px] text-gray-400 dark:text-gray-500"
+                    title={CREDIT_D_FAIL_DIST_NOTE}
+                  >
+                    Cr/D/F, not counted
+                  </span>
+                )}
+              </>
             ) : (
               <span className="text-[10px] px-2 py-0.5 rounded-full border border-dashed border-gray-300 dark:border-gray-700/60 text-gray-400 dark:text-gray-500">
                 no distributionals

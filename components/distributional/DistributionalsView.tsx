@@ -317,6 +317,7 @@ const DistributionalsView = ({
                     manual={!autoAllocate}
                     allocation={allocation}
                     onReassign={reassign}
+                    creditDFailCourses={allocation.creditDFailByReq[req.code]}
                   />
                 ))}
               </div>
@@ -337,6 +338,7 @@ const DistributionalsView = ({
                     manual={!autoAllocate}
                     allocation={allocation}
                     onReassign={reassign}
+                    creditDFailCourses={allocation.creditDFailByReq[req.code]}
                   />
                 ))}
               </div>
@@ -373,6 +375,11 @@ const DistributionalsView = ({
               split that satisfies the most requirements; switch to{" "}
               <span className="font-medium text-purple-600 dark:text-purple-300">Manual</span> to choose
               each course's requirement yourself with the dropdowns on the cards.
+            </p>
+            <p>
+              <span className="text-gray-700 dark:text-gray-300 font-medium">Credit/D/Fail:</span>{" "}
+              a course taken Credit/D/Fail does not count toward any area, skill, or
+              language requirement. It still shows on the cards, struck through.
             </p>
             <p className="text-xs text-gray-400 dark:text-gray-500 mt-2">
               Tags come from Yale's course catalog by default, and anything you

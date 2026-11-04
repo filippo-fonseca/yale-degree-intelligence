@@ -311,6 +311,46 @@ describe("junior milestone", () => {
   });
 });
 
+describe("ENGL 120 for the language requirement", () => {
+  const noSpanish = JUNIOR_SKILLS.filter((x) => !x.code.startsWith("SPAN"));
+
+  it("leaves ENGL 120 as writing when the student has not opted in", () => {
+    const res = evaluateDistributionalMilestones({
+      courses: [...noSpanish, ...JUNIOR_AREAS, ...filler(19)],
+      graduationYear: 2028,
+      currentTerm: "Fall 2027",
+    });
+    const m = milestone(res, "junior");
+    expect(m.slots[6].fill).toBe("done");
+    expect(m.slots[7].fill).toBe("empty");
+  });
+
+  it("counts ENGL 120 toward the language requirement and not WR", () => {
+    const res = evaluateDistributionalMilestones({
+      courses: [...noSpanish, ...JUNIOR_AREAS, ...filler(19)],
+      graduationYear: 2028,
+      currentTerm: "Fall 2027",
+      englishSatisfiesLanguage: true,
+    });
+    const m = milestone(res, "junior");
+    // Second WR bar loses ENGL 120; the language bar gains it.
+    expect(m.slots[6].fill).toBe("empty");
+    expect(m.slots[7].fill).toBe("done");
+    expect(m.slots[7].source).toBe("ENGL 120");
+  });
+
+  it("finishes the language requirement whatever the placement", () => {
+    const res = evaluateDistributionalMilestones({
+      courses: [...noSpanish, ...JUNIOR_AREAS, ...filler(19)],
+      graduationYear: 2028,
+      currentTerm: "Fall 2027",
+      languagePlacement: "L2",
+      englishSatisfiesLanguage: true,
+    });
+    expect(milestone(res, "junior").slots[7].fill).toBe("done");
+  });
+});
+
 describe("grading basis", () => {
   const crWriting = c({ code: "ENGL 114", distributionals: ["WR"], grade: "CR" });
 

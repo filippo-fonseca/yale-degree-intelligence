@@ -321,3 +321,46 @@ describe("buildDistributionalTallyInputs planned credit", () => {
     expect(tally.plannedCounts.Hu).toBe(1);
   });
 });
+
+describe("ENGL 120 for the language requirement", () => {
+  const taken = [
+    course({ code: "ENGL 120", status: "completed", distributionals: ["WR"] }),
+  ];
+  const plan = [
+    term("Fall 2030", [course({ code: "ENGL 114", distributionals: ["WR"] })]),
+  ];
+
+  it("tallies ENGL 120 as writing by default", () => {
+    const counts = countOf(
+      buildDistributionalTallyInputs({ taken, semesters: plan, ...auto }),
+    );
+    expect(counts.WR).toBe(2);
+    expect(counts.L5).toBeUndefined();
+  });
+
+  it("moves ENGL 120 from WR to the language axis on opt-in", () => {
+    const counts = countOf(
+      buildDistributionalTallyInputs({
+        taken,
+        semesters: plan,
+        ...auto,
+        englishSatisfiesLanguage: true,
+      }),
+    );
+    expect(counts.WR).toBe(1);
+    expect(counts.L5).toBe(1);
+  });
+
+  it("applies to ENGL 120 when it is only planned", () => {
+    const counts = countOf(
+      buildDistributionalTallyInputs({
+        taken: [],
+        semesters: [term("Fall 2030", [course({ code: "ENGL 120" })])],
+        ...auto,
+        englishSatisfiesLanguage: true,
+      }),
+    );
+    expect(counts.WR).toBeUndefined();
+    expect(counts.L5).toBe(1);
+  });
+});

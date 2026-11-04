@@ -156,6 +156,7 @@ export function useMajorProgressData(
           completed: !!(prev.completed || o.completed),
           skipped: !!(prev.skipped || o.skipped),
           manual: !!(prev.manual || o.manual),
+          creditDFail: prev.creditDFail ?? o.creditDFail,
           credits: Math.max(prev.credits ?? 0, o.credits ?? 0),
         });
       }

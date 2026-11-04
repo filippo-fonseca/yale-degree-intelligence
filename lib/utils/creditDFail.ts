@@ -47,3 +47,20 @@ export function countingDistributionals(
 /** Short reason shown wherever a Cr/D/F course's tags read as not counting. */
 export const CREDIT_D_FAIL_DIST_NOTE =
   "Taken Credit/D/Fail, so it does not count toward distributional requirements.";
+
+/** Warning on a major requirement a Cr/D/F course fills, rule unrecorded. */
+export const CREDIT_D_FAIL_MAJOR_WARNING =
+  "Taken Credit/D/Fail. Many majors do not count Cr/D/F courses; check your major's rules.";
+
+/** Note on a Cr/D/F course a major with a recorded "none" rule refuses. */
+export const CREDIT_D_FAIL_MAJOR_REFUSED =
+  "Taken Credit/D/Fail. This major does not count Cr/D/F courses.";
+
+/** The major warning for an option's flag, or null when there is nothing to say. */
+export function creditDFailMajorNote(
+  flag: "unverified" | "refused" | undefined | null,
+): string | null {
+  if (flag === "refused") return CREDIT_D_FAIL_MAJOR_REFUSED;
+  if (flag === "unverified") return CREDIT_D_FAIL_MAJOR_WARNING;
+  return null;
+}

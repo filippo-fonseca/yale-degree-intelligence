@@ -364,3 +364,35 @@ describe("ENGL 120 for the language requirement", () => {
     expect(counts.L5).toBe(1);
   });
 });
+
+describe("buildDistributionalTallyInputs: Credit/D/Fail", () => {
+  it("counts no area, skill, or language credit for a Credit/D/Fail course", () => {
+    const counts = countOf(
+      buildDistributionalTallyInputs({
+        taken: [
+          course({
+            code: "TEST 900",
+            status: "completed",
+            grade: "CR",
+            semester: "Fall",
+            year: 2025,
+            distributionals: ["Hu", "L3"],
+          }),
+          course({
+            code: "TEST 901",
+            status: "completed",
+            grade: "A",
+            semester: "Fall",
+            year: 2025,
+            distributionals: ["So"],
+          }),
+        ],
+        semesters: [],
+        ...auto,
+      }),
+    );
+    expect(counts.Hu).toBeUndefined();
+    expect(counts.L3).toBeUndefined();
+    expect(counts.So).toBe(1);
+  });
+});

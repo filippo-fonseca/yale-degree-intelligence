@@ -149,3 +149,32 @@ describe("ENGL 120 for students schooled in another language", () => {
     expect(tracks[1]).toMatchObject({ subject: "RUSS", viaEnglish: false });
   });
 });
+
+describe("buildLanguageTracks: Credit/D/Fail", () => {
+  const crdf = (code: string): Course => ({ ...course(code), grade: "CR" });
+
+  it("does not complete a level with a Credit/D/Fail course", () => {
+    const [track] = buildLanguageTracks({ L5: [crdf("FREN S164")] });
+
+    expect(track.isComplete).toBe(false);
+    expect(track.completedRequired).toEqual([]);
+    expect(track.coursesByLevel.L5 ?? []).toEqual([]);
+    expect(track.creditDFailByLevel.L5.map((c) => c.code)).toEqual(["FREN S164"]);
+  });
+
+  it("still reads the placement from a Credit/D/Fail course", () => {
+    // L1 taken Credit/D/Fail, then L2 and L3 for a grade: the placement is
+    // still L1, so the sequence is L1-L3 and L1 is the level left to do.
+    const [track] = buildLanguageTracks({
+      L1: [crdf("SPAN 1100")],
+      L2: [course("SPAN 1200")],
+      L3: [course("SPAN 1300")],
+    });
+
+    expect(track.placement).toBe(1);
+    expect(track.requiredLevels).toEqual(["L1", "L2", "L3"]);
+    expect(track.completedRequired).toEqual(["L2", "L3"]);
+    expect(track.isComplete).toBe(false);
+    expect(track.nextNeeded).toBe("L1");
+  });
+});

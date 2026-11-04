@@ -8,7 +8,11 @@
  */
 
 import { describe, expect, it } from "vitest";
-import { calculateMajorProgress } from "@/lib/majors";
+import {
+  calculateMajorProgress,
+  majorRequirements,
+  type MajorCreditDFailPolicy,
+} from "@/lib/majors";
 
 const MAJOR = "CPSC_BS";
 const REQUIREMENT = "Data Structures and Programming Techniques";
@@ -171,5 +175,133 @@ describe("calculateMajorProgress: Global Affairs L4 language requirement", () =>
     const { req } = langReq(["LATN 3900", "GREK 1400"]);
     expect(req?.completed).toBe(0);
     expect(req?.satisfied).toBe(false);
+  });
+});
+
+describe("calculateMajorProgress: Credit/D/Fail", () => {
+  // No major records its Cr/D/F rule yet, so the "none" and "allowed" cases
+  // set the field on a real major for the length of one test.
+  function withPolicy<T>(
+    majorId: string,
+    policy: MajorCreditDFailPolicy | undefined,
+    fn: () => T,
+  ): T {
+    const major = majorRequirements[majorId];
+    const before = major.creditDFail;
+    major.creditDFail = policy;
+    try {
+      return fn();
+    } finally {
+      major.creditDFail = before;
+    }
+  }
+
+  const progressFor = (completed: string[], crdf: string[]) =>
+    calculateMajorProgress(
+      MAJOR,
+      completed,
+      [],
+      [],
+      [],
+      [],
+      [],
+      undefined,
+      crdf,
+    );
+
+  it("records a Cr/D/F policy only as \"none\" or \"allowed\"", () => {
+    for (const major of Object.values(majorRequirements)) {
+      if (major.creditDFail !== undefined) {
+        expect(["none", "allowed"]).toContain(major.creditDFail);
+      }
+    }
+  });
+
+  it("still counts a Cr/D/F course when the major's rule is unrecorded, with a warning", () => {
+    const progress = progressFor([CODE], [CODE]);
+    const option = optionFor(progress, REQUIREMENT, CODE);
+
+    expect(option?.completed).toBe(true);
+    expect(option?.creditDFail).toBe("unverified");
+  });
+
+  it("does not flag a course taken for a letter grade", () => {
+    const option = optionFor(progressFor([CODE], []), REQUIREMENT, CODE);
+    expect(option?.completed).toBe(true);
+    expect(option?.creditDFail).toBeUndefined();
+  });
+
+  it("refuses a Cr/D/F course for a major whose rule is \"none\"", () => {
+    withPolicy(MAJOR, "none", () => {
+      const counted = progressFor([CODE], []);
+      const progress = progressFor([CODE], [CODE]);
+      const option = optionFor(progress, REQUIREMENT, CODE);
+
+      expect(option?.completed).toBe(false);
+      expect(option?.inProgress).toBe(false);
+      expect(option?.creditDFail).toBe("refused");
+      expect(progress.completedCredits).toBeLessThan(counted.completedCredits);
+    });
+  });
+
+  it("counts a Cr/D/F course without a warning for a major whose rule is \"allowed\"", () => {
+    withPolicy(MAJOR, "allowed", () => {
+      const option = optionFor(progressFor([CODE], [CODE]), REQUIREMENT, CODE);
+      expect(option?.completed).toBe(true);
+      expect(option?.creditDFail).toBeUndefined();
+    });
+  });
+
+  it("keeps a manual assignment of a Cr/D/F course, flagged, even under \"none\"", () => {
+    withPolicy(MAJOR, "none", () => {
+      const progress = calculateMajorProgress(
+        MAJOR,
+        [CODE],
+        [],
+        [],
+        [{ code: CODE, requirement: REQUIREMENT, credits: 1 }],
+        [],
+        [],
+        undefined,
+        [CODE],
+      );
+      const option = optionFor(progress, REQUIREMENT, CODE);
+      expect(option?.manual).toBe(true);
+      expect(option?.completed).toBe(true);
+      expect(option?.creditDFail).toBe("unverified");
+    });
+  });
+
+  it("lists, but does not count, a Cr/D/F course on a distributional option under \"none\"", () => {
+    const GLBL = "GLBL_BA";
+    const LANG_REQ = "Language Requirement (L4)";
+    const resolver = (code: string) => (code === "SPAN 1400" ? ["L4"] : []);
+    withPolicy(GLBL, "none", () => {
+      const progress = calculateMajorProgress(
+        GLBL,
+        ["SPAN 1400"],
+        [],
+        [],
+        [],
+        [],
+        [],
+        resolver,
+        ["SPAN 1400"],
+      );
+      const req = [
+        ...progress.completedRequirements,
+        ...progress.inProgressRequirements,
+        ...progress.remainingRequirements,
+      ].find((r) => r.name === LANG_REQ);
+
+      expect(req?.satisfied).toBe(false);
+      expect(req?.options).toEqual([
+        expect.objectContaining({
+          code: "SPAN 1400",
+          completed: false,
+          creditDFail: "refused",
+        }),
+      ]);
+    });
   });
 });

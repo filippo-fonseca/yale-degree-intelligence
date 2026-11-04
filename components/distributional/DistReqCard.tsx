@@ -102,7 +102,8 @@ export function DistReqCard({
             const isCompleted =
               course.status === "completed" && !course.skipped;
             const isInProgress = course.status === "in-progress";
-            const courseName = getCourseNameFromCode(course.code);
+            const courseName =
+              course.name ?? getCourseNameFromCode(course.code);
             return (
               <div
                 key={course.id}

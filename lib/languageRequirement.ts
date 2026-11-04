@@ -1,7 +1,85 @@
 import { Course } from "@/lib/types";
-import { courseSubject } from "@/lib/courseCatalog";
+import { courseSubject, normalizeCourseCode } from "@/lib/courseCatalog";
+import {
+  effectiveDistributionals,
+  type DistributionalCourseLike,
+} from "@/lib/utils/effectiveDistributionals";
 
 export const LANG_LEVELS = ["L1", "L2", "L3", "L4", "L5"] as const;
+
+const LANG_LEVEL_SET = new Set<string>(LANG_LEVELS);
+
+/* -------------------------------------------------------------------------- */
+/* ENGL 120 for students schooled in another language                          */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * ENGL 120 (Reading and Writing the Modern Essay) under its current catalog
+ * number. Legacy spellings ("ENGL 120") normalize to this.
+ */
+export const ENGLISH_LANGUAGE_COURSE = "ENGL 1020";
+
+/**
+ * The level the rule tags ENGL 120 with. Any one-course level would do; L5 is
+ * used because a single L5 course already satisfies the requirement in the
+ * track engine below, so every surface that reads language levels (the
+ * Distributionals page, the Simulator tally, the milestone chart) agrees
+ * without a special case of its own.
+ */
+export const ENGLISH_LANGUAGE_LEVEL = "L5";
+
+/** Track key for ENGL 120, kept apart from any other ENGL course. */
+export const ENGLISH_LANGUAGE_TRACK = "ENGL 120";
+
+export const isEnglishLanguageCourse = (code: string | null | undefined): boolean =>
+  !!code && normalizeCourseCode(code) === ENGLISH_LANGUAGE_COURSE;
+
+/**
+ * A student whose secondary school taught primarily in a language other than
+ * English may satisfy the language requirement with ENGL 120. When they opt in,
+ * ENGL 120 counts toward the language requirement and NOT toward WR, so its
+ * tags swap WR (and any stray level) for the language level. Other tags are
+ * left alone, and every other course is returned untouched.
+ */
+export const applyEnglishLanguageRule = (
+  code: string,
+  tags: string[],
+  enabled: boolean,
+): string[] => {
+  if (!enabled || !isEnglishLanguageCourse(code)) return tags;
+  return [
+    ...tags.filter((t) => t !== "WR" && !LANG_LEVEL_SET.has(t)),
+    ENGLISH_LANGUAGE_LEVEL,
+  ];
+};
+
+/**
+ * The rule applied to a list of courses, for the shared distributional
+ * computations. Matching courses come back as copies with their effective tags
+ * rewritten; nothing is persisted, so the stored tags (and the tag editors that
+ * read them) never see the swap. With the rule off the same array is returned,
+ * so memoized callers do not recompute.
+ */
+export function withEnglishLanguageRule<T extends DistributionalCourseLike>(
+  courses: T[],
+  enabled: boolean,
+): T[] {
+  if (!enabled || !courses?.some((c) => isEnglishLanguageCourse(c?.code))) {
+    return courses;
+  }
+  return courses.map((c) =>
+    isEnglishLanguageCourse(c?.code)
+      ? {
+          ...c,
+          distributionals: applyEnglishLanguageRule(
+            c.code,
+            effectiveDistributionals(c),
+            true,
+          ),
+        }
+      : c,
+  );
+}
 
 /**
  * Display names for the subject codes Yale teaches languages under. Only used
@@ -105,6 +183,8 @@ export type LanguageTrack = {
   progress: number;
   isComplete: boolean;
   nextNeeded: string | null;
+  /** True for the ENGL 120 track, which satisfies the requirement on its own. */
+  viaEnglish: boolean;
 };
 
 const UNKNOWN_SUBJECT = "__other__";
@@ -122,7 +202,9 @@ export const buildLanguageTracks = (
 
   LANG_LEVELS.forEach((level) => {
     (distMap[level] || []).forEach((course) => {
-      const subject = courseSubject(course.code) || UNKNOWN_SUBJECT;
+      const subject = isEnglishLanguageCourse(course.code)
+        ? ENGLISH_LANGUAGE_TRACK
+        : courseSubject(course.code) || UNKNOWN_SUBJECT;
       const levels = bySubject.get(subject) || {};
       levels[level] = [...(levels[level] || []), course];
       bySubject.set(subject, levels);
@@ -145,11 +227,15 @@ export const buildLanguageTracks = (
       (l) => (coursesByLevel[l] || []).length > 0,
     );
 
+    const viaEnglish = subject === ENGLISH_LANGUAGE_TRACK;
+
     tracks.push({
       subject,
       label:
         subject === UNKNOWN_SUBJECT
           ? "Language"
+          : viaEnglish
+          ? "English (ENGL 120)"
           : LANGUAGE_SUBJECT_NAMES[subject] || subject,
       coursesByLevel,
       taggedLevels: [...taggedLevels],
@@ -166,6 +252,7 @@ export const buildLanguageTracks = (
       nextNeeded:
         requiredLevels.find((l) => (coursesByLevel[l] || []).length === 0) ||
         null,
+      viaEnglish,
     });
   });
 

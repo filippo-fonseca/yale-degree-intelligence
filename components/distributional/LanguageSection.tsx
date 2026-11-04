@@ -12,8 +12,13 @@ import { LANG_LEVELS } from "./constants";
 
 export function LanguageSection({
   distMap,
+  englishSatisfiesLanguage = false,
+  onEnglishSatisfiesLanguageChange,
 }: {
   distMap: Record<string, Course[]>;
+  /** ENGL 120 counts toward this requirement instead of WR. */
+  englishSatisfiesLanguage?: boolean;
+  onEnglishSatisfiesLanguageChange?: (next: boolean) => void;
 }) {
   // The requirement is satisfied inside one language, so every number below is
   // scoped to the selected track. Tracks arrive best-first, so the default
@@ -34,6 +39,11 @@ export function LanguageSection({
   const isComplete = track?.isComplete ?? false;
   const nextNeeded = track?.nextNeeded ?? undefined;
   const satisfyingTrack = tracks.find((t) => t.isComplete) || null;
+  // The ENGL 120 track has no placement ladder: the one course is the whole
+  // requirement, so it gets its own copy instead of "placed into L5".
+  const viaEnglish = track?.viaEnglish ?? false;
+  const describeTrack = (t: NonNullable<typeof track>) =>
+    t.viaEnglish ? t.label : `${t.label} (L${t.placement} placement)`;
 
   // Derive status for header card styling
   const langStatus = isComplete
@@ -80,10 +90,21 @@ export function LanguageSection({
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
               <span className="text-sm text-gray-500 dark:text-gray-400">
-                {track ? `${track.label}: placed into ` : "Placed into "}
-                <span className="text-teal-600 dark:text-teal-300 font-semibold">
-                  L{placementLevel}
-                </span>
+                {viaEnglish ? (
+                  <>
+                    Satisfied by{" "}
+                    <span className="text-teal-600 dark:text-teal-300 font-semibold">
+                      ENGL 120
+                    </span>
+                  </>
+                ) : (
+                  <>
+                    {track ? `${track.label}: placed into ` : "Placed into "}
+                    <span className="text-teal-600 dark:text-teal-300 font-semibold">
+                      L{placementLevel}
+                    </span>
+                  </>
+                )}
               </span>
               {isComplete && (
                 <span className="px-2 py-0.5 text-xs rounded-full bg-emerald-500/20 text-emerald-600 dark:text-emerald-300 border border-emerald-500/30">
@@ -115,6 +136,7 @@ export function LanguageSection({
         )}
 
         {/* L-level track */}
+        {!viaEnglish && (
         <div className="relative py-2 mb-4">
           <div className="absolute top-[22px] left-[10%] right-[10%] h-0.5 bg-gray-200 dark:bg-gray-800 rounded-full" />
           <div className="relative flex justify-between px-2">
@@ -191,6 +213,7 @@ export function LanguageSection({
             })}
           </div>
         </div>
+        )}
 
         {/* Status message */}
         {placementLevel === null ? (
@@ -204,8 +227,7 @@ export function LanguageSection({
             <div className="p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/20 mb-3">
               <p className="text-xs text-emerald-600 dark:text-emerald-300">
                 Your language requirement is already satisfied by{" "}
-                <span className="font-semibold">{satisfyingTrack.label}</span> (L
-                {satisfyingTrack.placement} placement).{" "}
+                <span className="font-semibold">{describeTrack(satisfyingTrack)}</span>.{" "}
                 {track?.label} is extra: the next course in that sequence would be{" "}
                 <span className="font-semibold">{nextNeeded}</span>.
               </p>
@@ -225,11 +247,44 @@ export function LanguageSection({
         ) : isComplete ? (
           <div className="p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/20 mb-3">
             <p className="text-xs text-emerald-600 dark:text-emerald-300">
-              Language requirement complete{track ? ` in ${track.label}` : ""} for
-              your L{placementLevel} placement.
+              {viaEnglish ? (
+                <>
+                  Language requirement complete through ENGL 120. It counts here
+                  instead of toward Writing (WR).
+                </>
+              ) : (
+                <>
+                  Language requirement complete{track ? ` in ${track.label}` : ""} for
+                  your L{placementLevel} placement.
+                </>
+              )}
             </p>
           </div>
         ) : null}
+
+        {/* ENGL 120 opt-in for students schooled in another language */}
+        {onEnglishSatisfiesLanguageChange && (
+          <label className="flex items-start gap-2.5 p-3 mb-3 rounded-lg bg-gray-100/50 dark:bg-gray-800/30 border border-gray-200 dark:border-gray-800 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={englishSatisfiesLanguage}
+              onChange={(e) => onEnglishSatisfiesLanguageChange(e.target.checked)}
+              className="mt-0.5 h-4 w-4 flex-shrink-0 accent-teal-500 cursor-pointer"
+            />
+            <span className="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">
+              <span className="font-medium text-gray-800 dark:text-gray-200">
+                My secondary school&apos;s primary language of instruction was not
+                English.
+              </span>{" "}
+              ENGL 120 then counts toward your language requirement, and no
+              longer toward Writing (WR).
+              {englishSatisfiesLanguage &&
+                !tracks.some((t) => t.viaEnglish) && (
+                  <> Add ENGL 120 to your courses or plan to see it here.</>
+                )}
+            </span>
+          </label>
+        )}
 
         {/* Info note */}
         <div className="p-3 rounded-lg bg-gray-100/50 dark:bg-gray-800/30 border border-gray-200 dark:border-gray-800">

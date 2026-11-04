@@ -34,6 +34,7 @@ import {
   type MilestoneCourseInput,
 } from "@/lib/distributionalMilestones";
 import { effectiveDistributionals } from "@/lib/utils/effectiveDistributionals";
+import { withEnglishLanguageRule } from "@/lib/languageRequirement";
 import { isCurrentTerm, parseTermName } from "@/lib/academicTerm";
 
 /** The shape of a canvas column. Structurally the Simulator's `Semester`. */
@@ -164,8 +165,11 @@ export function buildDistributionalTallyInputs(args: {
   semesters: PlanSemesterLike[];
   auto: boolean;
   overrides: Record<string, string>;
+  /** ENGL 120 counts toward the language requirement instead of WR. */
+  englishSatisfiesLanguage?: boolean;
 }): DistTallyInput[] {
   const { taken, semesters, auto, overrides } = args;
+  const english = !!args.englishSatisfiesLanguage;
 
   const takenCourses = (taken ?? []).filter(isRealCourse);
   const takenCodes = new Set(takenCourses.map((c) => c.code));
@@ -177,13 +181,19 @@ export function buildDistributionalTallyInputs(args: {
     ...c,
     credits: planCourseCredits(c),
   });
-  const settled: Course[] = [
-    ...takenCourses,
-    ...placements.filter((p) => isCurrentTerm(p.term)).map((p) => p.course),
-  ].map(withCredits);
-  const planned: Course[] = placements
-    .filter((p) => !isCurrentTerm(p.term))
-    .map((p) => withCredits(p.course));
+  const settled: Course[] = withEnglishLanguageRule(
+    [
+      ...takenCourses,
+      ...placements.filter((p) => isCurrentTerm(p.term)).map((p) => p.course),
+    ].map(withCredits),
+    english,
+  );
+  const planned: Course[] = withEnglishLanguageRule(
+    placements
+      .filter((p) => !isCurrentTerm(p.term))
+      .map((p) => withCredits(p.course)),
+    english,
+  );
   const courses = [...settled, ...planned];
 
   const graduation = Object.fromEntries(

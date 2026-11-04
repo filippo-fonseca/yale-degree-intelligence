@@ -9,6 +9,9 @@ export function useDistributionalPreferences() {
   const { user } = useAuth();
   const [autoAllocate, setAutoAllocate] = useState(true);
   const [overrides, setOverrides] = useState<Record<string, string>>({});
+  // ENGL 120 counts toward the language requirement (and not WR) for students
+  // whose secondary school taught primarily in another language.
+  const [englishSatisfiesLanguage, setEnglishFlag] = useState(false);
 
   // Load the user's saved allocation preferences once.
   useEffect(() => {
@@ -21,11 +24,14 @@ export function useDistributionalPreferences() {
         const data = snap.data() as {
           distributionalAutoAllocate?: boolean;
           distributionalAllocations?: Record<string, string>;
+          englishSatisfiesLanguage?: boolean;
         };
         if (typeof data.distributionalAutoAllocate === "boolean")
           setAutoAllocate(data.distributionalAutoAllocate);
         if (data.distributionalAllocations)
           setOverrides(data.distributionalAllocations);
+        if (typeof data.englishSatisfiesLanguage === "boolean")
+          setEnglishFlag(data.englishSatisfiesLanguage);
       } catch {
         // non-fatal: fall back to auto allocation
       }
@@ -63,10 +69,24 @@ export function useDistributionalPreferences() {
     persist(autoAllocate, next);
   };
 
+  const setEnglishSatisfiesLanguage = (next: boolean) => {
+    setEnglishFlag(next);
+    if (!user) return;
+    setDoc(
+      doc(db, "users", user.uid),
+      { englishSatisfiesLanguage: next },
+      { merge: true },
+    ).catch(() => {
+      // non-fatal: UI state is already updated optimistically
+    });
+  };
+
   return {
     autoAllocate,
     overrides,
+    englishSatisfiesLanguage,
     setAuto,
     reassign,
+    setEnglishSatisfiesLanguage,
   };
 }

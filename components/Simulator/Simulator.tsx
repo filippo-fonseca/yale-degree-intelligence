@@ -484,6 +484,10 @@ export default function Simulator({
   const [distribOverrides, setDistribOverrides] = useState<
     Record<string, string>
   >({});
+  // ENGL 120 counts toward the language requirement instead of WR (set on the
+  // Distributionals page, read here so both surfaces agree).
+  const [englishSatisfiesLanguage, setEnglishSatisfiesLanguage] =
+    useState(false);
 
   // keep initial snapshot to detect changes
   const initialSemestersRef = useRef<Semester[]>([]);
@@ -828,11 +832,13 @@ export default function Simulator({
               savedPlans?: Plan[];
               distributionalAutoAllocate?: boolean;
               distributionalAllocations?: Record<string, string>;
+              englishSatisfiesLanguage?: boolean;
             })
           : null;
         // Seed the simulator's distributional base from the user's profile prefs.
         setDistribAutoAllocate(data?.distributionalAutoAllocate ?? true);
         setDistribOverrides(data?.distributionalAllocations ?? {});
+        setEnglishSatisfiesLanguage(data?.englishSatisfiesLanguage === true);
         let plans = data?.savedPlans ?? [];
         if (plans.length > 0) {
           // Migrate existing users: if no default is set, the newest becomes default.
@@ -1413,8 +1419,15 @@ export default function Simulator({
         semesters,
         auto: distribAutoAllocate,
         overrides: distribOverrides,
+        englishSatisfiesLanguage,
       }),
-    [takenForProjection, semesters, distribAutoAllocate, distribOverrides],
+    [
+      takenForProjection,
+      semesters,
+      distribAutoAllocate,
+      distribOverrides,
+      englishSatisfiesLanguage,
+    ],
   );
 
   // The same plan, shaped for Yale's promotion milestones. These are cumulative
@@ -1439,8 +1452,15 @@ export default function Simulator({
         allocationOverrides: distribAutoAllocate
           ? undefined
           : (distribOverrides as Record<string, DistReqKey>),
+        englishSatisfiesLanguage,
       }),
-    [milestoneCourseInputs, graduationYear, distribAutoAllocate, distribOverrides],
+    [
+      milestoneCourseInputs,
+      graduationYear,
+      distribAutoAllocate,
+      distribOverrides,
+      englishSatisfiesLanguage,
+    ],
   );
 
   // ------------ Live preview progress (local compute) ------------

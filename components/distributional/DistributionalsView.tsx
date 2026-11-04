@@ -9,7 +9,10 @@ import {
   sumCourseCredits,
 } from "@/lib/distributionalAllocation";
 import { effectiveDistributionals } from "@/lib/utils/effectiveDistributionals";
-import { primaryLanguageTrack } from "@/lib/languageRequirement";
+import {
+  primaryLanguageTrack,
+  withEnglishLanguageRule,
+} from "@/lib/languageRequirement";
 import { AREA_REQS, SKILL_REQS } from "./constants";
 import { DistPieChart } from "./DistPieChart";
 import { DistStatCard, DistributionalsLoadingSkeleton } from "./DistStatCard";
@@ -43,8 +46,21 @@ const DistributionalsView = ({
   onGoToCourses?: () => void;
 }) => {
   const [view, setView] = useState<"board" | "heatmap">("board");
-  const { autoAllocate, overrides, setAuto, reassign } =
-    useDistributionalPreferences();
+  const {
+    autoAllocate,
+    overrides,
+    englishSatisfiesLanguage,
+    setAuto,
+    reassign,
+    setEnglishSatisfiesLanguage,
+  } = useDistributionalPreferences();
+
+  // Every count below reads this list, so the ENGL 120 opt-in moves the course
+  // from WR to the language requirement everywhere on the page at once.
+  const distCourses = useMemo(
+    () => withEnglishLanguageRule(courses ?? [], englishSatisfiesLanguage),
+    [courses, englishSatisfiesLanguage],
+  );
 
   // Yale's promotion milestones, scored against the same allocation the cards
   // below use. Computed before the loading guard so hook order never changes.
@@ -63,8 +79,16 @@ const DistributionalsView = ({
         allocationOverrides: autoAllocate
           ? undefined
           : (overrides as Record<string, DistReqKey>),
+        englishSatisfiesLanguage,
       }),
-    [courses, plan, graduationYear, autoAllocate, overrides],
+    [
+      courses,
+      plan,
+      graduationYear,
+      autoAllocate,
+      overrides,
+      englishSatisfiesLanguage,
+    ],
   );
 
   // Data still resolving: render a polished skeleton instead of blank space.
@@ -75,7 +99,7 @@ const DistributionalsView = ({
   // Build raw distributional -> courses map (used for languages + the pie,
   // which intentionally show every tag, not the single-counted allocation).
   const distMap: Record<string, Course[]> = {};
-  courses.forEach((course) => {
+  distCourses.forEach((course) => {
     if (course.skipped) return;
     effectiveDistributionals(course).forEach((d) => {
       if (!distMap[d]) distMap[d] = [];
@@ -86,7 +110,7 @@ const DistributionalsView = ({
   const getCount = (code: string) => (distMap[code] || []).length;
 
   // Single-allocation for the 5 area/skill requirements: each course counts once.
-  const allocation = allocateDistributionals(courses, {
+  const allocation = allocateDistributionals(distCourses, {
     auto: autoAllocate,
     overrides,
   });
@@ -96,13 +120,13 @@ const DistributionalsView = ({
     allocation.coursesByReq[code] || [];
 
   // A course is reassignable only if it is eligible for more than one req.
-  const hasMultiTagCourses = courses.some(
+  const hasMultiTagCourses = distCourses.some(
     (c) =>
       !c.skipped &&
       (allocation.optionsByCourseKey[allocation.keyOf(c)]?.length ?? 0) > 1,
   );
 
-  const hasAnyDistributionals = courses.some(
+  const hasAnyDistributionals = distCourses.some(
     (c) => !c.skipped && effectiveDistributionals(c).length > 0,
   );
 
@@ -319,7 +343,11 @@ const DistributionalsView = ({
             </div>
 
             {/* Language */}
-            <LanguageSection distMap={distMap} />
+            <LanguageSection
+              distMap={distMap}
+              englishSatisfiesLanguage={englishSatisfiesLanguage}
+              onEnglishSatisfiesLanguageChange={setEnglishSatisfiesLanguage}
+            />
           </motion.div>
         ) : null}
       </AnimatePresence>

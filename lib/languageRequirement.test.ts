@@ -5,9 +5,13 @@
 
 import { describe, it, expect } from "vitest";
 import {
+  ENGLISH_LANGUAGE_LEVEL,
+  applyEnglishLanguageRule,
   buildLanguageTracks,
+  isEnglishLanguageCourse,
   primaryLanguageTrack,
   requiredLevelsForPlacement,
+  withEnglishLanguageRule,
 } from "@/lib/languageRequirement";
 import type { Course } from "@/lib/types";
 
@@ -99,5 +103,49 @@ describe("buildLanguageTracks", () => {
   it("returns nothing when no language course is tagged", () => {
     expect(buildLanguageTracks(distMap({ Hu: ["ENGL 1140"] }))).toEqual([]);
     expect(primaryLanguageTrack({})).toBeNull();
+  });
+});
+
+describe("ENGL 120 for students schooled in another language", () => {
+  it("recognizes ENGL 120 under its legacy and current numbers only", () => {
+    expect(isEnglishLanguageCourse("ENGL 120")).toBe(true);
+    expect(isEnglishLanguageCourse("ENGL 1020")).toBe(true);
+    expect(isEnglishLanguageCourse("ENGL 114")).toBe(false);
+    expect(isEnglishLanguageCourse("")).toBe(false);
+  });
+
+  it("swaps WR for the language level only when the student opts in", () => {
+    expect(applyEnglishLanguageRule("ENGL 120", ["WR"], false)).toEqual(["WR"]);
+    expect(applyEnglishLanguageRule("ENGL 120", ["WR"], true)).toEqual([
+      ENGLISH_LANGUAGE_LEVEL,
+    ]);
+    expect(applyEnglishLanguageRule("ENGL 114", ["WR"], true)).toEqual(["WR"]);
+  });
+
+  it("rewrites ENGL 120 from its catalog tags and leaves other courses alone", () => {
+    const engl = course("ENGL 120");
+    const other = { ...course("ENGL 114"), distributionals: ["WR"] };
+    const list = [engl, other];
+
+    expect(withEnglishLanguageRule(list, false)).toBe(list);
+    const ruled = withEnglishLanguageRule(list, true);
+    expect(ruled[0].distributionals).toEqual([ENGLISH_LANGUAGE_LEVEL]);
+    expect(ruled[1]).toBe(other);
+    // The stored course is never mutated.
+    expect(engl.distributionals).toBeUndefined();
+  });
+
+  it("scores ENGL 120 as its own complete track", () => {
+    const tracks = buildLanguageTracks(
+      distMap({ [ENGLISH_LANGUAGE_LEVEL]: ["ENGL 120"], L1: ["RUSS 1100"] }),
+    );
+
+    expect(tracks[0]).toMatchObject({
+      subject: "ENGL 120",
+      label: "English (ENGL 120)",
+      isComplete: true,
+      viaEnglish: true,
+    });
+    expect(tracks[1]).toMatchObject({ subject: "RUSS", viaEnglish: false });
   });
 });

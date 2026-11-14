@@ -4,7 +4,13 @@ import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { FiAlertTriangle, FiChevronDown, FiExternalLink, FiKey } from "react-icons/fi";
 import { useAuth } from "@/context/AuthContext";
-import { ClientGuideTabs, CopyButton, ServerUrlRow } from "@/components/ConnectedApps/ClientGuideTabs";
+import {
+  ClientGuideTabs,
+  CopyButton,
+  ServerUrlRow,
+  SnippetTabs,
+} from "@/components/ConnectedApps/ClientGuideTabs";
+import { CLIENT_GUIDES } from "@/lib/mcp/clientGuides";
 
 type Status = "active" | "idle" | "expired" | "revoked";
 
@@ -159,37 +165,93 @@ function ConnectionRow({
   );
 }
 
-function PersonalTokenCreator({ onCreated }: { onCreated: () => void }) {
+type CreatedToken = { token: string; name: string };
+
+/**
+ * The one moment the student can copy a new token. It lives at the section
+ * level, outside the collapsible guide: creating the first token adds a
+ * connection, which collapses the guide, and the token used to vanish with it.
+ */
+function NewTokenPanel({
+  created,
+  serverUrl,
+  onDismiss,
+}: {
+  created: CreatedToken;
+  serverUrl: string;
+  onDismiss: () => void;
+}) {
+  const [copied, setCopied] = useState(false);
+  const [confirmDismiss, setConfirmDismiss] = useState(false);
+  const guide = CLIENT_GUIDES.find((g) => g.auth === "token");
+  const snippets = guide?.snippets ?? [];
+
+  return (
+    <div
+      role="status"
+      className="mt-2.5 rounded-lg border border-emerald-500/25 bg-emerald-50 p-2.5 dark:bg-emerald-500/[0.06]"
+    >
+      <p className="text-[12px] font-medium text-emerald-900 dark:text-emerald-200">
+        Your token for {created.name} is ready. Copy it now: you won&apos;t see it again.
+      </p>
+      <div className="mt-2 flex items-center gap-2 rounded-md border border-black/[0.06] bg-white px-2 py-1.5 dark:border-white/[0.08] dark:bg-black/30">
+        <code className="min-w-0 flex-1 break-all font-mono text-[11px] text-gray-800 dark:text-gray-200">
+          {created.token}
+        </code>
+        <CopyButton value={created.token} label="Copy token" onCopied={() => setCopied(true)} />
+      </div>
+
+      {snippets.length > 0 && (
+        <div className="mt-3">
+          <p className="text-[11px] font-medium text-gray-800 dark:text-gray-200">
+            Paste-ready setup, with your token already filled in
+          </p>
+          <SnippetTabs snippets={snippets} url={serverUrl} token={created.token} onCopied={() => setCopied(true)} />
+        </div>
+      )}
+
+      <div className="mt-2.5 flex flex-wrap items-center gap-2">
+        {confirmDismiss ? (
+          <>
+            <span className="text-[11px] text-amber-800 dark:text-amber-200">
+              You haven&apos;t copied it yet. Close anyway?
+            </span>
+            <button
+              type="button"
+              onClick={onDismiss}
+              className="rounded-md bg-gray-900 px-2 py-1 text-[11px] text-white dark:bg-white dark:text-gray-900"
+            >
+              Close
+            </button>
+            <button
+              type="button"
+              onClick={() => setConfirmDismiss(false)}
+              className="text-[11px] text-gray-600 underline dark:text-gray-300"
+            >
+              Keep it open
+            </button>
+          </>
+        ) : (
+          <button
+            type="button"
+            onClick={() => (copied ? onDismiss() : setConfirmDismiss(true))}
+            className="text-[11px] text-gray-600 underline dark:text-gray-300"
+          >
+            Done, I&apos;ve saved it
+          </button>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function PersonalTokenCreator({ onCreated }: { onCreated: (created: CreatedToken) => void }) {
   const { user } = useAuth();
   const [name, setName] = useState("");
   const [write, setWrite] = useState(false);
   const [days, setDays] = useState(30);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [created, setCreated] = useState<{ token: string; name: string } | null>(null);
-
-  if (created) {
-    return (
-      <div className="rounded-lg border border-emerald-500/25 bg-emerald-50 p-2.5 dark:bg-emerald-500/[0.06]">
-        <p className="text-[12px] font-medium text-emerald-900 dark:text-emerald-200">
-          Token for {created.name}. Copy it now: you won&apos;t see it again.
-        </p>
-        <div className="mt-2 flex items-center gap-2 rounded-md border border-black/[0.06] bg-white px-2 py-1.5 dark:border-white/[0.08] dark:bg-black/30">
-          <code className="min-w-0 flex-1 break-all font-mono text-[11px] text-gray-800 dark:text-gray-200">
-            {created.token}
-          </code>
-          <CopyButton value={created.token} />
-        </div>
-        <button
-          type="button"
-          onClick={() => setCreated(null)}
-          className="mt-2 text-[11px] text-gray-600 underline dark:text-gray-300"
-        >
-          Done, I&apos;ve saved it
-        </button>
-      </div>
-    );
-  }
 
   const submit = async () => {
     if (!user) return;
@@ -205,9 +267,8 @@ function PersonalTokenCreator({ onCreated }: { onCreated: () => void }) {
       if (!res.ok || !data.token) {
         setError(data.error ?? "Couldn't create the token. Try again.");
       } else {
-        setCreated({ token: data.token, name: name.trim() });
+        onCreated({ token: data.token, name: name.trim() });
         setName("");
-        onCreated();
       }
     } catch {
       setError("Couldn't create the token. Try again.");
@@ -270,6 +331,7 @@ export function SettingsConnectedAppsSection() {
   const [state, setState] = useState<"loading" | "ready" | "unavailable" | "error">("loading");
   const [showGuide, setShowGuide] = useState(false);
   const [showActivity, setShowActivity] = useState(false);
+  const [created, setCreated] = useState<CreatedToken | null>(null);
 
   const load = useCallback(async () => {
     if (!user) return;
@@ -356,6 +418,10 @@ export function SettingsConnectedAppsSection() {
             <ServerUrlRow url={data.serverUrl} />
           </div>
 
+          {created && (
+            <NewTokenPanel created={created} serverUrl={data.serverUrl} onDismiss={() => setCreated(null)} />
+          )}
+
           {connections.length > 0 ? (
             <ul className="mt-2 divide-y divide-black/[0.05] dark:divide-white/[0.06]">
               {connections.map((c) => (
@@ -378,7 +444,17 @@ export function SettingsConnectedAppsSection() {
           </button>
           {(showGuide || connections.length === 0) && (
             <div className="mt-2">
-              <ClientGuideTabs url={data.serverUrl} tokenPanel={<PersonalTokenCreator onCreated={() => void load()} />} />
+              <ClientGuideTabs
+                url={data.serverUrl}
+                tokenPanel={
+                  <PersonalTokenCreator
+                    onCreated={(token) => {
+                      setCreated(token);
+                      void load();
+                    }}
+                  />
+                }
+              />
             </div>
           )}
 

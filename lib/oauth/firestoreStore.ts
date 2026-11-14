@@ -127,4 +127,14 @@ export class FirestoreOAuthStore implements OAuthStore {
       await batch.commit();
     }
   }
+
+  /** Account deletion: every grant and token the student ever had. */
+  async deleteAllForUser(uid: string) {
+    const grants = await this.listGrantsForUser(uid);
+    for (const grant of grants) {
+      await this.deleteTokensForGrant(grant.grantId);
+      await this.db.collection(GRANTS).doc(grant.grantId).delete();
+    }
+    return grants.length;
+  }
 }

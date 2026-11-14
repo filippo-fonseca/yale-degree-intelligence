@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { adminAuth, adminDb } from "@/config/firebaseAdmin";
 import { isAuthError, requireAuth } from "@/lib/apiAuth";
+import { FirestoreOAuthStore } from "@/lib/oauth/firestoreStore";
+import { FirestoreAuditLog } from "@/lib/mcp/audit";
 
 export async function POST(req: NextRequest) {
   try {
@@ -98,7 +100,12 @@ export async function POST(req: NextRequest) {
     await adminDb.collection("dan_keys").doc(userId).delete();
     await adminDb.collection("mcp_tokens").doc(userId).delete();
 
-    // 10. Delete user from Firebase Authentication
+    // 10. Disconnect every app connected through the MCP server, drop their
+    // tokens, and delete the log of what those apps changed.
+    await new FirestoreOAuthStore(adminDb).deleteAllForUser(userId);
+    await new FirestoreAuditLog(adminDb).deleteAll(userId);
+
+    // 11. Delete user from Firebase Authentication
     await adminAuth.deleteUser(userId);
 
     return NextResponse.json({ success: true });

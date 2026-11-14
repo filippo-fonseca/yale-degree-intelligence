@@ -37,7 +37,7 @@ export const CLIENT_GUIDES: ClientGuide[] = [
       "Choose Connect. You'll land on DegreeIntelligence to sign in and pick read-only or read and write.",
       "In a chat, turn the connector on from the tools menu. Ask something like “what do I still need for my major?”",
     ],
-    note: "Custom connectors are available on Claude's paid plans. On a Team or Enterprise plan an owner may need to add it first.",
+    note: "Custom connectors are available on Claude's paid plans. On a Team or Enterprise plan an owner may need to add it first. Don't paste a personal access token into a Claude chat: Claude can't use it there, and it leaves the token in your chat history.",
   },
   {
     id: "chatgpt",
@@ -110,14 +110,14 @@ export const CLIENT_GUIDES: ClientGuide[] = [
     steps: [
       "Create a personal access token below. Name it after what will use it (say, Discord bot) and allow changes only if it needs them.",
       "The token appears once, with the setups below already filled in. Copy the one that matches your client.",
-      "Grok Bot or another chat-configured bot: copy the setup message and send it to the bot. It adds the server and stores the token itself.",
+      "Grok Bot or another bot that can add MCP servers from chat: copy the setup message and send it to the bot. It adds the server and stores the token itself. Claude and ChatGPT chats can't do this: use their tab and sign in instead, no token needed.",
       "xAI API (Grok in your own code): send the request below with your own xAI API key, and Grok can call DegreeIntelligence for you.",
       "Anything else: point it at {url} and send the header Authorization: Bearer <your token>.",
       "Disconnect the token here whenever you like. It also stops working on its own when it expires.",
     ],
     snippets: [
       {
-        label: "Bot setup message",
+        label: "Grok Bot message",
         language: "text",
         code: 'Add a custom MCP server named "DegreeIntelligence". URL: {url}. Header: Authorization: Bearer {token}. Store the token as a secret, then call get_profile to confirm it works.',
       },

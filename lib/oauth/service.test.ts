@@ -420,3 +420,33 @@ describe("personal access tokens", () => {
     expect(await verifyAccessToken(deps, result.token)).not.toBeNull();
   });
 });
+
+describe("client ID metadata document clients", () => {
+  const GROK = "https://grok.com/oauth/mcp-client.json";
+  const GROK_REDIRECT = "https://grok.com/connectors-oauth-exchange-code/";
+
+  it("lets Grok connect without registering, using its pinned redirect", async () => {
+    const params = authParams(GROK, { redirect_uri: GROK_REDIRECT });
+    const valid = await validateAuthorizeRequest(deps, params);
+    expect(valid.client.clientName).toBe("Grok");
+
+    const redirect = await approveAuthorization(deps, { uid: "alice", email: "alice@yale.edu", params });
+    expect(redirect.startsWith(GROK_REDIRECT)).toBe(true);
+    const code = new URL(redirect).searchParams.get("code")!;
+    const tokens = await exchangeToken(
+      deps,
+      { grant_type: "authorization_code", code, code_verifier: VERIFIER, redirect_uri: GROK_REDIRECT, resource: RESOURCE },
+      { clientId: GROK },
+    );
+    expect(await verifyAccessToken(deps, tokens.access_token)).toMatchObject({ uid: "alice", clientName: "Grok" });
+  });
+
+  it("refuses a redirect Grok never published, and metadata URLs it does not know", async () => {
+    await expect(
+      validateAuthorizeRequest(deps, authParams(GROK, { redirect_uri: "https://evil.example/cb" })),
+    ).rejects.toBeInstanceOf(UnredirectableAuthorizeError);
+    await expect(
+      validateAuthorizeRequest(deps, authParams("https://evil.example/client.json")),
+    ).rejects.toBeInstanceOf(UnredirectableAuthorizeError);
+  });
+});

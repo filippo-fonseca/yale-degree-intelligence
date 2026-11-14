@@ -44,6 +44,12 @@ import type {
   TokenEndpointAuthMethod,
   TokenRecord,
 } from "./types";
+import { knownMetadataClient } from "./knownClients";
+
+/** A registered client: one of ours from /register, or a pinned metadata-document client. */
+async function lookupClient(deps: OAuthDeps, clientId: string): Promise<OAuthClient | null> {
+  return knownMetadataClient(clientId) ?? deps.store.getClient(clientId);
+}
 
 export class OAuthError extends Error {
   constructor(
@@ -288,7 +294,7 @@ export async function validateAuthorizeRequest(
   if (!params.client_id) {
     throw new UnredirectableAuthorizeError("The app that sent you here did not say who it is (missing client_id).");
   }
-  const client = await deps.store.getClient(params.client_id);
+  const client = await lookupClient(deps, params.client_id);
   if (!client) {
     throw new UnredirectableAuthorizeError(
       "This app is not registered with Degree Intelligence. Try connecting again from the app.",
@@ -436,7 +442,7 @@ async function authenticateClient(
   creds: ClientCredentials,
 ): Promise<OAuthClient> {
   if (!creds.clientId) throw new OAuthError("invalid_client", "client_id is required", 401);
-  const client = await deps.store.getClient(creds.clientId);
+  const client = await lookupClient(deps, creds.clientId);
   if (!client) throw new OAuthError("invalid_client", "unknown client", 401);
 
   if (client.tokenEndpointAuthMethod === "none") return client;

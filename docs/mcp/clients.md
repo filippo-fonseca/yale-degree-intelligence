@@ -53,10 +53,21 @@ developer mode.
 
 Both open the consent screen in the browser on first use.
 
-## Grok, bots and API agents (personal access token)
+## Grok (custom connector)
 
-Create a token in Settings > Connected apps > Connect a new app > Grok, bots &
-APIs. Pick a name, read-only or read and write, and 7, 30 or 90 days. It is
+At grok.com/connectors, choose New Connector > Custom and paste
+`https://degreeint.com/mcp`. Grok signs in through the consent screen like
+Claude does. It identifies itself with a client ID metadata document
+(`https://grok.com/oauth/mcp-client.json`) instead of registering, and the
+server accepts it because that registration is pinned in
+`lib/oauth/knownClients.ts`. If Grok changes its redirect URIs, update the
+entry there.
+
+## Bots and API agents (personal access token)
+
+Create a token in Settings > Connected apps > Connect a new app > Bots &
+APIs. The token appears once, with paste-ready setups (xAI request, MCP client
+config, bare header) already filled in. Pick a name, read-only or read and write, and 7, 30 or 90 days. It is
 shown once. Then send it as a bearer token.
 
 xAI and OpenAI Responses API, remote MCP tool:

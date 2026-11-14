@@ -3,6 +3,7 @@
 import { useState, type ReactNode } from "react";
 import { FiCheck, FiCopy, FiExternalLink, FiKey, FiLogIn } from "react-icons/fi";
 import { CLIENT_GUIDES, fillGuideText, type GuideSnippet } from "@/lib/mcp/clientGuides";
+import { copyText } from "@/lib/copyText";
 
 export function CopyButton({
   value,
@@ -13,24 +14,20 @@ export function CopyButton({
   label?: string;
   onCopied?: () => void;
 }) {
-  const [copied, setCopied] = useState(false);
+  const [state, setState] = useState<"idle" | "copied" | "failed">("idle");
   return (
     <button
       type="button"
-      onClick={() => {
-        navigator.clipboard
-          ?.writeText(value)
-          .then(() => {
-            setCopied(true);
-            onCopied?.();
-            setTimeout(() => setCopied(false), 1500);
-          })
-          .catch(() => {});
+      onClick={async (event) => {
+        const ok = await copyText(value, event.currentTarget);
+        setState(ok ? "copied" : "failed");
+        if (ok) onCopied?.();
+        setTimeout(() => setState("idle"), ok ? 1500 : 4000);
       }}
       className="inline-flex shrink-0 items-center gap-1 rounded-md border border-black/[0.08] px-2 py-1 text-[11px] text-gray-600 transition-colors hover:bg-black/[0.04] hover:text-gray-900 dark:border-white/[0.1] dark:text-gray-300 dark:hover:bg-white/[0.06] dark:hover:text-white"
     >
-      {copied ? <FiCheck size={11} /> : <FiCopy size={11} />}
-      {copied ? "Copied" : label}
+      {state === "copied" ? <FiCheck size={11} /> : <FiCopy size={11} />}
+      {state === "copied" ? "Copied" : state === "failed" ? "Select it and press ⌘C" : label}
     </button>
   );
 }
@@ -94,7 +91,7 @@ export function SnippetTabs({
         <CopyButton value={code} onCopied={onCopied} />
       </div>
       <pre
-        className={`bg-white px-2.5 py-2 font-mono ${
+        className={`select-all bg-white px-2.5 py-2 font-mono ${
           snippet.language === "text" ? "whitespace-pre-wrap break-words" : "overflow-x-auto"
         } text-[11px] leading-relaxed text-gray-800 dark:bg-black/30 dark:text-gray-200`}
       >

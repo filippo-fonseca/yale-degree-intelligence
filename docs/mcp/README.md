@@ -25,7 +25,7 @@ uses; the server never calls a model.
 | Tokens | Opaque, prefixed, stored only as SHA-256 hashes. Access 1 hour, refresh 30 days rotated on use, personal tokens up to 90 days |
 | Isolation | Every tool is bound to the token's student through `DegreeStore`. No tool takes a user id |
 | Writes | `dry_run` on every write, idempotent, plan edits in a Firestore transaction, audited to `mcp_audit/{uid}/events` for 90 days |
-| Limits | 300 calls per 10 minutes per connection |
+| Limits | 150 tool calls per 10 minutes per connection and 1,500 per student per day (`lib/mcp/limits.ts`). Listing tools is free; a hit returns a tool error the model can read, with `Retry-After` |
 | Out of scope | Friends data, account deletion, sign-in settings |
 
 ## Keeping responses small

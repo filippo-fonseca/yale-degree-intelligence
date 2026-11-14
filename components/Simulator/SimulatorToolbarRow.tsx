@@ -13,7 +13,8 @@ import SimulatorQuickSave, { type QuickSaveState } from "./SimulatorQuickSave";
  * Row one is the plan: the selector leads and takes the width, with quick save
  * appearing beside it the moment the canvas drifts from the stored plan. The
  * plan is the overarching structure, so it sits above everything it governs.
- * Row two is the pair of views onto that plan, deliberately smaller. Both rows
+ * Row two is the views onto that plan (Canvas, Progress, and Split on wide
+ * screens), deliberately smaller. Both rows
  * stay on both views, because the Progress readouts are scoped to whichever
  * plan is loaded and have to be readable and switchable from there too.
  *
@@ -24,6 +25,7 @@ export default function SimulatorToolbarRow({
   view,
   setView,
   showProgressNew = false,
+  splitAvailable = false,
   planName,
   planIsDefault,
   hasChanges,
@@ -36,6 +38,7 @@ export default function SimulatorToolbarRow({
   view: SimulatorView;
   setView: (view: SimulatorView) => void;
   showProgressNew?: boolean;
+  splitAvailable?: boolean;
   planName: string | null;
   planIsDefault: boolean;
   hasChanges: boolean;
@@ -69,6 +72,7 @@ export default function SimulatorToolbarRow({
           view={view}
           setView={setView}
           showProgressNew={showProgressNew}
+          splitAvailable={splitAvailable}
         />
       </div>
     </div>

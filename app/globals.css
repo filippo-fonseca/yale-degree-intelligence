@@ -730,6 +730,12 @@ body {
 }
 .rc-marquee { animation: rc-marquee 34s linear infinite; }
 
+/* Simulator Split panes scroll on their own, and the Canvas pane's bar sits
+   right beside the resize divider. A slimmer bar keeps it from reading as a
+   second divider. */
+.sim-split-pane::-webkit-scrollbar { width: 6px; }
+.sim-split-pane::-webkit-scrollbar-thumb { border-width: 1px; }
+
 /* Hide scrollbar utility for in-card scroll demos */
 .rc-no-scrollbar::-webkit-scrollbar { display: none; }
 .rc-no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }

@@ -196,20 +196,28 @@ export default function SimulatorProgressPane({
                 </div>
               )}
 
-              {breakdown}
+              {/* A query container, so the requirement cards inside pick their
+                  column count from this pane's width. That matters in Split,
+                  where the pane can be narrow on a wide screen. */}
+              <div className="[container-type:inline-size]">{breakdown}</div>
             </motion.div>
           )}
         </AnimatePresence>
       </div>
 
-      {/* GPA timeline and distributionals, always on in this view */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-        <SimulatorGradesSection terms={gpaTimelineTerms} />
-        <SimulatorDistributionalsSection
-          assignments={distributionalAssignments}
-          milestoneEvaluation={milestoneEvaluation}
-          milestoneSnapshot={milestoneSnapshot}
-        />
+      {/* GPA timeline and distributionals, always on in this view. Side by
+          side once the pane itself is laptop-wide (about 830px, which keeps the
+          full Progress tab as it was); stacked in a narrower Split pane, where
+          two columns would squeeze the milestone chart into a sideways scroll. */}
+      <div className="[container-type:inline-size]">
+        <div className="grid grid-cols-1 [@container(min-width:52rem)]:grid-cols-2 gap-3">
+          <SimulatorGradesSection terms={gpaTimelineTerms} />
+          <SimulatorDistributionalsSection
+            assignments={distributionalAssignments}
+            milestoneEvaluation={milestoneEvaluation}
+            milestoneSnapshot={milestoneSnapshot}
+          />
+        </div>
       </div>
     </div>
   );

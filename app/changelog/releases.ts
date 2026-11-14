@@ -38,6 +38,13 @@ export const RELEASES: Release[] = [
           "Connected apps have a fair-use limit: 150 actions every 10 minutes per app and 1,500 a day across all of them. If an assistant reaches it, it is told how long to wait, and you can keep using DegreeIntelligence yourself as normal.",
         ],
       },
+      {
+        title: "Simulator",
+        items: [
+          "On a laptop or larger screen, the Simulator has a new Split view that shows the Canvas and Projected progress + results side by side, so you can watch your progress, GPA and distributionals update as you plan. Drag the divider between them to resize, or double-click it to reset. Your split is remembered on that device.",
+          "The semester grid now fits its columns to the space it has, so it stays readable in a narrow Split pane as well as on smaller windows.",
+        ],
+      },
     ],
   },
   {

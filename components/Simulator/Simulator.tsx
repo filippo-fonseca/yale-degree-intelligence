@@ -44,6 +44,8 @@ import SimulatorProgressPane, {
 } from "./SimulatorProgressPane";
 import { useDismissibleFlag } from "@/lib/useDismissibleFlag";
 import { type SimulatorView } from "./SimulatorViewSwitcher";
+import SimulatorSplitView from "./SimulatorSplitView";
+import { useMediaQuery } from "@/hooks/useMediaQuery";
 import SimulatorToolbarRow from "./SimulatorToolbarRow";
 import { type QuickSaveState } from "./SimulatorQuickSave";
 import SimulatorCanvasActions from "./SimulatorCanvasActions";
@@ -252,6 +254,12 @@ export default function Simulator({
   // Canvas (build the plan) vs Progress (read the results). Canvas is the
   // default; the stored preference is applied on mount so SSR stays stable.
   const [activeView, setActiveView] = useState<SimulatorView>("canvas");
+  // Split needs room for both panes, so below Tailwind's lg breakpoint it
+  // falls back to the Canvas tab. The stored choice stays "split", so the
+  // layout comes back as soon as the window is wide again.
+  const splitAvailable = useMediaQuery("(min-width: 1024px)");
+  const shownView: SimulatorView =
+    activeView === "split" && !splitAvailable ? "canvas" : activeView;
   // The toolbar grows and shrinks with the view and the viewport, so the pool
   // below it parks itself against the measured height instead of a magic number.
   const toolbarRef = useRef<HTMLDivElement | null>(null);
@@ -826,14 +834,14 @@ export default function Simulator({
   const meetingTimesNote = useDismissibleFlag("sim:meeting-times-projected");
 
   useEffect(() => {
-    if (activeView === "progress") progressNew.dismiss();
-  }, [activeView, progressNew]);
+    if (shownView === "progress" || shownView === "split") progressNew.dismiss();
+  }, [shownView, progressNew]);
 
   // ------------ Canvas / Progress view preference ------------
   useEffect(() => {
     try {
       const stored = window.localStorage.getItem(ACTIVE_VIEW_STORAGE_KEY);
-      if (stored === "canvas" || stored === "progress") {
+      if (stored === "canvas" || stored === "progress" || stored === "split") {
         setActiveView(stored);
       }
     } catch {
@@ -1995,9 +2003,10 @@ export default function Simulator({
         }`}
       >
         <SimulatorToolbarRow
-          view={activeView}
+          view={shownView}
           setView={setActiveView}
           showProgressNew={progressNew.show}
+          splitAvailable={splitAvailable}
           planName={currentPlanName}
           planIsDefault={loadedPlanIsDefault}
           hasChanges={hasChanges}
@@ -2009,7 +2018,11 @@ export default function Simulator({
         />
       </div>
 
-      {activeView === "canvas" ? (
+      <SimulatorSplitView
+        view={shownView}
+        uid={user?.uid}
+        topOffset={toolbarHeight}
+        canvas={
         <>
           {/* Announces what Progress can now do, since nothing on Canvas would
               tell you. Sits here rather than in Progress because a user who has
@@ -2141,7 +2154,9 @@ export default function Simulator({
           {SHOW_QUICK_ADD_POOL && (
           <div
             className="sticky z-20 mb-2"
-            style={{ top: toolbarHeight + 8 }}
+            // In Split the pool scrolls inside its own pane, so it parks at
+            // the pane's top rather than below the page toolbar.
+            style={{ top: shownView === "split" ? 0 : toolbarHeight + 8 }}
             data-tour="simulator-course-pool"
           >
             {/* No overflow-hidden here: the info tooltip escapes the card, so
@@ -2237,8 +2252,12 @@ export default function Simulator({
             onClear={resetSimulator}
           />
 
-          {/* Semesters Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3" data-tour="simulator-board">
+          {/* Semesters Grid. Columns follow the width the grid actually has
+              (a container query on the wrapper), not the viewport, so it
+              reflows as the Split divider moves as well as when the window
+              resizes. */}
+          <div className="[container-type:inline-size]">
+          <div className="grid grid-cols-1 [@container(min-width:32rem)]:grid-cols-2 [@container(min-width:54rem)]:grid-cols-3 gap-3" data-tour="simulator-board">
             {semesters.map((semester) => {
               const semCredits = getSemesterCredits(semester);
               const semCreditsLabel = Number.isInteger(semCredits)
@@ -2551,8 +2570,10 @@ export default function Simulator({
               );
             })}
           </div>
+          </div>
         </>
-      ) : (
+        }
+        progress={
         <SimulatorProgressPane
           majorIds={majorIds}
           certificateIds={certificateIds}
@@ -2602,7 +2623,8 @@ export default function Simulator({
             )
           }
         />
-      )}
+        }
+      />
 
       {/* Save Plan Modal */}
       <AnimatePresence>

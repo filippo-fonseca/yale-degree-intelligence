@@ -93,7 +93,11 @@ export function SnippetTabs({
         )}
         <CopyButton value={code} onCopied={onCopied} />
       </div>
-      <pre className="overflow-x-auto bg-white px-2.5 py-2 font-mono text-[11px] leading-relaxed text-gray-800 dark:bg-black/30 dark:text-gray-200">
+      <pre
+        className={`bg-white px-2.5 py-2 font-mono ${
+          snippet.language === "text" ? "whitespace-pre-wrap break-words" : "overflow-x-auto"
+        } text-[11px] leading-relaxed text-gray-800 dark:bg-black/30 dark:text-gray-200`}
+      >
         {code}
       </pre>
     </div>

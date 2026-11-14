@@ -110,11 +110,17 @@ export const CLIENT_GUIDES: ClientGuide[] = [
     steps: [
       "Create a personal access token below. Name it after what will use it (say, Discord bot) and allow changes only if it needs them.",
       "The token appears once, with the setups below already filled in. Copy the one that matches your client.",
+      "Grok Bot or another chat-configured bot: copy the setup message and send it to the bot. It adds the server and stores the token itself.",
       "xAI API (Grok in your own code): send the request below with your own xAI API key, and Grok can call DegreeIntelligence for you.",
       "Anything else: point it at {url} and send the header Authorization: Bearer <your token>.",
       "Disconnect the token here whenever you like. It also stops working on its own when it expires.",
     ],
     snippets: [
+      {
+        label: "Bot setup message",
+        language: "text",
+        code: 'Add a custom MCP server named "DegreeIntelligence". URL: {url}. Header: Authorization: Bearer {token}. Store the token as a secret, then call get_profile to confirm it works.',
+      },
       {
         label: "Grok (xAI API)",
         language: "bash",

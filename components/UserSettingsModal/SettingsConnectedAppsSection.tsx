@@ -204,7 +204,7 @@ function NewTokenPanel({
       {snippets.length > 0 && (
         <div className="mt-3">
           <p className="text-[11px] font-medium text-gray-800 dark:text-gray-200">
-            Paste-ready setup, with your token already filled in
+            Paste-ready setup, with your token already filled in. For Grok Bot, just send it the setup message.
           </p>
           <SnippetTabs snippets={snippets} url={serverUrl} token={created.token} onCopied={() => setCopied(true)} />
         </div>

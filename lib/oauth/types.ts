@@ -60,6 +60,12 @@ export type Grant = {
   refreshExpiresAt: number;
   revokedAt?: number;
   revokedReason?: "user" | "refresh_token_reuse" | "code_reuse" | "client";
+  /**
+   * "personal": a token the student created in Settings for a client that
+   * can't run OAuth (scripts, bots, API-based agents). It has one long-lived
+   * access token and no refresh token. Absent means an OAuth connection.
+   */
+  kind?: "oauth" | "personal";
 };
 
 export type TokenKind = "access" | "refresh";

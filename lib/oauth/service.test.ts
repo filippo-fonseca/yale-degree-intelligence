@@ -7,6 +7,7 @@ import {
   UnredirectableAuthorizeError,
   approveAuthorization,
   connectionStatus,
+  createPersonalToken,
   denyAuthorization,
   exchangeToken,
   listConnections,
@@ -372,5 +373,50 @@ describe("the student's connections", () => {
     const grant = Array.from(store.grants.values())[0];
     expect(connectionStatus(grant, clock + 8 * 24 * 3600 * 1000)).toBe("idle");
     expect(connectionStatus(grant, clock + 31 * 24 * 3600 * 1000)).toBe("expired");
+  });
+});
+
+describe("personal access tokens", () => {
+  const make = (extra: Record<string, unknown> = {}) =>
+    createPersonalToken(deps, {
+      uid: "alice",
+      email: "alice@yale.edu",
+      name: "Grok bot",
+      scopes: ["degree:read"],
+      days: 30,
+      ...extra,
+    });
+
+  it("work as a bearer token until they expire", async () => {
+    const result = await make();
+    const access = await verifyAccessToken(deps, result.token);
+    expect(access).toMatchObject({ uid: "alice", clientName: "Grok bot", scopes: ["degree:read"] });
+    clock += 31 * 24 * 3600 * 1000;
+    expect(await verifyAccessToken(deps, result.token)).toBeNull();
+  });
+
+  it("show up as connections and stop working when revoked", async () => {
+    const result = await make({ scopes: ["degree:write"] });
+    expect(result.scopes).toEqual(["degree:read", "degree:write"]);
+    const [conn] = await listConnections(deps, "alice");
+    expect(conn).toMatchObject({ kind: "personal", clientName: "Grok bot", status: "active" });
+    expect(await revokeConnection(deps, "alice", conn.id)).toBe(true);
+    expect(await verifyAccessToken(deps, result.token)).toBeNull();
+  });
+
+  it("store only the hash and validate input", async () => {
+    const result = await make();
+    expect(JSON.stringify(Array.from(store.tokens.values()))).not.toContain(result.token);
+    await expectOAuthError(make({ days: 365 }), "invalid_request");
+    await expectOAuthError(make({ name: "" }), "invalid_request");
+    await expectOAuthError(make({ scopes: [] }), "invalid_scope");
+    await expectOAuthError(make({ scopes: ["admin"] }), "invalid_scope");
+  });
+
+  it("can't be refreshed or used by a registered client", async () => {
+    const result = await make();
+    const client = await register();
+    await revokeToken(deps, result.token, { clientId: client.client_id });
+    expect(await verifyAccessToken(deps, result.token)).not.toBeNull();
   });
 });

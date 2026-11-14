@@ -689,6 +689,7 @@ export type ConnectionStatus = "active" | "idle" | "expired" | "revoked";
 
 export type ConnectionSummary = {
   id: string;
+  kind: "oauth" | "personal";
   clientName: string;
   redirectHost: string;
   scopes: string[];
@@ -718,8 +719,9 @@ export async function listConnections(
     .filter((g) => g.uid === uid)
     .map((g) => ({
       id: g.grantId,
+      kind: g.kind ?? "oauth",
       clientName: g.clientName,
-      redirectHost: redirectDisplayHost(g.redirectUri),
+      redirectHost: g.kind === "personal" ? "" : redirectDisplayHost(g.redirectUri),
       scopes: g.scopes,
       connectedAt: g.createdAt,
       lastUsedAt: g.lastUsedAt ?? null,
@@ -727,6 +729,74 @@ export async function listConnections(
       revokedAt: g.revokedAt ?? null,
     }))
     .sort((a, b) => (b.lastUsedAt ?? b.connectedAt) - (a.lastUsedAt ?? a.connectedAt));
+}
+
+// ---------------------------------------------------------------------------
+// Personal access tokens, for clients that can't run the OAuth flow
+// ---------------------------------------------------------------------------
+
+export const PERSONAL_TOKEN_MAX_DAYS = 90;
+export const PERSONAL_TOKEN_NAME_MAX = 60;
+
+export type PersonalTokenResult = {
+  token: string;
+  connectionId: string;
+  scopes: string[];
+  expiresAt: number;
+};
+
+/**
+ * Creates a token the student pastes into a client by hand. It is a grant like
+ * any OAuth connection (listed, audited, revocable in Settings), carrying a
+ * single access token that lives for `days` and cannot be refreshed. The
+ * plaintext is returned once and never stored.
+ */
+export async function createPersonalToken(
+  deps: OAuthDeps,
+  input: { uid: string; email: string; name: unknown; scopes: unknown; days: unknown },
+): Promise<PersonalTokenResult> {
+  const name = typeof input.name === "string" ? input.name.trim() : "";
+  if (!name || name.length > PERSONAL_TOKEN_NAME_MAX) {
+    throw new OAuthError("invalid_request", `name must be 1 to ${PERSONAL_TOKEN_NAME_MAX} characters`);
+  }
+  const days = input.days;
+  if (typeof days !== "number" || !Number.isInteger(days) || days < 1 || days > PERSONAL_TOKEN_MAX_DAYS) {
+    throw new OAuthError("invalid_request", `days must be a whole number from 1 to ${PERSONAL_TOKEN_MAX_DAYS}`);
+  }
+  const requested = Array.isArray(input.scopes) ? input.scopes.filter((x): x is string => typeof x === "string") : [];
+  if (requested.some((x) => !isSupportedScope(x))) throw new OAuthError("invalid_scope", "unsupported scope");
+  const scopes = normalizeScopes(requested);
+  if (scopes.length === 0) throw new OAuthError("invalid_scope", "choose at least one scope");
+
+  const t = now(deps);
+  const expiresAt = t + days * 24 * 60 * 60 * 1000;
+  const grant: Grant = {
+    grantId: `dig_${randomToken(18)}`,
+    uid: input.uid,
+    email: input.email,
+    clientId: "personal",
+    clientName: name,
+    redirectUri: "",
+    scopes,
+    resource: deps.resource,
+    createdAt: t,
+    refreshExpiresAt: expiresAt,
+    kind: "personal",
+  };
+  await deps.store.putGrant(grant);
+  const token = `${ACCESS_PREFIX}${randomToken(32)}`;
+  await deps.store.putToken({
+    tokenHash: sha256Hex(token),
+    kind: "access",
+    grantId: grant.grantId,
+    uid: input.uid,
+    clientId: grant.clientId,
+    scopes,
+    resource: deps.resource,
+    createdAt: t,
+    expiresAt,
+  });
+  return { token, connectionId: grant.grantId, scopes, expiresAt };
 }
 
 /** Revokes one of the student's own connections. False if it is not theirs. */

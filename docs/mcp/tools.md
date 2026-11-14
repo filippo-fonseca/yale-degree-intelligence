@@ -15,6 +15,8 @@ DegreeIntelligence (degreeint.com) is a Yale College degree planner. These tools
 
 Start with get_profile: majors, certificates, graduation year and saved plans frame everything else. Program ids come from list_programs; course codes from search_courses (codes are normalized, so "cpsc 323" works).
 
+Look things up when you need them rather than loading everything: get_program_requirements takes one program (any major or certificate, not only the student's) and optionally one requirement, and search_courses returns a compact page with next_offset. To fill a plan semester, call search_courses with fills (the requirement you're targeting), offered_season (the semester's season) and untaken_only, add a pick with add_planned_course, and check the result with get_plan_progress.
+
 Two places hold courses. The transcript (My Courses: list_courses, add_courses) is what the student has taken or is taking. Plans (Simulator: get_plan, add_planned_course) hold future terms. Progress is reported both ways: get_degree_progress for the transcript, get_plan_progress for a plan's projection. Terms are written "Fall 2027"; plans have Fall and Spring only.
 
 The numbers come from the app's own rules engine, including Yale's certificate overlap policies. Report them as the app's reading of the requirements, not as an official audit: the student's DUS and Yale's degree audit have the final word.
@@ -74,15 +76,23 @@ No arguments.
 
 *Search the Yale course catalog* · read · idempotent
 
-Searches the catalog the app uses (Fall 2023 to Spring 2027) by code or title words, with optional filters. Returns canonical codes to pass to other tools.
+Finds courses in the catalog the app uses (Fall 2023 to Spring 2027), a page at a time, so you never need the whole catalog. Combine filters: words or a code, subject, distributional, level, term or season offered, and `fills` to get only courses that count toward a requirement of ANY major or certificate (not just the student's). For building or editing a Simulator plan, set untaken_only to skip what the student has taken or already planned, and offered_season to match the semester you're filling. Results are compact by default; page with offset.
 
 | Argument | Type | Required | Description |
 | --- | --- | --- | --- |
 | `query` | string | no | Code or words from the title, e.g. "CPSC 323" or "machine learning". |
 | `subject` | string | no | Subject code, e.g. "CPSC". |
 | `distributional` | `"Hu"` \| `"So"` \| `"Sc"` \| `"QR"` \| `"WR"` \| `"L1"` \| `"L2"` \| `"L3"` \| `"L4"` \| `"L5"` | no |  |
+| `min_level` | integer | no | Lowest course number, e.g. 3000. |
+| `max_level` | integer | no | Highest course number, e.g. 4999. |
 | `offered_in` | string | no | A catalog term, e.g. "Spring 2027". |
-| `limit` | integer | no | Default 20. (min 1, max 50) |
+| `offered_season` | `"fall"` \| `"spring"` | no | Usually offered in this season. Use it for plan terms past the catalog. |
+| `fills` | { program_type, program_id, requirement } | no | Only courses that count toward this program's requirements, as the app encodes them. |
+| `untaken_only` | boolean | no | Skip courses on the transcript (taken, in progress or placed out) and courses already in the plan. |
+| `plan_name` | string | no | The plan untaken_only checks. Default: the default plan. |
+| `detail` | `"compact"` \| `"full"` | no | full adds cross-listings and every catalog term. Default compact. |
+| `offset` | integer | no | Skip this many matches. Use next_offset from the last page. (min 0) |
+| `limit` | integer | no | Default 15. (min 1, max 50) |
 
 ### `get_course_details`
 
@@ -93,12 +103,13 @@ Catalog details for one course (cross-listings, credits, distributionals, terms 
 | Argument | Type | Required | Description |
 | --- | --- | --- | --- |
 | `code` | string | yes | e.g. "CPSC 323". |
+| `meetings_term` | string | no | Meeting times for this term, e.g. "Spring 2027". Default: the next term it is offered. |
 
 ### `list_programs`
 
 *List Yale majors and certificates* · read · idempotent
 
-Every major and certificate the app models, with the ids other tools take.
+Ids and names of the majors and certificates the app models (names only, no requirements). Pass `query` to narrow it, e.g. "computer". Then use get_program_requirements for one program.
 
 | Argument | Type | Required | Description |
 | --- | --- | --- | --- |
@@ -109,12 +120,13 @@ Every major and certificate the app models, with the ids other tools take.
 
 *Get a program's requirements* · read · idempotent
 
-The full requirement list of a major or certificate as the app encodes it: each requirement's name, how many it needs and the courses or groups that satisfy it. Requirement names are what set_requirement_assignment takes.
+The requirements of any major or certificate (declared or not) as the app encodes it: each requirement's name, how many it needs and the courses or groups that satisfy it. Fetch one program at a time, or one requirement with `requirement`. To find courses that fill a requirement, prefer search_courses with `fills`. Requirement names are what set_requirement_assignment takes.
 
 | Argument | Type | Required | Description |
 | --- | --- | --- | --- |
 | `program_type` | `"major"` \| `"certificate"` | yes |  |
-| `program_id` | string | yes |  |
+| `program_id` | string | yes | Any id from list_programs, declared or not. |
+| `requirement` | string | no | Only this requirement. Default: all of them. |
 
 ### `list_plans`
 

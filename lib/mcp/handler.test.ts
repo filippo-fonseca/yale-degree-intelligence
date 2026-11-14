@@ -164,9 +164,59 @@ describe("/mcp", () => {
     expect(res.status).toBe(405);
   });
 
-  it("applies the per-connection rate limit", async () => {
+  it("charges only tool calls, and tells the model when the limit is hit", async () => {
     const { access_token } = await connect("alice");
-    opts.rateLimit = async () => new Response("slow down", { status: 429 });
-    expect((await rpc(access_token, "tools/list")).status).toBe(429);
+    const charged: number[] = [];
+    opts.rateLimit = async (_access, calls) => {
+      charged.push(calls);
+      return { scope: "connection", retryAfterSeconds: 240 };
+    };
+
+    // Listing tools is free, so it still works while the budget is spent.
+    const list = await rpc(access_token, "tools/list");
+    expect(list.status).toBe(200);
+    expect(charged).toEqual([]);
+
+    const res = await rpc(access_token, "tools/call", { name: "get_profile", arguments: {} });
+    expect(res.status).toBe(200);
+    expect(res.headers.get("Retry-After")).toBe("240");
+    const out = (await res.json()) as {
+      result: { isError: boolean; content: { type: string; text: string }[] };
+    };
+    expect(out.result.isError).toBe(true);
+    expect(out.result.content[0].text).toMatch(/Rate limit reached/);
+    expect(out.result.content[0].text).toMatch(/about 4 minute/);
+    expect(charged).toEqual([1]);
+  });
+
+  it("charges a batch for every tool call in it", async () => {
+    const { access_token } = await connect("alice");
+    let charged = 0;
+    opts.rateLimit = async (_access, calls) => {
+      charged = calls;
+      return { scope: "student", retryAfterSeconds: 7200 };
+    };
+    const call = (id: number) => ({
+      jsonrpc: "2.0",
+      id,
+      method: "tools/call",
+      params: { name: "get_profile", arguments: {} },
+    });
+    const res = await handleMcpRequest(
+      new Request(RESOURCE, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json, text/event-stream",
+          Authorization: `Bearer ${access_token}`,
+        },
+        body: JSON.stringify([call(1), call(2), { jsonrpc: "2.0", method: "notifications/initialized" }]),
+      }),
+      opts,
+    );
+    expect(charged).toBe(2);
+    const out = (await res.json()) as { id: number; result: { content: { text: string }[] } }[];
+    expect(out.map((r) => r.id)).toEqual([1, 2]);
+    expect(out[0].result.content[0].text).toMatch(/daily limit/);
   });
 });

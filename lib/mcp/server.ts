@@ -7,6 +7,7 @@ import { z } from "zod";
 import { SCOPE_READ, SCOPE_WRITE } from "@/lib/oauth/config";
 import { NotFoundError } from "./store";
 import { ALL_TOOLS, ToolError, type ToolContext, type ToolDef } from "./tools";
+import { budgetSummary } from "./limits";
 
 export const SERVER_NAME = "degree-intelligence";
 export const SERVER_VERSION = "1.0.0";
@@ -20,6 +21,8 @@ export function serverInstructions(canWrite: boolean): string {
     "Look things up when you need them rather than loading everything: get_program_requirements takes one program (any major or certificate, not only the student's) and optionally one requirement, and search_courses returns a compact page with next_offset. To fill a plan semester, call search_courses with fills (the requirement you're targeting), offered_season (the semester's season) and untaken_only, add a pick with add_planned_course, and check the result with get_plan_progress.",
     "",
     "Two places hold courses. The transcript (My Courses: list_courses, add_courses) is what the student has taken or is taking. Plans (Simulator: get_plan, add_planned_course) hold future terms. Progress is reported both ways: get_degree_progress for the transcript, get_plan_progress for a plan's projection. Terms are written \"Fall 2027\"; plans have Fall and Spring only.",
+    "",
+    budgetSummary(),
     "",
     "The numbers come from the app's own rules engine, including Yale's certificate overlap policies. Report them as the app's reading of the requirements, not as an official audit: the student's DUS and Yale's degree audit have the final word.",
     "",

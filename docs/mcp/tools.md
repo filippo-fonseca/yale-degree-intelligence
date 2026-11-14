@@ -19,6 +19,8 @@ Look things up when you need them rather than loading everything: get_program_re
 
 Two places hold courses. The transcript (My Courses: list_courses, add_courses) is what the student has taken or is taking. Plans (Simulator: get_plan, add_planned_course) hold future terms. Progress is reported both ways: get_degree_progress for the transcript, get_plan_progress for a plan's projection. Terms are written "Fall 2027"; plans have Fall and Spring only.
 
+Calls are budgeted: 150 tool calls per 10 minutes for this connection, and 1500 a day across all of the student's connected apps. Plan before calling, reuse what you already fetched, and batch: add_courses and delete_courses take lists, search_courses filters server-side, and get_plan_progress checks a whole plan in one call. If a call says the limit was reached, stop and tell the student when it resets instead of retrying.
+
 The numbers come from the app's own rules engine, including Yale's certificate overlap policies. Report them as the app's reading of the requirements, not as an official audit: the student's DUS and Yale's degree audit have the final word.
 
 Every write tool takes dry_run. Use it to show the student what will change before you commit anything consequential, and always confirm before delete_courses, delete_plan or changing declared programs. Writes are idempotent: repeating one reports no change. Every change you make is listed for the student under Settings > Connected apps.

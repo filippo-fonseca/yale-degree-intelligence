@@ -64,7 +64,7 @@ export default function ConnectPage({ url, tools }: { url: string; tools: ToolSu
             tokenPanel={
               <p className="rounded-lg border border-black/[0.06] bg-gray-50 p-3 text-[12px] text-gray-700 dark:border-white/[0.08] dark:bg-white/[0.03] dark:text-gray-300">
                 Create the token in the app under Settings &gt; Connected apps &gt; Connect a new app
-                &gt; Grok, bots &amp; APIs.{" "}
+                &gt; Bots &amp; APIs.{" "}
                 <Link href="/" className="underline">
                   Open DegreeIntelligence
                 </Link>

@@ -53,6 +53,20 @@ export const CLIENT_GUIDES: ClientGuide[] = [
     note: "OpenAI changes where this lives from time to time. If the menu looks different, search their help for “custom connectors” or “developer mode”.",
   },
   {
+    id: "grok",
+    name: "Grok",
+    auth: "oauth",
+    blurb: "grok.com and the Grok apps, using a custom connector.",
+    link: { label: "Open Grok connectors", href: "https://grok.com/connectors" },
+    steps: [
+      "Open Grok's connectors page (button below) and choose New Connector → Custom.",
+      "Paste the server URL: {url}",
+      "Grok sends you to DegreeIntelligence to sign in and pick read-only or read and write. Approve, and you're back in Grok.",
+      "Ask Grok something like “what do I still need for my major?”",
+    ],
+    note: "Custom connectors may need a paid Grok plan. To use Grok through the xAI API instead, use the Bots & APIs tab.",
+  },
+  {
     id: "claude-code",
     name: "Claude Code",
     auth: "oauth",
@@ -90,13 +104,13 @@ export const CLIENT_GUIDES: ClientGuide[] = [
   },
   {
     id: "token",
-    name: "Grok, bots & APIs",
+    name: "Bots & APIs",
     auth: "token",
-    blurb: "Anything that can't sign in through a browser: Grok through the xAI API, the OpenAI or Anthropic APIs, Discord or Telegram bots, scripts.",
+    blurb: "Anything that can't sign in through a browser: the xAI, OpenAI or Anthropic APIs, Discord or Telegram bots, scripts.",
     steps: [
-      "Create a personal access token below. Name it after what will use it (say, Grok bot) and allow changes only if it needs them.",
+      "Create a personal access token below. Name it after what will use it (say, Discord bot) and allow changes only if it needs them.",
       "The token appears once, with the setups below already filled in. Copy the one that matches your client.",
-      "Grok: send the xAI request below (swap in your own xAI API key). Grok can then call DegreeIntelligence on your behalf.",
+      "xAI API (Grok in your own code): send the request below with your own xAI API key, and Grok can call DegreeIntelligence for you.",
       "Anything else: point it at {url} and send the header Authorization: Bearer <your token>.",
       "Disconnect the token here whenever you like. It also stops working on its own when it expires.",
     ],

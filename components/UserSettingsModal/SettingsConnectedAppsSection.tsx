@@ -284,7 +284,7 @@ function PersonalTokenCreator({ onCreated }: { onCreated: (created: CreatedToken
           value={name}
           maxLength={60}
           onChange={(e) => setName(e.target.value)}
-          placeholder="Name, e.g. Grok bot"
+          placeholder="Name, e.g. Discord bot"
           className="min-w-[10rem] flex-1 rounded-md border border-black/[0.08] bg-transparent px-2 py-1 text-[12px] text-gray-900 outline-none focus:border-gray-400 dark:border-white/[0.1] dark:text-gray-100"
         />
         <select

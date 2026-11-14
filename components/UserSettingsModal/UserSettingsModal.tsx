@@ -18,6 +18,7 @@ import type { UserSettingsModalProps } from "./settingsTypes";
 import { useUserProfileForm } from "./useUserProfileForm";
 import { SettingsProfileSection } from "./SettingsProfileSection";
 import { SettingsAcademicSection } from "./SettingsAcademicSection";
+import { SettingsConnectedAppsSection } from "./SettingsConnectedAppsSection";
 import { SettingsConfirmModals } from "./SettingsConfirmModals";
 
 export default function UserSettingsModal({
@@ -292,6 +293,8 @@ export default function UserSettingsModal({
             />
           </div>
           {/* end two-column section grid */}
+
+          <SettingsConnectedAppsSection />
 
           {/* Footer links */}
           <div className="mt-4 flex items-center justify-center gap-1.5 relative">

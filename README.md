@@ -76,6 +76,9 @@ the one exception: it reads the PDF you upload, and stops there.
   whole time at Yale.
 - **Friends:** compare progress with friends. Courses and distributionals are
   shared; **grades never are.**
+- **Connected apps:** connect Claude, ChatGPT, Grok or any MCP client to your
+  account so it can read your progress and, if you allow it, update your courses
+  and plans. See [docs/mcp](docs/mcp/README.md).
 - Light and dark mode throughout.
 
 ## Tech
@@ -116,6 +119,7 @@ Everything here is required for a working local setup except where noted.
 | `EXTRACT_DAILY_LIMIT` | Optional, default 500. Ceiling on model calls per 24h across all users |
 | `MODEL_CALLS_DISABLED` | Optional. Set to `1` to stop transcript parsing immediately |
 | `RESEND_API_KEY` | Optional, for the contact form. With no provider configured, messages persist to Firestore |
+| `PUBLIC_BASE_URL` | Production origin, e.g. `https://degreeint.com`. Fixes the OAuth issuer for the MCP server; local and preview builds can leave it unset. See [docs/mcp](docs/mcp/README.md) |
 
 The `NEXT_PUBLIC_*` values are public by design: they compile into the client
 bundle and identify the project rather than authorizing anything. Access is

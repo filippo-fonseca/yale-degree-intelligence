@@ -17,9 +17,29 @@ export type Release = {
 
 export const RELEASES: Release[] = [
   {
-    version: "v3.1.0",
+    version: "v3.2.0",
+    name: "Connected apps",
     date: "Fall 2026",
     current: true,
+    summary:
+      "Connect Claude, ChatGPT, Grok or another AI assistant to your account, and let it check your progress or update your plans for you.",
+    sections: [
+      {
+        title: "Connected apps",
+        items: [
+          "You can now connect an AI assistant to DegreeIntelligence. Ask it what you still need for your major, which courses would finish a certificate, or how a plan affects your distributionals, and it answers from the same requirement rules the app uses.",
+          "If you allow it, an assistant can also make changes for you: add courses you have taken, set grades, mark a course as placed out, update your majors and certificates, and build or rearrange plans in the Simulator.",
+          "Connecting is a few steps in Claude, ChatGPT, Claude Code, Cursor and similar apps. Each asks for your permission on a DegreeIntelligence page, where you choose read-only or read and write.",
+          "For assistants that can't sign in through a browser, such as Grok through its API or a bot you built, you can create a personal access token that lasts 7, 30 or 90 days.",
+          "Settings has a new Connected apps section: the address to paste into your assistant, step-by-step instructions for each one, every app you have connected with whether it is active and when it was last used, and a list of the changes apps have made. You can disconnect any app there at any time.",
+          "Assistants can never see your friends' information or delete your account. A public guide to connecting one is at degreeint.com/connect.",
+        ],
+      },
+    ],
+  },
+  {
+    version: "v3.1.0",
+    date: "Fall 2026",
     summary:
       "Yale's year-by-year distributional milestones, drawn the way the college draws them, plus a double-major overlap check that reads your whole plan.",
     sections: [

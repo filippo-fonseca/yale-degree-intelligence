@@ -25,7 +25,7 @@ import {
 } from "@/lib/meetingTimes";
 import toast from "react-hot-toast";
 import { useAuth } from "@/context/AuthContext";
-import { doc, getDoc, setDoc } from "firebase/firestore";
+import { doc, getDoc, onSnapshot, setDoc } from "firebase/firestore";
 import { db } from "@/config/firebase";
 import ManualCourseLookupModal from "./ManualCourseLookupModal";
 import SimulatorManualAssignModal from "./SimulatorManualAssignModal";
@@ -94,13 +94,18 @@ import {
   type SlotRefusal,
 } from "@/lib/utils/plannedCourseAdmission";
 import PlannedCourseBlockedModal from "./PlannedCourseBlockedModal";
+import {
+  buildSimulatorPolicyInputs,
+  collectRequirementOptionCodes,
+  courseMatchesOptionCodes,
+  findMatchedRequirements,
+} from "@/lib/simulatorPolicy";
 import SimulatorMajorOverlapPill from "./SimulatorMajorOverlapPill";
 import MilestoneSnapshot from "@/components/distributional/MilestoneSnapshot";
 import { findSharedMajorCourses } from "@/lib/utils/sharedCourses";
 import { ShinyButton } from "@/components/ui/shiny-button";
 import { playPop } from "@/lib/soundEffects";
 import { isTourActive, useTourActive } from "@/lib/tourState";
-import type { Allocation } from "@/lib/certificatePolicy";
 
 /**
  * The sticky "Quick-add: Pool of remaining courses from your major" card is
@@ -143,205 +148,6 @@ interface SimulatorProps {
 
 type PreviewProgressMap = Record<string, MajorProgress>;
 type CertificatePreviewProgressMap = Record<string, CertificateProgress>;
-
-type MatchedRequirement = {
-  programType: "major" | "certificate";
-  programId: string;
-  programName: string;
-  requirementName: string;
-};
-
-function collectRequirementOptionCodes(
-  requirements: { options: Array<{ type: string; code?: string; options?: string[] }> }[],
-): Set<string> {
-  const codes = new Set<string>();
-  for (const req of requirements) {
-    for (const opt of req.options) {
-      if (opt.type === "course" && opt.code) {
-        codes.add(opt.code);
-        const canon = getCanonicalCode(opt.code);
-        if (canon) codes.add(canon);
-      } else if (opt.type === "group" && opt.options) {
-        for (const code of opt.options) {
-          codes.add(code);
-          const canon = getCanonicalCode(code);
-          if (canon) codes.add(canon);
-        }
-      }
-    }
-  }
-  return codes;
-}
-
-function courseMatchesOptionCodes(
-  courseCode: string,
-  optionCodes: Set<string>,
-): boolean {
-  const canon = getCanonicalCode(courseCode) || courseCode;
-  return optionCodes.has(courseCode) || optionCodes.has(canon);
-}
-
-function findMatchedRequirements(
-  courseCode: string,
-  majorIds: string[],
-  certificateIds: string[],
-): MatchedRequirement[] {
-  const matches: MatchedRequirement[] = [];
-  const canon = getCanonicalCode(courseCode) || courseCode;
-
-  for (const majorId of majorIds) {
-    const major = majorRequirements[majorId];
-    if (!major) continue;
-
-    for (const req of major.requirements) {
-      let found = false;
-      for (const opt of req.options) {
-        if (opt.type === "course") {
-          const optCanon = getCanonicalCode(opt.code) || opt.code;
-          if (
-            opt.code === courseCode ||
-            opt.code === canon ||
-            optCanon === courseCode ||
-            optCanon === canon
-          ) {
-            found = true;
-            break;
-          }
-        } else if (opt.type === "group") {
-          for (const code of (opt as { type: "group"; options: string[] })
-            .options) {
-            const codeCanon = getCanonicalCode(code) || code;
-            if (
-              code === courseCode ||
-              code === canon ||
-              codeCanon === courseCode ||
-              codeCanon === canon
-            ) {
-              found = true;
-              break;
-            }
-          }
-        }
-        if (found) break;
-      }
-      if (found) {
-        matches.push({
-          programType: "major",
-          programId: majorId,
-          programName: major.name,
-          requirementName: req.name,
-        });
-      }
-    }
-  }
-
-  for (const certId of certificateIds) {
-    const cert = certificateRequirements[certId];
-    if (!cert) continue;
-
-    for (const req of cert.requirements) {
-      const optionCodes = collectRequirementOptionCodes([req]);
-      if (courseMatchesOptionCodes(courseCode, optionCodes)) {
-        matches.push({
-          programType: "certificate",
-          programId: certId,
-          programName: cert.name,
-          requirementName: req.name,
-        });
-      }
-    }
-  }
-
-  return matches;
-}
-
-/**
- * Everything the policy engine needs to judge a plan.
- *
- * Plan-scoped assignments live only in simulator state, so they reach the
- * engine as extra allocations: the preview, the assign modal, and the
- * requirements breakdown then all rest on the same picture the student is
- * looking at, and none of them has to work out policy on its own.
- *
- * Planned courses that auto-match a major become major allocations, because
- * auto-matching prefers majors. The ones that only match a certificate are
- * returned separately: they cannot count toward a major at all, which is a
- * blocked code rather than an allocation.
- */
-function buildSimulatorPolicyInputs(
-  majorIds: string[],
-  certificateIds: string[],
-  simulatorManualReqs: ManualRequirementEntry[],
-  plannedCodes: string[],
-): {
-  policyOptions: ProgramClaimOptions;
-  majorManuals: ManualRequirementEntry[];
-  certificateManuals: ManualRequirementEntry[];
-  certificateOnlyPlannedCodes: string[];
-} {
-  const majorManuals = simulatorManualReqs.filter(
-    (m) => m.programType === "major" || !m.programType,
-  );
-  const certificateManuals = simulatorManualReqs.filter(
-    (m) => m.programType === "certificate",
-  );
-
-  // Prefer majors for auto-matched planned courses that hit both catalogs.
-  // Explicit certificate assignment still wins via certificateManuals.
-  const certAssignedCodes = new Set(
-    certificateManuals.map((m) => getCanonicalCode(m.code) || m.code),
-  );
-  const majorAssignedCodes = new Set(
-    majorManuals.map((m) => getCanonicalCode(m.code) || m.code),
-  );
-  const plannedAutoMajorAllocations: Allocation[] = [];
-  const certificateOnlyPlannedCodes: string[] = [];
-  for (const code of plannedCodes) {
-    const canon = getCanonicalCode(code) || code;
-    if (certAssignedCodes.has(canon) || majorAssignedCodes.has(canon)) continue;
-    const matches = findMatchedRequirements(code, majorIds, certificateIds);
-    const majorMatch = matches.find((m) => m.programType === "major");
-    const certMatch = matches.find((m) => m.programType === "certificate");
-    if (majorMatch) {
-      plannedAutoMajorAllocations.push({
-        courseCode: canon,
-        program: { type: "major", id: majorMatch.programId },
-        requirementTitle: majorMatch.requirementName,
-      });
-    } else if (certMatch) {
-      certificateOnlyPlannedCodes.push(canon);
-    }
-  }
-
-  return {
-    policyOptions: {
-      majorIds,
-      certificateIds,
-      extraAllocations: [
-        ...majorManuals.map((m) => ({
-          courseCode: m.code,
-          program: {
-            type: "major" as const,
-            id: m.programId ?? majorIds[0] ?? "",
-          },
-          requirementTitle: m.requirement,
-        })),
-        ...certificateManuals.map((m) => ({
-          courseCode: m.code,
-          program: {
-            type: "certificate" as const,
-            id: m.programId ?? certificateIds[0] ?? "",
-          },
-          requirementTitle: m.requirement,
-        })),
-        ...plannedAutoMajorAllocations,
-      ],
-    },
-    majorManuals,
-    certificateManuals,
-    certificateOnlyPlannedCodes,
-  };
-}
 
 type PlannedCoursePick = Pick<Course, "code" | "status"> & {
   status: "in-progress"; // coerced for preview semantics
@@ -885,6 +691,54 @@ export default function Simulator({
     };
     loadSavedPlans();
   }, [user]);
+
+  // Keep the saved-plan list current while the Simulator is open. A connected
+  // app (Settings > Connected apps) or another tab can add, edit or delete a
+  // plan; every save here rewrites the whole list from this state, so a stale
+  // list would silently undo those changes. The plan on the canvas is the
+  // student's working copy and is never replaced under them.
+  const plansSnapshotRef = useRef<string>("");
+  // Firestore hands maps back with its own key order and without undefined
+  // fields, so compare plans in a canonical form or every save looks remote.
+  const canonical = (value: unknown): string =>
+    JSON.stringify(value, (_key, v) =>
+      v && typeof v === "object" && !Array.isArray(v)
+        ? Object.fromEntries(Object.entries(v).filter(([, x]) => x !== undefined).sort(([a], [b]) => a.localeCompare(b)))
+        : v,
+    );
+  useEffect(() => {
+    if (!user || !plansLoaded) return;
+    const unsubscribe = onSnapshot(
+      doc(db, "users", user.uid),
+      (snap) => {
+        if (snap.metadata.hasPendingWrites) return; // our own save, already in state
+        const plans = ((snap.data() as { savedPlans?: Plan[] } | undefined)?.savedPlans ?? []) as Plan[];
+        const serialized = canonical(plans);
+        if (serialized === plansSnapshotRef.current) return;
+        const first = plansSnapshotRef.current === "";
+        plansSnapshotRef.current = serialized;
+        setSavedPlans((prev) => {
+          if (canonical(prev) === serialized) return prev;
+          const open = first ? null : currentPlanNameRef.current;
+          if (open) {
+            const before = prev.find((p) => p.name === open);
+            const after = plans.find((p) => p.name === open);
+            if (before && canonical(before) !== canonical(after)) {
+              toast(
+                after
+                  ? `"${open}" was changed somewhere else. Open it again from your plans to see the latest version.`
+                  : `"${open}" was deleted somewhere else. Save it to keep what's on your canvas.`,
+                { id: "sim-plan-changed-elsewhere", duration: 6000 },
+              );
+            }
+          }
+          return plans;
+        });
+      },
+      (error) => console.error("Saved plans listener failed:", error),
+    );
+    return unsubscribe;
+  }, [user, plansLoaded]);
 
   // A tour can start while the plan selector is already up (the welcome modal
   // offers "Take the tour"), so closing it on load is not enough.

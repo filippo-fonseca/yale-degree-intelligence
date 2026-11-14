@@ -1,6 +1,6 @@
 # Connecting a client
 
-The server URL is `<origin>/mcp`, e.g. `https://degreeint.com/mcp` in
+The server URL is `<origin>/mcp`, e.g. `https://www.degreeint.com/mcp` in
 production. Settings > Connected apps shows the exact URL for the deployment
 you're on, with a copy button. The same steps live in
 `lib/mcp/clientGuides.ts`, which Settings and `/connect` render, so update that
@@ -23,7 +23,7 @@ have to add it first.
 ## Claude Code
 
 ```bash
-claude mcp add --transport http degree-intelligence https://degreeint.com/mcp
+claude mcp add --transport http degree-intelligence https://www.degreeint.com/mcp
 ```
 
 Then `/mcp` → `degree-intelligence` → Authenticate.
@@ -42,13 +42,13 @@ developer mode.
 `~/.cursor/mcp.json`:
 
 ```json
-{ "mcpServers": { "degree-intelligence": { "url": "https://degreeint.com/mcp" } } }
+{ "mcpServers": { "degree-intelligence": { "url": "https://www.degreeint.com/mcp" } } }
 ```
 
 `.vscode/mcp.json`:
 
 ```json
-{ "servers": { "degree-intelligence": { "type": "http", "url": "https://degreeint.com/mcp" } } }
+{ "servers": { "degree-intelligence": { "type": "http", "url": "https://www.degreeint.com/mcp" } } }
 ```
 
 Both open the consent screen in the browser on first use.
@@ -56,7 +56,7 @@ Both open the consent screen in the browser on first use.
 ## Grok (custom connector)
 
 At grok.com/connectors, choose New Connector > Custom and paste
-`https://degreeint.com/mcp`. Grok signs in through the consent screen like
+`https://www.degreeint.com/mcp`. Grok signs in through the consent screen like
 Claude does. It identifies itself with a client ID metadata document
 (`https://grok.com/oauth/mcp-client.json`) instead of registering, and the
 server accepts it because that registration is pinned in
@@ -67,7 +67,7 @@ entry there.
 
 Create a token in Settings > Connected apps > Connect a new app > Bots &
 APIs. The token appears once, with paste-ready setups (a setup message for
-Grok Bot and other bots configured by chat, xAI request, MCP client config,
+Grok Bot and other bots that add MCP servers from chat, xAI request, MCP client config,
 bare header) already filled in. For Grok Bot, sending the setup message is the
 whole setup: the bot adds the server and stores the token as a secret. Pick a name, read-only or read and write, and 7, 30 or 90 days. It is
 shown once. Then send it as a bearer token.
@@ -78,7 +78,7 @@ xAI and OpenAI Responses API, remote MCP tool:
 {
   "type": "mcp",
   "server_label": "degree-intelligence",
-  "server_url": "https://degreeint.com/mcp",
+  "server_url": "https://www.degreeint.com/mcp",
   "authorization": "dia_…"
 }
 ```
@@ -88,7 +88,7 @@ Anthropic Messages API, MCP connector:
 ```json
 {
   "mcp_servers": [
-    { "type": "url", "url": "https://degreeint.com/mcp", "name": "degree-intelligence", "authorization_token": "dia_…" }
+    { "type": "url", "url": "https://www.degreeint.com/mcp", "name": "degree-intelligence", "authorization_token": "dia_…" }
   ]
 }
 ```
@@ -96,7 +96,7 @@ Anthropic Messages API, MCP connector:
 Anything else:
 
 ```bash
-curl -s https://degreeint.com/mcp \
+curl -s https://www.degreeint.com/mcp \
   -H "Authorization: Bearer $DI_TOKEN" \
   -H "Content-Type: application/json" \
   -H "Accept: application/json, text/event-stream" \

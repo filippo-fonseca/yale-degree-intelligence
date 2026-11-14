@@ -205,6 +205,10 @@ export default function SimulatorGradesSection({
                         const prev =
                           i > 0 ? timeline.terms[i - 1].cumulativeGPA.gpa : null;
                         const isPlanned = t.kind === "planned";
+                        // A term with no grades in it (a distant semester
+                        // nobody has graded yet) has nothing to project, so
+                        // it reads N/A instead of echoing the prior overall.
+                        const ungraded = t.termGPA.gpa == null;
                         return (
                           <div
                             key={t.key}
@@ -230,7 +234,7 @@ export default function SimulatorGradesSection({
                             <span className="text-[10px] text-gray-400 dark:text-gray-500 tabular-nums">
                               term{" "}
                               <span className="text-gray-600 dark:text-gray-300 font-medium">
-                                {fmt(t.termGPA)}
+                                {ungraded ? "N/A" : fmt(t.termGPA)}
                               </span>
                             </span>
                             {/* The second figure is the running cumulative GPA,
@@ -239,12 +243,20 @@ export default function SimulatorGradesSection({
                                 side, so it is labelled like the term figure. */}
                             <span className="flex items-center gap-1 text-[10px] text-gray-400 dark:text-gray-500 tabular-nums">
                               overall
-                              <TrendArrow
-                                curr={t.cumulativeGPA.gpa}
-                                prev={prev}
-                              />
-                              <span className="text-emerald-600 dark:text-emerald-300 font-semibold">
-                                {fmt(t.cumulativeGPA)}
+                              {!ungraded && (
+                                <TrendArrow
+                                  curr={t.cumulativeGPA.gpa}
+                                  prev={prev}
+                                />
+                              )}
+                              <span
+                                className={
+                                  ungraded
+                                    ? "text-gray-500 dark:text-gray-400 font-medium"
+                                    : "text-emerald-600 dark:text-emerald-300 font-semibold"
+                                }
+                              >
+                                {ungraded ? "N/A" : fmt(t.cumulativeGPA)}
                               </span>
                             </span>
                           </div>

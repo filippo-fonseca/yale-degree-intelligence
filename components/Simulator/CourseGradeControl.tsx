@@ -18,7 +18,8 @@ export default function CourseGradeControl({
 }: CourseGradeControlProps) {
   return (
     <select
-      value={value ?? ""}
+      // A transcript's "In Progress" placeholder is not a grade; show it as unset.
+      value={value != null && value in gradePoints ? value : ""}
       disabled={disabled}
       onChange={(e) => onChange(e.target.value === "" ? null : e.target.value)}
       title="Projected grade"

@@ -78,15 +78,16 @@ const buckets = new Map<string, { count: number; resetAt: number }>();
 function inMemoryRateLimit(
   key: string,
   limit: number,
-  windowMs: number
+  windowMs: number,
+  cost = 1
 ): NextResponse | null {
   const now = Date.now();
   const entry = buckets.get(key);
   if (!entry || now >= entry.resetAt) {
-    buckets.set(key, { count: 1, resetAt: now + windowMs });
-    return null;
+    buckets.set(key, { count: cost, resetAt: now + windowMs });
+    return cost > limit ? tooManyRequests(windowMs) : null;
   }
-  entry.count += 1;
+  entry.count += cost;
   if (entry.count > limit) return tooManyRequests(entry.resetAt - now);
   return null;
 }
@@ -110,9 +111,11 @@ function inMemoryRateLimit(
 export async function rateLimit(
   key: string,
   limit: number,
-  windowMs: number
+  windowMs: number,
+  /** Units this request spends; a batch of N calls costs N. */
+  cost = 1
 ): Promise<NextResponse | null> {
-  if (!adminDb) return inMemoryRateLimit(key, limit, windowMs);
+  if (!adminDb) return inMemoryRateLimit(key, limit, windowMs, cost);
 
   const now = Date.now();
   const windowStart = Math.floor(now / windowMs) * windowMs;
@@ -126,7 +129,7 @@ export async function rateLimit(
     const count = await adminDb.runTransaction(async (tx) => {
       const snap = await tx.get(ref);
       const current = snap.exists ? Number(snap.data()?.count) || 0 : 0;
-      const next = current + 1;
+      const next = current + cost;
       tx.set(
         ref,
         {
@@ -144,6 +147,6 @@ export async function rateLimit(
     // Never fail a request because the limiter itself broke. Falling back to
     // the in-memory bucket is weaker but still better than no limit at all.
     console.error("Rate limit check failed; falling back to in-memory:", error);
-    return inMemoryRateLimit(key, limit, windowMs);
+    return inMemoryRateLimit(key, limit, windowMs, cost);
   }
 }

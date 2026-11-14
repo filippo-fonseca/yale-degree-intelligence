@@ -3,7 +3,13 @@ import { adminDb } from "@/config/firebaseAdmin";
 import { isAuthError, rateLimit, requireAuth } from "@/lib/apiAuth";
 import { oauthDeps } from "@/lib/oauth";
 import { mcpResourceUrl } from "@/lib/oauth/config";
-import { listConnections, revokeAllConnections, revokeConnection } from "@/lib/oauth/service";
+import {
+  OAuthError,
+  createPersonalToken,
+  listConnections,
+  revokeAllConnections,
+  revokeConnection,
+} from "@/lib/oauth/service";
 import { FirestoreAuditLog } from "@/lib/mcp/audit";
 
 export const dynamic = "force-dynamic";
@@ -45,6 +51,49 @@ export async function GET(req: NextRequest) {
     },
     { headers: { "Cache-Control": "no-store" } },
   );
+}
+
+/**
+ * Create a personal access token for a client that can't run OAuth (the Grok
+ * API, a bot, a script). The token is returned once and only its hash is kept.
+ *
+ * Body: { name: string, scopes: string[], days: number }
+ * Reply: { token, connectionId, scopes, expiresAt }
+ */
+export async function POST(req: NextRequest) {
+  const auth = await requireAuth(req, { checkRevoked: true });
+  if (isAuthError(auth)) return auth;
+  const limited = await rateLimit(`connections-token:${auth.uid}`, 20, 60 * 60 * 1000);
+  if (limited) return limited;
+
+  const deps = oauthDeps(req);
+  if (!deps) {
+    return NextResponse.json({ error: "Connecting apps is not configured" }, { status: 503 });
+  }
+  let body: { name?: unknown; scopes?: unknown; days?: unknown };
+  try {
+    body = await req.json();
+  } catch {
+    return NextResponse.json({ error: "Invalid request" }, { status: 400 });
+  }
+  try {
+    const result = await createPersonalToken(deps, {
+      uid: auth.uid,
+      email: auth.email ?? "",
+      name: typeof body.name === "string" ? body.name : "",
+      scopes: Array.isArray(body.scopes)
+        ? body.scopes.filter((s): s is string => typeof s === "string")
+        : [],
+      days: typeof body.days === "number" ? body.days : NaN,
+    });
+    return NextResponse.json(result, { headers: { "Cache-Control": "no-store" } });
+  } catch (error) {
+    if (error instanceof OAuthError) {
+      return NextResponse.json({ error: error.description }, { status: 400 });
+    }
+    console.error("[connections] personal token failed", error);
+    return NextResponse.json({ error: "Something went wrong" }, { status: 500 });
+  }
 }
 
 /** Body: { id: string } to disconnect one app, or { all: true } for every app. */

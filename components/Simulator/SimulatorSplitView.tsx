@@ -19,6 +19,18 @@ import type { SimulatorView } from "./SimulatorViewSwitcher";
 const DIVIDER_PX = 12;
 const CANVAS_PANE_ID = "sim-split-canvas";
 
+/** The element the Simulator scrolls inside: the dashboard's content panel in
+ *  the app, or null when the page itself scrolls. */
+function scrollParentOf(el: HTMLElement): HTMLElement | null {
+  for (let p = el.parentElement; p; p = p.parentElement) {
+    const { overflowY } = getComputedStyle(p);
+    if (overflowY === "auto" || overflowY === "scroll" || overflowY === "overlay") {
+      return p;
+    }
+  }
+  return null;
+}
+
 function safeLocalStorage(): Storage | null {
   try {
     return typeof window === "undefined" ? null : window.localStorage;
@@ -58,6 +70,9 @@ export default function SimulatorSplitView({
   // measured, which splitRatioBounds treats as "use the outer bounds".
   const [paneWidth, setPaneWidth] = useState(0);
   const [dragging, setDragging] = useState(false);
+  // Height of whatever the Simulator scrolls inside. The dashboard scrolls a
+  // content panel shorter than the viewport, so 100dvh would overshoot it.
+  const [viewportHeight, setViewportHeight] = useState<number | null>(null);
   const storageKey = splitRatioStorageKey(uid);
 
   const isSplit = view === "split";
@@ -79,6 +94,26 @@ export default function SimulatorSplitView({
     const ro = new ResizeObserver(measure);
     ro.observe(el);
     return () => ro.disconnect();
+  }, [isSplit]);
+
+  useEffect(() => {
+    if (!isSplit) return;
+    const el = containerRef.current;
+    if (!el) return;
+    const parent = scrollParentOf(el);
+    const measure = () =>
+      setViewportHeight(parent ? parent.clientHeight : window.innerHeight);
+    measure();
+    window.addEventListener("resize", measure);
+    let ro: ResizeObserver | null = null;
+    if (parent && typeof ResizeObserver !== "undefined") {
+      ro = new ResizeObserver(measure);
+      ro.observe(parent);
+    }
+    return () => {
+      window.removeEventListener("resize", measure);
+      ro?.disconnect();
+    };
   }, [isSplit]);
 
   const bounds = splitRatioBounds(paneWidth);
@@ -189,16 +224,19 @@ export default function SimulatorSplitView({
       className="sticky flex min-w-0"
       style={{
         top: topOffset + 8,
-        // Fills the viewport below the toolbar, so each pane scrolls on its
-        // own instead of the page growing to the taller of the two.
-        height: `calc(100dvh - ${topOffset + 16}px)`,
+        // Fills the visible scroll area below the toolbar, so each pane
+        // scrolls on its own instead of the page growing to the taller one.
+        height:
+          viewportHeight != null
+            ? Math.max(320, viewportHeight - topOffset - 16)
+            : `calc(100dvh - ${topOffset + 16}px)`,
       }}
     >
       <section
         id={CANVAS_PANE_ID}
         aria-label="Canvas"
         data-sim-split-pane="canvas"
-        className="min-w-0 shrink-0 overflow-y-auto overflow-x-hidden pr-2 pb-6 [container-type:inline-size] [scrollbar-gutter:stable]"
+        className="sim-split-pane min-w-0 shrink-0 overflow-y-auto overflow-x-hidden pr-2 pb-6 [container-type:inline-size] [scrollbar-gutter:stable]"
         style={{ flexBasis: basis(shown), transition: flexTransition }}
       >
         <div className="space-y-4">{canvas}</div>
@@ -248,7 +286,7 @@ export default function SimulatorSplitView({
       <section
         aria-label="Projected progress + results"
         data-sim-split-pane="progress"
-        className="min-w-0 flex-1 overflow-y-auto overflow-x-hidden pl-2 pb-6 [container-type:inline-size] [scrollbar-gutter:stable]"
+        className="sim-split-pane min-w-0 flex-1 overflow-y-auto overflow-x-hidden pl-2 pb-6 [container-type:inline-size] [scrollbar-gutter:stable]"
       >
         {progress}
       </section>

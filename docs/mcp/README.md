@@ -28,6 +28,26 @@ uses; the server never calls a model.
 | Limits | 300 calls per 10 minutes per connection |
 | Out of scope | Friends data, account deletion, sign-in settings |
 
+## Keeping responses small
+
+Agents pay for every token a tool returns, so nothing hands over a whole
+dataset by default:
+
+- `list_programs` returns ids and names only, and takes a `query`.
+- `get_program_requirements` takes one program (any major or certificate, not
+  only the student's) and optionally one `requirement`. The biggest program is
+  about 3.5 KB.
+- `search_courses` returns 15 compact results at a time with `next_offset`, out of
+  roughly 6,600 courses. `fills` narrows it to one program's requirement,
+  `untaken_only` drops the student's transcript and planned courses, and
+  `offered_season` and `min_level`/`max_level` narrow it further.
+- `get_degree_progress` caps example options at 12 per requirement and has
+  `summary_only`. `get_course_details` returns one term's meeting times.
+
+The usual plan-building loop is `get_plan` → `get_plan_progress` →
+`search_courses` (with `fills`, `offered_season`, `untaken_only`) →
+`add_planned_course` → `get_plan_progress`.
+
 ## How a request flows
 
 ```text

@@ -206,9 +206,11 @@ export default function SimulatorProgressPane({
       </div>
 
       {/* GPA timeline and distributionals, always on in this view. Side by
-          side once the pane itself has room for both, stacked otherwise. */}
+          side once the pane itself is laptop-wide (about 830px, which keeps the
+          full Progress tab as it was); stacked in a narrower Split pane, where
+          two columns would squeeze the milestone chart into a sideways scroll. */}
       <div className="[container-type:inline-size]">
-        <div className="grid grid-cols-1 [@container(min-width:44rem)]:grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 [@container(min-width:52rem)]:grid-cols-2 gap-3">
           <SimulatorGradesSection terms={gpaTimelineTerms} />
           <SimulatorDistributionalsSection
             assignments={distributionalAssignments}

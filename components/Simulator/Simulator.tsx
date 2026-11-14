@@ -25,7 +25,7 @@ import {
 } from "@/lib/meetingTimes";
 import toast from "react-hot-toast";
 import { useAuth } from "@/context/AuthContext";
-import { doc, getDoc, setDoc } from "firebase/firestore";
+import { doc, getDoc, onSnapshot, setDoc } from "firebase/firestore";
 import { db } from "@/config/firebase";
 import ManualCourseLookupModal from "./ManualCourseLookupModal";
 import SimulatorManualAssignModal from "./SimulatorManualAssignModal";
@@ -691,6 +691,54 @@ export default function Simulator({
     };
     loadSavedPlans();
   }, [user]);
+
+  // Keep the saved-plan list current while the Simulator is open. A connected
+  // app (Settings > Connected apps) or another tab can add, edit or delete a
+  // plan; every save here rewrites the whole list from this state, so a stale
+  // list would silently undo those changes. The plan on the canvas is the
+  // student's working copy and is never replaced under them.
+  const plansSnapshotRef = useRef<string>("");
+  // Firestore hands maps back with its own key order and without undefined
+  // fields, so compare plans in a canonical form or every save looks remote.
+  const canonical = (value: unknown): string =>
+    JSON.stringify(value, (_key, v) =>
+      v && typeof v === "object" && !Array.isArray(v)
+        ? Object.fromEntries(Object.entries(v).filter(([, x]) => x !== undefined).sort(([a], [b]) => a.localeCompare(b)))
+        : v,
+    );
+  useEffect(() => {
+    if (!user || !plansLoaded) return;
+    const unsubscribe = onSnapshot(
+      doc(db, "users", user.uid),
+      (snap) => {
+        if (snap.metadata.hasPendingWrites) return; // our own save, already in state
+        const plans = ((snap.data() as { savedPlans?: Plan[] } | undefined)?.savedPlans ?? []) as Plan[];
+        const serialized = canonical(plans);
+        if (serialized === plansSnapshotRef.current) return;
+        const first = plansSnapshotRef.current === "";
+        plansSnapshotRef.current = serialized;
+        setSavedPlans((prev) => {
+          if (canonical(prev) === serialized) return prev;
+          const open = first ? null : currentPlanNameRef.current;
+          if (open) {
+            const before = prev.find((p) => p.name === open);
+            const after = plans.find((p) => p.name === open);
+            if (before && canonical(before) !== canonical(after)) {
+              toast(
+                after
+                  ? `"${open}" was changed somewhere else. Open it again from your plans to see the latest version.`
+                  : `"${open}" was deleted somewhere else. Save it to keep what's on your canvas.`,
+                { id: "sim-plan-changed-elsewhere", duration: 6000 },
+              );
+            }
+          }
+          return plans;
+        });
+      },
+      (error) => console.error("Saved plans listener failed:", error),
+    );
+    return unsubscribe;
+  }, [user, plansLoaded]);
 
   // A tour can start while the plan selector is already up (the welcome modal
   // offers "Take the tour"), so closing it on load is not enough.

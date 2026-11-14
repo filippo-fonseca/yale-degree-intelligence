@@ -215,6 +215,32 @@ service cloud.firestore {
       allow read, write: if false;
     }
 
+    // OAuth for the DegreeIntelligence MCP server (lib/oauth). Clients,
+    // codes, grants and tokens hold only hashes of secrets, but even those are
+    // nobody's business but the server's. Students see their connections
+    // through /api/connections, which checks ownership.
+    match /oauth_clients/{clientId} {
+      allow read, write: if false;
+    }
+
+    match /oauth_codes/{codeHash} {
+      allow read, write: if false;
+    }
+
+    match /oauth_grants/{grantId} {
+      allow read, write: if false;
+    }
+
+    match /oauth_tokens/{tokenHash} {
+      allow read, write: if false;
+    }
+
+    // What connected apps changed, per student. Written by /mcp and read back
+    // for the owner by /api/connections, both through the Admin SDK.
+    match /mcp_audit/{userId}/{document=**} {
+      allow read, write: if false;
+    }
+
     match /contact_messages/{docId} {
       allow read, write: if false;
     }

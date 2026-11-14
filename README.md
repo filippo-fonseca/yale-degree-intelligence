@@ -78,8 +78,54 @@ the one exception: it reads the PDF you upload, and stops there.
   shared; **grades never are.**
 - **Connected apps:** connect Claude, ChatGPT, Grok or any MCP client to your
   account so it can read your progress and, if you allow it, update your courses
-  and plans. See [docs/mcp](docs/mcp/README.md).
+  and plans. See [Connect an AI assistant](#connect-an-ai-assistant-mcp).
 - Light and dark mode throughout.
+
+## Connect an AI assistant (MCP)
+
+DegreeIntelligence runs an [MCP](https://modelcontextprotocol.io) server at
+**`https://degreeint.com/mcp`**. Connect your own assistant and it can answer
+from your real transcript and plans ("what do I still need for my major?",
+"which courses would finish a certificate?") and, if you allow it, update your
+courses, profile and Simulator plans. The server itself never calls a model:
+every answer comes from the same deterministic engines the app uses.
+
+**Apps that sign in (no token to copy).** Add a custom connector with the URL
+above, then approve on the DegreeIntelligence screen, where you pick read-only
+or read and write.
+
+| Client | Where |
+| --- | --- |
+| Claude | [claude.ai/settings/connectors](https://claude.ai/settings/connectors) → Add custom connector |
+| ChatGPT | Settings → Apps & Connectors → Developer mode → Create, auth OAuth |
+| Grok | [grok.com/connectors](https://grok.com/connectors) → New Connector → Custom |
+| Claude Code | `claude mcp add --transport http degree-intelligence https://degreeint.com/mcp`, then `/mcp` → Authenticate |
+| Cursor / VS Code | `{ "mcpServers": { "degree-intelligence": { "url": "https://degreeint.com/mcp" } } }` in `mcp.json` |
+
+**Bots and APIs (personal access token).** In Settings → Connected apps →
+Bots & APIs, create a token (read-only or read and write, 7, 30 or 90 days). It
+appears once, with paste-ready setups already filled in:
+
+- **Grok Bot or any bot you set up by chat:** copy the *Bot setup message* and
+  send it to the bot. It adds the server and stores the token itself.
+- **xAI, OpenAI or Anthropic APIs:** pass the URL as a remote MCP tool with the
+  token as its authorization.
+- **Anything else:** send `Authorization: Bearer <token>` to the URL.
+
+The token only ever travels in that header, never in a URL.
+
+**What it can and can't do.** 12 read tools (progress, distributionals, course
+search, program requirements, plans) and, with write access, 16 more (courses,
+grades, placements, plan edits; every write supports `dry_run`). It can never
+see friends' data, delete your account, or change sign-in settings. Fair use is
+150 tool calls per 10 minutes per connection and 1,500 a day per student.
+Connections and a log of every change an app made are in Settings → Connected
+apps, where you can disconnect any of them.
+
+More: [overview](docs/mcp/README.md) · [tool reference](docs/mcp/tools.md) ·
+[connecting each client](docs/mcp/clients.md) ·
+[operations](docs/mcp/operations.md) · public guide at
+[degreeint.com/connect](https://degreeint.com/connect).
 
 ## Tech
 

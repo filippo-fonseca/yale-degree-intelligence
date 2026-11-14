@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { FiAlertTriangle, FiChevronDown, FiExternalLink, FiKey } from "react-icons/fi";
 import { useAuth } from "@/context/AuthContext";
@@ -183,11 +183,19 @@ function NewTokenPanel({
 }) {
   const [copied, setCopied] = useState(false);
   const [confirmDismiss, setConfirmDismiss] = useState(false);
+  const panelRef = useRef<HTMLDivElement>(null);
+
+  // The panel renders near the top of the section while the creator sits at
+  // the bottom, so bring it into view or it can appear off-screen.
+  useEffect(() => {
+    panelRef.current?.scrollIntoView({ block: "nearest", behavior: "smooth" });
+  }, [created.token]);
   const guide = CLIENT_GUIDES.find((g) => g.auth === "token");
   const snippets = guide?.snippets ?? [];
 
   return (
     <div
+      ref={panelRef}
       role="status"
       className="mt-2.5 rounded-lg border border-emerald-500/25 bg-emerald-50 p-2.5 dark:bg-emerald-500/[0.06]"
     >
@@ -195,7 +203,7 @@ function NewTokenPanel({
         Your token for {created.name} is ready. Copy it now: you won&apos;t see it again.
       </p>
       <div className="mt-2 flex items-center gap-2 rounded-md border border-black/[0.06] bg-white px-2 py-1.5 dark:border-white/[0.08] dark:bg-black/30">
-        <code className="min-w-0 flex-1 break-all font-mono text-[11px] text-gray-800 dark:text-gray-200">
+        <code className="min-w-0 flex-1 select-all break-all font-mono text-[11px] text-gray-800 dark:text-gray-200">
           {created.token}
         </code>
         <CopyButton value={created.token} label="Copy token" onCopied={() => setCopied(true)} />
@@ -411,16 +419,16 @@ export function SettingsConnectedAppsSection() {
         </p>
       )}
 
+      {created && data && (
+        <NewTokenPanel created={created} serverUrl={data.serverUrl} onDismiss={() => setCreated(null)} />
+      )}
+
       {state === "ready" && data && (
         <>
           <div className="mt-2.5">
             <p className="mb-1 text-[10px] uppercase tracking-wide text-gray-400">Server URL</p>
             <ServerUrlRow url={data.serverUrl} />
           </div>
-
-          {created && (
-            <NewTokenPanel created={created} serverUrl={data.serverUrl} onDismiss={() => setCreated(null)} />
-          )}
 
           {connections.length > 0 ? (
             <ul className="mt-2 divide-y divide-black/[0.05] dark:divide-white/[0.06]">
@@ -450,6 +458,7 @@ export function SettingsConnectedAppsSection() {
                   <PersonalTokenCreator
                     onCreated={(token) => {
                       setCreated(token);
+                      setShowGuide(true);
                       void load();
                     }}
                   />

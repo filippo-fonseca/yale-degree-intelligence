@@ -6,6 +6,7 @@ import { WebStandardStreamableHTTPServerTransport } from "@modelcontextprotocol/
 import { SCOPE_READ, SCOPE_WRITE } from "@/lib/oauth/config";
 import { verifyAccessToken, type AccessContext, type OAuthDeps } from "@/lib/oauth/service";
 import { CORS_HEADERS } from "@/lib/oauth/http";
+import { limitMessage, type LimitHit } from "./limits";
 import { createMcpServer } from "./server";
 import type { ToolContext } from "./tools";
 
@@ -14,8 +15,11 @@ export type McpHandlerOptions = {
   /** URL clients fetch to learn which authorization server to use (RFC 9728). */
   resourceMetadataUrl: string;
   context: (access: AccessContext) => ToolContext;
-  /** Returns a response to send instead (429) when the grant is over its limit. */
-  rateLimit?: (access: AccessContext) => Promise<Response | null>;
+  /**
+   * Charges `calls` tool calls to the budget. Returns which limit was hit, or
+   * null when the calls may run.
+   */
+  rateLimit?: (access: AccessContext, calls: number) => Promise<LimitHit | null>;
 };
 
 function withCors(res: Response): Response {
@@ -30,6 +34,41 @@ function bearerToken(req: Request): string | null {
   if (!header) return null;
   const [scheme, value] = header.split(" ");
   return scheme?.toLowerCase() === "bearer" && value ? value.trim() : null;
+}
+
+type RpcMessage = { jsonrpc?: string; id?: string | number | null; method?: string };
+
+/** The tools/call messages in a request body, and whether it was a batch. */
+async function toolCalls(req: Request): Promise<{ calls: RpcMessage[]; batch: boolean }> {
+  const parsed = (await req
+    .clone()
+    .json()
+    .catch(() => null)) as RpcMessage | RpcMessage[] | null;
+  const batch = Array.isArray(parsed);
+  const messages = batch ? parsed : parsed ? [parsed] : [];
+  return {
+    calls: messages.filter((m) => m && typeof m === "object" && m.method === "tools/call"),
+    batch,
+  };
+}
+
+/**
+ * A refused call answered as a tool result with isError, not as an HTTP 429:
+ * clients hand tool results to the model, while a transport error often
+ * reaches it as a bare failure with no reason and no time to wait.
+ */
+function limitedResponse(calls: RpcMessage[], hit: LimitHit, batch: boolean): Response {
+  const results = calls.map((m) => ({
+    jsonrpc: "2.0",
+    id: m.id ?? null,
+    result: { content: [{ type: "text", text: limitMessage(hit) }], isError: true },
+  }));
+  return withCors(
+    new Response(JSON.stringify(batch ? results : results[0]), {
+      status: 200,
+      headers: { "Content-Type": "application/json", "Retry-After": String(hit.retryAfterSeconds) },
+    }),
+  );
 }
 
 function challenge(
@@ -63,8 +102,15 @@ export async function handleMcpRequest(req: Request, opts: McpHandlerOptions): P
     return withCors(new Response(null, { status: 405, headers: { Allow: "POST, OPTIONS" } }));
   }
 
-  const limited = await opts.rateLimit?.(access);
-  if (limited) return withCors(limited);
+  // Only tool calls are charged: the handshake and tools/list stay free, so a
+  // client reconnecting or refreshing its tool list costs nothing.
+  if (opts.rateLimit) {
+    const { calls, batch } = await toolCalls(req);
+    if (calls.length > 0) {
+      const hit = await opts.rateLimit(access, calls.length);
+      if (hit) return limitedResponse(calls, hit, batch);
+    }
+  }
 
   const server = createMcpServer(opts.context(access));
   const transport = new WebStandardStreamableHTTPServerTransport({

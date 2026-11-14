@@ -2252,8 +2252,12 @@ export default function Simulator({
             onClear={resetSimulator}
           />
 
-          {/* Semesters Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3" data-tour="simulator-board">
+          {/* Semesters Grid. Columns follow the width the grid actually has
+              (a container query on the wrapper), not the viewport, so it
+              reflows as the Split divider moves as well as when the window
+              resizes. */}
+          <div className="[container-type:inline-size]">
+          <div className="grid grid-cols-1 [@container(min-width:34rem)]:grid-cols-2 [@container(min-width:54rem)]:grid-cols-3 gap-3" data-tour="simulator-board">
             {semesters.map((semester) => {
               const semCredits = getSemesterCredits(semester);
               const semCreditsLabel = Number.isInteger(semCredits)
@@ -2565,6 +2569,7 @@ export default function Simulator({
                 </motion.div>
               );
             })}
+          </div>
           </div>
         </>
         }

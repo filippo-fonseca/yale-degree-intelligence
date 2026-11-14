@@ -66,8 +66,10 @@ entry there.
 ## Bots and API agents (personal access token)
 
 Create a token in Settings > Connected apps > Connect a new app > Bots &
-APIs. The token appears once, with paste-ready setups (xAI request, MCP client
-config, bare header) already filled in. Pick a name, read-only or read and write, and 7, 30 or 90 days. It is
+APIs. The token appears once, with paste-ready setups (a setup message for
+Grok Bot and other bots configured by chat, xAI request, MCP client config,
+bare header) already filled in. For Grok Bot, sending the setup message is the
+whole setup: the bot adds the server and stores the token as a secret. Pick a name, read-only or read and write, and 7, 30 or 90 days. It is
 shown once. Then send it as a bearer token.
 
 xAI and OpenAI Responses API, remote MCP tool:

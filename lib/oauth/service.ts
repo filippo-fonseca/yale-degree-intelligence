@@ -697,6 +697,8 @@ export type ConnectionSummary = {
   lastUsedAt: number | null;
   status: ConnectionStatus;
   revokedAt: number | null;
+  /** When it stops working: the token's expiry, or the refresh token's for OAuth. */
+  expiresAt: number;
 };
 
 /** Used within this window counts as active; otherwise idle until it expires. */
@@ -727,6 +729,7 @@ export async function listConnections(
       lastUsedAt: g.lastUsedAt ?? null,
       status: connectionStatus(g, t),
       revokedAt: g.revokedAt ?? null,
+      expiresAt: g.refreshExpiresAt,
     }))
     .sort((a, b) => (b.lastUsedAt ?? b.connectedAt) - (a.lastUsedAt ?? a.connectedAt));
 }

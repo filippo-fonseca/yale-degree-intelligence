@@ -1,9 +1,16 @@
 import { z } from "zod";
-import { ALL_COURSES, getCourseInfo } from "@/lib/courseCatalog";
+import {
+  ALL_COURSES,
+  getCourseInfo,
+  isCourseOfferedInFall,
+  isCourseOfferedInSpring,
+  resolveCanonicalCode,
+  type CourseInfo,
+} from "@/lib/courseCatalog";
 import { MAJORS, majorRequirements } from "@/lib/majors";
 import { CERTIFICATES, certificateRequirements } from "@/lib/certificates";
 import { computeGPA } from "@/lib/gpa";
-import { isCurrentTerm, isPastTerm } from "@/lib/academicTerm";
+import { compareTermNames, currentTermName, isCurrentTerm, isPastTerm } from "@/lib/academicTerm";
 import { getCertificateProgress, getMajorProgress } from "@/components/dashboard/getMajorProgress";
 import { buildDistributionalTallyInputs } from "@/lib/simulatorMilestones";
 import { tallyDistributionals, type DistTallyResult } from "@/lib/distributionalTally";
@@ -185,47 +192,168 @@ export const getDistributionalProgress = defineTool({
   },
 });
 
+type RequirementLike = { name: string; options: Array<Record<string, unknown>> };
+
+/** What satisfies one requirement: explicit codes, and distributional rules. */
+function requirementMatcher(req: RequirementLike) {
+  const codes = new Set<string>();
+  const distributional: Array<{ tags: string[]; exclude: string[] }> = [];
+  for (const o of req.options) {
+    if (o.type === "course") codes.add(resolveCanonicalCode(o.code as string));
+    else if (o.type === "group") (o.options as string[]).forEach((c) => codes.add(resolveCanonicalCode(c)));
+    else if (o.type === "distributional") {
+      distributional.push({ tags: o.tags as string[], exclude: ((o.excludeSubjects as string[]) ?? []).map((x) => x.toUpperCase()) });
+    }
+  }
+  return (course: CourseInfo) => {
+    if (codes.has(course.codes[0]) || course.codes.some((c) => codes.has(c))) return true;
+    return distributional.some(
+      (d) =>
+        (course.distributionals ?? []).some((t) => d.tags.includes(t)) &&
+        !course.codes.some((c) => d.exclude.includes(c.split(" ")[0].toUpperCase())),
+    );
+  };
+}
+
+function courseNumber(code: string): number | null {
+  const n = Number.parseInt(code.split(" ")[1] ?? "", 10);
+  return Number.isFinite(n) ? n : null;
+}
+
 export const searchCourses = defineTool({
   name: "search_courses",
   title: "Search the Yale course catalog",
   description:
-    "Searches the catalog the app uses (Fall 2023 to Spring 2027) by code or title words, with optional filters. Returns canonical codes to pass to other tools.",
+    "Finds courses in the catalog the app uses (Fall 2023 to Spring 2027), a page at a time, so you never need the whole catalog. Combine filters: words or a code, subject, distributional, level, term or season offered, and `fills` to get only courses that count toward a requirement of ANY major or certificate (not just the student's). For building or editing a Simulator plan, set untaken_only to skip what the student has taken or already planned, and offered_season to match the semester you're filling. Results are compact by default; page with offset.",
   scope: "read",
   annotations: READ_ONLY,
   input: {
     query: z.string().optional().describe('Code or words from the title, e.g. "CPSC 323" or "machine learning".'),
     subject: z.string().optional().describe('Subject code, e.g. "CPSC".'),
     distributional: z.enum(DISTRIBUTIONAL_CODES).optional(),
+    min_level: z.number().int().optional().describe("Lowest course number, e.g. 3000."),
+    max_level: z.number().int().optional().describe("Highest course number, e.g. 4999."),
     offered_in: z.string().optional().describe('A catalog term, e.g. "Spring 2027".'),
-    limit: z.number().int().min(1).max(50).optional().describe("Default 20."),
+    offered_season: z
+      .enum(["fall", "spring"])
+      .optional()
+      .describe("Usually offered in this season. Use it for plan terms past the catalog."),
+    fills: z
+      .object({
+        program_type: programType,
+        program_id: z.string().describe("Any id from list_programs."),
+        requirement: z.string().optional().describe("One requirement name. Default: any requirement of the program."),
+      })
+      .optional()
+      .describe("Only courses that count toward this program's requirements, as the app encodes them."),
+    untaken_only: z
+      .boolean()
+      .optional()
+      .describe("Skip courses on the transcript (taken, in progress or placed out) and courses already in the plan."),
+    plan_name: z.string().optional().describe("The plan untaken_only checks. Default: the default plan."),
+    detail: z.enum(["compact", "full"]).optional().describe("full adds cross-listings and every catalog term. Default compact."),
+    offset: z.number().int().min(0).optional().describe("Skip this many matches. Use next_offset from the last page."),
+    limit: z.number().int().min(1).max(50).optional().describe("Default 15."),
   },
-  run: async (_ctx, args) => {
+  run: async (ctx, args) => {
     const q = args.query?.trim().toLowerCase().replace(/\s+/g, " ");
     const words = q ? q.split(" ") : [];
     const compactQ = q?.replace(/\s/g, "");
-    const matches = ALL_COURSES.filter((c) => {
-      if (args.subject && !c.codes.some((code) => code.toUpperCase().startsWith(`${args.subject!.toUpperCase()} `))) return false;
-      if (args.distributional && !(c.distributionals ?? []).includes(args.distributional)) return false;
-      if (args.offered_in && !c.offered.includes(args.offered_in)) return false;
-      if (!q) return true;
-      if (c.codes.some((code) => code.toLowerCase().replace(/\s/g, "").startsWith(compactQ!))) return true;
-      const hay = c.name.toLowerCase();
-      return words.every((w) => hay.includes(w));
-    });
-    const limit = args.limit ?? 20;
+    const subject = args.subject?.trim().toUpperCase();
+
+    let fillsMatchers: Array<{ name: string; test: (c: CourseInfo) => boolean }> | null = null;
+    if (args.fills) {
+      const program = requireProgram(args.fills.program_type, args.fills.program_id);
+      const reqs: RequirementLike[] = program.requirements as unknown as RequirementLike[];
+      const wanted = args.fills.requirement?.toLowerCase();
+      const picked = wanted ? reqs.filter((r) => r.name.toLowerCase() === wanted) : reqs;
+      if (picked.length === 0) {
+        throw new ToolError(
+          `${program.name} has no requirement "${args.fills.requirement}". Requirements: ${reqs.map((r) => `"${r.name}"`).join(", ")}.`,
+        );
+      }
+      fillsMatchers = picked.map((r) => ({ name: r.name, test: requirementMatcher(r) }));
+    }
+
+    let exclude: Set<string> | null = null;
+    if (args.untaken_only) {
+      const { user, courses } = await loadAll(ctx);
+      exclude = new Set(courses.map((c) => resolveCanonicalCode(c.code)));
+      const plans = user?.savedPlans ?? [];
+      if (plans.length > 0) {
+        const plan = findPlan(plans, args.plan_name);
+        for (const s of plan.semesters) for (const c of s.courses) exclude.add(resolveCanonicalCode(c.code));
+      }
+    }
+
+    const results: Array<{ course: CourseInfo; codeHit: boolean; fills: string[] }> = [];
+    for (const c of ALL_COURSES) {
+      if (subject && !c.codes.some((code) => code.toUpperCase().startsWith(`${subject} `))) continue;
+      if (args.distributional && !(c.distributionals ?? []).includes(args.distributional)) continue;
+      if (args.offered_in && !c.offered.includes(args.offered_in)) continue;
+      if (args.offered_season === "fall" && !isCourseOfferedInFall(c.codes[0])) continue;
+      if (args.offered_season === "spring" && !isCourseOfferedInSpring(c.codes[0])) continue;
+      if (args.min_level != null || args.max_level != null) {
+        const n = courseNumber(c.codes[0]);
+        if (n == null) continue;
+        if (args.min_level != null && n < args.min_level) continue;
+        if (args.max_level != null && n > args.max_level) continue;
+      }
+      if (exclude && c.codes.some((code) => exclude!.has(code))) continue;
+      let codeHit = false;
+      if (q) {
+        codeHit = c.codes.some((code) => code.toLowerCase().replace(/\s/g, "").startsWith(compactQ!));
+        if (!codeHit && !words.every((w) => c.name.toLowerCase().includes(w))) continue;
+      }
+      let fills: string[] = [];
+      if (fillsMatchers) {
+        fills = fillsMatchers.filter((m) => m.test(c)).map((m) => m.name);
+        if (fills.length === 0) continue;
+      }
+      results.push({ course: c, codeHit, fills });
+    }
+    if (q) results.sort((a, b) => Number(b.codeHit) - Number(a.codeHit));
+
+    const now = ctx.now();
+    const current = currentTermName(now);
+    const offset = args.offset ?? 0;
+    const limit = args.limit ?? 15;
+    const page = results.slice(offset, offset + limit);
+    const full = args.detail === "full";
     return {
-      total_matches: matches.length,
-      courses: matches.slice(0, limit).map((c) => ({
+      total_matches: results.length,
+      offset,
+      next_offset: offset + limit < results.length ? offset + limit : null,
+      courses: page.map(({ course: c, fills }) => ({
         code: c.codes[0],
-        also_listed_as: c.codes.slice(1),
         name: c.name,
         credits: c.credits,
         distributionals: c.distributionals ?? [],
-        offered: c.offered,
+        seasons: [
+          ...(isCourseOfferedInFall(c.codes[0]) ? ["Fall"] : []),
+          ...(isCourseOfferedInSpring(c.codes[0]) ? ["Spring"] : []),
+        ],
+        next_offered: [...c.offered].sort(compareTermNames).find((t) => compareTermNames(t, current) >= 0) ?? null,
+        ...(fillsMatchers && !args.fills?.requirement ? { fills } : {}),
+        ...(full ? { also_listed_as: c.codes.slice(1), offered: c.offered } : {}),
       })),
     };
   },
 });
+
+/** One term's sections rather than every term's, which can run long. */
+function meetingsFor(info: CourseInfo | undefined, term: string | undefined, now: Date) {
+  const all = info?.meetings ?? {};
+  const terms = Object.keys(all).sort(compareTermNames);
+  const current = currentTermName(now);
+  const pick = term ?? terms.find((t) => compareTermNames(t, current) >= 0) ?? terms[terms.length - 1];
+  const sections = pick ? all[pick] : undefined;
+  return {
+    meetings_term: sections ? pick : null,
+    meetings: (sections ?? []).map((s) => ({ section: s.section, type: s.type, meets: s.meets })),
+    terms_with_meetings: terms,
+  };
+}
 
 export const getCourseDetails = defineTool({
   name: "get_course_details",
@@ -234,7 +362,13 @@ export const getCourseDetails = defineTool({
     "Catalog details for one course (cross-listings, credits, distributionals, terms offered, meeting times), plus where it sits for this student: on the transcript, on the default plan, and which of their requirements it could fill.",
   scope: "read",
   annotations: READ_ONLY,
-  input: { code: z.string().describe('e.g. "CPSC 323".') },
+  input: {
+    code: z.string().describe('e.g. "CPSC 323".'),
+    meetings_term: z
+      .string()
+      .optional()
+      .describe('Meeting times for this term, e.g. "Spring 2027". Default: the next term it is offered.'),
+  },
   run: async (ctx, args) => {
     const { code, known } = normalizeCode(args.code);
     const info = getCourseInfo(code);
@@ -257,14 +391,7 @@ export const getCourseDetails = defineTool({
       credits: info?.credits ?? null,
       distributionals: info?.distributionals ?? [],
       offered: info?.offered ?? [],
-      meetings: info?.meetings
-        ? Object.fromEntries(
-            Object.entries(info.meetings).map(([term, sections]) => [
-              term,
-              (sections ?? []).map((s) => ({ section: s.section, type: s.type, meets: s.meets })),
-            ]),
-          )
-        : {},
+      ...meetingsFor(info, args.meetings_term, ctx.now()),
       student: {
         on_transcript: onTranscript,
         planned_in_default_plan: plannedIn,
@@ -282,7 +409,8 @@ export const getCourseDetails = defineTool({
 export const listPrograms = defineTool({
   name: "list_programs",
   title: "List Yale majors and certificates",
-  description: "Every major and certificate the app models, with the ids other tools take.",
+  description:
+    "Ids and names of the majors and certificates the app models (names only, no requirements). Pass `query` to narrow it, e.g. \"computer\". Then use get_program_requirements for one program.",
   scope: "read",
   annotations: READ_ONLY,
   input: {
@@ -307,12 +435,22 @@ export const getProgramRequirements = defineTool({
   name: "get_program_requirements",
   title: "Get a program's requirements",
   description:
-    "The full requirement list of a major or certificate as the app encodes it: each requirement's name, how many it needs and the courses or groups that satisfy it. Requirement names are what set_requirement_assignment takes.",
+    "The requirements of any major or certificate (declared or not) as the app encodes it: each requirement's name, how many it needs and the courses or groups that satisfy it. Fetch one program at a time, or one requirement with `requirement`. To find courses that fill a requirement, prefer search_courses with `fills`. Requirement names are what set_requirement_assignment takes.",
   scope: "read",
   annotations: READ_ONLY,
-  input: { program_type: programType, program_id: z.string() },
+  input: {
+    program_type: programType,
+    program_id: z.string().describe("Any id from list_programs, declared or not."),
+    requirement: z.string().optional().describe("Only this requirement. Default: all of them."),
+  },
   run: async (_ctx, args) => {
     const program = requireProgram(args.program_type, args.program_id);
+    const allReqs: Array<{ name: string }> = program.requirements;
+    const wanted = args.requirement?.toLowerCase();
+    const reqs = wanted ? allReqs.filter((r) => r.name.toLowerCase() === wanted) : allReqs;
+    if (wanted && reqs.length === 0) {
+      throw new ToolError(`${program.name} has no requirement "${args.requirement}". Requirements: ${allReqs.map((r) => `"${r.name}"`).join(", ")}.`);
+    }
     const cert = args.program_type === "certificate" ? certificateRequirements[args.program_id] : null;
     return {
       program_type: args.program_type,
@@ -323,7 +461,7 @@ export const getProgramRequirements = defineTool({
       ...(cert
         ? { requires_application: !!cert.requiresApplication, notes: cert.notes ?? [], source_url: cert.sourceUrl ?? null }
         : {}),
-      requirements: program.requirements.map((r) => ({
+      requirements: (reqs as typeof program.requirements).map((r) => ({
         name: r.name,
         description: r.description ?? null,
         required: r.required,

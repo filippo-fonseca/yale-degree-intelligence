@@ -132,6 +132,60 @@ describe("read tools", () => {
   });
 });
 
+describe("on-demand lookups", () => {
+  it("pages search results instead of returning the catalog", async () => {
+    const first = await ok(ctxFor("alice"), "search_courses", { subject: "CPSC", limit: 5 });
+    expect(first.courses).toHaveLength(5);
+    expect(first.total_matches).toBeGreaterThan(5);
+    expect(first.next_offset).toBe(5);
+    expect(first.courses[0]).not.toHaveProperty("offered");
+    const second = await ok(ctxFor("alice"), "search_courses", { subject: "CPSC", limit: 5, offset: 5 });
+    expect(second.courses[0].code).not.toBe(first.courses[0].code);
+  });
+
+  it("finds courses that fill a requirement of a program the student hasn't declared", async () => {
+    const res = await ok(ctxFor("alice"), "search_courses", {
+      fills: { program_type: "major", program_id: "ECON_BA", requirement: "Introductory Microeconomics" },
+    });
+    expect(res.total_matches).toBeGreaterThan(0);
+    expect(res.courses.some((c: { code: string }) => c.code.startsWith("ECON"))).toBe(true);
+    const any = await ok(ctxFor("alice"), "search_courses", {
+      fills: { program_type: "major", program_id: "CPSC_BS" },
+      query: "algorithms",
+    });
+    expect(any.courses.find((c: { code: string }) => c.code === "CPSC 3650").fills).toContain("Algorithms");
+    const bad = await call(ctxFor("alice"), "search_courses", {
+      fills: { program_type: "major", program_id: "ECON_BA", requirement: "Nope" },
+    });
+    expect(bad.isError).toBe(true);
+    expect(bad.text).toMatch(/Introductory Microeconomics/);
+  });
+
+  it("skips taken and planned courses when building a plan", async () => {
+    const ctx = ctxFor("alice");
+    const all = await ok(ctx, "search_courses", { subject: "CPSC", max_level: 3299, limit: 50 });
+    const codes = all.courses.map((c: { code: string }) => c.code);
+    expect(codes).toEqual(expect.arrayContaining(["CPSC 2010", "CPSC 2230", "CPSC 3230"]));
+    await ok(ctx, "create_plan", { name: "Main" });
+    await ok(ctx, "add_planned_course", { code: "CPSC 3650", term: "Spring 2027" });
+    const untaken = await ok(ctx, "search_courses", { subject: "CPSC", limit: 50, untaken_only: true, max_level: 3999 });
+    const left = untaken.courses.map((c: { code: string }) => c.code);
+    for (const taken of ["CPSC 2010", "CPSC 2230", "CPSC 3230", "CPSC 3650"]) expect(left).not.toContain(taken);
+  });
+
+  it("filters by season and returns one program's single requirement", async () => {
+    const spring = await ok(ctxFor("alice"), "search_courses", { subject: "CPSC", offered_season: "spring", limit: 50 });
+    expect(spring.courses.every((c: { seasons: string[] }) => c.seasons.includes("Spring"))).toBe(true);
+    const one = await ok(ctxFor("alice"), "get_program_requirements", {
+      program_type: "major",
+      program_id: "ECON_BA",
+      requirement: "econometrics",
+    });
+    expect(one.requirements).toHaveLength(1);
+    expect(one.requirements[0].name).toBe("Econometrics");
+  });
+});
+
 describe("transcript writes", () => {
   it("adds courses idempotently and replaces a changed grade", async () => {
     const ctx = ctxFor("alice");

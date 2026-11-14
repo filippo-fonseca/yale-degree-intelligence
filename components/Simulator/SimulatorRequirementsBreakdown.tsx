@@ -830,7 +830,7 @@ function ReqSection({
         </span>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
+      <div className="grid grid-cols-1 [@container(min-width:30rem)]:grid-cols-2 gap-1.5">
         {reqs.map((req) => {
           const manuals = manualReqs.filter((m) => m.requirement === req.name);
           const conflicts = policy?.conflicts.get(req.name) ?? [];

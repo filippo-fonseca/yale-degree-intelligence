@@ -87,9 +87,9 @@ npx vitest run lib/oauth lib/mcp
 
 ## Known limits
 
-- The Simulator loads saved plans once when it opens and saves whole plans, so a
-  plan edited by an assistant while the Simulator is open in a tab can be
-  overwritten by the next save in that tab. Reloading the Simulator picks up the
-  assistant's changes.
+- The Simulator listens for changes to saved plans, so its next save no longer
+  undoes a plan an assistant added or edited. The plan on the canvas is still
+  the student's working copy: if an assistant edits that same plan, the student
+  sees a notice, and saving from the canvas keeps the canvas version.
 - Progress is the app's reading of Yale's rules, not an official degree audit.
   The server instructions tell agents to say so.

@@ -33,6 +33,8 @@ export const RELEASES: Release[] = [
           "For assistants that can't sign in through a browser, such as Grok through its API or a bot you built, you can create a personal access token that lasts 7, 30 or 90 days.",
           "Settings has a new Connected apps section: the address to paste into your assistant, step-by-step instructions for each one, every app you have connected with whether it is active and when it was last used, and a list of the changes apps have made. You can disconnect any app there at any time.",
           "Assistants can never see your friends' information or delete your account. A public guide to connecting one is at degreeint.com/connect.",
+          "Grok now connects the same way Claude does: add a custom connector at grok.com with the DegreeIntelligence address and approve it, with no token to copy.",
+          "A new personal access token now stays on screen until you close it, along with ready-to-paste setups that already include it. Before, it could disappear before you had a chance to copy it.",
         ],
       },
     ],

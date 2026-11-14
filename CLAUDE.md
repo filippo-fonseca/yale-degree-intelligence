@@ -33,11 +33,27 @@
   addresses. Never commit one, never paste addresses into a PR, issue, or chat.
 
 ## No AI features in the product
-The Dan advisor and the per-user MCP server were removed in July 2026. DI is a
+The Dan advisor and the original per-user MCP server were removed in July 2026. DI is a
 deterministic degree tool: every course, requirement, and pace number comes from
 `lib/majors.ts`, `lib/courseCatalog.ts`, and the certificate policy engine, and
 nothing calls a model at request time. Transcript parsing on `/api/extract` is
 the one exception, and it stays scoped to parsing.
 
-Do not reintroduce a chat surface, a BYOK key store, or an MCP endpoint without
-an explicit decision to do so. GitHub issue #37 (Dan) is closed by that removal.
+Do not reintroduce a chat surface or a BYOK key store without an explicit
+decision to do so. GitHub issue #37 (Dan) is closed by that removal.
+
+### The MCP server (decided November 2026)
+Filippo decided in November 2026 to bring back an MCP server so students can
+connect their own assistants (Claude, ChatGPT, Grok, Cursor, bots) to their
+account. It lives at `/mcp` (`lib/mcp/`, `lib/oauth/`, docs in `docs/mcp/`) and
+keeps the rule above: every tool is a deterministic wrapper over the same
+engines the app uses, the server never calls a model, and no student API keys
+are stored. Access is OAuth 2.1 (PKCE, dynamic client registration) or a
+personal access token, scoped `degree:read` / `degree:write`, revocable from
+Settings > Connected apps, and every write is audited to `mcp_audit/{uid}`.
+
+Rules for new tools:
+- Bind to the token's student through `DegreeStore`. Never accept a uid argument.
+- Writes go through `performWrite`, take `dry_run`, and are idempotent.
+- Friends data and account deletion stay out of the tool surface.
+- Regenerate the reference: `UPDATE_MCP_DOCS=1 npx vitest run lib/mcp/toolDocs.test.ts`.

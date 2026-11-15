@@ -307,20 +307,15 @@ function CreditsMeter({
       {compact ? (
         // Narrow panes cannot hold "Credits for promotion: 8" without
         // truncating it, so compact says the same thing in four words.
+        // The earned/required count was dropped: the bars already show what
+        // is met, planned, and missing, and the bare number read as noise.
         <div className="flex items-baseline gap-1 text-[9px] whitespace-nowrap">
           <span className="text-gray-500 dark:text-gray-400">{required} cr</span>
-          <span className="text-gray-300 dark:text-gray-600">·</span>
-          <span className="font-mono text-gray-700 dark:text-gray-300">
-            {round(earned)}/{required}
-          </span>
         </div>
       ) : (
-        <div className="flex items-baseline justify-between gap-1">
+        <div className="flex items-baseline gap-1">
           <span className="text-[10px] text-gray-500 dark:text-gray-400 truncate">
             {label}
-          </span>
-          <span className="text-[10px] font-mono text-gray-700 dark:text-gray-300 shrink-0">
-            {round(earned)}/{required}
           </span>
         </div>
       )}

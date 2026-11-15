@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FiChevronDown, FiChevronUp, FiX, FiAlertTriangle } from "react-icons/fi";
 import { getCanonicalCode, normalizeCourseCode } from "@/lib/courseCatalog";
@@ -244,7 +244,27 @@ interface SimulatorRequirementsBreakdownProps {
   /** The plan's engine inputs, built once in the Simulator. */
   policyOptions: ProgramClaimOptions;
   onRemoveManualReq: (code: string, requirement: string) => void;
+  /**
+   * A requirement to bring into view, sent from a canvas card's badge. The
+   * matching program card opens, the row scrolls into view, and it glows for
+   * a few seconds. `nonce` makes a second click on the same row fire again.
+   */
+  focusRequest?: RequirementFocusRequest | null;
 }
+
+export type RequirementFocusRequest = {
+  /** `major-<id>` or `cert-<id>`, the same key the cards use. */
+  programKey: string;
+  requirement: string;
+  nonce: number;
+};
+
+/** How long a focused requirement row stays highlighted. */
+const FOCUS_HIGHLIGHT_MS = 2600;
+
+/** DOM key for a requirement row, so a focus request can find it. */
+export const requirementRowKey = (programKey: string, requirement: string) =>
+  `${programKey}::${requirement}`;
 
 export default function SimulatorRequirementsBreakdown({
   majorIds,
@@ -257,8 +277,41 @@ export default function SimulatorRequirementsBreakdown({
   courses,
   policyOptions,
   onRemoveManualReq,
+  focusRequest,
 }: SimulatorRequirementsBreakdownProps) {
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
+  const [highlightKey, setHighlightKey] = useState<string | null>(null);
+
+  // Open the requested program, wait for its rows to exist (the card animates
+  // open, and the pane may have just mounted), then scroll and highlight.
+  useEffect(() => {
+    if (!focusRequest) return;
+    const { programKey, requirement } = focusRequest;
+    setExpanded((prev) =>
+      prev[programKey] ? prev : { ...prev, [programKey]: true },
+    );
+    const key = requirementRowKey(programKey, requirement);
+    let attempts = 0;
+    let findTimer: ReturnType<typeof setTimeout> | undefined;
+    let clearTimer: ReturnType<typeof setTimeout> | undefined;
+    const find = () => {
+      const row = Array.from(
+        document.querySelectorAll<HTMLElement>("[data-sim-req-row]"),
+      ).find((el) => el.dataset.simReqRow === key);
+      if (row) {
+        row.scrollIntoView({ behavior: "smooth", block: "center" });
+        setHighlightKey(key);
+        clearTimer = setTimeout(() => setHighlightKey(null), FOCUS_HIGHLIGHT_MS);
+        return;
+      }
+      if (++attempts < 30) findTimer = setTimeout(find, 60);
+    };
+    findTimer = setTimeout(find, 60);
+    return () => {
+      clearTimeout(findTimer);
+      clearTimeout(clearTimer);
+    };
+  }, [focusRequest]);
 
   /**
    * What the audit says about each certificate in this plan.
@@ -427,6 +480,7 @@ export default function SimulatorRequirementsBreakdown({
           accent="purple"
           manualReqs={manualForProgram}
           isOpen={!!expanded[`major-${majorId}`]}
+          highlightKey={highlightKey}
           onToggle={() => toggle(`major-${majorId}`)}
           isPlanned={isPlanned}
           plannedSemesterFor={plannedSemesterFor}
@@ -461,6 +515,7 @@ export default function SimulatorRequirementsBreakdown({
           accent="teal"
           manualReqs={manualForProgram}
           isOpen={!!expanded[`cert-${certId}`]}
+          highlightKey={highlightKey}
           onToggle={() => toggle(`cert-${certId}`)}
           isPlanned={isPlanned}
           plannedSemesterFor={plannedSemesterFor}
@@ -536,6 +591,8 @@ function GroupLabel({
 }
 
 function ProgramProgressCard({
+  programKey,
+  highlightKey,
   title,
   prog,
   accent,
@@ -548,6 +605,7 @@ function ProgramProgressCard({
   policy,
 }: {
   programKey: string;
+  highlightKey: string | null;
   title: string;
   prog: ProgressData;
   accent: Accent;
@@ -729,6 +787,8 @@ function ProgramProgressCard({
                   isPlanned={isPlanned}
                   plannedSemesterFor={plannedSemesterFor}
                   policy={policy}
+                  programKey={programKey}
+                  highlightKey={highlightKey}
                 />
               )}
 
@@ -742,6 +802,8 @@ function ProgramProgressCard({
                   isPlanned={isPlanned}
                   plannedSemesterFor={plannedSemesterFor}
                   policy={policy}
+                  programKey={programKey}
+                  highlightKey={highlightKey}
                 />
               )}
 
@@ -755,6 +817,8 @@ function ProgramProgressCard({
                   isPlanned={isPlanned}
                   plannedSemesterFor={plannedSemesterFor}
                   policy={policy}
+                  programKey={programKey}
+                  highlightKey={highlightKey}
                   showCombinedProgress
                 />
               )}
@@ -769,6 +833,8 @@ function ProgramProgressCard({
                   isPlanned={isPlanned}
                   plannedSemesterFor={plannedSemesterFor}
                   policy={policy}
+                  programKey={programKey}
+                  highlightKey={highlightKey}
                 />
               )}
 
@@ -798,7 +864,11 @@ function ReqSection({
   plannedSemesterFor,
   policy,
   showCombinedProgress = false,
+  programKey,
+  highlightKey,
 }: {
+  programKey: string;
+  highlightKey: string | null;
   title: string;
   reqs: CompletedRequirement[];
   color: "green" | "blue" | "amber" | "red";
@@ -848,13 +918,21 @@ function ReqSection({
           const isIncomplete =
             showCombinedProgress && displayCredits < req.required;
 
+          const rowKey = requirementRowKey(programKey, req.name);
+          const highlighted = highlightKey === rowKey;
+
           return (
             <div
               key={req.name}
-              className={`px-2.5 py-1.5 rounded-lg bg-gray-50 dark:bg-gray-800/30 border ${
-                isIncomplete
-                  ? "border-red-500/50"
-                  : "border-gray-200 dark:border-gray-800/40"
+              data-sim-req-row={rowKey}
+              className={`px-2.5 py-1.5 rounded-lg border transition-[background-color,box-shadow,border-color] duration-500 ${
+                highlighted
+                  ? "bg-purple-50 dark:bg-purple-500/10 border-purple-400 dark:border-purple-400/60 ring-2 ring-purple-400/50 dark:ring-purple-400/40"
+                  : `bg-gray-50 dark:bg-gray-800/30 ${
+                      isIncomplete
+                        ? "border-red-500/50"
+                        : "border-gray-200 dark:border-gray-800/40"
+                    }`
               }`}
             >
               <div className="flex items-center justify-between mb-1">

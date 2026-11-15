@@ -36,6 +36,7 @@ export const RELEASES: Release[] = [
           "Grok now connects the same way Claude does: add a custom connector at grok.com with the DegreeIntelligence address and approve it, with no token to copy.",
           "A new personal access token now stays on screen until you close it, along with ready-to-paste setups that already include it. Before, it could disappear before you had a chance to copy it.",
           "Setting up Grok Bot or another bot you talk to is now one paste: create a token and copy the setup message, which already has the address and your token in it, then send it to the bot.",
+          "Copying a new token works again in browsers that block the usual copy method, and the new token now scrolls into view instead of appearing out of sight. If copying still fails, the button tells you to select it and copy by hand.",
           "Connected apps have a fair-use limit: 150 actions every 10 minutes per app and 1,500 a day across all of them. If an assistant reaches it, it is told how long to wait, and you can keep using DegreeIntelligence yourself as normal.",
         ],
       },

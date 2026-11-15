@@ -84,7 +84,7 @@ the one exception: it reads the PDF you upload, and stops there.
 ## Connect an AI assistant (MCP)
 
 DegreeIntelligence runs an [MCP](https://modelcontextprotocol.io) server at
-**`https://degreeint.com/mcp`**. Connect your own assistant and it can answer
+**`https://www.degreeint.com/mcp`**. Connect your own assistant and it can answer
 from your real transcript and plans ("what do I still need for my major?",
 "which courses would finish a certificate?") and, if you allow it, update your
 courses, profile and Simulator plans. The server itself never calls a model:
@@ -99,15 +99,17 @@ or read and write.
 | Claude | [claude.ai/settings/connectors](https://claude.ai/settings/connectors) → Add custom connector |
 | ChatGPT | Settings → Apps & Connectors → Developer mode → Create, auth OAuth |
 | Grok | [grok.com/connectors](https://grok.com/connectors) → New Connector → Custom |
-| Claude Code | `claude mcp add --transport http degree-intelligence https://degreeint.com/mcp`, then `/mcp` → Authenticate |
-| Cursor / VS Code | `{ "mcpServers": { "degree-intelligence": { "url": "https://degreeint.com/mcp" } } }` in `mcp.json` |
+| Claude Code | `claude mcp add --transport http degree-intelligence https://www.degreeint.com/mcp`, then `/mcp` → Authenticate |
+| Cursor / VS Code | `{ "mcpServers": { "degree-intelligence": { "url": "https://www.degreeint.com/mcp" } } }` in `mcp.json` |
 
 **Bots and APIs (personal access token).** In Settings → Connected apps →
 Bots & APIs, create a token (read-only or read and write, 7, 30 or 90 days). It
 appears once, with paste-ready setups already filled in:
 
-- **Grok Bot or any bot you set up by chat:** copy the *Bot setup message* and
-  send it to the bot. It adds the server and stores the token itself.
+- **Grok Bot or any bot that can add MCP servers from chat:** copy the *Grok
+  Bot message* and send it to the bot. It adds the server and stores the token
+  itself. Claude and ChatGPT chats can't do this, so use their connector above
+  instead and never paste a token into them.
 - **xAI, OpenAI or Anthropic APIs:** pass the URL as a remote MCP tool with the
   token as its authorization.
 - **Anything else:** send `Authorization: Bearer <token>` to the URL.

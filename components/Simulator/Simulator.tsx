@@ -103,6 +103,11 @@ import {
   findMatchedRequirements,
 } from "@/lib/simulatorPolicy";
 import SimulatorMajorOverlapPill from "./SimulatorMajorOverlapPill";
+import CourseRequirementBadge from "./CourseRequirementBadge";
+import {
+  buildCourseRequirementIndex,
+  requirementsForCourse,
+} from "@/lib/simulatorRequirementBadges";
 import MilestoneSnapshot from "@/components/distributional/MilestoneSnapshot";
 import { findSharedMajorCourses } from "@/lib/utils/sharedCourses";
 import { ShinyButton } from "@/components/ui/shiny-button";
@@ -292,6 +297,25 @@ export default function Simulator({
     useState<CertificatePreviewProgressMap>({});
   const [isPreviewLoading, setIsPreviewLoading] = useState<boolean>(false);
   const [previewError, setPreviewError] = useState<string | null>(null);
+
+  // Which requirements each course on the canvas counts toward, read straight
+  // off the preview so the card badge and the Projected progress pane agree.
+  const courseRequirementIndex = useMemo(
+    () =>
+      buildCourseRequirementIndex([
+        {
+          programType: "major",
+          progress: previewProgress,
+          nameOf: (id) => MAJORS[id],
+        },
+        {
+          programType: "certificate",
+          progress: certificatePreviewProgress,
+          nameOf: (id) => CERTIFICATES[id],
+        },
+      ]),
+    [previewProgress, certificatePreviewProgress],
+  );
 
   // Profile distributional preferences (mirrors the users/{uid} doc fields the
   // main DistributionalProgress reads); used to seed the sim from real courses.
@@ -2498,6 +2522,12 @@ export default function Simulator({
                               )}
                             </div>
                             <div className="flex items-center shrink-0">
+                              <CourseRequirementBadge
+                                hits={requirementsForCourse(
+                                  courseRequirementIndex,
+                                  course.code,
+                                )}
+                              />
                               <span
                                 className="ml-1.5 text-[10px] tabular-nums whitespace-nowrap opacity-60"
                                 title="Credits"

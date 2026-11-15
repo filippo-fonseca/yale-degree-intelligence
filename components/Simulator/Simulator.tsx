@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef, useMemo } from "react";
+import React, { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   FiChevronDown,
@@ -30,6 +30,7 @@ import { db } from "@/config/firebase";
 import ManualCourseLookupModal from "./ManualCourseLookupModal";
 import SimulatorManualAssignModal from "./SimulatorManualAssignModal";
 import SimulatorRequirementsBreakdown, {
+  type RequirementFocusRequest,
   COMPLETION_FULL_PCT,
   projectedCompletionPct,
 } from "./SimulatorRequirementsBreakdown";
@@ -103,10 +104,14 @@ import {
   findMatchedRequirements,
 } from "@/lib/simulatorPolicy";
 import SimulatorMajorOverlapPill from "./SimulatorMajorOverlapPill";
-import CourseRequirementBadge from "./CourseRequirementBadge";
+import CourseRequirementBadge, {
+  type RequirementDotKind,
+} from "./CourseRequirementBadge";
+import SimulatorRequirementLegend from "./SimulatorRequirementLegend";
 import {
   buildCourseRequirementIndex,
   requirementsForCourse,
+  type CourseRequirementHit,
 } from "@/lib/simulatorRequirementBadges";
 import MilestoneSnapshot from "@/components/distributional/MilestoneSnapshot";
 import { findSharedMajorCourses } from "@/lib/utils/sharedCourses";
@@ -316,6 +321,35 @@ export default function Simulator({
       ]),
     [previewProgress, certificatePreviewProgress],
   );
+
+  // Which marker kinds the canvas is showing, in key order, for the legend.
+  const requirementLegendKinds = useMemo<RequirementDotKind[]>(() => {
+    const seen = new Set<RequirementDotKind>();
+    courseRequirementIndex.forEach((hits) => {
+      const hasMajor = hits.some((h) => h.programType === "major");
+      const hasCert = hits.some((h) => h.programType === "certificate");
+      seen.add(hasMajor && hasCert ? "both" : hasMajor ? "major" : "certificate");
+    });
+    return (["major", "certificate", "both"] as const).filter((k) => seen.has(k));
+  }, [courseRequirementIndex]);
+
+  // Clicking a requirement in a card's badge tooltip jumps to that row in
+  // Projected progress. Split already shows the pane, so it stays put; the
+  // Canvas tab switches over. The pane opens if it was collapsed.
+  const [requirementFocus, setRequirementFocus] =
+    useState<RequirementFocusRequest | null>(null);
+  const focusRequirement = useCallback((hit: CourseRequirementHit) => {
+    setActiveView((v) => (v === "split" ? v : "progress"));
+    setShowMajorPreview(true);
+    setRequirementFocus({
+      programKey:
+        hit.programType === "major"
+          ? `major-${hit.programId}`
+          : `cert-${hit.programId}`,
+      requirement: hit.requirement,
+      nonce: Date.now(),
+    });
+  }, []);
 
   // Profile distributional preferences (mirrors the users/{uid} doc fields the
   // main DistributionalProgress reads); used to seed the sim from real courses.
@@ -2275,6 +2309,7 @@ export default function Simulator({
             onSave={quickSave}
             onClear={resetSimulator}
           />
+          <SimulatorRequirementLegend kinds={requirementLegendKinds} />
 
           {/* Semesters Grid. Columns follow the width the grid actually has
               (a container query on the wrapper), not the viewport, so it
@@ -2496,7 +2531,16 @@ export default function Simulator({
                           }
                         >
                           <div className="flex items-center justify-between w-full">
-                            <div>
+                            <div className="flex items-start min-w-0">
+                              <CourseRequirementBadge
+                                hits={requirementsForCourse(
+                                  courseRequirementIndex,
+                                  course.code,
+                                )}
+                                reserveSpace={courseRequirementIndex.size > 0}
+                                onSelectRequirement={focusRequirement}
+                              />
+                              <div className="min-w-0">
                               {course.code}
                               <span className="text-[10px] opacity-60 ml-1">
                                 {getCourseNameFromCode(course.code) ?? ""}
@@ -2520,14 +2564,9 @@ export default function Simulator({
                                   )}
                                 </span>
                               )}
+                              </div>
                             </div>
                             <div className="flex items-center shrink-0">
-                              <CourseRequirementBadge
-                                hits={requirementsForCourse(
-                                  courseRequirementIndex,
-                                  course.code,
-                                )}
-                              />
                               <span
                                 className="ml-1.5 text-[10px] tabular-nums whitespace-nowrap opacity-60"
                                 title="Credits"
@@ -2632,6 +2671,7 @@ export default function Simulator({
               simulatorManualReqs={simulatorManualReqs}
               courses={takenForProjection}
               policyOptions={policyOptions}
+              focusRequest={requirementFocus}
               onRemoveManualReq={(code, requirement) => {
                 setSimulatorManualReqs((prev) =>
                   prev.filter(

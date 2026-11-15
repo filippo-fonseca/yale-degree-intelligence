@@ -44,6 +44,7 @@ export const RELEASES: Release[] = [
         items: [
           "On a laptop or larger screen, the Simulator has a new Split view that shows the Canvas and Projected progress + results side by side, so you can watch your progress, GPA and distributionals update as you plan. Drag the divider between them to resize, or double-click it to reset. Your split is remembered on that device.",
           "The semester grid now fits its columns to the space it has, so it stays readable in a narrow Split pane as well as on smaller windows.",
+          "Courses on the Simulator canvas that count toward one of your majors or certificates now show a small check. Hover over it, or tap it on a phone, to see which program and which requirement the course fills. Purple means a major, teal a certificate.",
         ],
       },
     ],

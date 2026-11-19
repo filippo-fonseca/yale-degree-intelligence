@@ -5,7 +5,7 @@
 These are one-time steps an operator has to do. None of them is automated by
 this branch.
 
-1. **Set `PUBLIC_BASE_URL=https://degreeint.com`** in the Vercel production
+1. **Set `PUBLIC_BASE_URL=https://www.degreeint.com`** in the Vercel production
    environment. It fixes the OAuth issuer and the resource URL, so neither ever
    depends on a request's Host header. Previews can leave it unset and use their
    own origin.
